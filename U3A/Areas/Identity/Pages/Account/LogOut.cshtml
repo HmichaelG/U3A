@@ -9,7 +9,7 @@
         if (SignInManager.IsSignedIn(User)) {
             await SignInManager.SignOutAsync();
         }
-        
+
         return Redirect("~/closed.html");
     }
 

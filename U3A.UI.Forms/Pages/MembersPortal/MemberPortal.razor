@@ -52,11 +52,11 @@ else {
                 break;
 
             case PortalMenuSelection.DoEditMemberEnrolment:
-                <MemberEnrolment DbContext="dbc"
+                <MemberEnrolment
                      IsReadOnly=false OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                 break;
             case PortalMenuSelection.DoViewMemberEnrolment:
-                <MemberEnrolment DbContext="dbc"
+                <MemberEnrolment
                      IsReadOnly=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                 break;
             case PortalMenuSelection.DoShowLeaderMenu:

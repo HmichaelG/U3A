@@ -34,10 +34,20 @@ namespace U3A.Controllers
         }
 
         public string GetOrCreateUploadFolder() {
-            var path = Path.Combine(ContentRootPath, "uploads");
+            var pathname = "uploads";
+            var path = Path.Combine(ContentRootPath, pathname);
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+            DeleteOldTempFiles(path);
             return path;
         }
+        private void DeleteOldTempFiles(string dirName) {
+            Directory.GetFiles(dirName)
+                 .Select(f => new FileInfo(f))
+                 .Where(f => f.LastAccessTime < DateTime.Now.AddHours(-6))
+                 .ToList()
+                 .ForEach(f => f.Delete());
+        }
+
     }
 }

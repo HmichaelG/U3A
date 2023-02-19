@@ -2,7 +2,6 @@
 
 @layout BasicLayout
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@implements IDisposable
 @inject NavigationManager NavigationManager
 @inject SignInManager<IdentityUser> SignInMgr
 @inject IJSRuntime js
@@ -65,7 +64,7 @@ else {
                                   RenderStyle="ButtonRenderStyle.Primary"
                                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                             </DxButton>
-                            <DxButton Text="What's on today?'"
+                            <DxButton Text="What's on today?"
                                   IconCssClass="bi-clock menu-icon me-3 h2"
                                   CssClass="col-12 mt-1"
                                   Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoWhatsOn))"
@@ -183,7 +182,7 @@ else {
 
     bool IsReady;
     bool IsSmallLayout;
-    U3ADbContext? dbc;
+    //U3ADbContext? dbc;
     SystemSettings? settings;
     Term? term;
     MarkupString? message;
@@ -192,9 +191,6 @@ else {
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
-        IsReady = false;
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         IsReady = true;
     }
 
@@ -227,7 +223,4 @@ else {
         await OnMenuOptionSelected.InvokeAsync(selection);
     }
 
-    public void Dispose() {
-        dbc?.Dispose();
-    }
 }

@@ -1,8 +1,12 @@
-﻿@inject IJSRuntime js
+﻿
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+@inject IJSRuntime js
 @inject NavigationManager NavigationManager
+@inject IConfiguration config
 @using System.Web
 @using Microsoft.AspNetCore.Builder
-@using System.Configuration
+@using Microsoft.Extensions.Configuration;
 
 @attribute [Authorize]
 
@@ -135,7 +139,8 @@ else {
                                             }
                                         </div>
                                         var link = $"https://www.google.com/maps/embed/v1/place?key={googleMapAPIKey}&q={HttpUtility.UrlEncode($"{context.Venue?.Name} {context.Venue?.Address}")}";
-                                        <iframe width="100%"
+                                        <iframe 
+                                            width="100%"
                                             height="250rem"
                                             style="border:1"
                                             loading="lazy"
@@ -227,8 +232,8 @@ else {
     public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
     [Parameter]
     public bool IsReadOnly { get; set; }
-    [Parameter]
-    public U3ADbContext? DbContext { get; set; }
+
+    U3ADbContext? dbc { get; set; }
 
     Term? term;
     List<Class> ListboxData;
@@ -274,16 +279,17 @@ else {
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
+        dbc = await U3Adbfactory.CreateDbContextAsync();
         // wire up the data
-        term = BusinessRule.CurrentEnrolmentTerm(DbContext);
+        term = BusinessRule.CurrentEnrolmentTerm(dbc);
         if (term == null) {
             // Fallback to current term read-only mode
-            term = await BusinessRule.CurrentTermAsync(DbContext);
+            term = await BusinessRule.CurrentTermAsync(dbc);
             isListboxShowingSummary = false;
             isNotInEnrolmentPeriod = true;
         }
         if (term != null) {
-            Classes = BusinessRule.GetClassDetails(DbContext, term);
+            Classes = BusinessRule.GetClassDetails(dbc, term);
             if (Classes != null && loginState.SelectedPerson != null) {
                 SelectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson, term);
                 if (SelectedClasses.Count() > 0) isListboxShowingSummary = false;
@@ -294,8 +300,7 @@ else {
         listBoxSelectionMode = (IsReadOnly)
                 ? ListBoxSelectionMode.None
                 : ListBoxSelectionMode.Multiple;
-        var builder = WebApplication.CreateBuilder();
-        googleMapAPIKey = builder.Configuration["GoogleMapAPIKey"];
+        googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
         IsReady = true;
     }
 
@@ -305,6 +310,8 @@ else {
             if (isNotInEnrolmentPeriod && (term == null || Classes == null)) {
                 await ReturnToMenu(PortalMenuResult.EnrolmentCancelledTermNotDefined);
             }
+        }
+        else {
             if (IsReadOnly) {
                 if (SelectedClasses?.Count() <= 0) {
                     await messageBox.ShowOkOnlyAsync("No Erolment In Current Term",
@@ -313,8 +320,8 @@ else {
                     await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
                 }
             }
+            if ((bool)progress?.PopupVisible) { progress?.Close(); }
         }
-        if ((bool)progress?.PopupVisible) { progress?.Close(); }
     }
 
     async Task OnEmail(Class context) {
@@ -357,9 +364,9 @@ else {
 
     string GetStatus(Class context) {
         Enrolment? e = null;
-        var c = DbContext.Class.Include(x => x.Enrolments).FirstOrDefault(x => x.ID == context.ID);
+        var c = dbc.Class.Include(x => x.Enrolments).FirstOrDefault(x => x.ID == context.ID);
         if (c.Enrolments.Count > 0)
-            e = DbContext.Enrolment
+            e = dbc.Enrolment
                             .Include(x => x.Person)
                             .Include(x => x.Class)
                             .Include(x => x.Term)
@@ -369,7 +376,7 @@ else {
                                                     x.Term.TermNumber >= term.TermNumber &&
                                                     x.PersonID == loginState.SelectedPerson.ID);
         else {
-            e = DbContext.Enrolment
+            e = dbc.Enrolment
                             .Include(x => x.Person)
                             .Include(x => x.Course)
                             .Include(x => x.Term)
@@ -399,12 +406,12 @@ else {
         StateHasChanged();
         try {
             // Post changes to the database.
-            var addedEnrolments = await BusinessRule.AddEnrolmentRequests(DbContext, SelectedClasses, loginState.SelectedPerson, term);
-            var deletedEnrolments = BusinessRule.DeleteEnrolmentsRescinded(DbContext, SelectedClasses, loginState.SelectedPerson, term);
-            await BusinessRule.CreateEnrolmentSendMailAsync(DbContext);
-            await DbContext.SaveChangesAsync();
+            var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, SelectedClasses, loginState.SelectedPerson, term);
+            var deletedEnrolments = BusinessRule.DeleteEnrolmentsRescinded(dbc, SelectedClasses, loginState.SelectedPerson, term);
+            await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
+            await dbc.SaveChangesAsync();
             if (addedEnrolments.Count() > 0 || deletedEnrolments > 0) {
-                await messageBox.ShowOkOnlyAsync("New course status", await BusinessRule.GetEnrolmentStatusMarkup(DbContext, addedEnrolments, deletedEnrolments));
+                await messageBox.ShowOkOnlyAsync("New course status", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, deletedEnrolments));
             }
             await ReturnToMenu(PortalMenuResult.MenuOptionCompleted);
         }
@@ -432,7 +439,6 @@ else {
             isListboxShowingSummary = true;
         }
         SetReviewButtonText();
-        ScrollListboxToTop();
     }
 
     void ScrollListboxToTop() {
@@ -489,4 +495,7 @@ else {
         }
     }
 
+    public void Dispose() {
+        dbc?.Dispose();
+    }
 }
