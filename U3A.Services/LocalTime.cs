@@ -30,7 +30,7 @@ namespace U3A.Services
                 userTime = TimeSpan.FromMinutes(-timeDiffer);
             }
             // Converting to local time using UTC and local time minute difference.
-            return (DateTime)(UTCTime + userTime);
+            return UTCTime.Add(userTime.Value);
         }
     }
 }

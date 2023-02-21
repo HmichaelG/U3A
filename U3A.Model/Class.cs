@@ -84,7 +84,7 @@ namespace U3A.Model
         public string OccurrenceText { 
             get {
                 string result = string.Empty;
-                switch ((OccurrenceType) Occurrence.ID) {
+                switch ((OccurrenceType) OccurrenceID) {
                     case OccurrenceType.OnceOnly:
                         result += (StartDate.HasValue) ? StartDate.Value.ToString("ddd dd-MMM-yy") : "Term Start";
                         break;

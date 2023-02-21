@@ -60,6 +60,7 @@ else {
                 SelectionMode="GridSelectionMode.Multiple"
                 AllowSelectRowByClick="true"
                 AutoExpandAllGroupRows="true"
+                UnboundColumnData="Grid_CustomUnboundColumnData"
                 @bind-SelectedDataItems="SelectedDataItems">
                 <Columns>
                     <DxGridSelectionColumn Width="2rem" />
@@ -83,9 +84,9 @@ else {
                                   DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible="false" />
                     <DxGridDataColumn Caption="Enrolled" FieldName="DateEnrolled"
                                   DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
-                    <DxGridDataColumn Caption="Dropped Out" FieldName="DropoutDate"
-                                  DisplayFormat="{0:dd-MMM-yy hh:mm tt}" Width="8rem" />
-                    <DxGridDataColumn Caption="Dropped By" FieldName="DeletedBy" />
+                    <DxGridDataColumn FieldName="Dropout"
+                                  DisplayFormat="{0:dd-MMM-yy hh:mm tt}"
+                                  UnboundType="GridUnboundColumnType.DateTime" />                    <DxGridDataColumn Caption="Dropped By" FieldName="DeletedBy" />
                 </Columns>
             </DxGrid>
         </DxFormLayout>
@@ -141,7 +142,7 @@ else {
     DocumentServer server;
     int documentsSent;
     internal Progress? ProgressBar;
-
+    LocalTime? localTime;
 
     protected override async Task OnInitializedAsync() {
         // wire up the data
@@ -172,6 +173,15 @@ else {
                 await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");
                 NavMan.NavigateTo("/");
             }
+        }
+        else {
+            localTime = new LocalTime(js);
+        }
+    }
+
+    async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e) {
+        if (e.FieldName == "Dropout") {
+            e.Value = await localTime?.GetLocalTimeAsync((e.DataItem as Dropout).DropoutDate);
         }
     }
 

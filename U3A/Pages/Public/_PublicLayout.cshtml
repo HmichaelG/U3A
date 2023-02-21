@@ -28,6 +28,14 @@
 </head>
 <body class="d-flex flex-column h-100">
 
+    <script>
+        function GetTimezoneOffset() {
+            // Returns the time difference in minutes between UTC time and local time.
+            return new Date().getTimezoneOffset();
+        }
+    </script>
+
+
     @{
         var isIEOrEdgeLegacy = Context.Request.Headers["User-Agent"]
         .Any(userAgent => userAgent.Contains("MSIE") || userAgent.Contains("Trident") || userAgent.Contains("Edge/"));

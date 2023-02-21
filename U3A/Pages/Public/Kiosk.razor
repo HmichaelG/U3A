@@ -1,0 +1,97 @@
+﻿@page "/public/Kiosk"
+
+@layout BasicLayout
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager navMan
+
+<div class="schedule">
+    <div class="h1 text-center text-primary"><img class="me-4 mb-2" src="images/u3alogo.png" width="81" />@title</div>
+    <div class="h3 text-center text-primary">Today's Schedule</div>
+    <CourseSchedule IsPublic=true />
+</div>
+
+<div class="button-right m-5">
+    <DxButton Text="Member Portal"
+              IconCssClass="bi-people menu-icon me-3 h2"
+              CssClass="col-12 mt-1"
+              Click="@(e => OnPortalClciked(e))"
+              RenderStyle="ButtonRenderStyle.Primary"
+              RenderStyleMode="ButtonRenderStyleMode.Contained">
+    </DxButton>
+</div>
+
+<div class="button-left m-5">
+    <DxButton Text="Public Website"
+              IconCssClass="bi-globe2 menu-icon me-3 h2"
+              CssClass="col-12 mt-1"
+              Click="@(e => OnWebsiteClciked(e))"
+              RenderStyle="ButtonRenderStyle.Primary"
+              RenderStyleMode="ButtonRenderStyleMode.Contained">
+    </DxButton>
+</div>
+
+<div class="clcok-widget">
+    <Clock></Clock>
+</div>
+
+
+<style>
+
+    .button-left {
+        width: 400px;
+        z-index: 10;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .button-right {
+        width: 400px;
+        z-index: 10;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .schedule {
+        width: 90%;
+        height: 90%;
+        z-index: 1;
+        position: absolute;
+        left: 100px;
+        margin-right: 100px;
+        top: 25px;
+    }
+
+    .clcok-widget {
+        width: 400px;
+        height: 400px;
+        z-index: 10;
+        position: absolute;
+        bottom: 0;
+        left: calc(50% - 150px);
+        overflow: hidden
+    }
+</style>
+
+@code {
+    string? title;
+
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            title = (await dbc.SystemSettings.FirstOrDefaultAsync())?.U3AGroup;
+        }
+    }
+
+    void OnPortalClciked(EventArgs e) {
+        navMan.NavigateTo("/", true);
+    }
+
+    async void OnWebsiteClciked(EventArgs e) {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            var info = (TenantInfoEx)dbc.TenantInfo;
+            navMan.NavigateTo(info.Website, true);
+        }
+    }
+}

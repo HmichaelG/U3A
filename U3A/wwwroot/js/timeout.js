@@ -11,7 +11,7 @@ function resetTimer() {
 
 // Redirect to the page
 function redirectToExitPage() {
-    window.location.href = '/closed.html';
+    window.location.href = '/Identity/Account/LogOut';
 }
 
 // Set up the event listeners

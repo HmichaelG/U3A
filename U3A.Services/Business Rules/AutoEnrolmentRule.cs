@@ -62,7 +62,7 @@ namespace U3A.BusinessRules
             var settings = await dbc.SystemSettings.FirstAsync();
             if (string.IsNullOrWhiteSpace(settings.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
             // Set everyone to waitlisted if we are doing Full Enrolment
-            if (DoFullEnrolment) foreach (var e in enrolments) { e.IsWaitlisted = true; }
+            //if (DoFullEnrolment) foreach (var e in enrolments) { e.IsWaitlisted = true; }
             int enrolled = enrolments.Where(x => !x.IsWaitlisted).Count();
             int waitlisted = enrolments.Where(x => x.IsWaitlisted).Count();
             // If available places is less than waitlisted then enrol everyone.

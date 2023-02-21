@@ -29,12 +29,12 @@ else {
                 </ol>
 
                 <p>The parameters applied to these rules may be changed in System Settings.</p>
-@*                <p>
-                    <strong>Do you require Full Enrolment</strong> (see below) should only be checked once immediately prior to Term 1.<br />
-                    It auto-enrols every participant irrespective of their current waitlist status.
-                    If left unchecked, only current waitlisted enrolees will be auto-enrolled which is normal for Terms 2 thru 4.
-                </p>
-*@                <p>
+                @*                <p>
+            <strong>Do you require Full Enrolment</strong> (see below) should only be checked once immediately prior to Term 1.<br />
+            It auto-enrols every participant irrespective of their current waitlist status.
+            If left unchecked, only current waitlisted enrolees will be auto-enrolled which is normal for Terms 2 thru 4.
+            </p>
+            *@                <p>
                     <strong>Is Term Auto-Enrolment Finalised?</strong> (see below) should be checked on the final auto-enrolment for the term.<br />
                     Once checked, any future term enrolment will be automatically enrolled if a place is available.
                     If left unchecked, enrolment requests will be waitlisted only.
@@ -55,11 +55,12 @@ else {
                                 Value="@processTerm"
                                 ValueChanged="@((Term term) => OnTermChanged(term))" />
                     </DxFormLayoutItem>
-@*                    <DxFormLayoutItem Caption="Do you require full enrolment?" ColSpanMd="12">
-                        <DxCheckBox @bind-Checked="@DoFullEnrolment" />
-                    </DxFormLayoutItem>
-*@                    <DxFormLayoutItem Caption="Is Term Auto-Enrolment Finalised?" ColSpanMd="12">
-                        <DxCheckBox @bind-Checked="@IsClassAllocationFinalised" />
+                    @*                    <DxFormLayoutItem Caption="Do you require full enrolment?" ColSpanMd="12">
+                <DxCheckBox @bind-Checked="@DoFullEnrolment" />
+                </DxFormLayoutItem>
+                *@                    <DxFormLayoutItem Caption="Is Term Auto-Enrolment Finalised?" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@IsClassAllocationFinalised"
+                                Enabled=@(!IsClassAllocationFinalised) />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Queue Email For ALL participants?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@ForceEmailQueue" />
@@ -88,7 +89,7 @@ else {
 @code {
     bool IsReady;
     bool IsProcessing;
-    bool IsClassAllocationFinalised;
+    bool IsClassAllocationFinalised { get; set; }
     bool DoFullEnrolment;
     bool ForceEmailQueue;
     string? errorMessage;
@@ -109,20 +110,22 @@ else {
         if (processTerm != null) {
             FirstTermNextYear = await BusinessRule.FirstTermNextYearAsync(dbc, processTerm.Year);
             if (FirstTermNextYear != null
-                && DateTime.Today >= FirstTermNextYear.EnrolmentStartDate) processTerm = FirstTermNextYear;
+                && DateTime.Today >= FirstTermNextYear.EnrolmentStartDate) { processTerm = FirstTermNextYear; }
+            IsClassAllocationFinalised = processTerm.IsClassAllocationFinalised;
         }
-        if (processTerm != null && processTerm.TermNumber == 1 && !dbc.Enrolment.Where(x => x.TermID == processTerm.ID).Any())
-            DoFullEnrolment = true;
-        else
-            DoFullEnrolment = false;
+        //if (processTerm != null && processTerm.TermNumber == 1 && !dbc.Enrolment.Where(x => x.TermID == processTerm.ID).Any())
+        //    DoFullEnrolment = true;
+        //else
+        //    DoFullEnrolment = false;
         IsReady = true;
     }
 
     void OnTermChanged(Term newValue) {
         processTerm = newValue;
-        if (processTerm != null && processTerm.TermNumber == 1)
-            DoFullEnrolment = true;
-        else DoFullEnrolment = false;
+        IsClassAllocationFinalised = processTerm.IsClassAllocationFinalised;
+        //if (processTerm != null && processTerm.TermNumber == 1)
+        //    DoFullEnrolment = true;
+        //else DoFullEnrolment = false;
         StateHasChanged();
     }
 
@@ -132,8 +135,8 @@ else {
             errorMessage = null;
             IsProcessing = true;
             StateHasChanged();
-            await BusinessRule.AutoEnrolParticipantsAsync(dbc, processTerm, 
-                                                            DoFullEnrolment, 
+            await BusinessRule.AutoEnrolParticipantsAsync(dbc, processTerm,
+                                                            DoFullEnrolment,
                                                             IsClassAllocationFinalised,
                                                             ForceEmailQueue);
             IsProcessing = false;

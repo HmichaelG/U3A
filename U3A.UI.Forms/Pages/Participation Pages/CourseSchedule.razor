@@ -17,7 +17,7 @@
 }
 else {
 
-    
+
     if (!IsPortal) {
         <div class="row  align-content-start">
             <div class="col-4"><h3>Course Schedule</h3></div>
@@ -69,20 +69,20 @@ else {
                  ? SchedulerViewType.Day
                  : SchedulerViewType.WorkWeek)
                  DataStorage="@DataStorage"
+                 StartDateChanged="OnStartDateChanged"
                  CssClass="w-100">
             <Views>
                 <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
-                @if (!IsPortal)
-                {
+                @if (!IsPortal) {
                     <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
                     <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
                     <DxSchedulerMonthView ShowWorkDaysOnly="true" MonthCount="1"></DxSchedulerMonthView>
                     <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(14)" CellMinWidth="80">
                         <Scales>
-                        <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1"></DxSchedulerTimeScale>
-                        <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Hour" UnitCount="2"></DxSchedulerTimeScale>
-                    </Scales>
-                </DxSchedulerTimelineView>
+                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1"></DxSchedulerTimeScale>
+                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Hour" UnitCount="2"></DxSchedulerTimeScale>
+                        </Scales>
+                    </DxSchedulerTimelineView>
                 }
             </Views>
             <AppointmentTooltipTemplate>
@@ -104,7 +104,7 @@ else {
 <style>
     .schedule-height {
         overflow: auto;
-        height: @((IsPortal) ? "80vh" : "");
+        height: @((IsPortal && !IsPublic ) ? "80vh" : "85vh");
     }
 
 </style>
@@ -113,6 +113,8 @@ else {
 
     [Parameter]
     public bool IsPortal { get; set; }
+    [Parameter]
+    public bool IsPublic { get; set; }
 
     bool IsReady;
     public List<Venue>? AvailableVenues { get; set; }
@@ -121,7 +123,7 @@ else {
 
     private List<Term> terms { get; set; }
     private Term? selectedTerm { get; set; }
-    DateTime StartDate { get; set; }
+    DateTime StartDate { get; set; } = DateTime.Today;
     U3ADbContext dbc { get; set; }
 
     string SpinnerVisibility = "hidden";
@@ -136,6 +138,7 @@ else {
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+        if (IsPublic) IsPortal = true;
         if (selectedTerm != null) {
             SelectedTermChanged(selectedTerm);
             if (IsPortal && DataStorage == null && selectedTerm != null) {
@@ -147,14 +150,18 @@ else {
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
         await base.OnAfterRenderAsync(firstRender);
-        if (firstRender) {
+        if (firstRender)
+        {
             localTime = new LocalTime(js);
-            StartDate = (await localTime.GetLocalTimeAsync()).Date;
+            StartDate = (await localTime.GetLocalTimeAsync()).Date.AddHours(6);
         }
     }
 
+    async void OnStartDateChanged(DateTime newStartDate) => StartDate = (await localTime.GetLocalTimeAsync(newStartDate)).Date;
+
     async Task SelectedTermChanged(Term term) {
         selectedTerm = term;
+        if (localTime == null) localTime = new LocalTime(js);
         var now = (await localTime.GetLocalTimeAsync()).Date;
         if (now > term.StartDate && now <= term.EndDate) {
             StartDate = now;
