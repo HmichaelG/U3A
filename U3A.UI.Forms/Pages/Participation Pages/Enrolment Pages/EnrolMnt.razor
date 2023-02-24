@@ -130,6 +130,25 @@ else {
                             </DxComboBox>
                         </CellEditTemplate>
                     </DxGridDataColumn>
+                    <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem">
+                        <CellEditTemplate>
+                            @{
+                                thisEnrolment = (Enrolment)context.EditModel;
+                            }
+                            <DxCheckBox Checked="@thisEnrolment.IsCourseClerk"
+                                    CheckedExpression="@(() => thisEnrolment.IsCourseClerk)"
+                                    CheckedChanged="@((bool value) => OnCourseClerkChanged(value))" />
+                        </CellEditTemplate>
+                        <CellDisplayTemplate>
+                            <DxCheckBox Enabled="false" Checked="(bool)context.Value" />
+                        </CellDisplayTemplate>
+                        <FilterRowCellTemplate>
+                            <DxCheckBox Checked="(bool?)context.FilterRowValue"
+                                    CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                                    AllowIndeterminateStateByClick="true"
+                                    Alignment="CheckBoxContentAlignment.Center" />
+                        </FilterRowCellTemplate>
+                    </DxGridDataColumn>
                     <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem">
                         <CellEditTemplate>
                             @{
@@ -137,7 +156,7 @@ else {
                             }
                             <DxCheckBox Checked="@thisEnrolment.IsWaitlisted"
                                     CheckedExpression="@(() => thisEnrolment.IsWaitlisted)"
-                                    CheckedChanged="@((bool value) => OnCheckedChanged(value))" />
+                                    CheckedChanged="@((bool value) => OnWaitlistedChanged(value))" />
                         </CellEditTemplate>
                         <CellDisplayTemplate>
                             <DxCheckBox Enabled="false" Checked="(bool)context.Value" />
@@ -350,7 +369,7 @@ else {
         }
     }
 
-    async Task OnCheckedChanged(bool isWaitlisted) {
+    async Task OnWaitlistedChanged(bool isWaitlisted) {
         if (selectedTerm.Comparer > currentTerm.Comparer && !isWaitlisted) {
             await messageBox.ShowOkOnlyAsync("Enrol is not allowed",
                 "The enrolment status for future enrolments must remain Waitlisted.");
@@ -364,6 +383,12 @@ else {
         }
     }
 
+    async Task OnCourseClerkChanged(bool isCourseClerk) {
+        if (isCourseClerk && thisEnrolment.IsWaitlisted) {
+            await messageBox.ShowOkOnlyAsync("Student is waitlisted",
+                "A wiatlisted student cannot be a course clerk.");
+        } else { thisEnrolment.IsCourseClerk = isCourseClerk; }
+    }
 
 
     async Task SelectedTermChanged(Term term) {

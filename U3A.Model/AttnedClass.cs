@@ -15,8 +15,8 @@ namespace U3A.Model
         public Guid TermID { get; set; }
         public Term Term { get; set; }
 
-        public Guid? ClassID { get; set; }
-        public Class? Class { get; set; }
+        public Guid ClassID { get; set; }
+        public Class Class { get; set; }
 
         public DateTime Date { get; set; }
 

@@ -12,6 +12,9 @@
 }
 else {
 
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+                    @bind-IsActive="@IsMobileLayout" />
+
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" />
 
@@ -145,7 +148,7 @@ else {
 
 <style>
     .scrollable {
-        height: 78vh;
+        height: @((IsMobileLayout) ? "78vh" : "65vh");
         overflow-y: auto;
         overflow-x: hidden
     }
@@ -168,6 +171,7 @@ else {
     string City;
 
     bool IsReady = false;
+    bool IsMobileLayout;
     Person person = new Person();
     private AUState states;
     private Gender gender;

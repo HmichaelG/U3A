@@ -665,7 +665,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220813052441_U3A_Initial')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220813052441_U3A_Initial', N'7.0.1');
+    VALUES (N'20220813052441_U3A_Initial', N'7.0.3');
 END;
 GO
 
@@ -756,7 +756,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220818092843_U3A_CourseTypeChnage')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220818092843_U3A_CourseTypeChnage', N'7.0.1');
+    VALUES (N'20220818092843_U3A_CourseTypeChnage', N'7.0.3');
 END;
 GO
 
@@ -870,7 +870,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220819053920_U3A_AttendanceHistory')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220819053920_U3A_AttendanceHistory', N'7.0.1');
+    VALUES (N'20220819053920_U3A_AttendanceHistory', N'7.0.3');
 END;
 GO
 
@@ -966,7 +966,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220821064729_U3A_DefaultTerm')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220821064729_U3A_DefaultTerm', N'7.0.1');
+    VALUES (N'20220821064729_U3A_DefaultTerm', N'7.0.3');
 END;
 GO
 
@@ -1057,7 +1057,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220823005347_U3A_PersonCommunication')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220823005347_U3A_PersonCommunication', N'7.0.1');
+    VALUES (N'20220823005347_U3A_PersonCommunication', N'7.0.3');
 END;
 GO
 
@@ -1163,7 +1163,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220823064735_U3A_AddnClassOccurence')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220823064735_U3A_AddnClassOccurence', N'7.0.1');
+    VALUES (N'20220823064735_U3A_AddnClassOccurence', N'7.0.3');
 END;
 GO
 
@@ -1272,7 +1272,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220823225311_U3A_RemovePersonDiscontinued')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220823225311_U3A_RemovePersonDiscontinued', N'7.0.1');
+    VALUES (N'20220823225311_U3A_RemovePersonDiscontinued', N'7.0.3');
 END;
 GO
 
@@ -1381,7 +1381,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220824000648_U3A_RemoveCourseDiscontinued')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220824000648_U3A_RemoveCourseDiscontinued', N'7.0.1');
+    VALUES (N'20220824000648_U3A_RemoveCourseDiscontinued', N'7.0.3');
 END;
 GO
 
@@ -1486,7 +1486,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220826220449_U3A_EmailTemplate')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220826220449_U3A_EmailTemplate', N'7.0.1');
+    VALUES (N'20220826220449_U3A_EmailTemplate', N'7.0.3');
 END;
 GO
 
@@ -1577,7 +1577,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220828235252_U3A_EmailTemplateWithHTML')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220828235252_U3A_EmailTemplateWithHTML', N'7.0.1');
+    VALUES (N'20220828235252_U3A_EmailTemplateWithHTML', N'7.0.3');
 END;
 GO
 
@@ -1677,7 +1677,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220831001431_U3A_EmailHistory')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220831001431_U3A_EmailHistory', N'7.0.1');
+    VALUES (N'20220831001431_U3A_EmailHistory', N'7.0.3');
 END;
 GO
 
@@ -1774,7 +1774,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220831065109_U3A_AutoEnrolSettings')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220831065109_U3A_AutoEnrolSettings', N'7.0.1');
+    VALUES (N'20220831065109_U3A_AutoEnrolSettings', N'7.0.3');
 END;
 GO
 
@@ -1865,7 +1865,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220901020153_U3A_AddedDateEnrolled')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220901020153_U3A_AddedDateEnrolled', N'7.0.1');
+    VALUES (N'20220901020153_U3A_AddedDateEnrolled', N'7.0.3');
 END;
 GO
 
@@ -2010,7 +2010,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220903022302_U3A_Committee')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220903022302_U3A_Committee', N'7.0.1');
+    VALUES (N'20220903022302_U3A_Committee', N'7.0.3');
 END;
 GO
 
@@ -2120,7 +2120,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220903055005_U3A_Volunteer')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220903055005_U3A_Volunteer', N'7.0.1');
+    VALUES (N'20220903055005_U3A_Volunteer', N'7.0.3');
 END;
 GO
 
@@ -2271,7 +2271,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220905230015_U3A_DocumentType')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220905230015_U3A_DocumentType', N'7.0.1');
+    VALUES (N'20220905230015_U3A_DocumentType', N'7.0.3');
 END;
 GO
 
@@ -2368,7 +2368,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220906015610_U3A_DocumentTemplateNullSubject')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220906015610_U3A_DocumentTemplateNullSubject', N'7.0.1');
+    VALUES (N'20220906015610_U3A_DocumentTemplateNullSubject', N'7.0.3');
 END;
 GO
 
@@ -2465,7 +2465,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220907063013_U3A_DocumentTemplateDocumentTypeID')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220907063013_U3A_DocumentTemplateDocumentTypeID', N'7.0.1');
+    VALUES (N'20220907063013_U3A_DocumentTemplateDocumentTypeID', N'7.0.3');
 END;
 GO
 
@@ -2598,7 +2598,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220908214823_U3A_DocumentTemplateRemoveNotNull')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220908214823_U3A_DocumentTemplateRemoveNotNull', N'7.0.1');
+    VALUES (N'20220908214823_U3A_DocumentTemplateRemoveNotNull', N'7.0.3');
 END;
 GO
 
@@ -2722,7 +2722,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220913213917_U3A_PersonImport')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220913213917_U3A_PersonImport', N'7.0.1');
+    VALUES (N'20220913213917_U3A_PersonImport', N'7.0.3');
 END;
 GO
 
@@ -2819,7 +2819,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220914080048_U3A_PersonImportDateJoined')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220914080048_U3A_PersonImportDateJoined', N'7.0.1');
+    VALUES (N'20220914080048_U3A_PersonImportDateJoined', N'7.0.3');
 END;
 GO
 
@@ -2934,7 +2934,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220914224221_U3A_PersonImportIndex')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220914224221_U3A_PersonImportIndex', N'7.0.1');
+    VALUES (N'20220914224221_U3A_PersonImportIndex', N'7.0.3');
 END;
 GO
 
@@ -3025,7 +3025,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220915203410_U3A_PersonImportStudentID')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220915203410_U3A_PersonImportStudentID', N'7.0.1');
+    VALUES (N'20220915203410_U3A_PersonImportStudentID', N'7.0.3');
 END;
 GO
 
@@ -3122,7 +3122,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220916052700_U3A_PersonBaseEntity')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220916052700_U3A_PersonBaseEntity', N'7.0.1');
+    VALUES (N'20220916052700_U3A_PersonBaseEntity', N'7.0.3');
 END;
 GO
 
@@ -3213,7 +3213,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220918085306_U3A_CourseYear')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220918085306_U3A_CourseYear', N'7.0.1');
+    VALUES (N'20220918085306_U3A_CourseYear', N'7.0.3');
 END;
 GO
 
@@ -3326,7 +3326,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220921065755_U3A_PersonImportError')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220921065755_U3A_PersonImportError', N'7.0.1');
+    VALUES (N'20220921065755_U3A_PersonImportError', N'7.0.3');
 END;
 GO
 
@@ -3443,7 +3443,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220922035413_U3A_RemoveStdUsers')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220922035413_U3A_RemoveStdUsers', N'7.0.1');
+    VALUES (N'20220922035413_U3A_RemoveStdUsers', N'7.0.3');
 END;
 GO
 
@@ -3556,7 +3556,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220923200353_U3A_DataImportTimestamp')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220923200353_U3A_DataImportTimestamp', N'7.0.1');
+    VALUES (N'20220923200353_U3A_DataImportTimestamp', N'7.0.3');
 END;
 GO
 
@@ -3621,7 +3621,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220923212556_U3A_DataImportFileDetails')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220923212556_U3A_DataImportFileDetails', N'7.0.1');
+    VALUES (N'20220923212556_U3A_DataImportFileDetails', N'7.0.3');
 END;
 GO
 
@@ -3680,7 +3680,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220924075231_U3A_PersonFinancialTo')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220924075231_U3A_PersonFinancialTo', N'7.0.1');
+    VALUES (N'20220924075231_U3A_PersonFinancialTo', N'7.0.3');
 END;
 GO
 
@@ -3739,7 +3739,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220925101028_U3A_PersonImportHasPaid')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220925101028_U3A_PersonImportHasPaid', N'7.0.1');
+    VALUES (N'20220925101028_U3A_PersonImportHasPaid', N'7.0.3');
 END;
 GO
 
@@ -3804,7 +3804,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220925105903_U3A_PersonImportDateJoinedDeleted')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220925105903_U3A_PersonImportDateJoinedDeleted', N'7.0.1');
+    VALUES (N'20220925105903_U3A_PersonImportDateJoinedDeleted', N'7.0.3');
 END;
 GO
 
@@ -3869,7 +3869,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220927010121_U3A_PersonImportHasPaidDeleted')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220927010121_U3A_PersonImportHasPaidDeleted', N'7.0.1');
+    VALUES (N'20220927010121_U3A_PersonImportHasPaidDeleted', N'7.0.3');
 END;
 GO
 
@@ -3968,7 +3968,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220927041713_U3A_Receipt')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220927041713_U3A_Receipt', N'7.0.1');
+    VALUES (N'20220927041713_U3A_Receipt', N'7.0.3');
 END;
 GO
 
@@ -3986,7 +3986,7 @@ BEGIN
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Receipt]') AND [c].[name] = N'FinancialTo');
     IF @var15 IS NOT NULL EXEC(N'ALTER TABLE [Receipt] DROP CONSTRAINT [' + @var15 + '];');
-    UPDATE [Receipt] SET [FinancialTo] = 0 WHERE [FinancialTo] IS NULL;
+    EXEC(N'UPDATE [Receipt] SET [FinancialTo] = 0 WHERE [FinancialTo] IS NULL');
     ALTER TABLE [Receipt] ALTER COLUMN [FinancialTo] int NOT NULL;
     ALTER TABLE [Receipt] ADD DEFAULT 0 FOR [FinancialTo];
 END;
@@ -4053,7 +4053,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20220928051816_U3A_ReceiptDateJoined')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220928051816_U3A_ReceiptDateJoined', N'7.0.1');
+    VALUES (N'20220928051816_U3A_ReceiptDateJoined', N'7.0.3');
 END;
 GO
 
@@ -4106,7 +4106,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221009022810_U3A_ReceiptDataImportCascadeDelete')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221009022810_U3A_ReceiptDataImportCascadeDelete', N'7.0.1');
+    VALUES (N'20221009022810_U3A_ReceiptDataImportCascadeDelete', N'7.0.3');
 END;
 GO
 
@@ -4181,7 +4181,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221012210535_U3A_SystemSettingsFinancialToPercent')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221012210535_U3A_SystemSettingsFinancialToPercent', N'7.0.1');
+    VALUES (N'20221012210535_U3A_SystemSettingsFinancialToPercent', N'7.0.3');
 END;
 GO
 
@@ -4246,7 +4246,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221012222333_U3A_ReceiptProcessingYear')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221012222333_U3A_ReceiptProcessingYear', N'7.0.1');
+    VALUES (N'20221012222333_U3A_ReceiptProcessingYear', N'7.0.3');
 END;
 GO
 
@@ -4321,7 +4321,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221013052730_U3A_SendMail')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221013052730_U3A_SendMail', N'7.0.1');
+    VALUES (N'20221013052730_U3A_SendMail', N'7.0.3');
 END;
 GO
 
@@ -4402,7 +4402,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221020193948_U3A_SendEmailAddress')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221020193948_U3A_SendEmailAddress', N'7.0.1');
+    VALUES (N'20221020193948_U3A_SendEmailAddress', N'7.0.3');
 END;
 GO
 
@@ -4479,7 +4479,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221021222945_U3A_ReceiptImport_IsPosted')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221021222945_U3A_ReceiptImport_IsPosted', N'7.0.1');
+    VALUES (N'20221021222945_U3A_ReceiptImport_IsPosted', N'7.0.3');
 END;
 GO
 
@@ -4568,7 +4568,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221024043827_U3A_U3A_ReceiptImport_MovedPrevFieldsToPerson')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221024043827_U3A_U3A_ReceiptImport_MovedPrevFieldsToPerson', N'7.0.1');
+    VALUES (N'20221024043827_U3A_U3A_ReceiptImport_MovedPrevFieldsToPerson', N'7.0.3');
 END;
 GO
 
@@ -4653,7 +4653,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221027051426_U3A_RemoveASPNETSecurityFromDbContext')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221027051426_U3A_RemoveASPNETSecurityFromDbContext', N'7.0.1');
+    VALUES (N'20221027051426_U3A_RemoveASPNETSecurityFromDbContext', N'7.0.3');
 END;
 GO
 
@@ -4672,7 +4672,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221102222245_U3A_SettingsLastReceiptDate')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221102222245_U3A_SettingsLastReceiptDate', N'7.0.1');
+    VALUES (N'20221102222245_U3A_SettingsLastReceiptDate', N'7.0.3');
 END;
 GO
 
@@ -4690,7 +4690,7 @@ BEGIN
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Person]') AND [c].[name] = N'ICEPhone');
     IF @var19 IS NOT NULL EXEC(N'ALTER TABLE [Person] DROP CONSTRAINT [' + @var19 + '];');
-    UPDATE [Person] SET [ICEPhone] = N'' WHERE [ICEPhone] IS NULL;
+    EXEC(N'UPDATE [Person] SET [ICEPhone] = N'''' WHERE [ICEPhone] IS NULL');
     ALTER TABLE [Person] ALTER COLUMN [ICEPhone] nvarchar(50) NOT NULL;
     ALTER TABLE [Person] ADD DEFAULT N'' FOR [ICEPhone];
 END;
@@ -4704,7 +4704,7 @@ BEGIN
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Person]') AND [c].[name] = N'ICEContact');
     IF @var20 IS NOT NULL EXEC(N'ALTER TABLE [Person] DROP CONSTRAINT [' + @var20 + '];');
-    UPDATE [Person] SET [ICEContact] = N'' WHERE [ICEContact] IS NULL;
+    EXEC(N'UPDATE [Person] SET [ICEContact] = N'''' WHERE [ICEContact] IS NULL');
     ALTER TABLE [Person] ALTER COLUMN [ICEContact] nvarchar(50) NOT NULL;
     ALTER TABLE [Person] ADD DEFAULT N'' FOR [ICEContact];
 END;
@@ -4713,7 +4713,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221110041029_U3A_PersonRequireICE')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221110041029_U3A_PersonRequireICE', N'7.0.1');
+    VALUES (N'20221110041029_U3A_PersonRequireICE', N'7.0.3');
 END;
 GO
 
@@ -4726,7 +4726,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221110042556_U3A_PersonRequireICE1')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221110042556_U3A_PersonRequireICE1', N'7.0.1');
+    VALUES (N'20221110042556_U3A_PersonRequireICE1', N'7.0.3');
 END;
 GO
 
@@ -4745,7 +4745,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221111012843_U3A_SettingsTimezone')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221111012843_U3A_SettingsTimezone', N'7.0.1');
+    VALUES (N'20221111012843_U3A_SettingsTimezone', N'7.0.3');
 END;
 GO
 
@@ -4806,7 +4806,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221111185359_U3A_SettingsMail')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221111185359_U3A_SettingsMail', N'7.0.1');
+    VALUES (N'20221111185359_U3A_SettingsMail', N'7.0.3');
 END;
 GO
 
@@ -4831,7 +4831,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221114233010_U3A_SettingsBank')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221114233010_U3A_SettingsBank', N'7.0.1');
+    VALUES (N'20221114233010_U3A_SettingsBank', N'7.0.3');
 END;
 GO
 
@@ -4862,7 +4862,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221118015841_U3A_OnlinePaymentStatus')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221118015841_U3A_OnlinePaymentStatus', N'7.0.1');
+    VALUES (N'20221118015841_U3A_OnlinePaymentStatus', N'7.0.3');
 END;
 GO
 
@@ -4881,7 +4881,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221121001317_U3A_SettingsUTCOffset')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221121001317_U3A_SettingsUTCOffset', N'7.0.1');
+    VALUES (N'20221121001317_U3A_SettingsUTCOffset', N'7.0.3');
 END;
 GO
 
@@ -4930,7 +4930,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221125022428_U3A_OnlinePaymentStatusBaseEntity')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221125022428_U3A_OnlinePaymentStatusBaseEntity', N'7.0.1');
+    VALUES (N'20221125022428_U3A_OnlinePaymentStatusBaseEntity', N'7.0.3');
 END;
 GO
 
@@ -4979,7 +4979,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221127222455_U3A_VenueNewcastleDetail')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221127222455_U3A_VenueNewcastleDetail', N'7.0.1');
+    VALUES (N'20221127222455_U3A_VenueNewcastleDetail', N'7.0.3');
 END;
 GO
 
@@ -5016,7 +5016,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221127224003_U3A_VenueMaxLength')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221127224003_U3A_VenueMaxLength', N'7.0.1');
+    VALUES (N'20221127224003_U3A_VenueMaxLength', N'7.0.3');
 END;
 GO
 
@@ -5041,7 +5041,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221127224348_U3A_VenueKeyCodeNull')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221127224348_U3A_VenueKeyCodeNull', N'7.0.1');
+    VALUES (N'20221127224348_U3A_VenueKeyCodeNull', N'7.0.3');
 END;
 GO
 
@@ -5068,7 +5068,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221128004831_U3A_CourseNameLength')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221128004831_U3A_CourseNameLength', N'7.0.1');
+    VALUES (N'20221128004831_U3A_CourseNameLength', N'7.0.3');
 END;
 GO
 
@@ -5137,7 +5137,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221203035427_U3A_MembershipFees')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221203035427_U3A_MembershipFees', N'7.0.1');
+    VALUES (N'20221203035427_U3A_MembershipFees', N'7.0.3');
 END;
 GO
 
@@ -5162,7 +5162,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221205045943_U3A_OnlinePaymentAdminEmail')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221205045943_U3A_OnlinePaymentAdminEmail', N'7.0.1');
+    VALUES (N'20221205045943_U3A_OnlinePaymentAdminEmail', N'7.0.3');
 END;
 GO
 
@@ -5199,7 +5199,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221206215029_U3A_BaseEntityUser')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221206215029_U3A_BaseEntityUser', N'7.0.1');
+    VALUES (N'20221206215029_U3A_BaseEntityUser', N'7.0.3');
 END;
 GO
 
@@ -5242,7 +5242,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221207034113_U3A_SettingsComplimentaryParameters')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221207034113_U3A_SettingsComplimentaryParameters', N'7.0.1');
+    VALUES (N'20221207034113_U3A_SettingsComplimentaryParameters', N'7.0.3');
 END;
 GO
 
@@ -5313,7 +5313,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221207041315_U3A_CourseFees')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221207041315_U3A_CourseFees', N'7.0.1');
+    VALUES (N'20221207041315_U3A_CourseFees', N'7.0.3');
 END;
 GO
 
@@ -5362,7 +5362,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221207192428_U3A_AdditionalLeaders')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221207192428_U3A_AdditionalLeaders', N'7.0.1');
+    VALUES (N'20221207192428_U3A_AdditionalLeaders', N'7.0.3');
 END;
 GO
 
@@ -5411,7 +5411,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221211214017_U3A_Fee')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221211214017_U3A_Fee', N'7.0.1');
+    VALUES (N'20221211214017_U3A_Fee', N'7.0.3');
 END;
 GO
 
@@ -5446,7 +5446,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221212000414_U3A_CourseComplimentaryOverride')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221212000414_U3A_CourseComplimentaryOverride', N'7.0.1');
+    VALUES (N'20221212000414_U3A_CourseComplimentaryOverride', N'7.0.3');
 END;
 GO
 
@@ -5470,7 +5470,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221212023735_U3A_FeeIsMemberFee')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221212023735_U3A_FeeIsMemberFee', N'7.0.1');
+    VALUES (N'20221212023735_U3A_FeeIsMemberFee', N'7.0.3');
 END;
 GO
 
@@ -5489,7 +5489,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221213042626_U3A_CourseExcludeLeaderComplimentaryCount')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221213042626_U3A_CourseExcludeLeaderComplimentaryCount', N'7.0.1');
+    VALUES (N'20221213042626_U3A_CourseExcludeLeaderComplimentaryCount', N'7.0.3');
 END;
 GO
 
@@ -5508,7 +5508,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20221222190932_U3A_SendMailTermID')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221222190932_U3A_SendMailTermID', N'7.0.1');
+    VALUES (N'20221222190932_U3A_SendMailTermID', N'7.0.3');
 END;
 GO
 
@@ -5532,7 +5532,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230109042807_U3A_TermClassAllocationFinalised')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230109042807_U3A_TermClassAllocationFinalised', N'7.0.1');
+    VALUES (N'20230109042807_U3A_TermClassAllocationFinalised', N'7.0.3');
 END;
 GO
 
@@ -5596,7 +5596,7 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230127204532_U3A_Dropout')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230127204532_U3A_Dropout', N'7.0.1');
+    VALUES (N'20230127204532_U3A_Dropout', N'7.0.3');
 END;
 GO
 
@@ -5615,7 +5615,69 @@ GO
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230127220550_U3A_DropoutDeletedBy')
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230127220550_U3A_DropoutDeletedBy', N'7.0.1');
+    VALUES (N'20230127220550_U3A_DropoutDeletedBy', N'7.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230222202836_U3A_CourseClerk')
+BEGIN
+    ALTER TABLE [Enrolment] ADD [IsCourseClerk] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230222202836_U3A_CourseClerk')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230222202836_U3A_CourseClerk', N'7.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230224023108_U3A_AttendClassCascadeRule')
+BEGIN
+    ALTER TABLE [AttendClass] DROP CONSTRAINT [FK_AttendClass_Class_ClassID];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230224023108_U3A_AttendClassCascadeRule')
+BEGIN
+    DROP INDEX [IX_AttendClass_ClassID] ON [AttendClass];
+    DROP INDEX [IX_AttendClass_TermID_ClassID_Date] ON [AttendClass];
+    DECLARE @var30 sysname;
+    SELECT @var30 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[AttendClass]') AND [c].[name] = N'ClassID');
+    IF @var30 IS NOT NULL EXEC(N'ALTER TABLE [AttendClass] DROP CONSTRAINT [' + @var30 + '];');
+    EXEC(N'UPDATE [AttendClass] SET [ClassID] = ''00000000-0000-0000-0000-000000000000'' WHERE [ClassID] IS NULL');
+    ALTER TABLE [AttendClass] ALTER COLUMN [ClassID] uniqueidentifier NOT NULL;
+    ALTER TABLE [AttendClass] ADD DEFAULT '00000000-0000-0000-0000-000000000000' FOR [ClassID];
+    CREATE INDEX [IX_AttendClass_ClassID] ON [AttendClass] ([ClassID]);
+    CREATE INDEX [IX_AttendClass_TermID_ClassID_Date] ON [AttendClass] ([TermID], [ClassID], [Date]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230224023108_U3A_AttendClassCascadeRule')
+BEGIN
+    ALTER TABLE [AttendClass] ADD CONSTRAINT [FK_AttendClass_Class_ClassID] FOREIGN KEY ([ClassID]) REFERENCES [Class] ([ID]) ON DELETE CASCADE;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230224023108_U3A_AttendClassCascadeRule')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230224023108_U3A_AttendClassCascadeRule', N'7.0.3');
 END;
 GO
 

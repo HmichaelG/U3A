@@ -21,7 +21,7 @@ namespace U3A.Services
             IsAdminOnBehalfOfMember = true;
             this.AdminEmail = AdminEmail;
             if (!string.IsNullOrWhiteSpace(OnBehalfOfMember.Email)) {
-                GetLinkedMembers(OnBehalfOfMember.Email, dbFactory);
+                GetLinkedMembers(OnBehalfOfMember.Email, OnBehalfOfMember, dbFactory);
             }
             else {
                 LinkedPeople = new List<Person> { OnBehalfOfMember };
@@ -35,7 +35,13 @@ namespace U3A.Services
             AdminEmail = null;
             GetLinkedMembers(LoginEmail, dbFactory);
         }
-        private void GetLinkedMembers(string LoginEmail, IDbContextFactory<U3ADbContext> dbFactory) {
+        private void GetLinkedMembers(string LoginEmail,
+                    IDbContextFactory<U3ADbContext> dbFactory) {
+            GetLinkedMembers(LoginEmail, null, dbFactory);
+        }
+        private void GetLinkedMembers(string LoginEmail,
+                Person OnBehalfOfMember,
+                IDbContextFactory<U3ADbContext> dbFactory) {
             this.LoginEmail = LoginEmail;
             using (var dbc = dbFactory.CreateDbContext()) {
                 LinkedPeople = dbc.Person.Where(x => x.Email == LoginEmail).ToList();
@@ -46,9 +52,11 @@ namespace U3A.Services
                                                 .AsEnumerable()
                                       join linkedPeople in LinkedPeople
                                       on payStatus.PersonID equals linkedPeople.ID
+                                      where payStatus.Status.ToLower() != "processed"
                                       orderby payStatus.UpdatedOn descending
                                       select linkedPeople).FirstOrDefault();
-                    if (SelectedPerson == null) { SelectedPerson = LinkedPeople.FirstOrDefault(); }
+                    if (SelectedPerson == null) { SelectedPerson = OnBehalfOfMember; }
+                    if (SelectedPerson == null) { SelectedPerson = LinkedPeople.FirstOrDefault(); }             
                 }
             }
         }

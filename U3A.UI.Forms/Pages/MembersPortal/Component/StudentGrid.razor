@@ -34,6 +34,17 @@ else {
                             Alignment="CheckBoxContentAlignment.Center" />
                 </FilterRowCellTemplate>
             </DxGridDataColumn>
+            <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem">
+                <CellDisplayTemplate>
+                    <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
+                </CellDisplayTemplate>
+                <FilterRowCellTemplate>
+                    <DxCheckBox Checked="(bool?)context.FilterRowValue"
+                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                            AllowIndeterminateStateByClick="true"
+                            Alignment="CheckBoxContentAlignment.Center" />
+                </FilterRowCellTemplate>
+            </DxGridDataColumn>
             <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
                           Width="5rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
                 <CellDisplayTemplate>

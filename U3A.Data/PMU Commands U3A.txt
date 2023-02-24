@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Dropout
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_CourseClerk
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_DropoutDeletedBy
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_AttendClassCascadeRule
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_DropoutDeletedBy
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_AttendClassCascadeRule
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

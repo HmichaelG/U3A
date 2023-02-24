@@ -166,17 +166,22 @@ namespace U3A.Model
 
         [NotMapped]
         [DefaultValue(false)]
-        [Comment("Set in business rule")]
+        [Comment("Set in business rule: ApplyGroupsAsync")]
         public Boolean IsCourseLeader { get; set; }
 
         [NotMapped]
         [DefaultValue(false)]
-        [Comment("Set in business rule")]
+        [Comment("Set in business rule: ApplyGroupsAsync")]
+        public Boolean IsCourseClerk { get; set; }
+
+        [NotMapped]
+        [DefaultValue(false)]
+        [Comment("Set in business rule: ApplyGroupsAsync")]
         public Boolean IsCommitteeMember { get; set; }
 
         [NotMapped]
         [DefaultValue(false)]
-        [Comment("Set in business rule")]
+        [Comment("Set in business rule: ApplyGroupsAsync")]
         public Boolean IsVolunteer { get; set; }
 
         [InverseProperty("Leader")]

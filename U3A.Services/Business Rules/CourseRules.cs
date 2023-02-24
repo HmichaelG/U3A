@@ -67,7 +67,7 @@ namespace U3A.BusinessRules
             return courses;
         }
 
-        public static async Task<List<Course>> SelectableCoursesForLeader(U3ADbContext dbc, 
+        public static async Task<List<Course>> SelectableCoursesForLeader(U3ADbContext dbc,
                                             Term term, Person Leader) {
             var allCourses = await SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
             var courses = new List<Course>();
@@ -75,7 +75,7 @@ namespace U3A.BusinessRules
             foreach (var course in allCourses) {
                 foreach (var c in course.Classes) {
                     isCourseLeader = false;
-                    if (c.Leader != null &&  Leader.ID == c.LeaderID) {
+                    if (c.Leader != null && Leader.ID == c.LeaderID) {
                         isCourseLeader = true;
                     }
                     if (c.Leader != null && Leader.ID == c.Leader2ID) {
@@ -87,7 +87,19 @@ namespace U3A.BusinessRules
                     if (isCourseLeader) { courses.Add(course); }
                 }
             }
+            courses.AddRange(await GetClassDetailsForClerk(dbc, Leader, term));
             return courses;
+        }
+
+        public static async Task<List<Course>> GetClassDetailsForClerk(U3ADbContext dbc, Person Student, Term term) {
+            List<Course> result;
+            result = await dbc.Course
+                                .Include(c => c.Enrolments)
+                                .Where(c => c.Enrolments
+                                .Any(e => e.PersonID == Student.ID && e.TermID == term.ID &&
+                                    e.IsCourseClerk && !e.IsWaitlisted &&
+                                    (e.ClassID == null || e.ClassID == c.ID))).ToListAsync();
+            return result;
         }
 
         public static List<Person> SelectableCourseLeaders(Course SelectedCourse, Class? SelectedClass) {
@@ -166,11 +178,11 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        public static async Task<bool> IsCourseNumberUnique(U3ADbContext dbc,Course course, int Year) {
+        public static async Task<bool> IsCourseNumberUnique(U3ADbContext dbc, Course course, int Year) {
             var result = await dbc.Course.Where(x =>
                             x.ConversionID == course.ConversionID && x.Year == Year &&
                             x.ID != course.ID).ToListAsync();
-            return !await dbc.Course.Where(x => 
+            return !await dbc.Course.Where(x =>
                             x.ConversionID == course.ConversionID && x.Year == Year &&
                             x.ID != course.ID).AnyAsync();
         }

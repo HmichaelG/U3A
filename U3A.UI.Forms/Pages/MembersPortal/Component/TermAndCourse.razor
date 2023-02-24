@@ -25,7 +25,7 @@ else {
                     ValueChanged="@((Term term) => SelectedTermChanged(term))" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Course" ColSpanMd="12">
-                <DxComboBox Data="@courses" NullText="Processing ... please wait"
+                <DxComboBox Data="@courses" NullText="@nullCourseText"
                     Enabled="@Enabled"
                     FilteringMode="DataGridFilteringMode.Contains"
                     ListRenderMode="ListRenderMode.Virtual"
@@ -69,6 +69,7 @@ else {
     public Course? selectedCourse { get; set; }
     public Class? selectedClass { get; set; }
     public List<Enrolment>? Enrolments { get; set; }
+    string nullCourseText = "Processing ... please wait";
 
     bool IsReady;
     SystemSettings? settings;
@@ -99,9 +100,8 @@ else {
             leader = loginState.SelectedPerson;
             settings = await dbContext.SystemSettings.FirstOrDefaultAsync();
             terms = await BusinessRule.SelectableRelaxedTermsAsync(dbContext);
-            selectedTerm = await BusinessRule.CurrentTermAsync(dbContext);
-
-            isLeader = await BusinessRule.IsLeader(dbContext, leader, selectedTerm);
+            if (selectedTerm == null) { selectedTerm = await BusinessRule.CurrentTermAsync(dbContext); }
+            isLeader = await BusinessRule.IsLeaderOrClerk(dbContext, leader, selectedTerm);
             if (!isLeader) {
                 await messageBox.ShowOkOnlyAsync("No Leader Role", "You have no leadership role in the current year.");
                 await ReturnToMenu();
@@ -116,9 +116,9 @@ else {
             try {
                 courses = await BusinessRule.SelectableCoursesForLeader(dbContext, selectedTerm, leader);
                 if (courses.Count <= 0) {
-                    await messageBox.ShowOkOnlyAsync("There are no classes in the current term",
-                        $"The course(s) you lead have no classes in term {selectedTerm.TermNumber}.");
-                    await ReturnToMenu();
+                    nullCourseText = $"The course(s) you lead have no classes in term {selectedTerm.TermNumber}.";
+                    selectedCourse = null;
+                    selectedClass = null;
                 }
                 else {
                     if (selectedCourse == null || (!courses.Contains(selectedCourse))) {

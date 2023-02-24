@@ -92,6 +92,12 @@ else {
                                             }
                                         </tr>
                                         <tr class="d-flex">
+                                            <td class="col-md-2"><strong>Course Clerk:</strong></td>
+                                            <td class="col-md-10">
+                                                @((selectedEnrolment.IsCourseClerk) ? "Yes" : "No")
+                                            </td>
+                                        </tr>
+                                        <tr class="d-flex">
                                             <td class="col-md-2"><strong>Status:</strong></td>
                                             <td class="col-md-10">
                                                 @((selectedEnrolment.IsWaitlisted) ? "Waitlisted" : $"Enrolled ({selectedEnrolment.DateEnrolled?.ToShortDateString()})")
@@ -134,6 +140,23 @@ else {
                             }
                         </DxFormLayoutItem>
                     </DxFormLayoutGroup>
+                </div>
+            </DxFormLayout>
+            break;
+
+        case MenuOptions.AssignCourseClerk:
+            <DxFormLayout class="mx-4 w-100 d-block">
+                <div class="col-12 col-lg-8 col-xl-6 mx-auto my-2">
+                    <StudentGrid @ref="studentGrid"
+                     Enrolments="EnrolmentsToSelectFrom"
+                     Settings="settings" />
+                    <DxButton Text="Assign Course Clerk"
+                  IconCssClass="bi-person-badge menu-icon me-3 h2"
+                  CssClass="col-12 mt-1"
+                  Click="@(e => OnAssignCourseClerk())"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
                 </div>
             </DxFormLayout>
             break;
@@ -246,6 +269,13 @@ else {
                   RenderStyle="ButtonRenderStyle.Primary"
                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
+                    <DxButton Text="Assign Course Clerk"
+                  IconCssClass="bi bi-person-badge menu-icon me-3 h2"
+                  CssClass="col-12 mb-1"
+                  Click="@(e => OnMenuSelected(MenuOptions.AssignCourseClerk))"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
                     <DxButton Text="Email Students"
                   IconCssClass="bi bi-envelope menu-icon me-3 h2"
                   CssClass="col-12 mb-1"
@@ -344,6 +374,7 @@ else {
     {
         Nothing,
         StudentLookup,
+        AssignCourseClerk,
         Email,
         SMS,
         RecordAttendance,
@@ -385,6 +416,17 @@ else {
         await localStorage.SetItemAsync("emailDelimiter", delimiter);
         await messageBox.ShowOkOnlyAsync("Email Delimiter Saved", $"Your email delimiter has been saved as {name} ({delimiter}).");
         menuSelection = MenuOptions.Nothing;
+    }
+
+    async Task OnAssignCourseClerk() {
+        foreach (var e in Enrolments) {
+            var isSelected = studentGrid.SelectedDataItems.Contains(e);
+            e.IsCourseClerk = (isSelected) ? true : false;
+        }
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            dbc.UpdateRange(Enrolments);
+            await dbc.SaveChangesAsync();
+        }
     }
 
     async Task OnMenuSelected(MenuOptions selection) {
@@ -430,6 +472,9 @@ else {
                 }
             }
         }
+        if (menuSelection == MenuOptions.AssignCourseClerk) {
+            EnrolmentsToSelectFrom = Enrolments.Where(x => !x.IsWaitlisted).ToList();
+        }
     }
 
     async Task GetStudentEmailAddressList() {
@@ -472,7 +517,7 @@ else {
         }
         catch (Exception ex) {
             await messageBox.ShowOkOnlyAsync("Error Activating Phone App",
-                                                        $@"<p>A phone app is required to process your email.</p>
+                                                            $@"<p>A phone app is required to process your email.</p>
                  <p>Error: {ex.Message}");
         }
     }

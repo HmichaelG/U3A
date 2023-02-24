@@ -17,6 +17,7 @@ namespace U3A.Database
             if (!optionsBuilder.IsConfigured) {
                 var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
+                .AddUserSecrets<U3ADbContextSeed>()
                 .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
                 _configuration = builder.Build();
                 var cnstr = _configuration.GetConnectionString("SeedConnectionString");

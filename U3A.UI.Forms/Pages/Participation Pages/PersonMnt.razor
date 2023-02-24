@@ -44,6 +44,7 @@
             <DxTabs @ref="dxTabs" TabClick="@OnTabClick">
                 <DxTabPage Text="Participants" />
                 <DxTabPage Text="Leaders" />
+                <DxTabPage Text="Clerks" />
                 <DxTabPage Text="Committee" />
                 <DxTabPage Text="Life Members" />
                 <DxTabPage Text="All Volunteers" />
@@ -106,6 +107,17 @@
                     </FilterRowCellTemplate>
                 </DxGridDataColumn>
                 <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="4rem">
+                    <CellDisplayTemplate>
+                        <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
+                    </CellDisplayTemplate>
+                    <FilterRowCellTemplate>
+                        <DxCheckBox Checked="(bool?)context.FilterRowValue"
+                                CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                                AllowIndeterminateStateByClick="true"
+                                Alignment="CheckBoxContentAlignment.Center" />
+                    </FilterRowCellTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Visible="@true" Width="4rem">
                     <CellDisplayTemplate>
                         <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
                     </CellDisplayTemplate>
@@ -520,19 +532,22 @@
             case 1:             // Leaders
                 Persons = Persons.Where(x => x.IsCourseLeader && x.DateCeased == null && x.FinancialTo >= currentTerm.Year).ToList();
                 break;
-            case 2:             // Committe
+            case 2:             // Clerks
+                Persons = Persons.Where(x => x.IsCourseClerk && x.DateCeased == null && x.FinancialTo >= currentTerm.Year).ToList();
+                break;
+            case 3:             // Committe
                 Persons = Persons.Where(x => x.IsCommitteeMember && x.DateCeased == null).ToList();
                 break;
-            case 3:             // Life
+            case 4:             // Life
                 Persons = Persons.Where(x => x.IsLifeMember && x.DateCeased == null).ToList();
                 break;
-            case 4:             // Volunteer
+            case 5:             // Volunteer
                 Persons = Persons.Where(x => x.IsVolunteer && x.DateCeased == null).ToList();
                 break;
-            case 8:             // Unfinancial
+            case 6:             // Unfinancial
                 Persons = Persons.Where(x => x.FinancialTo < currentTerm?.Year && x.DateCeased == null).ToList();
                 break;
-            case 9:             // All Records
+            case 7:             // All Records
                 Persons = Persons.ToList();
                 break;
         }

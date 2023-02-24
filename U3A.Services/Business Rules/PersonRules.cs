@@ -93,15 +93,29 @@ namespace U3A.BusinessRules
             return people.Where(x => x.LeaderOf.Any()).ToList();
         }
 
-        public static async Task<bool> IsLeader(U3ADbContext dbc, Person person, Term term) {
-            return await dbc.Class
-                .Include(x => x.Course)
-                .AnyAsync(x => (x.LeaderID == person.ID || 
-                                x.Leader2ID == person.ID || 
-                                x.Leader3ID == person.ID) &&
-                                x.Course.Year == term.Year);
+        public static async Task<bool> IsLeaderOrClerk(U3ADbContext dbc, Person person, Term term) {
+            bool isLeader = await IsCourseLeader(dbc, person, term);
+            bool isClerk = await IsCourseClerk(dbc, person, term);
+            return isLeader || isClerk;
         }
 
+        public static async Task<bool> IsCourseLeader(U3ADbContext dbc, Person person, Term term) {
+            return await dbc.Class
+                            .Include(x => x.Course)
+                            .AnyAsync(x => (x.LeaderID == person.ID ||
+                                            x.Leader2ID == person.ID ||
+                                            x.Leader3ID == person.ID) &&
+                                            x.Course.Year == term.Year);
+        }
+        public static async Task<bool> IsCourseClerk(U3ADbContext dbc, Person person, Term term) {
+            return await dbc.Enrolment
+                            .Include(x => x.Term)
+                            .AnyAsync(x => x.Term.Year == term.Year &&
+                                            x.IsCourseClerk &&
+                                            x.PersonID == person.ID &&
+                                            !x.IsWaitlisted);
+
+        }
 
         public static List<Person> SelectablePersonsWithEnrolments(U3ADbContext dbc, Guid TermID, bool WaitlistStatus) {
             var term = dbc.Term.Find(TermID);
@@ -141,6 +155,13 @@ namespace U3A.BusinessRules
         async static Task ApplyGroupsAsync(U3ADbContext dbc, List<Person> people) {
             Term? term = await dbc.Term.Where(x => x.IsDefaultTerm).FirstOrDefaultAsync();
             if (term != null) {
+                foreach (var e in dbc.Enrolment
+                                            .Include(x => x.Term)
+                                            .Where(x => x.Term.Year == term.Year &&
+                                                    x.IsCourseClerk && !x.IsWaitlisted)) {
+                    var p = people.Find(x => x.ID == e.PersonID);
+                    if (p != null) p.IsCourseClerk = true;
+                }
                 foreach (var l in await dbc.Class.Include(x => x.Course)
                     .Where(x => x.LeaderID != null && x.Course.Year == term.Year)
                     .Select(x => x.LeaderID).ToListAsync()) {

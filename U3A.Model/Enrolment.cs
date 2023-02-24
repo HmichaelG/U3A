@@ -3,8 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace U3A.Model
 {
-    public class Enrolment
-    {
+    public class Enrolment {
         public Enrolment() { Created = DateTime.Now; }
 
         [Key]
@@ -29,6 +28,10 @@ namespace U3A.Model
         public long Random { get { return Created.Millisecond * 1000 + Created.Microsecond; } }
 
         public DateTime? DateEnrolled { get; set; }
+        
+        [Required]
+        [DefaultValue(false)]
+        public bool IsCourseClerk { get; set; } = false;
 
         private bool mIsWaitlisted;
         [Required]

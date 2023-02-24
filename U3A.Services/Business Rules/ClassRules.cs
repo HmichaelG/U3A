@@ -72,7 +72,6 @@ namespace U3A.BusinessRules
             }
             return classes.ToList();
         }
-
         public static List<Class> GetClassDetailsForStudent(IEnumerable<Class> Classes, Person Student, Term term) {
             List<Class> result;
             result = Classes.Where(c => c.Course.Enrolments

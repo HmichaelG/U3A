@@ -43,6 +43,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.3" />
 	</ItemGroup>
 	<ItemGroup>
@@ -70,6 +71,7 @@
 	</ItemGroup>
 	<PropertyGroup>
 		<SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
+		<UserSecretsId>9e197a90-e032-480f-a7c8-ecf464a9b6a2</UserSecretsId>
 	</PropertyGroup>
 	<Import Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.Sql.UnitTesting.targets" Condition="$(VisualStudioVersion) != '15.0' And '$(SQLDBExtensionsRefPath)' != ''" />
 	<Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.Sql.UnitTesting.targets" Condition="$(VisualStudioVersion) != '15.0' And '$(SQLDBExtensionsRefPath)' == ''" />
