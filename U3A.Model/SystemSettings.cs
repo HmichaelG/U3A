@@ -113,6 +113,9 @@ namespace U3A.Model
         [DefaultValue(true)]
         public bool IncludeCourseFeePerTermInComplimentary { get; set; }
 
+        [DefaultValue(true)]
+        public bool AllowLeaderToChangeEnrolment { get; set; } = true;
+
         [DefaultValue(0)]
         public int LeaderMaxComplimentaryCourses { get; set; }
     }

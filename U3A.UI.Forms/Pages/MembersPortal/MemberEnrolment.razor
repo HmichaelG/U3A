@@ -14,7 +14,7 @@
 }
 else {
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
-    <Progress @ref="progress" />
+    <Progress @ref="ProgressBar" />
     <MessageBox @ref="messageBox" />
 
     <DxFormLayout class="mx-4 w-100 mb-4">
@@ -228,8 +228,14 @@ else {
 
     [Parameter]
     public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+
+    [Parameter]
+    public EventCallback OnDataLoadComplete { get; set; }
+
     [Parameter]
     public bool IsReadOnly { get; set; }
+
+    Progress? ProgressBar;
 
     U3ADbContext? dbc { get; set; }
 
@@ -247,7 +253,6 @@ else {
     internal ErrorPopup? ErrorPopup { get; set; }
     internal string? ErrorHeader;
     internal string? ErrorMessage;
-    Progress progress;
     MessageBox? messageBox;
     string? googleMapAPIKey;
 
@@ -318,7 +323,8 @@ else {
                 }
             }
         }
-        if ((bool)progress?.PopupVisible) { progress?.Close(); }
+        if ((bool)ProgressBar?.PopupVisible) { ProgressBar?.Close(); }
+        await OnDataLoadComplete.InvokeAsync();
     }
 
     async Task OnEmail(Class context) {
@@ -449,7 +455,7 @@ else {
     void ShowSelectedClasses() {
         FilterText = null;
         if (isListboxShowingSummary) {
-            progress?.ShowSmallSpinnerAsync();
+            ProgressBar?.ShowSmallSpinnerAsync();
             ListboxData = Classes;
             isListboxShowingSummary = false;
             showFinalMessage = false;

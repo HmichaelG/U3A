@@ -1,0 +1,93 @@
+﻿@namespace U3A.UI.Forms
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+
+<DxLayoutBreakpoint MaxWidth="768"
+                    @bind-IsActive="@IsSmallLayout" />
+@if (!IsReady) {
+    <p><em>Loading...</em></p>
+}
+else {
+
+    <DxGrid @ref=@grid Data="@ClassAttendanceSummary" CssClass="grid-height"
+        ShowAllRows="true"
+        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+        KeyFieldName="ID"
+        ValidationEnabled="true"
+        AllowSort=true
+        AllowSelectRowByClick="false">
+        <Columns>
+            <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
+            <DxGridDataColumn Caption=@((IsSmallLayout) ? " " : "Present")
+                          FieldName="Present"
+                          Width=@((IsSmallLayout) ? "2rem" : "6rem")
+                          DisplayFormat="{0:F0}">
+                <CellDisplayTemplate>
+                    @{
+                        <div class="text-success">@context.Value</div>
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn Caption=@((IsSmallLayout) ? " " : "With Apology")
+                          FieldName="AbsentWithApology"
+                          Width=@((IsSmallLayout) ? "2rem" : "6rem")
+                          DisplayFormat="{0:F0}" >
+                <CellDisplayTemplate>
+                    @{
+                        <div class="text-warning">@context.Value</div>
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn Caption=@((IsSmallLayout) ? " " : "W/out Apology")
+                          FieldName="AbsentWithoutApology"
+                          Width=@((IsSmallLayout) ? "2rem" : "6rem")
+                          DisplayFormat="{0:F0}" >
+                <CellDisplayTemplate>
+                    @{
+                        <div class="text-danger">@context.Value</div>
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+        </Columns>
+    </DxGrid>
+    if (IsSmallLayout) {
+        <div class="input-group text-center">
+            <div class="alert-success flex-grow-1">Present</div>
+            <div class="alert-warning flex-grow-1">With Apology</div>
+            <div class="alert-danger flex-grow-1">W/out Apology</div>
+        </div>
+
+    }
+}
+<style>
+    .grid-height {
+        height: 50vh;
+    }
+
+</style>
+
+
+@code {
+    bool IsReady;
+
+    [Parameter]
+    public SystemSettings? Settings { get; set; }
+    [Parameter]
+    public Term? SelectedTerm { get; set; }
+    [Parameter]
+    public Class? SelectedClass { get; set; }
+
+    List<AttendClassSummary>? ClassAttendanceSummary;
+
+    bool IsSmallLayout;
+    int sequence = 1;
+    DxGrid? grid;
+
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            ClassAttendanceSummary = await BusinessRule.GetClassAttendanceSummary(dbc, SelectedTerm, SelectedClass);
+        }
+        IsReady = true;
+    }
+}

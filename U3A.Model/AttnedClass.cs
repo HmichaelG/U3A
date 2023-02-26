@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace U3A.Model
 {
@@ -31,6 +32,18 @@ namespace U3A.Model
         public string Comment { get; set; }
 
         public DateTime? DateProcessed { get; set; }
+
+    }
+
+    [NotMapped]
+    public class AttendClassSummary
+    {
+
+        public Guid PersonID { get; set; }
+        public Person Person { get; set; }
+        public int Present { get; set; }
+        public int AbsentWithApology { get; set; }
+        public int AbsentWithoutApology { get; set; }
 
     }
 }

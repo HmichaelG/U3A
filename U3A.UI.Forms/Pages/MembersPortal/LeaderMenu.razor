@@ -161,36 +161,62 @@ else {
             </DxFormLayout>
             break;
 
-        case MenuOptions.Email:
+        case MenuOptions.AttendanceHistory:
             <DxFormLayout class="mx-4 w-100 d-block">
                 <div class="col-12 col-lg-8 col-xl-6 mx-auto my-2">
-                    <StudentGrid @ref="studentGrid"
-                     Enrolments="EnrolmentsToSelectFrom"
-                     Settings="settings" />
-                    <DxButton Text="Email Selected Students"
-                  IconCssClass="bi-envelope menu-icon me-3 h2"
-                  CssClass="col-12 mt-1"
-                  Click="@(e => GetStudentEmailAddressList())"
-                  RenderStyle="ButtonRenderStyle.Primary"
-                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                    </DxButton>
+                    <AttendanceGrid SelectedClass="selectedClass" SelectedTerm="selectedTerm" />
                 </div>
             </DxFormLayout>
             break;
 
-        case MenuOptions.SMS:
+        case MenuOptions.ManageEnrolments:
+            <DxFormLayout class="mx-4 w-100 d-block">
+                <div class="col-12 col-lg-8 col-xl-6 mx-auto my-2">
+                    <StudentGrid @ref="studentGrid"
+                     Enrolments="EnrolmentsToSelectFrom"
+                     Settings="settings" IsManageEnrolmentsView=true />
+                    <div class="input-group">
+                        <DxButton Text="Delete Selected"
+                      IconCssClass="bi-person-dash menu-icon me-3 h2"
+                      CssClass="flex-grow-1"
+                      Click="@(e => OnDeleteEnrolments())"
+                      RenderStyle="ButtonRenderStyle.Danger"
+                      RenderStyleMode="ButtonRenderStyleMode.Contained">
+                        </DxButton>
+                        <DxButton Text="Toggle WaitList"
+                      IconCssClass="bi-toggle-on menu-icon me-3 h2"
+                      CssClass="flex-grow-1"
+                      Click="@(e => OnToggleWaitlist())"
+                      RenderStyle="ButtonRenderStyle.Warning"
+                      RenderStyleMode="ButtonRenderStyleMode.Contained">
+                        </DxButton>
+                    </div>
+                </div>
+            </DxFormLayout>
+            break;
+
+        case MenuOptions.Communicate:
             <DxFormLayout class="mx-4 w-100 d-block">
                 <div class="col-12 col-lg-8 col-xl-6 mx-auto my-2">
                     <StudentGrid @ref="studentGrid"
                      Enrolments="EnrolmentsToSelectFrom"
                      Settings="settings" />
-                    <DxButton Text="SMS Selected Students"
-                  IconCssClass="bi-phone menu-icon me-3 h2"
-                  CssClass="col-12 mt-1"
-                  Click="@(e => GetStudentSMSAddressList())"
-                  RenderStyle="ButtonRenderStyle.Primary"
-                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                    </DxButton>
+                    <div class="input-group">
+                        <DxButton Text="Email"
+                      IconCssClass="bi-envelope menu-icon me-3 h2"
+                      CssClass="flex-grow-1"
+                      Click="@(e => GetStudentEmailAddressList())"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline">
+                        </DxButton>
+                        <DxButton Text="SMS"
+                      IconCssClass="bi-phone menu-icon me-3 h2"
+                      CssClass="flex-grow-1"
+                      Click="@(e => GetStudentSMSAddressList())"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline">
+                        </DxButton>
+                    </div>
                 </div>
             </DxFormLayout>
             break;
@@ -276,17 +302,17 @@ else {
                   RenderStyle="ButtonRenderStyle.Primary"
                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
-                    <DxButton Text="Email Students"
-                  IconCssClass="bi bi-envelope menu-icon me-3 h2"
+                    <DxButton Text="Manage Enrolments" Visible="@(settings.AllowLeaderToChangeEnrolment)"
+                  IconCssClass="bi bi-person-rolodex menu-icon me-3 h2"
                   CssClass="col-12 mb-1"
-                  Click="@(e => OnMenuSelected(MenuOptions.Email))"
+                  Click="@(e => OnMenuSelected(MenuOptions.ManageEnrolments))"
                   RenderStyle="ButtonRenderStyle.Primary"
                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
-                    <DxButton Text="SMS Students"
-                  IconCssClass="bi bi-phone menu-icon me-3 h2"
+                    <DxButton Text="Email / SMS Students"
+                  IconCssClass="bi bi-broadcast-pin menu-icon me-3 h2"
                   CssClass="col-12 mb-1"
-                  Click="@(e => OnMenuSelected(MenuOptions.SMS))"
+                  Click="@(e => OnMenuSelected(MenuOptions.Communicate))"
                   RenderStyle="ButtonRenderStyle.Primary"
                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
@@ -294,6 +320,13 @@ else {
                   IconCssClass="bi bi-person-check menu-icon me-3 h2"
                   CssClass="col-12 mb-1"
                   Click="@(e => OnMenuSelected(MenuOptions.RecordAttendance))"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Attendance Histroy"
+                  IconCssClass="bi bi-clock-history menu-icon me-3 h2"
+                  CssClass="col-12 mb-1"
+                  Click="@(e => OnMenuSelected(MenuOptions.AttendanceHistory))"
                   RenderStyle="ButtonRenderStyle.Primary"
                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
@@ -375,9 +408,10 @@ else {
         Nothing,
         StudentLookup,
         AssignCourseClerk,
-        Email,
-        SMS,
+        ManageEnrolments,
+        Communicate,
         RecordAttendance,
+        AttendanceHistory,
         CancelClass,
         ConfigureEmail
     }
@@ -429,6 +463,59 @@ else {
         }
     }
 
+    async Task OnToggleWaitlist() {
+        if (await AreEnrolmentsSelected()) {
+            if (await messageBox.ShowAsync("Toggle Waitlist For Selection",
+                 $"<p>You are about to toggle the Waitlist status for {studentGrid.SelectedDataItems.Count()} students.<br/>" +
+                 "This means selected enrolled students will be set to waitlisted, and <br/>" +
+                 "selected waitlisted students will be set to enrolled.</p>" +
+                 "<p>Students are <strong>not</strong> automatically informed of this action.<br/> " +
+                 "Please ensure that you inform them yourself.</p>" +
+                 "<p>Do you wish to continue?")) {
+                foreach (var e in Enrolments) {
+                    if (studentGrid.SelectedDataItems.Contains(e)) {
+                        e.IsWaitlisted = !e.IsWaitlisted;
+                    }
+                }
+                using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+                    dbc.UpdateRange(Enrolments);
+                    await dbc.SaveChangesAsync();
+                }
+            }
+            studentGrid.ClearSelections();
+        }
+    }
+
+    async Task OnDeleteEnrolments() {
+        if (await AreEnrolmentsSelected()) {
+            if (await messageBox.ShowAsync("Delete Enrolment For Selection",
+                 $"<p><strong>Deletion is permanent!</strong><p>You are about to delete enrolment for {studentGrid.SelectedDataItems.Count()} students.</p>" +
+                 "</p><p>Although the student may re-enrol, you cannot undo this deletion.<br/>" +
+                 "Students are <strong>not</strong> automatically informed of this action. " +
+                 "Please ensure that you have informed them yourself.</p>" +
+                 "<p>Do you wish to continue?")) {
+                using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+                    foreach (var e in studentGrid.SelectedDataItems) {
+                        dbc.Remove(e);
+                        Enrolments.Remove((Enrolment)e);
+                    }
+                    await dbc.SaveChangesAsync();
+                }
+                await messageBox.ShowOkOnlyAsync("Selection deleted", $"{studentGrid.SelectedDataItems.Count()} enrolments have been deleted.");
+            }
+            studentGrid.ClearSelections();
+        }
+    }
+
+    async Task<bool> AreEnrolmentsSelected() {
+        var result = true;
+        if (studentGrid?.SelectedDataItems == null || studentGrid?.SelectedDataItems.Count() <= 0) {
+            await messageBox.ShowOkOnlyAsync("Select enrolment(s)", "You must select one or more enrolments before using this option.");
+            result = false;
+        }
+        return result;
+    }
+
     async Task OnMenuSelected(MenuOptions selection) {
         if (termAndCourse?.selectedTerm == null) return;
         if (termAndCourse?.selectedCourse == null) return;
@@ -438,11 +525,20 @@ else {
         selectedCourse = termAndCourse.selectedCourse;
         selectedClass = termAndCourse.selectedClass;
         Enrolments = termAndCourse.Enrolments;
+        menuSelection = selection;
+        if (menuSelection == MenuOptions.ManageEnrolments &&
+                !selectedTerm.IsClassAllocationFinalised) {
+            await messageBox.ShowOkOnlyAsync("Manage Enrolments not available",
+                                $"This option is not yet available for term {selectedTerm.TermNumber}<br/>" +
+                                "It will become available when the term's enrolment preparation is finalised.");
+            menuSelection = MenuOptions.Nothing;
+            return;
+        }
         Students.Clear();
         foreach (var e in Enrolments) { Students.Add(e.Person); }
         selectedStudent = null;
-        menuSelection = selection;
-        if (menuSelection == MenuOptions.Email || menuSelection == MenuOptions.SMS) {
+        EnrolmentsToSelectFrom = Enrolments; // set the default
+        if (menuSelection == MenuOptions.Communicate) {
             if (await selectEnrolmentType.ShowAsync()) {
                 switch (selectEnrolmentType.EnrolmentType) {
                     case 1:
@@ -478,6 +574,7 @@ else {
     }
 
     async Task GetStudentEmailAddressList() {
+        if (!await AreEnrolmentsSelected()) return;
         if (studentGrid == null) return;
         if (studentGrid.SelectedDataItems == null) return;
         var delimiter = await localStorage.GetItemAsync<string>("emailDelimiter");
@@ -499,6 +596,7 @@ else {
         }
     }
     async Task GetStudentSMSAddressList() {
+        if (!await AreEnrolmentsSelected()) return;
         if (studentGrid == null) return;
         if (studentGrid.SelectedDataItems == null) return;
         isApple = await js.InvokeAsync<bool>("IsApple");
@@ -517,8 +615,7 @@ else {
         }
         catch (Exception ex) {
             await messageBox.ShowOkOnlyAsync("Error Activating Phone App",
-                                                            $@"<p>A phone app is required to process your email.</p>
-                 <p>Error: {ex.Message}");
+                  $@"<p>A phone app is required to process your email.</p><p>Error: {ex.Message}");
         }
     }
 

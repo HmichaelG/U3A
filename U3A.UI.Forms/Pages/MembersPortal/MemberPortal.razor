@@ -21,6 +21,8 @@ else {
 
     <MessageBox @ref="@messageBox" />
 
+    <Progress @ref=@ProgressBar />
+
     <DxFormLayout CssClass="pt-2">
         @switch (menuSelection) {
             case PortalMenuSelection.DoSelectLinkedMember:
@@ -52,13 +54,15 @@ else {
                 break;
 
             case PortalMenuSelection.DoEditMemberEnrolment:
-                <MemberEnrolment
+                <MemberEnrolment OnDataLoadComplete="OnDataLoadComplete"
                      IsReadOnly=false OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                 break;
+
             case PortalMenuSelection.DoViewMemberEnrolment:
-                <MemberEnrolment
+                <MemberEnrolment OnDataLoadComplete="OnDataLoadComplete"
                      IsReadOnly=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                 break;
+
             case PortalMenuSelection.DoShowLeaderMenu:
                 <LeaderMenu OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                 break;
@@ -79,8 +83,7 @@ else {
     [CascadingParameter(Name = "QueryResult")]
     string? QueryResult { get; set; }
 
-    [CascadingParameter]
-    public Progress? ProgressBar { get; set; }
+    Progress? ProgressBar { get; set; }
 
     bool IsReady;
     bool IsProcessing;
@@ -146,6 +149,12 @@ else {
 
     async Task OnMenuOptionSelected(PortalMenuSelection selection) {
         if (await IsSelectionOK(selection)) {
+            if (selection == PortalMenuSelection.DoEditMemberEnrolment ||
+                    selection == PortalMenuSelection.DoViewMemberEnrolment) { 
+                await ProgressBar.ShowSmallSpinnerAsync();
+                StateHasChanged();
+                Task.Delay(1000);
+            }
             menuSelection = selection;
         }
         else {
@@ -199,6 +208,11 @@ else {
         }
         return result;
     }
+
+    async Task OnDataLoadComplete() {
+        await ProgressBar?.Close();
+    }
+
     async Task OnSelectedOptionCompleted(PortalMenuResult result) {
         switch (result) {
             case PortalMenuResult.EnrolmentCancelledTermNotDefined:

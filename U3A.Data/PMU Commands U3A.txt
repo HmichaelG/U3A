@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_CourseClerk
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_AttendClassCascadeRule
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_AttendClassCascadeRule
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_AllowLeaderToChangeEnrolments
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_AttendClassCascadeRule
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_AllowLeaderToChangeEnrolment
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

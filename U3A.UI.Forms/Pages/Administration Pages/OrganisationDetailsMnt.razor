@@ -73,6 +73,9 @@ else {
                     <DxFormLayoutItem Caption="Require Vax Certificate?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@systemSettings.RequireVaxCertificate" />
                     </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Allow leader/clerk to change enrolment?" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="@systemSettings.AllowLeaderToChangeEnrolment" />
+                    </DxFormLayoutItem>
                 </DxFormLayoutGroup>
                 <DxFormLayoutGroup Caption="Committee Positions (1 per line)" ColSpanMd="3" >
                     <DxMemo @bind-Text="@systemSettings.CommitteePositions" Rows="16" />

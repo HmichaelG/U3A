@@ -12,6 +12,20 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
+        public static async Task<List<AttendClassSummary>> GetClassAttendanceSummary(U3ADbContext dbc,
+            Term selectedTerm, Class selectedClass) {
+            var results = (await dbc.AttendClass.AsNoTracking().Include(ac => ac.Person)
+                .Where(ac => ac.TermID == selectedTerm.ID && ac.ClassID == selectedClass.ID)
+                .GroupBy(ac => ac.Person)
+                .Select(g => new AttendClassSummary {
+                    Person = g.Key,
+                    PersonID = g.Key.ID,
+                    Present = g.Count(ac => (AttendClassStatusType)ac.AttendClassStatusID == AttendClassStatusType.Present),
+                    AbsentWithApology = g.Count(ac => (AttendClassStatusType)ac.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithApology),
+                    AbsentWithoutApology = g.Count(ac => (AttendClassStatusType)ac.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithoutApology)
+                }).ToListAsync()).OrderBy(x => x.Person.FullNameAlpha).ToList();
+            return results;
+        }
         public static async Task<List<ClassDate>> SelectableAttendanceDatesAsync(U3ADbContext dbc,
                     Term selectedTerm, Class selectedClass, DateTime Now) {
             List<ClassDate> result;

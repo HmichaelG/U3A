@@ -3,6 +3,7 @@ using DevExpress.XtraRichEdit.Import.Rtf;
 using EllipticCurve;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Twilio.Rest.Trunking.V1;
 using U3A.Database;
 using U3A.Model;
 
@@ -406,7 +407,7 @@ namespace U3A.BusinessRules
                                         x.ClassID == c.ID)) {
                         var e = new Enrolment() {
                             Created = DateTime.Now,
-                            IsWaitlisted = await BusinessRule.SetWaitlistStatusAsync(dbc, course.ID, term, person)
+                            IsWaitlisted = await BusinessRule.SetWaitlistStatusAsync(dbc, course.ID, c.ID, term, person)
                         };
                         e.Person = await dbc.Person.FindAsync(person.ID);
                         e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == term.Year && x.TermNumber == termNumber);
@@ -420,22 +421,58 @@ namespace U3A.BusinessRules
             return result;
         }
 
+        // Saem participants in all classes
         public static async Task<bool> SetWaitlistStatusAsync(U3ADbContext dbc,
                                     Guid CourseID,
                                     Term CurrentTerm,
                                     Person person) {
             bool result = false;
             if (person.FinancialTo < CurrentTerm.Year) return true;
-            if (!CurrentTerm.IsClassAllocationFinalised) result = true;
-            else {
-                var course = await dbc.Course.FindAsync(CourseID);
-                int enrolments = await dbc.Enrolment
-                                    .Where(x => x.CourseID == CourseID && x.TermID == CurrentTerm.ID).CountAsync();
-                result = (enrolments >= course.MaximumStudents);
-            }
+            if (!CurrentTerm.IsClassAllocationFinalised) return true;
+
+            // If there are any waitlisted, then this enrolment must be waitlisted.
+            int waitlisted = await dbc.Enrolment
+                                .Where(x => x.CourseID == CourseID &&
+                                                x.TermID == CurrentTerm.ID &&
+                                                x.IsWaitlisted).CountAsync();
+            if (waitlisted > 0) return true;
+
+            // Otherwise, set enrolled if enrolled count less than Max count
+            var course = await dbc.Course.FindAsync(CourseID);
+            int enrolments = await dbc.Enrolment
+                                .Where(x => x.CourseID == CourseID && 
+                                            x.TermID == CurrentTerm.ID &&
+                                            !x.IsWaitlisted).CountAsync();
+            result = (enrolments >= course.MaximumStudents);
             return result;
         }
 
+        // Different participants in each class
+        public static async Task<bool> SetWaitlistStatusAsync(U3ADbContext dbc,
+                                    Guid CourseID,
+                                    Guid ClassID,
+                                    Term CurrentTerm,
+                                    Person person) {
+            bool result = false;
+            if (person.FinancialTo < CurrentTerm.Year) return true;
+            if (!CurrentTerm.IsClassAllocationFinalised) return true;
+
+            // If there are any waitlisted, then this enrolment must be waitlisted.
+            int waitlisted = await dbc.Enrolment
+                                .Where(x => x.CourseID == CourseID && x.ClassID == ClassID &&   
+                                                x.TermID == CurrentTerm.ID &&
+                                                x.IsWaitlisted).CountAsync();
+            if (waitlisted > 0) return true;
+
+            // Otherwise, set enrolled if enrolled count less than Max count
+            var course = await dbc.Course.FindAsync(CourseID);
+            int enrolments = await dbc.Enrolment
+                                .Where(x => x.CourseID == CourseID && x.ClassID == ClassID &&
+                                                x.TermID == CurrentTerm.ID &&
+                                                !x.IsWaitlisted).CountAsync();
+            result = (enrolments >= course.MaximumStudents);
+            return result;
+        }
 
         static int GetFirstTermNumber(Term currentTerm, Class requestedClass) {
             var termNumber = currentTerm.TermNumber;

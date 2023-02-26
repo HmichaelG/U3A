@@ -5684,3 +5684,22 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230226013334_U3A_AllowLeaderToChangeEnrolment')
+BEGIN
+    ALTER TABLE [SystemSettings] ADD [AllowLeaderToChangeEnrolment] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230226013334_U3A_AllowLeaderToChangeEnrolment')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230226013334_U3A_AllowLeaderToChangeEnrolment', N'7.0.3');
+END;
+GO
+
+COMMIT;
+GO
+

@@ -8,7 +8,7 @@
 }
 else {
 
-    <DxGrid Data="@Enrolments" CssClass="grid-height"
+    <DxGrid @ref=@grid Data="@Enrolments" CssClass="grid-height"
         ShowAllRows="true"
         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
         KeyFieldName="ID"
@@ -20,10 +20,10 @@ else {
         <Columns>
             <DxGridSelectionColumn Width="2rem" />
             <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
-                          DisplayFormat="n0"
+                          DisplayFormat="n0" Visible="@(!IsManageEnrolmentsView)"
                           UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
-            <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" Visible="false">
+            <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem" 
+                Visible="@IsManageEnrolmentsView">
                 <CellDisplayTemplate>
                     <DxCheckBox Enabled="false" Checked="(bool)context.Value" />
                 </CellDisplayTemplate>
@@ -34,7 +34,8 @@ else {
                             Alignment="CheckBoxContentAlignment.Center" />
                 </FilterRowCellTemplate>
             </DxGridDataColumn>
-            <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem">
+            <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
+            <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="3rem">
                 <CellDisplayTemplate>
                     <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
                 </CellDisplayTemplate>
@@ -45,8 +46,32 @@ else {
                             Alignment="CheckBoxContentAlignment.Center" />
                 </FilterRowCellTemplate>
             </DxGridDataColumn>
-            <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
-                          Width="5rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
+            <DxGridDataColumn Caption="Email?" Width="3rem">
+                <CellDisplayTemplate>
+                    <DxCheckBox Enabled="false" Checked="(!string.IsNullOrWhiteSpace(((Enrolment)context.DataItem).Person.Email))" 
+                            Alignment="CheckBoxContentAlignment.Center" />
+                </CellDisplayTemplate>
+                <FilterRowCellTemplate>
+                    <DxCheckBox Checked="(bool?)context.FilterRowValue"
+                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                            AllowIndeterminateStateByClick="true"
+                            Alignment="CheckBoxContentAlignment.Center" />
+                </FilterRowCellTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn Caption="SMS?" Width="3rem" Visible=@IsSmallLayout>
+                <CellDisplayTemplate>
+                    <DxCheckBox Enabled="false" Checked="(!string.IsNullOrWhiteSpace(((Enrolment)context.DataItem).Person.Mobile))"
+                            Alignment="CheckBoxContentAlignment.Center" />
+                </CellDisplayTemplate>
+                <FilterRowCellTemplate>
+                    <DxCheckBox Checked="(bool?)context.FilterRowValue"
+                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                            AllowIndeterminateStateByClick="true"
+                            Alignment="CheckBoxContentAlignment.Center" />
+                </FilterRowCellTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn Caption="Vax?" FieldName="Person.VaxCertificateViewed"
+                          Width="3rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
                 <CellDisplayTemplate>
                     <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
                 </CellDisplayTemplate>
@@ -97,9 +122,12 @@ else {
     public List<Enrolment>? Enrolments { get; set; }
     [Parameter]
     public IReadOnlyList<object> SelectedDataItems { get; set; }
+    [Parameter]
+    public bool IsManageEnrolmentsView { get; set; }
 
     bool IsSmallLayout;
     int sequence = 1;
+    DxGrid? grid;
 
 
     protected override void OnInitialized() {
@@ -123,4 +151,6 @@ else {
             e.Value = sequence++;
         }
     }
+
+    public void ClearSelections() { grid.ClearSelection(); }
 }
