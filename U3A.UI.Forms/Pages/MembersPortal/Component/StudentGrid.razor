@@ -18,12 +18,12 @@ else {
         UnboundColumnData="Grid_CustomUnboundColumnData"
         @bind-SelectedDataItems="SelectedDataItems">
         <Columns>
-            <DxGridSelectionColumn Width="2rem" />
+            <DxGridSelectionColumn Width="1rem" />
             <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
-                          DisplayFormat="n0" Visible="@(!IsManageEnrolmentsView)"
+                          Visible="@(!IsManageEnrolmentsView)"
                           UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem" 
-                Visible="@IsManageEnrolmentsView">
+            <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
+                          Visible="@IsManageEnrolmentsView">
                 <CellDisplayTemplate>
                     <DxCheckBox Enabled="false" Checked="(bool)context.Value" />
                 </CellDisplayTemplate>
@@ -34,41 +34,23 @@ else {
                             Alignment="CheckBoxContentAlignment.Center" />
                 </FilterRowCellTemplate>
             </DxGridDataColumn>
-            <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
-            <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="3rem">
+            <DxGridDataColumn Caption="Name" FieldName="Person.FullName">
                 <CellDisplayTemplate>
-                    <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
+                    @{
+                        var isCourseClerk = ((Enrolment)context.DataItem).IsCourseClerk;
+                        var hasEmail = !string.IsNullOrWhiteSpace(((Enrolment)context.DataItem).Person.Email);
+                        var hasMobile = !string.IsNullOrWhiteSpace(((Enrolment)context.DataItem).Person.Mobile);
+                        var css = "col-8 text-start ";
+                        var emailcss = (hasEmail) ? "col-2 bi-envelope" : "col-2";
+                        var mobilecss = (hasMobile) ? "col-2 bi-phone" : "col-2";
+                        if (isCourseClerk) css += "alert-success";
+                        <div class="input-group">
+                            <div class=@css>@context.Value</div>
+                            <div class=@mobilecss></div>
+                            <div class=@emailcss></div>
+                        </div>
+                    }
                 </CellDisplayTemplate>
-                <FilterRowCellTemplate>
-                    <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                            AllowIndeterminateStateByClick="true"
-                            Alignment="CheckBoxContentAlignment.Center" />
-                </FilterRowCellTemplate>
-            </DxGridDataColumn>
-            <DxGridDataColumn Caption="Email?" Width="3rem">
-                <CellDisplayTemplate>
-                    <DxCheckBox Enabled="false" Checked="(!string.IsNullOrWhiteSpace(((Enrolment)context.DataItem).Person.Email))" 
-                            Alignment="CheckBoxContentAlignment.Center" />
-                </CellDisplayTemplate>
-                <FilterRowCellTemplate>
-                    <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                            AllowIndeterminateStateByClick="true"
-                            Alignment="CheckBoxContentAlignment.Center" />
-                </FilterRowCellTemplate>
-            </DxGridDataColumn>
-            <DxGridDataColumn Caption="SMS?" Width="3rem" Visible=@IsSmallLayout>
-                <CellDisplayTemplate>
-                    <DxCheckBox Enabled="false" Checked="(!string.IsNullOrWhiteSpace(((Enrolment)context.DataItem).Person.Mobile))"
-                            Alignment="CheckBoxContentAlignment.Center" />
-                </CellDisplayTemplate>
-                <FilterRowCellTemplate>
-                    <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                            AllowIndeterminateStateByClick="true"
-                            Alignment="CheckBoxContentAlignment.Center" />
-                </FilterRowCellTemplate>
             </DxGridDataColumn>
             <DxGridDataColumn Caption="Vax?" FieldName="Person.VaxCertificateViewed"
                           Width="3rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
@@ -90,11 +72,11 @@ else {
                           FieldName="Person.FinancialTo"
                           Visible="!IsSmallLayout"
                           Width="4rem" DisplayFormat="{0:F0}" />
-            <DxGridDataColumn Caption="Mobile" 
+            <DxGridDataColumn Caption="Mobile"
                           Visible="!IsSmallLayout"
                           FieldName="Person.Mobile"
                           Width="6rem" />
-            <DxGridDataColumn Caption="Home" 
+            <DxGridDataColumn Caption="Home"
                           Visible="!IsSmallLayout"
                           FieldName="Person.HomePhone"
                           Width="6rem" />

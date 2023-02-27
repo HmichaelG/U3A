@@ -8,7 +8,7 @@
     <p><em>Loading...</em></p>
 }
 else {
-
+    <div class="text-center">As at @(summaryDate.ToLongDateString())</div>
     <DxGrid @ref=@grid Data="@ClassAttendanceSummary" CssClass="grid-height"
         ShowAllRows="true"
         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -76,18 +76,23 @@ else {
     public Term? SelectedTerm { get; set; }
     [Parameter]
     public Class? SelectedClass { get; set; }
+    [Parameter]
+    public LocalTime? LocalTime { get; set; }
 
     List<AttendClassSummary>? ClassAttendanceSummary;
 
     bool IsSmallLayout;
     int sequence = 1;
     DxGrid? grid;
+    DateTime summaryDate;
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
-            ClassAttendanceSummary = await BusinessRule.GetClassAttendanceSummary(dbc, SelectedTerm, SelectedClass);
+            summaryDate = (await LocalTime.GetLocalDateAsync());
+            ClassAttendanceSummary = await BusinessRule.GetClassAttendanceSummary(dbc, summaryDate, SelectedTerm, SelectedClass);
         }
         IsReady = true;
     }
+
 }

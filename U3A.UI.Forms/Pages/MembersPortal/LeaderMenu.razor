@@ -164,7 +164,8 @@ else {
         case MenuOptions.AttendanceHistory:
             <DxFormLayout class="mx-4 w-100 d-block">
                 <div class="col-12 col-lg-8 col-xl-6 mx-auto my-2">
-                    <AttendanceGrid SelectedClass="selectedClass" SelectedTerm="selectedTerm" />
+                    <AttendanceGrid SelectedClass="@selectedClass" 
+                                    SelectedTerm="@selectedTerm" LocalTime="@localTime" />
                 </div>
             </DxFormLayout>
             break;

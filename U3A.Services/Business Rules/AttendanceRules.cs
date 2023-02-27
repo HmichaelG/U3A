@@ -13,9 +13,11 @@ namespace U3A.BusinessRules
     public static partial class BusinessRule
     {
         public static async Task<List<AttendClassSummary>> GetClassAttendanceSummary(U3ADbContext dbc,
-            Term selectedTerm, Class selectedClass) {
+                                DateTime SummaryDate, Term selectedTerm, Class selectedClass) {
             var results = (await dbc.AttendClass.AsNoTracking().Include(ac => ac.Person)
-                .Where(ac => ac.TermID == selectedTerm.ID && ac.ClassID == selectedClass.ID)
+                .Where(ac => ac.TermID == selectedTerm.ID && 
+                                    ac.ClassID == selectedClass.ID &&
+                                    ac.Date < SummaryDate.AddDays(1))
                 .GroupBy(ac => ac.Person)
                 .Select(g => new AttendClassSummary {
                     Person = g.Key,

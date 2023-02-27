@@ -1,6 +1,7 @@
 ﻿using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
@@ -142,7 +143,7 @@ namespace U3A.BusinessRules
                     break;
             }
             DateTime? endDate = GetClassEndDate(dbc, Class, term);
-            if (endDate == null || endDate <= DateTime.Today) result = false ;
+            if (endDate == null || endDate <= DateTime.Today) result = false;
             return result;
         }
 

@@ -24,6 +24,14 @@ namespace U3A.Services
             // Converting to local time using UTC and local time minute difference.
             return DateTimeOffset.UtcNow.ToOffset(userTime.Value).DateTime;
         }
+        public async Task<DateTime> GetLocalDateAsync() {
+            if (userTime == null) {
+                int timeDiffer = await jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
+                userTime = TimeSpan.FromMinutes(-timeDiffer);
+            }
+            // Converting to local time using UTC and local time minute difference.
+            return DateTimeOffset.UtcNow.ToOffset(userTime.Value).Date;
+        }
         public async Task<DateTime> GetLocalTimeAsync(DateTime UTCTime) {
             if (userTime == null) {
                 int timeDiffer = await jsRuntime.InvokeAsync<int>("GetTimezoneOffset");

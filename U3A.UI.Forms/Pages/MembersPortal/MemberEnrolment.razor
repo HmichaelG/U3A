@@ -139,12 +139,12 @@ else {
                                         </div>
                                         var link = $"https://www.google.com/maps/embed/v1/place?key={googleMapAPIKey}&q={HttpUtility.UrlEncode($"{context.Venue?.Name} {context.Venue?.Address}")}";
                                         <iframe width="100%"
-                                            height="250rem"
-                                            style="border:1"
-                                            loading="lazy"
-                                            allowfullscreen
-                                            referrerpolicy="no-referrer-when-downgrade"
-                                            src="@link" />
+                                                height="250rem"
+                                                style="border:1"
+                                                loading="lazy"
+                                                allowfullscreen
+                                                referrerpolicy="no-referrer-when-downgrade"
+                                                src="@link" />
                                     }
                                 </div>
                             </Items>
@@ -318,13 +318,13 @@ else {
                 if (SelectedClasses?.Count() <= 0) {
                     await messageBox.ShowOkOnlyAsync("No Erolment In Current Term",
                             $"You have no enrolmnnts in {term.Year} Term {term.TermNumber}.<br>" +
-                            "Use <strong>Edit your course enrolments</strong> to add/delete enrolments.");
+                            "Use <strong>Change your course enrolments</strong> to add/delete enrolments.");
                     await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
                 }
             }
+            await OnDataLoadComplete.InvokeAsync();
         }
         if ((bool)ProgressBar?.PopupVisible) { ProgressBar?.Close(); }
-        await OnDataLoadComplete.InvokeAsync();
     }
 
     async Task OnEmail(Class context) {

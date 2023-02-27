@@ -12,9 +12,7 @@
     <Columns>
         <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" Width="6rem" />
         <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
-        <DxGridDataColumn Caption="Occurs" FieldName="OccurrenceText" Visible="@(!AllowEdit)" />
-        <DxGridDataColumn Caption="Occurs" FieldName="Occurrence.ShortName" Width="5rem" Visible="@AllowEdit" />
-        <DxGridDataColumn Caption="On Day" FieldName="OnDay.ShortDay" Width="4rem" Visible="@AllowEdit" />
+        <DxGridDataColumn Caption="Occurs" FieldName="OccurrenceText" />
         <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="t" Width="5rem" />
         <DxGridDataColumn Caption="Finish"
                           FieldName="StrEndTime" DisplayFormat="t" Width="5rem" Visible="@(!AllowEdit)" />

@@ -24,7 +24,7 @@ namespace U3A.BusinessRules
                         .OrderBy(x => x.Name)
                         .ToListAsync();
             foreach (var course in Courses) {
-                course.Classes = course.Classes.OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
+                course.Classes = course.Classes.OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
             }
             return Courses;
         }
@@ -43,7 +43,7 @@ namespace U3A.BusinessRules
                         .OrderBy(x => x.Name)
                         .ToListAsync();
             foreach (var course in Courses) {
-                course.Classes = course.Classes.OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
+                course.Classes = course.Classes.OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
             }
             return Courses;
         }
