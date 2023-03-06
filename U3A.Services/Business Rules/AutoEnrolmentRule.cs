@@ -3,22 +3,22 @@ using DevExpress.Utils.Serializing;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
+using Twilio.Rest.Trunking.V1;
 using U3A.Database;
 using U3A.Model;
 
 namespace U3A.BusinessRules
 {
-    public static partial class BusinessRule
-    {
+    public static partial class BusinessRule {
         public static async Task AutoEnrolParticipantsAsync(U3ADbContext dbc, Term SelectedTerm,
-                              bool DoFullEnrolment, 
+                              bool DoFullEnrolment,
                               bool IsClassAllocationDone,
                               bool ForceEmailQueue) {
             List<Enrolment> enrolmentsToProcess;
             List<Person> CourseLeaders;
             foreach (var course in await dbc.Course
                                             .Include(x => x.Classes)
-                                            .Where(x => x.Year== SelectedTerm.Year)
+                                            .Where(x => x.Year == SelectedTerm.Year)
                                             .ToListAsync()) {
                 CourseLeaders = new List<Person>();
                 foreach (var c in course.Classes) {
@@ -30,24 +30,26 @@ namespace U3A.BusinessRules
                     enrolmentsToProcess = dbc.Enrolment
                                                 .Include(x => x.Person).ThenInclude(x => x.Enrolments)
                                                 .AsEnumerable()
-                                                .Where(x => x.TermID == SelectedTerm.ID 
+                                                .Where(x => x.TermID == SelectedTerm.ID
                                                                 && x.CourseID == course.ID
-                                                                && x.Person.DateCeased == null 
+                                                                && x.Person.DateCeased == null
                                                                 && !CourseLeaders.Contains(x.Person)
                                                                 && x.Person.FinancialTo >= SelectedTerm.Year)
                                                 .ToList();
-                    await ProcessEnrolments(dbc, course, enrolmentsToProcess,DoFullEnrolment,ForceEmailQueue);
+                    await ProcessEnrolments(dbc, course, enrolmentsToProcess, DoFullEnrolment, ForceEmailQueue);
                 }
                 else {
                     foreach (var courseClass in course.Classes) {
-                        enrolmentsToProcess = await dbc.Enrolment
+                        enrolmentsToProcess = dbc.Enrolment
                                                     .Include(x => x.Person).ThenInclude(x => x.Enrolments)
-                                                    .Where(x => x.TermID == SelectedTerm.ID 
+                                                    .AsEnumerable()
+                                                    .Where(x => x.TermID == SelectedTerm.ID
                                                                     && x.ClassID == courseClass.ID
                                                                     && x.Person.DateCeased == null
+                                                                    && !CourseLeaders.Contains(x.Person)
                                                                     && x.Person.FinancialTo >= SelectedTerm.Year)
-                                                    .ToListAsync();
-                        await ProcessEnrolments(dbc, course, enrolmentsToProcess, DoFullEnrolment,ForceEmailQueue);
+                                                    .ToList();
+                        await ProcessEnrolments(dbc, course, enrolmentsToProcess, DoFullEnrolment, ForceEmailQueue);
                     }
                 }
             }
@@ -57,6 +59,7 @@ namespace U3A.BusinessRules
             dbc.Update(term);
             await dbc.SaveChangesAsync();
         }
+
         private static async Task ProcessEnrolments(U3ADbContext dbc, Course course,
                                     List<Enrolment> enrolments, bool DoFullEnrolment, bool ForceEmailQueue) {
             var settings = await dbc.SystemSettings.FirstAsync();

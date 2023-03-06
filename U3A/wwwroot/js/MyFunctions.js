@@ -10,6 +10,10 @@ function ScrollToTop(id) {
     }
 }
 
+function GetSessionState(key) {
+    return window.sessionStorage.getItem(key);
+}
+
 function IsApple() {
     return (/iP(hone|od|ad)/.test(navigator.platform));
 }

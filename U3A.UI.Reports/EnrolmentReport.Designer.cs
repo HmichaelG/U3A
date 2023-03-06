@@ -50,9 +50,9 @@
             this.tableCell5 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell3 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell5 = new DevExpress.XtraReports.UI.XRTableCell();
-            this.xrTableCell6 = new DevExpress.XtraReports.UI.XRTableCell();
-            this.xrTableCell7 = new DevExpress.XtraReports.UI.XRTableCell();
-            this.xrTableCell36 = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrActiveStudents = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrWaitlistStudents = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrTotalStudents = new DevExpress.XtraReports.UI.XRTableCell();
             this.Title = new DevExpress.XtraReports.UI.XRControlStyle();
             this.DetailCaption1 = new DevExpress.XtraReports.UI.XRControlStyle();
             this.DetailData1 = new DevExpress.XtraReports.UI.XRControlStyle();
@@ -268,9 +268,9 @@
             this.tableCell5,
             this.xrTableCell3,
             this.xrTableCell5,
-            this.xrTableCell6,
-            this.xrTableCell7,
-            this.xrTableCell36});
+            this.xrActiveStudents,
+            this.xrWaitlistStudents,
+            this.xrTotalStudents});
             this.rowDetail.ForeColor = System.Drawing.Color.Black;
             this.rowDetail.Name = "rowDetail";
             this.rowDetail.StylePriority.UseBackColor = false;
@@ -337,66 +337,63 @@
             this.xrTableCell5.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.xrTableCell5.Weight = 0.11798746224463866D;
             // 
-            // xrTableCell6
+            // xrActiveStudents
             // 
-            this.xrTableCell6.Borders = DevExpress.XtraPrinting.BorderSide.Top;
-            this.xrTableCell6.BorderWidth = 3F;
-            this.xrTableCell6.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Course].[TotalActiveStudents]")});
-            this.xrTableCell6.Font = new DevExpress.Drawing.DXFont("Arial Narrow", 8.25F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.xrActiveStudents.Borders = DevExpress.XtraPrinting.BorderSide.Top;
+            this.xrActiveStudents.BorderWidth = 3F;
+            this.xrActiveStudents.Font = new DevExpress.Drawing.DXFont("Arial Narrow", 8.25F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
-            this.xrTableCell6.Multiline = true;
-            this.xrTableCell6.Name = "xrTableCell6";
-            this.xrTableCell6.StyleName = "DetailData1";
-            this.xrTableCell6.StylePriority.UseBorders = false;
-            this.xrTableCell6.StylePriority.UseBorderWidth = false;
-            this.xrTableCell6.StylePriority.UseFont = false;
-            this.xrTableCell6.StylePriority.UseForeColor = false;
-            this.xrTableCell6.StylePriority.UseTextAlignment = false;
-            this.xrTableCell6.Text = "xrTableCell6";
-            this.xrTableCell6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell6.Weight = 0.11798746224463866D;
+            this.xrActiveStudents.Multiline = true;
+            this.xrActiveStudents.Name = "xrActiveStudents";
+            this.xrActiveStudents.StyleName = "DetailData1";
+            this.xrActiveStudents.StylePriority.UseBorders = false;
+            this.xrActiveStudents.StylePriority.UseBorderWidth = false;
+            this.xrActiveStudents.StylePriority.UseFont = false;
+            this.xrActiveStudents.StylePriority.UseForeColor = false;
+            this.xrActiveStudents.StylePriority.UseTextAlignment = false;
+            this.xrActiveStudents.Text = "xrActiveStudents";
+            this.xrActiveStudents.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+            this.xrActiveStudents.Weight = 0.11798746224463866D;
+            this.xrActiveStudents.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrActiveStudents_BeforePrint);
             // 
-            // xrTableCell7
+            // xrWaitlistStudents
             // 
-            this.xrTableCell7.Borders = DevExpress.XtraPrinting.BorderSide.Top;
-            this.xrTableCell7.BorderWidth = 3F;
-            this.xrTableCell7.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Course].[TotalWaitlistedStudents]")});
-            this.xrTableCell7.Font = new DevExpress.Drawing.DXFont("Arial Narrow", 8.25F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.xrWaitlistStudents.Borders = DevExpress.XtraPrinting.BorderSide.Top;
+            this.xrWaitlistStudents.BorderWidth = 3F;
+            this.xrWaitlistStudents.Font = new DevExpress.Drawing.DXFont("Arial Narrow", 8.25F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
-            this.xrTableCell7.Multiline = true;
-            this.xrTableCell7.Name = "xrTableCell7";
-            this.xrTableCell7.StyleName = "DetailData1";
-            this.xrTableCell7.StylePriority.UseBorders = false;
-            this.xrTableCell7.StylePriority.UseBorderWidth = false;
-            this.xrTableCell7.StylePriority.UseFont = false;
-            this.xrTableCell7.StylePriority.UseForeColor = false;
-            this.xrTableCell7.StylePriority.UseTextAlignment = false;
-            this.xrTableCell7.Text = "xrTableCell7";
-            this.xrTableCell7.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell7.Weight = 0.11798746224463866D;
+            this.xrWaitlistStudents.Multiline = true;
+            this.xrWaitlistStudents.Name = "xrWaitlistStudents";
+            this.xrWaitlistStudents.StyleName = "DetailData1";
+            this.xrWaitlistStudents.StylePriority.UseBorders = false;
+            this.xrWaitlistStudents.StylePriority.UseBorderWidth = false;
+            this.xrWaitlistStudents.StylePriority.UseFont = false;
+            this.xrWaitlistStudents.StylePriority.UseForeColor = false;
+            this.xrWaitlistStudents.StylePriority.UseTextAlignment = false;
+            this.xrWaitlistStudents.Text = "xrWaitlistStudents";
+            this.xrWaitlistStudents.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+            this.xrWaitlistStudents.Weight = 0.11798746224463866D;
+            this.xrWaitlistStudents.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrWaitlistStudents_BeforePrint);
             // 
-            // xrTableCell36
+            // xrTotalStudents
             // 
-            this.xrTableCell36.Borders = DevExpress.XtraPrinting.BorderSide.Top;
-            this.xrTableCell36.BorderWidth = 3F;
-            this.xrTableCell36.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[clcTotalStudents]")});
-            this.xrTableCell36.Font = new DevExpress.Drawing.DXFont("Arial Narrow", 8.25F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.xrTotalStudents.Borders = DevExpress.XtraPrinting.BorderSide.Top;
+            this.xrTotalStudents.BorderWidth = 3F;
+            this.xrTotalStudents.Font = new DevExpress.Drawing.DXFont("Arial Narrow", 8.25F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
-            this.xrTableCell36.Multiline = true;
-            this.xrTableCell36.Name = "xrTableCell36";
-            this.xrTableCell36.StyleName = "DetailData1";
-            this.xrTableCell36.StylePriority.UseBorders = false;
-            this.xrTableCell36.StylePriority.UseBorderWidth = false;
-            this.xrTableCell36.StylePriority.UseFont = false;
-            this.xrTableCell36.StylePriority.UseForeColor = false;
-            this.xrTableCell36.StylePriority.UseTextAlignment = false;
-            this.xrTableCell36.Text = "xrTableCell36";
-            this.xrTableCell36.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell36.TextFormatString = "{0:N0}";
-            this.xrTableCell36.Weight = 0.11798746224463866D;
+            this.xrTotalStudents.Multiline = true;
+            this.xrTotalStudents.Name = "xrTotalStudents";
+            this.xrTotalStudents.StyleName = "DetailData1";
+            this.xrTotalStudents.StylePriority.UseBorders = false;
+            this.xrTotalStudents.StylePriority.UseBorderWidth = false;
+            this.xrTotalStudents.StylePriority.UseFont = false;
+            this.xrTotalStudents.StylePriority.UseForeColor = false;
+            this.xrTotalStudents.StylePriority.UseTextAlignment = false;
+            this.xrTotalStudents.Text = "xrTotalStudents";
+            this.xrTotalStudents.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+            this.xrTotalStudents.TextFormatString = "{0:N0}";
+            this.xrTotalStudents.Weight = 0.11798746224463866D;
+            this.xrTotalStudents.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrTotalStudents_BeforePrint);
             // 
             // Title
             // 
@@ -1174,8 +1171,8 @@
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow1;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell3;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell5;
-        private DevExpress.XtraReports.UI.XRTableCell xrTableCell6;
-        private DevExpress.XtraReports.UI.XRTableCell xrTableCell7;
+        private DevExpress.XtraReports.UI.XRTableCell xrActiveStudents;
+        private DevExpress.XtraReports.UI.XRTableCell xrWaitlistStudents;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell12;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell13;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell14;
@@ -1188,7 +1185,7 @@
         private DevExpress.XtraReports.UI.XRLabel label1;
         private DevExpress.XtraReports.UI.ReportHeaderBand ReportHeader;
         private DevExpress.XtraReports.UI.XRLabel xrLabel2;
-        private DevExpress.XtraReports.UI.XRTableCell xrTableCell36;
+        private DevExpress.XtraReports.UI.XRTableCell xrTotalStudents;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell35;
         private DevExpress.XtraReports.Parameters.Parameter paramTermSummary;
         private DevExpress.XtraReports.UI.ReportFooterBand ReportFooter;

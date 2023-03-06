@@ -61,8 +61,10 @@ namespace U3A.BusinessRules
                         .Where(x => x.Year == term.Year & x.Classes.Any())
                         .OrderBy(x => x.Name)
                         .ToList();
-            foreach (var c in courses) {
-                SetCourseParticipationDetails(c, term);
+            foreach (var course in courses) {
+                foreach (var c in course.Classes) {
+                    SetCourseParticipationDetails(dbc, c, term);
+                }
             }
             return courses;
         }
@@ -125,18 +127,22 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        public static void SetCourseParticipationDetails(Course course, Term term) {
-            course.TotalActiveStudents = course.Enrolments.Where(x => !x.IsWaitlisted && x.TermID == term.ID).Count();
-            course.TotalWaitlistedStudents = course.Enrolments.Where(x => x.IsWaitlisted && x.TermID == term.ID).Count();
-            course.ParticipationRate = 0;
-            double count = 0;
-            if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses) {
-                count = course.MaximumStudents;
+        public static void SetCourseParticipationDetails(U3ADbContext dbc, Class Class, Term term) {
+            double maxStudents = Class.Course.MaximumStudents; ;
+            Class.ParticipationRate = 0;
+            if (Class.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses) {
+                Class.TotalActiveStudents = dbc.Enrolment.Where(x => x.CourseID == Class.CourseID &&
+                                                    !x.IsWaitlisted && x.TermID == term.ID).Count();
+                Class.TotalWaitlistedStudents = dbc.Enrolment.Where(x => x.CourseID == Class.CourseID &&
+                                                    x.IsWaitlisted && x.TermID == term.ID).Count();
             }
             else {
-                count = (course.MaximumStudents * course.Classes.Count());
+                Class.TotalActiveStudents = dbc.Enrolment.Where(x => x.ClassID == Class.ID &&
+                                                !x.IsWaitlisted && x.TermID == term.ID).Count();
+                Class.TotalWaitlistedStudents = dbc.Enrolment.Where(x => x.ClassID == Class.ID &&
+                                                x.IsWaitlisted && x.TermID == term.ID).Count();
             }
-            if (count != 0) course.ParticipationRate = (double)((course.TotalActiveStudents + course.TotalWaitlistedStudents) / count);
+            if (maxStudents != 0) Class.ParticipationRate = (double)((Class.TotalActiveStudents + Class.TotalWaitlistedStudents) / maxStudents);
         }
 
         public static async Task<List<Course>> SelectableCoursesByTermAsync(U3ADbContext dbc, int Year, int TermNumber) {

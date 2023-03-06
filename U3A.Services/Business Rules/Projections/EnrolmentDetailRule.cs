@@ -21,7 +21,6 @@ namespace U3A.BusinessRules
             var cr = dbc.Course.Where(x => x.ID == enrolment.CourseID).Include(x => x.Enrolments).FirstOrDefault(); 
             var pt = dbc.CourseParticpationType.Find(cr.CourseParticipationTypeID);
             var ct = dbc.CourseType.Find(cr.CourseTypeID);
-            SetCourseParticipationDetails(cr, t);
             var classes = new List<Class>();
             if (enrolment.ClassID != null) {
                 classes.Add(dbc.Class
@@ -34,6 +33,7 @@ namespace U3A.BusinessRules
                                     .Where(x => x.CourseID == cr.ID).ToList());
             }
             foreach (var c in classes) {
+                SetCourseParticipationDetails(dbc, c, t);
                 var od = dbc.WeekDay.Find(c.OnDayID);
                 var v = dbc.Venue.Find(c.VenueID);
                 var l = dbc.Person.Find(c.LeaderID);
@@ -50,9 +50,9 @@ namespace U3A.BusinessRules
                     CourseDuration = cr.Duration,
                     CourseRequiredStudents = cr.RequiredStudents,
                     CourseMaximumStudents = cr.MaximumStudents,
-                    CourseTotalActiveStudents = cr.TotalActiveStudents,
-                    CourseTotalWaitlistedStudents = cr.TotalWaitlistedStudents,
-                    CourseParticipationRate = cr.ParticipationRate,
+                    CourseTotalActiveStudents = c.TotalActiveStudents,
+                    CourseTotalWaitlistedStudents = c.TotalWaitlistedStudents,
+                    CourseParticipationRate = c.ParticipationRate,
                     CourseType = ct.Name,
                     // Class
                     ClassOfferedTerm1 = c.OfferedTerm1,

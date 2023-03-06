@@ -180,11 +180,14 @@ else {
     [Parameter]
     public EventCallback<PortalMenuSelection> OnMenuOptionSelected { get; set; }
 
+    [Parameter]
+    public Term? CurrentTerm { get; set; }
+
+
     bool IsReady;
     bool IsSmallLayout;
     //U3ADbContext? dbc;
     SystemSettings? settings;
-    Term? term;
     MarkupString? message;
     MarkupString welcomeText;
     string? SuccessMsg = null;
@@ -199,6 +202,15 @@ else {
         var email = loginState.LoginEmail;
         if (loginState.SelectedPerson != null) {
             var welcome = $"Welcome <strong>{loginState.SelectedPerson.FullName}</strong>!";
+            if (loginState.SelectedPerson.IsLifeMember) {
+                welcome += $"<br/>Life Member";
+            }
+            else if (loginState.SelectedPerson.FinancialTo >= CurrentTerm.Year) {
+                welcome += $"<br/>Financial To: <strong>{loginState.SelectedPerson.FinancialTo}</strong>";
+            }
+            else {
+                welcome += $"<br/>Your membership fees are now due";
+            }
             welcomeText = new MarkupString(welcome);
         }
         else {

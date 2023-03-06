@@ -44,7 +44,7 @@ namespace U3A.BusinessRules
                             .Where(x => x.Course.Year == term.Year)
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
             foreach (var c in classes) {
-                BusinessRule.SetCourseParticipationDetails(c.Course, term);
+                BusinessRule.SetCourseParticipationDetails(dbc, c, term);
             }
             return classes;
         }
@@ -69,7 +69,7 @@ namespace U3A.BusinessRules
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime)
                             .ToList().Where(x => IsClassInYear(dbc, x, term));
             foreach (var c in classes) {
-                BusinessRule.SetCourseParticipationDetails(c.Course, term);
+                BusinessRule.SetCourseParticipationDetails(dbc, c, term);
             }
             return classes.ToList();
         }

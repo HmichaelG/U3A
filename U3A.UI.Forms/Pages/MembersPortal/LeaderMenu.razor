@@ -324,7 +324,7 @@ else {
                   RenderStyle="ButtonRenderStyle.Primary"
                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
-                    <DxButton Text="Attendance Histroy"
+                    <DxButton Text="Attendance History"
                   IconCssClass="bi bi-clock-history menu-icon me-3 h2"
                   CssClass="col-12 mb-1"
                   Click="@(e => OnMenuSelected(MenuOptions.AttendanceHistory))"
@@ -455,8 +455,8 @@ else {
 
     async Task OnAssignCourseClerk() {
         foreach (var e in Enrolments) {
-            var isSelected = studentGrid.SelectedDataItems.Contains(e);
-            e.IsCourseClerk = (isSelected) ? true : false;
+            var isSelected = studentGrid.SelectedDataItems?.Contains(e);
+            e.IsCourseClerk = (isSelected.GetValueOrDefault()) ? true : false;
         }
         using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
             dbc.UpdateRange(Enrolments);
@@ -465,6 +465,7 @@ else {
     }
 
     async Task OnToggleWaitlist() {
+        var msg = string.Empty;
         if (await AreEnrolmentsSelected()) {
             if (await messageBox.ShowAsync("Toggle Waitlist For Selection",
                  $"<p>You are about to toggle the Waitlist status for {studentGrid.SelectedDataItems.Count()} students.<br/>" +
@@ -476,6 +477,13 @@ else {
                 foreach (var e in Enrolments) {
                     if (studentGrid.SelectedDataItems.Contains(e)) {
                         e.IsWaitlisted = !e.IsWaitlisted;
+                        if (e.Person.FinancialTo < selectedTerm.Year) {
+                            msg = $"{e.Person.FullName} set Waitlisted because they are unfinancial.<br/>";
+                            e.IsWaitlisted = true; }
+                        if (e.Person.DateCeased != null) {
+                            msg = $"{e.Person.FullName} set Waitlisted because they are ceased.<br/>";
+                            e.IsWaitlisted = true;
+                        }
                     }
                 }
                 using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
@@ -484,6 +492,9 @@ else {
                 }
             }
             studentGrid.ClearSelections();
+            if (msg != string.Empty) {
+                await messageBox.ShowOkOnlyAsync("Students Waitlisted", msg);
+            }
         }
     }
 
@@ -562,7 +573,7 @@ else {
                                     selectedTerm,
                                     selectedClass,
                                     selectedTerm.EndDate)).Where(x => x.Date >= now).ToList();
-                if (ClassDates.Count >= 0) { SelectedClassDate = ClassDates[0]; }
+                if (ClassDates.Count > 0) { SelectedClassDate = ClassDates[0]; }
                 else {
                     await messageBox.ShowOkOnlyAsync("There are no classes",
                                  "There are no classes in the current term to cancel.");

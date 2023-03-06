@@ -19,6 +19,16 @@ namespace U3A.Model
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private bool mIsSelected;
+        [NotMapped]
+        public bool IsSelected {
+            get { return mIsSelected; }
+            set {
+                    mIsSelected = value;
+                    NotifyPropertyChanged();
+            }
+        }
+
         private DateTime mStartTime { get; set; }
 
         [NotMapped]
@@ -226,6 +236,17 @@ namespace U3A.Model
                 return result.Trim();
             }
         }
+
+        [NotMapped]
+        [Comment("Set By Business Rule")]
+        public int TotalActiveStudents { get; set; }
+        [NotMapped]
+        [Comment("Set By Business Rule")]
+        public int TotalWaitlistedStudents { get; set; }
+
+        [NotMapped]
+        [Comment("Set By Business Rule")]
+        public double ParticipationRate { get; set; }
 
     }
 }

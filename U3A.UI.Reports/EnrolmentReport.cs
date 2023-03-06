@@ -24,7 +24,7 @@ namespace U3A.UI.Reports
             Guid id = (Guid)paramCourseYear.Value;
             var term = DbContext.Term.Find(id);
             if (term != null) {
-                Courses= BusinessRule.SelectableCourses(DbContext,term);
+                Courses = BusinessRule.SelectableCourses(DbContext, term);
                 var data = BusinessRule.SelectableEnrolments(DbContext, term);
                 switch ((int)prmEnrolmentStatus.Value) {
                     case 1:
@@ -58,6 +58,31 @@ namespace U3A.UI.Reports
 
         private void xrReportTotalMin_BeforePrint(object sender, CancelEventArgs e) {
             xrReportTotalMin.Text = Courses.Sum(x => x.RequiredStudents).ToString("n0");
+        }
+
+        private void xrActiveStudents_BeforePrint(object sender, CancelEventArgs e) {
+            var row = (Enrolment)GetCurrentRow();
+            xrActiveStudents.Text = (row.Class == null)
+                ? Courses.Find(x => x.ID == row.CourseID).Classes[0].TotalActiveStudents.ToString()
+                : row.Class.TotalActiveStudents.ToString();
+        }
+
+        private void xrWaitlistStudents_BeforePrint(object sender, CancelEventArgs e) {
+            var row = (Enrolment)GetCurrentRow();
+            xrWaitlistStudents.Text = (row.Class == null)
+                ? Courses.Find(x => x.ID == row.CourseID).Classes[0].TotalWaitlistedStudents.ToString()
+                : row.Class.TotalWaitlistedStudents.ToString();
+        }
+
+        private void xrTotalStudents_BeforePrint(object sender, CancelEventArgs e) {
+            var row = (Enrolment)GetCurrentRow();
+            var total = 0;
+            if (row.Class == null) {
+                var c = Courses.Find(x => x.ID == row.CourseID).Classes[0];
+                total = c.TotalActiveStudents + c.TotalWaitlistedStudents;
+            }
+            else { total = row.Class.TotalActiveStudents + row.Class.TotalWaitlistedStudents; }
+            xrTotalStudents.Text = total.ToString();
         }
     }
 }

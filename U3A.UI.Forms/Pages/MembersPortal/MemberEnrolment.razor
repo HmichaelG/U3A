@@ -17,7 +17,7 @@ else {
     <Progress @ref="ProgressBar" />
     <MessageBox @ref="messageBox" />
 
-    <DxFormLayout class="mx-4 w-100 mb-4">
+    <DxFormLayout class="mx-1 w-100">
         <div class="col-12 col-lg-8 col-xl-6 mx-auto">
             <div class="h6 pt-2 col-12" align="center">
                 @term?.TermSummary
@@ -29,7 +29,7 @@ else {
                     Displayed below are your courses in the current term.
                 </p>
             }
-            <div hidden=@(isListboxShowingSummary || IsReadOnly)>
+            <div class="list-detail mx-auto" hidden=@(isListboxShowingSummary || IsReadOnly)>
                 <div class="input-group">
                     <DxTextBox SizeMode="SizeMode.Large"
                            @bind-Text="FilterText"
@@ -44,27 +44,35 @@ else {
                           Click=@(() => FilterText=null)
                           CssClass="ms-1 clear-button input-group-append"></DxButton>
                 </div>
+                <DxTabs @ref="dxTabs" TabClick="@OnTabClick">
+                    <DxTabPage Text="All" />
+                    <DxTabPage Text="Mon" />
+                    <DxTabPage Text="Tue" />
+                    <DxTabPage Text="Wed" />
+                    <DxTabPage Text="Thu" />
+                    <DxTabPage Text="Fri" />
+                    <DxTabPage Text="W/E" />
+                </DxTabs>
             </div>
             <DxListBox Id="listBox" Data="@ListboxData"
-                   CssClass=@("mt-1 col-12 " + ((IsReadOnly)
+                   CssClass=@("mt-1 col-12 " + ((IsReadOnly || isListboxShowingSummary)
                    ? "listbox-scroll-readonly"
                    : "listbox-scroll"))
                    ShowCheckboxes="true"
                    ListRenderMode=ListRenderMode.Entire
                    SelectionMode="@listBoxSelectionMode"
-                   Values="@SelectedClasses"
-                   ValuesChanged="@((IEnumerable<Class> values) => SelectedItemsChanged(values))">
+                   Value="SelectedClass"
+                   ValueChanged="@((Class value) => SelectedItemsChanged(value))">
                 <ItemTemplate>
-                    <DxFormLayout CssClass="list-detail">
+                    <DxFormLayout CssClass="mx-auto list-detail">
                         <DxFormLayoutGroup Context="thisContext" HeaderCssClass="h5">
                             <CaptionTemplate>
-                                <div>
-                                    @*<span class="h4">@(new MarkupString($"<strong>{context.Course.ConversionID}:</strong> ")) </span>*@
+                                <div class=@((!IsReadOnly && context.IsSelected) ? "card alert-primary" : "")>
                                     @(new MarkupString($"{context.OnDay.Day}: {context.Course.Name}"))
                                 </div>
                             </CaptionTemplate>
                             <Items>
-                                <div class="row px-2 px-md-3 col-12" hidden="@(!isListboxShowingSummary)">
+                                <div class="row px-2 px-md-3 col-12">
                                     <div class="text-info col-12 text-center h6">@GetStatus(@context)</div>
                                 </div>
                                 <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
@@ -98,8 +106,8 @@ else {
                                 <div class="col-3 px-1 text-center"><strong>Waitlist</strong></div>
                                 <div class="col-3 px-1 text-center">@context.Course.MaximumStudents</div>
                                 <div class="col-3 px-1 text-center">@context.Course.RequiredStudents</div>
-                                <div class="col-3 px-1 text-center">@context.Course.TotalActiveStudents</div>
-                                <div class="col-3 px-1 text-center">@context.Course.TotalWaitlistedStudents</div>
+                                <div class="col-3 px-1 text-center">@context.TotalActiveStudents</div>
+                                <div class="col-3 px-1 text-center">@context.TotalWaitlistedStudents</div>
                                 <div class="pb-2" />
                                 <div class="col-12 px-1" hidden="@(!IsReadOnly)">
                                     @{
@@ -155,7 +163,7 @@ else {
 
             <div class="container">
                 <div class="h6 col-12 text-primary" align="center">
-                    @selectionCountText
+                    @(new MarkupString(selectionCountText))
                 </div>
                 @if (showFinalMessage) {
                     <div class='alert alert-warning col-12' align="center">
@@ -182,15 +190,15 @@ else {
 }
 <style>
     .listbox-scroll {
-        height: 67vh !important;
+        height: 60vh !important;
     }
 
     .listbox-scroll-readonly {
-        height: 70vh !important;
+        height: 65vh !important;
     }
 
     .list-detail {
-        width: 99%;
+        width: 95%;
     }
 
     .search-textbox {
@@ -242,14 +250,18 @@ else {
     Term? term;
     List<Class> ListboxData;
     List<Class>? Classes;
-    IEnumerable<Class> SelectedClasses = new List<Class>();
+    List<Class> SelectedClasses = new List<Class>();
+    Class SelectedClass;
 
     DxButton? listboxViewButton;
+    DxTabs? dxTabs;
+    int activeTabIndex;
+
     string selectionCountText = string.Empty;
     string listboxViewButtonText = string.Empty;
     bool showFinalMessage = false;
     bool isListboxShowingSummary = true;
-    ListBoxSelectionMode listBoxSelectionMode = ListBoxSelectionMode.Multiple;
+    ListBoxSelectionMode listBoxSelectionMode = ListBoxSelectionMode.Single;
     internal ErrorPopup? ErrorPopup { get; set; }
     internal string? ErrorHeader;
     internal string? ErrorMessage;
@@ -266,22 +278,44 @@ else {
         get { return _filterText; }
         set {
             _filterText = value;
-            var target = (_filterText == null)
-                            ? null
-                            : Classes.FindAll(x => x.Course.Name.ToLower().IndexOf(_filterText?.ToLower()) >= 0);
-            foreach (var c in Classes) {
-                c.SotrOrder = 0;
-                if (target != null && target.Contains(c)) c.SotrOrder = -1;
-            }
-            ListboxData = Classes.OrderBy(x => x.SotrOrder)
-                                            .ThenBy(x => x.OnDayID)
-                                            .ThenBy(x => x.StartTime).ToList();
+            ListboxData = (string.IsNullOrWhiteSpace(_filterText))
+                            ? ResetFilter()
+                            : FilterClassByName();
             ScrollListboxToTop();
         }
     }
 
+    List<Class> FilterClassByName() {
+        if (dxTabs != null) { activeTabIndex = dxTabs.ActiveTabIndex = 0; }
+        return Classes.FindAll(x => x.Course.Name.ToLower().IndexOf(_filterText?.ToLower()) >= 0);
+    }
+
+    List<Class> ResetFilter() {
+        if (isListboxShowingSummary) {
+            return SelectedClasses.ToList();
+        }
+        else {
+            if (dxTabs == null || activeTabIndex == 0) {
+                return Classes;
+            }
+            else {
+                if (activeTabIndex < 6) {
+                    //Monday - Friday
+                    return Classes.Where(x => x.OnDayID == activeTabIndex).ToList();
+                }
+                else {
+                    //Weekend
+                    return Classes.Where(x => x.OnDayID == activeTabIndex ||
+                                                x.OnDayID == 0).ToList();
+                }
+            }
+        }
+    }
+
+
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
+        activeTabIndex = 0;
         dbc = await U3Adbfactory.CreateDbContextAsync();
         // wire up the data
         term = BusinessRule.CurrentEnrolmentTerm(dbc);
@@ -297,13 +331,14 @@ else {
                 SelectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson, term);
                 if (SelectedClasses.Count() > 0) isListboxShowingSummary = false;
                 if (IsReadOnly && SelectedClasses.Count() <= 0) Classes.Clear();
+                foreach (var c in SelectedClasses) { c.IsSelected = true; }
                 SetReviewButtonText();
                 ShowSelectedClasses();
             }
         }
         listBoxSelectionMode = (IsReadOnly)
                 ? ListBoxSelectionMode.None
-                : ListBoxSelectionMode.Multiple;
+                : ListBoxSelectionMode.Single;
         googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
         IsReady = true;
     }
@@ -311,6 +346,7 @@ else {
     protected override async Task OnAfterRenderAsync(bool firstRender) {
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender) {
+            FilterText = null;
             if (isNotInEnrolmentPeriod && (term == null || Classes == null)) {
                 await ReturnToMenu(PortalMenuResult.EnrolmentCancelledTermNotDefined);
             }
@@ -366,36 +402,49 @@ else {
     }
 
     string GetStatus(Class context) {
-        Enrolment? e = null;
-        var c = dbc.Class.Include(x => x.Enrolments).FirstOrDefault(x => x.ID == context.ID);
-        if (c.Enrolments.Count > 0)
-            e = dbc.Enrolment
-                            .Include(x => x.Person)
-                            .Include(x => x.Class)
-                            .Include(x => x.Term)
-                            .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
-                            .FirstOrDefault(x => x.ClassID == context.ID &&
-                                                    x.Term.Year == term.Year &&
-                                                    x.Term.TermNumber >= term.TermNumber &&
-                                                    x.PersonID == loginState.SelectedPerson.ID);
-        else {
-            e = dbc.Enrolment
-                            .Include(x => x.Person)
-                            .Include(x => x.Course)
-                            .Include(x => x.Term)
-                            .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
-                            .FirstOrDefault(x => x.CourseID == context.Course.ID &&
-                                                    x.Term.Year == term.Year &&
-                                                    x.Term.TermNumber >= term.TermNumber &&
-                                                    x.PersonID == loginState.SelectedPerson.ID);
-        }
         var result = string.Empty;
-        if (e != null) {
-            var status = (e.IsWaitlisted) ? "Waitlisted" : "Enrolled";
-            result = $"Term {e.Term.TermNumber}: {status}";
-
+        if (!IsReadOnly && !isListboxShowingSummary) {
+            if (SelectedClasses.Contains(context)) {
+                result = "Click to remove";
+            }
+            else {
+                result = "Click to enrol";
+            }
         }
-        else result = "Pending";
+        else {
+            Enrolment? e = null;
+            var c = dbc.Class.Include(x => x.Enrolments).FirstOrDefault(x => x.ID == context.ID);
+            if (c.Enrolments.Count > 0)
+                e = dbc.Enrolment
+                                .Include(x => x.Person)
+                                .Include(x => x.Class)
+                                .Include(x => x.Term)
+                                .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
+                                .FirstOrDefault(x => x.ClassID == context.ID &&
+                                                        x.Term.Year == term.Year &&
+                                                        x.Term.TermNumber >= term.TermNumber &&
+                                                        x.PersonID == loginState.SelectedPerson.ID);
+            else {
+                e = dbc.Enrolment
+                                .Include(x => x.Person)
+                                .Include(x => x.Course)
+                                .Include(x => x.Term)
+                                .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
+                                .FirstOrDefault(x => x.CourseID == context.Course.ID &&
+                                                        x.Term.Year == term.Year &&
+                                                        x.Term.TermNumber >= term.TermNumber &&
+                                                        x.PersonID == loginState.SelectedPerson.ID);
+            }
+            if (e != null)
+            {
+                var status = (e.IsWaitlisted) ? "Waitlisted" : "Enrolled";
+                result = $"Term {e.Term.TermNumber}: {status}";
+            }
+            else { result = "Pending"; }
+            if (!IsReadOnly && isListboxShowingSummary) {
+                result += " - Click to remove";
+            }
+        }
         return result;
     }
 
@@ -464,6 +513,7 @@ else {
             ListboxData = SelectedClasses.ToList();
             isListboxShowingSummary = true;
         }
+        SelectedClass = null;
         SetReviewButtonText();
     }
 
@@ -471,15 +521,49 @@ else {
         js.InvokeVoidAsync("ScrollToTop", "listBox");
     }
 
-    async Task SelectedItemsChanged(IEnumerable<Class> values) {
+    async Task SelectedItemsChanged(Class value) {
         if (IsReadOnly) { return; }
-        SelectedClasses = values;
+        SelectedClass = value;
+        if (SelectedClasses.Contains(SelectedClass)) {
+            if (await messageBox.ShowAsync("Class is already selected",
+                       $"<p>The class, <strong>{SelectedClass.Course.Name}</strong> will be <strong>removed</strong> from your selection.</p>" +
+                       "Do you wish to continue?")) {
+                SelectedClasses.Remove(SelectedClass);
+                SelectedClass.IsSelected = false;
+            }
+        }
+        else {
+            if (await messageBox.ShowAsync("Add to selection",
+                       $"<p>The class, <strong>{SelectedClass.Course.Name}</strong> will be added to your selection.</p>" +
+                       "Do you wish to continue?")) {
+                SelectedClasses.Add(SelectedClass);
+                SelectedClass.IsSelected = true;
+            }
+        }
+        if (!string.IsNullOrWhiteSpace(FilterText) || isListboxShowingSummary) { FilterText = null; }
+        SelectedClass = null;
         SetReviewButtonText();
         StateHasChanged();
     }
 
+    void OnTabClick(TabClickEventArgs e) {
+        activeTabIndex = e.TabIndex;
+        FilterText = null; // force a list reset
+    }
+
     void SetReviewButtonText() {
-        selectionCountText = $"{SelectedClasses?.Count()} classes selected.";
+        if (SelectedClasses?.Count() <= 0) {
+            selectionCountText = $"Click a Class to select or remove.<br/>";
+        }
+        else {
+            selectionCountText = $"{SelectedClasses?.Count()} classes selected.<br/>";
+        }
+        int[] day = new int[7];
+        for (int i = 1; i <= 6; i++) {
+            day[i] = SelectedClasses.Where(x => x.OnDayID == i).Count();
+            if (i == 6) day[i] = SelectedClasses.Where(x => x.OnDayID == 0).Count();
+        }
+        selectionCountText += $"Mon: {day[1]} Tue: {day[2]} Wed: {day[3]} Thu: {day[4]} Fri: {day[5]} W/E: {day[6]}";
         if (!isListboxShowingSummary) {
             listboxViewButtonText = $"Review your choices";
         }

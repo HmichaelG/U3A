@@ -97,7 +97,14 @@ namespace U3A.BusinessRules
                                             .ThenBy(x => x.Person.FirstName)
                                 .ToList();
             foreach (var e in enrolments) {
-                SetCourseParticipationDetails(e.Course, SelectedTerm);
+                if (e.Class != null) {
+                    SetCourseParticipationDetails(dbc,e.Class, SelectedTerm);
+                }
+                else {
+                    foreach (var c in e.Course.Classes) {
+                        SetCourseParticipationDetails(dbc, c, SelectedTerm);
+                    }
+                }
             }
             return enrolments;
         }

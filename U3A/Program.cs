@@ -104,9 +104,6 @@ builder.Services.AddLocalization();
 // Get / Set local storage data
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSingleton<EwayConnectionSingleton>();
-#if !DEBUG
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
-#endif
 
 var app = builder.Build();
 

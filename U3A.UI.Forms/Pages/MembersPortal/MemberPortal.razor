@@ -30,7 +30,8 @@ else {
                 break;
 
             case PortalMenuSelection.ShowMenu:
-                <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected" />
+                <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
+                          CurrentTerm="term"/>
                 break;
 
             case PortalMenuSelection.DoMemberMaintenance:
@@ -150,7 +151,7 @@ else {
     async Task OnMenuOptionSelected(PortalMenuSelection selection) {
         if (await IsSelectionOK(selection)) {
             if (selection == PortalMenuSelection.DoEditMemberEnrolment ||
-                    selection == PortalMenuSelection.DoViewMemberEnrolment) { 
+                    selection == PortalMenuSelection.DoViewMemberEnrolment) {
                 await ProgressBar.ShowSmallSpinnerAsync();
                 StateHasChanged();
                 Task.Delay(1000);
@@ -183,11 +184,25 @@ else {
                 }
                 break;
             case PortalMenuSelection.DoMemberPayment:
-                result = await AreMemberDetailsOK();
+                if (result = await AreMemberDetailsOK()) {
+                    result = await IsAdminOnU3ADesktop();
+                }
                 break;
             default:
                 result = await AreMemberDetailsOK();
                 break;
+        }
+        return result;
+    }
+
+    async Task<bool> IsAdminOnU3ADesktop() {
+        if (!loginState.IsAdminOnBehalfOfMember) return true;
+        bool result = false;
+        var value = await js.InvokeAsync<string?>("GetSessionState", "isU3ADesktop");
+        if (value != null) result = true;
+        if (!result) {
+            await messageBox.ShowOkOnlyAsync("Not U3A Desktop",
+                "Our security policy requires that payments made on behalf of another member must be processed via the <strong>U3A Desktop</strong> application.");
         }
         return result;
     }

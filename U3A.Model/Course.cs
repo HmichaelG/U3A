@@ -74,17 +74,6 @@ namespace U3A.Model
         [Required]
         public bool ExcludeFromLeaderComplimentaryCount { get; set; }
 
-        [NotMapped]
-        [Comment("Set By Business Rule")]
-        public int TotalActiveStudents { get; set; }
-        [NotMapped]
-        [Comment("Set By Business Rule")]
-        public int TotalWaitlistedStudents { get; set; }
-
-        [NotMapped]
-        [Comment("Set By Business Rule")]
-        public double ParticipationRate { get; set; }
-
         public CourseType CourseType { get; set; }
         public Guid? CourseTypeID { get; set; }
 
