@@ -24,11 +24,13 @@ namespace U3A.BusinessRules
             var classes = new List<Class>();
             if (enrolment.ClassID != null) {
                 classes.Add(dbc.Class
+                                .Include(x => x.Course)
                                 .Include(x => x.Occurrence)
                                 .Where(x => x.ID == enrolment.ClassID).FirstOrDefault());
             }
             else {
                 classes.AddRange(dbc.Class
+                                    .Include(x => x.Course)
                                     .Include(x => x.Occurrence)
                                     .Where(x => x.CourseID == cr.ID).ToList());
             }
@@ -78,6 +80,9 @@ namespace U3A.BusinessRules
                 };
                 if (l != null) {
                     ed.ClassLeader = l.FullName;
+                    if (!string.IsNullOrWhiteSpace(l.Mobile)) { ed.ClassLeader += $"{Environment.NewLine}Mobile: {l.Mobile}"; }
+                    if (!string.IsNullOrWhiteSpace(l.HomePhone)) { ed.ClassLeader += $"{Environment.NewLine}Phone: {l.HomePhone}"; }
+                    if (!string.IsNullOrWhiteSpace(l.Email)) { ed.ClassLeader += $"{Environment.NewLine}Email: {l.Email}"; }
                     ed.ClassLeaderFirstName = l.FirstName;
                     ed.LeaderSummary = l.PersonSummary;
                 } else { ed.ClassLeader = "The Group"; }
