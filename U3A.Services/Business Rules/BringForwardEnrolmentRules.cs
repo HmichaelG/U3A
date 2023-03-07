@@ -63,14 +63,31 @@ namespace U3A.BusinessRules
             currentEnrolment.CopyTo(newEnrolment);
             newEnrolment.Term = await dbc.Term.FindAsync(targetTerm.ID);
             newEnrolment.Course = await dbc.Course.FindAsync(currentEnrolment.CourseID);
+            if (newEnrolment.Course == null) return;
             newEnrolment.Person = await dbc.Person.FindAsync(currentEnrolment.PersonID);
+            if (newEnrolment.Person == null) return;
             if (currentEnrolment.Class != null) {
                 newEnrolment.Class = await dbc.Class.FindAsync(currentEnrolment.ClassID);
+                if (newEnrolment.Class == null) return;
             }
             newEnrolment.ID = Guid.Empty;
-            await dbc.Enrolment.AddAsync(newEnrolment);
+            if (!await IsAlreadyEnrolled(dbc,newEnrolment)) { await dbc.Enrolment.AddAsync(newEnrolment); }
         }
-
+        static async Task<bool> IsAlreadyEnrolled(U3ADbContext dbc, Enrolment e) {
+            bool result;
+            if (e.ClassID == null) {
+                result = await dbc.Enrolment.AnyAsync(x => x.TermID == e.Term.ID &&
+                                                x.CourseID == e.Course.ID &&
+                                                x.PersonID == e.Person.ID);
+            }
+            else {
+                result = await dbc.Enrolment.AnyAsync(x => x.TermID == e.Term.ID &&
+                                x.CourseID == e.Course.ID &&
+                                x.PersonID == e.Person.ID &&
+                                x.ClassID == e.Class.ID);
+            }
+            return result;
+        }
         static bool IsClassInTerm(Term? targetTerm, Class? c) {
             bool result = false;
             if (c != null && c.StartDate == null) {

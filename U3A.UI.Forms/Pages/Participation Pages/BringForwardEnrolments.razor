@@ -23,7 +23,7 @@ else {
                     </p>
                     <p>The procedure should only be executed when the current term is complete.</p>
 
-                    <p>The following enrolements will not be brought forward...</p>
+                    <p>The following enrolments will not be brought forward...</p>
                     <ul>
                         <li>Enrolments for courses that are not available in the new Term, and</li>
                         <li>Enrolments for courses that have a Start Date</li>
@@ -34,7 +34,7 @@ else {
                         current term then enrolments cannot be brought forward. For example, 
                         if a course is offered in Terms 1 and 4 students will not be brought forward
                         into Term 4 using this procedure.
-                        In these cases, use <em>Enrol Participants</em> to transfer stduents from one term to another.
+                        In these cases, use <em>Enrol Participants</em> to transfer students from one term to another.
                     </p>
 
                 <MessageBox @ref="@messageBox" />
@@ -144,11 +144,11 @@ else {
                 msg += "*** Current Term must be prior to the new Term ***<br/>";
                 result = false;
             }
-            int count = await BusinessRule.CountOfTermEnrolments(dbc, targetTerm);
-            if (count > 0) {
-                msg += $"*** The new Term must not have any enrolments. The selected Term has {count} enrolments. ***<br/>";
-                result = false;
-            }
+            //int count = await BusinessRule.CountOfTermEnrolments(dbc, targetTerm);
+            //if (count > 0) {
+            //    msg += $"*** The new Term must not have any enrolments. The selected Term has {count} enrolments. ***<br/>";
+            //    result = false;
+            //}
         }
         if (!result) {
             msg += "<p>";
