@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_AttendClassCascadeRule
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Venue_CanMapAddress
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_AllowLeaderToChangeEnrolments
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_EmailAddress_trigger
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_AllowLeaderToChangeEnrolment
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_EmailAddress_trigger
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

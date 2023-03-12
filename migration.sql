@@ -5703,3 +5703,22 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230307225122_U3A_Venue_CanMapAddress')
+BEGIN
+    ALTER TABLE [Venue] ADD [CanMapAddress] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230307225122_U3A_Venue_CanMapAddress')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230307225122_U3A_Venue_CanMapAddress', N'7.0.3');
+END;
+GO
+
+COMMIT;
+GO
+

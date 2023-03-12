@@ -19,9 +19,9 @@
 }
 else {
 
-    <CreateDomainLogin @ref="createDomainLogin" 
-        Roles="@Roles"
-        Settings ="@settings"/>
+    <CreateDomainLogin @ref="createDomainLogin"
+                   Roles="@Roles"
+                   Settings="@settings" />
 
     <div class="container h-100">
         <div class="row  align-content-start">
@@ -57,7 +57,7 @@ else {
         </DxTabs>
 
         <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid />
-        <DxGrid id="mainGrid" Data="@Users" @ref="mainGrid" CssClass="h-75"
+        <DxGrid id="mainGrid" Data="@Users" @ref="mainGrid" CssClass="grid-height"
             UnboundColumnData="Grid_CustomUnboundColumnData"
             @bind-SelectedDataItems="@SelectedDataItems"
             ShowFilterRow="false"
@@ -121,7 +121,12 @@ else {
                               @bind-Values="@SelectedRoles">
                         </DxTagBox>
                     </DxFormLayoutItem>
-
+                    <DxFormLayoutItem Caption="Password" ColSpanMd="12">
+                        <DxTextBox @bind-Text=@password NullText="leave blank if unchenged" Password=true />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption=" Confirm Password" ColSpanMd="12">
+                        <DxTextBox @bind-Text=@confirmPassword Password=true />
+                    </DxFormLayoutItem>
                 </DxFormLayout>
             </EditFormTemplate>
 
@@ -135,14 +140,23 @@ else {
     </div>   @*Container*@
 }
 
+<style>
+    .grid-height {
+        height: 65vh;
+    }
+
+</style>
+
 @code {
     bool IsReady;
     bool PopupVisible;
     SystemSettings settings;
     IReadOnlyList<object> SelectedDataItems { get; set; }
-    IEnumerable<IdentityUser> Users { get; set; }
+    List<IdentityUser> Users { get; set; }
     IEnumerable<IdentityRole> Roles { get; set; }
     IEnumerable<IdentityRole>? SelectedRoles { get; set; } = new List<IdentityRole>();
+    string? password;
+    string? confirmPassword;
     IGrid? mainGrid;
     DxTabs? dxTabs;
     DxGridCommandColumnEx? GridCommandColumn;
@@ -168,10 +182,10 @@ else {
     }
 
     async Task RefreshData() {
+        mainGrid?.BeginUpdate();
         Users = await UserManager.Users.OrderBy(x => x.Email).ToListAsync();
-        if (mainGrid != null) {
-            mainGrid.ClearSelection();
-        }
+        mainGrid?.ClearSelection();
+        mainGrid?.EndUpdate();
     }
 
     protected override async void OnAfterRender(bool firstRender) {
@@ -243,6 +257,27 @@ else {
 
     async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
         var user = (IdentityUser)e.DataItem;  // must be dataItem!!
+        if (!string.IsNullOrWhiteSpace(password)) {
+            if (password != confirmPassword) {
+                await messageBox.ShowOkOnlyAsync("Passwords must match",
+                            "The password and confirm password fields fo not match!");
+                e.Cancel = true;
+                return;
+            }
+            else {
+                var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+                var result = await UserManager.ResetPasswordAsync(user, token, password);
+                if (!result.Succeeded) {
+                    var msg = string.Empty;
+                    foreach (var err in result.Errors) {
+                        msg += $"{err.Description}<br />";
+                    }
+                    await messageBox.ShowOkOnlyAsync("Passwords reset failed", msg);
+                    e.Cancel = true;
+                    return;
+                }
+            }
+        }
         foreach (var role in Roles) {
             if (await UserManager.IsInRoleAsync(user, role.Name)) {
                 await UserManager.RemoveFromRoleAsync(user, role.Name);
@@ -253,11 +288,11 @@ else {
                 await UserManager.AddToRoleAsync(user, role.Name);
             }
         }
-        Users = await UserManager.Users.OrderBy(x => x.Email).ToListAsync();
         e.Reload = true;
     }
 
     async void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e) {
+        password = confirmPassword = null;
         SelectedRoles = new List<IdentityRole>();
         var l = new List<IdentityRole>();
         if (!e.IsNew) {
@@ -275,7 +310,7 @@ else {
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e) {
         if (e.DataItem != null) {
             await UserManager.DeleteAsync(e.DataItem as IdentityUser);
-            await RefreshData();
+            Users.Remove(e.DataItem as IdentityUser);
             e.Reload = true;
         }
     }
@@ -289,6 +324,7 @@ else {
             "<p>Do you wish to continue?";
         if (await messageBox.ShowAsync("Password Reset", msg)) {
             await ProgressBar.ShowSpinnerAsync("Reset Passwords");
+            SetRelaxedPassword();
             foreach (var o in SelectedDataItems) {
                 var u = (IdentityUser)o;
                 var p = await dbc.Person.FirstOrDefaultAsync(x => x.Email.ToLower() == u.Email.ToLower());
@@ -297,10 +333,22 @@ else {
                     var result = await UserManager.ResetPasswordAsync(u, token, p.PersonIdentity);
                 }
             }
-            await RefreshData();
+            SetNormalPassword();
+            mainGrid?.ClearSelection();
             await ProgressBar.Close();
             await messageBox.ShowOkOnlyAsync("Password Reset", "Selected passwords have been reset.");
         }
+    }
+
+    private void SetRelaxedPassword() {
+        UserManager.Options.Password.RequiredUniqueChars = 0;
+        UserManager.Options.Password.RequireNonAlphanumeric = false;
+        UserManager.Options.Password.RequireUppercase = false;
+    }
+    private void SetNormalPassword() {
+        UserManager.Options.Password.RequiredUniqueChars = 1;
+        UserManager.Options.Password.RequireNonAlphanumeric = true;
+        UserManager.Options.Password.RequireUppercase = true;
     }
 
     async Task OnSetEmailConfirmed() {
@@ -311,13 +359,16 @@ else {
                 "<p>The procedure is safe to execute and may be re-executed as often as required. Note there is no procedure to unset Email Confirmation.</p>" +
                 "<p>Do you wish to continue?";
         if (await messageBox.ShowAsync("Set Email Confirmed", msg)) {
+            mainGrid?.BeginUpdate();
             await ProgressBar.ShowSpinnerAsync("Set Email Confirmed");
             foreach (var o in SelectedDataItems) {
                 var u = (IdentityUser)o;
                 var token = await UserManager.GenerateEmailConfirmationTokenAsync(u);
                 await UserManager.ConfirmEmailAsync(u, token);
+                Users.Remove(u);
+                Users.Add(u);
             }
-            await RefreshData();
+            mainGrid?.EndUpdate();
             await ProgressBar.Close();
             await messageBox.ShowOkOnlyAsync("Set Email Confirmed", "Selected login emails have been confirmed");
         }
@@ -338,6 +389,7 @@ else {
             var count = 0;
             var processed = 0;
             await ProgressBar.ShowAsync("Populate Logins", max);
+            mainGrid.BeginUpdate();
             foreach (var p in dbc.Person
                             .OrderByDescending(x => x.Gender).ThenBy(x => x.LastName).ThenBy(x => x.FirstName)
                             .Where(x => x.DateCeased == null && !string.IsNullOrWhiteSpace(x.Email))) {
@@ -350,17 +402,18 @@ else {
                             PasswordHash = hasher.HashPassword(null, p.PersonIdentity)
                         };
                     await UserManager.CreateAsync(user);
+                    Users.Add(user);
                     processed++;
                 }
             }
-            await RefreshData();
+            mainGrid?.EndUpdate();
             await ProgressBar.Close();
             await messageBox.ShowAsync("Login Population Complete", $"{processed} logins have been created.");
         }
     }
 
     async Task OnCreateDomainLogin() {
-       await createDomainLogin.ShowAsync();
+        await createDomainLogin.ShowAsync();
     }
 
     public void Dispose() {

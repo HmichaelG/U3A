@@ -1,0 +1,77 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+@if (courseTypes != null) {
+    <DxFormLayout>
+        <DxFormLayoutGroup Caption="Enrolment Summary" ColSpanLg="9">
+            <DxChart Data="enrolmentData"
+                 Width="100%"
+                 LabelOverlap="ChartLabelOverlap.Hide">
+                @foreach (var cType in courseTypes) {
+                    <DxChartBarSeries Name="@cType"
+                              T="EnrolmentSummary"
+                              TArgument="string"
+                              TValue="int"
+                              ArgumentField="r => r.TermName"
+                              Filter="r => r.CourseType == cType"
+                              ValueField="r => r.Count" />
+                }
+                <DxChartLegend Position="RelativePosition.Outside"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+                <DxChartTooltip Enabled="true">
+                    @context.Point.Render((seriesPoint) =>
+                    @<div style="margin: 0.75rem">
+                        <div>@seriesPoint.SeriesName</div>
+                        <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
+                        <span>@($"{seriesPoint.Value: 0,0}")</span>
+                    </div>
+                )
+                </DxChartTooltip>
+            </DxChart>
+        </DxFormLayoutGroup>
+        <DxFormLayoutGroup Caption="Enrolment Summary" ColSpanLg="3">
+            <DxGrid Data="@enrolmentData" CssClass="gridheight"
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                AutoExpandAllGroupRows="true"
+                ShowFilterRow="false"
+                ShowAllRows="true">
+                <Columns>
+                    <DxGridDataColumn Width="5rem" Caption="Term" FieldName="TermName" GroupIndex="0" />
+                    <DxGridDataColumn Width="10rem" Caption="Course Type" FieldName="CourseType" DisplayFormat="{0:D4}" />
+                    <DxGridDataColumn Caption="Enrolments" FieldName="Count" DisplayFormat="{0:n0}" />
+                </Columns>
+                <GroupSummary>
+                    <DxGridSummaryItem FooterColumnName="Count"
+                        SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
+                </GroupSummary>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
+                </TotalSummary>
+            </DxGrid>
+        </DxFormLayoutGroup>
+    </DxFormLayout>
+}
+<style>
+    .gridheight {
+        height: 21rem;
+    }
+</style>
+
+
+@code {
+    IEnumerable<EnrolmentSummary> enrolmentData;
+    [Parameter] public bool ShowSeriesPointMarkers { get; set; }
+    [Parameter] public bool ShowSeriesLabels { get; set; }
+
+    IEnumerable<string> courseTypes;
+
+    protected override async Task OnInitializedAsync() {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            var term = await BusinessRule.CurrentTermAsync(dbc);
+            if (term != null) {
+                enrolmentData = await BusinessRule.GetEnrolmentSummaryByTerm(dbc, term);
+                courseTypes = enrolmentData.Select(x => x.CourseType).Distinct();
+            }
+        }
+    }
+
+}

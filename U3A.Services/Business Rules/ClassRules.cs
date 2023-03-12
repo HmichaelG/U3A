@@ -60,6 +60,7 @@ namespace U3A.BusinessRules
                             x.TermNumber >= term.TermNumber);
             var classes = dbc.Class.AsNoTracking()
                             .Include(x => x.OnDay)
+                            .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Course)
                                 .ThenInclude(x => x.Enrolments.Where(x => terms.Contains(x.Term)))
                             .Include(x => x.Leader)

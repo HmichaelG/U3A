@@ -75,6 +75,9 @@ else {
                 <DxFormLayoutItem Caption="Venue Address" ColSpanMd="12">
                     <DxTextBox @bind-Text="@editItem.Address" />
                 </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Can Map Address" ColSpanMd="12">
+                    <DxCheckBox @bind-Checked="@editItem.CanMapAddress" />
+                </DxFormLayoutItem>
                 <DxFormLayoutGroup Caption="Contact Details">
                     <DxFormLayoutItem Caption="Name" ColSpanMd="12">
                         <DxTextBox @bind-Text="@editItem.Coordinator" />

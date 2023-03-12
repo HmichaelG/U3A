@@ -544,10 +544,10 @@
             case 5:             // Volunteer
                 Persons = Persons.Where(x => x.IsVolunteer && x.DateCeased == null).ToList();
                 break;
-            case 6:             // Unfinancial
+            case 9:             // Unfinancial
                 Persons = Persons.Where(x => x.FinancialTo < currentTerm?.Year && x.DateCeased == null).ToList();
                 break;
-            case 7:             // All Records
+            case 10:             // All Records
                 Persons = Persons.ToList();
                 break;
         }

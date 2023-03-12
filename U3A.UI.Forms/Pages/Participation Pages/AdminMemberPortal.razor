@@ -16,6 +16,7 @@
 else {
     <CascadingValue Value="@LoginState">
 
+        <Progress @ref=@progressBar />
         <MessageBox @ref="@messageBox" />
         <div class="h3 mt-4 text-center">Member Portal (Administration)</div>
         <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
@@ -29,10 +30,8 @@ else {
                             ListRenderMode="ListRenderMode.Virtual"
                             TextFieldName="@nameof(Person.PersonSummary)"
                             @bind-Value="@selectedPerson">
-                        <DxListEditorColumn FieldName="@nameof(Person.LastName)"
-                                        Caption="Last Name" />
-                        <DxListEditorColumn FieldName="@nameof(Person.FirstName)"
-                                        Caption="First Name" />
+                        <DxListEditorColumn FieldName="@nameof(Person.FullNameAlpha)"
+                                        Caption="Name" />
                         <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
                                         Caption="Mobile" />
                         <DxListEditorColumn FieldName="@nameof(Person.Email)"
@@ -45,6 +44,9 @@ else {
                 <DxButton Text="Clear" CssClass="button-width mt-2"
                       RenderStyle="@ButtonRenderStyle.Secondary"
                       Click="@OnClear" />
+                <DxButton Text="Refresh" CssClass="button-width mt-2"
+                      RenderStyle="@ButtonRenderStyle.Secondary"
+                      Click="@OnRefresh" />
             </DxFormLayoutGroup>
         </DxFormLayout>
         @if (isSelected) {
@@ -59,7 +61,8 @@ else {
                     <Items>
                         <DxAccordionItem Text="Add/Edit Member Details" Expanded="false">
                             <ContentTemplate>
-                                <div class="m-2"><PersonMnt IsEmbedded="true" GridHeight="40vh" /></div>
+                                <div class="mt-2 alert-info text-center"><small>Please <strong>Refresh</strong> data after adding/editing members</small></div>
+                                <div class="mx-2"><PersonMnt IsEmbedded="true" GridHeight="40vh" /></div>
                             </ContentTemplate>
                         </DxAccordionItem>
                         <DxAccordionItem Text="Received Today" Expanded="true">
@@ -111,6 +114,7 @@ else {
     bool isSelected = false;
 
     MessageBox? messageBox;
+    Progress? progressBar;
     U3ADbContext dbc { get; set; }
     List<Person> people { get; set; }
     Person selectedPerson { get; set; }
@@ -118,11 +122,14 @@ else {
     IEnumerable<Receipt> RecevivedToday;
 
     protected override async Task OnInitializedAsync() {
-        // wire up the data
+        await GetData();
+        IsReady = true;
+    }
+
+    private async Task GetData() {
         using (dbc = await U3Adbfactory.CreateDbContextAsync()) {
             people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
         }
-        IsReady = true;
     }
 
     protected override async Task OnParametersSetAsync() {
@@ -146,6 +153,13 @@ else {
                 }
             }
         }
+    }
+
+    async Task OnRefresh() {
+        progressBar.ShowSmallSpinnerAsync();
+        await GetData();
+        OnClear();
+        progressBar.Close();
     }
 
     void OnClear() {

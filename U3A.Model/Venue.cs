@@ -27,6 +27,10 @@ namespace U3A.Model
 
         public string Address { get; set; } = string.Empty;
 
+        [Required]
+        [DefaultValue(true)]
+        public bool CanMapAddress { get; set; } = true;
+
         public string? Equipment { get; set; }
         public string? Coordinator { get; set; }
         public string? Phone { get; set; }

@@ -34,10 +34,10 @@
                     @{
                         if (isAuthenticated) {
 
-                            if (isSystemAdmin) {
+                            if (isSystemAdminRole) {
                                 <DxMenuItem Text="Admin" IconCssClass="bi-menu-button-fill menu-icon">
                                     <Items>
-                                        @if (isSecurityAdmin) {
+                                        @if (isSecurityAdminRole) {
                                                 <DxMenuItem Text="Login Security &amp; Role Assignment" NavigateUrl="IdentityUserMnt" />
                                         }
                                         <DxMenuItem Text="Organisation Details" NavigateUrl="OrganisationDetailsMnt" />
@@ -55,7 +55,7 @@
                                 </DxMenuItem>
                             }
 
-                            if (isSystemAdmin | isCourse) {
+                            if (isSystemAdminRole | isCourseAdminRole) {
                                 <DxMenuItem Text="Course" IconCssClass="bi-menu-button-fill menu-icon">
                                     <Items>
                                         <DxMenuItem Text="Add/Edit Course Types" NavigateUrl="CourseTypeMnt" />
@@ -70,17 +70,16 @@
                                 </DxMenuItem>
                             }
 
-                            if (isSystemAdmin | isClerical) {
+                            if (isSystemAdminRole | isClericalRole) {
                                 <DxMenuItem Text="Participation" IconCssClass="bi-menu-button menu-icon">
                                     <Items>
                                         <DxMenuItem Text="Participant Data Import" NavigateUrl="ParticipantDataImport" />
                                         <DxMenuItem Text="Fees &amp; Receipting">
                                             <Items>
-                                                <DxMenuItem Text="Member Portal (Admin)" NavigateUrl="AdminMemberPortal" />
-                                                <DxMenuItem Text="Bank Data Import" NavigateUrl="BankDataImport" Enabled="@(isSystemAdmin | isAccounting)" />
-                                                <DxMenuItem Text="Receipt Adjustments" NavigateUrl="ReceiptMnt" Enabled="@(isSystemAdmin | isAccounting)" />
-                                                <DxMenuItem Text="Fee Adjustments" NavigateUrl="FeeMnt" Enabled="@(isSystemAdmin | isAccounting)" />
-                                                <DxMenuItem Text="Complimentary Membership" NavigateUrl="AssignComplimentaryMembership" Enabled="@(isSystemAdmin | isAccounting)" />
+                                                <DxMenuItem Text="Bank Data Import" NavigateUrl="BankDataImport" Enabled="@(isSystemAdminRole | isAccountingRole)" />
+                                                <DxMenuItem Text="Receipt Adjustments" NavigateUrl="ReceiptMnt" Enabled="@(isSystemAdminRole | isAccountingRole)" />
+                                                <DxMenuItem Text="Fee Adjustments" NavigateUrl="FeeMnt" Enabled="@(isSystemAdminRole | isAccountingRole)" />
+                                                <DxMenuItem Text="Complimentary Membership" NavigateUrl="AssignComplimentaryMembership" Enabled="@(isSystemAdminRole | isAccountingRole)" />
                                                 <DxMenuItem BeginGroup="true" Text="Receipts By Participant" NavigateUrl="XtraReportViewer/CashReceiptsByParticipantRpt" />
                                                 <DxMenuItem Text="Receipts By Date" NavigateUrl="XtraReportViewer/CashReceiptsByDateRpt" />
                                                 <DxMenuItem Text="Complimentary Membership Report" NavigateUrl="XtraReportViewer/ComplimentaryMembershipRpt" />
@@ -94,13 +93,17 @@
                                         <DxMenuItem Text="Enrol Participants" NavigateUrl="EnrolMnt" />
                                         <DxMenuItem Text="Review Class Dropouts" NavigateUrl="ReviewDropouts" />
                                         <DxMenuItem Text="Class Attendance" NavigateUrl="AttendClassMnt" />
-                                        <DxMenuItem BeginGroup=true Text="Bring Forward Enrolments" NavigateUrl="BringForwardEnrolments"Enabled="@(isSystemAdmin)" />
-                                        <DxMenuItem Text="Auto-Enrol Participants" NavigateUrl="AutoEnrolParticipants"Enabled="@(isSystemAdmin)" />
+                                        <DxMenuItem BeginGroup=true Text="Bring Forward Enrolments" NavigateUrl="BringForwardEnrolments"Enabled="@(isSystemAdminRole)" />
+                                        <DxMenuItem Text="Auto-Enrol Participants" NavigateUrl="AutoEnrolParticipants"Enabled="@(isSystemAdminRole)" />
                                     </Items>
                                 </DxMenuItem>
                             }
 
-                            if (isSystemAdmin | isCourse | isClerical | isReportView) {
+                            if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole | isOfficeRole) {
+                                <DxMenuItem Text="Portal (Admin)" IconCssClass="bi-people menu-icon" NavigateUrl="AdminMemberPortal" />
+                            }
+
+                            if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole) {
                                 <DxMenuItem Text="Reports" IconCssClass="bi-printer menu-icon">
                                     <Items>
                                         <DxMenuItem Text="Listings">
@@ -186,13 +189,14 @@
     MessageBox? messageBox;
 
     bool isAuthenticated { get; set; }
-    bool isSecurityAdmin { get; set; }
-    bool isSystemAdmin { get; set; }
-    bool isMembership { get; set; }
-    bool isAccounting { get; set; }
-    bool isClerical { get; set; }
-    bool isCourse { get; set; }
-    bool isReportView { get; set; }
+    bool isSecurityAdminRole { get; set; }
+    bool isSystemAdminRole { get; set; }
+    bool isMembershipRole { get; set; }
+    bool isAccountingRole { get; set; }
+    bool isClericalRole { get; set; }
+    bool isCourseAdminRole { get; set; }
+    bool isReportViewRole { get; set; }
+    bool isOfficeRole { get; set; }
     string user { get; set; }
     string Title = string.Empty;
 
@@ -201,7 +205,8 @@
                                                 "Course and Class",
                                                 "Membership",
                                                 "Accounting",
-                                                 "Report View"};
+                                                 "Report View",
+                                                  "Office"};
     string superAdmin = "SuperAdmin@U3A.com.au";
 
     [CascadingParameter]
@@ -215,14 +220,15 @@
         var authenticationState = await authenticationStateTask;
         isAuthenticated = authenticationState.User.Identity.IsAuthenticated;
         user = authenticationState.User.Identity.Name;
-        isSecurityAdmin = authenticationState.User.IsInRole("Security Administrator");
-        isSystemAdmin = authenticationState.User.IsInRole("System Administrator");
-        isMembership = authenticationState.User.IsInRole("Membership");
-        isAccounting = authenticationState.User.IsInRole("Accounting");
-        isCourse = authenticationState.User.IsInRole("Course and Class");
-        isReportView = authenticationState.User.IsInRole("Report View");
-        isClerical = authenticationState.User.IsInRole("Membership") |
+        isSecurityAdminRole = authenticationState.User.IsInRole("Security Administrator");
+        isSystemAdminRole = authenticationState.User.IsInRole("System Administrator");
+        isMembershipRole = authenticationState.User.IsInRole("Membership");
+        isAccountingRole = authenticationState.User.IsInRole("Accounting");
+        isCourseAdminRole = authenticationState.User.IsInRole("Course and Class");
+        isReportViewRole = authenticationState.User.IsInRole("Report View");
+        isClericalRole = authenticationState.User.IsInRole("Membership") |
                         authenticationState.User.IsInRole("Accounting");
+        isOfficeRole = authenticationState.User.IsInRole("Office");
     }
 
     void GetTenantInfo() {

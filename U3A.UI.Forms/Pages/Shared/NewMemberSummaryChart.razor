@@ -1,0 +1,78 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+<DxFormLayout>
+    <DxFormLayoutGroup Caption="New Member Summary" ColSpanLg="9">
+        <DxChart Data="memberData"
+                 Width="100%"
+                 LabelOverlap="ChartLabelOverlap.Hide">
+            <DxChartBarSeries Name="Male"
+                              Color="System.Drawing.Color.Blue"
+                              T="MemberSummary"
+                              TArgument="DateTime"
+                              TValue="int"
+                              ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
+                              ValueField="x => x.Count"
+                              Filter='x => x.Group.ToLower() == "male"' />
+            <DxChartBarSeries Name="Female"
+                                Color=System.Drawing.Color.HotPink
+                              T="MemberSummary"
+                              TArgument="DateTime"
+                              TValue="int"
+                              ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
+                              ValueField="x => x.Count"
+                              Filter='x => x.Group.ToLower() == "female"' />
+
+            <DxChartLegend Position="RelativePosition.Outside"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+            <DxChartTooltip Enabled="true">
+                @context.Point.Render((seriesPoint) =>
+                    @<div style="margin: 0.75rem">
+                        <div>@seriesPoint.SeriesName</div>
+                        <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
+                        <span>@($"{seriesPoint.Value: 0,0}")</span>
+                    </div>
+                )
+            </DxChartTooltip>
+        </DxChart>
+    </DxFormLayoutGroup>
+    <DxFormLayoutGroup Caption="New Members by Month" ColSpanLg="3">
+        <DxGrid Data="@memberData" CssClass="gridheight"
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                AutoExpandAllGroupRows="true"
+                ShowFilterRow="false"
+                ShowAllRows="true">
+            <Columns>
+                <DxGridDataColumn Caption="Gender" FieldName="Group" GroupIndex="0" />
+                <DxGridDataColumn Width="5rem" Caption="Year" FieldName="Year" DisplayFormat="{0:D4}" />
+                <DxGridDataColumn Width="5rem" Caption="Month" FieldName="MonthName" />
+                <DxGridDataColumn Caption="Members" FieldName="Count" DisplayFormat="{0:n0}" />
+            </Columns>
+            <GroupSummary>
+                <DxGridSummaryItem FooterColumnName="Count"
+                    SummaryType="GridSummaryItemType.Sum" FieldName="Count" ValueDisplayFormat="{0:n0}" />
+            </GroupSummary>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
+            </TotalSummary>
+        </DxGrid>
+    </DxFormLayoutGroup>
+</DxFormLayout>
+
+<style>
+    .gridheight {
+        height: 21rem;
+    }
+</style>
+
+@code {
+    IEnumerable<MemberSummary> memberData;
+    [Parameter] public bool ShowSeriesPointMarkers { get; set; }
+    [Parameter] public bool ShowSeriesLabels { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            memberData = await BusinessRule.GetNewMemberSummaryByMonth(dbc);
+        }
+    }
+
+}

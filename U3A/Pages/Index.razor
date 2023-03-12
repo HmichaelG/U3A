@@ -48,10 +48,14 @@ else {
                            role="link" target="=_top">Download the U3A Desktop app (Windows Only)</a>
                                     <div class="flex-grow-1 text-end">@($"There are {openCircuits} users logged in.")</div>
                                 </div>
-                                <div class="shadow card col col-12 m-1">
+                                <GeneralSummaryChart />
+                                <ReceiptSummaryChart />
+                                <NewMemberSummaryChart />
+                                <EnrolmentSummaryChart />
+@*                                <div class="shadow card col col-12 m-1">
                                     <iframe src="@homePage" width="100%" class="iframe-height"></iframe>
                                 </div>
-                            }
+*@                            }
                         }
                         else {
                             <MemberPortal />
@@ -97,7 +101,8 @@ else {
                                                 "Course and Class",
                                                 "Membership",
                                                 "Accounting",
-                                                 "Report View"};
+                                                 "Report View",
+                                                  "Office"};
     string superAdmin = "SuperAdmin@U3A.com.au";
 
     protected override async Task OnInitializedAsync() {

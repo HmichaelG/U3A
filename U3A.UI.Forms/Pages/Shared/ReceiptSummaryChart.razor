@@ -1,0 +1,61 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+<DxFormLayout>
+    <DxFormLayoutGroup Caption="Cash Receipts Summary" ColSpanLg="9">
+        <DxChart Data="receiptData"
+                 Width="100%"
+                 LabelOverlap="ChartLabelOverlap.Hide">
+            <DxChartLineSeries Name="Received"
+                               T="ReceiptSummary"
+                               TArgument="DateTime"
+                               TValue="decimal"
+                               ArgumentField="r => new DateTime(r.Year, r.Month, 1)"
+                               ValueField="r => r.Total"
+                               HoverMode="ChartContinuousSeriesHoverMode.None">
+                <DxChartSeriesPoint Visible=ShowSeriesPointMarkers
+                                    HoverMode="ChartSeriesPointHoverMode.None" />
+                <DxChartSeriesLabel Visible=ShowSeriesLabels
+                                    Format="ChartElementFormat.Thousands(1)" />
+            </DxChartLineSeries>
+            <DxChartLegend Position="RelativePosition.Outside"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+            <DxChartTooltip Enabled="!ShowSeriesLabels">
+                @context.Point.Render((seriesPoint) =>
+                    @<div style="margin: 0.75rem">
+                        <div>@seriesPoint.SeriesName</div>
+                        <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
+                        <span>@($"{seriesPoint.Value: $0,.0}K")</span>
+                    </div>
+                )
+            </DxChartTooltip>
+        </DxChart>
+    </DxFormLayoutGroup>
+    <DxFormLayoutGroup Caption="Cash Receipts by Month" ColSpanLg="3">
+        <DxGrid Data="@receiptData"
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                ShowFilterRow="false"
+                ShowAllRows="true">
+            <Columns>
+                <DxGridDataColumn Width="5rem" Caption="Year" FieldName="Year" DisplayFormat="{0:D4}" />
+                <DxGridDataColumn Width="5rem" Caption="Month" FieldName="MonthName" />
+                <DxGridDataColumn Caption="Amount" FieldName="Total" DisplayFormat="{0:c2}" />
+            </Columns>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+            </TotalSummary>
+        </DxGrid>
+    </DxFormLayoutGroup>
+</DxFormLayout>
+
+@code {
+    IEnumerable<ReceiptSummary> receiptData;
+    [Parameter] public bool ShowSeriesPointMarkers { get; set; }
+    [Parameter] public bool ShowSeriesLabels { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            receiptData = BusinessRule.GetReceiptSummaryByMonth(dbc);
+        }
+    }
+
+}

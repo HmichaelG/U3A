@@ -19,7 +19,7 @@ else {
     <DxLayoutBreakpoint MinWidth="1200"
                     @bind-IsActive="@IsSmallLayout" />
 
-
+    <MessageBox @ref="@messageBox" />
     <DxFormLayout class="mx-4 w-100">
         <div class="col-12 col-lg-6 col-xl-4 mx-auto">
             <div class="mt-1 py-1 py-lg-3 text-center alert alert-success col-12">@welcomeText</div>
@@ -138,7 +138,7 @@ else {
                                 <DxButton Text="Change your email address"
                                   IconCssClass="bi-shield-check menu-icon me-3 h2"
                                   CssClass="col-12 mb-1"
-                                  Click="@(e => OnChangeCredential(e,"Email"))"
+                                  Click="@(e => OnChangeEmail(e))"
                                   RenderStyle="ButtonRenderStyle.Primary"
                                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
@@ -190,6 +190,7 @@ else {
     SystemSettings? settings;
     MarkupString? message;
     MarkupString welcomeText;
+    MessageBox? messageBox;
     string? SuccessMsg = null;
 
     protected override async Task OnInitializedAsync() {
@@ -221,6 +222,22 @@ else {
 
     protected override void OnAfterRender(bool firstRender) {
         base.OnAfterRender(firstRender);
+    }
+
+    async Task OnChangeEmail(MouseEventArgs e) {
+        var msg = @"<p>Changing your email address is a multi-step process that must be co-ordinated
+                    with your U3A IT support personnel. It must be performed as follows...</p>
+                    <ol>
+                    <li>Enter your new email address on the form shown when when the <strong>Ok</strong> button below is clicked.</li>
+                    <li>Confirm your new address by clicking the link in the email sent to that address.</li>
+                    <li>Request your U3A IT support person change the email address on your participant record.</li>                    
+                    </ol>
+                    <p><strong>NB:</strong> You will no longer have access to your membership details
+                        after you have confirmed your new email in step 2 and until IT support have completed the change. This is normal.
+                    <p>Do you wish to continue?</p>";
+        if (await messageBox.ShowAsync("Are you sure?", msg)) {
+            OnChangeCredential(e, "Email");
+        }
     }
 
     void OnChangeCredential(MouseEventArgs e, string page) {
