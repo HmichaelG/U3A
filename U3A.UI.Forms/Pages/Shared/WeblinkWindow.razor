@@ -1,0 +1,82 @@
+﻿@using System.IO
+
+@implements IDisposable
+@inject IJSRuntime js
+
+
+    <DxWindow @ref=@weblinkWindow Width="@windowWidth"
+              Visible=false
+              Closed="OnClosed"
+              HorizontalAlignment="HorizontalAlignment.Center"
+              VerticalAlignment="VerticalAlignment.Center"
+              Height="80vh"
+              AllowResize="true"
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              BodyCssClass="h-100"
+              HeaderText="Help">
+        <BodyTextTemplate>
+            <iframe src="@WebLink" class="iframe-size" />
+        </BodyTextTemplate>
+    </DxWindow>
+
+
+<style>
+    .iframe-size {
+        height: 100%;
+        width: 100%;
+        border-style: none;
+        padding-bottom: 5px;
+    }
+
+    .window-details {
+        height: @windowHeight;
+    }
+
+</style>
+
+
+@code {
+
+    string WebLink { get; set; }
+
+    DxWindow? weblinkWindow;
+    string windowHeight = "600px";
+    string standardWidth = "80vw";
+    string windowWidth;
+
+    U3ADbContext dbc { get; set; }
+    SystemSettings? settings;
+    bool isReady;
+
+    public async Task ShowTopicAsync(string WebLinkTopic, string WindowWidth)
+    {
+        windowWidth = WindowWidth;
+        await ShowTopicAsync(WebLinkTopic);
+    }
+    public async Task ShowTopicAsync(string WebLinkTopic)
+    {
+        if (weblinkWindow.Visible) { await weblinkWindow.CloseAsync(); }
+        else
+        {
+            WebLink = WebLinkTopic;
+            if (string.IsNullOrWhiteSpace(windowWidth)) { windowWidth = standardWidth; }
+            await weblinkWindow.ShowAsync();
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    void OnClosed()
+    {
+        windowWidth = standardWidth;
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

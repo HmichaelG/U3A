@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <WarningLevel>0</WarningLevel>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="Pages\MembersPortal\Component\TellAFriend.razor" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Pages\MembersPortal\MemberPortalMenu.razor.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AsyncAwaitBestPractices" Version="7.0.0" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
+    <PackageReference Include="DevExpress.Blazor" Version="23.1.6" />
+    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="23.1.6" />
+    <PackageReference Include="DevExpress.DataAccess" Version="23.1.6" />
+    <PackageReference Include="DevExpress.Drawing" Version="23.1.6" />
+    <PackageReference Include="DevExpress.Drawing.Skia" Version="23.1.6" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.1.6" />
+    <PackageReference Include="Eway.Rapid.Standard" Version="1.0.0" />
+    <PackageReference Include="Eway.Rapid.Standard.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\U3A.Data\U3A.Database.csproj" />
+    <ProjectReference Include="..\U3A.Model\U3A.Model.csproj" />
+    <ProjectReference Include="..\U3A.Services\U3A.Services.csproj" />
+    <ProjectReference Include="..\U3A.UI.Reports\U3A.UI.Reports.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="OFXParser">
+      <HintPath>..\..\ofxparser.net\OFXParser\bin\Release\netstandard2.0\OFXParser.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Pages\Administration Pages\EnterExitMaintenance.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="Pages\Participation Pages\ReceiptMnt.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Pages\Shared\Document\AttendanceAnalysisByCourseType.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pages\MembersPortal\TellAFriend.razor" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,356 @@
+﻿@page "/DocumentTemplateMnt"
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+@using DevExpress.Drawing.Printing
+
+@attribute [Authorize]
+
+@if (!IsReady) {
+    <LoadingIndicator />
+}
+else {
+
+    <div class="row">
+        <ContextHelpTitle Title="Document Templates" HelpTopic="add_edit-document-templates.html" />
+    </div>
+    <div class="row">
+        <div class="col-11 d-none d-md-inline">
+            Email, Postal and SMS Templates that provide default details to be sent to participants.
+        </div>
+
+    </div>
+    <br />
+
+
+    <MessageBox @ref="@messageBox" />
+
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+    <DxGrid Data="@DocumentTemplates" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            ShowFilterRow="false"
+            ShowAllRows="true"
+            KeyFieldName="ID"
+            ValidationEnabled="true"
+            PopupEditFormCssClass="popup"
+            CustomizeEditModel="Grid_CustomizeEditModel"
+            EditMode="GridEditMode.PopupEditForm"
+            EditModelSaving="Grid_EditModelSaving"
+            DataItemDeleting="Grid_DataItemDeleting">
+        <ToolbarTemplate>
+            <GridToolbar LinkedGrid=@mainGrid />
+        </ToolbarTemplate>
+        <Columns>
+            <DxGridCommandColumnEx @ref="GridCommandColumn" Width="9rem"
+                                   EditButtonVisible="true" DeleteButtonVisible="true" NewButtonVisible="true" />
+            <DxGridDataColumn Caption="Type" FieldName="DocumentType.Name" />
+            <DxGridDataColumn Caption="Name" FieldName="Name" />
+            <DxGridDataColumn Caption="Subject" FieldName="Subject" />
+            <DxGridDataColumn Caption="From" FieldName="FromEmailAddress" />
+            <DxGridDataColumn Caption="Display Name" FieldName="FromDisplayName" />
+        </Columns>
+
+        <EditFormTemplate Context="EditFormContext">
+            @{
+                var editItem = (DocumentTemplate)EditFormContext.EditModel;
+            }
+            <DxFormLayout>
+                <DxFormLayoutItem>
+                    <ValidationSummary />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Template Type" ColSpanMd="12">
+                    <DxComboBox Data="@DocumentTypes" NullText="Select the document Type required..."
+                                TextFieldName="@nameof(DocumentType.Name)"
+                                Value="@editItem.DocumentType"
+                                ValueExpression="@(() => editItem.DocumentType)"
+                                ValueChanged="@((DocumentType docType) => SelectedDocTypeChanged(docType, editItem))" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Template Name" ColSpanMd="12">
+                    <DxTextBox @bind-Text="@editItem.Name" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Subject" ColSpanMd="12" Visible="@IsEmail">
+                    <DxTextBox @bind-Text="@editItem.Subject" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="From Email Address" ColSpanMd="12" Visible="@IsEmail">
+                    <DxComboBox Data="@emailAddresses" AllowUserInput="true"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                NullText="Enter the email address to send from..."
+                                TData="string"
+                                TValue="string"
+                                Text="@editItem.FromEmailAddress"
+                                TextExpression="@(() => editItem.FromEmailAddress)"
+                                TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress,editItem))" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption=@FromDisplayNameText ColSpanMd="12" Visible="IsEmailOrSMS">
+                    <DxComboBox Data=@displayNames AllowUserInput="true"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                NullText="Enter the Display Name to send from..."
+                                TData="string"
+                                TValue="string"
+                    @bind-Text=@editItem.FromDisplayName />
+                </DxFormLayoutItem>
+                <div class="alert-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
+                <DxRichEdit DocumentContent="@DocumentContent"
+                            CheckSpelling=true
+                            DocumentFormat="DocumentFormat.Rtf"
+                            DocumentLoaded="OnDocumentLoaded"
+                @ref="richEdit" CssClass="w-100">
+                    <MailMergeSettings>
+                        <DxMailMergeSettings Data="@MergeData" ViewMergedData="false" />
+                    </MailMergeSettings>
+                </DxRichEdit>
+            </DxFormLayout>
+        </EditFormTemplate>
+    </DxGrid>
+}
+
+<style>
+    .popup {
+        min-width: 65rem;
+    }
+
+    .grid-height {
+        height: @gridHeight;
+</style>
+
+@code {
+    bool IsReady;
+    bool IsEmail;
+    bool IsEmailOrSMS;
+    byte[] DocumentContent = null;
+    string AdditionalValidations = string.Empty;
+    List<DocumentType> DocumentTypes { get; set; }
+    List<DocumentTemplate> DocumentTemplates { get; set; }
+    IEnumerable<object> MergeData;
+    IEnumerable<EnrolmentExportData> Enrolments { get; set; } = new List<EnrolmentExportData>();
+    IEnumerable<ExportData> Participants { get; set; } = new List<ExportData>();
+
+    DxGridCommandColumnEx? GridCommandColumn;
+    MessageBox? messageBox;
+    string gridHeight = "100px";
+
+    IGrid? mainGrid { get; set; }
+    DxRichEdit? richEdit;
+    ErrorPopup? ErrorPopup { get; set; }
+    GridToolbar? Toolbar;
+    string ErrorHeader;
+    string ErrorMessage;
+    DocumentServer docx2Html;
+    Document documentAPI;
+    U3ADbContext dbc { get; set; }
+    string FromDisplayNameText;
+    SystemSettings settings;
+    IEnumerable<string> emailAddresses = new List<string>();
+    IEnumerable<string> displayNames = new List<string>();
+
+
+    protected override async Task OnInitializedAsync() {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        await GetDocumentTemplatesAsync();
+        docx2Html = new DocumentServer(dbc);
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
+        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async Task GetDocumentTemplatesAsync() {
+        DocumentTypes = await dbc.DocumentType.ToListAsync();
+        DocumentTemplates = await BusinessRule.EditableDocumentTemplatesAsync(dbc);
+        emailAddresses = DocumentTemplates
+                            .OrderBy(x => x.FromEmailAddress)
+                            .Where(x => x.FromEmailAddress != null)
+                            .Select(x => x.FromEmailAddress.ToLower()).Distinct().ToList();
+    }
+
+    void SelectedDocTypeChanged(DocumentType DocType, DocumentTemplate editItem) {
+        editItem.DocumentType = DocType;
+        SelectedEmailAddressChanged(editItem.FromEmailAddress, editItem);
+        SetupDocument(editItem, true);
+    }
+    void SelectedEmailAddressChanged(string emailAddress, DocumentTemplate editItem) {
+        switch (editItem.DocumentType.Name) {
+            case "Email":
+                editItem.FromEmailAddress = emailAddress;
+                displayNames = DocumentTemplates
+                                    .OrderBy(x => x.FromDisplayName)
+                                    .Where(x => x.FromEmailAddress?.ToLower() == emailAddress)
+                                    .Select(x => x.FromDisplayName).Distinct().ToList();
+                break;
+            case "SMS":
+                displayNames = DocumentTemplates
+                                    .OrderBy(x => x.FromDisplayName)
+                                    .Where(x => x.DocumentType.Name == "SMS")
+                                    .Select(x => x.FromDisplayName).Distinct().ToList();
+                editItem.FromDisplayName = displayNames.FirstOrDefault();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void SetupDocument(DocumentTemplate model, bool IsNew) {
+        IsEmail = model.DocumentType.IsEmail;
+        IsEmailOrSMS = (model.DocumentType.IsEmail || model.DocumentType.IsSMS);
+        switch (model.DocumentType.Name) {
+            case "EnrolmentSubdoc":
+                MergeData = Enrolments;
+                model.Subject = null;
+                model.FromEmailAddress = null;
+                model.FromDisplayName = null;
+                break;
+            case "ReceiptSubdoc":
+                //MergeData = Receipts;
+                model.Subject = null;
+                model.FromEmailAddress = null;
+                model.FromDisplayName = null;
+                break;
+            case "Email":
+                FromDisplayNameText = "From Display Name";
+                if (IsNew && settings != null) {
+                    model.FromEmailAddress = settings.SendEmailAddesss;
+                    model.FromDisplayName = settings.SendEmailDisplayName;
+                }
+                MergeData = Participants;
+                break;
+            case "SMS":
+                FromDisplayNameText = "From (11 Chars Max)";
+                if (IsNew) {
+                    model.FromDisplayName = "U3A Members";
+                }
+                model.Subject = null;
+                model.FromEmailAddress = null;
+                MergeData = Participants;
+                break;
+            default:
+                model.Subject = null;
+                model.FromEmailAddress = null;
+                model.FromDisplayName = null;
+                MergeData = Participants;
+                break;
+        }
+    }
+
+    async Task OnDocumentLoaded(Document doc) {
+        await richEdit.DocumentAPI.Fields.ShowAllFieldCodesAsync(true);
+        try {
+            documentAPI = richEdit.DocumentAPI;
+            var sections = await documentAPI.Sections.GetAllAsync();
+            foreach (Section s in sections)
+                await s.ChangePropertiesAsync(properties =>
+                {
+                    if (properties.PaperKind == DXPaperKind.Letter)
+                        properties.PaperKind = DXPaperKind.A4;
+                    //properties.Landscape = true;
+                });
+        }
+        catch (OperationCanceledException e) {
+            Console.WriteLine($"{nameof(OperationCanceledException)} thrown with message: {e.Message}");
+        }
+    }
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e) {
+        var model = (DocumentTemplate)e.EditModel;
+        if (e.IsNew) {
+            model.DocumentType = await dbc.DocumentType.FindAsync(0);
+            DocumentContent = null;
+        }
+        else {
+            DocumentContent = model.Content;
+        }
+        SetupDocument(model, e.IsNew);
+        SelectedEmailAddressChanged(model.FromEmailAddress, model);
+    }
+
+    bool isBusy;
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+        if (isBusy) return;
+        isBusy = true;
+        try {
+            await SaveRecord(e);
+        }
+        finally {
+            isBusy = false;
+        }
+    }
+
+    async Task SaveRecord(GridEditModelSavingEventArgs e) {
+    var editModel = (DocumentTemplate)e.EditModel;
+        if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
+        // Re-query a data item from the store.
+        var dataItem = e.IsNew ? new DocumentTemplate() : dbc.DocumentTemplate.Find(editModel.ID);
+        // Assign changes from the edit model to the data item.
+        if (dataItem != null) {
+            editModel.CopyTo(dataItem);
+            dataItem.DocumentType = dbc.DocumentType.Find(editModel.DocumentType.ID);
+            var content = await richEdit.ExportDocumentAsync(DocumentFormat.Rtf);
+            dataItem.Content = content;
+            await docx2Html.ConvertDocx2Html(dataItem);
+            // Post changes to the database.
+            if (e.IsNew) await dbc.AddAsync(dataItem);
+            if (await SaveChangesAsync()) {
+                // update the Grid.
+                await GetDocumentTemplatesAsync();
+            }
+        }
+    }
+
+    async Task<bool> IsDataOk(DocumentTemplate editItem) {
+        bool result = true;
+        var dup = await BusinessRule.DuplicateMarkUpAsync(dbc, editItem);
+        if (!string.IsNullOrWhiteSpace(dup)) {
+            await messageBox.ShowOkOnlyAsync("Duplicate Record", dup);
+            result = false;
+        }
+        else {
+            if (editItem.DocumentType.Name == "Email") {
+                var settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+                string[]? defaultSplits = settings?.SendEmailAddesss.Split("@");
+                string[]? fromSplits = editItem.FromEmailAddress?.Split("@");
+                if (fromSplits?.Count() > 0 && defaultSplits?.Count() > 0) {
+                    if (fromSplits[1].ToLower().Trim() != defaultSplits[1].ToLower().Trim()) {
+                        _ = await messageBox.ShowOkOnlyAsync("Invalid Domain", $"Your From Email address must end: @{defaultSplits[1]}.");
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e) {
+        dbc.Remove<DocumentTemplate>((DocumentTemplate)e.DataItem);
+        await SaveChangesAsync();
+        mainGrid.ClearSelection();
+        await GetDocumentTemplatesAsync();
+    }
+
+    async Task<bool> SaveChangesAsync() {
+        bool result = false;
+        try {
+            // Post changes to the database.
+            await dbc.SaveChangesAsync();
+            result = true;
+        }
+        catch (Exception ex) {
+            ErrorHeader = "Save to database error";
+            ErrorMessage = Helpers.GetErrorMessage(ex);
+            await ErrorPopup.ShowPopupAsync();
+            dbc?.ChangeTracker?.Clear();
+        }
+        return result;
+    }
+
+
+    public void Dispose() {
+        dbc?.Dispose();
+    }
+}

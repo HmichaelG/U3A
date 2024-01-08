@@ -1,0 +1,60 @@
+﻿@inherits DxGridCommandColumn
+@base.BuildRenderTree
+
+
+@code {
+    [CascadingParameter] 
+    public IGrid MyGrid { get; set; }
+    [Parameter]
+    public EventCallback<object> OnDeleteButtonClick { get; set; }
+
+    protected override bool ShouldRender() => false;
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        Width = (EditButtonVisible && DeleteButtonVisible) ? "5rem" : "2rem";
+        if (NewButtonVisible) {
+            HeaderTemplate = context => 
+          @<DxButton RenderStyle="ButtonRenderStyle.Primary"
+          RenderStyleMode="ButtonRenderStyleMode.Outline" title="Add new record"
+          IconCssClass="bi bi-plus" Click="async () => MyGrid.StartEditNewRowAsync()" />;
+        };
+        CellDisplayTemplate = context =>
+    @<text>
+        @if (EditButtonVisible) {
+            <DxButton RenderStyle="ButtonRenderStyle.Warning"
+              RenderStyleMode="ButtonRenderStyleMode.Outline" title="Edit this record"
+              IconCssClass="bi bi-pencil" Click="async () => MyGrid.StartEditDataItemAsync(context.DataItem)" />
+        }
+        @if (DeleteButtonVisible) {
+            <DxButton RenderStyle="ButtonRenderStyle.Danger" title="Delete this record"
+              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                  IconCssClass="bi bi-trash" Click="() => DoDeleteClick(context.DataItem)" />
+        }
+    </text>
+        ;
+        CellEditTemplate = context =>
+    @<text>
+        <DxButton RenderStyle="ButtonRenderStyle.Success"
+              RenderStyleMode="ButtonRenderStyleMode.Outline" title="Save your changes"
+              IconCssClass="bi bi-hdd" Click="async () => MyGrid.SaveChangesAsync()" />
+        <DxButton RenderStyle="ButtonRenderStyle.Danger" title="Cancel your changes"
+              RenderStyleMode="ButtonRenderStyleMode.Outline"
+              IconCssClass="bi bi-arrow-counterclockwise" Click="() => MyGrid.CancelEditAsync()" />
+    </text>
+    ;
+    }
+
+    async Task DoDeleteClick(object DataItem)
+    {
+        if (OnDeleteButtonClick.HasDelegate)
+        {
+            await OnDeleteButtonClick.InvokeAsync(DataItem);
+        }
+        else
+        {
+            MyGrid.ShowDataItemDeleteConfirmation(DataItem);
+        }
+    }
+
+}

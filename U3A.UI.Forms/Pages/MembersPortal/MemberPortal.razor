@@ -1,0 +1,283 @@
+﻿@page "/MemberPortal"
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+@implements IDisposable
+@inject NavigationManager NavigationManager
+@inject SignInManager<ApplicationUser> SignInMgr
+@using Microsoft.AspNetCore.Identity
+@using U3A.Data
+@using U3A.UI.Forms
+
+@attribute [Authorize]
+
+<DxLayoutBreakpoint MinWidth="1200" @bind-IsActive="@IsSmallLayout" />
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else {
+
+    <MessageBox @ref="@messageBox" />
+
+    <Progress @ref=@ProgressBar />
+
+        @switch (menuSelection)
+        {
+            case PortalMenuSelection.DoSelectLinkedMember:
+                <GetLinkedPerson @ref=@getLinkedPerson OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.ShowMenu:
+                <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
+                                  CurrentTerm="term" />
+                break;
+
+            case PortalMenuSelection.DoMemberMaintenance:
+                <MemberDetails IsNewLinkedMember=false OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoLinkNewMember:
+                <MemberDetails IsNewLinkedMember=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoLinkExistingMember:
+                <LinkExistingMember OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoUnlinkMember:
+                <UnlinkMember OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoMemberPayment:
+                <MemberPayment @ref=@memberPayment OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoMemberLeave:
+                <MemberLeave OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoSignInSignOut:
+                <MemberSignInSignOut OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoEditMemberEnrolment:
+                Guid classID = GetRequestedClass();
+                <MemberEnrolment IsReadOnly=false ClassID=classID OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoViewMemberEnrolment:
+                <MemberEnrolment IsReadOnly=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoShowLeaderMenu:
+                <LeaderMenu OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoTellAFriend:
+                <TellAFriend OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                break;
+
+            case PortalMenuSelection.DoWhatsOn:
+                <CourseSchedule IsPortal=true />
+                break;
+        }
+}
+
+
+
+@code {
+
+    [CascadingParameter]
+    LoginState? loginState { get; set; }
+
+    [CascadingParameter(Name = "QueryResult")]
+    string? QueryResult { get; set; }
+
+    Progress? ProgressBar { get; set; }
+
+    bool IsReady;
+    bool IsProcessing;
+    bool IsSmallLayout;
+    bool IsNewLinkedMember;
+    U3ADbContext? dbc;
+    SystemSettings? settings;
+    Term? term;
+    MarkupString? message;
+    MessageBox messageBox;
+    PortalMenuSelection menuSelection;
+    GetLinkedPerson? getLinkedPerson;
+    MemberPayment? memberPayment;
+    string Title;
+    string? SuccessMsg = null;
+
+    protected override async Task OnInitializedAsync() {
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        if (term == null) {
+            term = await BusinessRule.CurrentTermAsync(dbc);
+        }
+        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        Title = settings?.U3AGroup;
+        bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, await GetPersonAsync());
+        if (hasUnprocessedPayments) {
+            menuSelection = PortalMenuSelection.DoMemberPayment;
+        }
+        else if (isEnrolClassRequest()) {
+            menuSelection = PortalMenuSelection.DoEditMemberEnrolment;
+        }
+        else { menuSelection = PortalMenuSelection.ShowMenu; }
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    bool isEnrolClassRequest() {
+        return (QueryResult != null && QueryResult.StartsWith("EnrolClass=", StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    Guid GetRequestedClass() {
+        string classID;
+        Guid result = Guid.Empty;
+        if (isEnrolClassRequest()) {
+            classID = QueryResult.Remove(0, "EnrolClass=".Length);
+            Guid.TryParse(classID, out result);
+        }
+        return result;
+    }
+
+    void EnsureSelectedPersonSet() {
+        if (loginState.LinkedPeople.Count() > 1 && loginState.SelectedPerson == null) {
+            menuSelection = PortalMenuSelection.GetLinkedPerson;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender) {
+            EnsureSelectedPersonSet();
+            var person = await GetPersonAsync();
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+                if (person != null && await BusinessRule.HasUnprocessedOnlinePayment(dbc, person)) {
+                    menuSelection = PortalMenuSelection.DoMemberPayment;
+                }
+            }
+            if (person == null) menuSelection = PortalMenuSelection.DoMemberMaintenance;
+        }
+    }
+
+    void OnChangeCredential(MouseEventArgs e, string page) {
+        NavigationManager.NavigateTo("Identity/Account/Manage/" + page, true);
+    }
+
+    async Task OnMenuOptionSelected(PortalMenuSelection selection) {
+        if (await IsSelectionOK(selection)) {
+            menuSelection = selection;
+        }
+        else {
+            menuSelection = PortalMenuSelection.ShowMenu;
+        }
+    }
+
+    async Task<Person?> GetPersonAsync()
+    {
+        if (loginState == null) return null;
+        if (loginState.SelectedPerson == null) return null;
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            return await dbc.Person.FindAsync(loginState.SelectedPerson.ID);
+        }
+    }
+
+    async Task<bool> IsSelectionOK(PortalMenuSelection selection) {
+        bool result = true;
+        string msg = string.Empty;
+        var person = await GetPersonAsync();
+        switch (selection) {
+            case PortalMenuSelection.DoMemberMaintenance:
+                break;
+            case PortalMenuSelection.DoTellAFriend:
+                break;
+            case PortalMenuSelection.NotImplemented:
+                msg = "We're sorry. That option is yet to be implemented.";
+                await messageBox.ShowOkOnlyAsync("Option Unavailable", msg);
+                result = false;
+                break;
+            case PortalMenuSelection.DoEditMemberEnrolment:
+                if (result = await AreMemberDetailsOK()) {
+                    if (person.FinancialTo < term.Year) {
+                        await messageBox.ShowOkOnlyAsync("Your financial status",
+                        "<p>You are currently unfinancial.</p><p>You may continue with enrolment but your requests will remain Waitlisted " +
+                        "until membership fees are paid. Only then will your requests participate in the enrolment selection process<p>");
+                    }
+                }
+                break;
+            case PortalMenuSelection.DoMemberPayment:
+                result = await AreMemberDetailsOK();
+                break;
+            default:
+                result = await AreMemberDetailsOK();
+                break;
+        }
+        return result;
+    }
+
+    async Task<bool> IsAdminOnU3ADesktop() {
+        if (dbc.TenantInfo.UseEwayTestEnviroment) return true;
+        if (!loginState.IsAdminOnBehalfOfMember) return true;
+        bool result = false;
+        var value = await js.InvokeAsync<string?>("GetSessionState", "isU3ADesktop");
+        if (value != null) result = true;
+        if (!result) {
+            await messageBox.ShowOkOnlyAsync("Not U3A Desktop",
+                "Our security policy requires that payments made on behalf of another member must be processed via the <strong>U3A Desktop</strong> application.");
+        }
+        return result;
+    }
+
+    async Task<bool> AreMemberDetailsOK() {
+        bool result = true;
+        var person = await GetPersonAsync();
+        if (person == null) {
+            var msg = "You must provide your member details before selecting this option.";
+            await messageBox.ShowOkOnlyAsync("Option Unavailable", msg);
+            result = false;
+        }
+        else {
+            if (term == null) {
+                var msg = "Please contact your enrolment officer. Current and Enrolment terms not defined.";
+                await messageBox.ShowOkOnlyAsync("Option Unavailable", msg);
+                result = false;
+            }
+        }
+        return result;
+    }
+
+    async Task OnSelectedOptionCompleted(PortalMenuResult result) {
+        var person = await GetPersonAsync();
+        switch (result) {
+            case PortalMenuResult.EnrolmentCancelledTermNotDefined:
+                await messageBox.ShowOkOnlyAsync("Out of enrolment period",
+                        "We're sorry. Our enrolment period is currently closed. Please try again later.");
+                menuSelection = PortalMenuSelection.ShowMenu;
+                break;
+            case PortalMenuResult.NewMemberFeePayment:
+                menuSelection = PortalMenuSelection.DoMemberPayment;
+                break;
+            case PortalMenuResult.LinkedMemberChanged:
+                person = getLinkedPerson?.SelectedLinkedMember;
+                if (person != null) { person.CopyTo(loginState.SelectedPerson); }
+                menuSelection = PortalMenuSelection.ShowMenu;
+                break;
+            default:
+                menuSelection = PortalMenuSelection.ShowMenu;
+                break;
+        }
+        QueryResult = null;
+        StateHasChanged();
+    }
+
+    public void Dispose() {
+        dbc?.Dispose();
+    }
+}

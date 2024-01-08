@@ -1,0 +1,13 @@
+﻿
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_AddnInfoURL
+
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Occurence_Varies
+
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Occurence_Varies
+
+update-database -cont U3ADbContextSeed -project U3A.Database
+
+script-migration -cont U3ADbContextSeed -project U3A.Database -idempotent -Output migration.sql
+bundle-migration -cont U3ADbContextSeed -project U3A.Database -verbose
+
+use ./migratedb in Terminal (after testing locally)

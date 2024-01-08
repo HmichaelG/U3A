@@ -1,0 +1,155 @@
+﻿@using System.ComponentModel
+@using System.ComponentModel.DataAnnotations;
+@using U3A.Model
+
+<MessageBox @ref="@messageBox" />
+
+<DxFormLayout Data="@Course">
+    <DxFormLayoutItem ColSpanMd="12">
+        <ValidationSummary />
+    </DxFormLayoutItem>
+    <DxTabs @ref=@TabPages CssClass="page-height" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
+
+        <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>
+            <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+                             Settings=@Settings CourseEditView="@CourseEditViewType.Simplified"
+                             Course="Course"
+                             Persons="@Persons" CourseTypes="@CourseTypes"
+                             Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
+                             CourseParticipationTypes="@CourseParticipationTypes" />
+            <DxFormLayoutItem ColSpanMd="12">
+                <FrmClassSimple @ref="frmClassSimple" Course="@Course" IsActivityView="false"
+                                Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" DbContext="@DbContext" />
+            </DxFormLayoutItem>
+        </DxTabPage>
+
+        <DxTabPage Text="Activity View" Enabled=@(Course.Classes.Count <= 1)>
+            <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+                             Settings=@Settings CourseEditView="@CourseEditViewType.Activity"
+                             Course="Course"
+                             Persons="@Persons" CourseTypes="@CourseTypes"
+                             Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
+                             CourseParticipationTypes="@CourseParticipationTypes" />
+            <DxFormLayoutItem ColSpanMd="12">
+                <FrmClassSimple @ref="frmClassSimple" Course="@Course" IsActivityView="true"
+                                Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" DbContext="@DbContext" />
+            </DxFormLayoutItem>
+        </DxTabPage>
+
+        <DxTabPage Text="Detail View">
+            <FrmCourseDetail @ref="@frmCourseDetail" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+                             Settings=@Settings
+                             Course="Course"
+                             Persons="@Persons" CourseTypes="@CourseTypes"
+                             Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
+                             CourseParticipationTypes="@CourseParticipationTypes" />
+            <DxFormLayoutItem ColSpanMd="12">
+                <FrmClassDetailPopup @ref="classDetail" Course="@Course" AllowEdit="true"
+                                     Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" Occurrences="Occurrences"
+                                     DbContext="@DbContext" />
+            </DxFormLayoutItem>
+        </DxTabPage>
+
+        <DxTabPage Text="Settings">
+            <DxFormLayoutGroup Caption="System Overrides">
+                <DxFormLayoutItem Caption="Send Leader Reports To" ColSpanMd="12">
+                    <DxComboBox Data="sendLeaderReportsToList" NullText=@leaderReportsToNullText
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                    @bind-Value="@Course.SendLeaderReportsTo"
+                                ValueFieldName="@nameof(SendLeaderReportsToWrapper.Type)"
+                                TextFieldName="@nameof(SendLeaderReportsToWrapper.DisplayText)">
+                    </DxComboBox>
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Course Contact Order" ColSpanMd="12">
+                    <DxComboBox Data="contactOrder" NullText=@contactOrderNullText
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                    @bind-Value="@Course.CourseContactOrder"
+                                ValueFieldName="@nameof(CourseContactOrderWrapper.Type)"
+                                TextFieldName="@nameof(CourseContactOrderWrapper.DisplayText)">
+                    </DxComboBox>
+                </DxFormLayoutItem>
+                <DxFormLayout CssClass="p-2 w-100">
+                    <DxFormLayoutItem Caption="Exclude this Course from the Leaders Complimentary count?" ColSpanMd="12">
+                        <DxCheckBox @bind-Checked="Course.ExcludeFromLeaderComplimentaryCount" Alignment="CheckBoxContentAlignment.Right" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </DxFormLayoutGroup>
+        </DxTabPage>
+
+    </DxTabs>
+</DxFormLayout>
+<style>
+    .page-height {
+        min-height: 30rem !important;
+    }
+</style>
+
+@code {
+
+    [Parameter]
+    public bool AnyEnrolmentsInYear { get; set; }
+    [Parameter]
+    public Course Course { get; set; }
+    [Parameter]
+    public IEnumerable<CourseParticipationType> CourseParticipationTypes { get; set; }
+    [Parameter]
+    public List<Occurrence>? Occurrences { get; set; }
+    [Parameter]
+    public IEnumerable<Person> Persons { get; set; }
+    [Parameter]
+    public IList<CourseType> CourseTypes { get; set; }
+    [Parameter]
+    public IEnumerable<Venue> Venues { get; set; }
+    [Parameter]
+    public IEnumerable<WeekDay> WeekDays { get; set; }
+    [Parameter]
+    public U3ADbContext? DbContext { get; set; }
+    [Parameter]
+    public SystemSettings Settings { get; set; }
+
+    internal FrmClassDetailPopup? classDetail { get; set; }
+    internal FrmCourseSimple? frmCourseSimple { get; set; }
+    internal FrmCourseDetail? frmCourseDetail { get; set; }
+    internal FrmClassSimple? frmClassSimple { get; set; }
+    internal CourseEditViewType CourseViewType { get; set; }
+
+    MessageBox? messageBox;
+    string leaderReportsToNullText;
+    string contactOrderNullText;
+    DxTabs? TabPages;
+
+    List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
+    List<CourseContactOrderWrapper> contactOrder = new CourseContactOrderList();
+
+    protected override void OnInitialized()
+    {
+        if (Settings != null)
+        {
+            leaderReportsToNullText = $"(Optional) {Settings.SendLeaderReportsTo.GetAttribute<DisplayAttribute>().Name}";
+            contactOrderNullText = $"(Optional) {Settings.CourseContactOrder.GetAttribute<DisplayAttribute>().Name}";
+        }
+        CourseViewType = Course.EditType;
+        base.OnInitialized();
+    }
+
+    void OnTabPageClick(TabClickEventArgs e)
+    {
+        switch (e.TabIndex)
+        {
+            case 1:
+                CourseViewType = CourseEditViewType.Activity;
+                break;
+            case 2:
+                CourseViewType = CourseEditViewType.Detail;
+                break;
+            case 3:
+                CourseViewType = CourseEditViewType.Settings;
+                break;
+            default:
+                CourseViewType = CourseEditViewType.Simplified;
+                break;
+        }
+        if (CourseViewType != CourseEditViewType.Settings) { Course.EditType = CourseViewType; }
+    }
+
+}

@@ -1,0 +1,472 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+   <title>Course Menu &gt; Add/Edit Courses</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />   
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta name="description" content="A Course is an activity organised by the U3A group.&nbsp;" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+   <link type="text/css" href="custom.css" rel="stylesheet" />
+
+   <style TYPE="text/css" media="screen"> 
+      html, body { margin:0; 
+        padding:0; 
+        background: #ffffff; 
+      } 
+      div#printheader { display: none; }
+      #idheader { 
+        width:100%; 
+        min-height: 60px;
+        padding: 0; 
+        margin: 0;
+        position: fixed;
+        top: 0;
+        background: #2C5D88;
+        z-index: 2;
+      } 
+      /* The "min-height" for "#idheader table" ensures that the (blue) header of the topic
+         has at least the same height as the header of the navigation panel left of it */
+      #idheader table { min-height: 59px;}             
+      #idheader h1 span { color: #FFF }     
+      #idnav {
+        text-align: right;
+        width: 126px;
+        vertical-align: middle;        
+      } 
+      #idnav a { text-decoration: none }
+      #idnav span {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        margin-left: 4px;
+        background:url('hm_webhelp_buttons_grey.png') top left no-repeat;
+      } 
+      #idnav a span {
+        background-image:url('hm_webhelp_buttons_white.png');
+      } 
+      #idnav a span:hover {
+        background-image:url('hm_webhelp_buttons_orange.png');
+      } 
+      #idnav span.hmbtnprev { background-position: 0 -32px }
+      #idnav span.hmbtnnext { background-position: -24px -32px }
+      #idnav span.hmbtntop  { background-position: -48px -32px }
+      #idnav span.hmbtntoggle  { width: 20px; background-position: -70px -32px }
+      #idnav span.hmbtnprint  { background-position: -88px -32px }
+
+      #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+      #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+      #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+      #callout-table a {text-decoration: none; color: blue;}
+      #callout-table a:visited {text-decoration: none; color: blue;}
+      #overview-table a {text-decoration: none; color: black;}
+      #overview-table a:visited {text-decoration: none; color: black;}
+      #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}       
+      p.help-url { margin: 20px 0 5px 0; text-align: center; }
+	  p.help-url a:link { font-size: 50%; text-decoration: none; color: black; }
+	  p.help-url a:visited { color: black; }
+	  p.help-url a:hover { font-size: 95%; text-decoration: underline; }
+      #switchtoggles { text-align: right; padding: 0 2px 0 0; font-size: 90%; } 
+      .sync-toc { color: #FFF; font-size: 8pt; font-weight: bold; display: none; }
+      .sync-toc a { color: #FFF; text-decoration: none; font-weight: bold;}
+      .sync-toc a:visited { color: #FFF; }
+      .sync-toc a:hover { text-decoration: underline; }
+	  a#printbuttonlink { cursor: pointer; }
+      a.hmanchor { display: inline-block; margin-top: -4em; padding-top: 4em; }        
+   </style>
+   <style TYPE="text/css" media="print">
+      div#idheader, img.dropdown-toggle-icon, p.help-url { display:none } 
+   </style>
+   
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript" src="helpman_topicinit.js"></script>
+
+   <script type="text/javascript">
+     HMSyncTOC("index.html", "add_edit-courses.html");
+   </script>
+   <script type="text/javascript" src="highlight.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function(){highlight();});
+   </script>
+</head>
+<body>
+
+
+<div id="printheader"><h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Add/Edit Courses</span></h1>
+</div>
+<div id="idheader">
+<div id="idheaderbg">
+<table style="width:100%;border:none;margin:0px;" cellspacing="0" cellpadding="0"> 
+  <tr>
+    <td class="topichead" style="text-align:left; vertical-align:middle">
+      <p class="sync-toc">&lt;&lt; <a rel="nofollow" href="index.html?add_edit-courses.html" target="_top">Click to Display Table of Contents</a> &gt;&gt;</p>
+      <p class="crumbs"><b>Navigation:</b>&nbsp;
+      
+      Course Menu&nbsp;&gt;</p>
+   
+      <h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Add/Edit Courses</span></h1>
+
+    </td>
+    <td class="topichead" id="idnav">
+      <a href="javascript:HMToggleExpandAll(!HMAnyToggleOpen())" title="Click to open/close expanding sections"><span class="hmbtntoggle"></span></a>
+      <a href="add_edit-public-holidays.html" title="Previous Topic"><span class="hmbtnprev"></span></a>
+      <a href="introduction.html" title="Parent Chapter"><span class="hmbtntop"></span></a>
+      <a href="bring-forward-courses.html" title="Next Topic"><span class="hmbtnnext"></span></a>
+      
+    </td>
+  </tr>  
+</table>
+</div>
+</div>  
+
+<div id="idcontent"><div id="innerdiv">
+<!-- Ask Internet Explorer 6.users to update their obsolete and dangerous browser --> 
+<!--[if lt IE 7]><div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;'><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." /></a></div><![endif]-->
+
+<!--ZOOMRESTART-->
+<p class="p_Normal">A <span style="font-weight: bold;">Course</span> is an activity organised by the U3A group. </p>
+<p class="p_Normal">A course may have one to three <span style="font-style: italic; font-weight: bold;">Leaders</span><span style="font-style: italic;">, </span>and as many <span style="font-style: italic; font-weight: bold;">Students</span><span style="font-style: italic;"> </span>enrolled<span style="font-style: italic;"> </span>as allowed. In addition, the course may have a <span style="font-style: italic; font-weight: bold;">Guest Leader</span> which is a leader that is not a financial member of the U3A group. Leaders may assign <span style="font-style: italic; font-weight: bold;">Course Clerks</span> from the enrolled students to assist with administrative tasks.</p>
+<p class="p_Normal">A course may have one or more classes. A <span style="font-weight: bold;">Class</span> defines the time and place a course is held. It contains parameters that determine when it occurs and how it recurs. Students are enrolled into the class, not the course. Therefore, enrolment is not permitted into a course unless at least one class is defined.</p>
+<p class="p_Normal">A course and its associated class(es) can be deleted. However, this should be avoided once there are enrolments and/or attendance details. Deleting a course will delete all enrolment and attendance detail associated with it.</p>
+<p class="p_Normal" style="text-align: center; margin: 0 0 0 0;"><span style="font-weight: bold;">Hint: </span>Check the Current Year</p>
+<p class="p_Normal" style="text-align: center;">Before you create/edit courses please ensure you are working in the correct year. The year is displayed on the top right hand corner above the grid. Click the button titled, <span style="font-style: italic;">Change Year</span> to change. Note that terms for the new year must be created via <a href="add_edit-enrolment-terms.html" class="topiclink">Add/Edit Enrolment Terms</a> before you can do this.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">Preview Enrolment List button</span></h3>
+<p class="p_Normal">Click this button to preview all classes as seen by members making enrolments via the <span style="font-style: italic;">Member Portal</span>. It is anticipated that this preview will be useful when the current enrolment period is undefined.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">Course Edit Views</span></h3>
+<p class="p_Normal">When adding and editing course data, you have the option of choosing between one of three views...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span><span style="font-weight: bold;">Simple View</span>. This view presents the course and class data as one form. When creating a new course the <span style="font-style: italic;">Occurrence</span> will be set to <span style="font-weight: bold;">Weekly</span>. It is anticipated that this view will be suitable for most U3A courses.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span><span style="font-weight: bold;">Activity View</span>. This is a slight variation on the <span style="font-style: italic;">Simple View</span> specifically intended for activities and events that occur once only. Therefore, when creating a new course the <span style="font-style: italic;">Occurrence</span> will be set to <span style="font-weight: bold;">Once Only</span> and the <span style="font-style: italic;">Start Date </span>displayed.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span><span style="font-weight: bold;">Detail View</span>. A detail view in which all fields are displayed and provides the ability to create multiple classes per course. While being the most complex of all views, it is also the most flexible and comprehensive. </p>
+<p class="p_Normal"><span style="font-weight: bold;">Some Notes</span></p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin-left: 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>A view is persisted with course data. That means the view that was active at the time a course record is written to the database will be used when that data is subsequently retrieved from the database.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin-left: 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>Views are organised via a tabset at the top of the edit form. A view can be changed at any time by clicking the tab desired. The exception to this is a course with multiple classes which is always displayed as a <span style="font-style: italic;">Detail</span> view.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin-left: 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>A view is simply a means of displaying course data. All course records have the same data structure &quot;under the hood&quot;. It is therefore permissible to select and/or change the best view for the course you are implementing.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin-left: 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>The <span style="font-style: italic;">Simple</span> and <span style="font-style: italic;">Activity</span> views contain a <span style="font-weight: bold;">Show Details</span> checkbox on the Class group of fields. Ticking this field will display all fields for the class.</p>
+<p class="p_Toggle" style="border-top: none; border-right: none; border-left: none;"><img id="toggle0186a1_ICON" class="dropdown-toggle-icon" alt="hmtoggle_arrow1" width="9" height="9" style="margin:0;width:9px;height:9px;border:none" src="hmtoggle_arrow1.gif"/> &nbsp; &nbsp; &nbsp; &nbsp;<span class="f_Toggle"><a class="dropdown-toggle" href="javascript:HMToggle('toggle','toggle0186a1','toggle0186a1_ICON')">The Course Record</a></span></p>
+<div id="toggle0186a1" class="dropdown-toggle-body" style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table class="BlankTable" >
+<tr class="BlankTable">
+<td class="BlankTable"><p class="p_Normal">When you add/edit a course, the course record will be displayed as a pop-up window. This record is composed of two sections...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>The course details section. The course section consists of two tabs...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">a.</span><span style="font-style: italic;">Course Details</span>. The primary fields required to define a course, and</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">b.</span><span style="font-style: italic;">Settings</span>. Values that override settings entered in <a href="organistaion-details.html" class="topiclink">Organistaion Details</a></p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>The class grid, into which one or more classes may be added and/or edited.</p>
+<p class="p_Normal">Use the course details to enter the basic course details.</p>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; width:267px; background-color:#C0C0C0; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal"><span style="font-weight: bold;">Field</span></p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; background-color:#C0C0C0; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal"><span style="font-weight: bold;">Description</span></p>
+</td>
+</tr>
+<tr>
+<td colspan="3"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal"><span style="font-weight: bold;">The Course Details tab</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Course Number</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Optional. A number unique to the course. Note that course numbers are not a requirement in the system. They are provided to maintain compatibility with legacy systems.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Participation Type</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Required. This option only has effect when a course has multiple classes. Select either...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Same participants in all classes, or </p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 1px 0 16px 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>Different participants in each class.</p>
+<p class="p_Normal">For example, </p>
+<p class="p_Normal" style="text-indent: 0; line-height: 1.38; padding-left: 13px; margin: 0 0 0 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>A walking group meets three times per week. The same students attend each walk. Select option 1.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin-left: 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>An art class is very popular. It is decided to hold the same class three times per week but each class will have a different group of students. In this case, select option 2.</p>
+<p class="p_Normal">Please exercise care when changing the participation type once enrolment has commenced as changing the participation type will cause current enrolments to be lost.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Course Type</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Required. Select a course type from the drop-down list.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Course Name</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Required: A name that (should) uniquely describe the course.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Description</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Optional. Describe the course in a little detail to give potential enrolees sufficient information to make their decision. Try not to be too verbose as it can impact system performance over slow Internet connections.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Additional Information URL</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">A web link URL that provides additional detail about the course. This link must be fully qualified meaning it must start with https:// or http://. It is recommended that a URL shortcut be used if the web link URL is long, for example <a href="https://tinyurl.com" target="_blank" class="weblink">Tiny URL</a> </p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Class Duration</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Required. The length of a class in hours and fractions of an hour. For example, a class that will last for 1 hour and 15 minutes will be entered as 1.25.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Required Students</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Required. The number of students required for the class to proceed. This field is for information purposes only as the software currently does not take any action if a class falls below the minimum.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Maximum Students</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Required. The maximum students allowed in a class. A student will be <span style="font-style: italic;">Waitlisted </span>if an attempt is made to enrol in a class that has enrolments equal to or greater than this value.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:267px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Auto Enrol?</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Required. Automatic enrolment is the process of moving students from the waitlist to enrolled should places be or become available. It is a process that either occurs immediately on enrolment if the member is financial, or automatically overnight. Uncheck this option if auto enrolment is not to occur.</p>
+<p class="p_Normal">For example, the leader of the yoga class requires that all students have a minimum level of fitness before attempting the class. In this case, <span style="font-style: italic;">Auto Enrol? </span>will be unchecked and students moved off the wiatlist manually as they prove their fitness.</p>
+<p class="p_Normal">All course/classes with <span style="font-style: italic;">Auto-Enrol?</span> unchecked will be identified as <span style="font-weight: bold;">Closed</span> in member enrolment.</p>
+</td>
+</tr>
+<tr>
+<td rowspan="5"  style="vertical-align:top; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Fees</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1261px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Course fees may be added on a per term or per year basis. Course fees are in addition to membership fees. </p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:193px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Course Fee</p>
+</td>
+<td style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Enter the fee as dollars and cents.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:193px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Fee Description</p>
+</td>
+<td style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Enter a brief description of the fee.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:193px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Override Complimentary?</p>
+</td>
+<td style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Tick if you wish complimentary members to pay the fee.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:193px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Leader Pay Fee?</p>
+</td>
+<td style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Tick if you require leaders to pay the fee.</p>
+</td>
+</tr>
+<tr>
+<td colspan="3"  style="vertical-align:top; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal"><span style="font-weight: bold;">The Settings tab</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Send Leader Reports To</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Determines the recipients of leader reports sent automatically overnight...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span><span style="font-weight: bold;">Leaders, if none then clerks.</span> Leader reports will be sent to leaders. if there are no leaders with visible email addresses then the reports will be sent to clerks.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span><span style="font-weight: bold;">Clerks, if none then leaders.</span> Leader reports will be sent to clerks. if there are no clerks with email visible addresses then the reports will be sent to leaders.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span><span style="font-weight: bold;">Both</span>. Leader reports will be sent to both leaders and clerks with email addresses.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal"><span style="font-weight: bold;">Note:</span> This field overrides the value in <a href="organistaion-details.html" class="topiclink">Organistaion Details</a>. Leave blank to use the default value.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Course Contact Order</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Defines the order in which a course contact is determined. This field overrides the value entered in <a href="organistaion-details.html" class="topiclink">Organistaion Details</a>. The options are...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Leaders then clerks, or</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>Clerks then leaders</p>
+<p class="p_Normal">Class contacts can either be leaders or clerks all of which are optional and some may have requested their contact details to be silent. The software will therefore choose the contacts based on the order selected and who do not have their contact details silenced. </p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Exclude course from leaders complimentary count?</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">The system allows for membership fees to be waived if a leader is enrolled as a student in less than a defined count of classes. Tick this field if the course is not to be included in that count.</p>
+<p class="p_Normal">For example, special excursions and paid activities would normally be excluded from the count.</p>
+</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="p_Toggle" style="border-top: none; border-right: none; border-left: none;"><img id="toggle0186a2_ICON" class="dropdown-toggle-icon" alt="hmtoggle_arrow1" width="9" height="9" style="margin:0;width:9px;height:9px;border:none" src="hmtoggle_arrow1.gif"/> &nbsp; &nbsp; &nbsp; &nbsp;<span class="f_Toggle"><a class="dropdown-toggle" href="javascript:HMToggle('toggle','toggle0186a2','toggle0186a2_ICON')">The Class Record</a></span></p>
+<div id="toggle0186a2" class="dropdown-toggle-body" style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table class="BlankTable" >
+<tr class="BlankTable">
+<td class="BlankTable"><p class="p_Normal">Use the add/edit/delete on the Class grid within the Course record pop-up to create and /or edit classes. Enrolment cannot occur until a course has at least one class assigned.</p>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; width:272px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><span style="font-weight: bold;">Field</span></p>
+</td>
+<td style="vertical-align:top; width:1288px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><span style="font-weight: bold;">Description</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Term (1, 2, 3 &amp; 4)</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">A class must be assigned at least one term and may be assigned up to all four.</p>
+<p class="p_Normal">If a class occurs during a term break it is assigned to the term immediately preceding it. For example, If a class occurs during the Term 1 to Term 2 break, it will be assigned to Term 1.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Guest Leader</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Optional. A class may have a Guest leader, that is one that has not been entered as a participant in <a href="add_edit-participants.html" class="topiclink">Add/Edit Participants</a>. A Guest Leader is for information purposes only. It is strongly recommended that a class with a Presenter also have a participant leader to receive email etc. Most often this might be the Course Clerk or an activities officer.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Leaders 1, 2 &amp; 3</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Select the leader from the drop-down menu. A class may have up to three leaders. Note that a leader is not considered a student and therefore not included in the enrolment count.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Venue</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Select the venue from the drop-down list.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Start Date</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Optional. Enter the course start date, if required. By default it is left blank meaning the first class will occur on or after the start of term on which the <span style="font-style: italic;">On Day</span> day occurs (see below).</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Recurrence</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Optional. Enter how many times the class will recur. By default it is left blank meaning the course will recur till the end of term.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Occurrence</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Select from the list how the class occurs. The default value is <span style="font-style: italic;">Weekly</span> meaning the class will occur once per week.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">On Day</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Select the Day on which the class is held. If a <span style="font-style: italic;">Start Date</span> has been entered above, the <span style="font-style: italic;">On Day</span> value will be automatically calculated.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:272px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Start Time</p>
+</td>
+<td style="vertical-align:top; width:1288px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Enter the Start Time of the class as hours and minutes.</p>
+</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<p class="p_Toggle" style="border-top: none; border-right: none; border-left: none;"><img id="toggle0186a3_ICON" class="dropdown-toggle-icon" alt="The class link" title="The class link" width="9" height="9" style="margin:0;width:9px;height:9px;border:none" src="hmtoggle_arrow1.gif"/> &nbsp; &nbsp; &nbsp; &nbsp;<span class="f_Toggle"><a class="dropdown-toggle" title="The class link" href="javascript:HMToggle('toggle','toggle0186a3','toggle0186a3_ICON')">The Class Link</a></span></p>
+<div id="toggle0186a3" class="dropdown-toggle-body" style="text-align: left; padding: 0 0 0 0; margin: 0 0 16px 18px;"><table class="BlankTable" >
+<tr class="BlankTable">
+<td class="BlankTable"><p class="p_Normal">The class link is an internet address that allows a member to quickly enrol in a class. The link is intended to be used in email and other documentation to be sent to members or otherwise available in report form. By clicking on the link or scanning a QR Code created from the link the member will be enrolled in the class.</p>
+<h3 class="p_Heading3" style="margin: 8px 0 0 0;"><span class="f_Heading3">Create a link</span></h3>
+<p class="p_Normal">To obtain a Class link...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>On the grid in <a href="add_edit-courses.html" class="topiclink">Add/Edit Courses</a>, find the required Course.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>Click the arrow button to the left hand side of the Course record. This will display the Class record(s).</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span>Again, click the arrow to the left hand side of the Class record. This will display the Class link.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">4.</span>Click the Copy button to copy the link to the clipboard. </p>
+<h3 class="p_Heading3" style="margin: 8px 0 0 0;"><span class="f_Heading3">Using the link</span></h3>
+<p class="p_Normal">Using the copied link depends on the document you are creating. To add the link to an email created within the administrative portal...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Create your email document as usual via the <a href="communicate.html" class="topiclink">Communicate</a> button.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>Position the mouse pointer where you require the link to be inserted.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span>On the document menu, select <span style="font-weight: bold;">Insert | Hyperlink</span>. A popup dialog will appear.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">4.</span>Paste the saved link into the into the URL field.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">5.</span>Enter the hyperlink's <span style="font-style: italic;">Text </span>and <span style="font-style: italic;">Tooltip</span> and click the Save button.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 1px 0;">To create a QR Code in a Word document...</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Position the cursor in the document where you wish to insert the QR Code. Press <span style="font-weight: bold;">Ctrl + F9</span>. A pair of curly braces {} will appear in the document.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>Within the braces, type </p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 0 39px;"><span style="font-family: 'Cascadia Code';">DisplayBarcode &lt;paste link&gt; QR \s 100</span></p>
+<p class="p_Normal" style="margin: 0 0 0 39px;">&nbsp;</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span>When complete, right-click the field and select <span style="font-style: italic;">Toggle Field Codes</span>. This will display the QR Code.</p>
+<p class="p_Normal">Note: The \s value is a percentage value from 10 through 10000. It determines the size of the QR Code.</p>
+</td>
+</tr>
+</table>
+</div>
+
+<!--ZOOMSTOP-->
+
+<hr/>
+</div></div>
+<script type="text/javascript">
+
+
+
+function normHeaders() {
+ var topicHeadHeight =  $("#idheaderbg > table").first().height() + 1,
+	 $topicHeaderBox = $("#idheader"),
+	 $topicContentBox = $("#idcontent"),
+	 $navHeader = $("#navbar", parent.document),			 
+	$navBox = $("div#hmnavframe", parent.document),
+	 navHeaderHeight = $navHeader.height();
+ if (topicHeadHeight != navHeaderHeight) {
+	 $navHeader.css("height",topicHeadHeight + "px");
+	 $navBox.css("top", topicHeadHeight + "px");
+	 $topicHeaderBox.css("height", topicHeadHeight + "px");
+		if ($topicHeaderBox.css("position") == "fixed"){
+			$topicContentBox.css("margin-top", topicHeadHeight + "px");
+			}
+		}
+    }
+			 
+  $(document).ready(function(){
+    $(window).on('resize', function() {
+      var y = $('#idheader').height(); 
+      $('#idcontent').css('margin-top', y);
+      var par = window.parent;
+      if ($( par ).width() <= $( window ).width()+20) {
+        $('#idheader').css('position', 'relative');
+        $('#idcontent').css('margin-top', 0);
+        $('#idbacktotop').css('display', 'block');
+        $('.hmanchor').css('margin-top', -20);
+	$('.hmanchor').css('padding-top', 20);
+      }
+      else {
+        $('#idheader').css('position', 'fixed');
+        $('#idcontent').css('margin-top', $('#idheader').height());
+        $('#idbacktotop').css('display', 'none');
+        $('.hmanchor').css('margin-top', -y-20);
+		$('.hmanchor').css('padding-top', y+20);
+		$("div#hmsplitter", parent.document).css('width', '3px');
+      }
+	normHeaders();
+    });
+    
+	 $(window).resize(); //trigger event for initially small displays
+  });
+ 
+
+if ((!parent.hmNavigationFrame) && (parent.location) && (parent.location.href)) { $('.sync-toc').show();$('p.crumbs').hide();}
+
+</script>
+
+<script type="text/javascript">
+HMInitToggle('toggle0186a1_ICON','hm.type','dropdown','hm.state','0','hm.src0','hmtoggle_arrow0.gif','hm.src1','hmtoggle_arrow1.gif','onclick','HMToggle(\'toggle\',\'toggle0186a1\',\'toggle0186a1_ICON\')');
+HMInitToggle('toggle0186a1','hm.type','dropdown','hm.state','0');
+HMInitToggle('toggle0186a2_ICON','hm.type','dropdown','hm.state','0','hm.src0','hmtoggle_arrow0.gif','hm.src1','hmtoggle_arrow1.gif','onclick','HMToggle(\'toggle\',\'toggle0186a2\',\'toggle0186a2_ICON\')');
+HMInitToggle('toggle0186a2','hm.type','dropdown','hm.state','0');
+HMInitToggle('toggle0186a3_ICON','hm.type','dropdown','hm.state','0','hm.src0','hmtoggle_arrow0.gif','hm.src1','hmtoggle_arrow1.gif','onclick','HMToggle(\'toggle\',\'toggle0186a3\',\'toggle0186a3_ICON\')');
+HMInitToggle('toggle0186a3','hm.type','dropdown','hm.state','0');
+</script>
+</body>
+</html>

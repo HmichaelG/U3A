@@ -1,0 +1,289 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+   <title>User Interface (UI) elements &gt; UI Components &gt; Communicate</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />   
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta name="description" content="The Communicate module is a general purpose procedure designed to facilitate communication between the U3A and it's membership. The procedure is capable of..." />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+   <link type="text/css" href="custom.css" rel="stylesheet" />
+
+   <style TYPE="text/css" media="screen"> 
+      html, body { margin:0; 
+        padding:0; 
+        background: #ffffff; 
+      } 
+      div#printheader { display: none; }
+      #idheader { 
+        width:100%; 
+        min-height: 60px;
+        padding: 0; 
+        margin: 0;
+        position: fixed;
+        top: 0;
+        background: #2C5D88;
+        z-index: 2;
+      } 
+      /* The "min-height" for "#idheader table" ensures that the (blue) header of the topic
+         has at least the same height as the header of the navigation panel left of it */
+      #idheader table { min-height: 59px;}             
+      #idheader h1 span { color: #FFF }     
+      #idnav {
+        text-align: right;
+        width: 126px;
+        vertical-align: middle;        
+      } 
+      #idnav a { text-decoration: none }
+      #idnav span {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        margin-left: 4px;
+        background:url('hm_webhelp_buttons_grey.png') top left no-repeat;
+      } 
+      #idnav a span {
+        background-image:url('hm_webhelp_buttons_white.png');
+      } 
+      #idnav a span:hover {
+        background-image:url('hm_webhelp_buttons_orange.png');
+      } 
+      #idnav span.hmbtnprev { background-position: 0 -32px }
+      #idnav span.hmbtnnext { background-position: -24px -32px }
+      #idnav span.hmbtntop  { background-position: -48px -32px }
+      #idnav span.hmbtntoggle  { width: 20px; background-position: -70px -32px }
+      #idnav span.hmbtnprint  { background-position: -88px -32px }
+
+      #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+      #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+      #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+      #callout-table a {text-decoration: none; color: blue;}
+      #callout-table a:visited {text-decoration: none; color: blue;}
+      #overview-table a {text-decoration: none; color: black;}
+      #overview-table a:visited {text-decoration: none; color: black;}
+      #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}       
+      p.help-url { margin: 20px 0 5px 0; text-align: center; }
+	  p.help-url a:link { font-size: 50%; text-decoration: none; color: black; }
+	  p.help-url a:visited { color: black; }
+	  p.help-url a:hover { font-size: 95%; text-decoration: underline; }
+      #switchtoggles { text-align: right; padding: 0 2px 0 0; font-size: 90%; } 
+      .sync-toc { color: #FFF; font-size: 8pt; font-weight: bold; display: none; }
+      .sync-toc a { color: #FFF; text-decoration: none; font-weight: bold;}
+      .sync-toc a:visited { color: #FFF; }
+      .sync-toc a:hover { text-decoration: underline; }
+	  a#printbuttonlink { cursor: pointer; }
+      a.hmanchor { display: inline-block; margin-top: -4em; padding-top: 4em; }        
+   </style>
+   <style TYPE="text/css" media="print">
+      div#idheader, img.dropdown-toggle-icon, p.help-url { display:none } 
+   </style>
+   
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript" src="helpman_topicinit.js"></script>
+
+   <script type="text/javascript">
+     HMSyncTOC("index.html", "communicate.html");
+   </script>
+   <script type="text/javascript" src="highlight.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function(){highlight();});
+   </script>
+</head>
+<body>
+
+
+<div id="printheader"><h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Communicate</span></h1>
+</div>
+<div id="idheader">
+<div id="idheaderbg">
+<table style="width:100%;border:none;margin:0px;" cellspacing="0" cellpadding="0"> 
+  <tr>
+    <td class="topichead" style="text-align:left; vertical-align:middle">
+      <p class="sync-toc">&lt;&lt; <a rel="nofollow" href="index.html?communicate.html" target="_top">Click to Display Table of Contents</a> &gt;&gt;</p>
+      <p class="crumbs"><b>Navigation:</b>&nbsp;
+      
+      User Interface (UI) elements &gt; <a href="ui-components.html">UI Components</a>&nbsp;&gt;</p>
+   
+      <h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Communicate</span></h1>
+
+    </td>
+    <td class="topichead" id="idnav">
+      <a href="javascript:HMToggleExpandAll(!HMAnyToggleOpen())" title="Click to open/close expanding sections"><span class="hmbtntoggle"></span></a>
+      <a href="report.html" title="Previous Topic"><span class="hmbtnprev"></span></a>
+      <a href="ui-components.html" title="Parent Chapter"><span class="hmbtntop"></span></a>
+      <a href="tenant-details.html" title="Next Topic"><span class="hmbtnnext"></span></a>
+      
+    </td>
+  </tr>  
+</table>
+</div>
+</div>  
+
+<div id="idcontent"><div id="innerdiv">
+<!-- Ask Internet Explorer 6.users to update their obsolete and dangerous browser --> 
+<!--[if lt IE 7]><div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;'><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." /></a></div><![endif]-->
+
+<!--ZOOMRESTART-->
+<p class="p_Normal">The <span style="font-weight: bold;">Communicate</span> module is a general purpose procedure designed to facilitate communication between the U3A and it's membership. The procedure is capable of...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin: 0 0 0 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>Sending email to all or a subset of members.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin: 0 0 0 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>Sending SMS to members, and</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin-left: 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>Sending mail via traditional post to members.</p>
+<p class="p_Toggle" style="border-top: none; border-right: none; border-left: none;"><img id="toggle0186a1_ICON" class="dropdown-toggle-icon" alt="Some general comment about the communication facility" title="Some general comment about the communication facility" width="9" height="9" style="margin:0;width:9px;height:9px;border:none" src="hmtoggle_plus1.gif"/> &nbsp; &nbsp; &nbsp; &nbsp;<span class="f_Heading3"><a class="dropdown-toggle" title="Some general comment about the communication facility" href="javascript:HMToggle('toggle','toggle0186a1','toggle0186a1_ICON')">General Comments</a></span></p>
+<div id="toggle0186a1" class="dropdown-toggle-body" style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 8px 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; padding:10px; border:solid thin #c0c0c0;"><h3 class="p_Heading3"><span class="f_Heading3">The Postal Service</span></h3>
+<h3 class="p_Heading3">Sending email and SMS are digital processes and are completely handled within the application. Post however, requires manual intervention. The software will package all postal items into a single PDF and email it to the <span style="font-style: italic;">Send Email Address</span> as defined in <a href="organistaion-details.html" class="topiclink">Organistaion Details</a>. It is then the recipient's responsibility to print the PDF and manually post to the required members. All proforma stationary is designed to fit into standard window envelopes.</h3>
+<h3 class="p_Heading3"><span class="f_Heading3">Overnight Processing</span></h3>
+<p class="p_Normal">Any email that contains mail merge tags or attachments will be queued for processing overnight. These are compute-intensive tasks best left to quite periods during the night.</p>
+<p class="p_Normal">The exception is if the email is to be sent to one member only. In this case it will be sent immediately. This is intended to allow you to test the email.</p>
+<p class="p_Normal">Email without mail merge tags or attachments will be sent immediately.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">Broadcast (bulk) Email</span></h3>
+<p class="p_Normal">All email sent via the <span style="font-weight: bold;">Communicate</span> procedure will be placed into the broadcast email stream. This stream has the highest potential to be considered spam by members email service providers. Care should therefore be exercise in crafting the email. </p>
+<p class="p_Normal">In addition, all broadcast email must provide the ability to opt-out or unsubscribe. This is normally a link at the bottom of the email. You cannot create an email without this link.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">SMS</span></h3>
+<p class="p_Normal">The Australian Government now requires a formal registration and authentication process before you can create bulk SMS messages. Be aware the process is somewhat onerous and time consuming to complete. Also, compared to email, SMS can be quite expensive.</p>
+<p class="p_Normal">&nbsp;</p>
+</td>
+</tr>
+</table>
+</div>
+<h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Using the procedure</span></h2>
+<p class="p_Normal">After clicking the <span style="font-weight: bold;">Communicate</span> button within any procedure in which it is displayed, the software will popup the <span style="font-style: italic;">Communicate</span><span style="font-style: italic; font-weight: bold;"> </span>window.</p>
+<p class="p_Normal">To begin, select a <span style="font-style: italic;">Document Template</span> from the list provided. Document templates are created by administrators using the <a href="add_edit-document-templates.html" class="topiclink">Add/Edit Document Templates</a> procedure. Templates assist in the creation of documents by pre-filling communications parameters and optionally, the document text.</p>
+<p class="p_Normal">Alternatively, you may select <span style="font-style: italic;">Custom Email</span> as the document template. This allows the creation of an email document without reference to any template.</p>
+<p class="p_Normal">Depending on the communication type, you will be presented with one of the following.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;"><span style="font-weight: bold;">Email</span></p>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<thead>
+<tr>
+<th style="vertical-align:top; width:208px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Field</p>
+</th>
+<th style="vertical-align:top; width:743px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="vertical-align:top; width:208px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Email Subject</p>
+</td>
+<td style="vertical-align:top; width:743px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Text to be placed on the email's Subject line</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:208px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">From Address</p>
+</td>
+<td style="vertical-align:top; width:743px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The email address of the sender. Note that the email <span style="font-weight: bold;">must be sent from an email address containing the U3A's registered domain. </span>By default, the <span style="font-style: italic;">Send Email Address</span> found in <a href="organistaion-details.html" class="topiclink">Organistaion Details</a> will be used.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:208px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">From Display Name</p>
+</td>
+<td style="vertical-align:top; width:743px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">A friendly name &nbsp;to be displayed on the email's <span style="font-style: italic;">From</span> line. By default, the <span style="font-style: italic;">Send Email Display Name</span> found in <a href="organistaion-details.html" class="topiclink">Organistaion Details</a> will be used.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:208px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Attachments</p>
+</td>
+<td style="vertical-align:top; width:743px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Click the button to upload files to be attached to the email. Only PDF files are currently allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="p_Normal" style="line-height: 1.38; margin: 0 0 0 0;"><span style="font-weight: bold;"> SMS</span></p>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<thead>
+<tr>
+<th style="vertical-align:top; width:208px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Field</p>
+</th>
+<th style="vertical-align:top; width:743px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="vertical-align:top; width:208px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">From (11 Chars Max)</p>
+</td>
+<td style="vertical-align:top; width:743px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">A friendly name identifying who the email is from. This will be displayed instead of a phone number on the recipient's mobile device. <span style="font-weight: bold;">This name must be the registered name as provided to the sending service.</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="p_Normal" style="margin: 0 0 0 0;"><span style="font-weight: bold;">Post</span></p>
+<p class="p_Normal">No additional information is required for postal documents.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;"><span style="font-weight: bold;">Override Communications Preference?</span></p>
+<p class="p_Normal">All document communication types will ask if the communications preference is to be overridden. This will only occur if the member has provided sufficient detail to send via the communication type selected. For example, if the communication type is Email and the member has requested postal delivery, that member will receive an email <span style="font-style: italic;">only if they have supplied an email address </span>when this option is checked.</p>
+<p class="p_Normal">The option therefore has limited utility except for postal items. For example, if it is decided that a document must be sent to all members using the postal service, check this box to override those members who have elected to use email as their primary means of communication.</p>
+<p class="p_Normal"><span style="font-weight: bold;">Document Text</span></p>
+<p class="p_Normal">Enter or amend the text to be sent to recipients. If using a document template be careful not to edit any mail merge tags that may exist in the text.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">Sending the Document</span></h3>
+<p class="p_Normal">There are two ways to send the document, directly via the <span style="font-weight: bold;">Send Email</span> button or previewing the document via the <span style="font-weight: bold;">Mail Merge</span> button and sending from within the preview.</p>
+<p class="p_Normal"><span style="font-weight: bold;">Send Email</span>. This button is located at the bottom right-hand corner of the window. It will send the email to all selected recipients without further ado.</p>
+<p class="p_Normal"><span style="font-weight: bold;">Mail Merge.</span> The Mail Merge button is located on the document toolbar. When clicked, documents for all members will be created and displayed. Check to ensure your mail merge tag have been transcribed correctly. When you are satisfied, click the <span style="font-weight: bold;">Send Email</span> button at the bottom of the window.</p>
+
+<!--ZOOMSTOP-->
+
+<hr/>
+</div></div>
+<script type="text/javascript">
+
+
+
+function normHeaders() {
+ var topicHeadHeight =  $("#idheaderbg > table").first().height() + 1,
+	 $topicHeaderBox = $("#idheader"),
+	 $topicContentBox = $("#idcontent"),
+	 $navHeader = $("#navbar", parent.document),			 
+	$navBox = $("div#hmnavframe", parent.document),
+	 navHeaderHeight = $navHeader.height();
+ if (topicHeadHeight != navHeaderHeight) {
+	 $navHeader.css("height",topicHeadHeight + "px");
+	 $navBox.css("top", topicHeadHeight + "px");
+	 $topicHeaderBox.css("height", topicHeadHeight + "px");
+		if ($topicHeaderBox.css("position") == "fixed"){
+			$topicContentBox.css("margin-top", topicHeadHeight + "px");
+			}
+		}
+    }
+			 
+  $(document).ready(function(){
+    $(window).on('resize', function() {
+      var y = $('#idheader').height(); 
+      $('#idcontent').css('margin-top', y);
+      var par = window.parent;
+      if ($( par ).width() <= $( window ).width()+20) {
+        $('#idheader').css('position', 'relative');
+        $('#idcontent').css('margin-top', 0);
+        $('#idbacktotop').css('display', 'block');
+        $('.hmanchor').css('margin-top', -20);
+	$('.hmanchor').css('padding-top', 20);
+      }
+      else {
+        $('#idheader').css('position', 'fixed');
+        $('#idcontent').css('margin-top', $('#idheader').height());
+        $('#idbacktotop').css('display', 'none');
+        $('.hmanchor').css('margin-top', -y-20);
+		$('.hmanchor').css('padding-top', y+20);
+		$("div#hmsplitter", parent.document).css('width', '3px');
+      }
+	normHeaders();
+    });
+    
+	 $(window).resize(); //trigger event for initially small displays
+  });
+ 
+
+if ((!parent.hmNavigationFrame) && (parent.location) && (parent.location.href)) { $('.sync-toc').show();$('p.crumbs').hide();}
+
+</script>
+
+<script type="text/javascript">
+HMInitToggle('toggle0186a1_ICON','hm.type','dropdown','hm.state','0','hm.src0','hmtoggle_plus0.gif','hm.src1','hmtoggle_plus1.gif','onclick','HMToggle(\'toggle\',\'toggle0186a1\',\'toggle0186a1_ICON\')');
+HMInitToggle('toggle0186a1','hm.type','dropdown','hm.state','0');
+</script>
+</body>
+</html>

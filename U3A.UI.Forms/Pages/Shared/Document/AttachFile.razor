@@ -1,0 +1,150 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+@namespace U3A.UI.Forms
+
+<DxPopup @bind-Visible="@PopupVisible" @ref="@messageBox" Width="50%" Height="50%"
+         ApplyBackgroundShading="true"
+         CloseButtonClick="@NegativeButtonClicked"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         AllowDrag=true
+         AllowResize=true
+         HeaderText="Attach Files">
+    <BodyContentTemplate>
+        <DxFormLayout>
+            <DxFormLayoutItem ColSpanXxl="12" Context="formContext">
+                <div class="row"
+                <div class="card alert alert-info text-center col-7 m-auto">
+                    <p>For testing, you are allowed <strong>one</strong> email with attachments to be sent immediately.<br />
+                        Depneding on the size of the attachment(s), expect to wait up to 60 seconds to process.
+                    </p>
+                    <p>Otherwise, all email with an attachment will be sent overnight.<br />
+                        You may attach multiple PDF files with total size less than 10MBytes.
+                    </p>
+                </div>
+                <div id="overviewDemoDropZone" class="col-4 card custom-drop-zone bg-light rounded-3 m-auto">
+                    <span class="bi bi-upload icon-size mb-3"></span>
+                    <span>Drag and Drop <strong>PDF</strong> File Here</span><span class="m-1">or</span>
+                    <button id="overviewDemoSelectButton" class="btn border-primary btn-primary m-1">Select File</button>
+                </div>
+                </div>
+                <DxUpload Name="myFile" @ref="FileUploader"
+                          ExternalSelectButtonCssSelector="#overviewDemoSelectButton"
+                          ExternalDropZoneCssSelector="#overviewDemoDropZone"
+                          ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                          UploadUrl="@GetUploadUrl()"
+                          AllowedFileExtensions="@(new List<string> { ".pdf" })"
+                          FileUploaded="FileUploaded"
+                          SelectedFilesChanged="SelectedFilesChanged"
+                          AllowMultiFileUpload="true"
+                          MaxFileSize="10000000"
+                          CssClass="w-100">
+                </DxUpload>
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  Text="Ok"
+                  Click="@AffirmativeButtonClicked" />
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="Cancel"
+                  Click="@NegativeButtonClicked" />
+    </FooterContentTemplate>
+</DxPopup>
+<style>
+
+    .icon-size {
+        font-size: 2rem;
+    }
+
+    .custom-drop-zone {
+        padding: 0 !important;
+        border-style: dashed !important;
+        border-width: 2px !important;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .highlighted-item {
+        background-color: lightpink;
+        color: black;
+    }
+</style>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public List<String>? Attachments { get; set; }
+    bool PopupVisible = false;
+
+    int SelectedFilesCount;
+    IEnumerable<UploadFileInfo> UploadedFiles;
+
+    DxPopup? messageBox;
+    DxUpload? FileUploader;
+    string tenant;
+
+    TaskCompletionSource<bool>? tcs;
+
+    protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files) {
+        UploadedFiles = files.ToList();
+        SelectedFilesCount = files.ToList().Count;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public string GetUploadUrl() {
+        const string url = "api/Upload/UploadFile/";
+        return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
+    }
+
+    async void FileUploaded() {
+        string filename;
+        foreach (var fi in UploadedFiles) {
+            var sourceFile = Path.Combine("uploads", fi.Name);
+            if (File.Exists(sourceFile)) {
+                var destFile = Path.Combine("uploads", $"{tenant}_{fi.Name}");
+                if (File.Exists(destFile)) File.Delete(destFile);
+                File.Move(sourceFile, destFile);
+                if (!Attachments.Contains(fi.Name)) Attachments.Add(destFile);
+            }
+        }
+    }
+
+    public Task<bool> ShowAsync() {
+        Attachments.Clear();
+        PopupVisible = true;
+        using (var dbc = U3Adbfactory.CreateDbContext()) { tenant = dbc.TenantInfo.Identifier; }
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
+            PopupVisible = false;
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    void AffirmativeButtonClicked() {
+        PopupVisible = false;
+        tcs?.TrySetResult(true);
+    }
+    void NegativeButtonClicked() {
+        PopupVisible = false;
+        tcs?.TrySetResult(false);
+    }
+
+    public async Task Close() {
+        await Task.Run(() =>
+        {
+            PopupVisible = false;
+        });
+        StateHasChanged();
+    }
+}

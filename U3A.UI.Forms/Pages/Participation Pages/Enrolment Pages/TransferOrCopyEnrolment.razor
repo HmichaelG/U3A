@@ -1,0 +1,189 @@
+﻿
+<DxPopup Visible="@popupVisible" @ref="@InputBox"
+         ApplyBackgroundShading="true"
+         CloseButtonClick="@NegativeButtonClicked"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText=@($"{action} Enrolments")>
+    <BodyContentTemplate Context="PopupContext">
+        @quickMessage
+        <DxFormLayout>
+            <DxFormLayoutItem Caption=@($"{action} In Term") ColSpanMd="12">
+                <DxComboBox Data="@terms"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            TextFieldName="@nameof(Term.Name)"
+                            Value="@selectedTerm"
+                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption=@($"{action} To Course") ColSpanMd="12">
+                <DxComboBox Data="@courses"
+                            Enabled="@courseComboEnabled"
+                            NullText="@courseComboNullText"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            ListRenderMode="ListRenderMode.Virtual"
+                            TextFieldName="@nameof(Course.Name)"
+                            Value="@selectedCourse"
+                            ValueChanged="@((Course course) => SelectedCourseChanged(course))">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption=@($"{action} To Class") ColSpanMd="12">
+                <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
+                            TextFieldName="@nameof(Class.ClassSummary)"
+                            Value="@selectedClass"
+                            ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  Text=@($"{action}") Enabled="@AffirmativeButtonEnabled"
+                  Click="@AffirmativeButtonClicked" />
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="Cancel"
+                  Click="@NegativeButtonClicked" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    public Term? selectedTerm { get; set; }
+    public Course? selectedCourse { get; set; }
+    public Class? selectedClass { get; set; }
+
+    public Term? fromTerm { get; set; }
+    public Course? fromCourse { get; set; }
+    public Class? fromClass { get; set; }
+
+    private List<Term> terms { get; set; }
+    private List<Course> courses { get; set; }
+    private List<Class> classes { get; set; }
+
+    private string classComboNullText;
+    private string courseComboNullText;
+    private bool classComboEnabled;
+    private bool courseComboEnabled;
+    bool AffirmativeButtonEnabled;
+    private DxComboBox<Class, Class?> ClassComboBox;
+
+    bool popupVisible { get; set; }
+    DxPopup? InputBox;
+    MarkupString quickMessage;
+    string action;
+
+    TaskCompletionSource<bool>? tcs;
+    U3ADbContext? mDbc { get; set; }
+
+    public async Task<bool> ShowTransferAsync(U3ADbContext dbc, Term FromTerm, Course FromCourse, Class FromClass) {
+        action = "Transfer";
+        return await ShowAsync(dbc, FromTerm, FromCourse, FromClass);
+    }
+    public async Task<bool> ShowCopyAsync(U3ADbContext dbc, Term FromTerm, Course FromCourse, Class FromClass) {
+        action = "Copy";
+        return await ShowAsync(dbc, FromTerm, FromCourse, FromClass);
+    }
+
+    Task<bool> ShowAsync(U3ADbContext dbc, Term FromTerm, Course FromCourse, Class FromClass) {
+        mDbc = dbc;
+        fromClass = FromClass;
+        fromCourse = FromCourse;
+        fromTerm = FromTerm;
+        InitialSetupAsync();
+        popupVisible = true;
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
+            popupVisible = false;
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    void AffirmativeButtonClicked() {
+        popupVisible = false;
+        tcs?.SetResult(true);
+    }
+    void NegativeButtonClicked() {
+        popupVisible = false;
+        tcs?.SetResult(false);
+    }
+
+    async void InitialSetupAsync() {
+        selectedTerm = null;
+        selectedCourse = null;
+        selectedClass = null;
+        AffirmativeButtonEnabled = false;
+        courseComboEnabled = false;
+        quickMessage = new MarkupString(string.Empty);
+        terms = await BusinessRule.SelectableRelaxedTermsAsync(mDbc);
+        selectedTerm = BusinessRule.CurrentEnrolmentTerm(mDbc);
+        if (selectedTerm != null) { await SelectedTermChanged(selectedTerm); }
+    }
+
+    async Task SelectedTermChanged(Term term) {
+        selectedTerm = term;
+        selectedCourse = null;
+        selectedClass = null;
+        classComboEnabled = false;
+        courseComboEnabled = false;
+        courseComboNullText = "Loading Course & Enrolment data ... please wait";
+        classComboNullText = string.Empty;
+        StateHasChanged();
+        courses = await BusinessRule.SelectableCoursesByTermAsync(mDbc,term.Year, term.TermNumber);
+        courseComboNullText = string.Empty;
+        courseComboEnabled = true;
+        StateHasChanged();
+    }
+
+    void SelectedCourseChanged(Course course) {
+        selectedCourse = course;
+        classes = selectedCourse.Classes;
+        SetupClassToEnrol();
+    }
+
+    void SelectedClassChanged(Class Class) {
+        selectedClass = Class;
+        EnableProcess();
+    }
+
+    void SetupClassToEnrol() {
+        if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses) {
+            selectedClass = null;
+            classComboEnabled = false;
+            if (selectedCourse.Classes.Count == 1) {
+                classComboNullText = classes[0].ClassSummary;
+            }
+            else {
+                classComboNullText = selectedCourse.CourseParticipationType.Name;
+            }
+            EnableProcess();
+        }
+        else {
+            classComboNullText = string.Empty;
+            classComboEnabled = true;
+        }
+    }
+
+    void EnableProcess() {
+        bool isSameCourse = false;
+        Guid fromClassID = (fromClass == null) ? Guid.Empty : fromClass.ID;
+        Guid toClassID = (selectedClass == null) ? Guid.Empty : selectedClass.ID;
+        if (fromTerm.ID == selectedTerm.ID &&
+            fromCourse.ID == selectedCourse.ID &&
+            fromClassID == toClassID) {
+            quickMessage = new MarkupString("<p class='text-white bg-danger'>You cannot transfer into the same class.<br/>" +
+                "Please select the term, course and class to transfer into.</p>");
+        }
+        else {
+            quickMessage = new MarkupString(string.Empty);
+            AffirmativeButtonEnabled = true;
+            StateHasChanged();
+        }
+    }
+
+}
+
+
+
+

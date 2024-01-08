@@ -1,0 +1,249 @@
+﻿@namespace U3A.UI.Forms
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@using U3A.Services
+@using U3A.Services.Email;
+
+
+<Progress @ref=progressBar />
+<MessageBox @ref=messageBox />
+
+<h4>Search Email</h4>
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxFormLayout CssClass="w-100 mx-auto">
+        <DxFormLayoutGroup Caption="Participant Details" ColSpanMd="6">
+            <DxFormLayoutItem Caption="Search for participant" ColSpanLg="12">
+                <DxComboBox Data="@people"
+                            AllowUserInput=true
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            ListRenderMode="ListRenderMode.Virtual"
+                            TextFieldName="@nameof(Person.PersonSummary)"
+                            @bind-Value="@selectedPerson">
+                    <Buttons>
+                        <DxEditorButton Text="Search" CssClass="text-primary"
+                                        IconCssClass="h5 bi bi-search"
+                                        Tooltip="Click to search for the selected member"
+                                        Click="@OnSearch" />
+                    </Buttons>
+                </DxComboBox>
+            </DxFormLayoutItem>
+
+            <DxFormLayoutItem Caption="Or, email address" ColSpanLg="12">
+                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                           @bind-Text="@emailAddress">
+                    <Buttons>
+                        <DxEditorButton Text="Search" CssClass="text-primary"
+                                        IconCssClass="h5 bi bi-search"
+                                        Tooltip="Click to search for the selected member"
+                                        Click="@OnEmailSearch" />
+                    </Buttons>
+                </DxTextBox>
+            </DxFormLayoutItem>
+
+            <DxFormLayoutItem Caption="Or, Date Range" ColSpanLg="6">
+                <DxDateEdit @bind-Date="@fromDate" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="To" ColSpanLg="6">
+                <DxDateEdit @bind-Date="@toDate">
+                    <Buttons>
+                        <DxEditorButton Text="Search" CssClass="text-primary"
+                                        IconCssClass="h5 bi bi-search"
+                                        Tooltip="Click to search for the selected member"
+                                        Click="@OnDateSearch" />
+                    </Buttons>
+                </DxDateEdit>
+            </DxFormLayoutItem>
+
+        </DxFormLayoutGroup>
+    </DxFormLayout>
+
+    <DxGrid Data=@messages @ref=@mainGrid
+            CssClass="grid-height" id="myGrid">
+        <ToolbarTemplate>
+            <GridToolbar LinkedGrid=@mainGrid />
+        </ToolbarTemplate>
+        <Columns>
+            <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+            <DxGridDataColumn Caption="From" FieldName="From" />
+            <DxGridDataColumn Caption="To" FieldName="To" Visible=@IsSearchByDateRange />
+            <DxGridDataColumn Caption="Subject" FieldName="Subject" />
+            <DxGridDataColumn Caption="Attachments" FieldName="Attachments" />
+            <DxGridDataColumn Caption="Status" FieldName="Status" />
+            <DxGridDataColumn Width="8rem" Caption="Details" FieldName="MessageID" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
+                <CellDisplayTemplate>
+                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                              RenderStyle="ButtonRenderStyle.Primary" Text="Details"
+                              Click="() => OnDetailsClick((EmailMessage)context.DataItem)"></DxButton>
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+        </Columns>
+        <TotalSummary>
+            <DxGridSummaryItem FieldName="Subject" FooterColumnName="Subject" SummaryType="GridSummaryItemType.Count" />
+        </TotalSummary>
+    </DxGrid>
+
+    <DxWindow @ref=@emailDetailsForm Width="max(35vw, 400px)"
+              AllowResize="true"
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              CssClass="window-height"
+              HeaderText="Email Message Details">
+        <BodyTextTemplate>
+            <DxFormLayout>
+                <DxFormLayoutGroup Caption="Email Details" CssClass="my-2">
+                    <div class="px-4 w-100">
+                        <table class="table">
+                            <tbody>
+                                <tr><th scope="row" class="col-2">Time</th> <td>@selectedEmail.ReceivedAt.ToString("dd-MMM-yy hh:mm tt")</td></tr>
+                                <tr><th scope="row" class="col-2">Subject</th> <td>@selectedEmail.Subject</td></tr>
+                                <tr><th scope="row" class="col-2">From</th> <td>@selectedEmail.From</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </DxFormLayoutGroup>
+                <DxGrid Data=@messageEvents @ref=@eventGrid
+                        CssClass="m-2" id="myGrid">
+                    <Columns>
+                        <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Time" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                        <DxGridDataColumn Caption="Event" FieldName="Type" />
+                    </Columns>
+                </DxGrid>
+            </DxFormLayout>
+        </BodyTextTemplate>
+    </DxWindow>
+
+}
+<style>
+    .grid-height {
+        height: @gridHeight;
+    }
+
+    .window-height {
+        height: 40vh;
+    }
+
+    .event-grid-height {
+        height: 40vh;
+    }
+</style>
+
+
+@code {
+    IEnumerable<EmailMessage> messages;
+    IEnumerable<EmailMessageEvent> messageEvents;
+    EmailMessage selectedEmail;
+    List<Person> people { get; set; }
+    Person selectedPerson { get; set; }
+    MessageBox? messageBox;
+    Progress? progressBar;
+    U3ADbContext dbc { get; set; }
+    PostmarkService service;
+    bool IsReady;
+    bool isSearchByEmailAddress;
+    string emailAddress;
+    bool IsSearchByDateRange;
+
+    string gridHeight = "600px";
+
+    IGrid? mainGrid { get; set; }
+    IGrid? eventGrid { get; set; }
+    GridToolbar? Toolbar;
+    DxWindow emailDetailsForm;
+    DateTime fromDate;
+    DateTime toDate;
+    TimeSpan tzOffset;
+
+    protected override async Task OnInitializedAsync()
+    {
+        service = new PostmarkService(U3Adbfactory);
+        await GetData();
+        IsReady = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var localTime = new LocalTime(js);
+            tzOffset = await localTime.GetTimezoneOffsetAsync();
+            toDate = await localTime.GetLocalDateAsync();
+            fromDate = toDate.AddDays(-6);
+        }
+        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
+        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task GetData()
+    {
+        using (dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+        }
+    }
+
+    async Task OnDetailsClick(EmailMessage dataItem)
+    {
+        await progressBar.ShowSmallSpinnerAsync();
+        selectedEmail = dataItem;
+        var address = (isSearchByEmailAddress) ? emailAddress : (IsSearchByDateRange) ? selectedEmail.To : selectedPerson?.Email;
+        messageEvents = await service.GetEmailMessageDetailAsync(tzOffset, dataItem, address);
+        await emailDetailsForm.ShowAsync();
+        await progressBar.Close();
+    }
+
+    async Task OnSearch()
+    {
+        IsSearchByDateRange = false;
+        messages = new List<EmailMessage>();
+        if (selectedPerson != null && !string.IsNullOrEmpty(selectedPerson.Email))
+        {
+            isSearchByEmailAddress = false;
+            await SearchMessagesAsync(selectedPerson.Email);
+        }
+        else await messageBox.ShowOkOnlyAsync("Select a participant", "You must select a participant before you click the Search button.");
+    }
+
+    async Task OnEmailSearch()
+    {
+        IsSearchByDateRange = false;
+        messages = new List<EmailMessage>();
+        if (!string.IsNullOrEmpty(emailAddress))
+        {
+            isSearchByEmailAddress = true;
+            await SearchMessagesAsync(emailAddress);
+        }
+        else await messageBox.ShowOkOnlyAsync("Enter email address", "You must enter a email address before you click the Search button.");
+    }
+
+    async Task SearchMessagesAsync(string emailAddress)
+    {
+        await progressBar.ShowSmallSpinnerAsync();
+        messages = await service.SearchMessagesAsync(tzOffset, emailAddress);
+        await progressBar.Close();
+    }
+
+    async Task OnDateSearch()
+    {
+        IsSearchByDateRange = true;
+        isSearchByEmailAddress = false;
+        messages = new List<EmailMessage>();
+        if (toDate >= fromDate)
+        {
+            await progressBar.ShowSmallSpinnerAsync();
+            messages = await service.SearchMessagesAsync(tzOffset, From: fromDate, To: toDate);
+            await progressBar.Close();
+        }
+        else await messageBox.ShowOkOnlyAsync("Invalid Dates", "The From date must be prior to the To date.");
+    }
+}

@@ -1,0 +1,156 @@
+﻿@using System.ComponentModel
+@using System.ComponentModel.DataAnnotations;
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+
+<MessageBox @ref="@messageBox" />
+
+<DxFormLayout CssClass="px-2 pt-2">
+    <DxFormLayoutGroup Caption="Course Detail" Context="groupContext">
+        <HeaderContentTemplate>
+            <div class="d-flex input-group">
+                <div class="flex-grow-1">
+                    Class Detail
+                </div>
+                <div class="flex-grow-0">
+                    <DxCheckBox CssClass="align-content-end" tabindex="-1"
+                                @bind-Checked=@showFullDetail
+                                LabelPosition="LabelPosition.Left">Show Detail</DxCheckBox>
+                </div>
+            </div>
+        </HeaderContentTemplate>
+        <Items>
+
+            <DxFormLayoutItem Caption="Course Number" ColSpanMd="12" Visible=@showFullDetail>
+                <DxMaskedInput @bind-Value="Course.ConversionID"
+                               Mask="@NumericMask.WholeNumber" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
+                <DxComboBox Data="CourseTypes"
+                            @bind-Value="Course.CourseType"
+                            TextFieldName="@nameof(CourseType.NameWithStatus)">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Course Name" ColSpanMd="12">
+                <DxTextBox @bind-Text="Course.Name" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Description" ColSpanMd="12">
+                <DxMemo @bind-Text="Course.Description" Rows="3" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Additional Info URL" ColSpanMd="12">
+                <DxTextBox @bind-Text="Course.AdditionalInformationURL"
+                           NullText="A fully qualified URL: https://example.com.au. Keep it short, use TinyURL." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="3">
+                <DxMaskedInput @bind-Value="Course.Duration"
+                               Mask="n2" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Required Students" ColSpanMd="3">
+                <DxMaskedInput @bind-Value="Course.RequiredStudents"
+                               Mask="@NumericMask.WholeNumber" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Maximum Students" ColSpanMd="3">
+                <DxMaskedInput @bind-Value="Course.MaximumStudents"
+                               Mask="@NumericMask.WholeNumber" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Allow Auto-Enrol" ColSpanMd="3">
+                <DxCheckBox @bind-Checked="Course.AllowAutoEnrol" />
+            </DxFormLayoutItem>
+            <DxFormLayoutGroup Caption="Course Fee"
+                               ColSpanMd="@((CourseEditView == CourseEditViewType.Simplified) ? 6 : 12)"
+                               Expanded="false"
+                               ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                <HeaderContentTemplate>
+                    <div class="d-flex input-group">
+                        <div class="flex-grow-1">
+                            Course Fee
+                        </div>
+                        <div class="flex-grow-0 text-info text-end no-wrap">
+                            @($"{Course.CourseFeePerYear.ToString("c2")} {Course.CourseFeePerYearDescription}")
+                        </div>
+                    </div>
+                </HeaderContentTemplate>
+                <Items>
+                    <DxFormLayoutItem Caption="Course Fee" ColSpanMd="12">
+                        <DxMaskedInput @bind-Value="Course.CourseFeePerYear" Mask="@NumericMask.Currency" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
+                        <DxTextBox @bind-Text="Course.CourseFeePerYearDescription" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
+                        <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerYearFee" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
+                        <DxCheckBox @bind-Checked="Course.LeadersPayYearFee" />
+                    </DxFormLayoutItem>
+                </Items>
+            </DxFormLayoutGroup>
+            <DxFormLayoutGroup Caption="Term Fee" ColSpanMd="6"
+                               Visible=@(CourseEditView == CourseEditViewType.Simplified)
+                               Expanded="false"
+                               ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                <HeaderContentTemplate>
+                    <div class="d-flex input-group">
+                        <div class="flex-grow-1">
+                            Term Fee
+                        </div>
+                        <div class="flex-grow-0 text-info text-end no-wrap">
+                            @($"{Course.CourseFeePerTerm.ToString("c2")} {Course.CourseFeePerTermDescription}")
+                        </div>
+                    </div>
+                </HeaderContentTemplate>
+                <Items>
+                    <DxFormLayoutItem Caption="Course Fee / Term" ColSpanMd="12">
+                        <DxMaskedInput @bind-Value="Course.CourseFeePerTerm" Mask="@NumericMask.Currency" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
+                        <DxTextBox @bind-Text="Course.CourseFeePerTermDescription" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
+                        <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerTermFee" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
+                        <DxCheckBox @bind-Checked="Course.LeadersPayTermFee" />
+                    </DxFormLayoutItem>
+                </Items>
+            </DxFormLayoutGroup>
+        </Items>
+    </DxFormLayoutGroup>
+</DxFormLayout>
+<style>
+    .no-wrap {
+        width: 15rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+</style>
+
+@code {
+
+    [Parameter]
+    public bool AnyEnrolmentsInYear { get; set; }
+    [Parameter]
+    public Course Course { get; set; }
+    [Parameter]
+    public IEnumerable<CourseParticipationType> CourseParticipationTypes { get; set; }
+    [Parameter]
+    public IEnumerable<Person> Persons { get; set; }
+    [Parameter]
+    public IList<CourseType> CourseTypes { get; set; }
+    [Parameter]
+    public IEnumerable<Venue> Venues { get; set; }
+    [Parameter]
+    public IEnumerable<WeekDay> WeekDays { get; set; }
+    [Parameter]
+    public U3ADbContext? DbContext { get; set; }
+    [Parameter]
+    public SystemSettings Settings { get; set; }
+    [Parameter, EditorRequired]
+    public CourseEditViewType CourseEditView { get; set; }
+
+    MessageBox? messageBox;
+    bool showFullDetail;
+
+
+}

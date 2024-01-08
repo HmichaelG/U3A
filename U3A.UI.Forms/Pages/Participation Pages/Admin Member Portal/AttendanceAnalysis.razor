@@ -1,0 +1,179 @@
+﻿@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+
+<h3>Attendance Analysis</h3>
+
+@if (isReady) {
+    <MessageBox @ref=@messageBox />
+    <Progress @ref=@progress />
+    <DxFormLayout CssClass="col col-12">
+        <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="6">
+            <DxComboBox Data="@terms" NullText="Select the Term required..."
+                        FilteringMode="DataGridFilteringMode.Contains"
+                        TextFieldName="@nameof(Term.TermSummary)"
+            @bind-Value="@SelectedTerm">
+                <Buttons>
+                    <DxEditorButton Text="Process" CssClass="text-primary"
+                                    IconCssClass="h5 bi bi-check-lg"
+                                    Tooltip="Click to process the selected term"
+                                    Click="@OnProcess" />
+                </Buttons>
+            </DxComboBox>
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Show week by week totals" ColSpanMd="2">
+            <DxCheckBox Checked=@isWeekByWeekTotalsDisplayed
+                        CheckedChanged="@((bool value) => OnWeekeByWeekCheckChanged(value))" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Hide Expected Analysis" ColSpanMd="2">
+            <DxCheckBox Checked=@hideExpectedAnalysis
+                        CheckedChanged="@((bool value) => HideExpectedAnalysis(value))" />
+        </DxFormLayoutItem>
+
+        <DxFormLayoutItem Context="layoutContext" Caption="Selected Week Ending Dates" ColSpanMd="12">
+            <DxTagBox Data=@availableDates @ref=@tagBox
+                      NullText="Click Process to reset date selection"
+                      TData="DateTime"
+                      TValue="DateTime"
+                      DropDownVisible=@isTagboxDropDownVisible
+                      Values=@selectedDates
+                      ValuesChanged="OnTagBoxValuesChanged"
+                      EditFormat="dd-MMM-yyyy"
+                      DropDownVisibleChanged="@((value) => OnTagBoxDropDownVisibleChanges(value))">
+            </DxTagBox>
+        </DxFormLayoutItem>
+
+        <DxTabs @ref=tabs TabClick="OnTabClick" CssClass="w-100">
+            <DxTabPage Text="Course Type" />
+            <DxTabPage Text="Venue" />
+            <DxTabPage Text="Course" />
+        </DxTabs>
+
+        <DxPivotGrid @ref=pivotGrid Data="@pivotData"
+                     CssClass="w-100"
+                     ShowFieldHeaders="true">
+            @{
+                switch (selectedIndex) {
+                    case 1:
+                        <DxPivotGridField Field="@nameof(AttendClass.VenueName)" Area="PivotGridFieldArea.Row" Caption="Venue" />
+                        <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
+                        break;
+                    case 2:
+                        <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
+                        <DxPivotGridField Field="@nameof(AttendClass.PersonName)" Area="PivotGridFieldArea.Row" Caption="Student" />
+                        break;
+                    default:
+                        <DxPivotGridField Field="@nameof(AttendClass.CourseTypeName)" Area="PivotGridFieldArea.Row" Caption="Course Type" />
+                        <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
+                        break;
+
+                }
+            }
+            @if (isWeekByWeekTotalsDisplayed) {
+            <DxPivotGridField Field="@nameof(AttendClass.WeekEndDate)" Area="PivotGridFieldArea.Column" Caption="Wk Ending">
+                <HeaderTemplate>@(string.Format("{0:dd-MMM-yy}", context))</HeaderTemplate>
+            </DxPivotGridField>
+            }
+            <DxPivotGridField Field="@nameof(AttendClass.Actual)" Caption="Act" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
+            @if (!hideExpectedAnalysis)
+            {
+                <DxPivotGridField Field="@nameof(AttendClass.Expected)" Caption="Exp" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
+                <DxPivotGridField Field="@nameof(AttendClass.Difference)" Caption="+/-" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum">
+                <DataTemplate>
+                    <div class="@((decimal?)context >= 0 ? "text-success" : "text-danger")">
+                        <strong>@context</strong>
+                    </div>
+                </DataTemplate>
+            </DxPivotGridField>
+            }
+        </DxPivotGrid>
+
+    </DxFormLayout>
+}
+
+@code {
+
+    List<Term> terms { get; set; }
+    List<AttendClass>? pivotData { get; set; }
+    List<AttendClass>? attendance { get; set; }
+    IEnumerable<DateTime> availableDates;
+    IEnumerable<DateTime>? selectedDates;
+    Term SelectedTerm;
+    MessageBox? messageBox;
+    Progress? progress;
+    DxTabs? tabs;
+    DxPivotGrid? pivotGrid;
+    U3ADbContext dbc { get; set; }
+    DxTagBox<DateTime, DateTime>? tagBox;
+    DateTime now;
+    bool isReady;
+    bool showPresent = true;
+    bool showWithApology = false;
+    bool showWithoutApology = false;
+    bool isTagboxDropDownVisible = false;
+    bool isWeekByWeekTotalsDisplayed = true;
+    bool hideExpectedAnalysis;
+    int selectedIndex = 0;
+
+    protected override async Task OnInitializedAsync() {
+        pivotData = new List<AttendClass>();
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+        SelectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+        await base.OnInitializedAsync();
+        isReady = true;
+    }
+
+    async Task OnProcess() {
+        await GetData();
+        availableDates = selectedDates = attendance.Select(x => x.WeekEndDate).Distinct().OrderBy(x => x);
+    }
+    async Task GetData() {
+        await progress.ShowSmallSpinnerAsync();
+        var service = new LocalTime(js);
+        var now = await service.GetLocalDateAsync();
+        attendance = pivotData = await BusinessRule.GetAttendanceAsync(dbc, SelectedTerm,now);
+        await progress.Close();
+    }
+
+    async void OnTabClick(TabClickEventArgs e) {
+        selectedIndex = e.TabIndex;
+        await GetData();
+        RefreshData();
+    }
+
+    void OnTagBoxValuesChanged(IEnumerable<DateTime> values) {
+        selectedDates = values;
+        RefreshData();
+    }
+
+    async void OnWeekeByWeekCheckChanged(bool value) {
+        isWeekByWeekTotalsDisplayed = value;
+        await GetData();
+        RefreshData();
+    }
+    async void HideExpectedAnalysis(bool value) {
+        hideExpectedAnalysis = value;
+        await GetData();
+        RefreshData();
+    }
+
+    void RefreshData() {
+        if (selectedDates == null) return;
+        if (selectedDates.Count() == availableDates.Count()) {
+            pivotData = attendance;
+        }
+        else {
+            pivotData = attendance.Where(x => selectedDates.Contains(x.WeekEndDate)).ToList();
+        }
+        tagBox.DropDownVisible = false;
+        StateHasChanged();
+    }
+
+    void OnTagBoxDropDownVisibleChanges(bool value) {
+        isTagboxDropDownVisible = false;
+    }
+
+    public void Dispose() => dbc?.Dispose();
+
+}

@@ -1,0 +1,113 @@
+﻿@namespace U3A.UI.Forms
+
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" @bind-IsActive="@isMobileLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Small" @bind-IsActive="@isTabletLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Medium" @bind-IsActive="@isTabletLayout" />
+
+
+@if (isReady) {
+    <section class="card border-info alert-info w-100" hidden="@isHidden">
+        <div class=@($"text-center p-2 {fontSizeCssClass}")>
+            <button class="btn-close" onclick="@onCloseButtonClick" />
+            <strong>Terms &amp; Conditions</strong><br />@introduction
+        </div>
+        <DxButton Text="Click to view our T & C's" SizeMode="SizeMode.Small" CssClass="w-100" IconCssClass="bi bi-eyeglasses menu-icon"
+                  Click="@(e => OnTandCClicked())"
+                  RenderStyle="ButtonRenderStyle.Info"
+                  RenderStyleMode="ButtonRenderStyleMode.Contained">
+        </DxButton>
+    </section>
+
+    <DxWindow @ref=@detailsForm
+              AllowResize="false"
+              AllowDrag=false
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              CssClass=@windowCssClass
+              HeaderText="Terms & Conditions">
+        <BodyTextTemplate>
+            <div class="card overflow-scroll">
+                <div class="card-body">
+                    @(new MarkupString(htmlText))
+                </div>
+            </div>
+        </BodyTextTemplate>
+        <FooterContentTemplate>
+            <DxButton CssClass="popup-button" Text="Close" RenderStyle="ButtonRenderStyle.Primary" Click="onClick" />
+        </FooterContentTemplate>
+    </DxWindow>
+}
+<style>
+    .mobile-device {
+        width: 100vw !important;
+    }
+
+    .tablet-device {
+        width: 80vw !important;
+    }
+
+    .other-device {
+        width: 50vw !important;
+    }
+
+    .small-font {
+        font-size: x-small !important;
+    }
+
+    button {
+        float: right;
+    }
+</style>
+
+@code {
+    [Parameter, EditorRequired] public SystemSettings? SystemSettings { get; set; }
+    [Parameter] public bool IsEnrolmentNotice { get; set; }
+    [Parameter] public EventCallback OnCollapsed { get; set; }
+
+    DxWindow? detailsForm;
+    string htmlText;
+    bool isReady;
+    bool isMobileLayout;
+    bool isTabletLayout;
+    string windowCssClass;
+    string introduction;
+    string fontSizeCssClass;
+
+    bool isHidden = false;
+
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        if (SystemSettings != null && SystemSettings.TermsAndConditionsEnabled) {
+            htmlText = SystemSettings.TermsAndConditionsHTML;
+            introduction = (IsEnrolmentNotice)
+                                ? $"By participation, you acknowledge and accept the {SystemSettings?.U3AGroup} terms and conditions of membership."
+                                : $"By your fee payment, you acknowledge and accept the {SystemSettings?.U3AGroup} terms and conditions of membership.";
+            fontSizeCssClass = (isMobileLayout) ? "small-font" : "";
+            isReady = true;
+        }
+    }
+
+    async void OnTandCClicked() {
+        windowCssClass = (isMobileLayout)
+                            ? "mobile-device vh-100"
+                            : (isTabletLayout)
+                                ? "tablet-device vh-100"
+                                : "other-device vh-100";
+        await detailsForm.ShowAsync();
+    }
+
+    async void onClick() {
+        await detailsForm.CloseAsync();
+    }
+
+    async Task onCloseButtonClick() {
+        isHidden = true;
+        InvokeAsync(StateHasChanged);
+        await OnCollapsed.InvokeAsync();
+    }
+
+}

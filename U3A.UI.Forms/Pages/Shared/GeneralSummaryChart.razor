@@ -1,0 +1,217 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@using System.Drawing
+
+    <div class="row">
+        <DxPieChart Data="@memberData" CssClass="col-lg-4 my-2"
+                    InnerDiameter="0.5"
+                    LabelOverlap="PieChartLabelOverlap.Hide"
+                    CustomizeSeriesPoint="CustomizeGenderSeriesPoint"
+                    T="MemberSummary">
+            <DxChartTitle Text="Members" />
+            <DxPieChartSeries T="MemberSummary"
+                              TArgument="string"
+                              TValue="int"
+                              ValueField="si => si.Count"
+                              ArgumentField="si => si.Group"
+                              SummaryMethod="Enumerable.Sum">
+                <DxChartSeriesLabel Visible="true"
+                                    Position="RelativePosition.Inside"
+                                    Format='ChartElementFormat.FromLdmlString("#0")' />
+            </DxPieChartSeries>
+            <DxChartTooltip Enabled="true"
+                            Position="RelativePosition.Outside">
+                <div style="margin: 0.75rem">
+                    <div class="fw-bold">@context.Point.Argument</div>
+                    <div>
+                        @(
+                            $"{context.Point.Value:#,0.}"
+                            )
+                    </div>
+                </div>
+            </DxChartTooltip>
+            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                           VerticalAlignment="VerticalEdge.Top"
+                           Position="RelativePosition.Outside"
+                           Orientation="Orientation.Vertical" />
+        </DxPieChart>
+
+        <DxChart Data="attritionData" CssClass="col-lg-4 my-2"
+                 T="MemberSummary"
+                 CustomizeSeriesPoint="CustomizeAttritionSeriesPoint"
+                 LabelOverlap="ChartLabelOverlap.Hide">
+            <DxChartTitle Text=@($"{term?.Year}: Net Gain / Loss") />
+            <DxChartCommonSeries NameField="@((MemberSummary t) => t.Year)"
+                                 ArgumentField="@(s => s.Group)"
+                                 ValueField="@(s => s.Count)"
+                                 SummaryMethod="Enumerable.Sum"
+                                 SeriesType="ChartSeriesType.Bar">
+                <SeriesTemplate Context="settings">
+                    <DxChartBarSeries Settings="@settings">
+                        <DxChartSeriesLabel Visible=true Position="RelativePosition.Inside" />
+                    </DxChartBarSeries>
+                </SeriesTemplate>
+            </DxChartCommonSeries>
+            <DxChartLegend Position="RelativePosition.Outside" Visible=false
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+            <DxChartTooltip Enabled="true" Position="RelativePosition.Outside">
+                <div class="m-2">
+                    <div>
+                        @context.Point.Argument: @string.Format("{0:#0}", (int)context.Point.Value)
+                    </div>
+                </div>
+            </DxChartTooltip>
+        </DxChart>
+
+        <DxPieChart Data="@membershipLengthData" CssClass="col-lg-4 my-2"
+                    InnerDiameter="0.5"
+                    Palette="@memberLengthTheme"
+                    LabelOverlap="PieChartLabelOverlap.Hide"
+                    T="MemberSummary">
+            <DxChartTitle Text="Length of Membership" />
+            <DxPieChartSeries T="MemberSummary"
+                              TArgument="string"
+                              TValue="int"
+                              ValueField="si => si.Count"
+                              ArgumentField="si => si.Group"
+                              SummaryMethod="Enumerable.Sum">
+                <DxChartSeriesLabel Visible="true"
+                                    Position="RelativePosition.Inside"
+                                    Format='ChartElementFormat.FromLdmlString("#0")' />
+            </DxPieChartSeries>
+            <DxChartTooltip Enabled="true"
+                            Position="RelativePosition.Outside">
+                <div style="margin: 0.75rem">
+                    <div class="fw-bold">@context.Point.Argument</div>
+                    <div>
+                        @(
+                            $"{context.Point.Value:#,0.}"
+                            )
+                    </div>
+                </div>
+            </DxChartTooltip>
+            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                           VerticalAlignment="VerticalEdge.Top"
+                           Position="RelativePosition.Outside"
+                           Orientation="Orientation.Vertical" />
+        </DxPieChart>
+</div>
+<div class="row">
+    <DxPieChart Data="@enrolmentData" CssClass="col-lg-6"
+                InnerDiameter="0.5"
+                LabelOverlap="PieChartLabelOverlap.Hide"
+                Palette="@enrolmentTheme"
+                T="MemberSummary">
+        <DxChartTitle Text=@($"{term?.Name}: Enrolment") />
+        <DxPieChartSeries T="MemberSummary"
+                          TArgument="string"
+                          TValue="int"
+                          ValueField="si => si.Count"
+                          ArgumentField="si => si.Group"
+                          SummaryMethod="Enumerable.Sum">
+            <DxChartSeriesLabel Visible="true"
+                                Position="RelativePosition.Inside"
+                                Format='ChartElementFormat.FromLdmlString("#0")' />
+        </DxPieChartSeries>
+        <DxChartTooltip Enabled="true"
+                        Position="RelativePosition.Inside">
+            <div style="margin: 0.75rem">
+                <div class="fw-bold">@context.Point.Argument</div>
+                <div>
+                    @(
+                        $"{context.Point.Value:#,0.}"
+                        )
+                </div>
+            </div>
+        </DxChartTooltip>
+        <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                       VerticalAlignment="VerticalEdge.Top"
+                       Position="RelativePosition.Outside"
+                       Orientation="Orientation.Vertical" />
+    </DxPieChart>
+
+    <DxPieChart Data="@waitlistData" CssClass="col-lg-6"
+                InnerDiameter="0.5"
+                LabelOverlap="PieChartLabelOverlap.Hide"
+                Palette="@waitlistTheme"
+                T="MemberSummary">
+        <DxChartTitle Text=@($"{term?.Name}: Waitlist") />
+        <DxPieChartSeries T="MemberSummary"
+                          TArgument="string"
+                          TValue="int"
+                          ValueField="si => si.Count"
+                          ArgumentField="si => si.Group"
+                          SummaryMethod="Enumerable.Sum">
+            <DxChartSeriesLabel Visible="true"
+                                Position="RelativePosition.Inside"
+                                Format='ChartElementFormat.FromLdmlString("#0")' />
+        </DxPieChartSeries>
+        <DxChartTooltip Enabled="true"
+                        Position="RelativePosition.Outside">
+            <div style="margin: 0.75rem">
+                <div class="fw-bold">@context.Point.Argument</div>
+                <div>
+                    @(
+                        $"{context.Point.Value:#,0.}"
+                        )
+                </div>
+            </div>
+        </DxChartTooltip>
+        <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                       VerticalAlignment="VerticalEdge.Top"
+                       Position="RelativePosition.Outside"
+                       Orientation="Orientation.Vertical" />
+    </DxPieChart>
+
+</div>
+
+@code {
+    IEnumerable<MemberSummary> memberData;
+    IEnumerable<MemberSummary> membershipLengthData;
+    IEnumerable<MemberSummary> enrolmentData;
+    IEnumerable<MemberSummary> waitlistData;
+    IEnumerable<MemberSummary> attritionData;
+    Term? term;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            term = await BusinessRule.CurrentTermAsync(dbc);
+            if (term != null)
+            {
+                memberData = await BusinessRule.GetMemberSummaryByGender(dbc, term);
+                membershipLengthData = await BusinessRule.GetMemberSummaryByMshipLength(dbc, term);
+                enrolmentData = await BusinessRule.GetEnrolmentSummary(dbc, term);
+                waitlistData = await BusinessRule.GetWaitlistSummary(dbc, term);
+                attritionData = await BusinessRule.GetAttritionSummary(dbc, term);
+                InvokeAsync(StateHasChanged);
+            }
+        }
+        await base.OnInitializedAsync();
+    }
+
+    private void CustomizeGenderSeriesPoint(ChartSeriesPointCustomizationSettings settings)
+    {
+        if (settings.Point.Argument.ToString() == "Male")
+            settings.PointAppearance.Color = System.Drawing.Color.Blue;
+        if (settings.Point.Argument.ToString() == "Female")
+            settings.PointAppearance.Color = System.Drawing.Color.DeepPink;
+        if (settings.Point.Argument.ToString() == "Other")
+            settings.PointAppearance.Color = System.Drawing.Color.Purple;
+    }
+    private void CustomizeAttritionSeriesPoint(ChartSeriesPointCustomizationSettings settings)
+    {
+        IEnumerable<MemberSummary> dataItems = settings.Point.DataItems.Cast<MemberSummary>();
+        if (dataItems.FirstOrDefault().Year == 0)        //did not renew
+            settings.PointAppearance.Color = System.Drawing.Color.Red;
+        if (dataItems.FirstOrDefault().Year == 1)        //new members
+            settings.PointAppearance.Color = System.Drawing.Color.Green;
+        if (dataItems.FirstOrDefault().Year == 2)        //net gain / loss
+            settings.PointAppearance.Color = System.Drawing.Color.Blue;
+    }
+
+    string[] memberLengthTheme = ColorThemeGenerator.GenerateThemeStrings(Color.SaddleBrown);
+    string[] enrolmentTheme = ColorThemeGenerator.GenerateThemeStrings(Color.DarkOrchid);
+    string[] waitlistTheme = ColorThemeGenerator.GenerateThemeStrings(Color.DarkOrange);
+
+}

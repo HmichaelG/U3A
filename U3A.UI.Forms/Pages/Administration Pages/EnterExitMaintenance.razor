@@ -1,0 +1,133 @@
+﻿@page "/EnterExitMaintenance"
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@inject IJSRuntime js
+
+
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <div class="container-md py-md-5">
+        <div class="row">
+            <div class="col col-md-2" />
+            <div class="col col-md-8 border border-primary py-2">
+                <ContextHelpTitle Title="Enter / Exit Maintenance Mode" HelpTopic="Enter-_-Exit-Maintenance.html"></ContextHelpTitle>
+                <p class="mt-4">
+                    This procedure will place or remove the Member Portal in Maintenance Mode .<br />
+                    While in Maintenance Mode, members will be unable to use the portal.
+                    This has the advantage of allowing a major restructure of data such as preparation for a
+                    new U3A year to be done without being concerned with membership &amp; enrolments being
+                    performed at the same time.
+                </p>
+                <p>In the event of catastrophe, it allows the restore of data to be much simpler.</p>
+                <p>
+                    Use sparingly so as not to incur the wrath of members.
+                </p>
+
+
+                <MessageBox @ref="@messageBox" />
+                <DxFormLayout>
+                    <DxFormLayoutItem ColSpanMd="8" Caption="In Maintenance Till (approx.)">
+                        <Template>
+                            <div class="input-group">
+                                <DxDateEdit CssClass="flex-grow-3" @bind-Date=@settings.InMaintenanceTill />
+                                <DxTimeEdit CssClass="flex-grow-1" @bind-Time="@settings.InMaintenanceTill" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <Template>
+                            <div class="input-group">
+                                <DxButton CssClass="flex-grow-3"
+                                          Text=@((DoEnterMaintenance) ? "Enter Member Portal Maintenance Mode" : "Exit Member Portal Maintenance Mode") RenderStyle="@((DoEnterMaintenance) ? ButtonRenderStyle.Danger : ButtonRenderStyle.Success)"
+                                          Click="@Process" />
+                                <DxButton CssClass="flex-grow-1" Text="Cancel" RenderStyle="@ButtonRenderStyle.Light" Click="@Close" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+
+            </div>
+            <div class="col col-md-2" />
+        </div>
+    </div>
+
+}
+@code {
+    bool IsReady;
+    bool DoEnterMaintenance = false;
+    string? errorMessage;
+    SystemSettings? settings;
+    MessageBox? messageBox;
+    U3ADbContext dbc { get; set; }
+    LocalTime? localTime;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        IsReady = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            localTime = new LocalTime(js);
+            var today = await localTime.GetLocalTimeAsync();
+            if (settings != null)
+            {
+                if (settings.InMaintenanceTill == null)
+                {
+                    DoEnterMaintenance = true;
+                    settings.InMaintenanceTill = new DateTime(today.Year,today.Month,today.Day,today.Hour,0,0).AddHours(2);
+                    InvokeAsync(StateHasChanged);
+                }
+            }
+            else
+            {
+                await messageBox.ShowOkOnlyAsync("Organisation Details are undefined", "Please define organisation details before using this procedure.");
+                Close();
+            }
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+
+    async Task Process()
+    {
+        var msg = "";
+        if (DoEnterMaintenance) {
+            msg = "You have entered Member Portal Maintenance mode.<br/>Don't forget to come back and exit when you are done.";
+        }
+        else
+        {
+            settings.InMaintenanceTill = null;
+            msg = "Member Portal Maintenance has been exited. Normal operations wil recommence.";
+        }
+        await dbc.SaveChangesAsync();
+        await messageBox.ShowOkOnlyAsync("Member Portal Maintenance", msg);
+        Close();
+    }
+
+    void Close()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

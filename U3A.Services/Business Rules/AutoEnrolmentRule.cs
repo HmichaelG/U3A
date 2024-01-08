@@ -1,0 +1,295 @@
+﻿using DevExpress.Blazor;
+using DevExpress.Utils.Serializing;
+using Eway.Rapid.Abstractions.Response;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Text;
+using Twilio.Rest.Trunking.V1;
+using U3A.Database;
+using U3A.Model;
+
+namespace U3A.BusinessRules
+{
+    public static partial class BusinessRule
+    {
+
+        public static List<string> AutoEnrolments { get; set; }
+
+        // Are we in the period prior to the random allocation date.
+        public static bool IsPreRandomAllocationDay(Term currentEnrolmentTerm,
+                                            SystemSettings settings, DateTime Today)
+        {
+            DateTime allocationDate = GetThisTermAllocationDay(currentEnrolmentTerm, settings);
+            return IsPreRandomCutoffDate(currentEnrolmentTerm, settings, allocationDate, Today);
+        }
+
+        // Are we in the period prior to the random allocation email send date.
+        public static bool IsPreRandomAllocationEmailDay(Term currentEnrolmentTerm,
+                                            SystemSettings settings, DateTime Today)
+        {
+            DateTime allocationDate = GetThisTermAllocationDay(currentEnrolmentTerm, settings);
+            // add the review period
+            allocationDate = allocationDate.AddDays(constants.RANDOM_ALLOCATION_PREVIEW);
+            return IsPreRandomCutoffDate(currentEnrolmentTerm, settings, allocationDate, Today);
+        }
+        private static bool IsPreRandomCutoffDate(Term currentEnrolmentTerm,
+                                            SystemSettings settings, 
+                                            DateTime CutoffDate, 
+                                            DateTime today)
+        {
+            bool result = false;
+            var autoEnrollOccurrence = settings.AutoEnrolAllocationOccurs;
+            switch (autoEnrollOccurrence)
+            {
+                case AutoEnrollOccurrence.Annually:
+                    if (currentEnrolmentTerm.TermNumber == 1 && today < CutoffDate) result = true;
+                    break;
+                case AutoEnrollOccurrence.Semester:
+                    if (currentEnrolmentTerm.TermNumber == 1 && today < CutoffDate) result = true;
+                    if (currentEnrolmentTerm.TermNumber == 3 && today < CutoffDate) result = true;
+                    break;
+                case AutoEnrollOccurrence.Term:
+                    if (today < CutoffDate) result = true; break;
+                default: result = false; break;
+            }
+            return result;
+        }
+
+        public static bool IsRandomAllocationTerm(Term currentEnrolmentTerm,
+                                            SystemSettings settings)
+        {
+            bool result = false;
+            var autoEnrollOccurrence = settings.AutoEnrolAllocationOccurs;
+            switch (autoEnrollOccurrence)
+            {
+                case AutoEnrollOccurrence.Annually:
+                    if (currentEnrolmentTerm.TermNumber == 1) result = true;
+                    break;
+                case AutoEnrollOccurrence.Semester:
+                    if (currentEnrolmentTerm.TermNumber == 1) result = true;
+                    if (currentEnrolmentTerm.TermNumber == 3) result = true;
+                    break;
+                case AutoEnrollOccurrence.Term:
+                    result = true; break;
+                default: result = false; break;
+            }
+            return result;
+        }
+
+        // Return the date random allocation will occur, if it occurs this term.
+        public static DateTime GetThisTermAllocationDay(Term currentEnrolmentTerm, SystemSettings settings)
+        {
+            var week = settings.AutoEnrolAllocationWeek;
+            var onDay = (DayOfWeek)settings.AutoEnrolAllocationDay;
+            var allocationDate = currentEnrolmentTerm.StartDate.Date.AddDays(7 * week);
+            while (allocationDate.DayOfWeek != onDay)
+            {
+                allocationDate = allocationDate.AddDays(1);
+            }
+            return allocationDate;
+        }
+
+        // The day members are notified of allocation
+        public static DateTime GetThisTermAllocationMailoutDay(Term currentEnrolmentTerm, SystemSettings settings)
+        {
+            DateTime allocationDate = GetThisTermAllocationDay(currentEnrolmentTerm, settings);
+            return allocationDate.AddDays(constants.RANDOM_ALLOCATION_PREVIEW);
+        }
+
+        public static async Task AutoEnrolParticipantsAsync(U3ADbContext dbc, Term SelectedTerm,
+                              bool IsClassAllocationDone,
+                              bool ForceEmailQueue,
+                              DateTime? EmailDate = null)
+        {
+            AutoEnrolments = new List<string>();
+            List<Enrolment> enrolmentsToProcess;
+            List<Person> CourseLeaders;
+            var peoplePreviouslyEnrolled = await dbc.Enrolment
+                                        .Select(x => x.PersonID).Distinct()
+                                        .ToListAsync();
+            foreach (var course in await dbc.Course
+                                            .Include(x => x.Classes)
+                                            .Where(x => x.Year == SelectedTerm.Year
+                                                         && x.AllowAutoEnrol)
+                                            .ToListAsync())
+            {
+                CourseLeaders = new List<Person>();
+                foreach (var c in course.Classes)
+                {
+                    if (c.Leader != null && !CourseLeaders.Contains(c.Leader)) { CourseLeaders.Add(c.Leader); }
+                    if (c.Leader2 != null && !CourseLeaders.Contains(c.Leader2)) { CourseLeaders.Add(c.Leader2); }
+                    if (c.Leader3 != null && !CourseLeaders.Contains(c.Leader3)) { CourseLeaders.Add(c.Leader3); }
+                }
+                if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+                {
+                    enrolmentsToProcess = dbc.Enrolment
+                                                .Include(x => x.Person)
+                                                .Where(x => x.TermID == SelectedTerm.ID
+                                                                && x.CourseID == course.ID
+                                                                && x.Person.DateCeased == null
+                                                                && !CourseLeaders.Contains(x.Person)
+                                                                && x.Person.FinancialTo >= SelectedTerm.Year)
+                                                .ToList();
+                    if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
+                    {
+                        await ProcessEnrolments(dbc, SelectedTerm, course, enrolmentsToProcess, peoplePreviouslyEnrolled, ForceEmailQueue);
+                    }
+                }
+                else
+                {
+                    foreach (var courseClass in course.Classes)
+                    {
+                        enrolmentsToProcess = dbc.Enrolment
+                                                    .Include(x => x.Person)
+                                                    .Where(x => x.TermID == SelectedTerm.ID
+                                                                    && x.ClassID == courseClass.ID
+                                                                    && x.Person.DateCeased == null
+                                                                    && !CourseLeaders.Contains(x.Person)
+                                                                    && x.Person.FinancialTo >= SelectedTerm.Year)
+                                                    .ToList();
+                        if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
+                        {
+                            await ProcessEnrolments(dbc, SelectedTerm, course, enrolmentsToProcess, peoplePreviouslyEnrolled, ForceEmailQueue);
+                        }
+                    }
+                }
+            }
+            await BusinessRule.CreateEnrolmentSendMailAsync(dbc,EmailDate);
+            var term = await dbc.Term.FindAsync(SelectedTerm.ID);
+            await SetClassAllocationDone(dbc, term, IsClassAllocationDone);
+            await dbc.SaveChangesAsync();
+        }
+
+        private static async Task SetClassAllocationDone(U3ADbContext dbc,
+                                                        Term term,
+                                                        bool IsClassAllocationDone)
+        {
+            var today = DateTime.Today;
+            var settings = await dbc.SystemSettings
+                                    .OrderBy(x => x.ID)
+                                    .FirstAsync();
+            if (!IsRandomAllocationTerm(term, settings)) return;
+            var allocationDate = GetThisTermAllocationDay(term, settings);
+            var IsAllocationDone = IsClassAllocationDone || allocationDate >= today;
+            var autoEnrollOccurrence = settings.AutoEnrolAllocationOccurs;
+            IQueryable<Term> termsToUpdate;
+            int[] termArray;
+            switch (autoEnrollOccurrence)
+            {
+                case AutoEnrollOccurrence.Annually:
+                    termArray = new int[] { term.TermNumber };
+                    break;
+                case AutoEnrollOccurrence.Semester:
+                    termArray = new int[] { term.TermNumber, term.TermNumber + 1 };
+                    break;
+                case AutoEnrollOccurrence.Term:
+                    termArray = new int[] { 1, 2, 3, 4 };
+                    break;
+                default: return;
+            }
+            foreach (var t in dbc.Term.Where(x => x.Year == term.Year))
+            {
+                if (termArray.Contains(t.TermNumber))
+                {
+                    t.IsClassAllocationFinalised = IsAllocationDone;
+                    dbc.Update(t);
+                }
+            };
+        }
+        private static async Task ProcessEnrolments(U3ADbContext dbc,
+                                    Term term,
+                                    Course course,
+                                    List<Enrolment> enrolments,
+                                    List<Guid> PeoplePreviouslyEnrolled,
+                                    bool ForceEmailQueue)
+        {
+            var today = DateTime.Today;
+            var settings = await dbc.SystemSettings
+                                    .OrderBy(x => x.ID)
+                                    .FirstAsync();
+            if (string.IsNullOrWhiteSpace(settings.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
+            var isRandomEnrol = settings.AutoEnrolRemainderMethod.ToLower() == "random";
+
+            // We will do a random allocation once per allocation period (annual, semester or term)
+            // On completion IsClassAllocationFinalised is aet True.
+            var DoRandomEnrol = !term.IsClassAllocationFinalised && isRandomEnrol &&
+                                            today >= GetThisTermAllocationDay(term, settings);
+
+            int enrolled = enrolments.Where(x => !x.IsWaitlisted).Count();
+            if (enrolled >= course.MaximumStudents) { return; }
+            int waitlisted = enrolments.Where(x => x.IsWaitlisted).Count();
+            // If available places is less than waitlisted then enrol everyone.
+            if (waitlisted <= course.MaximumStudents - enrolled)
+            {
+                foreach (var e in enrolments.Where(x => x.IsWaitlisted))
+                {
+                    e.IsWaitlisted = false;
+                    LogEnrolment(e);
+                }
+            }
+            else
+            {
+                int places = 0;
+                // Enrol new participants first
+                if (DoRandomEnrol)
+                {
+                    decimal percent = settings.AutoEnrolNewParticipantPercent;
+                    if (percent > 0) { places = (int)(enrolments.Count * percent / 100); }
+                    if (places > 0 && places <= course.MaximumStudents - enrolled)
+                    {
+                        foreach (var e in enrolments
+                                            .OrderBy(x => x.Random)
+                                            .Where(x => x.IsWaitlisted && !PeoplePreviouslyEnrolled.Contains(x.Person.ID))
+                                            .Take(places))
+                        {
+                            LogEnrolment(e);
+                            e.IsWaitlisted = false;
+                        }
+                    }
+                }
+                // apply the remainder
+                enrolled = enrolments.Where(x => !x.IsWaitlisted).Count();
+                places = course.MaximumStudents - enrolled;
+                if (places > 0)
+                {
+                    if (isRandomEnrol)
+                    {
+                        foreach (var e in enrolments
+                                            .OrderBy(x => x.Random)
+                                            .Where(x => x.IsWaitlisted)
+                                            .Take(places))
+                        {
+                            LogEnrolment(e);
+                            e.IsWaitlisted = false;
+                        }
+                    }
+                    else
+                    {
+                        foreach (var e in enrolments
+                                            .OrderBy(x => x.Created)
+                                            .Where(x => x.IsWaitlisted)
+                                            .Take(places))
+                        {
+                            LogEnrolment(e);
+                            e.IsWaitlisted = false;
+                        }
+                    }
+                }
+            }
+            if (ForceEmailQueue)
+            {
+                foreach (var e in enrolments)
+                {
+                    if (dbc.Entry(e).State == EntityState.Unchanged) { dbc.Entry(e).State = EntityState.Modified; }
+                }
+            }
+        }
+
+        private static void LogEnrolment(Enrolment enrolment)
+        {
+            var person = enrolment.Person;
+            var course = enrolment.Course;
+            AutoEnrolments.Add($"{person.FullName} enrolled in {course.Name}.");
+        }
+    }
+}

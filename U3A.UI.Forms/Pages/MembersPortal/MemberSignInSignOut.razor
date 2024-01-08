@@ -1,0 +1,240 @@
+﻿@attribute [Authorize]
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+@inject IJSRuntime js
+
+<MessageBox @ref="@messageBox" />
+
+@if (isReady) {
+    <DxFormLayout CssClass="col col-md-6 mx-auto my-2">
+            <div class="w-100 h2 text-center alert alert-info">@(now.ToString("dddd, dd MMM hh:mm:ss tt"))</div>
+        @if (signInDetails == null || signInDetails.Count <= 0) {
+            <div class="alert alert-danger col-12 text-center">
+                You are not enrolled in any classes today.
+            </div>
+        }
+        else {
+            <table class="table mx-4">
+                <thead>
+                    <tr>
+                        <td class="h4 text-center" colspan="2">Class Sign In / Out</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row" class="col-2">Class</th>
+                        <td>@selectedSignIn.Name</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Time</th>
+                        <td>@selectedSignIn.Period</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Venue</th>
+                        <td>@selectedSignIn.Venue</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Address</th>
+                        <td>@selectedSignIn.Address</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Leader</th>
+                        <td>@selectedSignIn.Leader</td>
+                    </tr>
+                    @if (!isAbsent) {
+                        <tr>
+                            <th scope="row">Sign-In</th>
+                            <td>@selectedSignIn.SignedIn</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="w-25">Sign-Out</th>
+                            <td>@selectedSignIn.SignedOut</td>
+                        </tr>
+                    }
+                    @if (signInDetails.Count() > 0) {
+                        <tr>
+                            <th scopt="row">Class</th>
+                            <td>
+                                <DxPager PageCount=@(signInDetails.Count())
+                             SizeMode=SizeMode.Large
+                             ActivePageIndex=@selectedPageIndex
+                             VisibleNumericButtonCount=@(signInDetails.Count())
+                             ActivePageIndexChanged="OnActivePageChanged" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    @if (isAbsent) {
+                        <tr>
+                            <th scopt="row">Reason</th>
+                            <td>
+                                <DxTextBox @bind-Text="@selectedSignIn.AbsentReason" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <DxButton Text="Save" CssClass="col col-12" SizeMode="SizeMode.Large" IconCssClass="bi bi-emoji-frown menu-icon"
+                              SubmitFormOnClick="false"
+                              RenderStyle=ButtonRenderStyle.Warning
+                              Click="@OnProcessAbsent" />
+                            </td>
+                            <td>
+                                <DxButton Text="Cancel, I want to sign in/out" CssClass="col col-12" SizeMode="SizeMode.Large" IconCssClass="bi bi-emoji-smile menu-icon"
+                              SubmitFormOnClick="false"
+                              RenderStyle=ButtonRenderStyle.Secondary
+                              Click="@OnCancelAbsence" />
+                            </td>
+
+                        </tr>
+                    }
+                    else {
+                        <tr>
+                            <td colspan="2">
+                                <DxButton Text=@(IsSignIn() ? "Sign IN" : "Sign OUT") CssClass="col col-12" SizeMode="SizeMode.Large" IconCssClass="bi bi-alarm menu-icon"
+                              SubmitFormOnClick="false"
+                              RenderStyle=@(IsSignIn()
+                              ? ButtonRenderStyle.Success
+                              : ButtonRenderStyle.Danger)
+                              Click="@OnProcess" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <DxButton Text="Absent?" CssClass="col col-12" SizeMode="SizeMode.Large" IconCssClass="bi bi-emoji-frown menu-icon"
+                              SubmitFormOnClick="false"
+                              RenderStyle=ButtonRenderStyle.Warning
+                              Click="@(() => isAbsent = true)" />
+                            </td>
+                        </tr>
+                    }
+                </tfoot>
+            </table>
+        }
+
+        <DxButton Text="Return to menu" SizeMode=SizeMode.Large CssClass="col col-12" IconCssClass="bi bi-door-open" SubmitFormOnClick="false" RenderStyle="@ButtonRenderStyle.Secondary" Click="@ReturnToMenu" />
+
+    </DxFormLayout>
+}
+
+
+@code {
+    Person selectedPerson;
+
+    [CascadingParameter]
+    LoginState? loginState { get; set; }
+
+    [Parameter]
+    public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+
+    U3ADbContext dbc { get; set; }
+    MessageBox? messageBox;
+    LocalTime? locaTime;
+    DateTime now = DateTime.Now;
+
+    List<SignInOrOut>? signInDetails;
+    SignInOrOut selectedSignIn;
+    int selectedPageIndex = 0;
+
+    System.Threading.Timer timer;
+    LocalTime localTime;
+    bool isReady = false;
+    bool isAbsent = false;
+    string reason;
+
+    protected override async Task OnInitializedAsync() {
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+    }
+
+    protected override async void OnAfterRender(bool firstRender) {
+        base.OnAfterRender(firstRender);
+        if (firstRender) {
+            localTime = new LocalTime(js);
+            SetClock(null);
+            selectedPerson = loginState.SelectedPerson;
+            var dateNow = await localTime.GetLocalTimeAsync();
+            signInDetails = await BusinessRule.GetClassesToSignInAsync(dbc, loginState.SelectedPerson, dateNow);
+            if (signInDetails != null && signInDetails.Count > 0) {
+                selectedSignIn = signInDetails[0];
+                _ = IsSignIn();
+            }
+            timer = new System.Threading.Timer(SetClock, new System.Threading.AutoResetEvent(false), 1000, 1000);
+            isReady = true;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async void SetClock(object stateInfo) {
+        now = await localTime.GetLocalTimeAsync();
+        InvokeAsync(StateHasChanged);
+    }
+
+    void OnActivePageChanged(int activePageIndex) {
+        selectedPageIndex = activePageIndex;
+        selectedSignIn = signInDetails[selectedPageIndex];
+        _ = IsSignIn();
+    }
+
+    void OnCancelAbsence() {
+        selectedSignIn.AttendClass.AttendClassStatusID = (int)AttendClassStatusType.Present;
+        selectedSignIn.AttendClass.Comment = string.Empty;
+        isAbsent = false;
+    }
+
+    bool IsSignIn() {
+        bool result = false;
+        isAbsent = false;
+        var a = selectedSignIn.AttendClass;
+        if (a.AttendClassStatusID == (int)AttendClassStatusType.AbsentFromClassWithApology) {
+            isAbsent = true;
+        }
+        else {
+            var c = selectedSignIn.Class;
+            var classStart = new DateTime(now.Year, now.Month, now.Day,
+                            c.StartTime.Hour, c.StartTime.Minute, 0);
+            var classEnd = new DateTime(now.Year, now.Month, now.Day,
+                            c.EndTime.Value.Hour, c.EndTime.Value.Minute, 0);
+            if (now < classStart || (now < classEnd && a.SignIn == null)) result = true;
+        }
+        return result;
+    }
+
+    async Task OnProcess() {
+        var isSignIn = IsSignIn();
+        var attendClass = await dbc.AttendClass.FindAsync(selectedSignIn.AttendClass.ID);
+        if (attendClass != null) {
+            attendClass.Comment = string.Empty;
+            attendClass.AttendClassStatusID = (int)AttendClassStatusType.Present;
+            if (isSignIn) {
+                attendClass.SignIn = now;
+                attendClass.SignOut = null;
+            }
+            else {
+                attendClass.SignOut = now;
+            }
+            await dbc.SaveChangesAsync();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+    async Task OnProcessAbsent() {
+        var isSignIn = IsSignIn();
+        var attendClass = await dbc.AttendClass.FindAsync(selectedSignIn.AttendClass.ID);
+        if (attendClass != null) {
+            attendClass.AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithApology;
+            attendClass.Comment = selectedSignIn.AbsentReason;
+            attendClass.SignIn = null;
+            attendClass.SignOut = null;
+            await dbc.SaveChangesAsync();
+            await messageBox.ShowOkOnlyAsync("Saved", "Your class absence has been recorded - thank you.");
+        }
+    }
+
+    async Task ReturnToMenu() {
+        await OnSelectedOptionCompleted.InvokeAsync(PortalMenuResult.MenuOptionCancelled);
+    }
+
+    public void Dispose() {
+        dbc?.Dispose();
+    }
+}

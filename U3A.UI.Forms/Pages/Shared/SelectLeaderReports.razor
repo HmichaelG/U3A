@@ -1,0 +1,96 @@
+﻿@namespace U3A.UI.Forms
+
+<MessageBox @ref="@messageBox" />
+<DxFormLayoutGroup Caption="Select Report" ColSpanMd="12">
+    @if (SingleReportOnly) {
+        <DxRadioGroup Items="@reports"
+        @bind-Value="@selectedReport" />
+    }
+    else {
+        <DxFormLayoutItem Caption="@(reports[0])" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintLeaderReport" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Class Contact List" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintClassList" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="In Case of Emergency List" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintICEList" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Attendance Record" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintAttendanceRecord" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Attendance Analysis" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintAttendanceAnalysis" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Class CSV file" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintCSVFile" />
+        </DxFormLayoutItem>
+    }
+</DxFormLayoutGroup>
+@if (SingleReportOnly) {
+    <DxFormLayoutGroup Caption="Print Report" ColSpanMd="12">
+        <DxButton Text="Print Report" IconCssClass="bi bi-print menu-icon" CssClass="col col-11 mt-2 mx-auto"
+                  Enabled="@AreSelectionsMade"
+                  RenderStyle="ButtonRenderStyle.Primary" Click="@DoPrintAsync" />
+    </DxFormLayoutGroup>
+}
+else {
+    <DxFormLayoutGroup Caption="Create Queue" ColSpanMd="12">
+        <DxButton Text="Queue Report(s) for email" IconCssClass="bi bi-envelope menu-icon" CssClass="col col-11 mt-2 mx-auto"
+                  Enabled="@AreSelectionsMade"
+                  RenderStyle="ButtonRenderStyle.Primary" Click="@DoMailAsync" />
+    </DxFormLayoutGroup>
+}
+@code {
+    [Parameter]
+    public bool SingleReportOnly { get; set; }
+
+    [Parameter, EditorRequired]
+    public bool AreSelectionsMade { get; set; }
+
+    public bool PrintLeaderReport { get; set; }
+    public bool PrintClassList { get; set; }
+    public bool PrintICEList { get; set; }
+    public bool PrintAttendanceRecord { get; set; }
+    public bool PrintAttendanceAnalysis { get; set; }
+    public bool PrintCSVFile { get; set; }
+    public bool RequireEnrolements {get {
+            return PrintAttendanceRecord || PrintICEList || PrintClassList || PrintLeaderReport || PrintCSVFile;
+        }
+    }
+    MessageBox? messageBox;
+
+    static List<string> reports = new() { "Leader Report",
+                                            "Class Contact List",
+                                            "In Case of Emergency List",
+                                            "Attendance Record",
+                                            "Attendance Analysis"};
+    string selectedReport = reports[0];
+
+    [Parameter]
+    public EventCallback<PortalMenuSelection> OnQueueReportsSelected { get; set; }
+
+    async void DoMailAsync() {
+        InvokeAsync(StateHasChanged); await OnQueueReportsSelected.InvokeAsync();
+    }
+    async void DoPrintAsync() {
+        PrintLeaderReport = false;
+        PrintClassList = false;
+        PrintICEList = false;
+        PrintAttendanceRecord = false;
+        PrintAttendanceAnalysis = false;
+        if (selectedReport == reports[0]) PrintLeaderReport = true;
+        if (selectedReport == reports[1]) PrintClassList = true;
+        if (selectedReport == reports[2]) PrintICEList = true;
+        if (selectedReport == reports[3]) PrintAttendanceRecord = true;
+        if (selectedReport == reports[4]) PrintAttendanceAnalysis = true;
+        if (!PrintLeaderReport &&
+             !PrintClassList &&
+             !PrintICEList &&
+             !PrintAttendanceRecord && !PrintAttendanceAnalysis) {
+            await messageBox.ShowOkOnlyAsync("Select Report", "A report must be selected.");
+        }
+        else { InvokeAsync(StateHasChanged); await OnQueueReportsSelected.InvokeAsync(); }
+    }
+
+}

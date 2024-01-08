@@ -1,0 +1,171 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Identity
+@using U3A.Services
+
+ @implements IDisposable;
+
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+                    @bind-IsActive="@IsXtraSmallLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
+                    @bind-IsActive="@IsSmallLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Medium"
+                    @bind-IsActive="@IsMediumLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
+                    @bind-IsActive="@IsLargeLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
+                    @bind-IsActive="@IsXtraLargeLayout" />
+<div class="page w-100">
+    <DxGridLayout CssClass="page-layout">
+        <Rows>
+            <DxGridLayoutRow Areas="Left-Blank header Right-Blank" Height="auto" />
+            <DxGridLayoutRow Areas="Left-Blank content Right-Blank" />
+            <DxGridLayoutRow Areas="footer footer footer" Height="1rem" />
+        </Rows>
+        <Columns>
+            @{
+                if (IsXtraLargeLayout)
+                {
+                    <DxGridLayoutColumn Width="10%" />
+                    <DxGridLayoutColumn Width="80%" />
+                    <DxGridLayoutColumn Width="10%" />
+                }
+                else
+                {
+                    <DxGridLayoutColumn Width="1%" />
+                    <DxGridLayoutColumn Width="98%" />
+                    <DxGridLayoutColumn Width="1%" />
+                }
+            }
+        </Columns>
+        <Items>
+            <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none me-3 vh-100">
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="header" CssClass="py-1">
+                <Template>
+                    @if (hasRole)
+                    {
+                        <div class="fixed-top">
+                            <MainMenu />
+                        </div>
+                    }
+                    else
+                    {
+                        <PortalHeader />
+                    }
+                </Template>
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="content" CssClass="content">
+                <Template>
+                    <ErrorBoundary @ref="@errorBoundary">
+                        <ChildContent>
+                            <div class="@((hasRole) ? "content content-padding" : "" )">
+                                @if (!string.IsNullOrWhiteSpace(messageText))
+                                {
+                                    <div class="alert alert-danger text-center mx-auto">
+                                        @(new MarkupString(messageText))
+                                    </div>
+                                }
+                                @Body
+                            </div>
+                        </ChildContent>
+                        <ErrorContent>
+                            <p class="u3admin-error-boundary mt-5">
+                                Oops! Something went wrong. An unexpected error has occurred.<br />
+                                When reporting this issue please include the date and time: @(DateTime.Now.ToUniversalTime()) UTC.
+                                <button class="btn btn-warning" @onclick="ResetError">Reset</button>
+                            </p>
+                        </ErrorContent>
+                    </ErrorBoundary>
+                </Template>
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none ms-3 vh-100" />
+        </Items>
+    </DxGridLayout>
+</div>
+
+<style>
+    .content-padding {
+    padding-top: 2rem !important;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public RenderFragment? Body { get; set; } = null;
+    [CascadingParameter(Name = "HasRole")]
+    public bool hasRole { get; set; }
+
+    ErrorBoundary? errorBoundary;
+    IEnumerable<IdentityRole> Roles { get; set; }
+    bool IsXtraSmallLayout { get; set; }
+    bool IsSmallLayout { get; set; }
+    bool IsMediumLayout { get; set; }
+    bool IsLargeLayout { get; set; }
+    bool IsXtraLargeLayout { get; set; }
+    U3ADbContext? dbc { get; set; }
+    string? messageText;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            Roles = dbc.Roles.ToList();
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            foreach (var r in Roles)
+            {
+                if (authenticationState.User.IsInRole(r.Name))
+                {
+                    hasRole = true;
+                    break;
+                }
+            }
+            var authEmail = authenticationState.User.Identity.Name;
+            if (authEmail == constants.superAdmin) hasRole = true;
+        }
+        NavigationManager.LocationChanged += OnLocationChanged;
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var file = $"{System.IO.Directory.GetCurrentDirectory()}{@"\wwwroot\message.html"}";
+        messageText = string.Empty;
+        if (File.Exists(file))
+        {
+            messageText = await File.ReadAllTextAsync(file);
+            if (firstRender) StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void ResetError()
+    {
+        errorBoundary?.Recover();
+        NavigationManager.NavigateTo("/", true);
+    }
+
+    void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (IsMediumLayout)
+        {
+            InvokeAsync(StateHasChanged).SafeFireAndForget();
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        dbc?.Dispose();
+    }
+
+}
+

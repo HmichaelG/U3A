@@ -1,0 +1,141 @@
+﻿@page "/"
+
+<PageTitle>U3Amin Administration</PageTitle>
+
+@using Microsoft.AspNetCore.Components.Server.Circuits
+
+@using System.IO
+@using System.Web
+@using System.Text
+@using System.Collections.ObjectModel
+
+@inject NavigationManager navMan
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject CircuitHandler circuitHandler
+
+
+@if (@homePage == "")
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <MessageBox @ref="@messageBox" />
+    <DxFormLayout>
+        @if (!hasRole)
+        {
+            <U3A.UI.Forms.Pages.MembersPortal.MemberPortal />
+        }
+        else
+        {
+            <div class="input-group align-items-center">
+                <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"There are {openCircuits} users logged in.")</div>
+                <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
+                                  ButtonIconCssClass="bi bi-check2-circle"
+                                  HelpTopic="Version-History.html"
+                                  ActivationStyle="HelpActivationStyle.ButtonOnly" />
+            </div>
+            <DxTabs CssClass="mb-2 w-100">
+                <DxTabPage Text="Member Summary">
+                    <GeneralSummaryChart />
+                </DxTabPage>
+                <DxTabPage Text="Cash Receipts">
+                    <ReceiptSummaryChart />
+                </DxTabPage>
+                <DxTabPage Text="New Members">
+                    <NewMemberSummaryChart />
+                </DxTabPage>
+                <DxTabPage Text="Enrolments">
+                    <EnrolmentSummaryChart />
+                </DxTabPage>
+                <DxTabPage Text="Attendance">
+                    <AttendanceChart />
+                </DxTabPage>
+                <DxTabPage Text="Website">
+                    <div class="shadow card col col-12 m-1">
+                        <iframe src="@homePage" width="100%" class="iframe-height"></iframe>
+                    </div>
+                </DxTabPage>
+                <DxTabPage Text="u3admin.org.au">
+                    <div class="shadow card col col-12 m-1">
+                        <iframe src="https://u3admin.org.au" width="100%" class="iframe-height"></iframe>
+                    </div>
+                </DxTabPage>
+            </DxTabs>
+            <footer class="text-muted">
+                &copy; @(DateTime.Today.Year) - Visit: <a href="https://u3admin.org.au">U3Admin.org.au</a>
+            </footer>
+        }
+    </DxFormLayout>
+}
+
+<style>
+
+    .iframe-height {
+        min-height: 40vh;
+        height: 85vh;
+        border-style: none;
+        padding-bottom: 5px;
+    }
+
+</style>
+
+
+@code {
+
+    [CascadingParameter(Name = "OpenCircuits")]
+    public int openCircuits { get; set; }
+    [CascadingParameter]
+    public LoginState? LoginState { get; set; }
+    [CascadingParameter(Name = "HasRole")]
+    public bool hasRole { get; set; }
+
+    U3ADbContext dbc { get; set; }
+    MessageBox? messageBox;
+    string homePage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        homePage = dbc.TenantInfo.Website;
+        FinalisePaymentIfReqd();
+        await base.OnInitializedAsync();
+    }
+
+    void FinalisePaymentIfReqd()
+    {
+        var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
+        if (queryStringCollection.Count > 0) {
+            if (queryStringCollection.GetKey(0) == "Eway")
+            {
+                navMan.NavigateTo("/AdminMemberPortal");
+            }
+        }
+    }
+
+    public async Task OnCircuitClick()
+    {
+        StringBuilder msg = new();
+        msg.AppendLine("<table class='table'>");
+        msg.AppendLine("<thead><tr><td>UpTime</td><td>Login</td><td>Circuit</td></tr></thead><tbody>");
+        foreach (var cd in (circuitHandler as CircuitHandlerService).CircuitDetails)
+        {
+            string upTime = ((TimeSpan)(DateTime.Now - cd.Value.Created)).ToString(@"hh\:mm\:ss");
+            msg.AppendLine($"<tr><td>{upTime}</td><td>{cd.Value.Name}</td><td>{cd.Key}</td></tr>");
+        }
+        msg.AppendLine("</tbody></table");
+        await messageBox.SetPopupWidth("40rem");
+        await messageBox.ShowOkOnlyAsync("Logins", msg.ToString());
+    }
+
+
+
+    public string GetAssemblyVersion()
+    {
+        var version = GetType().Assembly.GetName().Version.ToString();
+        var splits = version.Split(".");
+        return $"{splits[0]}.{splits[1]}.{splits[2]}";
+    }
+
+}

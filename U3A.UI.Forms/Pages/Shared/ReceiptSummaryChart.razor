@@ -1,0 +1,106 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+
+<Progress @ref=@progress />
+<DxFormLayout>
+    <DxFormLayoutItem ColSpanMd="12">
+        <div class="float-end">
+            <DxButton Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
+                      IconCssClass="bi bi-database menu-icon" CssClass="col m-2" />
+        </div>
+    </DxFormLayoutItem>
+    <DxFormLayoutGroup Caption="Cash Receipts Summary" ColSpanLg="9" CssClass="receiptControlHeight">
+        <DxChart Data="receiptData" Id="receiptChart"
+                 Width="100%" Height="@controlHeight"
+                 LabelOverlap="ChartLabelOverlap.Hide">
+            <DxChartStackedBarSeries Name="Online"
+                                     Color="System.Drawing.Color.LimeGreen"
+                                     T="ReceiptSummary"
+                                     TArgument="DateTime"
+                                     TValue="decimal"
+                                     ArgumentField="r => new DateTime(r.Year, r.Month, 1)"
+                                     ValueField="r => r.Total"
+                                     Filter="@(r => r.Type == "Online")">
+                <DxChartSeriesLabel Visible=ShowSeriesLabels
+                                    Format="ChartElementFormat.Thousands(1)" />
+            </DxChartStackedBarSeries>
+            <DxChartStackedBarSeries Name="Other"
+                                     Color="System.Drawing.Color.DarkGreen"
+                                     T="ReceiptSummary"
+                                     TArgument="DateTime"
+                                     TValue="decimal"
+                                     ArgumentField="r => new DateTime(r.Year, r.Month, 1)"
+                                     ValueField="r => r.Total"
+                                     Filter="@(r => r.Type != "Online")">
+                <DxChartSeriesLabel Visible=ShowSeriesLabels
+                                    Format="ChartElementFormat.Thousands(1)" />
+            </DxChartStackedBarSeries>
+            <DxChartLegend Position="RelativePosition.Outside"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+            <DxChartTooltip Enabled="!ShowSeriesLabels">
+                @context.Point.Render((seriesPoint) =>
+                    @<div style="margin: 0.75rem">
+                        <div>@seriesPoint.SeriesName</div>
+                        <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
+                        <span>@($"{seriesPoint.Value: $0,.0}K")</span>
+                    </div>
+                )
+            </DxChartTooltip>
+        </DxChart>
+    </DxFormLayoutGroup>
+    <DxFormLayoutGroup Caption="Cash Receipts by Month" ColSpanLg="3">
+        <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="receiptControlHeight"
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                AutoExpandAllGroupRows=true
+                ShowFilterRow="false"
+                ShowAllRows="true">
+            <Columns>
+                <DxGridDataColumn Caption="Type" FieldName="Type" GroupIndex="0" />
+                <DxGridDataColumn Width="15%" Caption="Year" FieldName="Year" DisplayFormat="{0:D4}" />
+                <DxGridDataColumn Width="30%" Caption="Month" FieldName="MonthName" />
+                <DxGridDataColumn Width="45%" Caption="Amount" FieldName="Total" DisplayFormat="{0:c2}" />
+            </Columns>
+            <GroupSummary>
+                <DxGridSummaryItem FooterColumnName="Total" 
+                    SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+            </GroupSummary>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+            </TotalSummary>
+        </DxGrid>
+    </DxFormLayoutGroup>
+</DxFormLayout>
+<style>
+    .receiptControlHeight {
+        height: @controlHeight;
+    }
+</style>
+
+@code {
+    IEnumerable<ReceiptSummary> receiptData;
+    [Parameter] public bool ShowSeriesPointMarkers { get; set; }
+    [Parameter] public bool ShowSeriesLabels { get; set; }
+    Progress? progress;
+    string controlHeight = "350px";
+
+    protected override async void OnAfterRender(bool firstRender) {
+        // wire up the toolbar
+        base.OnAfterRender(firstRender);
+        var newHeight = await Window.FitToRemainingHeight(js, "receiptChart", controlHeight);
+        if (newHeight != controlHeight) {
+            controlHeight = newHeight;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    async Task OnProcess()
+    {
+        progress?.ShowSmallSpinnerAsync();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            receiptData = BusinessRule.GetReceiptSummaryByMonth(dbc);
+        }
+        progress.Close();
+    }
+
+}

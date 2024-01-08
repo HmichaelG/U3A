@@ -1,0 +1,276 @@
+﻿@page "/public"
+
+@layout BasicLayout
+
+<PageTitle>Welcome to U3Admin</PageTitle>
+
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Identity
+
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+                    @bind-IsActive="@IsXtraSmallLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
+                    @bind-IsActive="@IsSmallLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Medium"
+                    @bind-IsActive="@IsMediumLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
+                    @bind-IsActive="@IsLargeLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
+                    @bind-IsActive="@IsXtraLargeLayout" />
+
+@if (isReady)
+{
+    <div class="webkit-prefix">
+        @if ((AppleOSversion?[0] <= 12))
+        {
+            <div class="card text-center p-4 alert-danger">
+                <h3>Apple OS: Safari version: @AppleOSversion?[0].@AppleOSversion?[1].@AppleOSversion?[2] </h3>
+                <p>
+                    We're sorry. <strong>Member Portal</strong> is a new web application that requires
+                    a modern browser. Your Safari browser is less than the minimum supported version of 13.1.0
+                    and therefore cannot be used.
+                </p>
+                <p>
+                    Unlike other operating systems (Windows, Android, Linux, Unix etc), Apple does not provide browser updates for older devices.
+                    You will therefore need to use another device/PC to access our portal.
+                </p>
+                <p>However, you can access our Class Schedule but with reduced functionality.</p>
+                <button type="button" class="mb-4" @onclick="@OnReportClick">Click to view Class Schedule</button>
+                <button type="button" class="mb-4" @onclick="@OnClose">Return to website</button>
+            </div>
+        }
+        <DxGridLayout CssClass="pageBackColor">
+            <Rows>
+                @if (IsXtraSmallLayout)
+                {
+                    <DxGridLayoutRow Areas="header" Height="auto" />
+                    <DxGridLayoutRow Areas="content" />
+                    <DxGridLayoutRow Areas="footer" Height="1px" />
+                }
+                else
+                {
+                    <DxGridLayoutRow Areas="Left-Blank header Right-Blank" Height="auto" />
+                    <DxGridLayoutRow Areas="Left-Blank content Right-Blank" />
+                    <DxGridLayoutRow Areas="footer footer footer" Height="1rem" />
+                }
+            </Rows>
+            <Columns>
+                @{
+                    if (IsXtraSmallLayout)
+                    {
+                        <DxGridLayoutColumn Width="100%" />
+                    }
+                    else
+                    {
+                        <DxGridLayoutColumn Width="10%" />
+                        <DxGridLayoutColumn Width="80%" />
+                        <DxGridLayoutColumn Width="10%" />
+                    };
+                }
+            </Columns>
+            <Items>
+                <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none" />
+                <DxGridLayoutItem Area="header" CssClass="pt-1 pb-2">
+                    <Template>
+                        <PortalHeader NavigateTo="/public" />
+                    </Template>
+                </DxGridLayoutItem>
+                <DxGridLayoutItem Area="content" CssClass="px-md-4">
+                    <Template>
+                        <ErrorBoundary>
+                            <div class="col-12 col-md-8 mx-auto">
+                                <DxFormLayout>
+                                    <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                                    <DxFormLayoutGroup Caption="Display the Class Schedule" ColSpanXs="12" CaptionCssClass="text-primary">
+                                        <div class="col-11 mx-auto mt-2">
+                                            @if (isNoEnrolmentTermAvailable)
+                                            {
+                                                <p>We are currently working on a new Class Schedule. It will be available soon.</p>
+                                            }
+                                            else
+                                            {
+                                                <p>Click below to view the Class Schedule. You do not need to be logged in to view or print this report.</p>
+                                            }
+                                            <DxButton Text="Click to display the schedule" Enabled="@(!isNoEnrolmentTermAvailable)"
+                                                      IconCssClass="bi-printer menu-icon me-3 h2"
+                                                      CssClass="col-12"
+                                                      Click="OnReportClick"
+                                                      RenderStyle="ButtonRenderStyle.Primary"
+                                                      RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                            </DxButton>
+                                        </div>
+                                    </DxFormLayoutGroup>
+
+                                    <DxFormLayoutGroup Caption="New Member?" ColSpanMd="6" CaptionCssClass="text-primary">
+                                        <div class="mt-2 mx-2">
+                                            <div class="h6">Start Here</div>
+                                            <p class="box-height">
+                                                If you wish to join our U3A, register an account to securely use the membership system and protect your privacy. You will need an email address to do so.
+                                                If you have problems, contact the office for assistance.
+                                            </p>
+                                            <DxButton Text="Click to register" Enabled="@(!isBeforeEnrolmentDay && !isNoEnrolmentTermAvailable)"
+                                                      IconCssClass="bi bi-person-plus menu-icon me-3 h2"
+                                                      CssClass="col-12 mx-auto"
+                                                      Click="@(e => NavigationManager.NavigateTo("/Account/Register",true))"
+                                                      RenderStyle="ButtonRenderStyle.Primary"
+                                                      RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                            </DxButton>
+                                        </div>
+                                    </DxFormLayoutGroup>
+                                    <DxFormLayoutGroup Caption="Returning Member?" ColSpanMd="6" CaptionCssClass="text-primary">
+                                        <div class="mt-2 mx-2">
+                                            <div class="h6">Login Here</div>
+                                            <p class="box-height">
+                                                As an existing member, please login to access your membership details, pay your membership fees,
+                                                enrol in courses and more!
+                                            </p>
+                                            <DxButton Text="Click to Login" Enabled="@(!isBeforeEnrolmentDay)"
+                                                      IconCssClass="bi bi-person-check menu-icon me-3 h2"
+                                                      CssClass="col-12"
+                                                      Click="@(e => NavigationManager.NavigateTo("/Account/Login?ReturnUrl=%2F",true))"
+                                                      RenderStyle="ButtonRenderStyle.Primary"
+                                                      RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                            </DxButton>
+                                        </div>
+                                    </DxFormLayoutGroup>
+                                    @if (isBeforeEnrolmentDay || isNoEnrolmentTermAvailable)
+                                    {
+                                        <div class="card card-body border-info alert-info w-100 text-center h5">
+                                            @(new MarkupString(lockoutMessage))
+                                        </div>
+
+                                    }
+                                    <DxButton Text="Return to website"
+                                              IconCssClass="bi bi-globe-asia-australia menu-icon me-3 h2"
+                                              CssClass="col-11 mx-auto mt-4"
+                                              Click="@OnClose"
+                                              RenderStyle="ButtonRenderStyle.Primary"
+                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                    </DxButton>
+                                </DxFormLayout>
+                            </div>
+                        </ErrorBoundary>
+                    </Template>
+                </DxGridLayoutItem>
+                <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none" />
+            </Items>
+        </DxGridLayout>
+
+        <footer class="footer my-4 text-muted">
+            <div class="container" align="center">
+                &copy; @(DateTime.Today.Year) - Visit: <a href="https://u3admin.org.au">U3Admin.org.au</a>
+            </div>
+        </footer>
+
+    </div>
+}
+<style>
+    .box-height {
+        height: @((IsXtraSmallLayout || IsSmallLayout) ? "" : "6rem");
+    }
+</style>
+
+@code {
+    SystemSettings? settings { get; set; }
+    bool IsXtraSmallLayout { get; set; }
+    bool IsSmallLayout { get; set; }
+    bool IsMediumLayout { get; set; }
+    bool IsLargeLayout { get; set; }
+    bool IsXtraLargeLayout { get; set; }
+    bool isBeforeEnrolmentDay = false;
+    bool isNoEnrolmentTermAvailable = false;
+    string lockoutMessage = string.Empty;
+    int[]? AppleOSversion;
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+        }
+        isReady = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (js != null)
+            {
+                // Set the workstation ID
+                await Workstation.SetWorkstationID(js, localStorage);
+                // Apple version check
+                AppleOSversion = await js.InvokeAsync<int[]>("appleOSversion");
+                using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+                {
+                    // no ernolment term in force
+                    var localTime = TimezoneAdjustment.GetLocalTime();
+                    var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc, localTime);
+                    if (currentTerm == null)
+                    {
+                        currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+                        if (localTime < currentTerm.EnrolmentStartDate)
+                        {
+                            await SetUnavailableMessage(currentTerm);
+                        }
+                        else
+                        {
+                            var nextTerm = await BusinessRule.GetNextTermAsync(dbc, currentTerm);
+                            if (nextTerm != null)
+                            {
+                                if (localTime.Date > currentTerm.EndDate)
+                                {
+                                    await SetUnavailableMessage(nextTerm);
+                                }
+                            }
+                        }
+                    }
+                    // Enrolment day lockout
+                    var openingTime = await BusinessRule.IsEnrolmentDayLockoutPeriod(dbc, TimezoneAdjustment.GetLocalTime().Date);
+                    if (openingTime != null)
+                    {
+                        isBeforeEnrolmentDay = true;
+                        var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                        var sOpeningTime = openingTime?.ToString("ddd dd-MMM-yy hh:mm tt");
+                        lockoutMessage = $@"<strong>{term.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.";
+                    }
+                }
+            }
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async Task SetUnavailableMessage(Term term)
+    {
+        var sOpeningTime = term?.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
+        lockoutMessage = $@"<h6><strong>{term.Year} Term-{term.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.
+                                                    <br/>New member registration is unavailable till that time.</h6>";
+        isNoEnrolmentTermAvailable = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void OnReportClick()
+    {
+        var url = "/public/ClassScheduleView";
+        NavigationManager.NavigateTo(url);
+    }
+
+    async Task OnClose()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var info = dbc.TenantInfo;
+            NavigationManager.NavigateTo(info.Website, true);
+        }
+    }
+
+}

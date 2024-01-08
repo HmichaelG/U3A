@@ -1,0 +1,112 @@
+﻿@page "/public/ClassScheduleView"
+
+@using U3A.BusinessRules
+
+@inject IJSRuntime js
+@inject NavigationManager NavManager
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@implements IDisposable
+
+@layout BasicLayout
+
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+                    @bind-IsActive="@IsMobileLayout" />
+
+@if (!IsReady)
+{
+    <em>Loading...</em>
+}
+else
+{
+    <PortalHeader NavigateTo="/public" />
+    <div class="h6" align="center">This report contains many pages. Scroll down to view.</div>
+    <p>@message</p>
+    <DxReportViewer @ref="reportViewer" Id="reportViewer"
+                    Report="@rpt" SizeMode="SizeMode.Small"
+                    SinglePagePreview="false"
+                    RootCssClasses="w-100 viewer-height"
+                    TabPanelMinWidth="200"
+                    TabPanelMaxWidth="200"
+                    Zoom="1"
+                    OnCustomizeToolbar="@OnCustomizeToolbar" />
+
+}
+
+<style>
+    .viewer-height {
+        height: @viewerHeight;
+    }
+
+</style>
+
+
+@code {
+    bool IsReady;
+    bool IsMobileLayout;
+    string viewerHeight = "100px";
+
+    ClassScheduleRpt rpt;
+    MarkupString message = new MarkupString("");
+    DxReportViewer? reportViewer;
+    U3ADbContext? dbc { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        var today = DateTime.Today;
+        Term? term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        if (term != null)
+        {
+            rpt = new ClassScheduleRpt();
+            (rpt as IXtraReportWithNavManager).NavManager = NavManager;
+            foreach (var prm in rpt.Parameters)
+            {
+                prm.Visible = false;
+            }
+            rpt.DbContext = dbc;
+            rpt.prmTerm.Value = term.ID;
+            rpt.prmIntendedUse.Value = 0; // Public
+            rpt.CreateReport();
+        }
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+
+    void OnCustomizeToolbar(ToolbarModel toolbarModel)
+    {
+        string[] itemsToRemove = new string[] {"HighlightEditingFields",
+                                                "CancelDocumentCreation"
+                                };
+        foreach (var item in toolbarModel.AllItems)
+        {
+            if (itemsToRemove.Contains(item.Id))
+            {
+                item.GetEnabled = () => { return false; };
+                item.Visible = false;
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            reportViewer.TabPanelModel[TabContentKind.Parameters].Visible = false;
+            reportViewer.TabPanelModel[TabContentKind.Search].Visible = true;
+            reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
+            reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
+        }
+        var newHeight = await Window.FitToRemainingHeight(js, "reportViewer", viewerHeight,0);
+        if (newHeight != viewerHeight) { viewerHeight = newHeight; await InvokeAsync(StateHasChanged); }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+}

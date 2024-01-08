@@ -1,0 +1,38 @@
+﻿@page "/CorrespondenceHub"
+
+@namespace U3A.UI.Forms
+
+@attribute [Authorize]
+
+
+
+<DxFormLayout>
+
+    <ContextHelpTitle Title="Correspondence Hub" HelpTopic="correspondence-hub.html" />
+
+    <DxTabs CssClass="w-100">
+        <DxTabPage Text="Queued Transactional Email">
+            <div class="mt-1"> <QueuedTransactionalEmail /> </div>
+        </DxTabPage>
+        <DxTabPage Text="Queued Broadcast Email">
+            <div class="mt-1"> <QueuedBroadcastEmail /> </div>
+        </DxTabPage>
+        <DxTabPage Text="Queue Leader Reports">
+            <div class="mt-1"> <LeaderReport /> </div>
+        </DxTabPage>
+        <DxTabPage Text="Statistics/Bounces">
+            <div class="mt-1"> <PostmarkStats /> </div>
+        </DxTabPage>
+        <DxTabPage Text="Search">
+            <div class="mt-1"> <SearchEmail /> </div>
+        </DxTabPage>
+        <DxTabPage Text="Suppressions">
+            <div class="mt-1"> <Suppressions /> </div>
+        </DxTabPage>
+    </DxTabs>
+</DxFormLayout>
+
+
+@code {
+
+}

@@ -1,0 +1,167 @@
+﻿@page "/ReviewOnlinePaymentStatus"
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <div class="row">
+        <ContextHelpTitle Title="Review Online Payment Status" HelpTopic="Review-Online-Payment-Status.html"></ContextHelpTitle>
+    </div>
+    <div class="row">
+        <div class="col-11 d-none d-md-inline">
+            Review the status of payment attempts made online.
+        </div>
+
+    </div>
+    <br />
+
+    <MessageBox @ref="@messageBox" />
+
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+    <DxGrid Data="@PaymentStatus" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+            AutoExpandAllGroupRows="true"
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            UnboundColumnData="Grid_UnboundColumnData"
+            ShowAllRows="true"
+            KeyFieldName="ID">
+        <ToolbarTemplate>
+            <GridToolbar LinkedGrid=@mainGrid />
+        </ToolbarTemplate>
+        <Columns>
+            <DxGridDataColumn Width="10rem" Caption="Date"
+                              FieldName="Created"
+                              DisplayFormat="dd-MMM-yyyy"
+                              UnboundType="GridUnboundColumnType.DateTime"
+                              SortOrder="GridColumnSortOrder.Descending" />
+            <DxGridDataColumn Width="10rem" Caption="Time"
+                              FieldName="CreatedTime"
+                              DisplayFormat="hh:mm tt"
+                              UnboundType="GridUnboundColumnType.DateTime" />
+            <DxGridDataColumn Width="6rem" Caption="Status" FieldName="Status" />
+            <DxGridDataColumn Width="6rem" Caption="Result Code" FieldName="ResultCode" />
+            <DxGridDataColumn Width="6rem" Caption="Result Msg" FieldName="ResultMessage" />
+            <DxGridDataColumn Caption="Participant" FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
+            <DxGridDataColumn Width="6rem" Caption="Mobile" FieldName="Mobile" UnboundType="GridUnboundColumnType.String" />
+            <DxGridDataColumn Width="6rem" Caption="Phone" FieldName="Phone" UnboundType="GridUnboundColumnType.String" />
+            <DxGridDataColumn Caption="Email" FieldName="Email" UnboundType="GridUnboundColumnType.String" />
+            <DxGridDataColumn Caption="Processed By" FieldName="ProcessedBy" UnboundType="GridUnboundColumnType.String" />
+            <DxGridDataColumn Caption="W/Station ID" FieldName="WorkstationID" Visible=false />
+        </Columns>
+
+        <EditFormTemplate Context="EditFormContext">
+            @{
+                var editItem = (CourseType)EditFormContext.EditModel;
+            }
+            <DxFormLayout>
+                <DxFormLayoutItem ColSpanMd="12">
+                    <ValidationSummary />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
+                    <DxTextBox @bind-Text="@editItem.Name" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
+                    <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Discontinued">
+                    <DxCheckBox @bind-Checked="@editItem.Discontinued" />
+                </DxFormLayoutItem>
+            </DxFormLayout>
+        </EditFormTemplate>
+    </DxGrid>
+}
+<style>
+    .grid-height {
+        height: @gridHeight;
+    }
+</style>
+
+@code {
+    bool IsReady;
+    private List<OnlinePaymentStatus> PaymentStatus { get; set; }
+    private List<Person> People { get; set; }
+    private DxGridCommandColumnEx? GridCommandColumn;
+    MessageBox? messageBox;
+
+    internal IGrid? mainGrid { get; set; }
+    internal ErrorPopup? ErrorPopup { get; set; }
+    internal GridToolbar? Toolbar;
+    internal string ErrorHeader;
+    internal string ErrorMessage;
+    U3ADbContext dbc { get; set; }
+    string gridHeight = "100px";
+    TimeSpan? offset;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        PaymentStatus = await BusinessRule.GetOnlinePaymentStatus(dbc);
+        People = await BusinessRule.EditablePersonAsync(dbc);
+        IsReady = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var localTime = new LocalTime(js);
+            offset = await localTime.GetTimezoneOffsetAsync();
+        }
+        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
+        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    void Grid_UnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        var payStatus = e.DataItem as OnlinePaymentStatus;
+        var p = People.Find(x => x.ID == payStatus.PersonID);
+        if (e.FieldName == "Participant")
+        {
+            e.Value = p?.FullName ?? "*** Not Available ***";
+        }
+        if (e.FieldName == "Phone")
+        {
+            e.Value = p?.AdjustedHomePhone;
+        }
+        if (e.FieldName == "Mobile")
+        {
+            e.Value = p?.AdjustedMobile;
+        }
+        if (e.FieldName == "Email")
+        {
+            e.Value = p?.Email;
+        }
+        if (e.FieldName == "ProcessedBy")
+        {
+            if (p?.Email != payStatus.User) e.Value = payStatus.User;
+        }
+        if (e.FieldName == "Created")
+        {
+            e.Value = payStatus.CreatedOn + offset;
+        }
+        if (e.FieldName == "CreatedTime")
+        {
+            e.Value = payStatus.CreatedOn + offset;
+        }
+    }
+
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

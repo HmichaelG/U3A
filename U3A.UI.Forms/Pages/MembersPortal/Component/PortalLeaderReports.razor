@@ -1,0 +1,92 @@
+﻿@namespace U3A.UI.Forms
+@using Microsoft.AspNetCore.Hosting;
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IWebHostEnvironment Environment
+
+
+<MessageBox @ref="@messageBox" />
+<Progress @ref="@ProgressBar" />
+
+<div class="mx-4 my-1 card p-2">
+    <h5>Leader Reports</h5>
+    <div class="card alert-info text-center p-2">
+        <strong>Private Information</strong>
+        Leader reports contain the private contact details of members. Please use &amp; dispose of responsibly in
+        accordance with privacy law &amp; regulations in your State.
+    </div>
+    <SelectLeaderReports @ref=@rptSelect
+                         AreSelectionsMade="@true"
+                         OnQueueReportsSelected="OnQueueReportsSelected" />
+</div>
+
+@code {
+
+    [CascadingParameter]
+    LoginState? loginState { get; set; }
+
+    [Parameter, EditorRequired]
+    public Term? selectedTerm { get; set; }
+    [Parameter, EditorRequired]
+    public Course? selectedCourse { get; set; }
+    [Parameter, EditorRequired]
+    public Class? selectedClass { get; set; }
+
+    MessageBox messageBox;
+    Progress? ProgressBar;
+
+    SelectLeaderReports? rptSelect;
+    ProFormaReportFactory reportFactory;
+
+    async Task OnQueueReportsSelected() {
+        var msg = await ProcessReportsAsync(false);
+        if (msg == string.Empty) msg = $"<p>The selected documents have been queued and will be sent via email overnight.</p>";
+        await messageBox.ShowOkOnlyAsync("Leaders Reports", msg);
+    }
+
+    async Task<string> ProcessReportsAsync(bool IsPreview) {
+        var result = string.Empty;
+        reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
+        var leader = loginState.SelectedPerson;
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            var enrolments = new List<Enrolment>();
+            if (dbc.Enrolment.Any(x => x.ClassID == selectedClass.ID && x.TermID == selectedTerm.ID)) {
+                enrolments = dbc.Enrolment.Include(x => x.Person)
+                                          .Where(x => x.ClassID == selectedClass.ID
+                                                    && x.TermID == selectedTerm.ID).ToList();
+            }
+            else {
+                enrolments = dbc.Enrolment.Include(x => x.Person)
+                                            .Where(x => x.CourseID == selectedCourse.ID
+                                                            && x.TermID == selectedTerm.ID).ToList();
+            };
+            if (enrolments.Count > 0 || !rptSelect.RequireEnrolements) {
+                var mail = new SendMail()
+                    {
+                        DocumentName = "U3A Leaders Reports",
+                        Person = await dbc.Person.FindAsync(leader.ID),
+                        PersonID = leader.ID,
+                        TermID = selectedTerm.ID,
+                        PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
+                        PrintClassList = rptSelect.PrintClassList,
+                        PrintCSVFile = rptSelect.PrintCSVFile,
+                        PrintICEList = rptSelect.PrintICEList,
+                        PrintLeaderReport = rptSelect.PrintLeaderReport,
+                        PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
+                        RecordKey = selectedClass.ID
+                    };
+                dbc.Add(mail);
+                await dbc.SaveChangesAsync();
+            }
+            else { result = "<p>The selected reports could not be created because this course has no enrolments.</p>"; }
+            rptSelect.PrintLeaderReport = false;
+            rptSelect.PrintClassList = false;
+            rptSelect.PrintICEList = false;
+            rptSelect.PrintAttendanceRecord = false;
+            rptSelect.PrintCSVFile = false;
+            rptSelect.PrintAttendanceAnalysis = false;
+            return result;
+        }
+    }
+
+}

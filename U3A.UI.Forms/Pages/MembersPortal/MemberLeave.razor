@@ -1,0 +1,264 @@
+@attribute [Authorize]
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+@inject IJSRuntime js
+
+<MessageBox @ref="@messageBox" />
+
+<DxFormLayout CssClass=@((isOnBehalfOf)
+              ? "mb-2"
+              : "col-12 col-md-8 mx-auto mb-2")>
+    <div class="p-2 w-100 text-center text-info">
+        To add leave, click the <span class="text-success h6 bi bi-plus-lg"></span> button below.
+        Enter a start date, return date and reason then click Save.
+        To edit / delete leave, first click to select the leave item
+        then click <span class="text-warning h6 bi bi-pencil"></span> to edit,
+        click the <span class="text-danger h6 bi bi-trash"></span> to delete.
+    </div>
+    <DxGrid @ref="Grid" CustomizeElement="OnCustomizeElement"
+            CssClass="grid-height mx-2" id="myGrid"
+            Data="DataSource"
+            PageSize="12"
+            KeyFieldName="ID"
+            ValidationEnabled="true"
+            SelectionMode="GridSelectionMode.Single"
+            AllowSelectRowByClick="true"
+            @bind-SelectedDataItem="@selectedLeave"
+            CustomizeEditModel="Grid_CustomizeEditModel"
+            EditModelSaving="Grid_EditModelSaving"
+            EditMode="GridEditMode.EditForm">
+        <Columns>
+            <DxGridSelectionColumn Width="2rem" />
+            <DxGridDataColumn Caption="Leave Details" FieldName="ToString" />
+        </Columns>
+        <EditFormTemplate Context="EditFormContext">
+            @{
+                var leave = (Leave)EditFormContext.EditModel;
+            }
+            <DxFormLayout CssClass="w-100">
+
+                <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
+                    <DxDateEdit @bind-Date="@leave.StartDate" MinDate="@(new DateTime(DateTime.Now.Year,1,1))" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Return Date" ColSpanMd="12">
+                    <DxDateEdit @bind-Date="@leave.EndDate" MinDate="@(new DateTime(DateTime.Now.Year,1,1))" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="For Course" ColSpanMd="12">
+                    <DxComboBox Data="Courses" @bind-Value="@leave.Course"
+                                Enabled=@(!isOnBehalfOf)
+                                EditFormat="{0}"
+                                NullText="Leave blank for all courses"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                        <DxListEditorColumn FieldName="@nameof(Course.Name)"
+                                            Caption="Name" />
+                    </DxComboBox>
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Reason" ColSpanMd="12">
+                    <DxTextBox @bind-Text="@leave.Reason" />
+                </DxFormLayoutItem>
+            </DxFormLayout>
+        </EditFormTemplate>
+    </DxGrid>
+    <footer class="input-group mx-4 mt-2">
+        <DxButton Text="Add" CssClass="flex-grow-1"
+                  IconCssClass="bi bi-plus-lg"
+                  RenderStyle="@ButtonRenderStyle.Success"
+                  Click="@OnAddGridItem" />
+        <DxButton Text="Edit" CssClass="flex-grow-1"
+                  IconCssClass="bi bi-pencil"
+                  RenderStyle="@ButtonRenderStyle.Warning"
+                  Click="@OnEditGridItem" />
+        <DxButton Text="Delete" CssClass="flex-grow-1"
+                  IconCssClass="bi bi-trash"
+                  RenderStyle="@ButtonRenderStyle.Danger"
+                  Click="@OnDeleteGridItem" />
+        @if (!isOnBehalfOf) {
+            <DxButton Text="Menu" CssClass="flex-grow-1" IconCssClass="bi bi-door-open" SubmitFormOnClick="false" RenderStyle="@ButtonRenderStyle.Secondary" Click="@ReturnToMenu" />
+        }
+    </footer>
+</DxFormLayout>
+
+<style>
+    .removeWrapping {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .grid-height {
+        height: @gridHeight;
+    }
+</style>
+
+
+@code {
+    Person selectedPerson;
+    List<Leave> DataSource { get; set; } = new List<Leave>();
+    List<Course> Courses { get; set; } = new List<Course>();
+    object selectedLeave { get; set; }
+
+    [CascadingParameter]
+    LoginState? loginState { get; set; }
+
+    [Parameter]
+    public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+
+    [Parameter]
+    public Person ProcessOnBehalfOf { get; set; }
+    [Parameter]
+    public Course LeaderCourse { get; set; }
+    bool isOnBehalfOf;
+
+    IGrid Grid { get; set; }
+    U3ADbContext dbc { get; set; }
+    MessageBox? messageBox;
+    LocalTime? locaTime;
+    DateTime today = DateTime.Today;
+    string gridHeight;
+
+    protected override async Task OnInitializedAsync() {
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            locaTime = new LocalTime(js);
+            today = await locaTime.GetLocalTimeAsync();
+            DataSource = null;
+            if (ProcessOnBehalfOf != null) {
+                selectedPerson = ProcessOnBehalfOf;
+                isOnBehalfOf = true;
+            }
+            else {
+                selectedPerson = loginState.SelectedPerson;
+                isOnBehalfOf = false;
+            }
+            await RefreshData();
+            InvokeAsync(StateHasChanged);
+        }
+        else {
+            double footerHeight = isOnBehalfOf ? 0.3 : 0.15;
+            var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, footerHeight);
+            if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
+        }
+    }
+
+    bool isLoading;
+    async Task RefreshData() {
+        if (dbc == null) return;
+        if (Grid == null) return;
+        if (selectedPerson == null) return;
+        if (isLoading) return;
+        isLoading = true;
+        try {
+            Grid.BeginUpdate();
+            var term = await BusinessRule.CurrentTermAsync(dbc);
+            if (!isOnBehalfOf) {
+                DataSource = BusinessRule.GetLeaveForPerson(dbc,
+                                    selectedPerson, today);
+                Courses = await BusinessRule.GetStudentCoursesEnrolled(dbc, selectedPerson, term);
+            }
+            else if (LeaderCourse != null) {
+                DataSource = BusinessRule.GetLeaveForPersonForCourse(dbc,
+                                    selectedPerson, LeaderCourse, today);
+                Courses = new List<Course> { LeaderCourse };
+            }
+            Grid.EndUpdate();
+            InvokeAsync(StateHasChanged);
+        }
+        finally { isLoading = false; }
+    }
+
+    async Task OnAddGridItem() {
+        await Grid.StartEditNewRowAsync();
+    }
+
+    async Task OnEditGridItem() {
+        if (selectedLeave == null) { return; }
+        for (var i = 0; i < DataSource.Count(); i++) {
+            if (DataSource[i].ID == ((Leave)selectedLeave).ID) {
+                await Grid.StartEditRowAsync(i);
+                break;
+            }
+        }
+    }
+    async Task OnDeleteGridItem() {
+        if (selectedLeave == null) { return; }
+        if (await messageBox.ShowAsync("Delete Leave", "Are your sure you wish to delete the selected item?")) {
+            dbc.Remove(selectedLeave);
+            await dbc.SaveChangesAsync();
+            await RefreshData();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    void OnCustomizeElement(GridCustomizeElementEventArgs args) {
+        if (args.ElementType == GridElementType.DataCell) {
+            args.CssClass = "removeWrapping";
+        }
+    }
+
+    bool isBusy;
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+        if (isBusy) return;
+        isBusy = true;
+        try {
+            await SaveRecord(e);
+        }
+        finally {
+            isBusy = false;
+        }
+    }
+
+    async Task SaveRecord(GridEditModelSavingEventArgs e) {
+        var editModel = (Leave)e.EditModel;
+        if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
+        // Re-query a data item from the store.
+        var dataItem = e.IsNew ? new Leave() : dbc.Leave.Find(editModel.ID);
+        // Assign changes from the edit model to the data item.
+        if (dataItem != null) {
+            editModel.CopyTo(dataItem);
+            dataItem.Person = dbc.Person.Find(selectedPerson.ID);
+            if (editModel.Course != null) dataItem.Course = dbc.Course.Find(editModel.Course.ID);
+            // Post changes to the database.
+            if (e.IsNew) await dbc.AddAsync(dataItem);
+            await dbc.SaveChangesAsync();
+            // update the Grid.
+            await RefreshData();
+            e.Reload = true;
+        }
+    }
+
+    async Task<bool> IsDataOk(Leave editItem) {
+        bool result = true;
+        if (editItem.StartDate > editItem.EndDate) {
+            await messageBox.ShowOkOnlyAsync("Invalid Dates", "The start date is later than the return date.");
+            result = false;
+        }
+        else if (editItem.Reason.Length > 20) {
+            await messageBox.ShowOkOnlyAsync("Reason too long", "Please keep your reason for leave less than 20 characters.");
+            result = false;
+        }
+        return result;
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e) {
+        if (e.IsNew) {
+            var leave = (Leave)e.EditModel;
+            leave.Person = selectedPerson;
+            leave.StartDate = today;
+            leave.EndDate = today;
+            if (isOnBehalfOf) leave.Course = LeaderCourse;
+        }
+    }
+
+    async Task ReturnToMenu() {
+        await OnSelectedOptionCompleted.InvokeAsync(PortalMenuResult.MenuOptionCancelled);
+    }
+
+
+    public void Dispose() {
+        dbc?.Dispose();
+    }
+}

@@ -1,0 +1,1055 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+@inject IJSRuntime js
+@inject NavigationManager NavMan
+@inject IConfiguration config
+@using System.Web
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.Extensions.Configuration;
+@using System.Text.RegularExpressions;
+
+@attribute [Authorize]
+
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" @bind-IsActive="@IsMobileLayout" />
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+    <Progress @ref="ProgressBar" PopupVisible=@isProgressVisible />
+    <MessageBox @ref="messageBoxWithClassDetail">
+        <TextTemplate>
+            <ClassDetail Class="@selectedClass" FilterText="@filterText" />
+        </TextTemplate>
+    </MessageBox>
+
+    <MessageBox @ref="messageBox" />
+
+    <DxFormLayout CssClass="mx-1 w-100">
+        <div class=@((IsPreview) ? "col-10 mx-auto" : "col-12 col-md-10 mx-auto")>
+            <div class="h6 pt-2 col-12" align="center">
+                @term?.TermSummary
+            </div>
+            @if (isNotInEnrolmentPeriod)
+            {
+                <p class="alert alert-danger col-12 my-2" align="center">
+                    @(enrolmentLockoutText)
+                </p>
+            }
+            <div class="px-2 col-12" hidden=@(!isListboxShowingSummary || IsReadOnly || isNotInEnrolmentPeriod)>
+                <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+            </div>
+            <div class="list-detail mx-auto" hidden=@(isListboxShowingSummary || IsReadOnly)>
+                <div class="d-flex">
+                    <DxTextBox @ref=@filterTextBox
+                               CssClass="filter-text-box me-2 flex-grow-1"
+                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                               Text="@filterText"
+                               TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
+                               BindValueMode="BindValueMode.OnInput"
+                               InputDelay="500"
+                               NullText="Search">
+                    </DxTextBox>
+                    <DxComboBox Data="@ReportStyleList" CssClass="combo-list-box"
+                                ValueChanged="@((ReportStyle style) => OnReportStyleChanged(style))"
+                                TextFieldName="@nameof(ReportStyleWrapper.ListText)"
+                                ValueFieldName="@nameof(ReportStyleWrapper.Type)" />
+                </div>
+                <DxTabs @ref="dxTabs" TabClick="@OnTabClick" CssClass="col col-12">
+                    <DxTabPage Text="All" />
+                    <DxTabPage Text="Mon" />
+                    <DxTabPage Text="Tue" />
+                    <DxTabPage Text="Wed" />
+                    <DxTabPage Text="Thu" />
+                    <DxTabPage Text="Fri" />
+                    <DxTabPage Text="W/E" />
+                </DxTabs>
+            </div>
+            <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
+                    KeyFieldName="ID"
+                    VirtualScrollingEnabled=true
+                    AllowSelectRowByClick=true
+                    AllowGroup=false
+                    AllowSort=false
+                    PagerVisible=false
+                    SelectionMode="GridSelectionMode.Single"
+                    SelectedDataItemChanged="SelectedDataItemChanged"
+                    CssClass="mt-1 col-12 listbox-scroll">
+                <Columns>
+                    <DxGridDataColumn Width="100%">
+                        <HeaderCaptionTemplate></HeaderCaptionTemplate>
+                        <CellDisplayTemplate>
+                            @{
+                                var c = (Class)context.DataItem;
+
+                                @if (reportStyle == ReportStyle.Brief && !isListboxShowingSummary)
+                                {
+                                    <div class="mx-3">
+                                        <div class=@((!IsReadOnly && c.IsSelected) ? "selected-box alert-primary" : "")>
+                                            @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <DxFormLayout CssClass="mx-auto list-detail">
+                                        <DxFormLayoutGroup Context="thatContext" HeaderCssClass="h5">
+                                            <CaptionTemplate>
+                                                <div class=@((!IsReadOnly && c.IsSelected) ? "selected-box alert-primary" : "")>
+                                                    @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
+                                                </div>
+                                            </CaptionTemplate>
+                                            <Items>
+
+                                                <div class="row px-2 px-md-3 col-12">
+                                                    <div class="text-info col-12 text-center h6">@GetStatus(@c)</div>
+                                                </div>
+
+                                                <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
+                                                    <em style="white-space: pre-line">
+                                                        @(HighlightSearchText(c.Course.Description))
+                                                    </em>
+                                                </div>
+
+                                                @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
+                                                {
+                                                    <div class="col-small ps-1"><strong>Offered:</strong></div>
+                                                    <div class="col-large">@c.OfferedSummary</div>
+                                                    @if (c.Course.CourseFeePerYear != 0)
+                                                    {
+                                                        <div class="col-small ps-1"><strong>Course Fee:</strong></div>
+                                                        <div class="col-large">@($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</div>
+                                                    }
+                                                    @if (c.Course.CourseFeePerTerm != 0)
+                                                    {
+                                                        <div class="col-small ps-1"><strong>Term Fee:</strong></div>
+                                                        <div class="col-large">@($"{c.Course.CourseFeePerTerm.ToString("c2")} {c.Course.CourseFeePerTermDescription}")</div>
+                                                    }
+                                                    <div class="col-small ps-1"><strong>Type:</strong></div>
+                                                    <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
+                                                    <div class="col-small ps-1"><strong>Class:</strong></div>
+                                                    <div class="col-large">@(GetClassDetails(c))</div>
+                                                    <div class="col-small ps-1"><strong>Venue:</strong></div>
+                                                    <div class="col-large">@HighlightSearchText(c.Venue?.Name)</div>
+                                                    <div class="offset-small col-large">@c.Venue?.Address</div>
+                                                    <div class="col-small px-1"><strong>Leader:</strong></div>
+                                                    <div class="col-large">@HighlightSearchText(c.PrimaryLeader)</div>
+
+                                                    @if (c.CourseContacts.Count > 0)
+                                                    {
+                                                        var contact = c.SelectedCourseContact;
+                                                        <div class="col-small px-1"><strong>Contact:</strong></div>
+                                                        var p = contact.Person;
+                                                        <div class="col-large">
+                                                            @($"({contact.ContactType}) {HighlightSearchText(p.FullNameWithPostNominals)}")
+                                                        </div>
+                                                        var phone = "";
+                                                        if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.HomePhone))
+                                                        {
+                                                            phone = $"Phone: {p.AdjustedHomePhone} ";
+                                                        }
+                                                        if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.Mobile))
+                                                        {
+                                                            phone += $"Mobile: {p.AdjustedMobile}";
+                                                            if (p.SMSOptOut) phone += $" {constants.NO_SMS}";
+                                                        }
+                                                        <div class="offset-small col-large">@phone.Trim()</div>
+                                                        if (!p.IsEmailSilent)
+                                                        {
+                                                            <div class="offset-small col-large mb-2">@($"Email: {p.Email}")</div>
+                                                        }
+
+                                                        <div class="col-12" hidden="@(!IsReadOnly)">
+                                                            <div class="input-group mb-1">
+                                                                @if (!p.IsEmailSilent && !string.IsNullOrWhiteSpace(p.Email))
+                                                                {
+                                                                    <DxButton CssClass="flex-grow-1"
+                                                                              IconCssClass="bi bi-envelope"
+                                                                              Text="Email"
+                                                                              RenderStyle="@ButtonRenderStyle.Primary"
+                                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                              Click="() => OnEmail(c.Course.Name, p.Email)" />
+                                                                }
+                                                                @if (!p.IsPhoneSilent && !p.SMSOptOut && !string.IsNullOrWhiteSpace(p.Mobile))
+                                                                {
+                                                                    <DxButton CssClass="flex-grow-1"
+                                                                              IconCssClass="bi bi-phone"
+                                                                              Text="SMS"
+                                                                              RenderStyle="@ButtonRenderStyle.Primary"
+                                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                              Click="() => OnSMS(p.Mobile)" />
+                                                                }
+                                                                @if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.HomePhone))
+                                                                {
+                                                                    <DxButton CssClass="flex-grow-1"
+                                                                              IconCssClass="bi bi-telephone"
+                                                                              Text="Home"
+                                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                              RenderStyle="@ButtonRenderStyle.Primary"
+                                                                              Click="() => OnPhone(p.HomePhone)" />
+                                                                }
+                                                                @if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.Mobile))
+                                                                {
+                                                                    <DxButton CssClass="flex-grow-1"
+                                                                              IconCssClass="bi bi-phone"
+                                                                              Text="Mobile"
+                                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                              RenderStyle="@ButtonRenderStyle.Primary"
+                                                                              Click="() => OnPhone(p.Mobile)" />
+                                                                }
+                                                                @if (c.CourseContacts.Count > 1)
+                                                                {
+                                                                    <DxButton CssClass="flex-grow-1"
+                                                                              IconCssClass="bi bi-arrow-right"
+                                                                              IconPosition="ButtonIconPosition.AfterText"
+                                                                              Text="Next"
+                                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                              RenderStyle="@ButtonRenderStyle.Primary"
+                                                                              Click="async() => await GetNextCourseContact(c)" />
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                    }
+
+
+                                                }
+                                                <!-- Report Style Detail -->
+
+                                                <div class="row col col-12" hidden="@IsReadOnly">
+                                                    <div class="col-3 px-1 text-center"><strong>Max</strong></div>
+                                                    <div class="col-3 px-1 text-center"><strong>Min</strong></div>
+                                                    <div class="col-3 px-1 text-center"><strong>Enrolled</strong></div>
+                                                    <div class="col-3 px-1 text-center"><strong>Waitlist</strong></div>
+                                                    <div class="col-3 px-1 text-center">@c.Course.MaximumStudents</div>
+                                                    <div class="col-3 px-1 text-center">@c.Course.RequiredStudents</div>
+                                                    <div class="col-3 px-1 text-center">@c.TotalActiveStudents</div>
+                                                    <div class="col-3 px-1 text-center">@c.TotalWaitlistedStudents</div>
+                                                </div>
+
+                                                <DxButton CssClass="w-100 mb-1" IconCssClass="bi bi-globe2"
+                                                          Visible=@(!string.IsNullOrWhiteSpace(c.Course.AdditionalInformationURL))
+                                                          Text="Additional Information" RenderStyle="@ButtonRenderStyle.Primary"
+                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                          Click="async () => await OnAddnInfoURLClick(c)" />
+                                                <div class="px-2 pt-2 w-100" hidden="@(!IsReadOnly)">
+                                                    @if (c.Venue.CanMapAddress)
+                                                    {
+                                                        var link = $"https://www.google.com/maps/embed/v1/place?key={googleMapAPIKey}&q={HttpUtility.UrlEncode($"{c.Venue?.Name} {c.Venue?.Address}")}";
+                                                        <iframe width="100%"
+                                                                height="250rem"
+                                                                style="border:thin"
+                                                                loading="lazy"
+                                                                allowfullscreen
+                                                                referrerpolicy="no-referrer-when-downgrade"
+                                                                src="@link" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col-12 text-center h6">Map data is not available</div>
+                                                    }
+                                                </div>
+                                                <div class="watermark"
+                                                     hidden="@(IsReadOnly
+                                                            || isListboxShowingSummary
+                                                            || (c.Course.AllowAutoEnrol
+                                                            && c.TotalActiveStudents < c.Course.MaximumStudents))">
+                                                    @(c.TermNumber == term.TermNumber
+                                                    ? c.Course.AllowAutoEnrol
+                                                    ? "Class is Full"
+                                                    : "Class is Closed"
+                                                    : "")
+                                                </div>
+                                                <div class="watermark"
+                                                     hidden="@(isListboxShowingSummary
+                                                            || BusinessRule.IsClassInTerm(c,term.TermNumber)
+                                                            || BusinessRule.IsClassInTerm(c,prevTerm.TermNumber))">
+                                                    @(c.TermNumber == term.TermNumber ? "Not available this term" : "")
+                                                </div>
+                                                <div class="watermark"
+                                                     hidden="@(c.TermNumber == term.TermNumber)">
+                                                    @($"This is a Term {prevTerm.TermNumber} class")
+                                                </div>
+                                            </Items>
+                                        </DxFormLayoutGroup>
+                                    </DxFormLayout>
+                                }
+                            }<!-- Report Style not Brief -->
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </DxGrid>
+
+
+            <div class="h6 col-12 text-primary" align="center">
+                @(new MarkupString(selectionCountText))
+            </div>
+
+            <div class="input-group col-12 mb-4">
+                <DxButton @ref="listboxViewButton" CssClass="flex-grow-1" IconCssClass="bi bi-mortarboard"
+                          Visible=@(!isNotInEnrolmentPeriod && !IsReadOnly && !IsPreview)
+                          Text="@listboxViewButtonText"
+                          RenderStyle="@ButtonRenderStyle.Info" Click="@ShowSelectedClasses" />
+                <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save"
+                          Visible=@(!isNotInEnrolmentPeriod && !IsReadOnly && !IsPreview)
+                          Text="Save" RenderStyle="@ButtonRenderStyle.Primary" Click="@OnSave" />
+                <DxButton CssClass="flex-grow-1"
+                          Visible=@(!IsPreview)
+                          IconCssClass=@((isListboxShowingSummary) ? "bi-door-open" : "bi-x-circle")
+                          Text=@((isListboxShowingSummary)
+                      ? (IsMobileLayout) ? ((IsReadOnly) ? "Return to menu" :"Menu") :"Return to menu"
+                      : "Cancel")
+                          RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnCancel" />
+            </div>
+        </div>
+    </DxFormLayout>
+}
+<style>
+    .filter-text-box {
+        margin: auto;
+        background: url(images/search.svg) no-repeat scroll 5px 5px;
+        padding-left: 30px;
+    }
+
+    .combo-list-box {
+        margin: auto;
+        background: url(images/list-ul.svg) no-repeat scroll 5px 5px;
+        padding-left: 30px;
+    }
+
+    .selected-box {
+        width: 100%;
+        position: relative;
+        padding: 0.25rem 0.25rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+
+    .weblink-button {
+        width: 80%;
+        margin: auto
+    }
+
+    .highlight {
+        background-color: yellow !important;
+    }
+
+    .listbox-scroll {
+        height: @listHeight;
+    }
+
+    .list-detail {
+        width: 95%;
+    }
+
+    .col-small {
+        -webkit-box-flex: 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+        width: 20%;
+    }
+
+    .col-large {
+        -webkit-box-flex: 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+        width: 80%;
+    }
+
+    .offset-small {
+        margin-left: 20%;
+    }
+
+    .watermark {
+        width: 100%;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 500;
+        opacity: 0.6;
+        color: magenta;
+        position: absolute;
+        bottom: 15%;
+    }
+</style>
+@code {
+    [CascadingParameter]
+    LoginState loginState { get; set; }
+
+    [Parameter]
+    public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+
+    [Parameter]
+    public bool IsReadOnly { get; set; }
+
+    [Parameter]
+    public bool IsPreview { get; set; }
+
+    [Parameter]
+    public Guid ClassID { get; set; }
+
+    [Parameter]
+    public Term PreviewTerm { get; set; }
+
+    Progress? ProgressBar;
+    bool isProgressVisible { get; set; }
+
+    U3ADbContext? dbc { get; set; }
+
+
+    Term? term;
+    Term? prevTerm;
+    List<Class> ListboxData;
+    List<Class>? Classes;
+    List<Class> selectedClasses = new List<Class>();
+    List<Class> deletedClasses = new List<Class>();
+    Class selectedClass;
+    List<ReportStyleWrapper> ReportStyleList = new ReportStyleList();
+    ReportStyle reportStyle = ReportStyle.Detail;
+
+    DxButton? listboxViewButton;
+    DxTabs? dxTabs;
+    DxGrid? listGrid;
+    DxTextBox filterTextBox;
+
+    int activeTabIndex;
+    string listHeight;
+
+    string selectionCountText = string.Empty;
+    string listboxViewButtonText = string.Empty;
+    bool isListboxShowingSummary = true;
+    internal ErrorPopup? ErrorPopup { get; set; }
+    internal string? ErrorHeader;
+    internal string? ErrorMessage;
+    MessageBox? messageBox;
+    MessageBox? messageBoxWithClassDetail;
+    string? googleMapAPIKey;
+    bool showCourseFullWatermark = false;
+    bool IsMobileLayout;
+
+    Person perosn;
+    bool isNotInEnrolmentPeriod = false;
+    bool IsReady = false;
+    bool isDirty = false;
+    SystemSettings settings;
+    DateTime today;
+    MarkupString? enrolmentLockoutText;
+
+    // Search filter function
+    string? _filterText = null;
+    string? filterText
+    {
+        get { return _filterText; }
+        set
+        {
+            _filterText = value;
+            ListboxData = (string.IsNullOrWhiteSpace(_filterText))
+                            ? ResetFilter()
+                            : FilterClassByName();
+        }
+    }
+
+    async Task OnFilterTextChanged(string text)
+    {
+        await filterTextBox.FocusAsync();
+        filterText = text;
+    }
+
+    List<Class> FilterClassByName()
+    {
+        if (dxTabs != null) { activeTabIndex = dxTabs.ActiveTabIndex = 0; }
+        var result = Classes.FindAll(x => searchText(x).IndexOf(_filterText, StringComparison.CurrentCultureIgnoreCase) >= 0);
+        return result;
+    }
+
+    MarkupString HighlightSearchText(string searchText)
+    {
+        string result = "";
+        if (searchText == null) return new MarkupString(string.Empty);
+        if (string.IsNullOrWhiteSpace(_filterText)) return new MarkupString(searchText);
+        var pattern = Regex.Escape(_filterText);
+        Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
+        MatchCollection matches = regex.Matches(searchText);
+        foreach (Match match in matches.Reverse())
+        {
+            foreach (Group group in match.Groups)
+            {
+                foreach (Capture capture in group.Captures.Reverse())
+                {
+                    searchText = searchText.Insert(capture.Index + capture.Length, "</span>");
+                    searchText = searchText.Insert(capture.Index, "<span class='highlight'>");
+                }
+            }
+        }
+        return new MarkupString(searchText);
+    }
+
+    string searchText(Class c)
+    {
+        return $"{c.Course.ConversionID} {c.Course.Name} {c.Course.CourseType.Name} {c.Leader?.FullName} {c.Venue?.Name} {c.GuestLeader}";
+    }
+
+    List<Class> ResetFilter()
+    {
+        if (isListboxShowingSummary)
+        {
+            return selectedClasses.ToList();
+        }
+        else
+        {
+            if (dxTabs == null || activeTabIndex == 0)
+            {
+                return Classes;
+            }
+            else
+            {
+                if (activeTabIndex < 6)
+                {
+                    //Monday - Friday
+                    return Classes.Where(x => x.OnDayID == activeTabIndex).ToList();
+                }
+                else
+                {
+                    //Weekend
+                    return Classes.Where(x => x.OnDayID == activeTabIndex ||
+                                                x.OnDayID == 0).ToList();
+                }
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        deletedClasses = new List<Class>();
+        activeTabIndex = 0;
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        // wire up the data
+        settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+        if (IsPreview)
+        {
+            term = PreviewTerm;
+        }
+        else
+        {
+            term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        }
+        if (term == null)
+        {
+            var currentTerm = BusinessRule.CurrentTerm(dbc);
+            if (TimezoneAdjustment.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
+            {
+                SetUnavialable(currentTerm);
+            }
+            else
+            {
+                // Fallback to read-only mode if enrolment term is null
+                var nextTerm = await BusinessRule.GetNextTermAsync(dbc);
+                SetUnavialable(nextTerm);
+            }
+        }
+        if (term != null)
+        {
+            prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
+            Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
+            if (Classes != null)
+            {
+                if (loginState?.SelectedPerson != null)
+                {
+                    selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
+                    if (selectedClasses.Count() > 0) isListboxShowingSummary = false;
+                    if (IsReadOnly && selectedClasses.Count() <= 0) Classes.Clear();
+                    foreach (var c in selectedClasses) { c.IsSelected = true; }
+                    SetReviewButtonText();
+                }
+                else if (IsPreview)
+                {
+                    isListboxShowingSummary = true; // force a flip
+                }
+                ShowSelectedClasses();
+            }
+        }
+        googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
+        if (string.IsNullOrWhiteSpace(googleMapAPIKey)) googleMapAPIKey = config.GetConnectionString("GoogleMapAPIKey");
+        IsReady = true;
+    }
+
+    void SetUnavialable(Term? term)
+    {
+        if (term != null)
+        {
+            var sOpeningTime = term?.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
+            enrolmentLockoutText = new MarkupString($@"<h6><strong>{term.Year} Term-{term.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.</h6>");
+        }
+        isListboxShowingSummary = false;
+        isNotInEnrolmentPeriod = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            today = TimezoneAdjustment.GetLocalTime().Date;
+            filterText = null;
+            if (isNotInEnrolmentPeriod && (term == null || Classes == null))
+            {
+                await ReturnToMenu(PortalMenuResult.EnrolmentCancelledTermNotDefined);
+            }
+            else
+            {
+                if (IsReadOnly && messageBox != null)
+                {
+                    if (selectedClasses?.Count() <= 0)
+                    {
+                        await messageBox?.ShowOkOnlyAsync("No Enrolment In Current Term",
+                                $"You have no enrolments in {term.Year} Term {term.TermNumber}.<br>" +
+                                "Use <strong>Change your course enrolments</strong> to add/delete enrolments.");
+                        await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
+                    }
+                }
+            }
+        }
+        else
+        {
+            var newHeight = await Window.FitToRemainingHeight(js, "listBox", listHeight, 0.2);
+            if (newHeight != listHeight) { listHeight = newHeight; InvokeAsync(StateHasChanged); }
+            if (Classes != null && ClassID != Guid.Empty)
+            {
+                // We have a class ID passed in via QuerRequest
+                var Class = Classes.Find(x => x.ID == ClassID);
+                if (Class != null)
+                {
+                    SelectedDataItemChanged(Class);
+                }
+                else
+                {
+                    await messageBox?.ShowOkOnlyAsync("Selected class is not available",
+                            $"We're very sorry. Your selected class is no longer available.");
+                }
+                ClassID = Guid.Empty;
+                await js.InvokeVoidAsync("clearQueryString");
+            }
+        }
+        ProgressBar?.Close();
+    }
+
+    async Task OnReportStyleChanged(ReportStyle value)
+    {
+        reportStyle = value;
+        InvokeAsync(StateHasChanged);
+    }
+
+    async Task OnEmail(string courseName, string email)
+    {
+        string mailto = $"mailto:?subject=U3A Course: {courseName}&To={email}";
+        try
+        {
+            NavMan.NavigateTo(mailto, true);
+        }
+        catch (Exception ex)
+        {
+            await messageBox.ShowOkOnlyAsync("Error Activating Mail Client",
+                            $@"<p>A mail client is required to process your email.</p>" +
+                            $"<p>Error: {ex.Message}");
+        }
+    }
+
+    async Task OnSMS(string mobile)
+    {
+        var phone = HttpUtility.UrlEncode(mobile.Trim().Replace(" ", ""));
+        string smsto = $"sms:{phone}";
+        try
+        {
+            NavMan.NavigateTo(smsto, true);
+        }
+        catch (Exception ex)
+        {
+            await messageBox.ShowOkOnlyAsync("Error Activating SMS Client",
+                            $@"<p>An SMS client (Phone) is required to process your request.</p>" +
+                            $"<p>Error: {ex.Message}");
+        }
+    }
+
+    async Task OnPhone(string phoneNo)
+    {
+        var phone = HttpUtility.UrlEncode(phoneNo.Trim().Replace(" ", ""));
+        string phoneURL = $"tel:{phone}";
+        try
+        {
+            NavMan.NavigateTo(phoneURL, true);
+        }
+        catch (Exception ex)
+        {
+            await messageBox.ShowOkOnlyAsync("Error Activating Phone",
+                            $@"<p>A Phone is required to process your request.</p>" +
+                            $"<p>Error: {ex.Message}");
+        }
+    }
+
+    MarkupString GetClassDetails(Class c)
+    {
+        var result = new MarkupString(c.ClassDetailWithoutVenue);
+        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses && c.Course.Classes.Count > 1)
+        {
+            string text = string.Empty;
+            foreach (var thisClass in c.Course.Classes.OrderBy(x => x.StartDate))
+            {
+                text = $"{text}{thisClass.ClassDetail}<br/>";
+            }
+            if (text != string.Empty) result = new MarkupString(text);
+        }
+        return result;
+    }
+
+    string GetStatus(Class context)
+    {
+        var result = string.Empty;
+        if (IsPreview) { result = "Preview Only"; return result; }
+        if (!IsReadOnly && !isListboxShowingSummary && !isNotInEnrolmentPeriod)
+        {
+            if (selectedClasses.Contains(context))
+            {
+                result = "Click to remove";
+            }
+            else
+            {
+                result = "Click to select";
+            }
+        }
+        else
+        {
+            var c = context;
+            c.DoNotAllowEdit = false;
+            DateTime? classEndDate = null;
+            string status;
+            Enrolment? e = GetEnrolment(c, term);
+            if (e != null)
+            {
+                // Enrolled in class - display the status
+                status = BusinessRule.GetMemberPortalEnrolmentStatus(e, term, settings);
+                classEndDate = term.EndDate;
+            }
+            else
+            {
+                e = GetEnrolment(c, prevTerm);
+                status = BusinessRule.GetMemberPortalEnrolmentStatus(e, prevTerm, settings);
+                if (status != "Pending")
+                {
+                    // Enrolled in previous term - not current. Term is complete, do not allow edits.
+                    classEndDate = BusinessRule.GetClassEndDate(dbc, c, prevTerm);
+                    if (classEndDate < today) { c.DoNotAllowEdit = true; } // cannot delete an expired class
+                }
+            };
+
+            if (e != null)
+            {
+                result = $"Term {c.TermNumber}: {status}";
+            }
+            else
+            {
+                result = status;
+            };
+
+            if (!IsReadOnly
+                    && !isNotInEnrolmentPeriod
+                    && isListboxShowingSummary
+                    && classEndDate?.Date >= today)
+            {
+                result += " - Click to remove";
+            }
+        }
+        return result;
+    }
+
+    Enrolment? GetEnrolment(Class thisClass, Term thisTerm)
+    {
+        Enrolment? e = null;
+        if (!IsPreview)
+        {
+            var c = thisClass;
+            if (c.Course.Enrolments.Count > 0)
+            {
+                e = c.Course.Enrolments
+                                .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
+                                .FirstOrDefault(x => x.CourseID == thisClass.Course.ID &&
+                                    x.Term.Year == thisTerm.Year &&
+                                    x.Term.TermNumber >= thisTerm.TermNumber &&
+                                    x.PersonID == loginState.SelectedPerson.ID);
+            }
+        }
+        return e;
+    }
+
+    async Task OnSave()
+    {
+        try
+        {
+            // Post changes to the database.
+            var acceptableClasses = await GetAcceptableClasses();
+            var deletedEnrolments = await BusinessRule.DeleteEnrolmentsRescinded(dbc, deletedClasses, loginState.SelectedPerson, term, prevTerm);
+            var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
+            await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
+            await dbc.SaveChangesAsync();
+            if (addedEnrolments.Count() > 0 || deletedEnrolments.Count() > 0)
+            {
+                await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, deletedEnrolments, term, settings));
+            }
+            await ReturnToMenu(PortalMenuResult.MenuOptionCompleted);
+        }
+        catch (Exception ex)
+        {
+            ErrorHeader = "Save to database error";
+            ErrorMessage = Helpers.GetErrorMessage(ex);
+            await ErrorPopup.ShowPopupAsync();
+        }
+    }
+
+    async Task<List<Class>> GetAcceptableClasses()
+    {
+        if (selectedClasses?.Count() <= 0) return selectedClasses.ToList();
+        List<Class> leaderExceptions = new List<Class>();
+        List<Class> acceptableClasses = new List<Class>();
+        bool isClassInTerm = false;
+        foreach (var c in selectedClasses)
+        {
+            if ((new Guid?[] { c.LeaderID, c.Leader2ID, c.Leader3ID }).Contains(loginState.SelectedPerson.ID))
+            {
+                leaderExceptions.Add(c);
+            }
+            else { acceptableClasses.Add(c); }
+        }
+        if (leaderExceptions.Any())
+        {
+            var msg = "<p>You have or are attempting to enrol in classes you lead.<br/>" +
+            "Course leaders do not enrol in their own classes.</p>";
+            foreach (var c in leaderExceptions)
+            {
+                msg += $"<p><strong>Course:</strong> {c.Course.Name}</p>";
+            }
+            await messageBox.ShowOkOnlyAsync("You are the leader!", msg);
+        }
+        return acceptableClasses;
+    }
+
+    async Task ReturnToMenu(PortalMenuResult result)
+    {
+        await OnSelectedOptionCompleted.InvokeAsync(result);
+    }
+
+    async Task GetNextCourseContact(Class context)
+    {
+        IsReady = false;
+        InvokeAsync(StateHasChanged);
+        var c = selectedClasses.FirstOrDefault(x => x.ID == context.ID);
+        if (c != null)
+        {
+            c.GetNextCourseContact();
+            ListboxData = selectedClasses;
+        }
+        IsReady = true;
+    }
+
+
+
+    async Task ShowSelectedClasses()
+    {
+        selectedClass = null;
+        if (isListboxShowingSummary)
+        {
+            ProgressBar?.ShowSmallSpinnerAsync();
+            filterText = null;
+            // only show this term's classes & inter-term classes from last term.
+            ListboxData = Classes.Where(x => x.TermNumber == term?.TermNumber
+                                                   || (x.TermNumber == prevTerm.TermNumber
+                                                            && BusinessRule.IsClassEndDateInInterTermPeriod(
+                                                                dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))
+                                                                .Select(x => x).Distinct().ToList();
+            isListboxShowingSummary = false;
+        }
+        else
+        {
+            ListboxData = selectedClasses;
+            isListboxShowingSummary = true;
+        }
+        SetReviewButtonText();
+        ScrollListboxToTop();
+    }
+
+    void ScrollListboxToTop()
+    {
+        listGrid?.MakeRowVisible(0);
+    }
+
+    bool showingWebLink { get; set; } = false;
+    async Task OnAddnInfoURLClick(Class c)
+    {
+        showingWebLink = true;
+        try
+        {
+            await js.InvokeVoidAsync("open", c.Course.AdditionalInformationURL, "_blank");
+        }
+        finally
+        {
+            listGrid.ClearSelection();
+            showingWebLink = false;
+        }
+    }
+
+    async void SelectedDataItemChanged(object value)
+    {
+        if (showingWebLink) { return; }
+        if (IsReadOnly) { return; }
+        selectedClass = (Class)value;
+        if (selectedClass == null) { return; }
+        if (isNotInEnrolmentPeriod) { listGrid.ClearSelection(); return; }
+        if (selectedClasses.Contains(selectedClass))
+        {
+
+            // Edge case: enrolled in previous term but not in current.
+            if (selectedClass.DoNotAllowEdit)
+            {
+                await messageBox.ShowOkOnlyAsync("Class is complete",
+                                 $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
+                        and is now complete. Therefore, it cannot be deleted.</p><p>There are no enrolments in future terms to delete.");
+                listGrid.ClearSelection(); return;
+            }
+
+            if (await messageBox.ShowAsync("Class will be removed",
+                       $"<p>The class, <strong>{selectedClass.Course.Name}</strong> will be <strong>removed</strong> from your selection.</p>" +
+                       "Do you wish to continue?"))
+            {
+                selectedClasses.Remove(selectedClass);
+                if (!deletedClasses.Contains(selectedClass)) { deletedClasses.Insert(0, selectedClass); }
+                selectedClass.IsSelected = false;
+                isDirty = true;
+            }
+        }
+        else
+        {
+            var caption = "Add to selection";
+            var message = $"<p>The class, <strong>{selectedClass.Course.Name}</strong> will be added to your selection.</p>" +
+                        WaitlistWarning() +
+                       "<p>Do you wish to continue?</p>";
+            bool result;
+            if (reportStyle == ReportStyle.Detail)
+            {
+                result = await messageBox.ShowAsync(caption, message);
+            }
+            else
+            {
+                result = await messageBoxWithClassDetail.ShowAsync(caption, message);
+            }
+            if (result)
+            {
+                selectedClasses.Insert(0, selectedClass);
+                if (deletedClasses.Contains(selectedClass)) { deletedClasses.Remove(selectedClass); }
+                selectedClass.IsSelected = true;
+                isDirty = true;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterText) || isListboxShowingSummary) { filterText = null; }
+        listGrid.ClearSelection();
+        InvokeAsync(StateHasChanged);
+    }
+
+
+    string WaitlistWarning()
+    {
+        var result = string.Empty;
+        if (selectedClass.TotalActiveStudents >= selectedClass.Course.MaximumStudents || !selectedClass.Course.AllowAutoEnrol)
+        {
+            var reason = "Full";
+            if (!selectedClass.Course.AllowAutoEnrol) reason = "Closed";
+            var extendedReason = "Full";
+            if (!selectedClass.Course.AllowAutoEnrol) extendedReason = "Closed.<br/>A closed class means the leader has requested that new enrolments be suspended";
+            result = $@"<div class='alert alert-danger text-center'><h5>Class is {reason}</h5>
+                        You have requested enrolment in a class that is {extendedReason}.<br/>
+                        Your request will be <strong>Waitlisted</strong> meaning you will
+                        be notified should a place become available in the future.
+                        Please do not attend classes in which you are waitlisted.
+                        </div>";
+        }
+        else if (!BusinessRule.IsClassInTerm(selectedClass, term.TermNumber)
+                    &&
+                !BusinessRule.IsClassInTerm(selectedClass, prevTerm.TermNumber))
+        {
+            result = @"<div class='alert alert-danger text-center'><h5>Class is not currently available this term</h5>
+                        You have requested enrolment in a class that is not available this term.<br/>
+                        Your request will be <strong>Waitlisted</strong> until enrolment opens and allocation occurs.
+                        </div>";
+
+        }
+        return result;
+    }
+
+    void OnTabClick(TabClickEventArgs e)
+    {
+        activeTabIndex = e.TabIndex;
+        filterText = null; // force a list reset
+        ScrollListboxToTop();
+    }
+
+    void SetReviewButtonText()
+    {
+        if (selectedClasses?.Count() <= 0)
+        {
+            selectionCountText = $"Click a Class to select or remove.<br/>";
+        }
+        else
+        {
+            selectionCountText = $"{selectedClasses?.Count()} classes selected.<br/>";
+        }
+        int[] day = new int[7];
+        for (int i = 1; i <= 6; i++)
+        {
+            day[i] = selectedClasses.Where(x => x.OnDayID == i).Count();
+            if (i == 6) day[i] = selectedClasses.Where(x => x.OnDayID == 0).Count();
+        }
+        selectionCountText += $"Mon: {day[1]} Tue: {day[2]} Wed: {day[3]} Thu: {day[4]} Fri: {day[5]} W/E: {day[6]}";
+        if (!isListboxShowingSummary)
+        {
+            listboxViewButtonText = (IsMobileLayout) ? "Review" : "Review your choices";
+        }
+        else
+        {
+            listboxViewButtonText = (IsMobileLayout) ? "Add new" : "Add Enrolments";
+        }
+    }
+
+    void OnMapLink(MouseEventArgs args)
+    {
+        NavMan.NavigateTo("https://www.google.com/maps/embed/v1/place?key=AIzaSyCWgrdB2BvU2ShE9Q5xOSBcTdigmAzUm4k&q=Space+Needle,Seattle+WA", true);
+    }
+
+    async Task OnCancel()
+    {
+        if (loginState.SelectedPerson != null)
+        {
+            if (isDirty)
+            {
+                if (await messageBox.ShowAsync("You have changes to save",
+                        "You must save your changes now or they will be lost.<br/>" +
+                        "Would you like to save them now?"))
+                {
+                    await OnSave();
+                }
+            }
+            await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
+        }
+        else
+        {
+            NavMan.NavigateTo("Identity/Account/Logout", true);
+        }
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+}

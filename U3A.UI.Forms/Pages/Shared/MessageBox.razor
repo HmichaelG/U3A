@@ -1,0 +1,140 @@
+﻿<DxPopup Visible="@PopupVisible" @ref="@messageBox" Width="@PopupWidth"
+         ApplyBackgroundShading="true"
+         CloseButtonClick="@OnNegativeButtonClicked"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         AllowDrag=true
+         AllowResize=true
+         HeaderText=@mCaption>
+    <BodyContentTemplate Context="PopupContext">
+        @TextTemplate
+        <div class="messagebox-body-height">
+            @(new MarkupString(mMessage))
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button" Visible="@mShowOkButton"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  Text="@mOKButtonText"
+                  Click="@OnAffirmativeButtonClicked" />
+        <DxButton CssClass="popup-button ms-1" Visible="@mShowNoButton"
+                  RenderStyle="ButtonRenderStyle.Light"
+                  Text="@mNoButtonText"
+                  Click="@OnNoButtonClicked" />
+        <DxButton CssClass="popup-button ms-1" Visible="@mShowCancelButton"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="@mCancelButtonText"
+                  Click="@OnNegativeButtonClicked" />
+    </FooterContentTemplate>
+</DxPopup>
+<style>
+    .messagebox-body-height {
+        max-height: 75vh;
+        overflow: auto;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public bool PopupVisible { get; set; }
+    [Parameter]
+    public string PopupWidth { get; set; }
+    [Parameter]
+    public RenderFragment TextTemplate { get; set; } = default;
+
+    public MessageBoxDialogResult MessageBoxResult { get; set; }
+
+    DxPopup? messageBox;
+
+    string mOKButtonText { get; set; }
+    string mNoButtonText { get; set; }
+    string mCancelButtonText { get; set; }
+    string mMessage { get; set; }
+    string mCaption { get; set; }
+    bool mShowCancelButton { get; set; }
+    bool mShowOkButton { get; set; } = true;
+    bool mShowNoButton { get; set; } = false;
+
+    TaskCompletionSource<bool>? tcs;
+
+    public async Task SetPopupWidth(string Width)
+    {
+        PopupWidth = Width;
+        await InvokeAsync(StateHasChanged);
+    }
+    public async Task<bool> ShowAsync(MessageBoxArgs args)
+    {
+        mOKButtonText = args.OKButtonText;
+        mNoButtonText = args.NoButtonText;
+        mCancelButtonText = args.CancelButtonText;
+        mShowCancelButton = args.ShowCancelButton;
+        mShowOkButton = args.ShowOkButton;
+        mShowNoButton = args.ShowNoButton;
+        mCaption = args.Caption;
+        mMessage = args.Message;
+        return await ShowAsync();
+    }
+
+    public async Task<bool> ShowOkOnlyAsync(string Caption, string Message)
+    {
+        mOKButtonText = "Ok";
+        mShowOkButton = true;
+        mShowCancelButton = false;
+        mCaption = Caption;
+        mMessage = Message;
+        return await ShowAsync();
+    }
+
+    public async Task<bool> ShowAsync(string Caption, string Message)
+    {
+        mOKButtonText = "Ok";
+        mCancelButtonText = "Cancel";
+        mShowOkButton = true;
+        mShowCancelButton = true;
+        mCaption = Caption;
+        mMessage = Message;
+        return await ShowAsync();
+    }
+
+    public Task<bool> ShowAsync()
+    {
+        PopupVisible = true;
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
+            PopupVisible = false;
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    void OnAffirmativeButtonClicked()
+    {
+        MessageBoxResult = MessageBoxDialogResult.OkButtonClicked;
+        PopupVisible = false;
+        tcs?.TrySetResult(true);
+    }
+    void OnNegativeButtonClicked()
+    {
+        MessageBoxResult = MessageBoxDialogResult.CancelButtonClicked;
+        PopupVisible = false;
+        tcs?.TrySetResult(false);
+    }
+    void OnNoButtonClicked()
+    {
+        MessageBoxResult = MessageBoxDialogResult.NoButtonClicked;
+        PopupVisible = false;
+        tcs?.TrySetResult(false);
+    }
+
+    public async Task Close()
+    {
+        await Task.Run(() =>
+        {
+            PopupVisible = false;
+        });
+        StateHasChanged();
+    }
+
+}

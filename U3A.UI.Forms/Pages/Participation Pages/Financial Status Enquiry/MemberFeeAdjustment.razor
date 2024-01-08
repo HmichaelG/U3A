@@ -1,0 +1,73 @@
+﻿
+<DxPopup Visible="@popupVisible" @ref="@popup"
+         CloseButtonClick="@NegativeButtonClicked"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="Member Fee Adjustment">
+    <BodyTemplate Context="PopupContext">
+        <DxFormLayout CssClass="m-2">
+            <p class="alert alert-danger m-1">
+                This procedure will adjust the selected members fees
+                by creating a fee transaction for the amount entered.
+                A positive or negative amount may be entered increasing / decreasing total fees respectively.
+                Note the value of receipts will always remain unchanged.
+            </p>
+            <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
+                <DxTextBox @bind-Text=@FeeDescription />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Processing Date" ColSpanMd="12">
+                <DxDateEdit @bind-Date=@ProcessingDate />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Fee Amount" ColSpanMd="12">
+                <DxMaskedInput @bind-Value=@FeeAmount 
+                        Mask="c2" MaskMode="MaskMode.Numeric" />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </BodyTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  Text="Adjust Fees!"
+                  Click="@AffirmativeButtonClicked" />
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="Cancel" Click="@NegativeButtonClicked" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+
+    public string FeeDescription { get; set; } = "Fee adjustment";
+    public DateTime ProcessingDate { get; set; } = DateTime.Today;
+    public decimal FeeAmount { get; set; } = 0.00M;
+
+    bool popupVisible { get; set; }
+    DxPopup? popup;
+
+    TaskCompletionSource<bool>? tcs;
+
+    public Task<bool> ShowAsync()
+    {
+        popupVisible = true;
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
+            popupVisible = false;
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    void AffirmativeButtonClicked()
+    {
+        popupVisible = false;
+        tcs?.SetResult(true);
+    }
+    void NegativeButtonClicked()
+    {
+        popupVisible = false;
+        tcs?.SetResult(false);
+    }
+
+}

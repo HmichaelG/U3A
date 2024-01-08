@@ -1,0 +1,105 @@
+﻿@namespace U3A.UI.Forms
+
+@using System.Text.RegularExpressions;
+
+
+@if (Class != null)
+{
+    <DxFormLayout CssClass="pt-2">
+            <div class="col-small"><strong>Offered:</strong></div>
+            <div class="col-large">@Class.OfferedSummary</div>
+            @if (Class.Course.CourseFeePerYear != 0)
+            {
+                <div class="col-small"><strong>Course Fee:</strong></div>
+                <div class="col-large">@($"{Class.Course.CourseFeePerYear.ToString("c2")} {Class.Course.CourseFeePerYearDescription}")</div>
+            }
+            @if (Class.Course.CourseFeePerTerm != 0)
+            {
+                <div class="col-small"><strong>Term Fee:</strong></div>
+                <div class="col-large">@($"{Class.Course.CourseFeePerTerm.ToString("c2")} {Class.Course.CourseFeePerTermDescription}")</div>
+            }
+            <div class="col-small"><strong>Type:</strong></div>
+        <div class="col-large">@Class.Course.CourseType.Name</div>
+            <div class="col-small"><strong>Class:</strong></div>
+            <div class="col-large">@(GetClassDetails(Class))</div>
+            <div class="col-small"><strong>Venue:</strong></div>
+        <div class="col-large">@Class.Venue?.Name</div>
+            <div class="offset-small col-large">@Class.Venue?.Address</div>
+            <div class="col-small"><strong>Leader:</strong></div>
+        <div class="col-large">@Class.PrimaryLeader</div>
+
+            @if (Class.CourseContacts.Count > 0)
+            {
+                var contact = Class.SelectedCourseContact;
+                <div class="col-small px-1"><strong>Contact:</strong></div>
+                var p = contact.Person;
+                <div class="col-large">
+                @($"({contact.ContactType}) {p.FullNameWithPostNominals}")
+                </div>
+                var phone = "";
+                if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.HomePhone))
+                {
+                    phone = $"Phone: {p.AdjustedHomePhone} ";
+                }
+                if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.Mobile))
+                {
+                    phone += $"Mobile: {p.AdjustedMobile}";
+                    if (p.SMSOptOut) phone += $" {constants.NO_SMS}";
+                }
+                <div class="offset-small col-large">@phone.Trim()</div>
+                if (!p.IsEmailSilent)
+                {
+                    <div class="offset-small col-large mb-2">@($"Email: {p.Email}")</div>
+                }
+            }
+            else {<div class="mb-2"><br/></div>}
+    </DxFormLayout>
+}
+<style>
+
+    .col-small {
+        -webkit-box-flex: 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+        padding-left: 5px;
+        width: 20%;
+    }
+
+    .col-large {
+        -webkit-box-flex: 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+        width: 80%;
+    }
+
+    .offset-small {
+        margin-left: 20%;
+    }
+
+</style>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public Class Class { get; set; }
+    [Parameter]
+    public string? FilterText {get; set;}
+
+    MarkupString GetClassDetails(Class c)
+    {
+        var result = new MarkupString(c.ClassDetailWithoutVenue);
+        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses && c.Course.Classes.Count > 1)
+        {
+            string text = string.Empty;
+            foreach (var thisClass in c.Course.Classes.OrderBy(x => x.StartDate))
+            {
+                text = $"{text}{thisClass.ClassDetail}<br/>";
+            }
+            if (text != string.Empty) result = new MarkupString(text);
+        }
+        return result;
+    }
+
+}

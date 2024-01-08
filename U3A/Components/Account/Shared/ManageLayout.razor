@@ -1,0 +1,33 @@
+﻿@inherits LayoutComponentBase
+@layout BasicLayout
+@inject NavigationManager NavigationManager
+
+<PortalHeader NavigateTo="/" />
+<div class="container">
+    <main role="main" align="center">
+        <div align="center">
+            <div class="card p-2 my-4 col col-sm-8 col-md-6 col-lg-5">
+                @Body
+                <DxButton Text="Cancel / Return to menu"
+                          CssClass="col-12 mt-2"
+                          SizeMode="SizeMode.Large"
+                          onclick="location.href = '/';"
+                          RenderStyle="ButtonRenderStyle.Secondary"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline" />
+            </div>
+        </div>
+    </main>
+</div>
+<footer class="footer pl-3 text-muted">
+    <div class="container" align="center">
+        &copy; @(DateTime.Today.Year) - U3Admin.org.au
+    </div>
+</footer>
+
+@code {
+
+    void OnCancel()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

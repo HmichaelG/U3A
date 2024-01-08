@@ -1,0 +1,283 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+   <title>User Interface (UI) elements &gt; UI Components &gt; Grid</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />   
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta name="description" content="The grid is the component used to display two-dimensional data...&nbsp;" />
+   <link type="text/css" href="default.css" rel="stylesheet" />
+   <link type="text/css" href="custom.css" rel="stylesheet" />
+
+   <style TYPE="text/css" media="screen"> 
+      html, body { margin:0; 
+        padding:0; 
+        background: #ffffff; 
+      } 
+      div#printheader { display: none; }
+      #idheader { 
+        width:100%; 
+        min-height: 60px;
+        padding: 0; 
+        margin: 0;
+        position: fixed;
+        top: 0;
+        background: #2C5D88;
+        z-index: 2;
+      } 
+      /* The "min-height" for "#idheader table" ensures that the (blue) header of the topic
+         has at least the same height as the header of the navigation panel left of it */
+      #idheader table { min-height: 59px;}             
+      #idheader h1 span { color: #FFF }     
+      #idnav {
+        text-align: right;
+        width: 126px;
+        vertical-align: middle;        
+      } 
+      #idnav a { text-decoration: none }
+      #idnav span {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        margin-left: 4px;
+        background:url('hm_webhelp_buttons_grey.png') top left no-repeat;
+      } 
+      #idnav a span {
+        background-image:url('hm_webhelp_buttons_white.png');
+      } 
+      #idnav a span:hover {
+        background-image:url('hm_webhelp_buttons_orange.png');
+      } 
+      #idnav span.hmbtnprev { background-position: 0 -32px }
+      #idnav span.hmbtnnext { background-position: -24px -32px }
+      #idnav span.hmbtntop  { background-position: -48px -32px }
+      #idnav span.hmbtntoggle  { width: 20px; background-position: -70px -32px }
+      #idnav span.hmbtnprint  { background-position: -88px -32px }
+
+      #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+      #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+      #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+      #callout-table a {text-decoration: none; color: blue;}
+      #callout-table a:visited {text-decoration: none; color: blue;}
+      #overview-table a {text-decoration: none; color: black;}
+      #overview-table a:visited {text-decoration: none; color: black;}
+      #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}       
+      p.help-url { margin: 20px 0 5px 0; text-align: center; }
+	  p.help-url a:link { font-size: 50%; text-decoration: none; color: black; }
+	  p.help-url a:visited { color: black; }
+	  p.help-url a:hover { font-size: 95%; text-decoration: underline; }
+      #switchtoggles { text-align: right; padding: 0 2px 0 0; font-size: 90%; } 
+      .sync-toc { color: #FFF; font-size: 8pt; font-weight: bold; display: none; }
+      .sync-toc a { color: #FFF; text-decoration: none; font-weight: bold;}
+      .sync-toc a:visited { color: #FFF; }
+      .sync-toc a:hover { text-decoration: underline; }
+	  a#printbuttonlink { cursor: pointer; }
+      a.hmanchor { display: inline-block; margin-top: -4em; padding-top: 4em; }        
+   </style>
+   <style TYPE="text/css" media="print">
+      div#idheader, img.dropdown-toggle-icon, p.help-url { display:none } 
+   </style>
+   
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript" src="helpman_topicinit.js"></script>
+
+   <script type="text/javascript">
+     HMSyncTOC("index.html", "grid.html");
+   </script>
+   <script type="text/javascript" src="highlight.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function(){highlight();});
+   </script>
+</head>
+<body>
+
+
+<div id="printheader"><h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Grid</span></h1>
+</div>
+<div id="idheader">
+<div id="idheaderbg">
+<table style="width:100%;border:none;margin:0px;" cellspacing="0" cellpadding="0"> 
+  <tr>
+    <td class="topichead" style="text-align:left; vertical-align:middle">
+      <p class="sync-toc">&lt;&lt; <a rel="nofollow" href="index.html?grid.html" target="_top">Click to Display Table of Contents</a> &gt;&gt;</p>
+      <p class="crumbs"><b>Navigation:</b>&nbsp;
+      
+      User Interface (UI) elements &gt; <a href="ui-components.html">UI Components</a>&nbsp;&gt;</p>
+   
+      <h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Grid</span></h1>
+
+    </td>
+    <td class="topichead" id="idnav">
+      
+      <a href="main-menu.html" title="Previous Topic"><span class="hmbtnprev"></span></a>
+      <a href="ui-components.html" title="Parent Chapter"><span class="hmbtntop"></span></a>
+      <a href="form.html" title="Next Topic"><span class="hmbtnnext"></span></a>
+      
+    </td>
+  </tr>  
+</table>
+</div>
+</div>  
+
+<div id="idcontent"><div id="innerdiv">
+<!-- Ask Internet Explorer 6.users to update their obsolete and dangerous browser --> 
+<!--[if lt IE 7]><div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;'><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." /></a></div><![endif]-->
+
+<!--ZOOMRESTART-->
+<p class="p_Normal">The grid is the component used to display two-dimensional data... </p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin: 0 0 0 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span style="font-style: italic;">Records</span> such as course, venues and participants are displayed as rows down the grid</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin: 0 0 0 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span style="font-style: italic;">Fields</span> such as name, address and phone numbers are displayed as columns across the grid. The header at the top of each column is known as the <span style="font-style: italic;">Column Header</span> and is used to interact with the column.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">Most often, a grid will have a <span style="font-style: italic;">Group and Search Panel</span>, and a <span style="font-style: italic;">Toolbar</span> associated with it...</p>
+<p class="p_Normal" style="margin: 0 0 0 0;"><img alt="grid example" width="798" height="446" style="margin:0;width:798px;height:446px;border:none" src="hmfile_hash_f43702cf.png"/></p>
+<p class="p_Normal" style="margin: 0 0 0 0;"><span class="f_ImageCaption">The Public Holidays grid with its group and search panel and associated toolbar</span></p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">The grid offers many powerful feature to assist in drilling down into the information your require...</p>
+<h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Column Management</span></h2>
+<h3 class="p_Heading3"><span class="f_Heading3">Sorting</span></h3>
+<p class="p_Normal">Click a column header to sort by that column in descending order. Click again to sort in ascending order.</p>
+<p class="p_Normal">Use SHIFT-Click to sort by multiple columns, clicking each required column in the order of sort.</p>
+<p class="p_Normal">Use CTRL-Click to clear the column sort.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">Column Resize</span></h3>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; width:304px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><img alt="grid column resize" width="284" height="125" style="margin:0;width:284px;height:125px;border:none" src="hmfile_hash_e1545d6c.png"/></p>
+</td>
+<td style="vertical-align:top; width:526px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal" style="margin: 0 0 0 0;"><span style="font-size: 16px; font-family: 'Times New Roman',Times,Georgia,serif;">To resize columns and bands, drag the right edge of the target column</span></p>
+</td>
+</tr>
+</table>
+</div>
+<h3 class="p_Heading3"><span class="f_Heading3">Rearrange Columns</span></h3>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; width:369px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><img alt="grid column rearrange" width="458" height="164" style="margin:0;width:458px;height:164px;border:none" src="hmfile_hash_52602771.png"/></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="p_Normal">To rearrange or reorder columns, use the mouse to drag the column into the desired position, or</p>
+<p class="p_Normal">Click <span style="font-style: italic;">Choose </span>on the <span style="font-style: italic;">Toolbar. </span>In the pop-up window, move the column headers using the drag bar on the right.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">Add/Remove Columns</span></h3>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; width:215px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><img alt="Grid Toolbar Choose" width="200" height="407" style="margin:0;width:200px;height:407px;border:none" src="hmfile_hash_f51c2863.png"/></p>
+</td>
+<td style="vertical-align:top; width:625px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">On the toolbar, click <span style="font-style: italic;">Choose</span>.</p>
+<p class="p_Normal">In the pop-up windows tick or untick those columns you wish displayed or hidden.</p>
+</td>
+</tr>
+</table>
+</div>
+<h3 class="p_Heading3"><span class="f_Heading3">Group Data</span></h3>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"> <img alt="Grid Group Data" width="754" height="439" style="margin:0;width:754px;height:439px;border:none" src="hmfile_hash_49197ed3.png"/></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; padding:1px; border:solid thin #c0c0c0;"><br />
+</td>
+</tr>
+</table>
+</div>
+<p class="p_Normal">To group data drag a column to the <span style="font-style: italic;">Group Panel</span> above the column headers.</p>
+<p class="p_Normal">To un-group, drag the column from the Grouping Panel back to the column header bar.</p>
+<p class="p_Normal">Use the arrow marks to the left of the grouped row to expand/collapse the group detail. Use the <span style="font-style: italic;">Group Rows... </span>toolbar menu options to expand/collapse all rows.</p>
+<p class="p_Normal">If the column you are grouping is a date, use the <span style="font-style: italic;">Group Rows... </span>toolbar menu options to group by day, month or year.</p>
+<h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Searching &amp; Filtering</span></h2>
+<h3 class="p_Heading3"><span class="f_Heading3">Searching</span></h3>
+<p class="p_Normal">Enter text into the search box within the group panle to find all occurrences of that text. </p>
+<p class="p_Normal">If multiple words are entered, the software will search for each word individually. To search for the combination of multiple words, enclose them in punctuation marks.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">Filtering</span></h3>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><img alt="grid filter" width="1119" height="140" style="margin:0;width:1119px;height:140px;border:none" src="hmfile_hash_ef9f634b.png"/></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="p_Normal">Click the <span style="font-style: italic;">Filter</span> button on the <span style="font-style: italic;">Toolbar</span> to display the filter panel. Two types of filtering will be available...</p>
+<p class="p_Normal"><span style="font-weight: bold;">Column Header Filter</span></p>
+<p class="p_Normal">Click the filter on any column header. This will display a filter pop-up showing all unique values within the column's rows. Select a data item by...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Tick the check box to the left of the column title to select that column, or</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>Use SHIFT-Click to select a range of values.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">When selection is complete, click <span style="font-style: italic;">Apply.</span></p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 0 0;"><span style="font-weight: bold;">Inline Filter Row</span></p>
+<p class="p_Normal">Use the row displayed immediately below the column headers, to filter by an explicit value. The form of entry will depend on the type of data being filtered. If text, enter the filter as text, if a date select the date from the list etc.</p>
+<h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Selection</span></h2>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<tr>
+<td style="vertical-align:top; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><img alt="grid selection" width="491" height="261" style="margin:0;width:491px;height:261px;border:none" src="hmfile_hash_ef4708a2.png"/></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="p_Normal">If provided, rows can be selected by clicking the selection check box usually located as the left most column on the grid. Use the check box located on the column header to select/un-select all rows. A range of rows may be selected by using SHIFT-Click.</p>
+<h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Export</span></h2>
+<p class="p_Normal">Click the <span style="font-style: italic;">Export</span><span style="font-style: italic; font-weight: bold;"> </span>button on the toolbar to export the grid to Microsoft Excel. If selection is available you may choose to export all rows or the selected rows. The export will preserve all filtering, column ordering, grouping and sorting.</p>
+<p class="p_Normal">The export will be downloaded as an Excel file and placed in the Downloads folder on your PC. </p>
+
+<!--ZOOMSTOP-->
+
+<hr/>
+</div></div>
+<script type="text/javascript">
+
+
+
+function normHeaders() {
+ var topicHeadHeight =  $("#idheaderbg > table").first().height() + 1,
+	 $topicHeaderBox = $("#idheader"),
+	 $topicContentBox = $("#idcontent"),
+	 $navHeader = $("#navbar", parent.document),			 
+	$navBox = $("div#hmnavframe", parent.document),
+	 navHeaderHeight = $navHeader.height();
+ if (topicHeadHeight != navHeaderHeight) {
+	 $navHeader.css("height",topicHeadHeight + "px");
+	 $navBox.css("top", topicHeadHeight + "px");
+	 $topicHeaderBox.css("height", topicHeadHeight + "px");
+		if ($topicHeaderBox.css("position") == "fixed"){
+			$topicContentBox.css("margin-top", topicHeadHeight + "px");
+			}
+		}
+    }
+			 
+  $(document).ready(function(){
+    $(window).on('resize', function() {
+      var y = $('#idheader').height(); 
+      $('#idcontent').css('margin-top', y);
+      var par = window.parent;
+      if ($( par ).width() <= $( window ).width()+20) {
+        $('#idheader').css('position', 'relative');
+        $('#idcontent').css('margin-top', 0);
+        $('#idbacktotop').css('display', 'block');
+        $('.hmanchor').css('margin-top', -20);
+	$('.hmanchor').css('padding-top', 20);
+      }
+      else {
+        $('#idheader').css('position', 'fixed');
+        $('#idcontent').css('margin-top', $('#idheader').height());
+        $('#idbacktotop').css('display', 'none');
+        $('.hmanchor').css('margin-top', -y-20);
+		$('.hmanchor').css('padding-top', y+20);
+		$("div#hmsplitter", parent.document).css('width', '3px');
+      }
+	normHeaders();
+    });
+    
+	 $(window).resize(); //trigger event for initially small displays
+  });
+ 
+
+if ((!parent.hmNavigationFrame) && (parent.location) && (parent.location.href)) { $('.sync-toc').show();$('p.crumbs').hide();}
+
+</script>
+
+</body>
+</html>

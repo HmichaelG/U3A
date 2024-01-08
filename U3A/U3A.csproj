@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-U3A-1fe615b5-a026-4c5d-8e8e-7d353ab11b61</UserSecretsId>
+	  <IncrementVersionOnBuild>yyyy.MM.dd.HHmm</IncrementVersionOnBuild>
+	  <Version>2024.1.8.1331</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Components\Public\Pages\fallback.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="resources\en_AU.aff" />
+    <None Remove="resources\en_AU.dic" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="resources\en_AU.aff" />
+    <EmbeddedResource Include="resources\en_AU.dic" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\favicon\site.webmanifest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
+    <PackageReference Include="DevExpress.Blazor" Version="23.2.3" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="23.2.3" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="23.2.3" />
+    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="23.2.3" />
+    <PackageReference Include="DevExpress.Blazor.Themes" Version="23.2.3" />
+    <PackageReference Include="DevExpress.Drawing" Version="23.2.3" />
+    <PackageReference Include="DevExpress.Drawing.Skia" Version="23.2.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\U3A.Data\U3A.Database.csproj" />
+    <ProjectReference Include="..\U3A.Model\U3A.Model.csproj" />
+    <ProjectReference Include="..\U3A.Services\U3A.Services.csproj" />
+    <ProjectReference Include="..\U3A.UI.Forms\U3A.UI.Forms.csproj" />
+    <ProjectReference Include="..\U3A.UI.Reports\U3A.UI.Reports.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Public\Pages\fallback.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Public\Pages\fallback.razor" />
+  </ItemGroup>
+
+</Project>

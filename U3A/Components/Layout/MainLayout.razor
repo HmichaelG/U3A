@@ -1,0 +1,185 @@
+﻿@inherits LayoutComponentBase
+
+@using Microsoft.AspNetCore.Components.Server.Circuits
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using U3A.Data
+
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject CircuitHandler circuitHandler
+@inject NavigationManager navMan
+@inject IJSRuntime js
+@implements IDisposable
+
+@if (isReady && Body != null)
+{
+    <DxFormLayout CssClass="px-3 py-2">
+        <AntiforgeryToken />
+
+        <CascadingValue Value=@openCircuits Name="OpenCircuits">
+            <CascadingValue Value="@loginState">
+                <CascadingValue Value="@hasRole" Name="HasRole">
+                    @if (hasRole)
+                    {
+                        if (useTopMenu.HasValue)
+                        {
+                            if (useTopMenu.Value)
+                            {
+                                <MainLayoutTopMenu Body="@Body" />
+                            }
+                            else
+                            {
+                                <MainLayoutSideMenu Body="@Body" />
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <MainLayoutTopMenu Body="@Body" />
+                    }
+                </CascadingValue>
+            </CascadingValue>
+        </CascadingValue>
+
+    </DxFormLayout>
+}
+
+<style>
+    .main-page {
+        overflow-y: hidden;
+    }
+</style>
+
+@code {
+
+    public int openCircuits { get; set; }
+    public bool hasRole { get; set; }
+
+    [CascadingParameter]
+    public LoginState? loginState { get; set; }
+
+    bool? useTopMenu = null; // default is sidebar
+    U3ADbContext dbc { get; set; }
+    bool isReady = false;
+
+    private DotNetObjectReference<MainLayout>? dotNetObjectReference;
+
+    protected override async Task OnInitializedAsync()
+    {
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+
+        var hasSecurityAdmin = false;
+        // Ensure all roles are created
+        foreach (string n in constants.nameOfRoles)
+        {
+            if (await RoleManager.FindByNameAsync(n) == null)
+            {
+                await RoleManager.CreateAsync(new IdentityRole() { Name = n });
+            }
+        }
+        // Do we have a user in the security admin role
+        var role = await dbc.Roles.AsNoTracking().Where(x => x.Name == constants.nameOfRoles[0]).FirstAsync(); //super admin
+        hasSecurityAdmin = await dbc.UserRoles.AsNoTracking().AnyAsync(r => r.RoleId == role.Id);
+        if (!hasSecurityAdmin)
+        {
+            //a hasher to hash the password before seeding the user to the db
+            var hasher = new PasswordHasher<IdentityUser>();
+            // Get the security admin or create if not exists
+            var sAdmin = await UserManager.FindByEmailAsync(constants.superAdmin);
+            if (sAdmin == null)
+            {
+                sAdmin = new ApplicationUser()
+                    {
+                        Email = constants.superAdmin,
+                        UserName = constants.superAdmin,
+                        EmailConfirmed = true,
+                        PasswordHash = hasher.HashPassword(null, "U3A Rocks!!")
+                    };
+                await UserManager.CreateAsync(sAdmin);
+            }
+            // Add security admin permission
+            await UserManager.AddToRoleAsync(sAdmin, constants.nameOfRoles[0]);
+        }
+
+        var roles = dbc.Roles;
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        foreach (var r in roles)
+        {
+            if (r != null)
+            {
+                if (authenticationState.User.IsInRole(r.Name))
+                {
+                    hasRole = true;
+                    break;
+                }
+            }
+        }
+        var authEmail = authenticationState.User.Identity.Name;
+        if (authEmail == constants.superAdmin) hasRole = true;
+        loginState = new LoginState(authEmail, U3Adbfactory);
+
+        var ch = circuitHandler as CircuitHandlerService;
+        ch.CircuitsChanged += HandleCircuitsChanged;
+        openCircuits = ch.CircuitDetails.Count;
+        isReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            bool DoStateChange = false;
+
+            //Set timeout
+            dotNetObjectReference = DotNetObjectReference.Create(this);
+            await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
+            // Timezone adjustment
+            var lt = new LocalTime(js);
+            TimezoneAdjustment.TimezoneOffset = await lt.GetTimezoneOffsetAsync();
+            // Set the workstation ID
+            await Workstation.SetWorkstationID(js, localStorage);
+
+            var key = "use-topmenu";
+            if (await localStorage.ContainKeyAsync(key))
+            {
+                bool value = await localStorage.GetItemAsync<bool>(key);
+                if (value != useTopMenu)
+                {
+                    useTopMenu = value;
+                    DoStateChange = true;
+                }
+            }
+            else if (!useTopMenu.HasValue)
+            {
+                useTopMenu = false;
+                DoStateChange = true;
+            }
+            if (DoStateChange) await InvokeAsync(StateHasChanged);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    [JSInvokable]
+    public void OnTimeout()
+    {
+        navMan.NavigateTo("/closed.html", true);
+    }
+
+    public void HandleCircuitsChanged(object sender, EventArgs args)
+    {
+        openCircuits = (circuitHandler as CircuitHandlerService).CircuitDetails.Count;
+    }
+
+    public void Dispose()
+    {
+        (circuitHandler as CircuitHandlerService).CircuitsChanged -= HandleCircuitsChanged;
+        dbc?.Dispose();
+    }
+
+
+}

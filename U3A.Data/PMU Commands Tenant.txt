@@ -1,0 +1,9 @@
+﻿update-database -cont TenantStoreDbContext -project U3A.Database ContactRequest
+
+remove-migration -cont TenantStoreDbContext -project U3A.Database -args ContactRequest_u3a
+
+add-migration -cont TenantStoreDbContext -project U3A.Database ContactRequest_u3a
+
+update-database -cont TenantStoreDbContext -project U3A.Database
+
+script-migration -cont TenantStoreDbContext -project U3A.Database -idempotent -Output TenantMigration.sql

@@ -1,0 +1,394 @@
+﻿@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager NavigationManager
+
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+@if (!IsReady) {
+    <LoadingIndicator />
+}
+else {
+
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+    @bind-IsActive="@IsMobileLayout" />
+
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+    <MessageBox @ref="@messageBox" />
+
+    <div class="col-12 col-md-8 m-auto">
+        <EditForm Model="@person"
+                  OnValidSubmit=@ValidFormSubmitted
+                  Context="editContext">
+            <DataAnnotationsValidator />
+            <DxFormLayout CssClass="scrollable px-2 border-top border-bottom" id="myForm">
+                @if (loginState.SelectedPerson == null) {
+                    <span class="text-center alert alert-success col-12">
+                        <div>
+                            Welcome! Let's start by getting to know you.
+                        </div>
+                    </span>
+                }
+                @if (IsNewLinkedMember) {
+                    <span class="text-center alert alert-info">
+                        <div>
+                            You are about to create a new linked member for whom you will
+                            assume responsibility for membership fees and course enrolment.
+                        </div>
+                    </span>
+                    <DxFormLayoutItem Visible="@(!isDatabaseCheckDone)" Context="ThisContext" ColSpanMd="12">
+                        <DxFormLayoutGroup Caption="Is the person to link already on file?">
+                            <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@FirstName" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@LastName" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="City" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@City" />
+                            </DxFormLayoutItem>
+                        </DxFormLayoutGroup>
+                        <DxFormLayoutItem>
+                            <DxButton CssClass="col-3 me-2" Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
+                            <DxButton CssClass="col-3" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnCancel" />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutItem>
+                }
+                <div hidden="@(IsNewLinkedMember && !isDatabaseCheckDone)">
+                    <DxFormLayoutGroup Caption="Personal">
+                        <DxFormLayoutItem Caption="Identity" ColSpanMd="12" Visible="@(!isNew)">
+                            <DxTextBox Text="@person.PersonIdentity"
+                                       TextExpression="@(() => person.PersonIdentity)" ReadOnly="true" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Title" ColSpanMd="12">
+                            <DxComboBox TData="string" TValue="string"
+                                        NullText="(Optional) Select or Enter Title"
+                                        Data="@titles"
+                            @bind-Text="@person.Title"
+                                        AllowUserInput="true" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@person.FirstName" ReadOnly="@(isDatabaseCheckDone)" />
+                            <ValidationMessage For="@(() => person.FirstName)" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@person.LastName" ReadOnly="@(isDatabaseCheckDone)" />
+                            <ValidationMessage For="@(() => person.LastName)" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12" Visible=@systemSettings.AllowPostNominalLetters>
+                            <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
+                            @bind-Text="@person.PostNominals" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
+                            <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
+                            <ValidationMessage For="@(() => person.Gender)" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
+                            <DxDateEdit @bind-Date="@person.BirthDate" NullText="Optional It helps to know you." />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
+                            <DxMemo @bind-Text="@person.Occupation" Rows="3"
+                                    NullText="Tinker, tailor, soldier, spy? Your skills may be useful to us. Enter one per line." />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
+
+                    <DxFormLayoutGroup Caption="Address / Contact Information">
+                        <DxFormLayoutItem Caption="Street" ColSpanXl="12">
+                            <DxTextBox @bind-Text="@person.Address" />
+                            <ValidationMessage For="@(() => person.Address)" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="City" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@person.City" ReadOnly="@(isDatabaseCheckDone)" />
+                            <ValidationMessage For="@(() => person.City)" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="State" ColSpanMd="6">
+                            <DxComboBox Data="@states" @bind-Value="@person.State" />
+                            <ValidationMessage For="@(() => person.State)" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
+                            <DxSpinEdit @bind-Value="@person.Postcode" />
+                            <ValidationMessage For="@(() => person.Postcode)" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Email" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@person.Email" ReadOnly="true" >
+                                <Buttons>
+                                    <DxEditorButton Text="Help" CssClass="text-info"
+                                                    IconCssClass="bi bi-question"
+                                                    Click="@(async () => await messageBox?
+                                                            .ShowOkOnlyAsync("Email Address",
+                                @"<div class='text-center alert alert-info col-12'>
+                                <p>Your email address and password is the key to access your U3A details.
+                                    It must be protected and kept secure at all times.
+                                <p>To change your wmail address or password, return to the menu and click <strong>Manage Credentials</strong>.
+                                <p>Select <strong>Change your email address</strong>. The system will request your new address and send an email for confirmation.
+                                    Once, confirmed, you will be able to login with the new email address."))" />
+                                </Buttons>
+                            </DxTextBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Home Phone" ColSpanMd="6">
+                            <DxTextBox @bind-Text="@person.HomePhone" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Mobile Phone" ColSpanMd="6">
+                            <DxTextBox @bind-Text="@person.Mobile" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
+                            <DxComboBox Data="silentContactList"
+                            @bind-Value="@person.SilentContact"
+                                        ValueFieldName="@nameof(SilentContactWrapper.Type)"
+                                        TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
+                                <Buttons>
+                                    <DxEditorButton Text="Help" CssClass="text-info"
+                                                    IconCssClass="bi bi-question"
+                                                    Click="@(async () => await messageBox?
+                                                            .ShowOkOnlyAsync("Silent Contacts",
+                                @"<div class='text-center alert alert-info col-12'>
+                                <p>Silent phone numbers are not visible to leaders, clerks or students.
+                                <p>A <strong>leader/clerk's</strong> silent email is not visible to students.
+                                <p>A <strong>student's</strong> silent email remains visible to leaders/clerks so that communication is possible.
+                                    <p><em>If not silent, your course leader and clerk has access to your contact details and you have access to theirs. Students do not have access to other students’ details.</em>
+                                    "))" />
+                                </Buttons>
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
+                            <DxCheckBox @bind-Checked="@person.SMSOptOut"
+                                        Alignment="CheckBoxContentAlignment.Right" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Mail preference" ColSpanMd="6">
+                            <DxComboBox Data="@Communication" @bind-Value="@person.Communication" />
+                        </DxFormLayoutItem>
+
+                    </DxFormLayoutGroup>
+                    <DxFormLayoutGroup Caption="In Case of Emergency">
+                        <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@person.ICEContact" />
+                            <ValidationMessage For="@(() => person.ICEContact)" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@person.ICEPhone" />
+                            <ValidationMessage For="@(() => person.ICEPhone)" />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
+                </div>
+            </DxFormLayout>
+            <footer class="input-group px-2 mt-2" id="footer">
+                <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Save" />
+                <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnCancel" />
+            </footer>
+        </EditForm>
+    </div>
+}
+
+<style>
+    .scrollable {
+        height: @formHeight;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border-bottom: thin;
+    }
+
+</style>
+
+
+@code {
+    [CascadingParameter]
+    LoginState loginState { get; set; }
+
+    [Parameter]
+    public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+
+    [Parameter, EditorRequired]
+    public bool IsNewLinkedMember { get; set; }
+
+    //Search fields
+    string FirstName;
+    string LastName;
+    string City;
+    string formHeight = "100px";
+
+    bool IsReady = false;
+    bool IsMobileLayout;
+    Person person = new Person();
+    private AUState states;
+    private Gender gender;
+    Communication Communication;
+    string communicationPreference = "Email";
+    bool showCommunicationWarning = false;
+    bool isDatabaseCheckDone = false;
+    string? surcharge;
+    bool isNew = false;
+    PersonTitles titles = new PersonTitles();
+    List<SilentContactWrapper> silentContactList = new SilentContactList();
+
+    List<string> AutoEnrolAllocationMethods;
+    int ActiveTabIndex { get; set; } = 0;
+    private SystemSettings systemSettings { get; set; }
+    U3ADbContext? dbc { get; set; }
+
+    internal ErrorPopup? ErrorPopup { get; set; }
+    internal string? ErrorHeader;
+    internal string? ErrorMessage;
+    MessageBox? messageBox;
+
+    protected override async Task OnInitializedAsync() {
+        // wire up the data
+        states = new AUState();
+        gender = new Gender();
+        Communication = new Communication();
+        showCommunicationWarning = false;
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        systemSettings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        surcharge = systemSettings.MailSurcharge.ToString("c2");
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        var formBounds = await Window.GetElementBounds(js, "myForm");
+        var newHeight = await Window.FitToRemainingHeight(js, "myForm", formHeight);
+        if (newHeight != formHeight) {
+            formHeight = newHeight;
+            InvokeAsync(StateHasChanged);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override async Task OnParametersSetAsync() {
+        person = await dbc.Person.FindAsync(loginState.SelectedPerson?.ID);
+        if (person == null || IsNewLinkedMember) {
+            person = new Person()
+                {
+                    Email = loginState.LoginEmail,
+                    FinancialTo = constants.START_OF_TIME,
+                    DateJoined = DateTime.Today
+                };
+            isNew = true;
+        }
+        else isNew = false;
+        await base.OnParametersSetAsync();
+    }
+
+    bool isBusy;
+    async Task ValidFormSubmitted(EditContext editContext) {
+        if (isBusy) return;
+        isBusy = true;
+        try {
+            isNew = false;
+            var editModel = (Person)editContext.Model;
+            if (!await IsDataOK(editModel)) return;
+            // Re-query a data item from the store.
+            var dataItem = dbc.Person.Find(editModel.ID);
+            if (dataItem == null) {
+                dataItem = new Person();
+                isNew = true;
+            }
+            // Assign changes from the edit model to the data item.
+            if (dataItem != null) {
+                editModel.CopyTo(dataItem);
+                try {
+                    // Post changes to the database.
+                    if (isNew) await dbc.AddAsync(dataItem);
+                    await dbc.SaveChangesAsync();
+                    loginState.SelectedPerson = dataItem;
+                    if (IsNewLinkedMember) {
+                        await messageBox.ShowOkOnlyAsync("Link Succeeded", "You must now re-login for the change to take affect.<br>" +
+                                                            "Click Ok to logout");
+                        loginState.SelectedPerson = null;
+                        await OnCancel();
+                    }
+                    else {
+                        if (isNew) await DoFeePaymentRequest();
+                        else await ReturnToMenu(PortalMenuResult.MemberDetailsCompleted);
+                    }
+                }
+                catch (Exception ex) {
+                    ErrorHeader = "Save to database error";
+                    ErrorMessage = Helpers.GetErrorMessage(ex);
+                    await ErrorPopup.ShowPopupAsync();
+                    dbc?.ChangeTracker?.Clear();
+                }
+            }
+        }
+        finally { isBusy = false; }
+    }
+
+    async Task<bool> IsDataOK(Person person) {
+        bool result = true;
+        var dupHTML = await BusinessRule.GetDuplicateMarkupToProhibit(dbc, person);
+        if (!string.IsNullOrWhiteSpace(dupHTML)) {
+            await messageBox.ShowOkOnlyAsync("Duplicate Participant?", dupHTML);
+            result = false;
+        }
+        var msg = "";
+        if (person.Communication != Communication[0] && systemSettings.MailSurcharge > 0) {
+            msg += "<div class='text-center alert alert-danger col-12'>" +
+                      $"A Post mail preference incurs an additional <strong>{surcharge}</strong> postal surcharge per year.<br />" +
+                      "Click <strong>Cancel</strong> and change to <strong>Email</strong> which is free, or<br />" +
+                      "Click <strong>Ok</strong> again to confirm your choice." +
+                      "</div>";
+        }
+        if (msg != "") { result = await messageBox.ShowAsync("Please Note ...", msg); }
+        return result;
+    }
+
+    async Task DoFeePaymentRequest() {
+        var result = PortalMenuResult.MenuOptionCompleted;
+        var msg = @"<p>Thank you for sharing your details with us.<br/>
+                    Only financial members may participate in U3A courses.</p>
+                    <p>Would you like to pay the membership fee now?</p>";
+        MessageBoxArgs args = new MessageBoxArgs()
+            {
+                CancelButtonText = "No thanks, I'll do it later",
+                Caption = $"Welcome, {loginState.SelectedPerson?.FirstName}",
+                Message = msg,
+                OKButtonText = "Yes",
+                ShowCancelButton = true,
+                ShowOkButton = true
+            };
+        if (await messageBox.ShowAsync(args)) result = PortalMenuResult.NewMemberFeePayment;
+        await OnSelectedOptionCompleted.InvokeAsync(result);
+    }
+    async Task ReturnToMenu(PortalMenuResult result) {
+        await OnSelectedOptionCompleted.InvokeAsync(result);
+    }
+
+    async Task OnSearch() {
+        if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(City)) {
+            await messageBox.ShowOkOnlyAsync("Complete all fields", "Enter the First Name, Last Name and City of the person to be linked.");
+            return;
+        }
+        var lastName = LastName.ToLower().Trim();
+        var firstName = FirstName.ToLower().Trim();
+        var city = City.ToLower().Trim();
+        if (dbc.Person.Any(x => x.LastName.ToLower().Trim() == lastName &&
+                                    x.FirstName.ToLower().Trim() == firstName &&
+                                    x.City.ToLower().Trim() == city)) {
+            await messageBox.ShowOkOnlyAsync("Already on file", "A person with First Name, Last Name and City already exists in our database.");
+        }
+        else {
+            person = new Person()
+                {
+                    LastName = LastName,
+                    FirstName = FirstName,
+                    City = City,
+                    Email = loginState.LoginEmail,
+                    FinancialTo = constants.START_OF_TIME,
+                    DateJoined = DateTime.Today
+                };
+            isDatabaseCheckDone = true;
+            StateHasChanged();
+        }
+
+    }
+
+    async Task OnCancel() {
+        await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
+    }
+
+    public void Dispose() {
+        dbc?.Dispose();
+    }
+
+}

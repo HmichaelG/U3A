@@ -1,0 +1,265 @@
+﻿@namespace U3A.UI.Forms
+
+
+@inject IJSRuntime js
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Logging
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject ILogger<LeaderReport> Logger
+@inject IWebHostEnvironment Environment
+@implements IDisposable
+@using U3A.UI.Reports
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <h3>Queue Leader Reports for email</h3>
+    <p>Queue Class reports for selected courses/leaders.</p>
+    <CollapsableAlert AlertText=@(@"<strong>Leader Reports</strong> is now an automated procedure.<br />
+                  All reports are automatically sent to leaders one day prior (Sunday) to the
+                  start of term.")
+                      OnAlertCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+    <DxFormLayout>
+        <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="4">
+            <DxComboBox Data="@terms" NullText="Select the Term required..."
+                        FilteringMode="DataGridFilteringMode.Contains"
+                        TextFieldName="@nameof(Term.TermSummary)"
+                        Value="@selectedTerm"
+                        ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+        </DxFormLayoutItem>
+    </DxFormLayout>
+    <br />
+
+    <MessageBox @ref="@messageBox" />
+    <Progress @ref="@ProgressBar" />
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+    <DxFormLayout>
+        <div class="col-10 p-2">
+            <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    SelectionMode="GridSelectionMode.Multiple"
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    SelectedDataItemChanged="OnSelectedDataItemChanged"
+                    @bind-SelectedDataItems="SelectedDataItems"
+                    ValidationEnabled="true">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridSelectionColumn Width="2rem" />
+                    <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
+                    <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
+                    <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
+                    <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
+                    <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
+                    <DxGridDataColumn Caption="Send To 1" FieldName="Recipient0"
+                                      UnboundType="GridUnboundColumnType.String" Width="10rem" />
+                    <DxGridDataColumn Caption="Send To 2" FieldName="Recipient1"
+                                      UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Caption="Send To 3" FieldName="Recipient2"
+                                      UnboundType="GridUnboundColumnType.String" />
+                </Columns>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
+                </TotalSummary>
+
+            </DxGrid>
+        </div>
+        <div class="col col-2">
+            <SelectLeaderReports @ref=@rptSelect SingleReportOnly=false
+                                 AreSelectionsMade="@AreSelectionsMade"
+                                 OnQueueReportsSelected="OnQueueReportsSelected" />
+        </div>
+    </DxFormLayout>
+}
+<style>
+    .grid-height {
+        height: @gridHeight;
+    }
+
+</style>
+
+
+@code {
+    bool IsReady;
+    List<Class> Classes { get; set; } = new List<Class>();
+    List<Term> terms { get; set; }
+    Term currentTerm;
+    Term selectedTerm;
+    SystemSettings settings;
+    IReadOnlyList<object> SelectedDataItems { get; set; }
+    List<LeaderReportRecipientsByClass> reportRecipients;
+
+
+    //bool PrintLeaderReport { get; set; }
+    //bool PrintClassList { get; set; }
+    //bool PrintICEList { get; set; }
+    //bool PrintAttendanceRecord { get; set; }
+    //bool PrintCSVFile { get; set; }
+    //bool PrintAttendanceAnalysis { get; set; }
+    bool AreSelectionsMade { get; set; }
+    SelectLeaderReports? rptSelect;
+    ProFormaReportFactory reportFactory;
+
+    DxGridCommandColumnEx? GridCommandColumn;
+    MessageBox messageBox;
+    string gridHeight = "600px";
+
+    IGrid? mainGrid { get; set; }
+    ErrorPopup? ErrorPopup { get; set; }
+    GridToolbar? Toolbar;
+    Progress? ProgressBar;
+    string ErrorHeader;
+    string ErrorMessage;
+    U3ADbContext dbc { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+        currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+        selectedTerm = currentTerm;
+        await SelectedTermChanged(selectedTerm);
+        IsReady = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
+        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async Task SelectedTermChanged(Term term)
+    {
+        selectedTerm = term;
+        Classes = (await BusinessRule.GetClassDetailsAsync(dbc, selectedTerm, settings))
+                        .OrderBy(x => x.Course.Name).ThenBy(x => x.OnDayID).ToList();
+        reportRecipients = await BusinessRule.GetLeaderReportRecipientsByClass(dbc, settings, currentTerm, Classes);
+    }
+
+    void OnSelectedDataItemChanged()
+    {
+        AreSelectionsMade = true;
+    }
+
+    async Task OnQueueReportsSelected()
+    {
+        //PrintLeaderReport = rptSelect.PrintLeaderReport;
+        //PrintClassList = rptSelect.PrintClassList;
+        //PrintICEList = rptSelect.PrintICEList;
+        //PrintAttendanceRecord = rptSelect.PrintAttendanceRecord;
+        //PrintCSVFile = rptSelect.PrintCSVFile;
+        //PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis;
+        ErrorMessage = "";
+        await ProcessReportsAsync(false);
+        var msg = $"<p>The selected documents have been queued and will be sent via email overnight.</p>";
+        if (ErrorMessage != "") { msg += $"<div class='alert alert-danger'>{ErrorMessage}</div>"; }
+        await messageBox.SetPopupWidth("30%");
+        await messageBox.ShowOkOnlyAsync("Communication Complete", msg);
+    }
+
+    async Task ProcessReportsAsync(bool IsPreview)
+    {
+        await ProgressBar.ShowAsync("Processing ... Please Wait", SelectedDataItems.Count);
+        reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
+        int count = 0;
+        foreach (var c in SelectedDataItems.Cast<Class>())
+        {
+            var recipients = GetReportRecipients(c);
+            if (recipients.Count > 0)
+            {
+                foreach (var r in recipients)
+                {
+                    await ProcessReportAsync(r.Person, c.Course, c);
+                }
+                count++;
+            }
+            else { ErrorMessage += $"<strong>{c.Course.Name}</strong> not printed. It has no leaders/clerks with visible email addresses.<br/>"; }
+            await ProgressBar.SetValueAsync(count);
+        }
+        await ProgressBar.Close();
+        await dbc.SaveChangesAsync();
+    }
+
+    async Task ProcessReportAsync(Person Leader, Course Course, Class Class)
+    {
+        var enrolments = new List<Enrolment>();
+        if (dbc.Enrolment.Any(x => x.ClassID == Class.ID && x.TermID == selectedTerm.ID))
+        {
+            enrolments = dbc.Enrolment.Include(x => x.Person)
+                                      .Where(x => x.ClassID == Class.ID
+                                                && x.TermID == selectedTerm.ID).ToList();
+        }
+        else
+        {
+            enrolments = dbc.Enrolment.Include(x => x.Person)
+                                        .Where(x => x.CourseID == Course.ID
+                                                        && x.TermID == selectedTerm.ID).ToList();
+        };
+        if (enrolments.Count > 0 || !rptSelect.RequireEnrolements)
+        {
+            var mail = new SendMail()
+                {
+                    DocumentName = "U3A Leaders Reports",
+                    Person = await dbc.Person.FindAsync(Leader.ID),
+                    PersonID = Leader.ID,
+                    TermID = selectedTerm.ID,
+                    PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
+                    PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
+                    PrintClassList = rptSelect.PrintClassList,
+                    PrintCSVFile = rptSelect.PrintCSVFile,
+                    PrintICEList = rptSelect.PrintICEList,
+                    PrintLeaderReport = rptSelect.PrintLeaderReport,
+                    RecordKey = Class.ID
+                };
+            dbc.Add(mail);
+        }
+        else
+        {
+            ErrorMessage += $"<strong>{Course.Name}</strong> not printed because it has no enrolments<br/>";
+        }
+    }
+
+    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        var Class = e.DataItem as Class;
+        var recipient = GetReportRecipients(Class);
+        if (e.FieldName == "Recipient0" && recipient.Count >= 1)
+        {
+            e.Value = recipient[0]?.Person.FullName;
+        }
+        if (e.FieldName == "Recipient1" && recipient.Count >= 2)
+        {
+            e.Value = recipient[1]?.Person.FullName;
+        }
+        if (e.FieldName == "Recipient2" && recipient.Count >= 3)
+        {
+            e.Value = recipient[2]?.Person.FullName;
+        }
+    }
+
+    List<LeaderReportRecipientsByClass> GetReportRecipients(Class c)
+    {
+        return reportRecipients
+            .Where(x => x.Class.ID == c.ID)
+            .OrderBy(x => x.SortOrder).ThenBy(x => x.Person.FullNameAlpha).ToList();
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

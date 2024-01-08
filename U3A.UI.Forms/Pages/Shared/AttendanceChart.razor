@@ -1,0 +1,105 @@
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+
+<Progress @ref=@progress />
+<DxFormLayout>
+    <DxFormLayoutItem ColSpanMd="12">
+        <div class="float-end">
+            <DxButton Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
+                      IconCssClass="bi bi-database menu-icon" CssClass="col m-2" />
+        </div>
+    </DxFormLayoutItem>
+    <DxFormLayoutGroup Caption="Attendance Summary" ColSpanMd="9" CssClass="attendCcontrolHeight">
+        <DxChart T="AttendClassSummaryByWeek" Height=@controlHeight
+                 Data="@ChartsData" id="myChart"
+                 Width="100%">
+            <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
+                                         TArgument="DateTime"
+                                         TValue="int"
+                                         ArgumentField="a => a.WeekEnd"
+                                         Name="Present"
+                                         ValueField="a => a.Present"
+                                         SummaryMethod="Enumerable.Sum" />
+            <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
+                                         TArgument="DateTime"
+                                         TValue="int"
+                                         ArgumentField="a => a.WeekEnd"
+                                         Name="With Apology"
+                                         ValueField="a => a.AbsentWithApology"
+                                         SummaryMethod="Enumerable.Sum" />
+            <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
+                                         TArgument="DateTime"
+                                         TValue="int"
+                                         ArgumentField="a => a.WeekEnd"
+                                         Name="W/Out Apology"
+                                         ValueField="a => a.AbsentWithoutApology"
+                                         SummaryMethod="Enumerable.Sum" />
+            <DxChartLegend Position="RelativePosition.Outside"
+                           HorizontalAlignment="HorizontalAlignment.Right"
+                           Orientation="Orientation.Vertical"
+                           VerticalAlignment="VerticalEdge.Top" />
+            <DxChartTooltip Enabled="true"
+                            Position="RelativePosition.Inside">
+                <div style="margin: 0.75rem">
+                    <div>@($"{context.Point.Argument:d}")</div>
+                    <div>@context.Point.SeriesName</div>
+                    <div>@($"{context.Point.Value:N0}")</div>
+                </div>
+            </DxChartTooltip>
+        </DxChart>
+    </DxFormLayoutGroup>
+
+    <DxFormLayoutGroup Caption="Attendance Summary" ColSpanMd="3">
+        <DxGrid Data="@(ChartsData?.Where(x => x.Total != 0))" CssClass="attendCcontrolHeight" id="attendGrid"
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                AutoExpandAllGroupRows="true"
+                ShowAllRows="true">
+            <Columns>
+                <DxGridDataColumn Caption="Week" FieldName="WeekEnd" 
+                    GroupIndex=0 DisplayFormat="{0:dddd, dd MMMM yyyy}" />
+                <DxGridDataColumn Caption="Present" FieldName="Present" DisplayFormat="{0:n0}" />
+                <DxGridDataColumn Caption="Apology" FieldName="AbsentWithApology" DisplayFormat="{0:n0}" />
+                <DxGridDataColumn Caption="No Apology" FieldName="AbsentWithoutApology" DisplayFormat="{0:n0}" />
+                <DxGridDataColumn Caption="Total" FieldName="Total" DisplayFormat="{0:n0}" />
+            </Columns>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Present" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithApology" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithoutApology" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+            </TotalSummary>
+        </DxGrid>
+
+    </DxFormLayoutGroup>
+</DxFormLayout>
+
+<style>
+    .attendCcontrolHeight {
+        height: @controlHeight;
+    }
+</style>
+
+
+@code {
+    List<AttendClassSummaryByWeek> ChartsData;
+    Progress? progress;
+    string controlHeight = "350px";
+
+    protected override async void OnAfterRender(bool firstRender) {
+        // wire up the toolbar
+        base.OnAfterRender(firstRender);
+        var newHeight = await Window.FitToRemainingHeight(js, "myChart", controlHeight);
+        if (newHeight != controlHeight) { controlHeight = newHeight; InvokeAsync(StateHasChanged); }
+    }
+
+    async Task OnProcess()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            await progress.ShowSmallSpinnerAsync();
+            ChartsData = await BusinessRule.GetClassAttendanceSummaryByWeek(dbc);
+            await progress.Close();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+}

@@ -1,0 +1,101 @@
+﻿
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+
+<Progress @ref=@progress />
+<DxFormLayout>
+    <DxFormLayoutItem ColSpanMd="12">
+        <div class="float-end">
+            <DxButton Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
+                      IconCssClass="bi bi-database menu-icon" CssClass="col m-2" />
+        </div>
+    </DxFormLayoutItem>
+    <DxFormLayoutGroup Caption="New Member Summary" ColSpanLg="9" CssClass="newMemberControlHeight">
+        <DxChart Data="memberData" Id="newMemberChart"
+                 Width="100%" Height="@controlHeight"
+                 LabelOverlap="ChartLabelOverlap.Hide">
+            <DxChartStackedBarSeries Name="Male"
+                              Color="System.Drawing.Color.Blue"
+                              T="MemberSummary"
+                              TArgument="DateTime"
+                              TValue="int"
+                              ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
+                              ValueField="x => x.Count"
+                              Filter='x => x.Group.ToLower() == "male"' />
+            <DxChartStackedBarSeries Name="Female"
+                              Color=System.Drawing.Color.HotPink
+                              T="MemberSummary"
+                              TArgument="DateTime"
+                              TValue="int"
+                              ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
+                              ValueField="x => x.Count"
+                              Filter='x => x.Group.ToLower() == "female"' />
+
+            <DxChartLegend Position="RelativePosition.Outside"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+            <DxChartTooltip Enabled="true">
+                @context.Point.Render((seriesPoint) =>
+                    @<div style="margin: 0.75rem">
+                        <div>@seriesPoint.SeriesName</div>
+                        <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
+                        <span>@($"{seriesPoint.Value: 0,0}")</span>
+                    </div>
+                )
+            </DxChartTooltip>
+        </DxChart>
+    </DxFormLayoutGroup>
+    <DxFormLayoutGroup Caption="New Members by Month" ColSpanLg="3">
+        <DxGrid Data="@memberData" CssClass="newMemberControlHeight"
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                AutoExpandAllGroupRows="true"
+                ShowFilterRow="false"
+                ShowAllRows="true">
+            <Columns>
+                <DxGridDataColumn Caption="Gender" FieldName="Group" GroupIndex="0" />
+                <DxGridDataColumn Width="15%" Caption="Year" FieldName="Year" DisplayFormat="{0:D4}" />
+                <DxGridDataColumn Width="30%" Caption="Month" FieldName="MonthName" />
+                <DxGridDataColumn Width="45%" Caption="Members" FieldName="Count" DisplayFormat="{0:n0}" />
+            </Columns>
+            <GroupSummary>
+                <DxGridSummaryItem FooterColumnName="Count"
+                                   SummaryType="GridSummaryItemType.Sum" FieldName="Count" ValueDisplayFormat="{0:n0}" />
+            </GroupSummary>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
+            </TotalSummary>
+        </DxGrid>
+    </DxFormLayoutGroup>
+</DxFormLayout>
+
+<style>
+    .newMemberControlHeight {
+        height: @controlHeight;
+    }
+</style>
+
+
+@code {
+    IEnumerable<MemberSummary> memberData;
+    Progress? progress;
+    string controlHeight = "350px";
+
+    protected override async void OnAfterRender(bool firstRender) {
+        // wire up the toolbar
+        base.OnAfterRender(firstRender);
+        var newHeight = await Window.FitToRemainingHeight(js, "newMemberChart", controlHeight);
+        if (newHeight != controlHeight) {
+            controlHeight = newHeight;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    async Task OnProcess()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            await progress?.ShowSmallSpinnerAsync();
+            memberData = await BusinessRule.GetNewMemberSummaryByMonth(dbc);
+            await progress?.Close();
+        }
+    }
+}

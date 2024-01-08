@@ -1,0 +1,111 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+@using System.Drawing
+@using System.Text.Json
+
+<Progress @ref=@progress />
+<DxFormLayout>
+    <DxFormLayoutItem ColSpanMd="12">
+        <div class="float-end">
+            <DxButton Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
+                      IconCssClass="bi bi-database menu-icon" CssClass="col m-2" />
+        </div>
+    </DxFormLayoutItem>
+    <DxFormLayoutGroup Caption="Enrolment Request Summary" ColSpanLg="9" CssClass="enrolControlHeight">
+        <DxChart Data="enrolmentData" Id="enrolChart"
+                 Width="100%" Height=@controlHeight
+                 LabelOverlap="ChartLabelOverlap.Hide">
+            @if (enrolmentData != null)
+            {
+                foreach (var cType in enrolmentData.Select(x => x.CourseType).Distinct())
+                {
+                    <DxChartStackedBarSeries Name="@cType"
+                                             T="EnrolmentSummary"
+                                             TArgument="DateTime"
+                                             TValue="int"
+                                             ArgumentField="x => x.Period"
+                                             Filter="x => x.CourseType == cType"
+                                             ValueField="x => x.Count" />
+                }
+            }
+            <DxChartValueAxis>
+                <DxChartAxisTitle Text="Requests including Waitlist" />
+            </DxChartValueAxis>
+            <DxChartArgumentAxis TickInterval="ChartAxisTickInterval.Month" />
+            <DxChartLegend Position="RelativePosition.Outside"
+                           Orientation="Orientation.Vertical"
+                           HorizontalAlignment="HorizontalAlignment.Right" />
+            <DxChartTooltip Enabled="true">
+                @context.Point.Render((seriesPoint) =>
+                    @<div style="margin: 0.75rem">
+                        <div>@seriesPoint.SeriesName</div>
+                        <span>@($"{((DateTime)seriesPoint.Argument).ToString("MMM yyyy")}: ")</span>
+                        <span>@($"{seriesPoint.Value: 0,0}")</span>
+                    </div>
+                         )
+            </DxChartTooltip>
+        </DxChart>
+    </DxFormLayoutGroup>
+    <DxFormLayoutGroup Caption="Enrolment Request Summary" ColSpanLg="3">
+        <DxGrid Data="@(enrolmentData?.Where(x => x.Count != 0))" CssClass="enrolControlHeight" id="enrolGrid"
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                AutoExpandAllGroupRows="true"
+                ShowFilterRow="false"
+                ShowAllRows="true">
+            <Columns>
+                <DxGridDataColumn Caption="Month" FieldName="Period" GroupIndex="0" GroupInterval="GridColumnGroupInterval.DateMonth" />
+                <DxGridDataColumn Caption="W'drawn?" FieldName="IsDropout" Width="20%" />
+                <DxGridDataColumn Width="45%" Caption="Course Type" FieldName="CourseType" />
+                <DxGridDataColumn Width="30%" Caption="Requests" FieldName="Count" DisplayFormat="{0:n0}" />
+            </Columns>
+            <GroupSummary>
+                <DxGridSummaryItem FooterColumnName="Count"
+                                   SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
+            </GroupSummary>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
+            </TotalSummary>
+        </DxGrid>
+    </DxFormLayoutGroup>
+</DxFormLayout>
+
+<style>
+    .enrolControlHeight {
+        height: @controlHeight;
+    }
+</style>
+
+
+@code {
+    IEnumerable<EnrolmentSummary>? enrolmentData;
+    Progress? progress;
+
+    string controlHeight = "350px";
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        // wire up the toolbar
+        base.OnAfterRender(firstRender);
+        var newHeight = await Window.FitToRemainingHeight(js, "enrolChart", controlHeight);
+        if (newHeight != controlHeight)
+        {
+            controlHeight = newHeight;
+            StateHasChanged();
+        }
+    }
+
+    async Task OnProcess()
+    {
+        await progress?.ShowSmallSpinnerAsync();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var term = await BusinessRule.CurrentTermAsync(dbc);
+            if (term != null)
+            {
+                enrolmentData = await BusinessRule.GetEnrolmentSummaryByTerm(dbc, term);
+                var json = JsonSerializer.Serialize(enrolmentData);
+            }
+        }
+        await progress?.Close();
+    }
+}

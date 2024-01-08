@@ -1,0 +1,135 @@
+﻿@using System.IO
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+@inject IJSRuntime js
+
+@if (isReady)
+{
+    @switch (ActivationStyle)
+    {
+        case HelpActivationStyle.None:
+            break;
+        case HelpActivationStyle.ButtonOnly:
+            if (settings?.InMaintenanceTill != null)
+            {
+                <div class="alert alert-danger text-center text-alert">Warning: You are in Member Portal Maintenance Mode</div>
+            }
+            <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title" 
+                      SizeMode=SizeMode.Small
+                      RenderStyleMode="ButtonRenderStyleMode.Outline" 
+                      CssClass="@ButtonCssClass"
+                      Click="ShowTopicAsync" Id="helpButton" />
+            break;
+        default:
+            <PageTitle>@Title</PageTitle>
+            if (settings?.InMaintenanceTill != null)
+            {
+                <div class="alert alert-danger text-center text-alert">Warning: You are in Member Portal Maintenance Mode</div>
+            }
+            <h3 class="@TitleCssClass">
+                <DxButton IconCssClass="@ButtonIconCssClass" Text="Help" SizeMode=SizeMode.Small CssClass="@ButtonCssClass"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline" style="float: left; margin-right: 0.5rem;"
+                          Click="ShowTopicAsync" Id="helpButton" />
+                @Title
+            </h3>
+            break;
+    }
+
+    <DxWindow @ref=@helpWindow Width="@windowWidth"
+              Visible=false
+              Closed="OnClosed"
+              HorizontalAlignment="HorizontalAlignment.Center"
+              VerticalAlignment="VerticalAlignment.Center"
+              Height="80vh"
+              AllowResize="true"
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              BodyCssClass="h-100"
+              HeaderText="Help">
+        <BodyTextTemplate>
+            <iframe src="@helpFile" class="iframe-size"></iframe>
+        </BodyTextTemplate>
+    </DxWindow>
+}
+
+<style>
+    .iframe-size {
+        height: 100%;
+        width: 100%;
+        border-style: none;
+        padding-bottom: 5px;
+    }
+
+    .window-details {
+        height: @windowHeight;
+    }
+
+</style>
+
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public string Title { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public string HelpTopic { get; set; }
+    [Parameter]
+    public HelpActivationStyle ActivationStyle { get; set; }
+    [Parameter]
+    public string ButtonCssClass { get; set; }
+    [Parameter]
+    public string TitleCssClass { get; set; } = "d-flex align-items-center";
+    [Parameter]
+    public string ButtonIconCssClass { get; set; } = "bi bi-question menu-icon";
+    
+    DxWindow? helpWindow;
+    string helpFile;
+    string windowHeight = "600px";
+    string standardWidth = "max(35vw, 400px)";
+    string windowWidth;
+
+    U3ADbContext dbc { get; set; }
+    SystemSettings? settings;
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        isReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    public async Task ShowTopicAsync(string WindowWidth)
+    {
+        windowWidth = WindowWidth;
+        await ShowTopicAsync();
+    }
+    public async Task ShowTopicAsync()
+    {
+        if (helpWindow.Visible) { await helpWindow.CloseAsync(); }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(windowWidth)) { windowWidth = standardWidth; }
+            helpFile = $"help/index.html?{HelpTopic}";
+            await helpWindow.ShowAsync();
+        }
+    }
+
+    void OnClosed()
+    {
+        windowWidth = standardWidth;
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

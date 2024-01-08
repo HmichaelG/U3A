@@ -1,0 +1,434 @@
+﻿@page "/CourseFeesDueEnquiry"
+
+@inject NavigationManager NavMan
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <div class="row align-content-start">
+        <ContextHelpTitle Title="Course Fees Due Enquiry" HelpTopic="Course-Fess-Due-Report.html" />
+    </div>
+
+    <MessageBox @ref="@messageBox" />
+
+    <CollapsableAlert AlertText="<strong>Fees Due</strong> includes all fees outstanding not just fees for the selected course. Click a member row to view their statement of account." />
+    <Progress @ref="@ProgressBar" />
+
+    <DxFormLayout>
+        <div class="col col-12 col-md-8 p-2">
+            <DxFormLayoutGroup Caption="Enrolment Details">
+                <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
+                    <DxComboBox Data="@terms" NullText="Select the Term required..."
+                                FilteringMode="DataGridFilteringMode.Contains"
+                                TextFieldName="@nameof(Term.TermSummary)"
+                                Value="@selectedTerm"
+                                ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Course" ColSpanMd="12">
+                    <DxComboBox Data="@courses"
+                                Enabled="@courseComboEnabled"
+                                NullText="@courseComboNullText"
+                                FilteringMode="DataGridFilteringMode.Contains"
+                                ListRenderMode="ListRenderMode.Virtual"
+                                TextFieldName="@nameof(Course.Name)"
+                                Value="@selectedCourse"
+                                ValueChanged="@((Course course) => SelectedCourseChanged(course))">
+                        <DxListEditorColumn FieldName="@nameof(Course.ConversionID)"
+                                            Caption="No"
+                                            Width="25%" />
+                        <DxListEditorColumn FieldName="@nameof(Course.Name)"
+                                            Caption="Course"
+                                            Width="75%" />
+                    </DxComboBox>
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Class" ColSpanMd="12">
+                    <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
+                                TextFieldName="@nameof(Class.ClassSummary)"
+                                Value="@selectedClass"
+                                ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
+                </DxFormLayoutItem>
+            </DxFormLayoutGroup>
+
+            <DxTabs TabClick="@OnTabClick">
+                <DxTabPage Text="Active Participants" />
+                <DxTabPage Text="Waitlisted Participants" />
+                <DxTabPage Text="Withdrawn Participants" />
+            </DxTabs>
+
+            <DxLoadingPanel @bind-Visible="loadingPanelVisible"
+                            IsContentBlocked="true"
+                            ApplyBackgroundShading="true"
+                            IndicatorAreaVisible="false"
+                            Text="Fetching Data...">
+
+                <DxGrid Data="@Enrolments" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                        ShowAllRows="true"
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        KeyFieldName="ID"
+                        ValidationEnabled="true"
+                        UnboundColumnData="Grid_CustomUnboundColumnData"
+                        CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
+                        CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
+                        FocusedRowEnabled="true"
+                        FocusedRowChanged="OnFocusedRowChanged"
+                        AllowSelectRowByClick="true">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid />
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
+                        <DxGridDataColumn Caption="Leader/Clerk?" FieldName="IsCourseClerk" Width="6rem" />
+                        <DxGridDataColumn Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
+                        <DxGridDataColumn Caption="Mobile" FieldName="Person.AdjustedMobile" Width="6rem" />
+                        <DxGridDataColumn Caption="Home" FieldName="Person.AdjustedHome" Width="6rem" />
+                        <DxGridDataColumn Caption="Email" FieldName="Person.Email" Width="12rem" />
+                        <DxGridDataColumn Caption="Fees Due" Width="5rem" FieldName="Due"
+                                          DisplayFormat="c2"
+                                          UnboundType="GridUnboundColumnType.Decimal" />
+                    </Columns>
+                    <GroupSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Due" />
+                    </GroupSummary>
+                    <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Due" />
+                    </TotalSummary>
+                </DxGrid>
+
+            </DxLoadingPanel>
+
+        </div>
+        <div class="col col-12 col-md-4 p-2">
+            <DxFormLayoutGroup Caption="@($"Statement of Account for: {selectedPerson?.FullName}")" HeaderCssClass="h4">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Description</th>
+                            <th scope="col" style="text-align: right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var fee in memberFees)
+                        {
+                            <tr>
+                                <td>@fee.Description</td>
+                                <td style="text-align: right">@(fee.Amount.ToString("c2"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="col">Outstanding</th>
+                            <th scope="col" style="text-align: right">@(totalFees.ToString("c2"))</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </DxFormLayoutGroup>
+        </div>
+    </DxFormLayout>
+
+}
+<style>
+    .grid-height {
+        height: @gridHeight;
+    }
+
+    .leader-height {
+        height: 11vh;
+    }
+
+</style>
+
+
+@code {
+    bool IsReady;
+    int ShowEnrolmentType;
+    SystemSettings? settings;
+
+    private List<Enrolment>? Enrolments { get; set; }
+    Enrolment? thisEnrolment;
+
+    private List<Person>? Persons { get; set; }
+    Person? selectedPerson;
+
+    private List<Person>? CourseLeaders { get; set; }
+    private IEnumerable<Person>? leaders { get; set; }
+
+    private List<Term> terms { get; set; }
+    private Term? selectedTerm { get; set; } // Term selected in the grid
+    private Term? currentTerm { get; set; } // Current default Term
+
+    private List<Course> courses { get; set; }
+    private Course? selectedCourse { get; set; }
+
+    private List<Class> classes { get; set; }
+    private Class? selectedClass { get; set; }
+
+    MessageBox? messageBox { get; set; }
+    bool IsSetSelectionEnrolledEnabled;
+    bool loadingPanelVisible;
+
+    private string classComboNullText;
+    private bool classComboEnabled;
+    private string courseComboNullText = "Select the Course to enrol...";
+    private bool courseComboEnabled;
+
+    private DxComboBox<Class, Class?> ClassComboBox;
+
+    IGrid? mainGrid { get; set; }
+    string gridHeight { get; set; } = "100px";
+    GridToolbar Toolbar;
+    U3ADbContext dbc { get; set; }
+    Progress? ProgressBar;
+
+    Dictionary<Guid, decimal> FeeDue;
+    MemberFeeCalculationService service;
+    List<MemberFee> memberFees = new List<MemberFee>();
+    decimal totalFees = 0;
+    int selectedTabIndex = 0; // active enrolments
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        service = new MemberFeeCalculationService();
+        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+        currentTerm = selectedTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
+        IsSetSelectionEnrolledEnabled = true;
+        courseComboEnabled = false;
+        if (selectedTerm != null)
+        {
+            Persons = await BusinessRule.SelectablePersonsAsync(dbc, selectedTerm);
+            await SelectedTermChanged(selectedTerm);
+        }
+        IsReady = true;
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        // wire up the toolbar
+        base.OnAfterRender(firstRender);
+        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
+        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
+        if (!firstRender)
+        {
+            if (selectedTerm == null)
+            {
+                await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");
+                NavMan.NavigateTo("/");
+            }
+        }
+    }
+
+    async Task SelectedTermChanged(Term term)
+    {
+        selectedTerm = term;
+        CourseLeaders = null;
+        selectedCourse = null;
+        selectedClass = null;
+        classComboEnabled = false;
+        courseComboEnabled = false;
+        if (Enrolments != null) { Enrolments.Clear(); }
+        courseComboNullText = "Loading Course & Enrolment data ... please wait";
+        StateHasChanged();
+        courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
+        courseComboNullText = string.Empty;
+        courseComboEnabled = true;
+        IsSetSelectionEnrolledEnabled = (selectedTerm.Comparer <= currentTerm.Comparer);
+        StateHasChanged();
+    }
+
+    async Task SelectedCourseChanged(Course course)
+    {
+        selectedCourse = course;
+        CourseLeaders = null;
+        classes = selectedCourse.Classes;
+        if (Enrolments != null) { Enrolments.Clear(); }
+        SetupClassToEnrol();
+        await SetupGrid();
+    }
+
+    async Task SelectedClassChanged(Class Class)
+    {
+        selectedClass = Class;
+        await SetupGrid();
+    }
+
+    async Task SetupGrid()
+    {
+        //ProgressBar.ShowSmallSpinnerAsync();
+        loadingPanelVisible = true;
+        mainGrid.BeginUpdate();
+        if (selectedCourse != null)
+        {
+            if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+            {
+                await GetEnrolments();
+            }
+            else
+            {
+                if (selectedClass != null)
+                {
+                    await GetEnrolments();
+                }
+            }
+        }
+        mainGrid.EndUpdate();
+        loadingPanelVisible = false;
+        //ProgressBar.Close();
+    }
+
+    async void OnTabClick(TabClickEventArgs e)
+    {
+        selectedTabIndex = e.TabIndex;
+        if (selectedClass != null)
+        {
+            await GetEnrolments();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    async Task GetEnrolments()
+    {
+        switch (selectedTabIndex)
+        {
+            case 1:
+                Enrolments = (await BusinessRule.EditableEnrolmentsAsync(dbc, selectedTerm, selectedCourse, selectedClass))
+                                .Where(x => x.IsWaitlisted).ToList();
+                break;
+            case 2:
+                Enrolments = new List<Enrolment>();
+                var active = await GetActiveAttendeesAsync();
+                var dropouts = await BusinessRule.SelectableDropoutsByClassAsync(dbc, selectedTerm, selectedCourse, selectedClass);
+                foreach (var d in dropouts)
+                {
+                    if (!active.Any(x => x.PersonID == d.PersonID))
+                    {
+                        var e = new Enrolment()
+                            {
+                                ID = d.ID,
+                                PersonID = d.ID,
+                                Person = d.Person,
+                                IsWaitlisted = false
+                            };
+                        Enrolments.Add(e);
+                    }
+                }
+                break;
+            default:
+                Enrolments = await GetActiveAttendeesAsync();
+                break;
+        }
+        await CalculateFees();
+    }
+
+    async Task<List<Enrolment>> GetActiveAttendeesAsync()
+    {
+        var result = (await BusinessRule.EditableEnrolmentsAsync(dbc, selectedTerm, selectedCourse, selectedClass))
+                        .Where(x => !x.IsWaitlisted).ToList();
+        CourseLeaders = BusinessRule.SelectableCourseLeaders(selectedCourse, selectedClass);
+        foreach (var p in CourseLeaders)
+        {
+            var e = new Enrolment()
+                {
+                    PersonID = p.ID,
+                    Person = p,
+                    IsCourseClerk = true,
+                    IsWaitlisted = false
+                };
+            result.Add(e);
+        }
+        return result;
+    }
+
+    async Task CalculateFees()
+    {
+        FeeDue = new Dictionary<Guid, decimal>();
+        foreach (var e in Enrolments)
+        {
+            var person = e.Person;
+            var due = await service.CalculateFeeAsync(U3Adbfactory, person);
+            FeeDue.Add(person.ID, due);
+        }
+    }
+
+    void SetupClassToEnrol()
+    {
+        selectedClass = null;
+        classComboNullText = string.Empty;
+        classComboEnabled = false;
+        if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+        {
+            if (selectedCourse.Classes.Count == 1)
+            {
+                classComboNullText = classes[0].ClassSummary;
+                selectedClass = classes[0];
+            }
+            else
+            {
+                classComboNullText = selectedCourse.CourseParticipationType.Name;
+            }
+        }
+        else
+        {
+            classComboEnabled = true;
+        }
+    }
+
+    async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        if (e.FieldName == "Due")
+        {
+            var person = ((Enrolment)e.DataItem).Person;
+            var kvp = FeeDue.FirstOrDefault(x => x.Key == person.ID);
+            e.Value = kvp.Value;
+        }
+    }
+
+    async void OnFocusedRowChanged(GridFocusedRowChangedEventArgs e)
+    {
+        var enrolment = e.DataItem as Enrolment;
+        if (enrolment != null)
+        {
+            selectedPerson = enrolment.Person;
+            totalFees = await service.CalculateFeeAsync(U3Adbfactory, selectedPerson);
+            memberFees = service.MemberFees;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    void Grid_CustomizeSummaryDisplayText(GridCustomizeSummaryDisplayTextEventArgs e)
+    {
+        if (e.Item.FieldName == "Due")
+            e.DisplayText = string.Format("{0:c2}", e.Value);
+        if (e.Item.FieldName == "Person.FullName")
+            e.DisplayText = string.Format("{0:N0} members", e.Value);
+    }
+
+    void Grid_CustomizeGroupValueDisplayText(GridCustomizeGroupValueDisplayTextEventArgs e)
+    {
+        if (e.FieldName == "Due")
+            e.DisplayText = string.Format("{0:c2}", e.Value);
+        if (e.FieldName == "Person.FullName")
+            e.DisplayText = string.Format("{0:N0} members", e.Value);
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

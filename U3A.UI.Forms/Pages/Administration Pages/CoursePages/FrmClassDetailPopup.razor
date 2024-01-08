@@ -1,0 +1,320 @@
+﻿@inject NavigationManager NavMan
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+<MessageBox @ref="@messageBox" />
+<Progress @ref=@progressBar />
+
+<DxGrid @ref="@grid" Data="@Course.Classes"
+        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+        PageSize="5"
+        PagerVisible="@((Course?.Classes.Count() > 5) ? true : false)"
+        KeyFieldName="ID"
+        ValidationEnabled="true"
+        TextWrapEnabled=false
+        PopupEditFormCssClass="classPopup-width"
+        PopupEditFormHeaderText="Add/Edit Class"
+        CustomizeEditModel="Grid_CustomizeEditModel"
+        EditModelSaving="Grid_EditModelSaving"
+        DataItemDeleting="Grid_DataItemDeleting"
+        VirtualScrollingEnabled=false
+        EditMode="GridEditMode.PopupEditForm">
+    <Columns>
+        <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" Width="7rem" />
+        <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
+        <DxGridDataColumn Caption="Occurs" FieldName="OccurrenceTextBrief" Visible="@(AllowEdit)" />
+        <DxGridDataColumn Caption="Occurs" FieldName="OccurrenceText" Visible="@(!AllowEdit)" />
+        <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="t" Width="5rem" />
+        <DxGridDataColumn Caption="Finish"
+                          FieldName="StrEndTime" DisplayFormat="t" Width="5rem" Visible="@(!AllowEdit)" />
+        <DxGridDataColumn Caption="Leader" FieldName="LeaderSummaryBrief" Width="10rem" Visible="@AllowEdit" />
+        <DxGridDataColumn Caption="Leader" FieldName="LeaderSummary" Visible="@(!AllowEdit)" Width="40rem" />
+        <DxGridCommandColumnEx EditButtonVisible="true"
+                               NewButtonVisible="true"
+                               DeleteButtonVisible="true" Visible="@AllowEdit" />
+    </Columns>
+    <DetailRowTemplate>
+        @{
+            var Class = (Class)context.DataItem;
+            <CopyToClipboard Text=@($"{NavMan.BaseUri}EnrolClass={Class.ID}") />
+        }
+
+    </DetailRowTemplate>
+    <EditFormTemplate Context="ClassContext">
+        @{
+            var editItem = (Class)ClassContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem ColSpanMd="12">
+                <ValidationSummary />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Offered:" ColSpanMd="3" />
+            <DxFormLayoutItem Caption="Term-1" ColSpanMd="2" CssClass="border border-primary me-2">
+                <DxCheckBox @bind-Checked="editItem.OfferedTerm1" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Term-2" ColSpanMd="2" CssClass="border border-primary me-2">
+                <DxCheckBox @bind-Checked="editItem.OfferedTerm2" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Term-3" ColSpanMd="2" CssClass="border border-primary me-2">
+                <DxCheckBox @bind-Checked="editItem.OfferedTerm3" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Term-4" ColSpanMd="2" CssClass="border border-primary">
+                <DxCheckBox @bind-Checked="editItem.OfferedTerm4" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Guest Leader" ColSpanMd="12">
+                <DxTextBox @bind-Text="editItem.GuestLeader"
+                           NullText="A non-member presenter, leader or speaker"
+                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
+                <DxComboBox Data="Persons"
+                            ListRenderMode="ListRenderMode.Virtual"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            @bind-Value="editItem.Leader"
+                            TextFieldName="@nameof(Person.PersonSummary)">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Leader 2" ColSpanMd="12">
+                <DxComboBox Data="Persons"
+                            ListRenderMode="ListRenderMode.Virtual"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            @bind-Value="editItem.Leader2"
+                            TextFieldName="@nameof(Person.PersonSummary)">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Leader 3" ColSpanMd="12">
+                <DxComboBox Data="Persons"
+                            ListRenderMode="ListRenderMode.Virtual"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            @bind-Value="editItem.Leader3"
+                            TextFieldName="@nameof(Person.PersonSummary)">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
+                <DxComboBox Data="Venues"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            @bind-Value="editItem.Venue"
+                            TextFieldName="@nameof(Venue.Name)">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
+                <DxDateEdit T="DateTime?" Date="@editItem.StartDate" DateExpression="@(() => editItem.StartDate)"
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            NullText="Start Date of class. Only if not the Start of Term"
+                            DateChanged="@((DateTime? newValue) => OnStartDateChanged(newValue, editItem))" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12">
+                <DxSpinEdit @bind-Value="editItem.Recurrence" MinValue="1" MaxValue="52"
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            NullText="The number of times the class recurs. Only if not End of Term." />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Occurrence" ColSpanMd="12">
+                <DxComboBox Data="Occurrences"
+                            @bind-Value="editItem.Occurrence"
+                            TextFieldName="@nameof(Occurrence.Name)">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="On Day" ColSpanMd="12">
+                <DxComboBox Data="WeekDays"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            @bind-Value="editItem.OnDay"
+                            TextFieldName="@nameof(WeekDay.Day)" ReadOnly="@IsOnDayReadOnly">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Start Time" ColSpanMd="12">
+                <DxTimeEdit DisplayFormat="t" @bind-Time="editItem.StartTime" />
+            </DxFormLayoutItem>
+
+        </DxFormLayout>
+    </EditFormTemplate>
+
+</DxGrid>
+
+<style>
+    .classPopup-width {
+        min-width: 40rem;
+    }
+</style>
+
+@code {
+
+    [Parameter]
+    public Course? Course { get; set; }
+    [Parameter]
+    public IEnumerable<Venue>? Venues { get; set; }
+    [Parameter]
+    public IEnumerable<Person>? Persons { get; set; }
+    [Parameter]
+    public IEnumerable<WeekDay>? WeekDays { get; set; }
+    [Parameter]
+    public bool AllowEdit { get; set; } = false;
+    [Parameter]
+    public U3ADbContext? DbContext { get; set; }
+    [Parameter]
+    public List<Occurrence>? Occurrences { get; set; }
+
+    public IGrid? grid { get; set; }
+    MessageBox? messageBox;
+    Progress? progressBar;
+
+    bool IsOnDayReadOnly;
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        var editModel = (Class)e.EditModel;
+        IsOnDayReadOnly = false;
+        if (e.IsNew)
+        {
+            editModel.Occurrence = Occurrences.FirstOrDefault(x => x.ID == (int)OccurrenceType.Weekly);
+        }
+        else
+        {
+            if (editModel.StartDate != null) { IsOnDayReadOnly = true; }
+        }
+    }
+
+
+    bool isBusy;
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (isBusy) return;
+        isBusy = true;
+        try
+        {
+            await SaveRecord(e);
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (Class)e.EditModel;
+        if (!await IsDataOk(editModel, e.IsNew)) { e.Cancel = true; return; }
+        // Re-query a data item from the store.
+        var dataItem = e.IsNew ? new Class() : DbContext?.Class.Find(editModel.ID);
+        // Assign changes from the edit model to the data item.
+        editModel.CopyTo(dataItem);
+        dataItem.Venue = DbContext.Venue.Find(editModel.Venue.ID);
+        if (editModel.StartDate.HasValue)
+        {
+            dataItem.OnDay = DbContext.WeekDay.Find((int)editModel.StartDate.Value.DayOfWeek);
+        }
+        else
+        {
+            dataItem.OnDay = DbContext.WeekDay.Find(editModel.OnDay.ID);
+        }
+        dataItem.OnDayID = dataItem.OnDay.ID;
+        dataItem.Occurrence = DbContext.Occurrence.Find(editModel.Occurrence.ID);
+        if (editModel.Leader != null) { dataItem.Leader = DbContext.Person.Find(editModel.Leader.ID); }
+        if (editModel.Leader2 != null) { dataItem.Leader2 = DbContext.Person.Find(editModel.Leader2.ID); }
+        if (editModel.Leader3 != null) { dataItem.Leader3 = DbContext.Person.Find(editModel.Leader3.ID); }
+        var t = dataItem.StartTime;
+        dataItem.StartTime = new DateTime(1, 1, 1, t.Hour, t.Minute, 0);
+        // Post changes to the database.
+        if (e.IsNew) await DbContext.AddAsync(dataItem);
+        if (e.IsNew)
+        {
+            Course.Classes.Insert(0, dataItem);
+        }
+        else
+        {
+            int idx = Course.Classes.FindIndex(x => x.ID == dataItem.ID);
+            Course.Classes[idx] = dataItem;
+        }
+    }
+
+    async Task<bool> IsDataOk(Class EditModel, bool IsNew)
+    {
+        var msg = string.Empty;
+        if (await BusinessRule.IsOutOfTermClass(DbContext, EditModel))
+        {
+            if (!await BusinessRule.IsOutOfTermClassOK(DbContext, EditModel))
+            {
+                msg = @"<p>An Out of Term class must have an Occurrence of <strong>Once Only</strong> and Recurrence of <strong>nothing</strong>.</p>";
+                // set correct values
+                EditModel.OccurrenceID = (int)OccurrenceType.OnceOnly;
+                EditModel.Occurrence = DbContext?.Occurrence.First(x => x.ID == (int)OccurrenceType.OnceOnly);
+                EditModel.Recurrence = null;
+            }
+            if (!await BusinessRule.IsOutOfTermClassTermOK(DbContext, EditModel))
+            {
+                msg += @"<p>An Out of Term class must be offered in <strong>one</strong>
+                            term only being the term immediately preceding the Start Date.</p>";
+            }
+            if (msg != string.Empty)
+            {
+                await messageBox.ShowOkOnlyAsync("Incorrect Out of Term configuration", msg);
+                return false;
+            }
+        }
+        else
+        {
+            await BusinessRule.AssignTermForOnceOnlyClass(DbContext, EditModel);
+        }
+
+        if (IsNew) return true;
+
+        var original = DbContext?.Class.AsNoTracking().Include(x => x.OnDay).FirstOrDefault(x => x.ID == EditModel.ID);
+        if (original != null && (EditModel.StartTime != original.StartTime || EditModel.OnDay.ID != original.OnDay.ID))
+        {
+            msg = @"<p>Changing the <strong>Start Time</strong> or <strong>On Day</strong> fields will cause the date on
+                        all attendance records for this class to be recalculated. </p>
+                        <p>Do you wish to continue?</p>";
+            if (!await messageBox.ShowAsync("Change to Start Time / On Day", msg)) return false;
+            await progressBar.ShowSmallSpinnerAsync();
+            await DbContext?.AttendClass
+                    .Where(x => x.ClassID == EditModel.ID)
+                    .ForEachAsync(x =>
+                    {
+                        x.Date = x.Date.Date + EditModel.StartTime.TimeOfDay;
+                        x.Date = x.Date.AddDays(EditModel.OnDay.ID - (int)x.Date.DayOfWeek);
+                    });
+            await progressBar.Close();
+        }
+        return true;
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        await DbContext.SaveChangesAsync();
+        Class classToDelete = (Class)e.DataItem;
+        await BusinessRule.DeleteEnrolmentByClassID(DbContext, classToDelete.ID);
+        DbContext.Remove<Class>(classToDelete);
+        await DbContext.SaveChangesAsync();
+        grid.ClearSelection();
+    }
+
+    async Task OnStartDateChanged(DateTime? newStartDate, Class editItem)
+    {
+        editItem.StartDate = newStartDate;
+        if (newStartDate.HasValue)
+        {
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                editItem.OnDay = dbc.WeekDay.Find((int)newStartDate.Value.DayOfWeek);
+                Term term = await BusinessRule.FindTermAsync(dbc, newStartDate.Value);
+                if (term != null)
+                {
+                    editItem.OfferedTerm1 = (term.TermNumber == 1);
+                    editItem.OfferedTerm2 = (term.TermNumber == 2);
+                    editItem.OfferedTerm3 = (term.TermNumber == 3);
+                    editItem.OfferedTerm4 = (term.TermNumber == 4);
+                }
+            }
+        }
+        else
+        {
+            editItem.OfferedTerm1 = true;
+            editItem.OfferedTerm2 = true;
+            editItem.OfferedTerm3 = true;
+            editItem.OfferedTerm4 = true;
+        }
+        IsOnDayReadOnly = newStartDate.HasValue;
+    }
+}
+

@@ -1,0 +1,27 @@
+﻿<section class="alert alert-danger text-center" hidden="@isHidden">
+    <button class="btn-close" onclick="@onButtonClick" />
+    @(new MarkupString(AlertText))
+</section>
+
+<style>
+    section {
+    }
+
+    button {
+        float: right;
+    }
+</style>
+@code {
+
+    [Parameter, EditorRequired] public string AlertText { get; set; }
+    [Parameter] public EventCallback OnAlertCollapsed { get; set; }
+
+    bool isHidden = false;
+
+    async Task onButtonClick() {
+        isHidden = true;
+        InvokeAsync( StateHasChanged);
+        await OnAlertCollapsed.InvokeAsync();
+    }
+}
+

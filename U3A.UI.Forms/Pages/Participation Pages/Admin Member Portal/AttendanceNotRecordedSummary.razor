@@ -1,0 +1,87 @@
+﻿@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+
+<h3>Attendance Not Recorded</h3>
+
+<Progress @ref=@progress />
+<DxFormLayout>
+    <DxFormLayoutItem Caption="Attendance Term" CssClass="my-4">
+        <DxComboBox Data="@terms" NullText="Select the Term required..."
+                    FilteringMode="DataGridFilteringMode.Contains"
+                    TextFieldName="@nameof(Term.TermSummary)"
+        @bind-Value="@SelectedTerm">
+            <Buttons>
+                <DxEditorButton Text="Process" CssClass="text-primary"
+                                IconCssClass="h5 bi bi-check-lg"
+                                Tooltip="Click to process the selected term"
+                                Click="@OnProcess" />
+            </Buttons>
+        </DxComboBox>
+    </DxFormLayoutItem>
+
+    <DxGrid Data="@data" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            AutoExpandAllGroupRows="true"
+            ShowAllRows="true">
+        <ToolbarTemplate>
+            <GridToolbar LinkedGrid=@mainGrid />
+        </ToolbarTemplate>
+        <Columns>
+            <DxGridDataColumn Caption="Course" FieldName="CourseDetail" GroupIndex="0" />
+            <DxGridDataColumn Caption="Day / Time" FieldName="ClassDate" DisplayFormat="dddd, dd-MMMM-yyyy hh:mm tt" />
+            <DxGridDataColumn Caption="Cancelled?" FieldName="IsCancelled" />
+        </Columns>
+        <TotalSummary>
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="ClassDate" />
+        </TotalSummary>
+    </DxGrid>
+
+</DxFormLayout>
+<style>
+    .grid-height {
+        height: @gridHeight;
+    }
+</style>
+
+
+@code {
+    List<AttendanceRecorded> data;
+    List<Term> terms { get; set; }
+    Term SelectedTerm;
+    Progress? progress;
+    DxGrid? mainGrid;
+    string gridHeight { get; set; }
+    U3ADbContext dbc { get; set; }
+    GridToolbar? Toolbar;
+
+
+    protected override async Task OnInitializedAsync() {
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+        SelectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
+        if (newHeight != gridHeight) {
+            gridHeight = newHeight;
+            InvokeAsync(StateHasChanged);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async Task OnProcess() {
+        await progress.ShowSmallSpinnerAsync();
+        mainGrid.BeginUpdate();
+        data = await BusinessRule.GetAttendanceNotRecordedAsync(dbc, SelectedTerm, DateTime.Now);
+        mainGrid.EndUpdate();
+        InvokeAsync(StateHasChanged);
+        await progress.Close();
+    }
+
+    public void Dispose() {
+        dbc?.Dispose();
+    }
+}

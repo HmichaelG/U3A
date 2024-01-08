@@ -1,0 +1,279 @@
+﻿@namespace U3A.UI.Forms
+
+@using System
+@using System.IO
+@using U3A.Services
+@using U3A.Services.Email;
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager NavigationManager
+
+<MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
+<Progress @ref="@ProgressBar" />
+<ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+
+<h4>Outbound Email Statistics</h4>
+<DxGrid Data=@statistics @ref=@bounceGrid ColumnResizeMode=GridColumnResizeMode.ColumnsContainer
+        ShowGroupPanel=false ShowSearchBox=false>
+    <Columns>
+        <DxGridDataColumn Width="8rem" Caption="Period" FieldName="Period" />
+        <DxGridDataColumn Caption="From" FieldName="StartDate" DisplayFormat="dd-MMM-yyyy" Visible=true />
+        <DxGridDataColumn Caption="To" FieldName="EndDate" DisplayFormat="dd-MMM-yyyy" Visible=true />
+        <DxGridDataColumn Caption="Sent" FieldName="Sent" />
+        <DxGridDataColumn Caption="Opens" FieldName="Opens" />
+        <DxGridDataColumn Caption="Unique Opens" FieldName="UniqueOpens" />
+        <DxGridDataColumn Caption="Spam Complaints" FieldName="SpamComplaints" />
+        <DxGridDataColumn Caption="Spam Complaints Rate" TextAlignment="GridTextAlignment.Center" FieldName="SpamComplaintsRate">
+            <CellDisplayTemplate>
+                @{
+                    var rate = (double)context.Value;
+                    string cssClass;
+                    switch (rate)
+                    {
+                        case > 0.1:
+                            cssClass = "bg-danger";
+                            break;
+                        case > 0:
+                            cssClass = "bg-warning";
+                            break;
+                        default:
+                            cssClass = "bg-success";
+                            break;
+                    }
+                    <div class="d-flex">
+                        <div class="badge badge-size py-1 px-2 mx-auto text-white @cssClass">@rate.ToString("n2")%</div>
+                    </div>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName="Bounced" Caption="Bounced" />
+        <DxGridDataColumn Caption="Bounce Rate" FieldName="BounceRate">
+            <CellDisplayTemplate>
+                @{
+                    var rate = (double)context.Value;
+                    string cssClass;
+                    switch (rate)
+                    {
+                        case > 0:
+                            cssClass = "bg-warning";
+                            break;
+                        default:
+                            cssClass = "bg-success";
+                            break;
+                    }
+                    <div class="d-flex">
+                        <div class="badge badge-size py-1 px-2 mx-auto text-white @cssClass">@rate.ToString("n2")%</div>
+                    </div>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn Width="8rem" Caption="Issues" AllowGroup="false">
+            <CellDisplayTemplate>
+                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                          RenderStyle="ButtonRenderStyle.Primary" Text=@($"{GetEmailIssues(context.DataItem as EmailOutboundOverviewStats)} Issues")
+                          Click="() => OnBouncedClick((EmailOutboundOverviewStats)context.DataItem)"></DxButton>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+    </Columns>
+    <TotalSummary>
+        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Sent" FooterColumnName="Sent" />
+        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Opens" FooterColumnName="Opens" />
+        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="UniqueOpens" FooterColumnName="UniqueOpens" />
+        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="SpamComplaints" FooterColumnName="SpamComplaints" />
+    </TotalSummary>
+
+</DxGrid>
+
+@if (showBounceGrid)
+{
+    <div class="mt-2">
+        <h4>Bounce Email &amp; Spam Complaints</h4>
+        <DxGrid Data=@bounces @ref=@bounceGrid
+                CssClass="grid-height" id="bounceGrid">
+            <ToolbarTemplate>
+                <GridToolbar LinkedGrid=@bounceGrid />
+            </ToolbarTemplate>
+            <Columns>
+                <DxGridDataColumn Width="8rem" Caption="Date" FieldName="BouncedAt"
+                                  DisplayFormat="dd-MMM-yy hh:mm tt" />
+                <DxGridDataColumn Caption="Subject" FieldName="Subject" />
+                <DxGridDataColumn Caption="From" FieldName="From" />
+                <DxGridDataColumn Caption="To Email" FieldName="Email" />
+                <DxGridDataColumn Caption="To Person" FieldName="Person.FullName" />
+                <DxGridDataColumn Caption="Reason" FieldName="Details" />
+                <DxGridDataColumn Width="8rem" FieldName="ID" Caption="Bounce Type" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
+                    <CellDisplayTemplate>
+                        <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                  RenderStyle="ButtonRenderStyle.Primary" Text=@($"{(context.DataItem as EmailBounce).Name}")
+                                  Click="() => OnSelectedBounceClick((EmailBounce)context.DataItem)"></DxButton>
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </DxGrid>
+    </div>
+
+    <DxWindow @ref=@bounceDetailsForm Width="max(35vw, 400px)"
+              AllowResize="true"
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              CssClass="vh-75"
+              HeaderText="Bounced Email Details">
+        <BodyTextTemplate>
+            <div class="px-2 w-100">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td class="h6 text-left" colspan="2">Email Details</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row" class="col-2">Type</th> <td>@selectedBounce.Name</td></tr>
+                        <tr><th scope="row" class="col-2">Subject</th> <td>@selectedBounce.Subject</td></tr>
+                        <tr><th scope="row" class="col-2">From</th> <td>@selectedBounce.From</td></tr>
+                        <tr><th scope="row" class="col-2">To</th> <td>@selectedBounce.Email</td></tr>
+                        <tr><th scope="row" class="col-2">Date</th> <td>@selectedBounce.BouncedAt.ToString("dd-MMM-yy hh:mm tt")</td></tr>
+                    </tbody>
+                </table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td class="h6 text-left" colspan="2">Bounce Details</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row" class="col-2">Reason</th> <td>@selectedBounce.Details</td></tr>
+                        <tr>
+                            <th scope="row" class="col-2">Status</th>
+                            <td>
+                                @((selectedBounce.Inactive)
+                                    ? "The email address has been deactiveted."
+                                    : "The email address remains active.")
+                            </td>
+                        </tr>
+                        @if (selectedBounce.Inactive)
+                        {
+                            <tr><th scope="row" class="col-2">Can Reactivate?</th> <td>@selectedBounce.CanActivate</td></tr>
+                        }
+                    </tbody>
+                </table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td class="h6 text-left" colspan="2">Praticipant Details</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (selectedBounce.Person != null)
+                        {
+                            <tr><th scope="row" class="col-2">Name</th> <td>@selectedBounce.Person.FullName</td></tr>
+                            <tr><th scope="row" class="col-2">Joined</th> <td>@selectedBounce.Person.DateJoined?.ToString("dd-MMM-yyyy")</td></tr>
+                            <tr><th scope="row" class="col-2">Mobile</th> <td>@selectedBounce.Person.Mobile</td></tr>
+                            <tr><th scope="row" class="col-2">Home Phone</th> <td>@selectedBounce.Person.HomePhone</td></tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td class="h6 text-center text-info" colspan="2">
+                                    This email address is no longer associated with a participant.<br />
+                                    Normally, this indicates the issue has been resolved.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </BodyTextTemplate>
+    </DxWindow>
+
+
+}
+
+<style>
+    .grid-height {
+        height: @gridHeight;
+    }
+
+    .vh-85 {
+        height: 75vh;
+    }
+
+    .badge-size {
+        font-size: 0.7rem !important;
+    }
+</style>
+
+@code {
+    bool IsReady;
+    IEnumerable<EmailOutboundOverviewStats> statistics { get; set; }
+    IEnumerable<EmailBounce> bounces { get; set; }
+    EmailBounce selectedBounce;
+    MessageBox? messageBox;
+    string? messageBoxWidth;
+
+    ErrorPopup? ErrorPopup { get; set; }
+    IGrid? bounceGrid { get; set; }
+    GridToolbar? bounceToolbar;
+    string ErrorHeader;
+    string ErrorMessage;
+    Progress? ProgressBar;
+    string gridHeight = "600px";
+
+
+    U3ADbContext dbc { get; set; }
+    DocumentServer server;
+    PostmarkService service;
+    bool showBounceGrid;
+    DxWindow bounceDetailsForm;
+    LocalTime localTime;
+    TimeSpan tzOffset;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        service = new PostmarkService(U3Adbfactory);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            localTime = new LocalTime(js);
+            tzOffset = await localTime.GetTimezoneOffsetAsync();
+            statistics = await service.GetOverviewStatisticsAsync(tzOffset);
+            IsReady = true;
+            StateHasChanged();
+        }
+        var newHeight = await Window.FitToRemainingHeight(js, "bounceGrid", gridHeight);
+        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
+    }
+
+    int GetEmailIssues(EmailOutboundOverviewStats dataItem)
+    {
+        return dataItem.Bounced + dataItem.SpamComplaints;
+    }
+
+    async Task OnBouncedClick(EmailOutboundOverviewStats dataItem)
+    {
+        showBounceGrid = true;
+        bounces = (dataItem.Bounced + dataItem.SpamComplaints == 0)
+            ? new List<EmailBounce>()
+            : await service.GetBounceData(tzOffset, dataItem.StartDateUTC, dataItem.EndDateUTC);
+    }
+
+    async Task OnSelectedBounceClick(EmailBounce dataItem)
+    {
+        selectedBounce = dataItem;
+        await bounceDetailsForm.ShowAsync();
+    }
+
+}
