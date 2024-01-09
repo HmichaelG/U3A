@@ -36,7 +36,7 @@ else
                                   HelpTopic="Version-History.html"
                                   ActivationStyle="HelpActivationStyle.ButtonOnly" />
             </div>
-            <DxTabs CssClass="mb-2 w-100">
+            <DxTabs CssClass="mb-2 vw-100">
                 <DxTabPage Text="Member Summary">
                     <GeneralSummaryChart />
                 </DxTabPage>
@@ -53,18 +53,18 @@ else
                     <AttendanceChart />
                 </DxTabPage>
                 <DxTabPage Text="Website">
-                    <div class="shadow card col col-12 m-1">
-                        <iframe src="@homePage" width="100%" class="iframe-height"></iframe>
+                    <div class="">
+                        <iframe src="@homePage" class="shadow card p-1 iframe-height"></iframe>
                     </div>
                 </DxTabPage>
                 <DxTabPage Text="u3admin.org.au">
-                    <div class="shadow card col col-12 m-1">
-                        <iframe src="https://u3admin.org.au" width="100%" class="iframe-height"></iframe>
-                    </div>
+                        <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-height"></iframe>
                 </DxTabPage>
             </DxTabs>
-            <footer class="text-muted">
-                &copy; @(DateTime.Today.Year) - Visit: <a href="https://u3admin.org.au">U3Admin.org.au</a>
+            <footer class="mt-4 footer vw-100 text-muted">
+                <div align="center">
+                    &copy; @(DateTime.Today.Year) - Visit: <a href="https://u3admin.org.au">U3Admin.org.au</a>
+                </div>
             </footer>
         }
     </DxFormLayout>
@@ -73,8 +73,9 @@ else
 <style>
 
     .iframe-height {
+        width: 85vw;
         min-height: 40vh;
-        height: 85vh;
+        height: 95vh;
         border-style: none;
         padding-bottom: 5px;
     }

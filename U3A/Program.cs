@@ -12,8 +12,19 @@ using U3A.Services;
 using DevExpress.Blazor.RichEdit.SpellCheck;
 using Microsoft.Extensions.FileProviders;
 using System.Reflection;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (!builder.Environment.IsDevelopment())
+{
+    var uri = Environment.GetEnvironmentVariable("VaultUri");
+    if (uri != null )
+    {
+        var keyVaultEndpoint = new Uri(uri);
+        builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+    }
+}
 
 // **** Start local modifications ****
 
@@ -125,6 +136,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
+builder.Services.AddApplicationInsightsTelemetry(options =>
+   options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 
 var app = builder.Build();
 
