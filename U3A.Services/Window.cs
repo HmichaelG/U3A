@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 
 namespace U3A.Services
 {
@@ -35,7 +36,7 @@ namespace U3A.Services
         }
         public static async Task<string> FitToRemainingHeight(IJSRuntime js, string ElementID, string currentHeight)
         {
-            return await FitToRemainingHeight(js, ElementID, currentHeight, 0.1);
+            return await FitToRemainingHeight(js, ElementID, currentHeight, 0.02);
         }
 
         public static async Task<string> FitToRemainingHeight(IJSRuntime js, string ElementID, string currentHeight, double Offset)

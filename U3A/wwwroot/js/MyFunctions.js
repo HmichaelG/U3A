@@ -5,6 +5,11 @@
     };
 };
 
+function getLocalStorage(key) {
+    var result = localStorage.getItem(key);
+    return result == 'true';
+}
+
 function setFocus(id) {
     let elem = document.getElementById(id);
     if (elem != null) {
