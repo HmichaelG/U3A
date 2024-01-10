@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-09-22T11:13:09.454+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Bank Data Import</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Bank Data Import</para>
+    </header>
+    <para styleclass="Normal"><text style="font-weight:bold;">Bank data import</text> is the process of importing bank cash receipt details and assigning those receipts to the members that paid them. Importantly, bank data import is only required for those members that paid their fees via their banking software, cash or cheque. <text style="text-decoration:underline;">It is not required for those members who paid their fees via the Eway online payments system</text>. Any receipts paid via Eway must be ignored in this procedure.</para>
+    <para styleclass="Heading3">Before you begin</para>
+    <para styleclass="Normal">To use this procedure you must have access to the U3A&apos;s banking software or be provided with a file by somebody that does. The file required is known as an <text style="font-weight:bold;">OFX file</text>, meaning an Open Financial Exchange file. It has a very specific file format and is supported by all major Australian financial institutions. </para>
+    <para styleclass="Normal">Normally, when you request this file you will be given the ability to enter a date range. We suggest the start date be one day after the last file import and the end date be no later than yesterday&apos;s date.</para>
+    <para styleclass="Normal" style="text-align:center; margin-bottom:0px;"><text style="font-weight:bold;">Important</text></para>
+    <para styleclass="Normal" style="text-align:center; margin-bottom:0px;"><text style="font-style:italic;">During data import, the software will attempt to match receipts to participants (members). This is done by extracting the member&apos;s name from the transaction&apos;s description. At best, this procedure is problematic. Therefore,</text></para>
+    <para styleclass="Normal" style="text-align:center;"><text style="font-weight:bold; font-style:italic;">All receipt transactions &amp; their assignment must be checked carefully for accuracy.</text></para>
+    <para styleclass="Heading3">Screen Layout</para>
+    <para styleclass="Normal">The procedure&apos;s user interface consists of three sections...</para>
+    <para styleclass="Normal" style="margin-bottom:0px; line-height:1.15;">1. On the top-left corner is the <text style="font-weight:bold;">file upload dialogue</text>. Use this dialogue to select the file to be imported into the system.</para>
+    <para styleclass="Normal" style="margin-bottom:0px; line-height:1.15;">2. On the top-right corner is the procedure&apos;s <text style="font-weight:bold;">command buttons</text>. These give you access to the <text style="font-style:italic;">actions</text> performed by the procedure.</para>
+    <para styleclass="Normal" style="margin-bottom:1px; line-height:1.15;">3. Underneath items 1 and 2, is the <text style="font-weight:bold;">display grid</text>. This displays the transactions entered and provides the ability to manually assign a receipt to a member.</para>
+    <para styleclass="Normal" style="margin-bottom:1px; line-height:1.15;"></para>
+    <para styleclass="Normal" style="margin-top:1px; line-height:1.15;">The current financial year will be displayed in the <text style="font-weight:bold;">command button </text>section. Always check to ensure you are working in the correct financial year. if it is incorrect, click the <text style="font-style:italic;">Change Year</text><text style="font-weight:bold; font-style:italic;">&#32;</text>button and select the year required. </para>
+    <para styleclass="Normal" style="margin-top:1px; line-height:1.15;">The other buttons available are...</para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-top:1px; line-height:1.15; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-top:1px; line-height:1.15;"><text style="font-weight:bold;">Apply Payments to Participant records</text>. When you are satisfied that all imported transactions are correctly assigned to participant records, click this button to apply the transactions and finalise the procedure.</li>
+      <li styleclass="Normal" style="margin-top:1px; line-height:1.15;"><text style="font-weight:bold;">Show all bank transactions</text>. Normally, only receipt transactions are displayed. Click this button to show all transactions in the import file.</li>
+      <li styleclass="Normal" style="margin-top:1px; line-height:1.15;"><text style="font-weight:bold;">Clear bank OFX file</text>. This option will delete the OFX file from the system. It is intended to be used if a mistake was made when importing the file. An incorrect date range, for example. The original OFX file will remain intact on your client PC. &#160;</li>
+    </list>
+    <para styleclass="Normal" style="margin-top:1px; line-height:1.15;">The <text style="font-weight:bold;">display grid </text>has the following columns...</para>
+    <para styleclass="Normal" style="margin-top:1px; line-height:1.15;"><table styleclass="Default" rowcount="7" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:269px;">
+          <para styleclass="Normal">Column</para>
+        </td>
+        <td style="width:682px;">
+          <para styleclass="Normal">Description</para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:269px;">
+          <para styleclass="Normal">Name</para>
+        </td>
+        <td style="width:682px;">
+          <para styleclass="Normal">The participant (member) to whom the receipt has or will be assigned.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:269px;">
+          <para styleclass="Normal">On File?</para>
+        </td>
+        <td style="width:682px;">
+          <para styleclass="Normal">A checkbox to indicate the receipt has already been processed by the system in a previous import. This will occur if your OFX file&apos;s date range overlaps with a previous import.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:269px;">
+          <para styleclass="Normal">Amount</para>
+        </td>
+        <td style="width:682px;">
+          <para styleclass="Normal">The amount received.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:269px;">
+          <para styleclass="Normal">Date</para>
+        </td>
+        <td style="width:682px;">
+          <para styleclass="Normal">The date received/processed by the U3A&apos;s financial institution.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:269px;">
+          <para styleclass="Normal">Description</para>
+        </td>
+        <td style="width:682px;">
+          <para styleclass="Normal">The description of the transaction. Most often this is text entered by the participant when the payment was made.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:269px;">
+          <para styleclass="Normal">Identifier</para>
+        </td>
+        <td style="width:682px;">
+          <para styleclass="Normal">Most often not used.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading3">How to import a file</para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">Using your U3A&apos;s banking software, download the OFX onto your PC. It will normally be placed in your <text style="font-style:italic;">Downloads</text> folder.</li>
+      <li styleclass="Normal">Using the <text style="font-weight:bold;">file upload dialogue</text>, import the file into the system. You can do this in one of two ways...</li>
+      <list id="1" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+        <li styleclass="Normal">Drag the file from your operating system&apos;s file manager (File Explorer, for example) and drop onto the <text style="font-weight:bold;">file upload dialogue</text>, or</li>
+        <li styleclass="Normal">Click the <text style="font-style:italic;">Select File</text> button to open a standard operating system file open dialogue, navigate to and select the file required.</li>
+      </list>
+    </list>
+    <para styleclass="Normal" style="margin-left:13px;">Once selected, the system will upload the OFX file onto the U3Admin server and process it. The results will be output into the <text style="font-weight:bold;">display grid.</text></para>
+    <para styleclass="Heading3">Assigning Receipts</para>
+    <para styleclass="Normal">The import process will make a &quot;best guess&quot; at assigning receipts to participants. The process is not perfect and quite often you will need to correct the automatic assignment. </para>
+    <para styleclass="Normal">Click the edit (pencil) button on the grid row you wish to change. Select the required member from the drop-down list on the <text style="font-style:italic;">Name </text>column. When you are satisfied that all is correct, click the Save (disk) icon on the grid row. Your changes are now saved. Repeat for all receipts to be assigned.</para>
+    <para styleclass="Heading3">Completing the import</para>
+    <para styleclass="Normal">When you are satisfied that all rows are correct (or, correct as can be), click the button, <text style="font-weight:bold;">Apply Payments to Participant records. </text>This will finalise the procedure and return you to the main menu.</para>
+    <para styleclass="Heading3">Exit without applying payments</para>
+    <para styleclass="Normal">It is safe to exit the procedure without applying the payments to participant records. When you re-enter the procedure all transactions will be displayed in the grid exactly as you have left them.</para>
+  </body>
+</topic>

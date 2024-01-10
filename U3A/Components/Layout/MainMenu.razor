@@ -30,11 +30,11 @@
                 <TitleTemplate>
                     @if (IsTopMenu)
                     {
-                        <span><img src="images/U3ALogo.png" alt="@context">&nbsp;@OrganisationName</span>
+                        <span class="title"><img src="images/U3ALogo.png" alt="@context">&nbsp;@OrganisationName</span>
                     }
                     else
                     {
-                        <div>@OrganisationName<hr /></div>
+                        <div class="title">@OrganisationName<hr /></div>
                     }
                 </TitleTemplate>
                 <Items>
@@ -197,11 +197,6 @@
                                                 Click="@(() => OnChangeCredential("TwoFactorAuthentication"))" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem IconCssClass="bi bi-question" Click="@(ShowHelp)">
-                                <TextTemplate>
-                                    @((isVertical) ? "Help" : "")
-                                </TextTemplate>
-                            </DxMenuItem>
                             <DxMenuItem IconCssClass="bi bi-house" NavigateUrl="./" Visible="@(!IsOnHomePage())">
                                 <TextTemplate>
                                     @((isVertical) ? "Home" : "")
@@ -308,7 +303,7 @@
 
     async Task ShowHelp()
     {
-        await help.ShowTopicAsync("max(50vw, 800px)");
+        await help!.ShowTopicAsync();
     }
 
     async Task OnSwitchMenu()

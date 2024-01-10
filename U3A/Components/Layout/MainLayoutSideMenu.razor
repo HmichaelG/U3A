@@ -16,20 +16,21 @@
         <Rows>
             <DxGridLayoutRow Areas="header header" Height="auto"></DxGridLayoutRow>
             <DxGridLayoutRow Areas="sidebar content"></DxGridLayoutRow>
+            <DxGridLayoutRow Areas="footer footer" Height="auto"></DxGridLayoutRow>
         </Rows>
         <Columns>
             <DxGridLayoutColumn Width="auto" />
             <DxGridLayoutColumn />
         </Columns>
         <Items>
-            <DxGridLayoutItem Area="header" CssClass="vw-100">
-            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="header" CssClass="vw-100" />
+            <DxGridLayoutItem Area="footer" CssClass="vw-100" />
             <DxGridLayoutItem Area="sidebar" CssClass="layout-sidebar">
                 <Template>
                     <SideBar />
                 </Template>
             </DxGridLayoutItem>
-            <DxGridLayoutItem Area="content" CssClass="w-100 content px-4">
+            <DxGridLayoutItem Area="content" CssClass="content px-4">
                 <Template>
                     <ErrorBoundary @ref="@errorBoundary">
                         <ChildContent>
@@ -77,13 +78,13 @@
             var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             foreach (var r in roles)
             {
-                if (authenticationState.User.IsInRole(r.Name))
+                if (authenticationState.User.IsInRole(r.Name!))
                 {
                     hasRole = true;
                     break;
                 }
             }
-            var authEmail = authenticationState.User.Identity.Name;
+            var authEmail = authenticationState.User.Identity!.Name;
             if (authEmail == constants.superAdmin) hasRole = true;
         }
         await base.OnInitializedAsync();

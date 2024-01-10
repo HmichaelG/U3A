@@ -15,9 +15,9 @@
             {
                 <div class="alert alert-danger text-center text-alert">Warning: You are in Member Portal Maintenance Mode</div>
             }
-            <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title" 
+            <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
                       SizeMode=SizeMode.Small
-                      RenderStyleMode="ButtonRenderStyleMode.Outline" 
+                      RenderStyleMode="ButtonRenderStyleMode.Outline"
                       CssClass="@ButtonCssClass"
                       Click="ShowTopicAsync" Id="helpButton" />
             break;
@@ -35,20 +35,18 @@
             </h3>
             break;
     }
-
     <DxWindow @ref=@helpWindow Width="@windowWidth"
               Visible=false
               Closed="OnClosed"
-              HorizontalAlignment="HorizontalAlignment.Center"
+              HorizontalAlignment="HorizontalAlignment.Right"
               VerticalAlignment="VerticalAlignment.Center"
-              Height="80vh"
+              Height="100vh"
               AllowResize="true"
               Context="windowContext"
               CloseOnEscape=true
               ShowCloseButton=true
               ShowFooter=true
               Scrollable=true
-              BodyCssClass="h-100"
               HeaderText="Help">
         <BodyTextTemplate>
             <iframe src="@helpFile" class="iframe-size"></iframe>
@@ -62,10 +60,6 @@
         width: 100%;
         border-style: none;
         padding-bottom: 5px;
-    }
-
-    .window-details {
-        height: @windowHeight;
     }
 
 </style>
@@ -87,12 +81,14 @@
     public string TitleCssClass { get; set; } = "d-flex align-items-center";
     [Parameter]
     public string ButtonIconCssClass { get; set; } = "bi bi-question menu-icon";
-    
+    [Parameter]
+    public bool IncludeTableOfContents { get; set; } = false;
+
+    public string windowWidth { get; set; }
+
     DxWindow? helpWindow;
     string helpFile;
-    string windowHeight = "600px";
-    string standardWidth = "max(35vw, 400px)";
-    string windowWidth;
+    string standardWidth;
 
     U3ADbContext dbc { get; set; }
     SystemSettings? settings;
@@ -108,23 +104,22 @@
 
     public async Task ShowTopicAsync(string WindowWidth)
     {
-        windowWidth = WindowWidth;
+        this.windowWidth = WindowWidth;
         await ShowTopicAsync();
     }
+
     public async Task ShowTopicAsync()
     {
+        standardWidth = (IncludeTableOfContents) ? "max(45vw, 400px)" : "max(40vw, 400px)";
+        if (string.IsNullOrWhiteSpace(windowWidth)) { windowWidth = standardWidth; }
         if (helpWindow.Visible) { await helpWindow.CloseAsync(); }
-        else
-        {
-            if (string.IsNullOrWhiteSpace(windowWidth)) { windowWidth = standardWidth; }
-            helpFile = $"help/index.html?{HelpTopic}";
-            await helpWindow.ShowAsync();
-        }
+        helpFile = $"help/index.html?{HelpTopic}";
+        await helpWindow.ShowAsync();
     }
 
     void OnClosed()
     {
-        windowWidth = standardWidth;
+        standardWidth=windowWidth;
     }
 
     public void Dispose()

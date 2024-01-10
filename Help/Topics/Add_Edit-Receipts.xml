@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-12-18T12:50:58.120+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Add/Edit Receipts</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Add/Edit Receipts</para>
+    </header>
+    <para styleclass="Normal">Cash receipts are normally applied to participant records either automatically when the Eway online payment gateway is used or manually when the participant pays via some other payment method, cash, cheque or direct payment.</para>
+    <para styleclass="Normal">This procedure should therefore be rarely used. Its primary purpose is to re-assign receipts that have been incorrectly applied to the wrong participant or to split a receipt amongst multiple participants. The procedure may also be used to edit the participant&apos;s <text style="font-style:italic;">Financial To</text> year.</para>
+    <para styleclass="Normal">At all times, the total money received must match your banking records. Receipt transactions should only be edited or deleted when money has been credited back to the participant.</para>
+    <para styleclass="Heading3">Financial Status - Add/Edit</para>
+    <para styleclass="Normal">Using this procedure, you may <text style="font-style:italic;">Set</text> or <text style="font-style:italic;">Reset</text> a participant&apos;s Financial Status. </para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal"><text style="font-weight:bold;">Set Financial Status</text>. If the participant&apos;s Financial To year is prior to the current Processing Year, you will be presented with a check-box asking if the Participant&apos;s Financial To year is to be set to the current Processing Year. Tick this check-box to update the Financial To year. This will make the participant a financial member of the U3A.</li>
+    </list>
+    <para styleclass="Normal" style="margin-left:13px;">Note that by default, this check-box is automatically ticked if a new receipt is created.</para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal"><text style="font-weight:bold;">Reset Financial Status.</text> If the participant&apos;s Financial To year is equal to the current Processing Year, you will be presented &#160;with a check-box asking if the Participant&apos;s Financial To year is to be reset to the Processing Year - 1. This will make the participant not financial in the current year.</li>
+    </list>
+    <para styleclass="Normal">If you edit a receipt and change the participant, you will be presented with two check-boxes. The first will ask if the new participant is to have their Financial To year set to the current processing year and the second will ask if the previous participant&apos;s Financial Year is to be reset to the previous processing year. </para>
+    <para styleclass="Heading3">Financial Status - Delete</para>
+    <para styleclass="Normal">If you delete a participant&apos;s receipt, you will be asked if you wish to also reset the participant&apos;s Financial To year. You have three choices...</para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">Click <text style="font-weight:bold;">Yes</text>. The receipt will be deleted and the participant&apos;s Financial To year is reset. </li>
+      <li styleclass="Normal">Click <text style="font-weight:bold;">No</text>. The receipt will be deleted but the participant&apos;s Financial To year will remain as is.</li>
+      <li styleclass="Normal">Click <text style="font-weight:bold;">Cancel</text>. No action is taken. The receipt will not be deleted and the Participant&apos;s Financial To year will remain as is. </li>
+    </list>
+    <para styleclass="Normal"><text styleclass="Heading2">The receipt record</text></para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="6" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:180px;">
+          <para styleclass="Normal">Field</para>
+        </td>
+        <td style="width:771px;">
+          <para styleclass="Normal">Description</para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:180px;">
+          <para styleclass="Normal">Received From</para>
+        </td>
+        <td style="width:771px;">
+          <para styleclass="Normal">Select the participant from whom the money was received.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:180px;">
+          <para styleclass="Normal">Date</para>
+        </td>
+        <td style="width:771px;">
+          <para styleclass="Normal">Enter or select the date the money was received. This should match your bank statement.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:180px;">
+          <para styleclass="Normal">Description</para>
+        </td>
+        <td style="width:771px;">
+          <para styleclass="Normal">Briefly describe the transaction.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:180px;">
+          <para styleclass="Normal">Indentifier</para>
+        </td>
+        <td style="width:771px;">
+          <para styleclass="Normal">(Optional) May be used to provided additional detail to explain the transaction.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:180px;">
+          <para styleclass="Normal">Amount</para>
+        </td>
+        <td style="width:771px;">
+          <para styleclass="Normal">Enter the receipt amount as a positive number. The software does not allow a negative receipt amount.</para>
+        </td>
+      </tr>
+    </table></para>
+  </body>
+</topic>

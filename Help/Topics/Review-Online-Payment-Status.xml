@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-11-26T13:33:45.761+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Review Online Payment Status</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Review Online Payment Status</para>
+    </header>
+    <para styleclass="Normal"><text style="font-weight:bold; color:#ff0000;">Note:</text><text style="color:#ff0000;"> Be aware Message Result </text><text style="font-weight:bold; color:#ff0000;">D4406</text><text style="color:#ff0000;"> includes payment requests cancelled by the user.</text></para>
+    <para styleclass="Normal">Use this procedure to review the status of all<text style="font-style:italic;"> Eway request for payment</text> status attempts.</para>
+    <para styleclass="Normal">A payment request has the following life cycle...</para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">The u3admin website creates a unique access code.</li>
+      <li styleclass="Normal">The u3admin website persists the access code in a payment request record in the database.</li>
+      <li styleclass="Normal">The u3admin website activates the EWAY API and passes the access code in a payment request call.</li>
+      <li styleclass="Normal">The EWAY website processes the payment and returns to the u3admin website.</li>
+      <li styleclass="Normal">The u3admin website retrieves incomplete payment requests from the database and interrogates the EWAY API to ascertain the payment result.</li>
+      <li styleclass="Normal">For those requests that the EWAY API has marked as complete, the u3admin will either...</li>
+      <list id="0" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+        <li styleclass="Normal">Create a receipt if the request has been successful. The payment request will be updated as <text style="font-weight:bold;">Processed</text> and a success result code recorded.</li>
+        <li styleclass="Normal">If the request has been unsuccessful, the payment request will be marked as <text style="font-weight:bold;">Processed</text> and the failure codes recorded. A receipt will not be created.</li>
+      </list>
+    </list>
+    <para styleclass="Normal">A request record may therefore have a Status result that is either blank, meaning unprocessed by the u3admin system or <text style="font-weight:bold;">Processed</text> meaning the above life cycle is complete for that request. </para>
+    <para styleclass="Normal">HTTP and/or other network errors will leave the request in an unprocessed or incomplete state. If the request was created in the <text style="font-style:italic;">Member Portal</text> then it will be processed the next time the member attempts to enter the Member Payments sub-menu. A similar event will occur when the administrator re-enters the Admin Portal. If neither of these events occur, the request will be re-processed overnight. </para>
+    <para styleclass="Normal">Those status records with a result code of 00 represent successful payments. All others represent either a cancelled or declined request.</para>
+  </body>
+</topic>

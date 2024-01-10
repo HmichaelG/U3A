@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-11-09T20:25:05.347+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Statistics/Bounces</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Statistics/Bounces</para>
+    </header>
+    <para styleclass="Normal">This tab provides statistics obtained from the Postmark email server. The details provided are...</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="8" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:166px;">
+          <para styleclass="Normal">Property</para>
+        </td>
+        <td style="width:785px;">
+          <para styleclass="Normal">Meaning</para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:166px;">
+          <para styleclass="Normal">Sent</para>
+        </td>
+        <td style="width:785px;">
+          <para styleclass="Normal">The total number of email sent in the current period.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:166px;">
+          <para styleclass="Normal">Opens</para>
+        </td>
+        <td style="width:785px;">
+          <para styleclass="Normal">The total number of times email has been opened by the recipients. If a recipient opens the same email &#160;three times then this value is increased by 3.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:166px;">
+          <para styleclass="Normal">Unique Opens</para>
+        </td>
+        <td style="width:785px;">
+          <para styleclass="Normal">The total number of times email has been uniquely opened by recipients. If a recipient opens the same email &#160;three times then this value is increased by 1.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:166px;">
+          <para styleclass="Normal">Spam Complaints</para>
+        </td>
+        <td style="width:785px;">
+          <para styleclass="Normal">The number of spam complaints received.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:166px;">
+          <para styleclass="Normal">Spam Complaint Rate</para>
+        </td>
+        <td style="width:785px;">
+          <para styleclass="Normal">Total spam complaints as a percent of total email sent.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:166px;">
+          <para styleclass="Normal">Bounced</para>
+        </td>
+        <td style="width:785px;">
+          <para styleclass="Normal">The number of bounced emails sent</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:166px;">
+          <para styleclass="Normal">Bounced Rate</para>
+        </td>
+        <td style="width:785px;">
+          <para styleclass="Normal">Total bounced email as a percent of total email sent.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal">The <text style="font-style:italic;">Bounce</text> cell values are buttons that when clicked will provide further detail on the emails bounced in a secondary grid. This grid, in turn contains a Bounce Type cell which when clicked will provide full detail of the bounce including the recipient&apos;s details if available. </para>
+    <para styleclass="Normal"><text style="font-weight:bold;">Engagement</text></para>
+    <para styleclass="Normal">Total <text style="font-style:italic;">Sent </text>compared with <text style="font-style:italic;">Unique Opens</text> can be used as a measure of engagement. The closer these figures equal each other, the more engaged your audience is. <text style="font-style:italic;">Opens</text> compared with <text style="font-style:italic;">Unique Opens</text> can however be a two-edged sword. More Opens than Unique Opens may indicate an interested and engaged audience or, it may indicate a complex email that may have to be read a number of times for readers to comprehend its content. </para>
+    <para styleclass="Normal"><text style="font-weight:bold;">Bounces &amp; Spam Complaints</text></para>
+    <para styleclass="Normal">There are many reasons why an email will bounce. Most will be either a Soft bounce meaning the issue is temporary and will probably resolve itself, or a <text style="font-style:italic;">Hard Bounce</text> meaning Postmark will block further email to that address.</para>
+    <para styleclass="Normal">A notable exception to this rule is the <text style="font-style:italic;">Relay Access Denied</text> error. This is most often caused when the domain part of a recipient&apos;s email address is incorrect. Postmark will report this as a <text style="font-style:italic;">Soft</text> rather than a <text style="font-style:italic;">Hard</text><text style="font-weight:bold; font-style:italic;">&#32;</text>bounce. To maintain good reputation this error must be acted on immediately.</para>
+    <para styleclass="Normal">Of all bounce notices spam complaints are the most problematic. <text style="color:#ff0000;">Postmark&apos;s tolerance for spam complaints is 0.1% of email sent. You can expect Postmark to permanently deactivate email addresses reporting complaint if this tolerance level is exceeded. Multiple transgressions will result in email flow being paused until the situation is resolved. </text></para>
+    <para styleclass="Normal">A full list of bounce type provided by Postmark is provided below. </para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="23" colcount="1">
+      <thead style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal">Name &amp; Description</para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Soft bounce/Undeliverable</text> — Unable to temporarily deliver message (i.e. mailbox full, account disabled, exceeds quota, out of disk space).</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Hard bounce</text> — The server was unable to deliver your message (ex: unknown user, mailbox not found).</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Message delayed/Undeliverable</text> — The server could not temporarily deliver your message (ex: Message is delayed due to network troubles).</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Unsubscribe request</text> — Unsubscribe or Remove request.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Subscribe request</text> — Subscribe request from someone wanting to get added to the mailing list.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Auto responder</text> — &quot;Autoresponder&quot; is an automatic email responder including nondescript NDRs and some &quot;out of office&quot; replies.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Address change</text> — The recipient has requested an address change.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">DNS error</text> — A temporary DNS error.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Spam notification</text> — The message was delivered, but was either blocked by the user, or classified as spam, bulk mail, or had rejected content.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Open relay test</text> — The NDR is actually a test email message to see if the mail server is an open relay.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Unknown</text> — Unable to classify the NDR.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Virus notification</text> — The bounce is actually a virus notification warning about a virus/code infected message.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Spam challenge verification</text> — The bounce is a challenge asking for verification you actually sent the email. Typcial challenges are made by Spam Arrest, or MailFrontier Matador.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Invalid email address</text> — The address is not a valid email address.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Spam complaint</text> — The subscriber explicitly marked this message as spam.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Manually deactivated</text> — The email was manually deactivated.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Registration not confirmed</text> — The subscriber has not clicked on the confirmation link upon registration or import.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">ISP block</text> — Blocked from this ISP due to content or blacklisting.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">SMTP API error</text> — An error occurred while accepting an email through the SMTP API.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Processing failed</text> — Unable to deliver inbound message to destination inbound hook.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">DMARC Policy</text> — Email rejected due DMARC Policy.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:bottom; width:711px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Template rendering failed</text> — An error occurred while attempting to render your template.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="" style="text-align:left; text-indent:0px; margin-top:0px; margin-right:0px; margin-bottom:11px; margin-left:0px; line-height:1.07; background-color:transparent; white-space:normal; page-break-inside:auto; page-break-after:auto; border:none; tabstops:none;"></para>
+    <para styleclass="" style="text-align:left; text-indent:0px; margin-top:0px; margin-right:0px; margin-bottom:11px; margin-left:0px; line-height:1.07; background-color:transparent; white-space:normal; page-break-inside:auto; page-break-after:auto; border:none; tabstops:none;"></para>
+  </body>
+</topic>

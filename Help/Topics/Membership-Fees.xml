@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-10-12T14:37:42.810+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Membership Fees</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Membership Fees</para>
+    </header>
+    <para styleclass="Normal">This procedure defines the fees payable by members for the current year. It also defines the fees waived for complimentary members.</para>
+    <para styleclass="Normal">A member may optionally be charged a postal surcharge. This is the fee charged if the member chooses not to receive correspondence via email.</para>
+    <para styleclass="Normal">The system has the concept of a <text style="font-weight:bold;">Financial Member</text>, being a member that has paid their membership fee plus the postal surcharge if applicable, for the current year. If a member is not financial they are not permitted to enrol in a class. If such an attempt is made, they will be wiatlisted. A current financial member becomes not financial when fees for the new year are not paid.</para>
+    <para styleclass="Normal">The current year is determined by the current term as defined in <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Enrolment-Terms">Add/Edit Enrolment Terms</link>.</para>
+    <para styleclass="Normal">The membership fees record has the following fields...</para>
+    <para styleclass="Heading2">Fee Parameters</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="6" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal">Full Year Membership Fee </para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal">The fee charged to continuing members and new members joining in Term 1.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal">Term 2 Membership Fee</para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal">The fee charged to new members joining in Term 2</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal">Term 3 Membership Fee</para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal">The fee charged to new members joining in Term 3</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal">Term 4 Membership Fee</para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal">The fee charged to new members joining in Term 4</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal">Mail Correspondence Surcharge</para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal">Optional. The fee charged if the participant chooses postal correspondence rather than email.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading2">Complimentary Parameters</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="6" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:341px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:912px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:341px;">
+          <para styleclass="Normal">Include membership fee in complimentary</para>
+        </td>
+        <td style="width:912px;">
+          <para styleclass="Normal">Tick if membership fees are to be waived for complimentary members. The default is ticked.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:341px;">
+          <para styleclass="Normal">Include Mail Surcharge in complimentary</para>
+        </td>
+        <td style="width:912px;">
+          <para styleclass="Normal">Tick if the mail surcharge are to be waived for complimentary members. The default is ticked.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:341px;">
+          <para styleclass="Normal">Include Course Fees Per Year in complimentary</para>
+        </td>
+        <td style="width:912px;">
+          <para styleclass="Normal">Tick if course fees per year are to be waived for complimentary members. The default is not ticked meaning the fee will be charged.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:341px;">
+          <para styleclass="Normal">Include Course Fees Per Term in complimentary</para>
+        </td>
+        <td style="width:912px;">
+          <para styleclass="Normal">Tick if course fees per term are to be waived for complimentary members. The default is not ticked meaning the fee will be charged.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:341px;">
+          <para styleclass="Normal">Maximum Leader Enrolments in complimentary</para>
+        </td>
+        <td style="width:912px;">
+          <para styleclass="Normal">Enter the number of courses a leader is permitted to enrol before membership fees are charged. If a leader enrols in fewer courses than the value entered, that leader is awarded complimentary status when <link displaytype="text" defaultstyle="true" type="topiclink" href="Complimentary-Membership">Complimentary Membership</link> is executed and the <text style="font-style:italic;">Assign to Course Leaders?</text> check box is ticked.</para>
+          <para styleclass="Normal">If 0 or an impossibly high number is entered, a leader will always be awarded complimentary status if <text style="font-style:italic;">Assign to Course Leaders? </text>is checked in <link displaytype="text" defaultstyle="true" type="topiclink" href="Complimentary-Membership">Complimentary Membership</link>. </para>
+          <para styleclass="Normal"><text style="font-weight:bold;">Note</text>: This field implements a known business rule that exists in some U3A. If your U3A does not currently implement this rule, it is recommended that you do not introduce it. That is, set this field&apos;s value to zero.</para>
+        </td>
+      </tr>
+    </table></para>
+  </body>
+</topic>

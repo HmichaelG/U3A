@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-09-20T12:48:06.313+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Communicate</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Communicate</para>
+    </header>
+    <para styleclass="Normal">The <text style="font-weight:bold;">Communicate</text> module is a general purpose procedure designed to facilitate communication between the U3A and it&apos;s membership. The procedure is capable of...</para>
+    <list id="0" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:Symbol; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:0px;">Sending email to all or a subset of members.</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">Sending SMS to members, and</li>
+      <li styleclass="Normal">Sending mail via traditional post to members.</li>
+    </list>
+    <para styleclass="Toggle"><image src="hmtoggle_plus0.gif" scale="100.00%" styleclass="Heading3" figurelistinclude="0"></image><tab /><toggle type="dropdown" print-expanded="true" help-expanded="false" defaultstyle="true" src-collapsed="hmtoggle_plus0.gif" src-expanded="hmtoggle_plus1.gif" styleclass="Heading3"><caption><![CDATA[General Comments]]></caption><title>Some general comment about the communication facility</title></toggle></para>
+    <para styleclass="Heading3"><table styleclass="Default" rowcount="1" colcount="1" style="cell-padding:10px; cell-spacing:0px;">
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Heading3">The Postal Service</para>
+          <para styleclass="Heading3"><text styleclass="Normal">Sending email and SMS are digital processes and are completely handled within the application. Post however, requires manual intervention. The software will package all postal items into a single PDF and email it to the </text><text styleclass="Normal" style="font-style:italic;">Send Email Address</text><text styleclass="Normal"> as defined in </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details" styleclass="Normal">Organistaion Details</link><text styleclass="Normal">. It is then the recipient&apos;s responsibility to print the PDF and manually post to the required members. All proforma stationary is designed to fit into standard window envelopes.</text></para>
+          <para styleclass="Heading3">Overnight Processing</para>
+          <para styleclass="Normal">Any email that contains mail merge tags or attachments will be queued for processing overnight. These are compute-intensive tasks best left to quite periods during the night.</para>
+          <para styleclass="Normal">The exception is if the email is to be sent to one member only. In this case it will be sent immediately. This is intended to allow you to test the email.</para>
+          <para styleclass="Normal">Email without mail merge tags or attachments will be sent immediately.</para>
+          <para styleclass="Heading3">Broadcast (bulk) Email</para>
+          <para styleclass="Normal">All email sent via the <text style="font-weight:bold;">Communicate</text> procedure will be placed into the broadcast email stream. This stream has the highest potential to be considered spam by members email service providers. Care should therefore be exercise in crafting the email. </para>
+          <para styleclass="Normal">In addition, all broadcast email must provide the ability to opt-out or unsubscribe. This is normally a link at the bottom of the email. You cannot create an email without this link.</para>
+          <para styleclass="Heading3">SMS</para>
+          <para styleclass="Normal">The Australian Government now requires a formal registration and authentication process before you can create bulk SMS messages. Be aware the process is somewhat onerous and time consuming to complete. Also, compared to email, SMS can be quite expensive.</para>
+          <para styleclass="Normal">&#32;</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading2">Using the procedure</para>
+    <para styleclass="Normal">After clicking the <text style="font-weight:bold;">Communicate</text> button within any procedure in which it is displayed, the software will popup the <text style="font-style:italic;">Communicate</text><text style="font-weight:bold; font-style:italic;">&#32;</text>window.</para>
+    <para styleclass="Normal">To begin, select a <text style="font-style:italic;">Document Template</text> from the list provided. Document templates are created by administrators using the <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Document-Templates">Add/Edit Document Templates</link> procedure. Templates assist in the creation of documents by pre-filling communications parameters and optionally, the document text.</para>
+    <para styleclass="Normal">Alternatively, you may select <text style="font-style:italic;">Custom Email</text> as the document template. This allows the creation of an email document without reference to any template.</para>
+    <para styleclass="Normal">Depending on the communication type, you will be presented with one of the following.</para>
+    <para styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Email</text></para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="5" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">Field</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">Description</para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">Email Subject</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">Text to be placed on the email&apos;s Subject line</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">From Address</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">The email address of the sender. Note that the email <text style="font-weight:bold;">must be sent from an email address containing the U3A&apos;s registered domain. </text>By default, the <text style="font-style:italic;">Send Email Address</text> found in <link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details">Organistaion Details</link> will be used.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">From Display Name</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">A friendly name &#160;to be displayed on the email&apos;s <text style="font-style:italic;">From</text> line. By default, the <text style="font-style:italic;">Send Email Display Name</text> found in <link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details">Organistaion Details</link> will be used.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">Attachments</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">Click the button to upload files to be attached to the email. Only PDF files are currently allowed.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal" style="margin-bottom:0px; line-height:1.15;"><text style="font-weight:bold;"> SMS</text></para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="2" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">Field</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">Description</para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">From (11 Chars Max)</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">A friendly name identifying who the email is from. This will be displayed instead of a phone number on the recipient&apos;s mobile device. <text style="font-weight:bold;">This name must be the registered name as provided to the sending service.</text></para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Post</text></para>
+    <para styleclass="Normal">No additional information is required for postal documents.</para>
+    <para styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Override Communications Preference?</text></para>
+    <para styleclass="Normal">All document communication types will ask if the communications preference is to be overridden. This will only occur if the member has provided sufficient detail to send via the communication type selected. For example, if the communication type is Email and the member has requested postal delivery, that member will receive an email <text style="font-style:italic;">only if they have supplied an email address </text>when this option is checked.</para>
+    <para styleclass="Normal">The option therefore has limited utility except for postal items. For example, if it is decided that a document must be sent to all members using the postal service, check this box to override those members who have elected to use email as their primary means of communication.</para>
+    <para styleclass="Normal"><text style="font-weight:bold;">Document Text</text></para>
+    <para styleclass="Normal">Enter or amend the text to be sent to recipients. If using a document template be careful not to edit any mail merge tags that may exist in the text.</para>
+    <para styleclass="Heading3">Sending the Document</para>
+    <para styleclass="Normal">There are two ways to send the document, directly via the <text style="font-weight:bold;">Send Email</text> button or previewing the document via the <text style="font-weight:bold;">Mail Merge</text> button and sending from within the preview.</para>
+    <para styleclass="Normal"><text style="font-weight:bold;">Send Email</text>. This button is located at the bottom right-hand corner of the window. It will send the email to all selected recipients without further ado.</para>
+    <para styleclass="Normal"><text style="font-weight:bold;">Mail Merge.</text> The Mail Merge button is located on the document toolbar. When clicked, documents for all members will be created and displayed. Check to ensure your mail merge tag have been transcribed correctly. When you are satisfied, click the <text style="font-weight:bold;">Send Email</text> button at the bottom of the window.</para>
+  </body>
+</topic>

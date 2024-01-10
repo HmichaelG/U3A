@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-06-20T16:57:44.247+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Login Security &amp; Role Assignment</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Login Security &amp; position Assignment</para>
+    </header>
+    <para styleclass="Normal"><text style="font-weight:bold;">Login Security &amp; Role Assignment</text> provides access to the login parameters used to authenticate and authorise system users.</para>
+    <para styleclass="Heading2">Login</para>
+    <para styleclass="Normal">All users must successfully login to the system in order to use it. The login procedure <text style="font-weight:bold;">authenticates</text> the user.</para>
+    <para styleclass="Normal">Other than the login parameters, it is important to understand a login record contains no other detail about the participant. That is the role of the <link displaytype="text" defaultstyle="true" type="topiclink" href="Auto-Enrol-Participants">Participant</link> record.</para>
+    <para styleclass="Normal">It is possible to have a login that is not a U3A participant and it is also possible to have a U3A participant that does not have a login. Typically however, they are linked and that linkage is created when both the login and the participant records share the same email address.</para>
+    <para styleclass="Normal">It is possible for a participant to have two logins. Usually, they are used as follows... </para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:0px;">The first is the participant&apos;s real personal email address. It is used for non-administrative purposes; to gain access to the Member Portal and receive email.</li>
+      <li styleclass="Normal">the second is used to access the Administration Portal. This can be a real email address or a Domain Login (see below). In either case both use the U3A&apos;s registered domain in their address.</li>
+    </list>
+    <para styleclass="Heading3">Passwords</para>
+    <para styleclass="Normal">The password is never stored on the login record. Rather a password hash is stored. A hash is a seemingly random sequence of characters generated from the actual password plus a predefined seed value.</para>
+    <para styleclass="Normal">To validate a password, the system takes the entered password and re-generates the hash value. If the re-generated value equals the stored value the entered password passes validation.</para>
+    <para styleclass="Normal">Importantly, it is currently impossible to reverse the process. You cannot obtain the password from the stored hash value.</para>
+    <para styleclass="Normal">Therefore, user passwords cannot be obtained by hacking the database.</para>
+    <para styleclass="Normal">Password hashing is a specific form of a more generalised <link displaytype="text" defaultstyle="true" type="weblink" href="https://en.wikipedia.org/wiki/Key_derivation_function" target="_blank">Key Derivation Function (KDF)</link>. For a in-depth discussion of password storage refer <link displaytype="text" defaultstyle="true" type="weblink" href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html" target="_blank">Password Storage Cheat Sheet.</link></para>
+    <para styleclass="Heading2">Roles</para>
+    <para styleclass="Normal">Roles <text style="font-weight:bold;">authorise</text> the user to allow or deny them access to procedures and modules within the system (that is, menu items).</para>
+    <para styleclass="Normal">Those assigned a role will have access to the Administrative Portal. Those without a role will have access to the Member Portal only. Roles are assigned using this procedure.</para>
+    <para styleclass="Normal">The available roles are...</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="8" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Role</text></para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Security Admin</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Access to this procedure and <link displaytype="text" defaultstyle="true" type="topiclink" href="Tenant-Details">Tenant Details</link> procedure.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">System Admin</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Admin-Menu">Admin Menu</link> column except this procedure and <link displaytype="text" defaultstyle="true" type="topiclink" href="Tenant-Details">Tenant Details</link> procedure.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Course &amp; Class</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Chapter-2">Course Menu</link> column</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Membership</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Participation-Menu">Participation Menu</link> column but not it&apos;s <link displaytype="text" defaultstyle="true" type="topiclink" href="Fees--Receipting">Fees &amp; Receipting</link> sub-menu</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Accounting</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Participation-Menu">Participation Menu</link> and it&apos;s <link displaytype="text" defaultstyle="true" type="topiclink" href="Fees--Receipting">Fees &amp; Receipting</link> sub-menu</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Office</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Portal-(Admin)">Portal (Admin)</link> menu item.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Report View</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Reports-Menu">Reports Menu</link> column.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal">A login may have multiple roles. In this case the authorisations will be combined. Thus a login with the Security Admin role and the System Admin role will have access to all items on the Admin menu column.</para>
+    <para styleclass="Normal">The above table also identifies a hierarchy that for the most part is honoured. Thus, the System Admin has access not only to the Admin menu column but also all menu items to the right of it (or, below it in the table above). The exceptions to this are... </para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">The Security Admin role has no access to anything other than this procedure and <link displaytype="text" defaultstyle="true" type="topiclink" href="Tenant-Details">Tenant Details</link> procedure. A purist would consider it a security risk assigning a Security Admin access to any other role. It is also possible for the U3A group to outsource the Security Admin role to a third party without granting access to any other system function.</li>
+      <li styleclass="Normal">The Office role has no access to any other menu columns.</li>
+    </list>
+    <para styleclass="Normal">The role with the least access is the Report View role. It has read-only access to the reports menu column only.</para>
+    <para styleclass="Heading2">Buttons</para>
+    <para styleclass="Normal">The following buttons are located at the top of the procedure and are typically used to perform an action on a group of participants...</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="5" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Button</text></para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Create Domain Login</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">A domain login is a login not associated with a physical email address and is typically used to provide a group of persons the same login and password to the system. As such they should be sparingly used if at all. They should never be used with administrative function roles.</para>
+          <para styleclass="Normal">An example might be, <link displaytype="text" defaultstyle="true" type="weblink" href="mailto:&lt;%LINK_CAPTION%&gt;">office@myU3A.org.au</link> to allow a group of office volunteers access to the administrative portal and the Office role.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Populate Logins</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Use <text style="font-style:italic;">Populate Logins</text> to create login records for participants that have been manually created via <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Participants">Add/Edit Participants</link>. It will create a login record for every participant that does not have a login record using the <text style="font-style:italic;">Email Address</text> and <text style="font-style:italic;">Member Identity</text> as the password.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Set Email Confirmed</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Intended to be used to set the <text style="font-style:italic;">Email Confirmed </text>flag should a participant be not able to respond to their login/password reset confirmation email. This option should be only used after ensuring the email address is correct. Emails can be confirmed as correct by using the Postmark third-party website,</para>
+          <para styleclass="Normal">To use this option, select the required participant(s) and then click.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Reset Password</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">To reset password(s), select the required login record(s) and then click. The password will be reset to the participant&apos;s <text style="font-style:italic;">Member Identity</text>.</para>
+          <para styleclass="Normal">Password reset is meant to be a self-service activity. Use this option only when problems persist.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading2">Login Record fields</para>
+    <para styleclass="Normal">Use the grid&apos;s Edit / Delete buttons to maintain logins. Note that logins can only be created using the <text style="font-style:italic;">Populate Logins</text> button as described above or by the participant registering their login via the Member or Administration Portals. Self-registration is the normal form of creating a login.</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="5" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">User Roles</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Select from the list provided, the roles to be assigned to the participant. Leave blank for Member Portal access only.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Is Email Confirmed?</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Tick to set the email confirmation flag as confirmed. Once set, this field cannot be changed.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Password</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Enter a strong password, or leave blank if the password is unchanged</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:263px;">
+          <para styleclass="Normal">Confirm Password</para>
+        </td>
+        <td style="width:990px;">
+          <para styleclass="Normal">Re-enter the password, or leave blank if the password is unchanged</para>
+        </td>
+      </tr>
+    </table></para>
+  </body>
+</topic>

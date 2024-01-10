@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-12-06T16:11:02.504+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Add/Edit Courses</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Add/Edit Courses</para>
+    </header>
+    <para styleclass="Normal">A <text style="font-weight:bold;">Course</text> is an activity organised by the U3A group. </para>
+    <para styleclass="Normal">A course may have one to three <text style="font-weight:bold; font-style:italic;">Leaders</text><text style="font-style:italic;">, </text>and as many <text style="font-weight:bold; font-style:italic;">Students</text><text style="font-style:italic;">&#32;</text>enrolled<text style="font-style:italic;">&#32;</text>as allowed. In addition, the course may have a <text style="font-weight:bold; font-style:italic;">Guest Leader</text> which is a leader that is not a financial member of the U3A group. Leaders may assign <text style="font-weight:bold; font-style:italic;">Course Clerks</text> from the enrolled students to assist with administrative tasks.</para>
+    <para styleclass="Normal">A course may have one or more classes. A <text style="font-weight:bold;">Class</text> defines the time and place a course is held. It contains parameters that determine when it occurs and how it recurs. Students are enrolled into the class, not the course. Therefore, enrolment is not permitted into a course unless at least one class is defined.</para>
+    <para styleclass="Normal">A course and its associated class(es) can be deleted. However, this should be avoided once there are enrolments and/or attendance details. Deleting a course will delete all enrolment and attendance detail associated with it.</para>
+    <para styleclass="Normal" style="text-align:center; margin-bottom:0px;"><text style="font-weight:bold;">Hint: </text>Check the Current Year</para>
+    <para styleclass="Normal" style="text-align:center;">Before you create/edit courses please ensure you are working in the correct year. The year is displayed on the top right hand corner above the grid. Click the button titled, <text style="font-style:italic;">Change Year</text> to change. Note that terms for the new year must be created via <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Enrolment-Terms">Add/Edit Enrolment Terms</link> before you can do this.</para>
+    <para styleclass="Heading3">Preview Enrolment List button</para>
+    <para styleclass="Normal">Click this button to preview all classes as seen by members making enrolments via the <text style="font-style:italic;">Member Portal</text>. It is anticipated that this preview will be useful when the current enrolment period is undefined.</para>
+    <para styleclass="Heading3">Course Edit Views</para>
+    <para styleclass="Normal">When adding and editing course data, you have the option of choosing between one of three views...</para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal"><text style="font-weight:bold;">Simple View</text>. This view presents the course and class data as one form. When creating a new course the <text style="font-style:italic;">Occurrence</text> will be set to <text style="font-weight:bold;">Weekly</text>. It is anticipated that this view will be suitable for most U3A courses.</li>
+      <li styleclass="Normal"><text style="font-weight:bold;">Activity View</text>. This is a slight variation on the <text style="font-style:italic;">Simple View</text> specifically intended for activities and events that occur once only. Therefore, when creating a new course the <text style="font-style:italic;">Occurrence</text> will be set to <text style="font-weight:bold;">Once Only</text> and the <text style="font-style:italic;">Start Date </text>displayed.</li>
+      <li styleclass="Normal"><text style="font-weight:bold;">Detail View</text>. A detail view in which all fields are displayed and provides the ability to create multiple classes per course. While being the most complex of all views, it is also the most flexible and comprehensive. </li>
+    </list>
+    <para styleclass="Normal"><text style="font-weight:bold;">Some Notes</text></para>
+    <list id="1" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">A view is persisted with course data. That means the view that was active at the time a course record is written to the database will be used when that data is subsequently retrieved from the database.</li>
+      <li styleclass="Normal">Views are organised via a tabset at the top of the edit form. A view can be changed at any time by clicking the tab desired. The exception to this is a course with multiple classes which is always displayed as a <text style="font-style:italic;">Detail</text> view.</li>
+      <li styleclass="Normal">A view is simply a means of displaying course data. All course records have the same data structure &quot;under the hood&quot;. It is therefore permissible to select and/or change the best view for the course you are implementing.</li>
+      <li styleclass="Normal">The <text style="font-style:italic;">Simple</text> and <text style="font-style:italic;">Activity</text> views contain a <text style="font-weight:bold;">Show Details</text> checkbox on the Class group of fields. Ticking this field will display all fields for the class.</li>
+    </list>
+    <para styleclass="Toggle"><image src="hmtoggle_arrow0.gif" scale="100.00%" figurelistinclude="0"></image><tab /><toggle type="dropdown" print-expanded="true" help-expanded="false" defaultstyle="true" src-collapsed="hmtoggle_arrow0.gif" src-expanded="hmtoggle_arrow1.gif"><caption><![CDATA[The Course Record]]></caption></toggle></para>
+    <para styleclass="Normal"><table styleclass="Blank Table" rowcount="1" colcount="1">
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal">When you add/edit a course, the course record will be displayed as a pop-up window. This record is composed of two sections...</para>
+          <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal">The course details section. The course section consists of two tabs...</li>
+            <list id="2" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+              <li styleclass="Normal"><text style="font-style:italic;">Course Details</text>. The primary fields required to define a course, and</li>
+              <li styleclass="Normal"><text style="font-style:italic;">Settings</text>. Values that override settings entered in <link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details">Organistaion Details</link></li>
+            </list>
+          </list>
+          <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal">The class grid, into which one or more classes may be added and/or edited.</li>
+          </list>
+          <para styleclass="Normal">Use the course details to enter the basic course details.</para>
+          <para styleclass="Normal"><table styleclass="Default" rowcount="21" colcount="3" style="cell-padding:0px; cell-spacing:0px; border-width:1px; border-spacing:0px; border-collapse:collapse; cell-border-width:1px; border-color:#c0c0c0; border-style:solid;">
+            <tr style="vertical-align:top">
+              <td style="width:267px; background-color:#c0c0c0;">
+                <para styleclass="Normal" style="border:none;"><text style="font-weight:bold;">Field</text></para>
+              </td>
+              <td colspan="2" style="width:1261px; background-color:#c0c0c0;">
+                <para styleclass="Normal" style="border:none;"><text style="font-weight:bold;">Description</text></para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td colspan="3" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;"><text style="font-weight:bold;">The Course Details tab</text></para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Course Number</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Optional. A number unique to the course. Note that course numbers are not a requirement in the system. They are provided to maintain compatibility with legacy systems.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Participation Type</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Required. This option only has effect when a course has multiple classes. Select either...</para>
+                <list id="3" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; border:none; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                  <li styleclass="Normal" style="margin-bottom:0px; border:none;">Same participants in all classes, or </li>
+                  <li styleclass="Normal" style="margin-top:1px; border:none;">Different participants in each class.</li>
+                </list>
+                <para styleclass="Normal" style="border:none;">For example, </para>
+                <list id="4" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; line-height:1.15; border:none; font-family:Symbol; font-size:11pt; color:#000000;">
+                  <li styleclass="Normal" style="margin-bottom:0px; line-height:1.15; border:none;">A walking group meets three times per week. The same students attend each walk. Select option 1.</li>
+                  <li styleclass="Normal" style="border:none;">An art class is very popular. It is decided to hold the same class three times per week but each class will have a different group of students. In this case, select option 2.</li>
+                </list>
+                <para styleclass="Normal" style="border:none;">Please exercise care when changing the participation type once enrolment has commenced as changing the participation type will cause current enrolments to be lost.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Course Type</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Required. Select a course type from the drop-down list.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Course Name</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Required: A name that (should) uniquely describe the course.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Description</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Optional. Describe the course in a little detail to give potential enrolees sufficient information to make their decision. Try not to be too verbose as it can impact system performance over slow Internet connections.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Additional Information URL</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">A web link URL that provides additional detail about the course. This link must be fully qualified meaning it must start with https:// or http://. It is recommended that a URL shortcut be used if the web link URL is long, for example <link displaytype="text" defaultstyle="true" type="weblink" href="https://tinyurl.com" target="_blank">Tiny URL</link>&#32;</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Class Duration</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Required. The length of a class in hours and fractions of an hour. For example, a class that will last for 1 hour and 15 minutes will be entered as 1.25.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Required Students</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Required. The number of students required for the class to proceed. This field is for information purposes only as the software currently does not take any action if a class falls below the minimum.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Maximum Students</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Required. The maximum students allowed in a class. A student will be <text style="font-style:italic;">Waitlisted </text>if an attempt is made to enrol in a class that has enrolments equal to or greater than this value.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:267px;">
+                <para styleclass="Normal" style="border:none;">Auto Enrol?</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Required. Automatic enrolment is the process of moving students from the waitlist to enrolled should places be or become available. It is a process that either occurs immediately on enrolment if the member is financial, or automatically overnight. Uncheck this option if auto enrolment is not to occur.</para>
+                <para styleclass="Normal" style="border:none;">For example, the leader of the yoga class requires that all students have a minimum level of fitness before attempting the class. In this case, <text style="font-style:italic;">Auto Enrol? </text>will be unchecked and students moved off the wiatlist manually as they prove their fitness.</para>
+                <para styleclass="Normal" style="border:none;">All course/classes with <text style="font-style:italic;">Auto-Enrol?</text> unchecked will be identified as <text style="font-weight:bold;">Closed</text> in member enrolment.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td rowspan="5">
+                <para styleclass="Normal" style="border:none;">Fees</para>
+              </td>
+              <td colspan="2" style="width:1261px;">
+                <para styleclass="Normal" style="border:none;">Course fees may be added on a per term or per year basis. Course fees are in addition to membership fees. </para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:193px;">
+                <para styleclass="Normal" style="border:none;">Course Fee</para>
+              </td>
+              <td style="width:1066px;">
+                <para styleclass="Normal" style="border:none;">Enter the fee as dollars and cents.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:193px;">
+                <para styleclass="Normal" style="border:none;">Fee Description</para>
+              </td>
+              <td style="width:1066px;">
+                <para styleclass="Normal" style="border:none;">Enter a brief description of the fee.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:193px;">
+                <para styleclass="Normal" style="border:none;">Override Complimentary?</para>
+              </td>
+              <td style="width:1066px;">
+                <para styleclass="Normal" style="border:none;">Tick if you wish complimentary members to pay the fee.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:193px;">
+                <para styleclass="Normal" style="border:none;">Leader Pay Fee?</para>
+              </td>
+              <td style="width:1066px;">
+                <para styleclass="Normal" style="border:none;">Tick if you require leaders to pay the fee.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td colspan="3">
+                <para styleclass="Normal"><text style="font-weight:bold;">The Settings tab</text></para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td>
+                <para styleclass="Normal">Send Leader Reports To</para>
+              </td>
+              <td colspan="2" style="width:1066px;">
+                <para styleclass="Normal">Determines the recipients of leader reports sent automatically overnight...</para>
+                <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                  <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Leaders, if none then clerks.</text> Leader reports will be sent to leaders. if there are no leaders with visible email addresses then the reports will be sent to clerks.</li>
+                  <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Clerks, if none then leaders.</text> Leader reports will be sent to clerks. if there are no clerks with email visible addresses then the reports will be sent to leaders.</li>
+                  <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Both</text>. Leader reports will be sent to both leaders and clerks with email addresses.</li>
+                </list>
+                <para styleclass="Normal" style="margin-bottom:0px;"></para>
+                <para styleclass="Normal"><text style="font-weight:bold;">Note:</text> This field overrides the value in <link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details">Organistaion Details</link>. Leave blank to use the default value.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td>
+                <para styleclass="Normal">Course Contact Order</para>
+              </td>
+              <td colspan="2" style="width:1066px;">
+                <para styleclass="Normal">Defines the order in which a course contact is determined. This field overrides the value entered in <link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details">Organistaion Details</link>. The options are...</para>
+                <list id="6" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                  <li styleclass="Normal" style="margin-bottom:0px;">Leaders then clerks, or</li>
+                  <li styleclass="Normal">Clerks then leaders</li>
+                </list>
+                <para styleclass="Normal">Class contacts can either be leaders or clerks all of which are optional and some may have requested their contact details to be silent. The software will therefore choose the contacts based on the order selected and who do not have their contact details silenced. </para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td>
+                <para styleclass="Normal" style="border:none;">Exclude course from leaders complimentary count?</para>
+              </td>
+              <td colspan="2" style="width:1066px;">
+                <para styleclass="Normal" style="border:none;">The system allows for membership fees to be waived if a leader is enrolled as a student in less than a defined count of classes. Tick this field if the course is not to be included in that count.</para>
+                <para styleclass="Normal" style="border:none;">For example, special excursions and paid activities would normally be excluded from the count.</para>
+              </td>
+            </tr>
+          </table></para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Toggle"><image src="hmtoggle_arrow0.gif" scale="100.00%" figurelistinclude="0"></image><tab /><toggle type="dropdown" print-expanded="true" help-expanded="false" defaultstyle="true" src-collapsed="hmtoggle_arrow0.gif" src-expanded="hmtoggle_arrow1.gif"><caption><![CDATA[The Class Record]]></caption></toggle></para>
+    <para styleclass="Normal"><table styleclass="Blank Table" rowcount="1" colcount="1">
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal">Use the add/edit/delete on the Class grid within the Course record pop-up to create and /or edit classes. Enrolment cannot occur until a course has at least one class assigned.</para>
+          <para styleclass="Normal"><table styleclass="Default" rowcount="10" colcount="2" style="border-width:1px; border-spacing:0px; border-collapse:collapse; cell-border-width:1px; border-color:#c0c0c0; border-style:solid;">
+            <tr style="vertical-align:top">
+              <td style="width:272px; background-color:#c0c0c0;">
+                <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+              </td>
+              <td style="width:1288px; background-color:#c0c0c0;">
+                <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Term (1, 2, 3 &amp; 4)</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">A class must be assigned at least one term and may be assigned up to all four.</para>
+                <para styleclass="Normal">If a class occurs during a term break it is assigned to the term immediately preceding it. For example, If a class occurs during the Term 1 to Term 2 break, it will be assigned to Term 1.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Guest Leader</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">Optional. A class may have a Guest leader, that is one that has not been entered as a participant in <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Participants">Add/Edit Participants</link>. A Guest Leader is for information purposes only. It is strongly recommended that a class with a Presenter also have a participant leader to receive email etc. Most often this might be the Course Clerk or an activities officer.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Leaders 1, 2 &amp; 3</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">Select the leader from the drop-down menu. A class may have up to three leaders. Note that a leader is not considered a student and therefore not included in the enrolment count.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Venue</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">Select the venue from the drop-down list.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Start Date</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">Optional. Enter the course start date, if required. By default it is left blank meaning the first class will occur on or after the start of term on which the <text style="font-style:italic;">On Day</text> day occurs (see below).</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Recurrence</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">Optional. Enter how many times the class will recur. By default it is left blank meaning the course will recur till the end of term.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Occurrence</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">Select from the list how the class occurs. The default value is <text style="font-style:italic;">Weekly</text> meaning the class will occur once per week.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">On Day</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">Select the Day on which the class is held. If a <text style="font-style:italic;">Start Date</text> has been entered above, the <text style="font-style:italic;">On Day</text> value will be automatically calculated.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Start Time</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">Enter the Start Time of the class as hours and minutes.</para>
+              </td>
+            </tr>
+          </table></para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Toggle"><image src="hmtoggle_arrow0.gif" scale="100.00%" styleclass="Normal" figurelistinclude="0"></image><tab /><toggle type="dropdown" print-expanded="true" help-expanded="false" defaultstyle="true" src-collapsed="hmtoggle_arrow0.gif" src-expanded="hmtoggle_arrow1.gif"><caption><![CDATA[The Class Link]]></caption><title>The class link</title></toggle></para>
+    <para styleclass="Normal" style="text-indent:-18px; margin-left:18px;"><table styleclass="Blank Table" rowcount="1" colcount="1">
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal">The class link is an internet address that allows a member to quickly enrol in a class. The link is intended to be used in email and other documentation to be sent to members or otherwise available in report form. By clicking on the link or scanning a QR Code created from the link the member will be enrolled in the class.</para>
+          <para styleclass="Heading3" style="margin-bottom:0px;">Create a link</para>
+          <para styleclass="Normal">To obtain a Class link...</para>
+          <list id="7" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal" style="margin-bottom:0px;">On the grid in <link displaytype="text" defaultstyle="true" type="topiclink" href="">Add/Edit Courses</link>, find the required Course.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Click the arrow button to the left hand side of the Course record. This will display the Class record(s).</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Again, click the arrow to the left hand side of the Class record. This will display the Class link.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Click the Copy button to copy the link to the clipboard. </li>
+          </list>
+          <para styleclass="Heading3" style="margin-bottom:0px;">Using the link</para>
+          <para styleclass="Normal">Using the copied link depends on the document you are creating. To add the link to an email created within the administrative portal...</para>
+          <list id="8" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal" style="margin-bottom:0px;">Create your email document as usual via the <link displaytype="text" defaultstyle="true" type="topiclink" href="Communicate">Communicate</link> button.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Position the mouse pointer where you require the link to be inserted.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">On the document menu, select <text style="font-weight:bold;">Insert | Hyperlink</text>. A popup dialog will appear.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Paste the saved link into the into the URL field.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Enter the hyperlink&apos;s <text style="font-style:italic;">Text </text>and <text style="font-style:italic;">Tooltip</text> and click the Save button.</li>
+          </list>
+          <para styleclass="Normal" style="margin-bottom:0px;"></para>
+          <para styleclass="Normal" style="margin-bottom:1px;">To create a QR Code in a Word document...</para>
+          <para styleclass="Normal" style="margin-bottom:0px;"></para>
+          <list id="9" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal" style="margin-bottom:0px;">Position the cursor in the document where you wish to insert the QR Code. Press <text style="font-weight:bold;">Ctrl + F9</text>. A pair of curly braces {} will appear in the document.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Within the braces, type </li>
+          </list>
+          <para styleclass="Normal" style="margin-bottom:0px;"></para>
+          <para styleclass="Normal" style="margin-bottom:0px; margin-left:39px;"><text style="font-family:&apos;Cascadia Code&apos;;">DisplayBarcode &lt;paste link&gt; QR \s 100</text></para>
+          <para styleclass="Normal" style="margin-bottom:0px; margin-left:39px;"></para>
+          <list id="10" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="3" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal">When complete, right-click the field and select <text style="font-style:italic;">Toggle Field Codes</text>. This will display the QR Code.</li>
+          </list>
+          <para styleclass="Normal">Note: The \s value is a percentage value from 10 through 10000. It determines the size of the QR Code.</para>
+        </td>
+      </tr>
+    </table></para>
+  </body>
+</topic>

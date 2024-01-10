@@ -1,0 +1,386 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-11-08T11:05:38.166+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Organistaion Details</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Organistaion Details</para>
+    </header>
+    <para styleclass="Normal"><text style="font-weight:bold;">Organisation Details</text> are basic items of information pertaining to the U3A Group as a whole. They include such things as name, address and contact details. They also include parameters used to automatically enrol members into courses, committee positions, volunteer groups and mail label parameters. Finally, it allows input of the group&apos;s Term &amp; Conditions.</para>
+    <para styleclass="Normal">In short, it is a grab bag of parameters used throughout the system. They are values that must be defined before any other part of the system is used but once defined, rarely change.</para>
+    <para styleclass="Normal">The procedure is divided into the following tabs...</para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Your Group&apos;s Details</text>, contains the organisation&apos;s name and address details, committee and volunteer group names.</li>
+      <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Operations</text>, contains parameters used in the automatic allocation of enrolments and waitlists as well as other parameters that control the behaviour of the system,</li>
+      <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Terms and Conditions</text>, allows the entry of text in Rich Text Format (RTF). Members are required to accept these T&amp;C&apos;s on a regular basis.</li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading2">Your Group&apos;s Details tab</para>
+    <para styleclass="Heading3">The Organisation Details group</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="13" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">UTC local time offset</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The number of hours difference between UTC time (GMT+0.00) and local time, ignoring any daylight savings adjustment. For Australian Eastern Standard Time accept the default of 10.</para>
+          <para styleclass="Normal">This value is used to calculate local time during overnight processing, only.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">U3A Group</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The registered name of the U3A group.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Australian Business Number (ABN)</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The group&apos;s ABN</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Office Location</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The office building name, if any. For example, The Fred Smith Memorial Library</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Office Street Address</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The office street address, if any</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Office Postal Address</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The group&apos;s postal address, if any.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Phone Number</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The group&apos;s phone number for member support</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Email Address</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The group&apos;s primary email address. Most often this is the address of the secretary.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Website</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The group&apos;s public website. This is not the u3admin.org.au address.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Send Email Address</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The email address from which automatic emails are sent. Automatic emails are generated in response to changes in enrolment and the receipt of membership fees. It is most often the address of the membership coordinator.</para>
+          <para styleclass="Normal">This address will also receive an email from the system postman overnight detailing system warnings and information.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Send Email Display Name</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The send email address display name. For example, myU3A Membership Office.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">System Postman CC Address</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">Optionally, enter additional email addresses to receive system warnings and information from the system postman.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading3">The Bank Details Group</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="3" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Bank BSB</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The bank BSB into that receives membership fees when members make payment via the direct payment method.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Bank Account Number</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The bank account into that receives membership fees when members make payment via the direct payment method.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading3">The Committee Positions group</para>
+    <para styleclass="Normal">Enter the committee positions, one per line. These positions are used when configuring the committee in <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Committee">Add/Edit Committee</link>.</para>
+    <para styleclass="Heading3">The Volunteer Activities group</para>
+    <para styleclass="Normal">A volunteer activity is normally an activity that occurs regularly within the group that is not considered a Course. Examples might be grounds maintenance, office administration or other assistance to the U3A group. Once defined, volunteer groups can be contacted by email/SMS as a group.</para>
+    <para styleclass="Normal">Optionally enter volunteer activities, one per line. You can then assign participants to the activity using <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Volunteers">Add/Edit Volunteers</link>.</para>
+    <para styleclass="Heading2">The Operations tab</para>
+    <para styleclass="Normal"><text styleclass="Heading3">The Auto Enrolment group</text></para>
+    <para styleclass="Normal">The allocation rules discussed in these sections only apply to the <text style="font-style:italic;">Enrolment Allocation Day when allocation is </text>random (see below). Allocation at all other times of the year occur on a <text style="font-style:italic;">First In Wins</text> basis.</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="4" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:331px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:922px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:331px;">
+          <para styleclass="Normal">Rule 1: New Participant Percent (%)</para>
+        </td>
+        <td style="width:922px;">
+          <para styleclass="Normal">Enter the percentage of enrolment places that will be allocated to new students. For the purpose of auto-enrolment, a new student is one that has joined in the current financial year and has not yet been enrolled in any of their selected courses. </para>
+          <para styleclass="Normal">Once enrolled in one or more courses, they are no longer considered a new participant.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:331px;">
+          <para styleclass="Normal">Rule 2: Remainder Allocation Method</para>
+        </td>
+        <td style="width:922px;">
+          <para styleclass="Normal">The allocation method may be <text style="font-weight:bold;">random</text> or <text style="font-weight:bold;">first in wins</text>.</para>
+          <list id="1" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:Symbol; font-size:11pt; color:#000000;">
+            <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Random</text>. Students are enrolled into their selected courses on a random basis. Random allocation is considered a fair and equitable means of allocating students to an oversubscribed course. Refer to Enrolment Allocation Day below for further details.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">First in wins</text>. Students are allocated on a first come, first served basis. Use this method if you wish to encourage students to enrol early.</li>
+          </list>
+          <para styleclass="Normal" style="margin-bottom:0px;"></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td colspan="2" style="width:922px;">
+          <para styleclass="Heading3" style="margin-left:18px;">Enrolment Allocation Day</para>
+          <para styleclass="Normal" style="margin-left:18px;">Randomised allocation occurs once per <text style="font-style:italic;">allocation period</text> on a date calculated by the configuration parameters below. After that date any new enrolments for the period are allocated on a <text style="font-style:italic;">First In Wins</text> basis.</para>
+          <para styleclass="Normal" style="margin-left:18px;">The parameters below are ignored if Rule 2 above is <text style="font-style:italic;">First In Wins</text>. In this case allocation occurs at enrolment.</para>
+          <para styleclass="Normal" style="margin-left:18px;"><table styleclass="Default" rowcount="4" colcount="2" style="width:100%;">
+            <thead style="vertical-align:top">
+              <td style="width:414px;">
+                <para styleclass="Normal" style="margin-left:18px;"><text style="font-weight:bold;">Field</text></para>
+              </td>
+              <td style="width:1155px;">
+                <para styleclass="Normal" style="margin-left:18px;"><text style="font-weight:bold;">Description</text></para>
+              </td>
+            </thead>
+            <tr style="vertical-align:top">
+              <td style="width:414px;">
+                <para styleclass="Normal" style="margin-left:18px;">Week(s) Before Term Start</para>
+              </td>
+              <td style="width:1155px;">
+                <para styleclass="Normal" style="margin-left:18px;">The number of weeks prior to term start in which automatic randomised enrolment will occur. The allowed values are from -1 being the week before term start to -4 being four weeks from the start. The default is -2 meaning the allocation will occur 2 weeks prior to term start.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:414px;">
+                <para styleclass="Normal" style="margin-left:18px;">On Day</para>
+              </td>
+              <td style="width:1155px;">
+                <para styleclass="Normal" style="margin-left:18px;">The weekday on which automatic allocation will occur. The default is Tuesday.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:414px;">
+                <para styleclass="Normal" style="margin-left:18px;">Occurrence</para>
+              </td>
+              <td style="width:1155px;">
+                <para styleclass="Normal" style="margin-left:18px;">The number of times automatic randomised allocation will occur throughout the year. Select from...</para>
+                <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; margin-left:18px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                  <li styleclass="Normal" style="margin-bottom:0px; margin-left:18px;"><text style="font-weight:bold;">Per Year.</text> Once a year prior to term 1.</li>
+                  <li styleclass="Normal" style="margin-bottom:0px; margin-left:18px;"><text style="font-weight:bold;">Per Semester.</text> Twice per year. Once prior to term 1 and once prior to term 3.</li>
+                  <li styleclass="Normal" style="margin-left:18px;"><text style="font-weight:bold;">Per Term</text>. Prior to each and every term.</li>
+                </list>
+              </td>
+            </tr>
+          </table></para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading3">The Leaders / Clerks Group</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="5" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Send Leader Reports To</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">Determines the recipients of leader reports sent automatically overnight...</para>
+          <list id="3" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Leaders, if none then clerks.</text> Leader reports will be sent to leaders. if there are no leaders with email addresses then the reports will be sent to clerks.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Clerks, if none then leaders.</text> Leader reports will be sent to clerks. if there are no clerks with email addresses then the reports will be sent to leaders.</li>
+            <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Both</text>. Leader reports will be sent to both leaders and clerks with email addresses.</li>
+          </list>
+          <para styleclass="Normal" style="margin-bottom:0px;"></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Course Contact Order</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">Defines the order in which a course contact is determined. The options are...</para>
+          <list id="4" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal" style="margin-bottom:0px;">Leaders then clerks, or</li>
+            <li styleclass="Normal">Clerks then leaders</li>
+          </list>
+          <para styleclass="Normal">Class contacts can either be leaders or clerks all of which are optional and some may have requested their contact details to be silent. The software will therefore choose the contacts based on the order selected and who do not have their contact details silenced. </para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Allow leader/clerk to change enrolment?</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">If not ticked, enrolment can only be changed by persons with <text style="font-weight:bold;">Membership</text> authorisation or above. Otherwise, leaders and clerks may also move students to and from the waitlist via the <text style="font-style:italic;">Member Portal</text>.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Allow leader/clerk to change enrolment?</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">If not ticked, clerks can only be assigned by persons with <text style="font-weight:bold;">Membership</text> authorisation or above. Otherwise, leaders may assign clerks via the <text style="font-style:italic;">Member Portal</text>.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading3">The Other Settings Group</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="3" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Require Vax Certificate?</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">Tick this check box if you require the sighting of vaccination certificates.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
+          <para styleclass="Normal">Allow Person Post-Nominal Letters?</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"><link displaytype="text" defaultstyle="true" type="weblink" href="https://en.wikipedia.org/wiki/Post-nominal_letters" style="font-family:Arial; text-decoration:none; vertical-align:baseline; color:#000000; background-color:#ffffff;">Post-nominal letters</link><text style="font-family:Arial; text-decoration:none; vertical-align:baseline; color:#202122; background-color:#ffffff;"> are letters placed after the name of a person to indicate that the individual holds a position, office, or honour. Tick to allow the entry of a participant&apos;s post-nominal letters in the </text><text style="font-family:Arial; font-style:italic; text-decoration:none; vertical-align:baseline; color:#202122; background-color:#ffffff;">Member Portal</text><text style="font-family:Arial; text-decoration:none; vertical-align:baseline; color:#202122; background-color:#ffffff;">. Post-nominal letters may always be entered via </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Participants" style="font-family:Arial; text-decoration:none; vertical-align:baseline; color:#202122; background-color:#ffffff;">Add/Edit Participants</link><text style="font-family:Arial; text-decoration:none; vertical-align:baseline; color:#202122; background-color:#ffffff;">.</text></para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading3">The Mail Labels group</para>
+    <para styleclass="Normal">Define the parameters for mailing labels. Labels are normally supplied as an A4 sheet. The default values are suitable for most...</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="7" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:332px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:921px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:332px;">
+          <para styleclass="Normal">Top Margin</para>
+        </td>
+        <td style="width:921px;">
+          <para styleclass="Normal">The distance in centimetres from the top of the sheet to the top of the first label perforation. </para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:332px;">
+          <para styleclass="Normal">Bottom Margin</para>
+        </td>
+        <td style="width:921px;">
+          <para styleclass="Normal">The distance in centimetres from the bottom of the sheet to the bottom of the last label perforation.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:332px;">
+          <para styleclass="Normal">Left Margin</para>
+        </td>
+        <td style="width:921px;">
+          <para styleclass="Normal">as above but for the left margin.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:332px;">
+          <para styleclass="Normal">Right Margin</para>
+        </td>
+        <td style="width:921px;">
+          <para styleclass="Normal">as above but for the right margin.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:332px;">
+          <para styleclass="Normal">Label Height</para>
+        </td>
+        <td style="width:921px;">
+          <para styleclass="Normal">The height in centimetres of one label</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:332px;">
+          <para styleclass="Normal">Label Width</para>
+        </td>
+        <td style="width:921px;">
+          <para styleclass="Normal">The length in centimetres of one label</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading2">The Terms &amp; Conditions tab</para>
+    <para styleclass="Normal">Use the Rich Text Format (RTF) editor to enter your U3A group&apos;s &apos;Terms and Conditions. <text style="font-weight:bold;">Hint</text>: it might be easier to use a Word processor such a <text style="font-style:italic;">Microsoft Word</text> to do this and copy and paste the result.</para>
+    <para styleclass="Normal">If entered, your members will be required to agree to these terms on a regular basis. The Terms &amp; Conditions will be displayed in the <text style="font-style:italic;">Member Portal</text> and the member will be required to accept them using an <text style="font-style:italic;">Accept</text> button. If the member does not accept the T&amp;C&apos;s they will be logged out until they do.</para>
+  </body>
+</topic>

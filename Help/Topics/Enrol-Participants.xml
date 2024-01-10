@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-07-17T09:55:03.518+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Enrol Participants</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Enrol Participants</para>
+    </header>
+    <para styleclass="Normal">Normally, course enrolment is a self-service activity performed by participants via the <text style="font-style:italic;">Member Portal</text>. The procedure <text style="font-weight:bold;">Enrol Participants</text> is therefore intended to allow administrators to make manual adjustment as required.</para>
+    <para styleclass="Normal">An enrolment exits for a course within a term. Thus a person may be enrolled in say, Tai Chi in Term 1 but not in Term 2.</para>
+    <para styleclass="Normal">When an enrolment is made via the <text style="font-style:italic;">Member Portal </text>it is initially a request only. Depending on the person&apos;s financial status, course&apos;s maximum number, and the current number enrolled that request may be accepted or <text style="font-weight:bold;">Waitlisted</text>. The system will automatically move an enrolment request from waitlisted to accepted as space becomes available. The system will never automatically move a person from accepted to waitlisted.</para>
+    <para styleclass="Normal">To view or edit enrolments...</para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:0px;">Select the Term required. The software will default to the current enrolment term.</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">Select the course required.</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">Optionally, select the class required. Note that this field is only required when the course has different participants in each class.</li>
+    </list>
+    <para styleclass="Normal" style="margin-bottom:0px;"></para>
+    <para styleclass="Normal" style="margin-top:1px;">On entry of these details the current course enrolments will be displayed in the grid, the leader&apos;s details and enrolment statistics will be displayed in the columns to the right. </para>
+    <para styleclass="Normal">With the grid you are able to...</para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:0px;">Add or Delete enrolment records.</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">Assign waitlist status</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">Assign course clerks</li>
+      <li styleclass="Normal">Select multiple records on which to perform a <text style="font-style:italic;">Quick Action</text>.</li>
+    </list>
+    <para styleclass="Heading3">Quick Actions</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="7" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:236px;">
+          <para styleclass="Normal">Actions</para>
+        </td>
+        <td style="width:717px;">
+          <para styleclass="Normal">Description</para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:236px;">
+          <para styleclass="Normal">Quick Enrolment</para>
+        </td>
+        <td style="width:717px;">
+          <para styleclass="Normal">This action allows you to select multiple participants to enrol in the course. Clicking the button will popup a form in which multiple participant records may be selected. The selected records may be added as waitlisted or not.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:236px;">
+          <para styleclass="Normal">Set Selection Enrolled</para>
+        </td>
+        <td style="width:717px;">
+          <para styleclass="Normal">Sets the selected grid&apos;s records as enrolled. This option is intended to quickly move wiatlisted requests to enrolled.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:236px;">
+          <para styleclass="Normal">Set Selection Waitlisted</para>
+        </td>
+        <td style="width:717px;">
+          <para styleclass="Normal">Sets the selected grid&apos;s records as waitlisted. This option is intended to quickly move enrolled requests to waitlisted.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:236px;">
+          <para styleclass="Normal">Transfer Selection</para>
+        </td>
+        <td style="width:717px;">
+          <para styleclass="Normal">Allows the transfer of selected participants to another course/class. This may be useful if a full course is to be split in two, for example.</para>
+          <para styleclass="Normal">The transfers are made with the current enrolment status intact.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:236px;">
+          <para styleclass="Normal">Copy Selection</para>
+        </td>
+        <td style="width:717px;">
+          <para styleclass="Normal">Unlike <text style="font-style:italic;">Transfer Selection</text> which moves an enrolment from one course to another, this quick action copies the selection leaving the original enrolments in the current course in place.</para>
+          <para styleclass="Normal">It might be used to move enrollees in a Term 1 beginner course to a Term 2 advanced course, for example.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:236px;">
+          <para styleclass="Normal">Delete Selection</para>
+        </td>
+        <td style="width:717px;">
+          <para styleclass="Normal">Deletes the selected enrolments.</para>
+        </td>
+      </tr>
+    </table></para>
+  </body>
+</topic>

@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2023-06-14T11:56:33.112+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Add/Edit Document Templates</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Add/Edit Document Templates</para>
+    </header>
+    <para styleclass="Normal">A <text style="font-weight:bold;">Document Template</text> defines a document or part of a document that will be posted, emailed or SMS&apos;ed to U3A participants. Templates are not only designed to reduce the effort in creating a document but also to provide a standard by which your email and other documents are written.</para>
+    <para styleclass="Normal">A template text used to create a final document may be changed and added to when the final document is written. Therefore, keep your templates general rather than specific unless you are creating a template for a repetitive document. Common items found in a template might be...</para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:0px;">Initial font and style</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">Header text including the U3A logo</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">Signature</li>
+    </list>
+    <para styleclass="Normal" style="margin-bottom:0px;"></para>
+    <para styleclass="Normal" style="margin-bottom:0px;">Examples of repetitive emails are...</para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:0px;">A welcome email to new members from the president and/or committee.</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">A reminder that next year&apos;s fees are due.</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">A notice of suspension or termination of membership.</li>
+    </list>
+    <para styleclass="Normal" style="margin-bottom:0px;"></para>
+    <para styleclass="Normal" style="margin-bottom:0px;">This procedure uses a modified version of the rich text editor component supplied by DevExpress Inc. For for details to its use please refer to <link displaytype="text" defaultstyle="true" type="weblink" href="https://devexpress.github.io/dotnet-eud/interface-elements-for-desktop/articles/rich-text-editor.html" target="_blank">DevExpress web rich text editor</link></para>
+    <para styleclass="Normal" style="margin-bottom:0px;"></para>
+    <para styleclass="Normal" style="margin-bottom:0px;">The template record consists of the following fields...</para>
+    <para styleclass="Normal" style="margin-bottom:0px;"><table styleclass="Default" rowcount="8" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal">Template Type</para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal">Select to type of document to be created...</para>
+          <list id="2" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:Symbol; font-size:11pt; color:#000000;">
+            <li styleclass="Normal" style="margin-bottom:0px;">Email</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Postal</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">SMS</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Enrolment Subdoc</li>
+            <li styleclass="Normal" style="margin-bottom:0px;">Receipt Subdoc</li>
+          </list>
+          <para styleclass="Normal" style="margin-bottom:0px;"></para>
+          <para styleclass="Normal" style="margin-bottom:0px;">The enrolment and receipt sub-documents allow the creation of sub-documents that contain the parent-child relationship with the main document. These options are an advanced topic and rarely used.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal">Template Name</para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal">Enter a name that uniquely describes the document.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal">From (11 chars max)</para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal">SMS only. Enter text that will be displayed instead of your phone number. <text style="font-weight:bold;">Note:</text> The Australian Government now requires all such text to be registered. This is done via the SMS service provider.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal">Subject</para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal">Email Only. Enter a subject for the email.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal">From Email Address</para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal">Email only. Enter or select the address from which the email is being sent. <text style="font-weight:bold;">Important:</text> This address must be from your U3A&apos;s registered domain.</para>
+          <para styleclass="Normal">The from address may be a non-existent address such as, <text style="font-style:italic;">no-reply@myU3A.org.au</text>. However, to ensure high email reputation, such addresses should be used sparingly. </para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal">From Display Name</para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal">Email only. Enter the name to be displayed in the <text style="font-style:italic;">From</text> field on the recipient&apos;s email.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal">Document Body</para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal">Enter and format the document&apos;s text.</para>
+          <para styleclass="Normal"><text style="font-weight:bold;">Hint: </text>The editor provided is sufficient for simple text entry. For complex formatting tasks we suggest the document be created in Microsoft Word or equivalent and then copy and pasted into the document body. </para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal" style="margin-bottom:0px;"></para>
+  </body>
+</topic>
