@@ -76,6 +76,10 @@ else
                     SelectedDataItemChanged="SelectedDataItemChanged"
                     CssClass="mt-1 col-12 listbox-scroll">
                 <Columns>
+                    @if (IsEnrolmentRequestView)
+                    {
+                        <DxGridDataColumn FieldName="IsSelected" Width="0.25rem" Caption=" " />
+                    }
                     <DxGridDataColumn Width="100%">
                         <HeaderCaptionTemplate>
                             <div class="d-flex">
@@ -109,7 +113,7 @@ else
                                 @if (reportStyle == ReportStyle.Brief && !isListboxShowingSummary)
                                 {
                                     <div class="mx-3">
-                                        <div class=@((!IsReadOnly && c.IsSelected) ? "selected-box bg-primary-subtle" : "")>
+                                        <div class=@((IsEnrolmentRequestView && c.IsSelected) ? "selected-box bg-primary-subtle" : "")>
                                             @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
                                         </div>
                                     </div>
@@ -119,7 +123,9 @@ else
                                     <DxFormLayout CssClass="mx-auto list-detail">
                                         <DxFormLayoutGroup Context="thatContext" HeaderCssClass="h5">
                                             <CaptionTemplate>
-                                                <div class="@((!IsReadOnly && c.IsSelected) ? "selected-box bg-primary-subtle" : "")">
+                                                <div class="@((IsEnrolmentRequestView && c.IsSelected) 
+                                                                ? "selected-box bg-primary-subtle" 
+                                                                : "")">
                                                     @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
                                                 </div>
                                             </CaptionTemplate>
