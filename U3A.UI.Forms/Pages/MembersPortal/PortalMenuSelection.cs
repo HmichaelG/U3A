@@ -13,7 +13,9 @@ namespace U3A.UI.Forms
         DoSelectLinkedMember,
         DoMemberMaintenance,
         DoMemberLeave,
-        DoEditMemberEnrolment,
+        DoShowEnrolmentSubmenu,
+        DoRequestMemberEnrolment,
+        DoWithdrawMemberEnrolment,
         DoViewMemberEnrolment,
         DoShowLeaderMenu,
         DoMemberPayment,
@@ -31,6 +33,8 @@ namespace U3A.UI.Forms
     public enum PortalMenuResult
     {
         MenuOptionCompleted,
+        EnrolmentSubmenuOptionCompleted,
+        EnrolmentSubmenuOptionCancelled,
         MenuOptionCancelled,
         MemberDetailsCompleted,
         NewMemberFeePayment,

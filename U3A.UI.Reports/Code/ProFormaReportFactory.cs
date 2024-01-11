@@ -220,7 +220,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             var result = string.Empty;
             var createdFilenames = new List<string>();
             var reportNames = new List<string>();
-            if (DoLeaderReport)
+            if (DoLeaderReport || !(Enrolments.Where(x => !x.IsWaitlisted).Any()))
             {
                 using (var leaderReportProForma = new LeaderReport())
                 {
@@ -228,46 +228,49 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                     reportNames.Add("Leader's Report.pdf");
                 }
             }
-            if (DoLeaderAttendanceList)
+            if (Enrolments.Where(x => !x.IsWaitlisted).Any())
             {
-                using (var leaderAttendanceList = new LeaderAttendanceList())
+                if (DoLeaderAttendanceList)
                 {
-                    createdFilenames.Add(await CreateLeaderReportAsync(leaderAttendanceList,
-                                            Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
-                    reportNames.Add("Student Attendance Record.pdf");
+                    using (var leaderAttendanceList = new LeaderAttendanceList())
+                    {
+                        createdFilenames.Add(await CreateLeaderReportAsync(leaderAttendanceList,
+                                                Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
+                        reportNames.Add("Student Attendance Record.pdf");
+                    }
                 }
-            }
-            if (DoLeaderClassList)
-            {
-                using (var leaderClassList = new LeaderClassList())
+                if (DoLeaderClassList)
                 {
-                    createdFilenames.Add(await CreateLeaderReportAsync(leaderClassList,
-                                            Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
-                    reportNames.Add("Class Contact Listing.pdf");
+                    using (var leaderClassList = new LeaderClassList())
+                    {
+                        createdFilenames.Add(await CreateLeaderReportAsync(leaderClassList,
+                                                Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
+                        reportNames.Add("Class Contact Listing.pdf");
+                    }
                 }
-            }
-            if (DoLeaderICEList)
-            {
-                using (var leaderICEList = new LeaderICEList())
+                if (DoLeaderICEList)
                 {
-                    createdFilenames.Add(await CreateLeaderReportAsync(leaderICEList,
-                                            Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
-                    reportNames.Add("Class ICE Listing.pdf");
+                    using (var leaderICEList = new LeaderICEList())
+                    {
+                        createdFilenames.Add(await CreateLeaderReportAsync(leaderICEList,
+                                                Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
+                        reportNames.Add("Class ICE Listing.pdf");
+                    }
                 }
-            }
-            if (DoAttendanceAnalysis)
-            {
-                using (var AttendanceAnalysis = new AttendanceAnalysis())
+                if (DoAttendanceAnalysis)
                 {
-                    createdFilenames.Add(await CreateAttendanceAnalysisReportAsync(AttendanceAnalysis,
-                                            Leader, CourseID));
-                    reportNames.Add("Attendance Analysis.pdf");
+                    using (var AttendanceAnalysis = new AttendanceAnalysis())
+                    {
+                        createdFilenames.Add(await CreateAttendanceAnalysisReportAsync(AttendanceAnalysis,
+                                                Leader, CourseID));
+                        reportNames.Add("Attendance Analysis.pdf");
+                    }
                 }
-            }
-            if (DoLeaderCSVFile && !isPreview)
-            {
-                createdFilenames.Add(CreateCSVFile(Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
-                reportNames.Add("Class List.csv");
+                if (DoLeaderCSVFile && !isPreview)
+                {
+                    createdFilenames.Add(CreateCSVFile(Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
+                    reportNames.Add("Class List.csv");
+                }
             }
             return await ProcessLeaderReport(Leader, ReportName, CourseName, createdFilenames.ToArray(), reportNames.ToArray());
         }

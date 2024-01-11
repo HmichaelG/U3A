@@ -29,7 +29,7 @@ else
     <MessageBox @ref="messageBox" />
 
     <DxFormLayout CssClass="mx-1 w-100">
-        <div class=@((IsPreview) ? "col-10 mx-auto" : "col-12 col-md-10 mx-auto")>
+        <div class=@((IsPreview) ? "col-10 mx-auto" : "col-12 col-md-10 col-lg-9 col-xl-8 mx-auto")>
             <div class="h6 pt-2 col-12" align="center">
                 @term?.TermSummary
             </div>
@@ -39,9 +39,6 @@ else
                     @(enrolmentLockoutText)
                 </p>
             }
-            <div class="px-2 col-12" hidden=@(!isListboxShowingSummary || IsReadOnly || isNotInEnrolmentPeriod)>
-                <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
-            </div>
             <div class="list-detail mx-auto" hidden=@(isListboxShowingSummary || IsReadOnly)>
                 <div class="d-flex">
                     <DxTextBox @ref=@filterTextBox
@@ -75,12 +72,36 @@ else
                     AllowGroup=false
                     AllowSort=false
                     PagerVisible=false
-                    SelectionMode="GridSelectionMode.Single"
+                    SelectionMode="GridSelectionMode.Multiple"
                     SelectedDataItemChanged="SelectedDataItemChanged"
                     CssClass="mt-1 col-12 listbox-scroll">
                 <Columns>
                     <DxGridDataColumn Width="100%">
-                        <HeaderCaptionTemplate></HeaderCaptionTemplate>
+                        <HeaderCaptionTemplate>
+                            <div class="d-flex">
+                                <div class="flex-grow-1 my-auto">
+                                    @if (IsEnrolmentRequestView)
+                                    {
+                                        <span class="h6 text-info">Request your course enrolments</span>
+                                    }
+                                    @if (IsEnrolmentWithdrawalView)
+                                    {
+                                        <span class="h6 text-danger">Withdraw from course enrolments</span>
+                                    }
+                                    @if (IsReadOnly)
+                                    {
+                                        <span class="h6 text-info">View your course enrolments</span>
+                                    }
+                                </div>
+                                @if (IsEnrolmentRequestView)
+                                {
+                                    <DxButton @ref=@listboxViewButton Text="@ListboxViewButtonText"
+                                              RenderStyle="ButtonRenderStyle.Primary"
+                                              RenderStyleMode="ButtonRenderStyleMode.Text"
+                                              Click="ToggleListboxViewButton" CssClass="flex-grow-0" />
+                                }
+                            </div>
+                        </HeaderCaptionTemplate>
                         <CellDisplayTemplate>
                             @{
                                 var c = (Class)context.DataItem;
@@ -88,7 +109,7 @@ else
                                 @if (reportStyle == ReportStyle.Brief && !isListboxShowingSummary)
                                 {
                                     <div class="mx-3">
-                                        <div class=@((!IsReadOnly && c.IsSelected) ? "selected-box alert-primary" : "")>
+                                        <div class=@((!IsReadOnly && c.IsSelected) ? "selected-box bg-primary-subtle" : "")>
                                             @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
                                         </div>
                                     </div>
@@ -98,7 +119,7 @@ else
                                     <DxFormLayout CssClass="mx-auto list-detail">
                                         <DxFormLayoutGroup Context="thatContext" HeaderCssClass="h5">
                                             <CaptionTemplate>
-                                                <div class=@((!IsReadOnly && c.IsSelected) ? "selected-box alert-primary" : "")>
+                                                <div class="@((!IsReadOnly && c.IsSelected) ? "selected-box bg-primary-subtle" : "")">
                                                     @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
                                                 </div>
                                             </CaptionTemplate>
@@ -283,26 +304,23 @@ else
                 </Columns>
             </DxGrid>
 
+            <div class="align-items-end">
+                <div class="h6 col-12 text-primary" align="center">
+                    @(new MarkupString(selectionCountText))
+                </div>
 
-            <div class="h6 col-12 text-primary" align="center">
-                @(new MarkupString(selectionCountText))
-            </div>
-
-            <div class="input-group col-12 mb-4">
-                <DxButton @ref="listboxViewButton" CssClass="flex-grow-1" IconCssClass="bi bi-mortarboard"
-                          Visible=@(!isNotInEnrolmentPeriod && !IsReadOnly && !IsPreview)
-                          Text="@listboxViewButtonText"
-                          RenderStyle="@ButtonRenderStyle.Info" Click="@ShowSelectedClasses" />
-                <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save"
-                          Visible=@(!isNotInEnrolmentPeriod && !IsReadOnly && !IsPreview)
-                          Text="Save" RenderStyle="@ButtonRenderStyle.Primary" Click="@OnSave" />
-                <DxButton CssClass="flex-grow-1"
-                          Visible=@(!IsPreview)
-                          IconCssClass=@((isListboxShowingSummary) ? "bi-door-open" : "bi-x-circle")
-                          Text=@((isListboxShowingSummary)
-                      ? (IsMobileLayout) ? ((IsReadOnly) ? "Return to menu" :"Menu") :"Return to menu"
-                      : "Cancel")
-                          RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnCancel" />
+                <div class="input-group col-12 mb-4">
+                    <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save"
+                              Visible=@(!isNotInEnrolmentPeriod && !IsReadOnly && !IsPreview)
+                              Text="Save" RenderStyle="@ButtonRenderStyle.Primary" Click="@OnSave" />
+                    <DxButton CssClass="flex-grow-1"
+                              Visible=@(!IsPreview)
+                              IconCssClass=@((isListboxShowingSummary) ? "bi-door-open" : "bi-x-circle")
+                              Text=@((isListboxShowingSummary)
+                          ? (IsMobileLayout) ? ((IsReadOnly) ? "Return to menu" :"Menu") :"Return to menu"
+                          : "Cancel")
+                              RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnCancel" />
+                </div>
             </div>
         </div>
     </DxFormLayout>
@@ -390,6 +408,12 @@ else
     public bool IsPreview { get; set; }
 
     [Parameter]
+    public bool IsEnrolmentRequestView { get; set; }
+
+    [Parameter]
+    public bool IsEnrolmentWithdrawalView { get; set; }
+
+    [Parameter]
     public Guid ClassID { get; set; }
 
     [Parameter]
@@ -420,7 +444,6 @@ else
     string listHeight;
 
     string selectionCountText = string.Empty;
-    string listboxViewButtonText = string.Empty;
     bool isListboxShowingSummary = true;
     internal ErrorPopup? ErrorPopup { get; set; }
     internal string? ErrorHeader;
@@ -616,8 +639,6 @@ else
         }
         else
         {
-            var newHeight = await Window.FitToRemainingHeight(js, "listBox", listHeight, 0.2);
-            if (newHeight != listHeight) { listHeight = newHeight; InvokeAsync(StateHasChanged); }
             if (Classes != null && ClassID != Guid.Empty)
             {
                 // We have a class ID passed in via QuerRequest
@@ -634,6 +655,8 @@ else
                 ClassID = Guid.Empty;
                 await js.InvokeVoidAsync("clearQueryString");
             }
+            var newHeight = await Window.FitToRemainingHeight(js, "listBox", listHeight, 0.1);
+            if (newHeight != listHeight) { listHeight = newHeight; InvokeAsync(StateHasChanged); }
         }
         ProgressBar?.Close();
     }
@@ -799,7 +822,7 @@ else
             {
                 await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, deletedEnrolments, term, settings));
             }
-            await ReturnToMenu(PortalMenuResult.MenuOptionCompleted);
+            await ReturnToMenu(PortalMenuResult.EnrolmentSubmenuOptionCompleted);
         }
         catch (Exception ex)
         {
@@ -854,30 +877,52 @@ else
         IsReady = true;
     }
 
-
+    string ListboxViewButtonText = "Show selected only";
+    async Task ToggleListboxViewButton()
+    {
+        isListboxShowingSummary = !isListboxShowingSummary;
+        if (isListboxShowingSummary)
+        {
+            ListboxViewButtonText = "Show all courses";
+            ListboxData = selectedClasses;
+        }
+        else
+        {
+            ListboxViewButtonText = "Show selected only";
+            GetData();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
 
     async Task ShowSelectedClasses()
     {
         selectedClass = null;
-        if (isListboxShowingSummary)
+        if (IsEnrolmentRequestView)
         {
+            //Enrolment request view
             ProgressBar?.ShowSmallSpinnerAsync();
             filterText = null;
-            // only show this term's classes & inter-term classes from last term.
-            ListboxData = Classes.Where(x => x.TermNumber == term?.TermNumber
-                                                   || (x.TermNumber == prevTerm.TermNumber
-                                                            && BusinessRule.IsClassEndDateInInterTermPeriod(
-                                                                dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))
-                                                                .Select(x => x).Distinct().ToList();
+            GetData();
             isListboxShowingSummary = false;
         }
         else
         {
+            //Enrolment withdrawal view
             ListboxData = selectedClasses;
             isListboxShowingSummary = true;
         }
         SetReviewButtonText();
         ScrollListboxToTop();
+    }
+
+    void GetData()
+    {
+        // only show this term's classes & inter-term classes from last term.
+        ListboxData = Classes.Where(x => x.TermNumber == term?.TermNumber
+                                               || (x.TermNumber == prevTerm.TermNumber
+                                                        && BusinessRule.IsClassEndDateInInterTermPeriod(
+                                                            dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))
+                                                            .Select(x => x).Distinct().ToList();
     }
 
     void ScrollListboxToTop()
@@ -914,7 +959,7 @@ else
             if (selectedClass.DoNotAllowEdit)
             {
                 await messageBox.ShowOkOnlyAsync("Class is complete",
-                                 $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
+                                                         $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
                         and is now complete. Therefore, it cannot be deleted.</p><p>There are no enrolments in future terms to delete.");
                 listGrid.ClearSelection(); return;
             }
@@ -997,14 +1042,7 @@ else
 
     void SetReviewButtonText()
     {
-        if (selectedClasses?.Count() <= 0)
-        {
-            selectionCountText = $"Click a Class to select or remove.<br/>";
-        }
-        else
-        {
-            selectionCountText = $"{selectedClasses?.Count()} classes selected.<br/>";
-        }
+        selectionCountText = $"You have {selectedClasses?.Count()} class requests.<br/>";
         int[] day = new int[7];
         for (int i = 1; i <= 6; i++)
         {
@@ -1012,14 +1050,6 @@ else
             if (i == 6) day[i] = selectedClasses.Where(x => x.OnDayID == 0).Count();
         }
         selectionCountText += $"Mon: {day[1]} Tue: {day[2]} Wed: {day[3]} Thu: {day[4]} Fri: {day[5]} W/E: {day[6]}";
-        if (!isListboxShowingSummary)
-        {
-            listboxViewButtonText = (IsMobileLayout) ? "Review" : "Review your choices";
-        }
-        else
-        {
-            listboxViewButtonText = (IsMobileLayout) ? "Add new" : "Add Enrolments";
-        }
     }
 
     void OnMapLink(MouseEventArgs args)
@@ -1040,7 +1070,7 @@ else
                     await OnSave();
                 }
             }
-            await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
+            await ReturnToMenu(PortalMenuResult.EnrolmentSubmenuOptionCancelled);
         }
         else
         {

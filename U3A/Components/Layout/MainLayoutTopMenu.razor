@@ -39,14 +39,14 @@
                 }
                 else
                 {
-                    <DxGridLayoutColumn Width="1%" />
-                    <DxGridLayoutColumn Width="98%" />
-                    <DxGridLayoutColumn Width="1%" />
+                    <DxGridLayoutColumn Width="0%" />
+                    <DxGridLayoutColumn Width="100%" />
+                    <DxGridLayoutColumn Width="0%" />
                 }
             }
         </Columns>
         <Items>
-            <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none me-3 vh-100">
+            <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none vh-100">
             </DxGridLayoutItem>
             <DxGridLayoutItem Area="header" CssClass="py-1">
                 <Template>
@@ -86,7 +86,7 @@
                     </ErrorBoundary>
                 </Template>
             </DxGridLayoutItem>
-            <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none ms-3 vh-100" />
+            <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none vh-100" />
         </Items>
     </DxGridLayout>
 </div>

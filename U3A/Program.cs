@@ -39,6 +39,11 @@ foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
 
 // TenantDbContextFactory
 string? MultiTenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
+if (MultiTenantConnectionString is null)
+{
+    MultiTenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString");
+}
+
 builder.Services.AddDbContextFactory<TenantStoreDbContext>(options =>
 {
     options.UseSqlServer(MultiTenantConnectionString);
