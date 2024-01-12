@@ -16,10 +16,9 @@
 }
 
 ::deep .content {
-/* top right bottom left */
-    padding: 1rem 1rem 0 1rem;
     overflow: auto;
 }
+
 @media (max-width: 1199.98px) {
     ::deep .page-layout > .dx-gridlayout-root {
         grid-template-columns: minmax(0, 1fr) !important;
