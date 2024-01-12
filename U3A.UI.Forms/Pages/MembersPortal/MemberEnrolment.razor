@@ -664,7 +664,8 @@ else
                 ClassID = Guid.Empty;
                 await js.InvokeVoidAsync("clearQueryString");
             }
-            var newHeight = await Window.FitToRemainingHeight(js, "listBox", listHeight, 0.1);
+            var offset = (loginState.IsAdminOnBehalfOfMember) ? 0.175 : 0.1;
+            var newHeight = await Window.FitToRemainingHeight(js, "listBox", listHeight, offset);
             if (newHeight != listHeight)
             {
                 listHeight = newHeight;
