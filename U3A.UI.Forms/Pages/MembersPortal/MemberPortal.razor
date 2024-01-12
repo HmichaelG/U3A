@@ -68,11 +68,14 @@ else
 
         case PortalMenuSelection.DoRequestMemberEnrolment:
             Guid classID = GetRequestedClass();
-            <MemberEnrolment IsEnrolmentRequestView=true ClassID=classID OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+            <MemberEnrolment IsEnrolmentRequestView=true
+                             ClassID=classID
+                             OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
             break;
 
         case PortalMenuSelection.DoWithdrawMemberEnrolment:
-            <MemberEnrolment IsEnrolmentWithdrawalView=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+            <MemberEnrolment IsEnrolmentWithdrawalView=true
+                             OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
             break;
 
         case PortalMenuSelection.DoViewMemberEnrolment:

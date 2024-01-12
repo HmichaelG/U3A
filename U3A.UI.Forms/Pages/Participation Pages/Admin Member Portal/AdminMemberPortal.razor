@@ -20,7 +20,7 @@ else
     <CascadingValue Value="@LoginState">
 
         <MessageBox @ref="@messageBox" />
-
+        
             <DxLoadingPanel @bind-Visible="isProcessing"
                             IsContentBlocked="true"
                             ApplyBackgroundShading="true"
@@ -30,7 +30,7 @@ else
                     <DxTabPage Text="Process On Behalf Of">
                         <div class="h3 text-center">Member Portal (Administration)</div>
                         <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
-                    <DxFormLayout CssClass="col-12 col-lg-8 mx-auto overflow-hidden">
+                    <DxFormLayout CssClass="px-2 col-12 px-sm-0 col-sm-10 col-md-8 col-lg-6 mx-auto">
                             <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" ColSpanMd="12">
                                 <HeaderContentTemplate>
                                     <div class="d-flex input-group">
@@ -137,7 +137,7 @@ else
                     </DxTabPage>
                 </DxTabs>
             </DxLoadingPanel>
-    </CascadingValue>
+        </CascadingValue>
 }
 <style>
     .member-selection-width {
@@ -245,14 +245,14 @@ else
 
     async Task OnRefresh()
     {
-        showWaitIndicator = true;
-        await InvokeAsync(StateHasChanged);
-        await GetData();
-        isSelected = false;
-        selectedPerson = null;
-        showWaitIndicator = false;
-        await InvokeAsync(StateHasChanged);
-    }
+            showWaitIndicator = true;
+            await InvokeAsync(StateHasChanged);
+            await GetData();
+            isSelected = false;
+            selectedPerson = null;
+            showWaitIndicator = false;
+            await InvokeAsync(StateHasChanged);
+        }
 
     async Task OnProcess()
     {

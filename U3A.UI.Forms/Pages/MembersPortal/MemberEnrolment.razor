@@ -1,5 +1,5 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@implements IDisposable
+@implements IAsyncDisposable
 @inject IJSRuntime js
 @inject NavigationManager NavMan
 @inject IConfiguration config
@@ -27,9 +27,8 @@ else
     </MessageBox>
 
     <MessageBox @ref="messageBox" />
-
-    <DxFormLayout CssClass="mx-1 w-100">
-        <div class=@((IsPreview) ? "col-10 mx-auto" : "col-12 col-md-10 col-lg-9 col-xl-8 mx-auto")>
+    <div class="vh-100">
+        <div class=@((IsPreview) ? "col-10 mx-auto" : "")>
             <div class="h6 pt-2 col-12" align="center">
                 @term?.TermSummary
             </div>
@@ -67,6 +66,7 @@ else
             </div>
             <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
                     KeyFieldName="ID"
+                    ShowAllRows=true
                     VirtualScrollingEnabled=true
                     AllowSelectRowByClick=true
                     AllowGroup=false
@@ -82,7 +82,7 @@ else
                                 <div class="flex-grow-1 my-auto">
                                     @if (IsEnrolmentRequestView)
                                     {
-                                        <span class="h6 text-info">Request your course enrolments</span>
+                                        <span class="h6 text-info">Request course enrolments</span>
                                     }
                                     @if (IsEnrolmentWithdrawalView)
                                     {
@@ -333,7 +333,7 @@ else
                 </div>
             </div>
         </div>
-    </DxFormLayout>
+    </div>
 }
 <style>
     .filter-text-box {
@@ -451,7 +451,7 @@ else
     DxTextBox filterTextBox;
 
     int activeTabIndex;
-    string listHeight;
+    string listHeight = "0%";
 
     string selectionCountText = string.Empty;
     bool isListboxShowingSummary = true;
@@ -603,7 +603,6 @@ else
                 {
                     isListboxShowingSummary = true; // force a flip
                 }
-                ShowSelectedClasses();
             }
         }
         googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
@@ -666,7 +665,12 @@ else
                 await js.InvokeVoidAsync("clearQueryString");
             }
             var newHeight = await Window.FitToRemainingHeight(js, "listBox", listHeight, 0.1);
-            if (newHeight != listHeight) { listHeight = newHeight; InvokeAsync(StateHasChanged); }
+            if (newHeight != listHeight)
+            {
+                listHeight = newHeight;
+                if (ListboxData.Count == 0) { await ShowSelectedClasses(); }
+                InvokeAsync(StateHasChanged);
+            }
         }
         ProgressBar?.Close();
     }
@@ -703,8 +707,8 @@ else
         catch (Exception ex)
         {
             await messageBox.ShowOkOnlyAsync("Error Activating SMS Client",
-                            $@"<p>An SMS client (Phone) is required to process your request.</p>" +
-                            $"<p>Error: {ex.Message}");
+                                    $@"<p>An SMS client (Phone) is required to process your request.</p>" +
+                                    $"<p>Error: {ex.Message}");
         }
     }
 
@@ -719,8 +723,8 @@ else
         catch (Exception ex)
         {
             await messageBox.ShowOkOnlyAsync("Error Activating Phone",
-                            $@"<p>A Phone is required to process your request.</p>" +
-                            $"<p>Error: {ex.Message}");
+                                    $@"<p>A Phone is required to process your request.</p>" +
+                                    $"<p>Error: {ex.Message}");
         }
     }
 
@@ -789,9 +793,9 @@ else
             };
 
             if (!IsReadOnly
-                    && !isNotInEnrolmentPeriod
-                    && isListboxShowingSummary
-                    && classEndDate?.Date >= today)
+            && !isNotInEnrolmentPeriod
+            && isListboxShowingSummary
+            && classEndDate?.Date >= today)
             {
                 result += " - Click to remove";
             }
@@ -808,11 +812,11 @@ else
             if (c.Course.Enrolments.Count > 0)
             {
                 e = c.Course.Enrolments
-                                .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
-                                .FirstOrDefault(x => x.CourseID == thisClass.Course.ID &&
-                                    x.Term.Year == thisTerm.Year &&
-                                    x.Term.TermNumber >= thisTerm.TermNumber &&
-                                    x.PersonID == loginState.SelectedPerson.ID);
+                .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
+                .FirstOrDefault(x => x.CourseID == thisClass.Course.ID &&
+                x.Term.Year == thisTerm.Year &&
+                x.Term.TermNumber >= thisTerm.TermNumber &&
+                x.PersonID == loginState.SelectedPerson.ID);
             }
         }
         return e;
@@ -910,7 +914,6 @@ else
         if (IsEnrolmentRequestView)
         {
             //Enrolment request view
-            ProgressBar?.ShowSmallSpinnerAsync();
             filterText = null;
             GetData();
             isListboxShowingSummary = false;
@@ -969,7 +972,7 @@ else
             if (selectedClass.DoNotAllowEdit)
             {
                 await messageBox.ShowOkOnlyAsync("Class is complete",
-                                                         $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
+                                                                         $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
                         and is now complete. Therefore, it cannot be deleted.</p><p>There are no enrolments in future terms to delete.");
                 listGrid.ClearSelection(); return;
             }
@@ -1088,7 +1091,7 @@ else
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         dbc?.Dispose();
     }

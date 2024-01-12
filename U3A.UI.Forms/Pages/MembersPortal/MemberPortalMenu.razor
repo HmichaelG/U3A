@@ -19,7 +19,7 @@
     <AntiforgeryToken />
     <Progress @ref=@progress />
     <div class="vw-100">
-        <div class="col-md-6 col-lg-5 col-xl-4 mx-auto">
+        <div class="px-2 col-12 px-sm-0 col-md-10 col-lg-6 mx-auto">
             <div class="text-center alert alert-success col-12">
                 @welcomeText @classText
             </div>
@@ -28,14 +28,22 @@
                 <Items>
                     @if (ShowEnrolmentSubMneu)
                     {
-                        <DxAccordionItem Text="Enrolment Submenu">
+                        <DxAccordionItem Text="Manage your course enrolments">
                             <ContentTemplate>
-                                <div class="py-4">
+                                <div class="py-1">
                                     <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                                </div>
+                                <div class="p-1 mt-2 text-center">
+                                    <div class="h6 text-primary"><span class="px-2 bg-primary text-light h6 bi bi-save" /> &nbsp; Reminder: Save Your Work!</div>
+                                    <div>
+                                        You may request multiple course enrolments or withdrawals at the one time.
+                                        When selection is complete, you must click the <strong>Save</strong> button to
+                                        save your selection to our database.
+                                    </div>
                                 </div>
                                 <DxButton Text="View your course enrolments"
                                           IconCssClass="bi-award menu-icon me-3 h2"
-                                          CssClass="col-12 mt-1"
+                                          CssClass="col-12 mt-2"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoViewMemberEnrolment))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
