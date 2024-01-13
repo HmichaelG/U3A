@@ -34,7 +34,7 @@ namespace U3A.Services
             var id = accessor.HttpContext.User.Identity; // store in dictionary somewhere
             var cd = new CircuitDetail()
             {
-                Circuit = circuit,
+                Id = circuit.Id,
                 Name = (!string.IsNullOrWhiteSpace(id?.Name)) ? id.Name : "Anonymous (Public)",
             };
             CircuitDetails.TryAdd(circuit.Id, cd);
@@ -56,6 +56,8 @@ namespace U3A.Services
         public override Task OnConnectionDownAsync(Circuit circuit,
                               CancellationToken cancellationToken)
         {
+            var kvp = CircuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
+            if (kvp!.Value != null) { kvp.Value.Down = DateTime.Now; }
             return base.OnConnectionDownAsync(circuit,
                              cancellationToken);
         }
@@ -63,14 +65,34 @@ namespace U3A.Services
         public override Task OnConnectionUpAsync(Circuit circuit,
                             CancellationToken cancellationToken)
         {
+            var kvp = CircuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
+            if (kvp!.Value != null) { kvp.Value.Down = null; }
             return base.OnConnectionUpAsync(circuit, cancellationToken);
         }
     }
 
     public class CircuitDetail
     {
-        public Circuit Circuit { get; set; }
+        public string Id { get; set; }
         public string? Name { get; set; }
         public DateTime? Created { get; set; } = DateTime.Now;
+        public DateTime? Down { get; set; }
+
+        public string UpTime
+        {
+            get
+            {
+                return ((TimeSpan)(DateTime.Now - Created!)).ToString(@"hh\:mm\:ss");
+            }
+        }
+        public string DownTime
+        {
+            get
+            {
+                return (Down != null)
+                        ? "Down: " + ((TimeSpan)(DateTime.Now - Down!)).ToString(@"hh\:mm\:ss")
+                        : "Active";
+            }
+        }
     }
 }
