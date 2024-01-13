@@ -286,21 +286,12 @@ else
                                                         <div class="col-12 text-center h6">Map data is not available</div>
                                                     }
                                                 </div>
-                                                <div class="watermark"
-                                                     hidden="@(IsReadOnly
-                                                            || isListboxShowingSummary
-                                                            || (c.Course.AllowAutoEnrol
-                                                            && c.TotalActiveStudents < c.Course.MaximumStudents))">
-                                                    @(c.TermNumber == term.TermNumber
-                                                    ? c.Course.AllowAutoEnrol
-                                                    ? "Class is Full"
-                                                    : "Class is Closed"
-                                                    : "")
-                                                </div>
                                                 @{
                                                     string? message = null;
                                                     if (c.TermNumber != term.TermNumber) { message = $"Offered {c.OfferedSummary}"; }
                                                     if (c.TermNumber == prevTerm.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
+                                                    if (c.TotalActiveStudents > c.Course.MaximumStudents) { message = "Class is Full"; }
+                                                    if (!c.Course.AllowAutoEnrol) { message = "Class is Closed"; }
                                                     if (message != null)
                                                     {
                                                         <div class="watermark"
@@ -939,10 +930,10 @@ else
     {
         // only show this term's classes & inter-term classes from last term.
         ListboxData = Classes.Where(x => x.TermNumber == term?.TermNumber
-                                           || (x.TermNumber == prevTerm.TermNumber
-                                                    && BusinessRule.IsClassEndDateInInterTermPeriod(
-                                                        dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))
-                                                        .Select(x => x).Distinct().ToList();
+                                       || (x.TermNumber == prevTerm.TermNumber
+                                                && BusinessRule.IsClassEndDateInInterTermPeriod(
+                                                    dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))
+                                                    .Select(x => x).Distinct().ToList();
     }
 
     void ScrollListboxToTop()
@@ -979,7 +970,7 @@ else
             if (selectedClass.DoNotAllowEdit)
             {
                 await messageBox.ShowOkOnlyAsync("Class is complete",
-                                                                                     $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
+                                                                                             $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
                         and is now complete. Therefore, it cannot be deleted.</p><p>There are no enrolments in future terms to delete.");
                 listGrid.ClearSelection(); return;
             }
@@ -1041,8 +1032,8 @@ else
                         </div>";
         }
         else if (!BusinessRule.IsClassInTerm(selectedClass, term.TermNumber)
-                &&
-            !BusinessRule.IsClassInTerm(selectedClass, prevTerm.TermNumber))
+            &&
+        !BusinessRule.IsClassInTerm(selectedClass, prevTerm.TermNumber))
         {
             result = @"<div class='alert alert-danger text-center'><h5>Class is not currently available this term</h5>
                         You have requested enrolment in a class that is not available this term.<br/>
