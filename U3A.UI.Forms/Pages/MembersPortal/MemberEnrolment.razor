@@ -297,16 +297,18 @@ else
                                                     : "Class is Closed"
                                                     : "")
                                                 </div>
-                                                <div class="watermark"
-                                                     hidden="@(isListboxShowingSummary
-                                                            || BusinessRule.IsClassInTerm(c,term.TermNumber)
-                                                            || BusinessRule.IsClassInTerm(c,prevTerm.TermNumber))">
-                                                    @(c.TermNumber == term.TermNumber ? "Not available this term" : "")
-                                                </div>
-                                                <div class="watermark"
-                                                     hidden="@(c.TermNumber == term.TermNumber)">
-                                                    @($"This is a Term {prevTerm.TermNumber} class")
-                                                </div>
+                                                @{
+                                                    string? message = null;
+                                                    if (c.TermNumber != term.TermNumber) { message = $"Offered {c.OfferedSummary}"; }
+                                                    if (c.TermNumber == prevTerm.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
+                                                    if (message != null)
+                                                    {
+                                                        <div class="watermark"
+                                                             hidden="@(isListboxShowingSummary)">
+                                                            "@message"
+                                                        </div>
+                                                    }
+                                                }
                                             </Items>
                                         </DxFormLayoutGroup>
                                     </DxFormLayout>
@@ -402,10 +404,10 @@ else
         text-align: center;
         font-size: 2rem;
         font-weight: 500;
-        opacity: 0.6;
+        opacity: 0.4;
         color: magenta;
         position: absolute;
-        bottom: 15%;
+        bottom: 10%;
     }
 </style>
 @code {
@@ -937,10 +939,10 @@ else
     {
         // only show this term's classes & inter-term classes from last term.
         ListboxData = Classes.Where(x => x.TermNumber == term?.TermNumber
-                                               || (x.TermNumber == prevTerm.TermNumber
-                                                        && BusinessRule.IsClassEndDateInInterTermPeriod(
-                                                            dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))
-                                                            .Select(x => x).Distinct().ToList();
+                                           || (x.TermNumber == prevTerm.TermNumber
+                                                    && BusinessRule.IsClassEndDateInInterTermPeriod(
+                                                        dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))
+                                                        .Select(x => x).Distinct().ToList();
     }
 
     void ScrollListboxToTop()
@@ -977,7 +979,7 @@ else
             if (selectedClass.DoNotAllowEdit)
             {
                 await messageBox.ShowOkOnlyAsync("Class is complete",
-                                                                             $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
+                                                                                     $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
                         and is now complete. Therefore, it cannot be deleted.</p><p>There are no enrolments in future terms to delete.");
                 listGrid.ClearSelection(); return;
             }
@@ -1039,8 +1041,8 @@ else
                         </div>";
         }
         else if (!BusinessRule.IsClassInTerm(selectedClass, term.TermNumber)
-                    &&
-                !BusinessRule.IsClassInTerm(selectedClass, prevTerm.TermNumber))
+                &&
+            !BusinessRule.IsClassInTerm(selectedClass, prevTerm.TermNumber))
         {
             result = @"<div class='alert alert-danger text-center'><h5>Class is not currently available this term</h5>
                         You have requested enrolment in a class that is not available this term.<br/>
