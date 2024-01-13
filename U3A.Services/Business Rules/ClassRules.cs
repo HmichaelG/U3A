@@ -76,7 +76,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Course)
-                                .ThenInclude(x => x.Enrolments.Where(x => x.TermID == term.ID))
+                                .ThenInclude(x => x.Enrolments.Where(x => x.TermID >= term.ID))
                             .Include(x => x.Leader)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)

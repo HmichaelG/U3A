@@ -113,7 +113,7 @@ else
                                 {
                                     <div class="mx-1 d-flex">
                                         <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
-                                            @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))"
+                                            @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
                                         </div>
                                         @if (IsEnrolmentRequestView)
                                         {
@@ -128,7 +128,7 @@ else
                                             <CaptionTemplate>
                                                 <div class="mx-1 d-flex w-100 my-auto">
                                                     <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
-                                                        @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))"
+                                                        @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
                                                     </div>
                                                     @if (IsEnrolmentRequestView)
                                                     {
