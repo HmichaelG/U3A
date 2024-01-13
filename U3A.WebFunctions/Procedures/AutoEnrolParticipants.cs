@@ -21,7 +21,7 @@ namespace U3A.WebFunctions.Procedures
                 var settings = await dbc.SystemSettings
                                     .OrderBy(x => x.ID)
                                     .FirstOrDefaultAsync();
-                if (string.IsNullOrWhiteSpace(settings.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
+                if (string.IsNullOrWhiteSpace(settings!.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
 
                 //get the current enrolment term
                 var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
@@ -50,7 +50,7 @@ namespace U3A.WebFunctions.Procedures
                             // force all members to get a report
                             forceEmailQueue = true;
                             // set TRUE to force all leaders to get a report
-                            DailyProcedures.RandomAllocationExecuted[tenant.Identifier] = true;
+                            DailyProcedures.RandomAllocationExecuted[tenant.Identifier!] = true;
                         }
 #if DEBUG
                         forceEmailQueue = false;
