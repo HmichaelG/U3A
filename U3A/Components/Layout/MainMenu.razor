@@ -19,8 +19,8 @@
 
     <div class="@((IsTopMenu)
                 ? "card shadow-sm w-100"
-                : "vh-100")">
-        <div class="d-print-none h-100">
+                : "sidebar")">
+        <div class="d-print-none">
             <DxMenu ItemClick="OnItemClick" CssClass="menu-item menu"
                     DropDownActionMode="MenuDropDownActionMode.Click"
                     ItemsPosition="ItemPosition.End"
@@ -216,6 +216,9 @@
 <style>
     .logout-button {
         width: 15rem;
+    }
+    .sidebar {
+        height: 94vh !important;
     }
 </style>
 

@@ -1,10 +1,10 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
     <div id="sidebar" class="@(IsExpanded ? "expanded": "")">
-        <DxGridLayout CssClass="page-layout" RowSpacing="0rem">
+        <DxGridLayout RowSpacing="0rem">
             <Rows>
                 <DxGridLayoutRow Areas="header menu-button" Height="auto"></DxGridLayoutRow>
-                <DxGridLayoutRow Areas="navigation navigation"></DxGridLayoutRow>
+                <DxGridLayoutRow Areas="navigation navigation" ></DxGridLayoutRow>
             </Rows>
             <Columns>
                 <DxGridLayoutColumn></DxGridLayoutColumn>

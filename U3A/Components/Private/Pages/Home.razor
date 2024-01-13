@@ -97,7 +97,7 @@ else
     [CascadingParameter(Name = "HasRole")]
     public bool hasRole { get; set; }
 
-    U3ADbContext dbc { get; set; }
+    U3ADbContext? dbc { get; set; }
     MessageBox? messageBox;
     string homePage = "";
 
@@ -125,13 +125,13 @@ else
         StringBuilder msg = new();
         msg.AppendLine("<table class='table'>");
         msg.AppendLine("<thead><tr><td>UpTime</td><td>Login</td><td>Circuit</td></tr></thead><tbody>");
-        foreach (var cd in (circuitHandler as CircuitHandlerService).CircuitDetails)
+        foreach (var cd in (circuitHandler as CircuitHandlerService)!.CircuitDetails)
         {
             string upTime = ((TimeSpan)(DateTime.Now - cd.Value.Created)).ToString(@"hh\:mm\:ss");
             msg.AppendLine($"<tr><td>{upTime}</td><td>{cd.Value.Name}</td><td>{cd.Key}</td></tr>");
         }
         msg.AppendLine("</tbody></table");
-        await messageBox.SetPopupWidth("40rem");
+        await messageBox!.SetPopupWidth("40rem");
         await messageBox.ShowOkOnlyAsync("Logins", msg.ToString());
     }
 
@@ -139,7 +139,7 @@ else
 
     public string GetAssemblyVersion()
     {
-        var version = GetType().Assembly.GetName().Version.ToString();
+        var version = GetType().Assembly.GetName().Version!.ToString();
         var splits = version.Split(".");
         return $"{splits[0]}.{splits[1]}.{splits[2]}";
     }

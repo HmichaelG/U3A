@@ -17,7 +17,7 @@
 
 @if (isReady && Body != null)
 {
-    <DxFormLayout CssClass="px-3 py-2">
+    <div class="main">
         <AntiforgeryToken />
 
         <CascadingValue Value=@openCircuits Name="OpenCircuits">
@@ -45,7 +45,7 @@
             </CascadingValue>
         </CascadingValue>
 
-    </DxFormLayout>
+    </div>
 }
 
 

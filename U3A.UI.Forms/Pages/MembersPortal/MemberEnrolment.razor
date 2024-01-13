@@ -28,7 +28,10 @@ else
 
     <MessageBox @ref="messageBox" />
     <div class="vh-100">
-        <div class=@((IsPreview) ? "col-10 mx-auto" : "")>
+        <div class=@((IsPreview)
+         ? "col-10 mx-auto"
+         : ((bool)loginState?.IsAdminOnBehalfOfMember) ? ""
+         : "col col-sm-10 col-md-9 col-lg-7 mx-auto")>
             <div class="h6 pt-2 col-12" align="center">
                 @term?.TermSummary
             </div>
@@ -54,7 +57,7 @@ else
                                 TextFieldName="@nameof(ReportStyleWrapper.ListText)"
                                 ValueFieldName="@nameof(ReportStyleWrapper.Type)" />
                 </div>
-                <DxTabs @ref="dxTabs" TabClick="@OnTabClick" CssClass="col col-12">
+                <DxTabs @ref="dxTabs" TabClick="@OnTabClick" CssClass="">
                     <DxTabPage Text="All" />
                     <DxTabPage Text="Mon" />
                     <DxTabPage Text="Tue" />
@@ -74,7 +77,7 @@ else
                     PagerVisible=false
                     SelectionMode="GridSelectionMode.Multiple"
                     SelectedDataItemChanged="SelectedDataItemChanged"
-                    CssClass="mt-1 col-12 listbox-scroll">
+                    CssClass="mt-1 listbox-scroll">
                 <Columns>
                     <DxGridDataColumn Width="100%">
                         <HeaderCaptionTemplate>
@@ -370,7 +373,8 @@ else
     }
 
     .list-detail {
-        width: 95%;
+        width: 98%;
+        margin: auto;
     }
 
     .col-small {
@@ -664,7 +668,7 @@ else
                 ClassID = Guid.Empty;
                 await js.InvokeVoidAsync("clearQueryString");
             }
-            var offset = (loginState.IsAdminOnBehalfOfMember) ? 0.175 : 0.1;
+            var offset = (loginState.IsAdminOnBehalfOfMember) ? 0.175 : 0.15;
             var newHeight = await Window.FitToRemainingHeight(js, "listBox", listHeight, offset);
             if (newHeight != listHeight)
             {
@@ -973,7 +977,7 @@ else
             if (selectedClass.DoNotAllowEdit)
             {
                 await messageBox.ShowOkOnlyAsync("Class is complete",
-                                                                         $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
+                                                                             $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
                         and is now complete. Therefore, it cannot be deleted.</p><p>There are no enrolments in future terms to delete.");
                 listGrid.ClearSelection(); return;
             }

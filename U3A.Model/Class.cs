@@ -217,10 +217,10 @@ namespace U3A.Model
             string result = string.Empty;
             if (StartDate.HasValue && Recurrence.HasValue)
             {
-                result = $": From {StartDate.Value.ToString("d")}, {Recurrence} repeats.";
+                result = $": From {StartDate.Value.ToString("dd-MMM-yy")}, {Recurrence} repeats.";
             }
             if (!StartDate.HasValue && !Recurrence.HasValue) { result = ": For full term."; }
-            if (StartDate.HasValue && !Recurrence.HasValue) { result = $": From {StartDate.Value.ToString("d")} till End of Term."; }
+            if (StartDate.HasValue && !Recurrence.HasValue) { result = $": From {StartDate.Value.ToString("dd-MMM-yy")} till End of Term."; }
             if (!StartDate.HasValue && Recurrence.HasValue) { result = $": From Start of Term, {Recurrence} repeats."; }
             return result;
         }

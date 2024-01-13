@@ -48,7 +48,7 @@ namespace U3A.Services
         {
             CircuitDetail circuitRemoved;
             CircuitDetails.TryRemove(circuit.Id, out circuitRemoved);
-            OnCircuitsChanged();
+            OnCircuitsChanged();           
             return base.OnCircuitClosedAsync(circuit,
                               cancellationToken);
         }
