@@ -53,7 +53,7 @@ namespace U3A.WebFunctions.Procedures
                             DailyProcedures.RandomAllocationExecuted[tenant.Identifier] = true;
                         }
 #if DEBUG
-                        //forceEmailQueue = false;
+                        forceEmailQueue = false;
 #endif
                     }
                 }
