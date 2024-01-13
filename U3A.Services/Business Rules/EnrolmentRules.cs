@@ -546,15 +546,31 @@ namespace U3A.BusinessRules
             foreach (var c in RequestedClasses)
             {
                 if (c.DoNotAllowEdit) continue;
+                int thisYear;
+                int thisTermNo;
                 Term thisTerm = term;
-                var termNumber = c.TermNumber;
-                thisTerm = (term.TermNumber == termNumber) ? term : prevTerm;
+                if (c.TermNumber == term.TermNumber)
+                {
+                    thisYear = term.Year;
+                    thisTermNo = term.TermNumber;
+                }
+                else if (c.TermNumber == prevTerm.TermNumber) 
+                {
+                    thisYear = prevTerm.Year;
+                    thisTermNo = prevTerm.TermNumber;
+                }
+                else
+                {
+                    thisYear = term.Year;
+                    thisTermNo = GetRequiredTerm(term.TermNumber,c);
+                    thisTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.Year == term.Year && x.TermNumber == thisTermNo);
+                }
                 var course = await dbc.Course.FindAsync(c.CourseID);
                 if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
                 {
                     if (!await dbc.Enrolment.AnyAsync(x =>
                                         x.PersonID == person.ID &&
-                                        x.Term.Year == thisTerm.Year && x.Term.TermNumber == termNumber &&
+                                        x.Term.Year == thisYear && x.Term.TermNumber == thisTermNo &&
                                         x.CourseID == c.CourseID))
                     {
                         var e = new Enrolment()
@@ -562,9 +578,9 @@ namespace U3A.BusinessRules
                             Created = DateTime.Now,
                             IsWaitlisted = await BusinessRule.SetWaitlistStatusAsync(dbc, course.ID, thisTerm, person)
                         };
-                        if (!BusinessRule.IsClassInTerm(c, thisTerm.TermNumber)) { e.IsWaitlisted = true; }
+                        if (!BusinessRule.IsClassInTerm(c, thisTermNo)) { e.IsWaitlisted = true; }
                         e.Person = await dbc.Person.FindAsync(person.ID);
-                        e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisTerm.Year && x.TermNumber == termNumber);
+                        e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
                         e.Course = await dbc.Course.FindAsync(c.Course.ID);
                         if (c.Course.CourseParticipationTypeID == 1)
                         {
@@ -578,7 +594,7 @@ namespace U3A.BusinessRules
                 {
                     if (!await dbc.Enrolment.AnyAsync(x =>
                                         x.PersonID == person.ID &&
-                                        x.Term.Year == thisTerm.Year && x.Term.TermNumber == termNumber &&
+                                        x.Term.Year == thisYear && x.Term.TermNumber == thisTermNo &&
                                         x.CourseID == c.CourseID &&
                                         x.ClassID == c.ID))
                     {
@@ -588,7 +604,7 @@ namespace U3A.BusinessRules
                             IsWaitlisted = await BusinessRule.SetWaitlistStatusAsync(dbc, course.ID, c.ID, thisTerm, person)
                         };
                         e.Person = await dbc.Person.FindAsync(person.ID);
-                        e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisTerm.Year && x.TermNumber == termNumber);
+                        e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
                         e.Course = await dbc.Course.FindAsync(c.Course.ID);
                         e.Class = await dbc.Class.FindAsync(c.ID);
                         result.Add(e);

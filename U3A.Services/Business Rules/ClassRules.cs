@@ -84,7 +84,7 @@ namespace U3A.BusinessRules
                             .AsEnumerable().Where(x => IsClassInYear(dbc, x, term, defaultTerm)).ToList();
             Parallel.ForEach(classes, c =>
             {
-                c.TermNumber = term.TermNumber;
+                c.TermNumber = GetRequiredTerm( term.TermNumber,c);
                 Parallel.ForEach(c.Course.Enrolments, e =>
                 {
                     e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
@@ -126,6 +126,19 @@ namespace U3A.BusinessRules
                         .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name).ToList();
         }
 
+        public static int GetRequiredTerm(int termNumber, Class c)
+        {
+            int Result = 0;
+            while (true)
+            {
+                Result++;
+                if (Result == 1 && c.OfferedTerm1) return Result;
+                if (Result == 2 && c.OfferedTerm2) return Result;
+                if (Result == 3 && c.OfferedTerm3) return Result;
+                if (Result == 5 && c.OfferedTerm4) return Result;
+                if (Result == 2 && c.OfferedTerm2) throw new ArgumentException();
+            }
+        }
         private static IEnumerable<Class> EnsureOneClassOnlyForSameParticipantsInEachClass(U3ADbContext dbc, IEnumerable<Class> classes)
         {
             var result = new List<Class>();
