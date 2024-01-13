@@ -504,7 +504,7 @@ namespace U3A.BusinessRules
                 {
                     var e = dbc.Enrolment.Where(x =>
                                         x.PersonID == person.ID &&
-                                        x.Term.Year == thisTerm.Year && x.Term.TermNumber == termNumber &&
+                                        x.Term.Year == thisTerm.Year && x.Term.TermNumber >= termNumber &&
                                         x.CourseID == c.CourseID).ToImmutableList();
                     if (e.Count > 0)
                     {
@@ -516,7 +516,7 @@ namespace U3A.BusinessRules
                 {
                     var e = dbc.Enrolment.Where(x =>
                                         x.PersonID == person.ID &&
-                                        x.Term.Year == term.Year && x.Term.TermNumber == termNumber &&
+                                        x.Term.Year == term.Year && x.Term.TermNumber >= termNumber &&
                                         x.CourseID == c.CourseID &&
                                         x.ClassID == c.ID).ToImmutableList();
                     if (e.Count > 0)
