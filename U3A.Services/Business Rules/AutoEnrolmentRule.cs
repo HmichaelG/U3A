@@ -33,8 +33,8 @@ namespace U3A.BusinessRules
             return IsPreRandomCutoffDate(currentEnrolmentTerm, settings, allocationDate, Today);
         }
         private static bool IsPreRandomCutoffDate(Term currentEnrolmentTerm,
-                                            SystemSettings settings, 
-                                            DateTime CutoffDate, 
+                                            SystemSettings settings,
+                                            DateTime CutoffDate,
                                             DateTime today)
         {
             bool result = false;
@@ -155,7 +155,7 @@ namespace U3A.BusinessRules
                     }
                 }
             }
-            await BusinessRule.CreateEnrolmentSendMailAsync(dbc,EmailDate);
+            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
             var term = await dbc.Term.FindAsync(SelectedTerm.ID);
             await SetClassAllocationDone(dbc, term, IsClassAllocationDone);
             await dbc.SaveChangesAsync();
@@ -168,7 +168,8 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Class)
                                     .Include(x => x.Course)
                                     .Include(x => x.Course.Classes)
-                                    .Where(x => x.TermID == term.ID).ToListAsync()) {
+                                    .Where(x => x.TermID == term.ID).ToListAsync())
+            {
                 if (e.Class != null)
                 {
                     if (!BusinessRule.IsClassInTerm(e.Class, term.TermNumber))
@@ -182,11 +183,12 @@ namespace U3A.BusinessRules
                 {
                     bool isInTerm = false;
                     // load term numbers into sorted list so we can find the first one
-                    var list = new SortedList<int, Class>();
+                    var list = new SortedList<int, int?>();
                     foreach (var c in e.Course.Classes)
                     {
                         if (BusinessRule.IsClassInTerm(c, term.TermNumber)) { isInTerm = true; break; }
-                        list.Add(BusinessRule.GetRequiredTerm(term.TermNumber, c), c);
+                        int key = BusinessRule.GetRequiredTerm(term.TermNumber, c);
+                        list.TryAdd(key, key);
                     }
                     if (!isInTerm)
                     {
