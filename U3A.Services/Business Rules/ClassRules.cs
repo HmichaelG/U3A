@@ -136,7 +136,7 @@ namespace U3A.BusinessRules
                 if (Result == 2 && c.OfferedTerm2) return Result;
                 if (Result == 3 && c.OfferedTerm3) return Result;
                 if (Result == 4 && c.OfferedTerm4) return Result;
-                if (Result > 4) { throw new ArgumentException(); }
+                if (Result > 4) { return termNumber; }
             }
         }
         private static IEnumerable<Class> EnsureOneClassOnlyForSameParticipantsInEachClass(U3ADbContext dbc, IEnumerable<Class> classes)
