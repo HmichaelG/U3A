@@ -26,7 +26,7 @@ namespace U3A.WebFunctions.Procedures
                 //get the current enrolment term
                 var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
                 if (currentTerm == null) return;
-
+                await BusinessRule.FixEnrolmentTerm(dbc, currentTerm);
                 if (settings.AutoEnrolRemainderMethod.ToLower() == "random")
                 {
                     //Allocation is random
