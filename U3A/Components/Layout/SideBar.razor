@@ -1,41 +1,57 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-    <div id="sidebar" class="@(IsExpanded ? "expanded": "")">
-        <DxGridLayout RowSpacing="0rem">
-            <Rows>
-                <DxGridLayoutRow Areas="header menu-button" Height="auto"></DxGridLayoutRow>
-                <DxGridLayoutRow Areas="navigation navigation" ></DxGridLayoutRow>
-            </Rows>
-            <Columns>
-                <DxGridLayoutColumn></DxGridLayoutColumn>
-                <DxGridLayoutColumn Width="auto"></DxGridLayoutColumn>
-            </Columns>
-            <Items>
-                <DxGridLayoutItem Area="header" CssClass="sidebar-header">
-                    <Template>
-                        <span class="h6">
-                            <img src="images/U3ALogo.png" />
-                        </span>
-                    </Template>
-                </DxGridLayoutItem>
-                <DxGridLayoutItem Area="menu-button" CssClass="sidebar-header menu-button-container">
-                    <Template>
-                        <div class="menu-button" @onclick="TriggerIsExpanded"></div>
-                    </Template>
-                </DxGridLayoutItem>
-                <DxGridLayoutItem Area="navigation" CssClass="layout-item">
-                    <Template>
-                        <div @onclick="Collapse">
-                            <MainMenu IsTopMenu=false />
-                        </div>
-                    </Template>
-                </DxGridLayoutItem>
-            </Items>
-        </DxGridLayout>
-    </div>
+<div id="minimiseButton" class="p-1 minimise-button-container bg-primary">
+    <DxButton Click="OnToggleMinimised" Visible=@IsMinimised
+              CssClass="m-auto"
+              IconCssClass="bi-arrow-right-circle"
+              SizeMode="SizeMode.Large"
+              RenderStyle="ButtonRenderStyle.Primary" />
+</div>
+
+<div id="sidebar" class="@(IsMinimised ? "d-none": "") @(IsExpanded ? "expanded": "")">
+
+    <DxGridLayout RowSpacing="0rem">
+        <Rows>
+            <DxGridLayoutRow Areas="header menu-button" Height="auto"></DxGridLayoutRow>
+            <DxGridLayoutRow Areas="navigation navigation"></DxGridLayoutRow>
+        </Rows>
+        <Columns>
+            <DxGridLayoutColumn />
+            <DxGridLayoutColumn Width="auto" />
+        </Columns>
+        <Items>
+            <DxGridLayoutItem Area="header" CssClass="sidebar-header">
+                <Template>
+                    <span class="minimise-button-container">
+                        <DxButton Click="OnToggleMinimised"
+                                  CssClass="menu-item"
+                                  IconCssClass="bi bi-arrow-left-circle"
+                                  SizeMode="SizeMode.Large"
+                                  RenderStyleMode="ButtonRenderStyleMode.Text"/>
+                        <img src="images/U3ALogo.png" onclick="@(() => OnToggleMinimised())" />
+                    </span>
+                </Template>
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="menu-button" CssClass="sidebar-header menu-button-container">
+                <Template>
+                    <div class="menu-button" @onclick="TriggerIsExpanded"></div>
+                </Template>
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="navigation" CssClass="layout-item">
+                <Template>
+                    <div @onclick="Collapse">
+                        <MainMenu IsTopMenu=false />
+                    </div>
+                </Template>
+            </DxGridLayoutItem>
+        </Items>
+    </DxGridLayout>
+</div>
 
 @code {
     public bool IsExpanded { get; set; } = false;
+
+    public bool IsMinimised { get; set; } = false;
 
     void TriggerIsExpanded()
     {
@@ -45,6 +61,11 @@
     void Collapse()
     {
         IsExpanded = false;
+    }
+
+    void OnToggleMinimised()
+    {
+        IsMinimised = !IsMinimised;
     }
 
 }

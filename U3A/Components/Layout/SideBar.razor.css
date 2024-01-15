@@ -3,9 +3,13 @@
     max-width: 15rem;
     box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.16);
     transition: transform 0.1s ease-out;
-    height: 100%;
-    max-height: 100%;
+/*    height: 100vh;
+    max-height: 100vh;*/
     background-image: linear-gradient(180deg, var(--bs-primary) 0%, var(--bs-black) 150%);
+}
+
+::deep .minimise-button-container {
+    align-self: start;
 }
 
 ::deep .sidebar-header {
@@ -105,6 +109,8 @@
     #sidebar {
         min-width: inherit;
         max-width: inherit;
+        height: 100%;
+        max-height: 100%;
     }
 
         #sidebar.expanded {
@@ -131,6 +137,14 @@
 
     ::deep .menu-button-container {
         display: block;
+    }
+
+    .minimise-button-container {
+        display: none;
+    }
+
+    .minimise-button {
+        display: none;
     }
 
     ::deep .layout-item {
