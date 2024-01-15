@@ -218,7 +218,7 @@
                     if (currentTerm == null)
                     {
                         currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-                        if (localTime < currentTerm.EnrolmentStartDate)
+                        if (localTime < currentTerm!.EnrolmentStartDate)
                         {
                             await SetUnavailableMessage(currentTerm);
                         }
@@ -241,7 +241,7 @@
                         isBeforeEnrolmentDay = true;
                         var term = BusinessRule.CurrentEnrolmentTerm(dbc);
                         var sOpeningTime = openingTime?.ToString("ddd dd-MMM-yy hh:mm tt");
-                        lockoutMessage = $@"<strong>{term.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.";
+                        lockoutMessage = $@"<strong>{term!.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.";
                     }
                 }
             }
@@ -252,7 +252,7 @@
     async Task SetUnavailableMessage(Term term)
     {
         var sOpeningTime = term?.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
-        lockoutMessage = $@"<h6><strong>{term.Year} Term-{term.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.
+        lockoutMessage = $@"<h6><strong>{term!.Year} Term-{term.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.
                                                     <br/>New member registration is unavailable till that time.</h6>";
         isNoEnrolmentTermAvailable = true;
         await InvokeAsync(StateHasChanged);

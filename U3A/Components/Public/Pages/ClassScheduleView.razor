@@ -37,7 +37,7 @@ else
     bool IsReady;
     bool IsMobileLayout;
 
-    ClassScheduleRpt rpt;
+    ClassScheduleRpt? rpt;
     MarkupString message = new MarkupString("");
     DxReportViewer? reportViewer;
     U3ADbContext? dbc { get; set; }
@@ -85,7 +85,7 @@ else
         if (firstRender)
         {
 
-            reportViewer.TabPanelModel[TabContentKind.Parameters].Visible = false;
+            reportViewer!.TabPanelModel[TabContentKind.Parameters].Visible = false;
             reportViewer.TabPanelModel[TabContentKind.Search].Visible = true;
             reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
             reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;

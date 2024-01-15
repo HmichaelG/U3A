@@ -93,8 +93,8 @@
                         Email = constants.superAdmin,
                         UserName = constants.superAdmin,
                         EmailConfirmed = true,
-                        PasswordHash = hasher.HashPassword(null, "U3A Rocks!!")
                     };
+                sAdmin.PasswordHash = hasher.HashPassword(sAdmin, "U3A Rocks!!");
                 await UserManager.CreateAsync(sAdmin);
             }
             // Add security admin permission
@@ -107,19 +107,19 @@
         {
             if (r != null)
             {
-                if (authenticationState.User.IsInRole(r.Name))
+                if (authenticationState.User.IsInRole(r.Name!))
                 {
                     hasRole = true;
                     break;
                 }
             }
         }
-        var authEmail = authenticationState.User.Identity.Name;
+        var authEmail = authenticationState.User.Identity!.Name;
         if (authEmail == constants.superAdmin) hasRole = true;
-        loginState = new LoginState(authEmail, U3Adbfactory);
+        loginState = new LoginState(authEmail!, U3Adbfactory);
 
         var ch = circuitHandler as CircuitHandlerService;
-        ch.CircuitsChanged += HandleCircuitsChanged;
+        ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count;
         isReady = true;
         await base.OnInitializedAsync();
@@ -168,12 +168,12 @@
 
     public void HandleCircuitsChanged(object sender, EventArgs args)
     {
-        openCircuits = (circuitHandler as CircuitHandlerService).CircuitDetails.Count;
+        openCircuits = (circuitHandler as CircuitHandlerService)!.CircuitDetails.Count;
     }
 
     public void Dispose()
     {
-        (circuitHandler as CircuitHandlerService).CircuitsChanged -= HandleCircuitsChanged;
+        (circuitHandler as CircuitHandlerService)!.CircuitsChanged -= HandleCircuitsChanged!;
         dbc?.Dispose();
     }
 
