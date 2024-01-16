@@ -30,7 +30,7 @@ else
                   OnValidSubmit=@ValidFormSubmitted
                   Context="editContext">
             <DxFormLayout CssClass="px-2 col-12 px-sm-0 col-sm-10 col-md-9 col-lg-6 mx-auto">
-                <h3 class="w-100">Support &amp; Assistance</h3>
+                <h3 class="w-100">Request Support</h3>
                 <p class="w-100">
                     Please enter or confirm your contact details and provide a <strong>clear, succinct</strong>
                     description of your issue.
@@ -50,7 +50,7 @@ else
                     <DxTextBox @bind-Text="@supportModel!.Email" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Problem Description" ColSpanMd="12">
-                    <DxMemo Rows="10" @bind-Text="@supportModel!.Description" />
+                    <DxMemo Rows="8" @bind-Text="@supportModel!.Description" />
                 </DxFormLayoutItem>
                 <footer class="input-group px-2 mt-2" id="footer">
                     <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
