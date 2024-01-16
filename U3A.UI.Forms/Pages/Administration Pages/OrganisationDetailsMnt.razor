@@ -69,10 +69,15 @@ else {
                                                 <DxTextBox @bind-Text="@systemSettings.Website" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Send Email Address" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@systemSettings.SendEmailAddesss" />
+                                                <DxTextBox @bind-Text="@systemSettings.SendEmailAddesss"
+                                                      NullText="The email address from which transaction email is sent."/>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Send Email Display Name" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@systemSettings.SendEmailDisplayName" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Support Email Address" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@systemSettings.SupportEmailAddesss"
+                                                    NullText="The email address to which member support requuests are sent."/>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="System Postman CC Email" ColSpanMd="12">
                                                 <DxMemo @bind-Text="@systemSettings.SystemPostmanCCAddresses" 

@@ -36,6 +36,10 @@ namespace U3A.Model
         [Comment("Pro-forma reports are sent from here")]
         public string SendEmailAddesss { get; set; }
 
+        [EmailAddress]
+        [Comment("Support requests are sent to here")]
+        public string? SupportEmailAddesss { get; set; }
+
         [Comment("Email addresses to which System Postman emails are CC'd")]
         public string SystemPostmanCCAddresses { get; set; }
 

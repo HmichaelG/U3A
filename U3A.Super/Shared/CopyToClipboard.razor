@@ -1,0 +1,50 @@
+﻿@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="input-group">
+    <div class="form-control flex-grow-1 text-wrap" readonly>@Text</div>
+    <button id="@flyoutID" type="button" class="flex-grow-0 btn btn-light" @onclick="CopyTextToClipboard">Copy</button>
+</div>
+
+<DxFlyout @bind-IsOpen=IsOpen
+          PositionTarget=@($"#{flyoutID}")
+          Position="FlyoutPosition.LeftStart"
+          CloseMode="FlyoutCloseMode.Close"
+          HeaderVisible="false"
+          PreventCloseOnPositionTargetClick="true">
+    <BodyTextTemplate>
+        <div class="text-primary">Copied</div>
+    </BodyTextTemplate>
+</DxFlyout>
+
+<style>
+    .text-wrap {
+        inline-size: 400px;
+        word-wrap: anywhere;
+    }
+
+</style>
+
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    bool IsOpen;
+    string flyoutID = "ID" + Guid.NewGuid().ToString();
+    System.Threading.Timer? timer;
+
+
+    private async Task CopyTextToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", Text);
+        IsOpen = true;
+        timer = new System.Threading.Timer(CloseFlyout, new System.Threading.AutoResetEvent(true), 1500, 1500);
+    }
+
+    async void CloseFlyout(object? stateInfo)
+    {
+        IsOpen = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() { timer?.Dispose(); }
+}

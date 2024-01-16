@@ -1,0 +1,244 @@
+﻿@page "/DeleteTenant"
+
+<PageTitle>Delete Tenant</PageTitle>
+
+@inject NavigationManager NavigationManager
+@inject IDbContextFactory<TenantStoreDbContext> Tenantdbfactory
+@inject IConfiguration config
+@inject DefaultAzureCredential credential
+
+@implements IDisposable
+@inject IJSRuntime js
+
+@using System.ComponentModel.DataAnnotations
+@using Azure
+@using Azure.Core;
+@using Azure.Identity;
+@using Azure.ResourceManager;
+@using Azure.ResourceManager.Resources;
+@using Azure.ResourceManager.Dns
+@using Azure.ResourceManager.Dns.Models
+@using Azure.ResourceManager.Sql
+@using Azure.ResourceManager.Sql.Models
+@using Azure.ResourceManager.AppService
+@using Azure.ResourceManager.AppService.Models
+@using System.Net;
+@using System.Linq;
+@using Microsoft.Data.SqlClient;
+@using Microsoft.EntityFrameworkCore.Infrastructure
+
+
+@attribute [Authorize(Roles = "U3Admin.Administer")]
+
+
+@if (!IsReady) {
+    <em>Loading...</em>
+}
+else {
+
+    <div class="col-md-6">
+        <h3 class="pb-2">Delete a U3A Tenant</h3>
+        <p class="pb-2 mw-1100 text-danger"><strong>Warning</strong>: A deleted tenant's database remains available on Azure for 30 days.
+                                                    After that time, it is permanently deleted.</p>
+        <div class="alert alert-danger pb-4" hidden="@(string.IsNullOrWhiteSpace(ErrorMessage))">@ErrorMessage</div>
+        <div class="alert alert-success pb-4" hidden="@(string.IsNullOrWhiteSpace(SuccessMessage))">@SuccessMessage</div>
+        <EditForm Model="@details" OnValidSubmit=@ValidFormSubmitted Context="editContext">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <DxFormLayout>
+                <DxFormLayoutItem Caption="Tenant ID" ColSpanMd="12">
+                    <DxTextBox @bind-Text=@details.TenantKey NullText="The tenant subdomain name." />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem ColSpanMd="12" Context="myContext">
+                    <Template>
+                        <DxButton SubmitFormOnClick="true" RenderStyle="@ButtonRenderStyle.Primary" Enabled=@(!isProcessing)>
+                            <div class="d-flex">
+                                <DxWaitIndicator Visible=@isProcessing />
+                                <span class="mx-2">Submit</span>
+                            </div>
+                        </DxButton>
+                        <DxButton SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
+                    </Template>
+                </DxFormLayoutItem>
+            </DxFormLayout>
+        </EditForm>
+        <ul class="my-2">
+            @(new MarkupString(status))
+        </ul>
+    </div>
+}
+@code {
+
+    [CascadingParameter]
+    Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    U3ASecrets? mySecrets;
+    bool IsReady = false;
+    int ActiveTabIndex { get; set; } = 0;
+    Details details { get; set; }
+    AUState states = new AUState();
+    string? ErrorMessage;
+    string? SuccessMessage;
+    bool isProcessing;
+    string status;
+    PostmarkAdminService service;
+
+    protected override async Task OnInitializedAsync() {
+        var authenticationState = await authenticationStateTask;
+        mySecrets = new U3ASecrets(config);
+        details = new Details();
+        service = new(config);
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    async void ValidFormSubmitted(EditContext editContext) {
+        if (isProcessing) return;
+        isProcessing = true;
+        ErrorMessage = string.Empty;
+        SuccessMessage = string.Empty;
+        status = string.Empty;
+        if (await TenantExistsAsync()) {
+            try {
+                SetMessage("Processing Started - please do not interrupt");
+                ArmClient armClient = new ArmClient(credential);
+                SetMessage("Azure connection created");
+                SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
+                SetMessage($"Azure subscription [{subscription.Data.DisplayName}] retrieved");
+                await DeleteDNSAsync(subscription);
+                await DeleteWebAppCustomDomainAsync(subscription);
+                await DeleteTenantAsync();
+                ErrorMessage = null;
+                SuccessMessage = "U3A tenant has been deleted.";
+                StateHasChanged();
+            }
+            catch (Exception ex) {
+                SuccessMessage = null;
+                ErrorMessage = ex.ToString();
+                StateHasChanged();
+            }
+        }
+        else {
+            SuccessMessage = null;
+            ErrorMessage = $"The name [{details.TenantKey}] was not found in the tenant database!";
+            StateHasChanged();
+        }
+        isProcessing = false;
+    }
+
+    async Task<bool> TenantExistsAsync() {
+        var result = false;
+        var key = details.TenantKey.ToLower();
+        using (var dbc = await Tenantdbfactory.CreateDbContextAsync()) {
+            result = await dbc.TenantInfo.AnyAsync(x => x.Identifier == key);
+        }
+        return result;
+    }
+
+
+    async Task DeleteTenantAsync() {
+        string key = details.TenantKey.ToLower();
+        string dbName = string.Empty;
+        TenantInfo? tenant = default;
+        using (var dbc = await Tenantdbfactory.CreateDbContextAsync()) {
+            tenant = await dbc.TenantInfo.FirstAsync(x => x.Identifier == key);
+            var builder = new SqlConnectionStringBuilder(tenant.ConnectionString);
+            dbName = builder.InitialCatalog;
+        }
+        string mailServer = string.Empty;
+        try
+        {
+            mailServer = await service.DeleteServer(tenant.PostmarkAPIKey);
+            SetMessage($"Deleted [{mailServer}] Postmark mail server.");
+        }
+        catch (Exception)
+        {
+            SetMessage($"FAIL: Unable to delete Postmark mail server"); 
+        }
+        try
+        {
+            var dbcTenant = new U3ADbContext(tenant);
+            await dbcTenant.Database.EnsureDeletedAsync();
+            SetMessage($"Deleted [{key}] Database.");
+        }
+        catch (Exception) { SetMessage($"FAIL: Delete [{key}] Database."); }
+        using (var dbc = await Tenantdbfactory.CreateDbContextAsync()) {
+            dbc.Remove(tenant);
+            await dbc.SaveChangesAsync();
+            SetMessage($"TenantInfo [{key}] record removed from Tenant database.");
+        }
+    }
+
+    async Task DeleteDNSAsync(SubscriptionResource subscription) {
+        // Get the resource group
+        string rgName = mySecrets.DNS_RESOURCE_GROUP;
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
+        // Get the DnsZone from the resource group
+        DnsZoneResource dnsZone = await resourceGroup.GetDnsZoneAsync(mySecrets.DNS_NAME);
+        var tenant = details.TenantKey.ToLower();
+        // Delete CName pointing to A record
+        string cnameName = tenant;
+        try {
+            DnsCnameRecordResource cname = await dnsZone.GetDnsCnameRecordAsync(cnameName);
+            await cname.DeleteAsync(WaitUntil.Completed);
+            SetMessage($"Deleted CNAME record [{tenant}.{mySecrets.DNS_NAME}] from DNS");
+        }
+        catch (Exception) { SetMessage($"FAIL: Delete CNAME record [{tenant}.{mySecrets.DNS_NAME}] from DNS"); }
+        try {
+            DnsTxtRecordResource txtRecord = dnsZone.GetDnsTxtRecord($"asuid.{tenant}");
+            if (txtRecord != null) await txtRecord.DeleteAsync(WaitUntil.Completed);
+            SetMessage($"Deleted TXT record [asuid.{tenant}] from DNS");
+        }
+        catch (Exception) {}
+    }
+
+    async Task DeleteWebAppCustomDomainAsync(SubscriptionResource subscription) {
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(mySecrets.WEBAPP_RESOURCE_GROUP);
+        var website = (await resourceGroup.GetWebSiteAsync(mySecrets.WEBAPP_NAME)).Value;
+        SiteHostNameBindingCollection hostNameBindings = website.GetSiteHostNameBindings();
+        var hostName = $"{details.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
+        try {
+            var binding = await hostNameBindings.GetAsync(hostName);
+            await binding.Value.DeleteAsync(WaitUntil.Completed);
+            SetMessage($"Deleted custom domain [{hostName}] in web application [{mySecrets.WEBAPP_NAME}]");
+        }
+        catch (Exception) { SetMessage($"FAIL: Delete custom domain [{hostName}] in web application [{mySecrets.WEBAPP_NAME}]"); }
+        await DeleteAppCertificate(resourceGroup);
+    }
+
+    async Task DeleteAppCertificate(ResourceGroupResource resourceGroup) {
+        var website = (await resourceGroup.GetWebSiteAsync(mySecrets.WEBAPP_NAME)).Value;
+        AppServicePlanResource plan = await resourceGroup.GetAppServicePlanAsync(mySecrets.WEBAPP_SERVICE_PLAN);
+        var canonicalName = $"{details.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
+        var certificateName = $"{canonicalName}-{mySecrets.WEBAPP_NAME}";
+        try {
+            var cert = (await resourceGroup.GetAppCertificateAsync(certificateName));
+            await cert.Value.DeleteAsync(WaitUntil.Completed);
+            SetMessage($"Deleted SSL Certificate {certificateName}");
+        }
+        catch (Exception) { SetMessage($"FAIL: Delete SSL Certificate {certificateName}"); }
+    }
+
+
+
+    async Task<AzureLocation> GetAuEastLocationAsync(ResourceGroupResource rg) {
+        return (await rg.GetAvailableLocationsAsync()).Value.First(x => x.Name == mySecrets.LOCATION);
+    }
+
+    void SetMessage(string msg) {
+        status += $"<li>{msg}</li>";
+        InvokeAsync(StateHasChanged);
+    }
+
+    void Close() {
+        NavigationManager.NavigateTo("/");
+    }
+
+    public void Dispose() {
+    }
+
+    class Details {
+        [Required] public string TenantKey { get; set; }
+    }
+
+}

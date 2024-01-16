@@ -48,6 +48,7 @@ namespace U3A.Services
                 Person OnBehalfOfMember,
                 IDbContextFactory<U3ADbContext> dbFactory)
         {
+            if (LoginEmail == null) { return; }
             this.LoginEmail = LoginEmail;
             using (var dbc = dbFactory.CreateDbContext())
             {

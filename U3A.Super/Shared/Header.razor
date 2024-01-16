@@ -1,0 +1,35 @@
+﻿<nav class="navbar header-navbar">
+    <div class="d-inline-flex">
+        <button class="navbar-toggler bg-primary flex-start" @onclick="OnToggleClick">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="ms-3 fw-bold h4 pe-4 flex-start">U3Admin Supervisor</div>
+    </div>
+    <div class="pe-4 justify-end">
+        <LoginDisplay />
+    </div>
+</nav>
+<style>
+    justify-start {
+        justify-content: flex-start;
+    }
+
+    justify-start {
+        justify-content: flex-end;
+    }
+</style>
+
+@code {
+    [Parameter] public bool ToggleOn { get; set; }
+    [Parameter] public EventCallback<bool> ToggleOnChanged { get; set; }
+
+    async Task OnToggleClick() => await Toggle();
+
+    async Task Toggle(bool? value = null) {
+        var newValue = value ?? !ToggleOn;
+        if (ToggleOn != newValue) {
+            ToggleOn = newValue;
+            await ToggleOnChanged.InvokeAsync(ToggleOn);
+        }
+    }
+}

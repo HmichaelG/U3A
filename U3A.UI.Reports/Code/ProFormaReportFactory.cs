@@ -362,7 +362,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                             student enrolment requests was performed early this morning.
                             You now have {constants.RANDOM_ALLOCATION_PREVIEW} days to review this allocation
                             and request changes prior to your students being informed by email.</p>
-                            <p>Please keep enrolment details confidentail until students have received their email.</p>"
+                            <p>Please keep enrolment details confidential until students have received their email.</p>"
                 : "";
 
             if (!isPreview && Leader.Communication.ToLower() == "email")

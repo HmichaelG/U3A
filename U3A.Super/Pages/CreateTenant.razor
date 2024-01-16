@@ -1,0 +1,410 @@
+﻿@page "/CreateTenant"
+
+<PageTitle>Create Tenant</PageTitle>
+
+@inject NavigationManager NavigationManager
+@inject IDbContextFactory<TenantStoreDbContext> Tenantdbfactory
+@inject IConfiguration config
+@inject DefaultAzureCredential credential
+
+@implements IDisposable
+@inject IJSRuntime js
+
+@using System.ComponentModel.DataAnnotations
+@using Azure
+@using Azure.Core;
+@using Azure.Identity;
+@using Azure.ResourceManager;
+@using Azure.ResourceManager.Resources;
+@using Azure.ResourceManager.Dns
+@using Azure.ResourceManager.Dns.Models
+@using Azure.ResourceManager.Sql
+@using Azure.ResourceManager.Sql.Models
+@using Azure.ResourceManager.AppService
+@using Azure.ResourceManager.AppService.Models
+@using System.Net;
+@using System.Linq;
+@using Microsoft.Data.SqlClient;
+@using Microsoft.EntityFrameworkCore.Infrastructure
+@using U3A.Data
+
+
+@attribute [Authorize(Roles = "U3Admin.Administer")]
+
+@if (!IsReady)
+{
+    <em>Loading...</em>
+}
+else
+{
+
+    <div class="col-12">
+        <h3 class="pb-2">Create a U3A Tenant</h3>
+        <p class="pb-2 text-danger"><strong>Warning</strong>: Creating a U3A tenant incurs Azure subscription cost. Use responsibly. </p>
+        <div class="alert alert-danger pb-4" hidden="@(string.IsNullOrWhiteSpace(ErrorMessage))">@ErrorMessage</div>
+        <div class="alert alert-success pb-4" hidden="@(!SuccessMessageVisible)">
+            <h5>U3A tenant has been created.</h5>
+            <PostmarkValidation domain="@domain" />
+        </div>
+        <EditForm Model="@details" OnValidSubmit=@ValidFormSubmitted Context="editContext">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <DxFormLayout>
+                <DxFormLayoutItem Caption="Tenant ID" ColSpanMd="7">
+                    <DxTextBox @bind-Text=@details.TenantKey NullText="The unique tenant subdomain & database name. Must conform to DNS naming standards." />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="U3A Display Name" ColSpanMd="7">
+                    <DxTextBox @bind-Text=@details.TenantName 
+                        NullText="Use the form: U3A <myU3Aname> <State>. For example, U3A Newcastle NSW" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Website" ColSpanMd="7">
+                    <DxTextBox @bind-Text=@details.website NullText="The U3A public website. Must be FQDN eg. https://myU3Asite.org.au" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Email Domain" ColSpanMd="7">
+                    <DxTextBox @bind-Text=@details.EmailDomain NullText="The U3A Postmark email domain, eg. myU3AEmailDomain.org.au" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="State" ColSpanMd="7">
+                    <DxComboBox Data="@states" @bind-Value="@details.State" />
+                    <ValidationMessage For="@(() => details.State)" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem ColSpanMd="12" Context="myContext">
+                    <Template>
+                        <DxButton SubmitFormOnClick="true" RenderStyle="@ButtonRenderStyle.Primary" Enabled=@(!isProcessing)>
+                            <div class="d-flex">
+                                <DxWaitIndicator Visible=@isProcessing />
+                                <span class="mx-2">Submit</span>
+                            </div>
+                        </DxButton>
+                        <DxButton SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
+                    </Template>
+                </DxFormLayoutItem>
+            </DxFormLayout>
+        </EditForm>
+        <ul class="my-2 col-12">
+            @(new MarkupString(status))
+        </ul>
+    </div>
+}
+
+@code {
+
+    [CascadingParameter]
+    Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    U3ASecrets? mySecrets;
+    bool IsReady = false;
+    int ActiveTabIndex { get; set; } = 0;
+    Details details { get; set; }
+    AUState states = new AUState();
+    string? ErrorMessage;
+    bool SuccessMessageVisible = false;
+    bool isProcessing;
+    string status;
+    PostmarkAdminService service;
+    PostmarkBaseDomain newEmailDomain;
+    PostmarkCompleteDomain? domain;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await authenticationStateTask;
+        mySecrets = new U3ASecrets(config);
+        details = new Details();
+        service = new PostmarkAdminService(config);
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    async void ValidFormSubmitted(EditContext editContext)
+    {
+        if (isProcessing) return;
+        isProcessing = true;
+        ErrorMessage = string.Empty;
+        SuccessMessageVisible = false;
+        status = string.Empty;
+        if (!await TenantExistsAsync())
+        {
+            try
+            {
+                var tenant = details.TenantKey.ToLower();
+                if (mySecrets.ILLEGAL_SUBDOMAINS.Contains(tenant))
+                {
+                    SuccessMessageVisible = false;
+                    ErrorMessage = $"The DNS subdomain [{tenant}] ia not allowed.";
+                    StateHasChanged();
+                }
+                else
+                {
+                    SetMessage("Processing Started - please do not interrupt");
+                    ArmClient armClient = new ArmClient(credential);
+                    SetMessage("Azure connection created");
+                    SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
+                    SetMessage($"Azure subscription [{subscription.Data.DisplayName}] retrieved");
+                    await CreateUpdateDNSAsync(subscription);
+                    await CreateUpdateWebAppCustomDomainAsync(subscription);
+                    await CreateTenantAsync(subscription);
+                    await DeleteTXTAsync(subscription);
+                    ErrorMessage = null;
+                    domain = await service.GetDomainDetailsAsync(newEmailDomain.ID);
+                    SuccessMessageVisible = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                isProcessing = false;
+                SuccessMessageVisible = false;
+                ErrorMessage = ex.ToString();
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            SuccessMessageVisible = false;
+            ErrorMessage = $"The DNS/Database name [{details.TenantKey}] is already in use!";
+        }
+
+        isProcessing = false;
+        StateHasChanged();
+    }
+
+    async Task<bool> TenantExistsAsync()
+    {
+        var result = false;
+        var key = details.TenantKey.ToLower();
+        using (var dbc = await Tenantdbfactory.CreateDbContextAsync())
+        {
+            result = await dbc.TenantInfo.AnyAsync(x => x.Identifier == key);
+        }
+        return result;
+    }
+
+
+    async Task CreateTenantAsync(SubscriptionResource subscription)
+    {
+        string rgName = mySecrets.SQL_RESOURCE_GROUP;
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
+        var csTemplate = config.GetConnectionString("TenantConnectionString");
+        var key = details.TenantKey.ToLower();
+        var builder = new SqlConnectionStringBuilder(csTemplate);
+        builder.InitialCatalog = key;
+        var cnnString = builder.ConnectionString;
+
+        // postmark
+        var poostmarkSandboxAPIKey = config.GetValue<string>("PostmarkSandboxAPIKey");
+        var newServer = await service.CreateServer($"{details.TenantKey} {details.State} U3A Server");
+        SetMessage($"Postmark server [{newServer.Name}] created.");
+        newEmailDomain = await service.CreateDomain(details.EmailDomain);
+        SetMessage($"Postmark Email Domain [{newEmailDomain.Name}] created.");
+
+        TenantInfo tenant = new TenantInfo()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = details.TenantName,
+                Identifier = key,
+                ConnectionString = cnnString,
+                PostmarkAPIKey = newServer.ApiTokens[0],
+                PostmarkSandboxAPIKey = poostmarkSandboxAPIKey,
+                UseEwayTestEnviroment = true,
+                UseEmailTestEnviroment = true,
+                UsePostmarkTestEnviroment = true,
+                UseSMSTestEnviroment = true,
+                State = details.State,
+                Website = details.website,
+            };
+
+        var sqlServer = (await resourceGroup.GetSqlServerAsync("u3admin-server")).Value;
+        var databases = sqlServer.GetSqlDatabases();
+        SqlDatabaseData newDb = new(await GetAuEastLocationAsync(resourceGroup))
+            {
+                Sku = new SqlSku("Basic") { Tier = "Basic" },
+                RequestedBackupStorageRedundancy = SqlBackupStorageRedundancy.Local
+            };
+        await databases.CreateOrUpdateAsync(WaitUntil.Completed, key, newDb);
+        // Create Roles
+        string SecurityAdminID = string.Empty;
+        using (var dbc = new U3ADbContextSeed())
+        {
+            dbc.TenantInfo = tenant;
+            await dbc.Database.MigrateAsync();
+            SetMessage($"[{key}] Database schema created.");
+            foreach (var name in constants.nameOfRoles)
+            {
+                if (!await dbc.Roles.AnyAsync(x => x.Name == name))
+                {
+                    IdentityRole role = new()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Name = name,
+                            NormalizedName = name.ToUpper(),
+                            ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        };
+                    await dbc.Roles.AddAsync(role);
+                    if (name == constants.nameOfRoles[0]) SecurityAdminID = role.Id;
+                }
+            }
+            SetMessage("Application roles created.");
+            if (!await dbc.Users.AnyAsync(x => x.Email == constants.superAdmin))
+            {
+                ApplicationUser user = new()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        Email = constants.superAdmin,
+                        EmailConfirmed = true,
+                        NormalizedEmail = constants.superAdmin.ToUpper(),
+                        NormalizedUserName = constants.superAdmin.ToUpper(),
+                        PasswordHash = "AQAAAAEAACcQAAAAEGO9hnvP8x8fJPlDhs2gGYMhl9koCigXL2PPHidC9luB5nbMxW8fCFahxG/ZCA1OSw==",
+                        UserName = constants.superAdmin,
+                    };
+                await dbc.Users.AddAsync(user);
+                IdentityUserRole<string> userRole = new()
+                    {
+
+                        RoleId = SecurityAdminID,
+                        UserId = user.Id
+                    };
+                await dbc.UserRoles.AddAsync(userRole);
+            }
+            SetMessage($"Application user [{constants.superAdmin}] created.");
+            await dbc.SaveChangesAsync();
+        }
+        using (var dbc = await Tenantdbfactory.CreateDbContextAsync())
+        {
+            await dbc.AddAsync(tenant);
+            await dbc.SaveChangesAsync();
+        }
+        SetMessage($"TenantInfo [{key}] record in Tenant database created.");
+    }
+
+    async Task DeleteTXTAsync(SubscriptionResource subscription)
+    {
+        // Get the resource group
+        string rgName = mySecrets.DNS_RESOURCE_GROUP;
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
+        // Get the DnsZone from the resource group
+        DnsZoneResource dnsZone = await resourceGroup.GetDnsZoneAsync(mySecrets.DNS_NAME);
+        var tenant = details.TenantKey.ToLower();
+        try
+        {
+            DnsTxtRecordResource txtRecord = dnsZone.GetDnsTxtRecord($"asuid.{tenant}");
+            await txtRecord.DeleteAsync(WaitUntil.Completed);
+            SetMessage($"Deleted TXT validation record [asuid.{tenant}] from DNS");
+        }
+        catch (Exception) { }
+    }
+
+
+    async Task CreateUpdateDNSAsync(SubscriptionResource subscription)
+    {
+        // Get the resource group
+        string rgName = mySecrets.DNS_RESOURCE_GROUP;
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
+        // Get the DnsZone from the resource group
+        DnsZoneResource dnsZone = await resourceGroup.GetDnsZoneAsync(mySecrets.DNS_NAME);
+        var tenant = details.TenantKey.ToLower();
+        // Create or update CName pointing to A record
+        string cnameName = tenant;
+        DnsCnameRecordData dnsCnameRecordData = new() { Cname = mySecrets.DNS_CNAME, TtlInSeconds = (long)TimeSpan.FromMinutes(60).TotalSeconds, };
+        DnsCnameRecordCollection cnameRecordCollection = dnsZone.GetDnsCnameRecords();
+        await cnameRecordCollection.CreateOrUpdateAsync(WaitUntil.Completed, cnameName, dnsCnameRecordData);
+        SetMessage($"[Create/Update subdomain [{tenant}.{mySecrets.DNS_NAME}] pointing to [{mySecrets.DNS_CNAME}]");
+        DnsTxtRecordCollection txtRecordCollection = dnsZone.GetDnsTxtRecords();
+        DnsTxtRecordResource txtRecord = dnsZone.GetDnsTxtRecord("asuid");
+        await txtRecordCollection.CreateOrUpdateAsync(WaitUntil.Completed, $"asuid.{tenant}", txtRecord.Data);
+    }
+
+    async Task CreateUpdateWebAppCustomDomainAsync(SubscriptionResource subscription)
+    {
+
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(mySecrets.WEBAPP_RESOURCE_GROUP);
+        AppServicePlanResource plan = await resourceGroup.GetAppServicePlanAsync(mySecrets.WEBAPP_SERVICE_PLAN);
+        var website = (await resourceGroup.GetWebSiteAsync(mySecrets.WEBAPP_NAME)).Value;
+        SiteHostNameBindingCollection hostNameBindings = website.GetSiteHostNameBindings();
+        var data = new HostNameBindingData()
+            {
+                SiteName = mySecrets.WEBAPP_NAME,
+                CustomHostNameDnsRecordType = CustomHostNameDnsRecordType.CName,
+                HostNameType = AppServiceHostNameType.Managed,
+            };
+        var hostName = $"{details.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
+        var binding = (await hostNameBindings.CreateOrUpdateAsync(Azure.WaitUntil.Completed, hostName, data).ConfigureAwait(false)).Value;
+        SetMessage($"Create/Update custom domain [{hostName}] in web application [{mySecrets.WEBAPP_NAME}]");
+
+        var cert = await CreateOrUpdateAppCertificate(resourceGroup);
+        data.Thumbprint = cert.Thumbprint;
+        data.SslState = HostNameBindingSslState.SniEnabled;
+        _ = await hostNameBindings.CreateOrUpdateAsync(Azure.WaitUntil.Completed, hostName, data).ConfigureAwait(false);
+        SetMessage($"Custom domain [{hostName}] bound to SSL Certificate [{cert.Name}]");
+    }
+
+    async Task<AppCertificateData> CreateOrUpdateAppCertificate(ResourceGroupResource resourceGroup)
+    {
+        var website = (await resourceGroup.GetWebSiteAsync(mySecrets.WEBAPP_NAME)).Value;
+        AppServicePlanResource plan = await resourceGroup.GetAppServicePlanAsync(mySecrets.WEBAPP_SERVICE_PLAN);
+        var canonicalName = $"{details.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
+        var certificateName = $"{canonicalName}-{mySecrets.WEBAPP_NAME}";
+        var newCert = new AppCertificateData(await GetAuEastLocationAsync(resourceGroup))
+            {
+                CanonicalName = canonicalName,
+                ServerFarmId = plan.Id,
+            };
+        AppCertificateCollection certCollection = resourceGroup.GetAppCertificates();
+        try
+        {
+            await certCollection.CreateOrUpdateAsync(WaitUntil.Completed, $"{newCert.CanonicalName}-{mySecrets.WEBAPP_NAME}", newCert);
+        }
+        catch (Exception)
+        {
+        }
+        SetMessage($"Create/Update SSL Certificate [{certificateName}] for subdomain [{canonicalName}]");
+        var count = 0;
+        while (count < 20)
+        {
+            try
+            {
+                newCert = (await resourceGroup.GetAppCertificateAsync(certificateName)).Value.Data;
+                count = 99;
+            }
+            catch (Exception)
+            {
+                Thread.Sleep(5000);
+                count++;
+                SetMessage($"Retrieve SSL Certificate [{certificateName}] attempt {count}");
+            }
+        }
+        return newCert;
+    }
+
+
+
+    async Task<AzureLocation> GetAuEastLocationAsync(ResourceGroupResource rg)
+    {
+        return (await rg.GetAvailableLocationsAsync()).Value.First(x => x.Name == mySecrets.LOCATION);
+    }
+
+    void SetMessage(string msg)
+    {
+        SuccessMessageVisible = false;
+        ErrorMessage = null;
+        status += $"<li>{msg}</li>";
+        InvokeAsync(StateHasChanged);
+    }
+
+    void Close()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+    }
+
+    class Details
+    {
+        [Required] public string TenantKey { get; set; }
+        [Required] public string TenantName { get; set; }
+        [Required] public string website { get; set; }
+        [Required] public string State { get; set; }
+        [Required] public string EmailDomain { get; set; }
+    }
+
+}

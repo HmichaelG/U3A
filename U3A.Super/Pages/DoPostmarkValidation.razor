@@ -1,0 +1,131 @@
+﻿@page "/DoPostmarkValidation"
+
+<PageTitle>Email Domain Validation</PageTitle>
+
+@inject NavigationManager NavigationManager
+@inject IDbContextFactory<TenantStoreDbContext> Tenantdbfactory
+@inject IConfiguration config
+@inject DefaultAzureCredential credential
+
+@inject IJSRuntime js
+
+@using System.ComponentModel.DataAnnotations
+@using Azure
+@using Azure.Core;
+@using Azure.Identity;
+@using Azure.ResourceManager;
+@using Azure.ResourceManager.Resources;
+@using Azure.ResourceManager.Dns
+@using Azure.ResourceManager.Dns.Models
+@using Azure.ResourceManager.Sql
+@using Azure.ResourceManager.Sql.Models
+@using Azure.ResourceManager.AppService
+@using Azure.ResourceManager.AppService.Models
+@using System.Net;
+@using System.Linq;
+@using Microsoft.Data.SqlClient;
+@using Microsoft.EntityFrameworkCore.Infrastructure
+
+
+@attribute [Authorize(Roles = "U3Admin.Administer")]
+
+
+@if (!IsReady)
+{
+    <em>Loading...</em>
+}
+else
+{
+    <div class="page-width">
+        <h2 class="pb-2">Email Domain Validation Summary</h2>
+        <p class="pb-2">
+            Verify ownership of an email domain. Requires access to the U3A DNS server.
+        </p>
+        <div class="pb-2">
+            <DxGrid @ref="grid" Data="@domains" CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    VirtualScrollingEnabled="true"
+                    ShowSearchBox="true"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="Id"
+                    ValidationEnabled="true">
+                <Columns>
+                    <DxGridDataColumn Caption="Email Domain" FieldName="Name" />
+                    <DxGridDataColumn Caption="DKIM Verified?" FieldName="isDKIMVerified"
+                                      UnboundType="GridUnboundColumnType.Boolean" UnboundExpression="[DKIMPendingHost] == ''" />
+                    <DxGridDataColumn Caption="Return-Path Verified?" FieldName="ReturnPathDomainVerified" />
+                    <DxGridDataColumn Width="8rem" Caption="" AllowGroup="false">
+                        <CellDisplayTemplate>
+                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                      RenderStyle="ButtonRenderStyle.Primary" Text="@(EnableDetailsButton(context.DataItem) ? "Verify" : "Complete")"
+                                      Enabled="@(EnableDetailsButton(context.DataItem))"
+                                      Click="() => OnDetailsClick(context.DataItem)"></DxButton>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </DxGrid>
+        </div>
+        <div hidden="@(selectedDomain == null)">
+            <PostmarkValidation domain="selectedDomain" OnDomainVerified="@(UpdateDataAsync)" />
+        </div>
+    </div>
+}
+
+<style>
+    .page-width {
+        max-width: 1200px;
+    }
+
+    .button-width {
+        width: 100%;
+    }
+
+    .grid-height {
+        height: 33vh;
+    }
+</style>
+
+
+
+@code {
+
+    bool IsReady;
+    IEnumerable<PostmarkCompleteDomain>? domains;
+    PostmarkCompleteDomain? selectedDomain;
+    IGrid? grid;
+    PostmarkAdminService? service;
+
+    protected override async Task OnInitializedAsync()
+    {
+        service = new(config);
+        domains = (await service.ListCompleteDomainsAsync()).OrderBy(x => x.Name);
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    async Task GetDataAsync() { domains = (await service.ListCompleteDomainsAsync()).OrderBy(x => x.Name); }
+
+    async Task UpdateDataAsync(PostmarkCompleteDomain domain) {
+        selectedDomain = domain;
+        if (selectedDomain.DKIMPendingHost == "" && selectedDomain.ReturnPathDomainVerified) { selectedDomain = null; }
+        await GetDataAsync(); 
+        StateHasChanged();
+    }
+
+    void OnDetailsClick(object dataItem)
+    {
+        selectedDomain = dataItem as PostmarkCompleteDomain;
+    }
+
+    bool EnableDetailsButton(object dataItem)
+    {
+        var result = false;
+        var domain = dataItem as PostmarkCompleteDomain;
+        if (domain != null)
+        {
+            result = (domain.DKIMPendingHost != "" || !domain.ReturnPathDomainVerified);
+        }
+        return result;
+    }
+}

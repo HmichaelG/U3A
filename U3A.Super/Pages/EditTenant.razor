@@ -1,0 +1,189 @@
+﻿@page "/EditTenant"
+
+@using Microsoft.Data.SqlClient
+@inject IJSRuntime js
+@inject IDbContextFactory<TenantStoreDbContext> Tenantdbfactory
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <em>Loading...</em>
+}
+else
+{
+
+    <div class="col-md-6">
+        <div class="row  align-content-start">
+            <h2>Tenant Details</h2>
+        </div>
+
+        <DxFormLayout>
+            <DxFormLayoutGroup Caption="Select Tenant">
+                <DxFormLayoutItem Caption="Tenant to edit" ColSpanMd="12">
+                    <DxComboBox Data="@tenants"
+                                TextFieldName="@nameof(TenantInfo.Identifier)"
+                                ValueChanged="@((TenantInfo tenant) => OnTenantChanged(tenant))">
+                        <Columns>
+
+                        </Columns>
+                    </DxComboBox>
+                </DxFormLayoutItem>
+            </DxFormLayoutGroup>
+        </DxFormLayout>
+
+        <div hidden="@(selectedTenant.Id == null)">
+            <EditForm Model="@selectedTenant" OnValidSubmit=@ValidFormSubmitted Context="editContext">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <DxFormLayout>
+                    <DxFormLayoutGroup Caption="Tenant Details" ColSpanLg="12">
+                        <DxFormLayoutItem Caption="Host Name" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.Identifier ReadOnly=true />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Organisation Name" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.Name Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Website" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.Website Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="State" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.State Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Database Catalog" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@DatabaseCatalog Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
+                    <DxFormLayoutGroup Caption="Eway Payments">
+                        <DxFormLayoutItem Caption="Eway API Key" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.EwayAPIKey Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Eway Password" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.EwayPassword Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Use Test Environment" ColSpanMd="12">
+                            <DxCheckBox @bind-Checked=@selectedTenant.UseEwayTestEnviroment Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
+                    <DxFormLayoutGroup Caption="Postmark Email">
+                        <DxFormLayoutItem Caption="Postmark API Key" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.PostmarkAPIKey Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Postmark Test API Key" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.PostmarkSandboxAPIKey Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Use Test Environment" ColSpanMd="12">
+                            <DxCheckBox @bind-Checked=@selectedTenant.UsePostmarkTestEnviroment Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
+                    <DxFormLayoutGroup Caption="Twilio SMS">
+                        <DxFormLayoutItem Caption="Twilio Account SID" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.TwilioAccountSID Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Twilio Auth Token" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.TwilioAuthToken Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Twilio Phone Number" ColSpanMd="12">
+                            <DxTextBox @bind-Text=@selectedTenant.TwilioPhoneNo Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <Template>
+                            <DxButton SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" CssClass="me-5" Click="@Close" />
+                            <DxButton SubmitFormOnClick="false" Text="Enable Edit" RenderStyle="@ButtonRenderStyle.Danger" CssClass="ms-5" Click="@OnEnableEdit" />
+                            <DxButton SubmitFormOnClick="true" Text="Submit" RenderStyle="@ButtonRenderStyle.Primary" />
+                        </Template>
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </EditForm>
+        </div>
+    </div>
+}
+@code {
+    IEnumerable<TenantInfo>? tenants;
+    bool IsReady = false;
+    bool IsEditEnabled = false;
+    int ActiveTabIndex { get; set; } = 0;
+    private SystemSettings? systemSettings { get; set; }
+    TenantStoreDbContext? dbc { get; set; }
+    TenantInfo selectedTenant = new();
+    string DatabaseCatalog;
+
+    internal string? ErrorHeader;
+    internal string? ErrorMessage;
+
+    protected override void OnInitialized()
+    {
+        // wire up the data
+        dbc = Tenantdbfactory.CreateDbContext();
+        tenants = dbc.TenantInfo.OrderBy(x => x.Identifier);
+        IsReady = true;
+    }
+
+    async void ValidFormSubmitted(EditContext editContext)
+    {
+        bool isNew = false;
+        using (dbc = Tenantdbfactory.CreateDbContext())
+        {
+            var editModel = (TenantInfo)editContext.Model;
+            // Re-query a data item from the store.
+            var dataItem = dbc.TenantInfo.Find(editModel.Id);
+            if (dataItem == null)
+            {
+                dataItem = new TenantInfo();
+                isNew = true;
+            }
+            // Assign changes from the edit model to the data item.
+            if (dataItem != null)
+            {
+                editModel.CopyTo(dataItem);
+                var builder = new SqlConnectionStringBuilder(selectedTenant.ConnectionString);
+                if (DatabaseCatalog != builder.InitialCatalog)
+                {
+                    builder.InitialCatalog = DatabaseCatalog;
+                    dataItem.ConnectionString = builder.ConnectionString;
+                }
+                try
+                {
+                    // Post changes to the database.
+                    if (isNew) await dbc.AddAsync(dataItem);
+                    await dbc.SaveChangesAsync();
+                    Close();
+                }
+                catch (Exception ex)
+                {
+                    ErrorHeader = "Save to database error";
+                    ErrorMessage = Helpers.GetErrorMessage(ex);
+                    dbc?.ChangeTracker?.Clear();
+                }
+            }
+        }
+    }
+
+    void OnTenantChanged(TenantInfo dataItem)
+    {
+        selectedTenant = dataItem;
+        var builder = new SqlConnectionStringBuilder(selectedTenant.ConnectionString);
+        DatabaseCatalog = builder.InitialCatalog;
+    }
+    async Task OnEnableEdit()
+    {
+        IsEditEnabled = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void Close()
+    {
+        selectedTenant = new();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

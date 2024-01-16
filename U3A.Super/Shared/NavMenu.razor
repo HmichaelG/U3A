@@ -1,0 +1,40 @@
+<div class="sidebar @StateCssClass">
+    <DxTreeView AllowSelectNodes="true" CssClass="app-sidebar">
+        <Nodes>
+            <DxTreeViewNode Text="Menu" CssClass="root-item first-child" Expanded=true>
+                <Nodes>
+                    <DxTreeViewNode NavigateUrl="./" Text="Tenant Summary" />
+                    <DxTreeViewNode Text="Controlled Access" CssClass="root-item first-child" Expanded=true>
+                        <Nodes>
+                            <DxTreeViewNode Text="Add U3A Tenant" CssClass="root-item first-child" Expanded=true>
+                                <Nodes>
+                                    <DxTreeViewNode NavigateUrl="CreateTenant" Text="Create U3A Tenant" />
+                                    <DxTreeViewNode NavigateUrl="EditTenant" Text="Edit U3A Tenant" />
+                                    <DxTreeViewNode NavigateUrl="DoPostmarkValidation" Text="Validate Email Domain" />
+                                    <DxTreeViewNode NavigateUrl="DatabaseUpdate" Text="Update Database Schema" />
+                                </Nodes>
+                            </DxTreeViewNode>
+                            <DxTreeViewNode Text="Remove U3A Tenant" CssClass="root-item first-child" Expanded=true>
+                                <Nodes>
+                                    <DxTreeViewNode NavigateUrl="DeleteEmailDomain" Text="Delete Email Domain" />
+                                    <DxTreeViewNode NavigateUrl="DeleteTenant" Text="Delete U3A Tenant" />
+                                </Nodes>
+                            </DxTreeViewNode>
+                            <DxTreeViewNode Text="Service Providers" CssClass="root-item first-child" Expanded=true>
+                                <Nodes>
+                                    <DxTreeViewNode Text="Postmark Email login" NavigateUrl="https://postmarkapp.com/" />
+                                </Nodes>
+                            </DxTreeViewNode>
+
+                        </Nodes>
+                    </DxTreeViewNode>
+                </Nodes>
+            </DxTreeViewNode>
+        </Nodes>
+    </DxTreeView>
+</div>
+
+@code {
+    const string rootNodeCssClass = "root-item";
+    [Parameter] public string? StateCssClass { get; set; }
+}

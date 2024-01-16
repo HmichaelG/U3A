@@ -1,0 +1,145 @@
+﻿@page "/DeleteEmailDomain"
+
+<PageTitle>Delete Email Domain</PageTitle>
+
+@inject NavigationManager NavigationManager
+@inject IDbContextFactory<TenantStoreDbContext> Tenantdbfactory
+@inject IConfiguration config
+@inject DefaultAzureCredential credential
+
+@inject IJSRuntime js
+
+@using System.ComponentModel.DataAnnotations
+@using Azure
+@using Azure.Core;
+@using Azure.Identity;
+@using Azure.ResourceManager;
+@using Azure.ResourceManager.Resources;
+@using Azure.ResourceManager.Dns
+@using Azure.ResourceManager.Dns.Models
+@using Azure.ResourceManager.Sql
+@using Azure.ResourceManager.Sql.Models
+@using Azure.ResourceManager.AppService
+@using Azure.ResourceManager.AppService.Models
+@using System.Net;
+@using System.Linq;
+@using Microsoft.Data.SqlClient;
+@using Microsoft.EntityFrameworkCore.Infrastructure
+
+
+@attribute [Authorize(Roles = "U3Admin.Administer")]
+
+
+@if (!IsReady)
+{
+    <em>Loading...</em>
+}
+else
+{
+    <DxLoadingPanel @bind-Visible="PanelVisible"
+                    IsContentBlocked="true"
+                    ApplyBackgroundShading="true"
+                    IndicatorAreaVisible="false"
+                    Text="Deleting Domain">
+
+        <div class="page-width">
+            <h2 class="pb-2">Delete Email Domain</h2>
+            <p class="pb-2">
+                Delete an email domain from Postmark servers. This <strong>does not</strong> delete the domain from DNS.
+            </p>
+            <div class="pb-2">
+                <DxGrid @ref="grid" Data="@domains" CssClass="grid-height" id="myGrid"
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        VirtualScrollingEnabled="true"
+                        ShowSearchBox="true"
+                        ShowFilterRow="false"
+                        ShowAllRows="true"
+                        KeyFieldName="Id"
+                        ValidationEnabled="true">
+                    <Columns>
+                        <DxGridDataColumn Caption="Email Domain" FieldName="Name" />
+                        <DxGridDataColumn Caption="DKIM Verified?" FieldName="isDKIMVerified"
+                                          UnboundType="GridUnboundColumnType.Boolean" UnboundExpression="[DKIMPendingHost] == ''" />
+                        <DxGridDataColumn Caption="Return-Path Verified?" FieldName="ReturnPathDomainVerified" />
+                        <DxGridDataColumn Width="8rem" Caption="" AllowGroup="false">
+                            <CellDisplayTemplate>
+                                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                          RenderStyle="ButtonRenderStyle.Primary" Text="Delete"
+                                          Click="() => OnDeleteClick(context.DataItem)"></DxButton>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+            </div>
+            <div hidden="@(selectedDomain == null)">
+                <div class="alert alert-danger col-md-8">
+                    <div class="d-flex form-inline">
+                        <div class="form-control text-danger">@(new MarkupString($"Delete <strong>{selectedDomain?.Name}</strong>. Are you sure?"))</div>
+                        <button type="button" class="btn btn-danger" @onclick="DoDelete">Yes</button>
+                        <button type="button" class="btn btn-light" @onclick="DoCancel">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </DxLoadingPanel>
+}
+
+<style>
+    .page-width {
+        max-width: 1200px;
+    }
+
+    .button-width {
+        width: 100%;
+    }
+
+    .grid-height {
+        height: 33vh;
+    }
+</style>
+
+
+
+@code {
+
+    bool IsReady;
+    bool PanelVisible;
+    IEnumerable<PostmarkCompleteDomain>? domains;
+    PostmarkCompleteDomain? selectedDomain;
+    IGrid? grid;
+    PostmarkAdminService? service;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        service = new(config);
+        domains = (await service.ListCompleteDomainsAsync()).OrderBy(x => x.Name);
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    async Task GetDataAsync() { domains = (await service.ListCompleteDomainsAsync()).OrderBy(x => x.Name); }
+
+    async Task UpdateDataAsync()
+    {
+        selectedDomain = null;
+        await GetDataAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void OnDeleteClick(object dataItem)
+    {
+        selectedDomain = dataItem as PostmarkCompleteDomain;
+    }
+
+    async Task DoDelete() {
+        PanelVisible = true;
+        try{
+            await service.DeleteDomain(selectedDomain.Name); 
+            await UpdateDataAsync(); 
+        } finally { PanelVisible = false; }
+    }
+
+    void DoCancel() { selectedDomain = null; }
+
+}

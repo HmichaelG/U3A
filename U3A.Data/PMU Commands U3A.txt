@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_AddnInfoURL
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Occurence_Varies
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Occurence_Varies
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_SystemSettings_SupportEmail
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Occurence_Varies
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_SystemSettings_SupportEmail
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

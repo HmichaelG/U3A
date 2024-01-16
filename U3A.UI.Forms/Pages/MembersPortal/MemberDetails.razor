@@ -247,7 +247,7 @@ else {
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
         var formBounds = await Window.GetElementBounds(js, "myForm");
-        var newHeight = await Window.FitToRemainingHeight(js, "myForm", formHeight);
+        var newHeight = await Window.FitToRemainingHeight(js, "myForm", formHeight,0.05);
         if (newHeight != formHeight) {
             formHeight = newHeight;
             InvokeAsync(StateHasChanged);

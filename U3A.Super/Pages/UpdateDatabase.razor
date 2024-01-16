@@ -1,0 +1,64 @@
+﻿@page "/DatabaseUpdate"
+
+<PageTitle>Update Database Schema</PageTitle>
+
+@attribute [Authorize(Roles = "U3Admin.Administer")]
+
+@inject NavigationManager NavMan
+@inject IDbContextFactory<TenantStoreDbContext> Tenantdbfactory
+@inject IConfiguration config
+
+@inject IJSRuntime js
+
+<div class="page-width">
+    <h2 class="pb-2">Update Database Schema</h2>
+    <div class="alert alert-info col-md-8">
+        <div class="d-flex form-inline">
+            <div class="form-control text-info">@(new MarkupString("This procedure will update database schema for all tenants. Are you sure?"))</div>
+            <button type="button" class="btn btn-success" @onclick="DoUpdate">Yes</button>
+            <button type="button" class="btn btn-light" @onclick="DoCancel">No</button>
+        </div>
+    </div>
+    <ul class="my-2 col-12">
+        @(new MarkupString(result))
+    </ul>
+    <h4>@(new MarkupString(msgComplete))</h4>
+</div>
+<style>
+    .page-width {
+        max-width: 1200px;
+    }
+
+</style>
+
+
+@code {
+
+    List<TenantInfo>? tenantInfo { get; set; }
+    string result = string.Empty;
+    string msgComplete = string.Empty;
+
+    async Task DoUpdate()
+    {
+        result = string.Empty;
+        msgComplete = string.Empty;
+        using (var dbc = await Tenantdbfactory.CreateDbContextAsync())
+        {
+            tenantInfo = await dbc.TenantInfo.OrderBy(x => x.Identifier).ToListAsync();
+        }
+        foreach (var tenant in tenantInfo)
+        {
+            using (var dbc = new U3ADbContextSeed())
+            {
+                dbc.TenantInfo = tenant;
+                await dbc.Database.MigrateAsync();
+                result += $"<li>Database schema for [{tenant.Identifier}] has been updated</li>";
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        msgComplete = "Schema Update Complete";
+    }
+
+    void DoCancel() { NavMan.NavigateTo("/"); }
+
+}

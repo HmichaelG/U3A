@@ -1,0 +1,176 @@
+﻿@using U3A.Model
+@using System.Text;
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager navMan;
+
+@page "/Public/Support"
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <MessageBox @ref=@messageBox>
+        <TextTemplate>
+            <p>
+                Your request has been sent to your U3A's support representative and will be responded to.
+                Please be aware that we are all volunteers and there may be a short delay in attending to your request.
+            </p>
+        </TextTemplate>
+    </MessageBox>
+    <DxLoadingPanel @bind-Visible="@isBusy"
+                    IsContentBlocked="true"
+                    ApplyBackgroundShading="true"
+                    IndicatorAreaVisible="false"
+                    Text="Sending support request">
+
+        <EditForm Model="@supportModel"
+                  OnValidSubmit=@ValidFormSubmitted
+                  Context="editContext">
+            <DxFormLayout CssClass="px-2 col-12 px-sm-0 col-sm-10 col-md-9 col-lg-6 mx-auto">
+                <h3 class="w-100">Support &amp; Assistance</h3>
+                <p class="w-100">
+                    Please enter or confirm your contact details and provide a <strong>clear, succinct</strong>
+                    description of your issue.
+                </p>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <DxFormLayoutItem Caption="Your Name" ColSpanMd="12">
+                    <DxTextBox @bind-Text="@supportModel!.Name" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Your Home Phone" ColSpanMd="12">
+                    <DxTextBox @bind-Text="@supportModel!.Phone" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Your Mobile Number" ColSpanMd="12">
+                    <DxTextBox @bind-Text="@supportModel!.Mobile" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Your Email Address" ColSpanMd="12">
+                    <DxTextBox @bind-Text="@supportModel!.Email" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Problem Description" ColSpanMd="12">
+                    <DxMemo Rows="10" @bind-Text="@supportModel!.Description" />
+                </DxFormLayoutItem>
+                <footer class="input-group px-2 mt-2" id="footer">
+                    <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
+                    <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" onclick="window.location = '/';" />
+                </footer>
+            </DxFormLayout>
+        </EditForm>
+    </DxLoadingPanel>
+}
+
+@code {
+    [CascadingParameter]
+    public LoginState? LoginState { get; set; }
+
+    bool isReady;
+
+    SystemSettings? settings;
+    MessageBox? messageBox;
+    SupportModel? supportModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+        }
+        isReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (LoginState != null)
+        {
+            if (LoginState.SelectedPerson != null)
+            {
+                supportModel!.Name = LoginState.SelectedPerson.FullName;
+                supportModel.Phone = LoginState.SelectedPerson.HomePhone!;
+                supportModel.Mobile = LoginState.SelectedPerson.Mobile!;
+                supportModel.Email = LoginState.SelectedPerson.Email;
+            }
+        }
+    }
+
+    bool isBusy;
+    async Task ValidFormSubmitted(EditContext editContext)
+    {
+        if (isBusy) return;
+        isBusy = true;
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var emailSender = EmailFactory.GetEmailSender(dbc);
+            var sendTo = settings!.SupportEmailAddesss ?? settings.SendEmailAddesss;
+            var msg = BuildMessage();
+            var subject = $"!!!HEADS UP!!! {supportModel!.Name} requires your support.";
+            await emailSender!.SendEmailAsync(
+                            EmailType.Transactional,
+                            "system@u3admin.org.au",
+                            "System Postman",
+                            sendTo,
+                            "System Support & Assistance",
+                            subject,
+                            msg,
+                            string.Empty
+                            );
+        }
+        isBusy = false;
+        await InvokeAsync(StateHasChanged);
+        await messageBox!.ShowOkOnlyAsync("Support Request Sent");
+        navMan.NavigateTo("/", true);
+    }
+
+    string BuildMessage()
+    {
+        var txt = new StringBuilder();
+
+        txt.AppendLine(@"<table style='width: 100%; border: 1pt solid black;'>");
+        txt.AppendLine(@"<tr>
+                                    <th colspan='2' style='text-align: left;
+                                            padding-left: 10pt;
+                                            border-bottom: 1pt solid black;'>
+                                            Support request detail</th>
+                                </tr>");
+        txt.AppendLine($@"<tr>
+                                    <td style='text-align: left;
+                                            padding-left: 10pt;'>
+                                            <strong>Name</strong></td>
+                                    <td>{supportModel!.Name}</td>
+                                    </tr>");
+        txt.AppendLine($@"<tr>
+                                    <td style='text-align: left;
+                                            padding-left: 10pt;'>
+                                            <strong>Email</strong></td>
+                                    <td>{supportModel.Email}</td>
+                                    </tr>");
+        txt.AppendLine($@"<tr>
+                                    <td style='text-align: left;
+                                            padding-left: 10pt;'>
+                                            <strong>Phone Number</strong></td>
+                                    <td>{supportModel.Phone}</td>
+                                    </tr>");
+        txt.AppendLine($@"<tr>
+                                    <td style='text-align: left;
+                                            padding-left: 10pt;'>
+                                            <strong>Mobile Number</strong></td>
+                                    <td>{supportModel.Mobile}</td>
+                                    </tr>");
+        txt.AppendLine($@"<tr>
+                                    <td style='text-align: left;
+                                            padding-left: 10pt;'>
+                                            <strong>Message</strong></td>
+                                    <td>{supportModel.Description}</td>
+                                    </tr>");
+        txt.AppendLine($@"<tr>
+                                    <td colspan='3' >
+                                    </td>
+                                    </tr>");
+        txt.AppendLine("</table>");
+        txt.AppendLine("<p>Please do not reply directly to this email as it is not being monitored.");
+        return txt.ToString();
+    }
+}

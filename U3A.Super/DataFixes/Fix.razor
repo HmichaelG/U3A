@@ -1,0 +1,70 @@
+﻿@page "/fix"
+
+@inject NavigationManager NavMan
+@inject IDbContextFactory<TenantStoreDbContext> Tenantdbfactory
+
+@attribute [Authorize]
+
+<div class="page-width">
+    <h2 class="pb-2">Apply Database fix</h2>
+    <div class="alert alert-info col-md-8">
+        <div class="d-flex form-inline">
+            <div class="form-control text-info">@(new MarkupString("This procedure will apply a fix for all tenants. Are you sure?"))</div>
+            <button type="button" class="btn btn-success" @onclick="DoUpdate">Yes</button>
+            <button type="button" class="btn btn-light" @onclick="DoCancel">No</button>
+        </div>
+    </div>
+    <ul class="my-2 col-12">
+        @(new MarkupString(result))
+    </ul>
+    <h4>@(new MarkupString(msgComplete))</h4>
+</div>
+<style>
+    .page-width {
+        max-width: 1200px;
+    }
+
+</style>
+
+
+@code {
+
+
+    List<TenantInfo>? tenantInfo { get; set; }
+    string result = string.Empty;
+    string msgComplete = string.Empty;
+
+    async Task DoUpdate()
+    {
+        result = string.Empty;
+        msgComplete = string.Empty;
+        using (var dbc = await Tenantdbfactory.CreateDbContextAsync())
+        {
+            tenantInfo = await dbc.TenantInfo.OrderBy(x => x.Identifier).ToListAsync();
+        }
+        foreach (var tenant in tenantInfo)
+        {
+            using (var dbc = new U3ADbContext(tenant))
+            {
+                var service = new EwayPaymentService(dbc);
+                var payStatus = await dbc.OnlinePaymentStatus.Where(x => x.Status == "Processed").ToListAsync();
+                foreach (var status in payStatus)
+                {
+                    var result = await service.FixResultCodesAsync(dbc, status);
+                    if (result != null)
+                    {
+                        status.ResultCode = result.Item1;
+                        status.ResultMessage = result.Item2;
+                    }
+                }
+                await dbc.SaveChangesAsync();
+                result += $"<li>Fix is done for [{tenant.Identifier}].</li>";
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        msgComplete = "Schema Update Complete";
+    }
+
+    void DoCancel() { NavMan.NavigateTo("/"); }
+
+}

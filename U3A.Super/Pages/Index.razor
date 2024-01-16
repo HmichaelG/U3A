@@ -1,0 +1,144 @@
+﻿@page "/"
+
+@inject IDbContextFactory<TenantStoreDbContext> tenantDbfactory
+@inject IJSRuntime js
+
+<PageTitle>Tenant Summary</PageTitle>
+
+<DxLoadingPanel @bind-Visible="PanelVisible"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Fetching Data...">
+
+    <div class="page-width">
+        <h2 class="pb-2">Tenant Summary</h2>
+        <p class="pb-2">
+            Note: U3A Tenants without <em>Postmark Enabled</em> are considered demonstration tenants only.
+        </p>
+        <div class="input-group">
+            <p class="h6 flex-grow-1">Current Tenants</p>
+            <DxFormLayout>
+                <DxFormLayoutItem Caption="Email Start" ColSpanMd="4">
+                    <DxDateEdit @bind-Date=@startDate />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Email End" ColSpanMd="4">
+                    <DxDateEdit @bind-Date=@endDate />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem ColSpanMd="4">
+                    <DxButton Text="Show Email" Click="ShowEmail" CssClass="button-width" />
+                </DxFormLayoutItem>
+            </DxFormLayout>
+        </div>
+        <div class="pb-2">
+            <DxGrid @ref="grid" Data="@tenantInfo" CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    UnboundColumnData="GetUnboundColumnData"
+                    VirtualScrollingEnabled="true"
+                    ShowSearchBox="true"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="Id"
+                    ValidationEnabled="true">
+                <Columns>
+                    <DxGridDataColumn Caption="Tenant ID" FieldName="Identifier" />
+                    <DxGridDataColumn Caption="Display Name" FieldName="Name" />
+                    <DxGridDataColumn Caption="Website" FieldName="Website" />
+                    <DxGridDataColumn Caption="EWAY Enabled" FieldName="EwayEnabled"
+                                      UnboundType=GridUnboundColumnType.Boolean
+                                      UnboundExpression="[UseEwayTestEnviroment] = 0" />
+                    <DxGridDataColumn Caption="Postmark Enabled" FieldName="PostmarkEnabled"
+                                      UnboundType=GridUnboundColumnType.Boolean
+                                      UnboundExpression="[UsePostmarkTestEnviroment] = 0" />
+                    <DxGridDataColumn Caption=@($"Financial To {DateTime.Today.Year}") FieldName="FinancialMembers"
+                                      UnboundType=GridUnboundColumnType.Integer Width="8rem" />
+                    <DxGridDataColumn Caption="Email Sent" FieldName="EmailStatistics" Visible="@showPostmark"
+                                      UnboundType=GridUnboundColumnType.Integer Width="8rem" />
+                </Columns>
+
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FinancialMembers" FooterColumnName="FinancialMembers" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="EmailStatistics" FooterColumnName="EmailStatistics" />
+                </TotalSummary>
+
+            </DxGrid>
+        </div>
+    </div>
+</DxLoadingPanel>
+<style>
+    .page-width {
+        max-width: 1200px;
+    }
+
+    .button-width {
+        width: 100%;
+    }
+
+    .grid-height {
+        height: 50vh;
+    }
+</style>
+
+@code {
+
+    List<TenantInfo> tenantInfo { get; set; }
+    Dictionary<string, int> financialMembers = new();
+    Dictionary<string, PostmarkOutboundOverviewStats> EmailStats = new();
+    bool showPostmark;
+    bool PanelVisible;
+    DateTime startDate = DateTime.Today.AddMonths((-DateTime.Today.Month) + 1).AddDays((-DateTime.Today.Day) + 1);
+    DateTime endDate = DateTime.Today;
+    DxGrid? grid;
+
+    protected override async Task OnInitializedAsync() {
+        // wire up the data
+        using (var dbc = await tenantDbfactory.CreateDbContextAsync()) {
+            tenantInfo = await dbc.TenantInfo.OrderBy(x => x.Identifier).ToListAsync();
+        }
+        foreach (var tenant in tenantInfo.Where(x => !x.UsePostmarkTestEnviroment)) {
+            using (var dbc = new U3ADbContext(tenant)) {
+                var finMembers = dbc.Person.Count(x => x.FinancialTo >= DateTime.Today.Year);
+                financialMembers.Add(tenant.Id!, finMembers);
+            }
+        }
+    }
+
+    void GetUnboundColumnData(GridUnboundColumnDataEventArgs e) {
+        var tenant = (TenantInfo)e.DataItem;
+        if (e.FieldName == "FinancialMembers") {
+            int result = 0;
+            if (financialMembers.TryGetValue(tenant.Id!, out result)) e.Value = result;
+        }
+        if (e.FieldName == "EmailStatistics") {
+            PostmarkOutboundOverviewStats? result = default;
+            if (EmailStats.TryGetValue(tenant.Id!, out result)) e.Value = result.Sent;
+        }
+
+    }
+
+    async Task ShowEmail() {
+        showPostmark = true;
+        EmailStats = new();
+        PanelVisible = true;
+        PostmarkClient? client = default;
+        foreach (TenantInfo tenant in tenantInfo.Where(x => !x.UsePostmarkTestEnviroment)) {
+            var UsePostmarkTestEnvironment = tenant.UsePostmarkTestEnviroment;
+            if (UsePostmarkTestEnvironment && tenant.PostmarkSandboxAPIKey != null) {
+                client = new PostmarkClient(tenant.PostmarkSandboxAPIKey);
+            }
+            else if (tenant.PostmarkAPIKey != null) { client = new PostmarkClient(tenant.PostmarkAPIKey); }
+            if (client != null) {
+                await GetEmailStatisticsAsync(tenant, client);
+            }
+        }
+        grid.RefreshSummary();
+        PanelVisible = false;
+    }
+
+    public async Task GetEmailStatisticsAsync(TenantInfo tenant, PostmarkClient client) {
+        PostmarkOutboundOverviewStats stats;
+        stats = await client.GetOutboundOverviewStatsAsync(null, startDate, endDate);
+        EmailStats.Add(tenant.Id, stats);
+    }
+
+}

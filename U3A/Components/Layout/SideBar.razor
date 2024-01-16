@@ -8,7 +8,7 @@
               RenderStyle="ButtonRenderStyle.Primary" />
 </div>
 
-<div id="sidebar" class="@(IsMinimised ? "d-none": "") @(IsExpanded ? "expanded": "")">
+<div id="sidebar" class="@(IsMinimised ? "d-none": "")">
 
     <DxGridLayout RowSpacing="0rem">
         <Rows>
@@ -28,18 +28,18 @@
                                   IconCssClass="bi bi-arrow-left-circle"
                                   SizeMode="SizeMode.Large"
                                   RenderStyleMode="ButtonRenderStyleMode.Text"/>
-                        <img src="images/U3ALogo.png" onclick="@(() => OnToggleMinimised())" />
                     </span>
+                    <img src="images/U3ALogo.png" />
                 </Template>
             </DxGridLayoutItem>
             <DxGridLayoutItem Area="menu-button" CssClass="sidebar-header menu-button-container">
                 <Template>
-                    <div class="menu-button" @onclick="TriggerIsExpanded"></div>
+                    <div class="menu-button" onclick="document.getElementById('sidebar').classList.toggle('expanded')" ></div>
                 </Template>
             </DxGridLayoutItem>
             <DxGridLayoutItem Area="navigation" CssClass="layout-item">
                 <Template>
-                    <div @onclick="Collapse">
+                    <div onclick="document.getElementById('sidebar').classList.remove('expanded')">
                         <MainMenu IsTopMenu=false />
                     </div>
                 </Template>
@@ -49,19 +49,7 @@
 </div>
 
 @code {
-    public bool IsExpanded { get; set; } = false;
-
     public bool IsMinimised { get; set; } = false;
-
-    void TriggerIsExpanded()
-    {
-        IsExpanded = !IsExpanded;
-    }
-
-    void Collapse()
-    {
-        IsExpanded = false;
-    }
 
     void OnToggleMinimised()
     {

@@ -1,0 +1,104 @@
+﻿@inject IConfiguration config
+
+<div class="alert alert-danger pb-4" hidden="@(!IsErrorMessage)">
+    @Message<br />
+    It may take up to 48 hours for DNS changes to propagate through the Internet (but usually, it is much faster).
+</div>
+<table class='table col-md-8'>
+    <thead>
+        <tr>
+            <td class='h6 text-left' colspan='4'>@($"Postmark Validation Details for: {domain?.Name}") </td>
+        </tr>
+        <tr>
+            <td colspan="5">Head over to the DNS provider and add <strong>DKIM</strong> and <strong>Return-Path</strong> DNS records to verify the domain and ensure effective delivery.</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th width="10%">Verify</th>
+            <th width="40%">Hostname</th>
+            <th width="5%">Type</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <th scope='row'>DKIM</th>
+            <td><CopyToClipboard Text="@(domain?.DKIMPendingHost.Replace($".{domain?.Name}",""))" /></td>
+            <td>TXT</td>
+            <td>
+                <CopyToClipboard Text="@domain?.DKIMPendingTextValue" />
+            </td>
+            <td>
+                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                          RenderStyle="ButtonRenderStyle.Primary" Text=@((domain?.DKIMPendingHost == "") ? "Complete" : "Verify")
+                          Enabled="@(domain?.DKIMPendingHost != "")"
+                          Click="() => VerifyDKIM()"></DxButton>
+            </td>
+        </tr>
+        <tr>
+            <th scope='row'>Return-Path</th>
+            <td><CopyToClipboard Text="pm-bounces" /></td>
+            <td>CNAME</td>
+            <td><CopyToClipboard Text="@domain?.ReturnPathDomainCNAMEValue" /></td>
+            @if (domain?.ReturnPathDomainVerified != null)
+            {
+                <td>
+                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                              RenderStyle="ButtonRenderStyle.Primary" Text=@((bool)domain.ReturnPathDomainVerified ? "Complete" : "Verify")
+                              Enabled="@(!(bool)domain.ReturnPathDomainVerified)"
+                              Click="() => VerifyReturnPath()"></DxButton>
+                </td>
+            }
+        </tr>
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public PostmarkCompleteDomain? domain { get; set; }
+
+    [Parameter]
+    public EventCallback<PostmarkCompleteDomain> OnDomainVerified { get; set; }
+
+
+    PostmarkAdminService service;
+    string? Message;
+    bool IsErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        service = new(config);
+        await base.OnInitializedAsync();
+    }
+
+    async Task VerifyDKIM()
+    {
+        try
+        {
+            _ = await service.VerifyDomainDkim(domain);
+            domain = await service.GetDomainDetailsAsync(domain.ID);
+            await OnDomainVerified.InvokeAsync(domain);
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            IsErrorMessage = true;
+            Message = ex.Message;
+        }
+    }
+
+    async Task VerifyReturnPath()
+    {
+        try
+        {
+            _ = await service.VerifyDomainReturnPath(domain);
+            domain = await service.GetDomainDetailsAsync(domain.ID);
+            await OnDomainVerified.InvokeAsync(domain);
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            IsErrorMessage = true;
+            Message = ex.Message;
+        }
+    }
+}
