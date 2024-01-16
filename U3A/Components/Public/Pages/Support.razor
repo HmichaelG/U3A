@@ -61,7 +61,7 @@ else
                         <Captcha CaptchaWord="@supportModel!.Captcha" CaptchaWordChanged="@((w) => OnCaptchaChanged(w))"
                                  CharNumber="@CaptchaLetters" />
                     </div>
-                    <DxFormLayoutItem Caption="Prove you are real?" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Prove you are real" ColSpanMd="12">
                         <DxTextBox @bind-Text="@supportModel.CaptchaResponse" NullText="Enter the above code exactly as given." />
                     </DxFormLayoutItem>
                 }
