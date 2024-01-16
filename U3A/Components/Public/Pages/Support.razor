@@ -1,10 +1,13 @@
-﻿@using U3A.Model
+﻿@page "/Public/Support"
+@page "/Public/Support/{IsCaptchaRequired?}"
+
+@using U3A.Model
 @using System.Text;
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager navMan;
+@using BlazorCaptcha
 
-@page "/Public/Support"
 
 @if (!isReady)
 {
@@ -26,10 +29,10 @@ else
                     IndicatorAreaVisible="false"
                     Text="Sending support request">
 
-        <EditForm Model="@supportModel"
+        <EditForm Model="@supportModel" class="px-2 col-12 px-sm-0 col-sm-10 col-md-9 col-lg-6 mx-auto"
                   OnValidSubmit=@ValidFormSubmitted
                   Context="editContext">
-            <DxFormLayout CssClass="px-2 col-12 px-sm-0 col-sm-10 col-md-9 col-lg-6 mx-auto">
+            <DxFormLayout CssClass="">
                 <h3 class="w-100">Request Support</h3>
                 <p class="w-100">
                     Please enter or confirm your contact details and provide a <strong>clear, succinct</strong>
@@ -52,11 +55,21 @@ else
                 <DxFormLayoutItem Caption="Problem Description" ColSpanMd="12">
                     <DxMemo Rows="8" @bind-Text="@supportModel!.Description" />
                 </DxFormLayoutItem>
-                <footer class="input-group px-2 mt-2" id="footer">
-                    <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
-                    <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" onclick="window.location = '/';" />
-                </footer>
+                @if (IsCaptchaRequired == "true")
+                {
+                    <div class="mt-2 mx-auto">
+                        <Captcha CaptchaWord="@supportModel!.Captcha" CaptchaWordChanged="@((w) => OnCaptchaChanged(w))"
+                                 CharNumber="@CaptchaLetters" />
+                    </div>
+                    <DxFormLayoutItem Caption="Prove you are real?" ColSpanMd="12">
+                        <DxTextBox @bind-Text="@supportModel.CaptchaResponse" NullText="Enter the above code exactly as given." />
+                    </DxFormLayoutItem>
+                }
             </DxFormLayout>
+            <footer class="input-group px-2 mt-2" id="footer">
+                <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
+                <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" onclick="window.location = '/';" />
+            </footer>
         </EditForm>
     </DxLoadingPanel>
 }
@@ -65,11 +78,16 @@ else
     [CascadingParameter]
     public LoginState? LoginState { get; set; }
 
+    [Parameter]
+    public string? IsCaptchaRequired { get; set; }
+
     bool isReady;
 
     SystemSettings? settings;
     MessageBox? messageBox;
-    SupportModel? supportModel = new();
+    SupportModel? supportModel;
+
+    private int CaptchaLetters = 5;
 
     protected override async Task OnInitializedAsync()
     {
@@ -77,13 +95,8 @@ else
         {
             settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
         }
-        isReady = true;
-        await base.OnInitializedAsync();
-    }
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
+        supportModel = new();
+        supportModel!.Captcha = BlazorCaptcha.Tools.GetCaptchaWord(CaptchaLetters);
         if (LoginState != null)
         {
             if (LoginState.SelectedPerson != null)
@@ -93,8 +106,12 @@ else
                 supportModel.Mobile = LoginState.SelectedPerson.Mobile!;
                 supportModel.Email = LoginState.SelectedPerson.Email;
             }
+            if (IsCaptchaRequired != null) supportModel.IsCaptchaRequired = (IsCaptchaRequired == "true") ? true : false;
         }
+        isReady = true;
+        await base.OnInitializedAsync();
     }
+
 
     bool isBusy;
     async Task ValidFormSubmitted(EditContext editContext)
@@ -172,5 +189,10 @@ else
         txt.AppendLine("</table>");
         txt.AppendLine("<p>Please do not reply directly to this email as it is not being monitored.");
         return txt.ToString();
+    }
+    void OnCaptchaChanged(string newWord)
+    {
+        supportModel!.Captcha = newWord;
+        supportModel.CaptchaResponse = "";
     }
 }
