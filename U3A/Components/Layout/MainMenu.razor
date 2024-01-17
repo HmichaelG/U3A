@@ -11,7 +11,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
-@inject NavigationManager NavigationManager
+@inject NavigationManager navMan
 @implements IDisposable;
 
 
@@ -26,7 +26,7 @@
                     ItemsPosition="ItemPosition.End"
                     Orientation="@((IsTopMenu) ? Orientation.Horizontal : Orientation.Vertical)"
                     SizeMode="@((IsTopMenu) ? SizeMode.Small : SizeMode.Medium)"
-                    CollapseItemsToHamburgerMenu="@((IsTopMenu) ? true : false)">
+                    CollapseItemsToHamburgerMenu="@((IsTopMenu) ? true : true)">
                 <TitleTemplate>
                     @if (IsTopMenu)
                     {
@@ -44,13 +44,13 @@
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
-                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear">
+                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear" >
                                     <Items>
                                         @if (isSecurityAdminRole)
                                         {
-                                            <DxMenuItem Text="Login Security &amp; Role Assignment" NavigateUrl="IdentityUserMnt" />
+                                            <DxMenuItem Click="OnCloseMenu" Text="Login Security &amp; Role Assignment" NavigateUrl="IdentityUserMnt" />
                                         }
-                                        <DxMenuItem Text="Organisation Details" NavigateUrl="OrganisationDetailsMnt" />
+                                        <DxMenuItem Click="OnCloseMenu" Text="Organisation Details" NavigateUrl="OrganisationDetailsMnt" />
                                         <DxMenuItem Text="Membership Fees" NavigateUrl="MembershipFeesMnt" />
                                         <DxMenuItem Text="Add/Edit Document Templates" NavigateUrl="DocumentTemplateMnt" />
                                         <DxMenuItem Text="Setup an Office PC" IconCssClass="bi bi-display" NavigateUrl="/OfficePC.html" />
@@ -250,12 +250,12 @@
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
-        OrganisationName = dbc.TenantInfo.Name;
+        OrganisationName = dbc.TenantInfo.Name!;
         authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
         if (user != null)
         {
-            isAuthenticated = user.Identity.IsAuthenticated;
+            isAuthenticated = user.Identity!.IsAuthenticated;
             userName = user.Identity.Name;
             isSecurityAdminRole = user.IsInRole("Security Administrator");
             isSystemAdminRole = user.IsInRole("System Administrator");
@@ -267,8 +267,8 @@
                             user.IsInRole("Accounting");
             isOfficeRole = user.IsInRole("Office");
         }
-        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        NavigationManager.LocationChanged += OnLocationChanged;
+        currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
+        navMan.LocationChanged += OnLocationChanged;
     }
 
     protected override void OnParametersSet()
@@ -279,7 +279,7 @@
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        currentUrl = navMan.ToBaseRelativePath(e.Location);
         StateHasChanged();
     }
 
@@ -294,14 +294,20 @@
             {
                 var theme = name.ToLower().Replace(" ", "-");
                 localStorage.SetItemAsync("theme", theme).SafeFireAndForget();
-                NavigationManager.NavigateTo("/", true);
+                navMan.NavigateTo("/", true);
             }
         }
     }
 
+    private async Task OnCloseMenu(MenuItemClickEventArgs obj)
+    {
+        if (isVertical) { await js.InvokeVoidAsync("closeSideBarMenu"); }
+    }
+
+
     bool IsOnHomePage()
     {
-        return (string.IsNullOrEmpty(NavigationManager.ToBaseRelativePath(NavigationManager.Uri)));
+        return (string.IsNullOrEmpty(navMan.ToBaseRelativePath(navMan.Uri)));
     }
 
     async Task ShowHelp()
@@ -318,19 +324,19 @@
             useTopMenu = !(await localStorage.GetItemAsync<bool>(key));
         }
         await localStorage.SetItemAsync<bool>(key, useTopMenu);
-        NavigationManager.NavigateTo("/", true);
+        navMan.NavigateTo("/", true);
 
     }
 
     void OnChangeCredential(string page)
     {
-        NavigationManager.NavigateTo("Account/Manage/" + page, true);
+        navMan.NavigateTo("Account/Manage/" + page, true);
     }
 
 
     public void Dispose()
     {
-        NavigationManager.LocationChanged -= OnLocationChanged;
+        navMan.LocationChanged -= OnLocationChanged;
         dbc?.Dispose();
     }
 

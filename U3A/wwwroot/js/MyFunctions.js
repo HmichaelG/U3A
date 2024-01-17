@@ -1,4 +1,7 @@
-﻿window.getWindowDimensions = function () {
+﻿function closeSideBarMenu() {
+    document.getElementById("sidebar").classList.remove("expanded");
+};
+window.getWindowDimensions = function () {
     return {
         width: window.innerWidth,
         height: window.innerHeight
