@@ -6,28 +6,30 @@
 
 <DxLayoutBreakpoint MaxWidth="768"
                     @bind-IsActive="@IsSmallLayout" />
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <DxGrid @ref=@grid Data="@Enrolments" CssClass="grid-height" id="myGrid"
-        ShowAllRows="true"
-        ShowSearchBox=true
-        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-        KeyFieldName="ID"
-        ValidationEnabled="true"
-        SelectionMode="GridSelectionMode.Multiple"
-        AllowSelectRowByClick="false"
-        UnboundColumnData="Grid_CustomUnboundColumnData"
-        @bind-SelectedDataItems="SelectedDataItems">
+            ShowAllRows="true"
+            ShowSearchBox=true
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            KeyFieldName="ID"
+            ValidationEnabled="true"
+            SelectionMode="GridSelectionMode.Multiple"
+            AllowSelectRowByClick="false"
+            UnboundColumnData="Grid_CustomUnboundColumnData"
+            @bind-SelectedDataItems="SelectedDataItems">
         <Columns>
             <DxGridSelectionColumn Width="1rem" />
             <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
-                          Visible="@(!IsManageEnrolmentsView)"
-                          UnboundType="GridUnboundColumnType.Integer" />
+                              Visible="@(!IsManageEnrolmentsView)"
+                              UnboundType="GridUnboundColumnType.Integer" />
             <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
-                          Visible="@IsManageEnrolmentsView"/>
+                              Visible="@IsManageEnrolmentsView" />
             <DxGridDataColumn Caption="Name" FieldName="Person.FullName">
                 <CellDisplayTemplate>
                     @{
@@ -35,44 +37,47 @@ else {
                         var isCourseClerk = e.IsCourseClerk;
                         var hasEmail = !e.Person.IsEmailSilent;
                         var hasMobile = !e.Person.IsPhoneSilent && !e.Person.SMSOptOut;
-                        var css = "col-8 text-start ";
+                        var namecss = "col-8 text-start ";
                         var emailcss = (hasEmail) ? "col-2 bi-envelope" : "col-2";
                         var mobilecss = (hasMobile) ? "col-2 bi-phone" : "col-2";
-                        if (isCourseClerk) css += "alert-success";
-                        <div class="input-group">
-                            <div class=@css>@context.Value</div>
-                            <div class=@mobilecss></div>
-                            <div class=@emailcss></div>
+                        var outerCss = "w-100";
+                        if (isCourseClerk) outerCss += " badge badge-size bg-success text-white";
+                        <div class="@outerCss">
+                            <div class="input-group">
+                                <div class=@namecss>@context.Value</div>
+                                <div class=@mobilecss></div>
+                                <div class=@emailcss></div>
+                            </div>
                         </div>
                     }
                 </CellDisplayTemplate>
             </DxGridDataColumn>
             <DxGridDataColumn Caption="NoSMS" FieldName="Person.SMSOptOut"
-                          Width="3rem">
+                              Width="3rem">
             </DxGridDataColumn>
             <DxGridDataColumn Caption="Vax?" FieldName="Person.VaxCertificateViewed"
                               Width="3rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
             </DxGridDataColumn>
             <DxGridDataColumn Caption="Enrolled"
-                          FieldName="DateEnrolled"
-                          Visible="!IsSmallLayout"
-                          Width="4rem" DisplayFormat="{0:dd/MM/yy}" />
+                              FieldName="DateEnrolled"
+                              Visible="!IsSmallLayout"
+                              Width="4rem" DisplayFormat="{0:dd/MM/yy}" />
             <DxGridDataColumn Caption="Fin-To"
-                          FieldName="Person.FinancialTo"
-                          Visible="!IsSmallLayout"
-                          Width="4rem" DisplayFormat="{0:F0}" />
+                              FieldName="Person.FinancialTo"
+                              Visible="!IsSmallLayout"
+                              Width="4rem" DisplayFormat="{0:F0}" />
             <DxGridDataColumn Caption="Mobile"
-                          Visible="!IsSmallLayout"
-                          FieldName="Person.MobileOrSilent"
-                          Width="6rem" />
+                              Visible="!IsSmallLayout"
+                              FieldName="Person.MobileOrSilent"
+                              Width="6rem" />
             <DxGridDataColumn Caption="Home"
-                          Visible="!IsSmallLayout"
-                          FieldName="Person.HomePhoneOrSilent"
-                          Width="6rem" />
+                              Visible="!IsSmallLayout"
+                              FieldName="Person.HomePhoneOrSilent"
+                              Width="6rem" />
             <DxGridDataColumn Caption="Due" Width="3rem" FieldName="Due"
-                          Visible="@(!IsSmallLayout && AreFeesPayable)"
-                          DisplayFormat="c2"
-                          UnboundType="GridUnboundColumnType.Decimal" />
+                              Visible="@(!IsSmallLayout && AreFeesPayable)"
+                              DisplayFormat="c2"
+                              UnboundType="GridUnboundColumnType.Decimal" />
         </Columns>
     </DxGrid>
     <p>
@@ -83,6 +88,10 @@ else {
 <style>
     .grid-height {
         height: @gridHeight;
+    }
+
+    .badge-size {
+        font-size: 0.7rem !important;
     }
 
 </style>
@@ -110,15 +119,19 @@ else {
     Dictionary<Guid, decimal> FeeDue;
     bool AreFeesPayable = false;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         sequence = 0;
         service = new MemberFeeCalculationService();
         FeeDue = new Dictionary<Guid, decimal>();
-        if (Enrolments != null && Enrolments.Count > 0) {
+        if (Enrolments != null && Enrolments.Count > 0)
+        {
             var course = Enrolments.First().Course;
             AreFeesPayable = (course.CourseFeePerTerm > 0 || course.CourseFeePerYear > 0);
-            if (AreFeesPayable) {
-                foreach (var e in Enrolments) {
+            if (AreFeesPayable)
+            {
+                foreach (var e in Enrolments)
+                {
                     var person = e.Person;
                     var due = await service.CalculateFeeAsync(U3Adbfactory, person);
                     FeeDue.Add(person.ID, due);
@@ -129,24 +142,29 @@ else {
         await base.OnInitializedAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, FooterHeight);
         if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         sequence = 1;
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    int SelectedDataItemsCount() {
+    int SelectedDataItemsCount()
+    {
         var result = 0;
         if (SelectedDataItems != null) result = SelectedDataItems.Count();
         return result;
     }
 
-    async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e) {
-        if (e.FieldName == "Sequence") {
+    async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        if (e.FieldName == "Sequence")
+        {
             e.Value = sequence++;
         }
-        if (e.FieldName == "Due" && AreFeesPayable) {
+        if (e.FieldName == "Due" && AreFeesPayable)
+        {
             var person = ((Enrolment)e.DataItem).Person;
             var kvp = FeeDue.FirstOrDefault(x => x.Key == person.ID);
             e.Value = kvp.Value;
