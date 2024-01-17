@@ -59,7 +59,7 @@
     public LoginState? loginState { get; set; }
 
     bool? useTopMenu = null; // default is sidebar
-    U3ADbContext dbc { get; set; }
+    U3ADbContext? dbc { get; set; }
     bool isReady = false;
 
     private DotNetObjectReference<MainLayout>? dotNetObjectReference;
