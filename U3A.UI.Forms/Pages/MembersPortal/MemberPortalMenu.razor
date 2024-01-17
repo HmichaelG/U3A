@@ -33,21 +33,6 @@
                                 <div class="py-1">
                                     <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                                 </div>
-                                <div class="p-1 mt-2 text-center">
-                                    <div class="h6 text-primary"><span class="px-2 bg-primary text-light h6 bi bi-save" /> &nbsp; Reminder: Save Your Work!</div>
-                                    <div>
-                                        You may request multiple course enrolments or withdrawals at the one time.
-                                        When selection is complete, you must click the <strong>Save</strong> button to
-                                        save your selection to our database.
-                                    </div>
-                                </div>
-                                <DxButton Text="View your course enrolments"
-                                          IconCssClass="bi-award menu-icon me-3 h2"
-                                          CssClass="col-12 mt-2"
-                                          Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoViewMemberEnrolment))"
-                                          RenderStyle="ButtonRenderStyle.Primary"
-                                          RenderStyleMode="ButtonRenderStyleMode.Outline">
-                                </DxButton>
                                 <DxButton Text="Request course enrolments" Context="ThisContext"
                                           IconCssClass="bi-mortarboard menu-icon me-3 h2"
                                           CssClass="col-12 mt-1"
@@ -106,6 +91,13 @@
                                               IconCssClass="bi-coin menu-icon me-3 h2"
                                               CssClass="col-12 mt-1"
                                               Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberPayment))"
+                                              RenderStyle="ButtonRenderStyle.Primary"
+                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                    </DxButton>
+                                    <DxButton Text="View your course enrolments"
+                                              IconCssClass="bi-award menu-icon me-3 h2"
+                                              CssClass="col-12 mt-2"
+                                              Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoViewMemberEnrolment))"
                                               RenderStyle="ButtonRenderStyle.Primary"
                                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                                     </DxButton>
