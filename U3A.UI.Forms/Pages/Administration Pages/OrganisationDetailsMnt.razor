@@ -283,8 +283,8 @@ else {
                     MailLabelHeight = 25
                 };
         }
-        if (systemSettings.AutoEnrolAllocationDay < 1 ||
-                systemSettings.AutoEnrolAllocationDay > 7) systemSettings.AutoEnrolAllocationDay = 2;
+        if (systemSettings.AutoEnrolAllocationDay < 0 ||
+                systemSettings.AutoEnrolAllocationDay > 6) systemSettings.AutoEnrolAllocationDay = 2;
         server = new DocumentServer(dbc);
         IsReady = true;
     }

@@ -67,7 +67,7 @@ namespace U3A.UI.Reports
             if (prmSelectedCourses.Value != null)
             {
                 var selectedCourses = (prmSelectedCourses.Value as IEnumerable<Guid>);
-                result = result.Where(x => x.EnrolledClasses.Any(c => selectedCourses.Contains(c.CourseID))).ToList();
+                result = result.Where(x => selectedCourses.All(c => x.EnrolledClasses.Any(ec => ec.CourseID == c))).ToList();
             }
 
             if (prmFinancialStatus.Value == null) { return result; }
