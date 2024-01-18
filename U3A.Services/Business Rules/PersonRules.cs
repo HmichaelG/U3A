@@ -234,6 +234,7 @@ namespace U3A.BusinessRules
                         .Include(x => x.Leader)
                         .Include(x => x.Occurrence)
                         .Where(x => x.Course.Year == term.Year).ToList();
+            BusinessRule.AssignClassCounts(dbc, term, Classes);
             var people = dbc.Person.Where(x => x.DateCeased == null).AsNoTracking().ToList();
             var enrolments = dbc.Enrolment
                 .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)

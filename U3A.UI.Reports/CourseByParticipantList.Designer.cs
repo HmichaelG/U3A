@@ -31,7 +31,9 @@
             DevExpress.XtraReports.Parameters.DynamicListLookUpSettings dynamicListLookUpSettings1 = new DevExpress.XtraReports.Parameters.DynamicListLookUpSettings();
             DevExpress.XtraReports.Parameters.StaticListLookUpSettings staticListLookUpSettings1 = new DevExpress.XtraReports.Parameters.StaticListLookUpSettings();
             DevExpress.XtraReports.Parameters.StaticListLookUpSettings staticListLookUpSettings2 = new DevExpress.XtraReports.Parameters.StaticListLookUpSettings();
+            DevExpress.XtraReports.Parameters.DynamicListLookUpSettings dynamicListLookUpSettings2 = new DevExpress.XtraReports.Parameters.DynamicListLookUpSettings();
             this.objectDataSource2 = new DevExpress.DataAccess.ObjectBinding.ObjectDataSource(this.components);
+            this.objectDataSource3 = new DevExpress.DataAccess.ObjectBinding.ObjectDataSource(this.components);
             this.TopMargin = new DevExpress.XtraReports.UI.TopMarginBand();
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
             this.pageInfo1 = new DevExpress.XtraReports.UI.XRPageInfo();
@@ -92,7 +94,11 @@
             this.paramWaitlistStatus = new DevExpress.XtraReports.Parameters.Parameter();
             this.paramReportTitle = new DevExpress.XtraReports.Parameters.Parameter();
             this.prmFinancialStatus = new DevExpress.XtraReports.Parameters.Parameter();
+            this.prmMinErolments = new DevExpress.XtraReports.Parameters.Parameter();
+            this.prmShowWiatlistedOnly = new DevExpress.XtraReports.Parameters.Parameter();
+            this.prmSelectedCourses = new DevExpress.XtraReports.Parameters.Parameter();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.objectDataSource3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.table1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable3)).BeginInit();
@@ -104,6 +110,11 @@
             // 
             this.objectDataSource2.DataSource = typeof(global::U3A.Model.Term);
             this.objectDataSource2.Name = "objectDataSource2";
+            // 
+            // objectDataSource3
+            // 
+            this.objectDataSource3.DataSource = typeof(global::U3A.Model.Course);
+            this.objectDataSource3.Name = "objectDataSource3";
             // 
             // TopMargin
             // 
@@ -296,6 +307,9 @@
             // 
             // xrTable1
             // 
+            this.xrTable1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Font.Bold", "Iif([TotalActiveStudents]+[TotalWaitlistedStudents] >+[Course].[MaximumStudents]," +
+                    " true,false )\n")});
             this.xrTable1.LocationFloat = new DevExpress.Utils.PointFloat(6.103516E-05F, 0F);
             this.xrTable1.Name = "xrTable1";
             this.xrTable1.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
@@ -321,7 +335,9 @@
             this.xrTableCell2.BorderWidth = 2F;
             this.xrTableCell2.CanGrow = false;
             this.xrTableCell2.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Course].[Name]")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Course].[Name]"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Font.Bold", "Iif([TotalActiveStudents]+[TotalWaitlistedStudents] >= [Course].[MaximumStudents]" +
+                    ", true,false )\n")});
             this.xrTableCell2.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F);
             this.xrTableCell2.ForeColor = System.Drawing.Color.Black;
             this.xrTableCell2.Multiline = true;
@@ -351,9 +367,9 @@
             this.xrTableCell1.BorderWidth = 2F;
             this.xrTableCell1.CanGrow = false;
             this.xrTableCell1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[ClassDetailWithoutVenue]")});
-            this.xrTableCell1.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F);
-            this.xrTableCell1.ForeColor = System.Drawing.Color.Black;
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[ClassDetailWithoutVenue]"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Font.Bold", "Iif([TotalActiveStudents]+[TotalWaitlistedStudents] >= [Course].[MaximumStudents]" +
+                    ", true,false )\n")});
             this.xrTableCell1.Multiline = true;
             this.xrTableCell1.Name = "xrTableCell1";
             this.xrTableCell1.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 6, 0, 0, 100F);
@@ -378,7 +394,9 @@
             this.xrTableCell9.Borders = DevExpress.XtraPrinting.BorderSide.Left;
             this.xrTableCell9.BorderWidth = 2F;
             this.xrTableCell9.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Course].[Duration]")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Course].[Duration]"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Font.Bold", "Iif([TotalActiveStudents]+[TotalWaitlistedStudents] >= [Course].[MaximumStudents]" +
+                    ", true,false )\n")});
             this.xrTableCell9.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F);
             this.xrTableCell9.ForeColor = System.Drawing.Color.Black;
             this.xrTableCell9.Multiline = true;
@@ -430,7 +448,9 @@
             // 
             this.xrCheckBox1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "CheckBoxState", "[IsSelected]"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif([IsSelected], \'Enrolled\',\'Waitlisted\' )")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif([IsSelected], \'Enrolled\',\'Waitlist\' )"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Font.Bold", "Iif([TotalActiveStudents]+[TotalWaitlistedStudents] >= [Course].[MaximumStudents]" +
+                    ", true,false )\n")});
             this.xrCheckBox1.GlyphOptions.Alignment = DevExpress.Utils.HorzAlignment.Far;
             this.xrCheckBox1.LocationFloat = new DevExpress.Utils.PointFloat(10F, 0F);
             this.xrCheckBox1.Name = "xrCheckBox1";
@@ -868,6 +888,7 @@
             // 
             this.paramTermSummary.Description = "Parameter1";
             this.paramTermSummary.Name = "paramTermSummary";
+            this.paramTermSummary.ValueInfo = "00000000-0000-0000-0000-000000000000";
             this.paramTermSummary.Visible = false;
             // 
             // clcActive
@@ -909,6 +930,37 @@
             staticListLookUpSettings2.LookUpValues.Add(new DevExpress.XtraReports.Parameters.LookUpValue(1, "Participants Not Financial"));
             this.prmFinancialStatus.ValueSourceSettings = staticListLookUpSettings2;
             // 
+            // prmMinErolments
+            // 
+            this.prmMinErolments.AllowNull = true;
+            this.prmMinErolments.Description = "For members with enrolments greater than (none = ignore)";
+            this.prmMinErolments.Name = "prmMinErolments";
+            this.prmMinErolments.Type = typeof(int);
+            this.prmMinErolments.ValueInfo = "0";
+            // 
+            // prmShowWiatlistedOnly
+            // 
+            this.prmShowWiatlistedOnly.Description = "Show only members with all classes waitlisted";
+            this.prmShowWiatlistedOnly.Name = "prmShowWiatlistedOnly";
+            this.prmShowWiatlistedOnly.Type = typeof(bool);
+            this.prmShowWiatlistedOnly.ValueInfo = "False";
+            // 
+            // prmSelectedCourses
+            // 
+            this.prmSelectedCourses.AllowNull = true;
+            this.prmSelectedCourses.Description = "For members with these courses (none = ignore)";
+            this.prmSelectedCourses.MultiValue = true;
+            this.prmSelectedCourses.Name = "prmSelectedCourses";
+            this.prmSelectedCourses.Type = typeof(global::System.Guid);
+            dynamicListLookUpSettings2.DataMember = null;
+            dynamicListLookUpSettings2.DataSource = this.objectDataSource3;
+            dynamicListLookUpSettings2.DisplayMember = "Name";
+            dynamicListLookUpSettings2.FilterString = null;
+            dynamicListLookUpSettings2.SortMember = "Name";
+            dynamicListLookUpSettings2.SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
+            dynamicListLookUpSettings2.ValueMember = "ID";
+            this.prmSelectedCourses.ValueSourceSettings = dynamicListLookUpSettings2;
+            // 
             // CourseByParticipantList
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -926,7 +978,8 @@
             this.clcWaitListed});
             this.ComponentStorage.AddRange(new System.ComponentModel.IComponent[] {
             this.objectDataSource2,
-            this.objectDataSource1});
+            this.objectDataSource1,
+            this.objectDataSource3});
             this.DataSource = this.objectDataSource1;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Margins = new DevExpress.Drawing.DXMargins(48F, 50F, 50F, 50F);
@@ -934,17 +987,23 @@
             this.PageWidth = 827;
             this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
-            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.paramTerm, DevExpress.XtraReports.Parameters.Orientation.Vertical),
-            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmFinancialStatus, DevExpress.XtraReports.Parameters.Orientation.Vertical),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.paramReportTitle, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.paramTermSummary, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
-            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.paramWaitlistStatus, DevExpress.XtraReports.Parameters.Orientation.Vertical)});
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.paramTerm, DevExpress.XtraReports.Parameters.Orientation.Vertical),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmFinancialStatus, DevExpress.XtraReports.Parameters.Orientation.Vertical),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.paramWaitlistStatus, DevExpress.XtraReports.Parameters.Orientation.Vertical),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmSelectedCourses, DevExpress.XtraReports.Parameters.Orientation.Vertical),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmMinErolments, DevExpress.XtraReports.Parameters.Orientation.Vertical),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmShowWiatlistedOnly, DevExpress.XtraReports.Parameters.Orientation.Vertical)});
             this.Parameters.AddRange(new DevExpress.XtraReports.Parameters.Parameter[] {
-            this.paramTerm,
-            this.prmFinancialStatus,
             this.paramReportTitle,
             this.paramTermSummary,
-            this.paramWaitlistStatus});
+            this.paramTerm,
+            this.prmFinancialStatus,
+            this.paramWaitlistStatus,
+            this.prmSelectedCourses,
+            this.prmMinErolments,
+            this.prmShowWiatlistedOnly});
             this.StyleSheet.AddRange(new DevExpress.XtraReports.UI.XRControlStyle[] {
             this.Title,
             this.GroupCaption1,
@@ -956,9 +1015,11 @@
             this.DetailData3_Odd,
             this.PageInfo});
             this.Version = "23.2";
-            this.ParametersRequestBeforeShow += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.CourseByVenueList_ParametersRequestBeforeShow);
-            this.ParametersRequestSubmit += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.CourseByVenueList_ParametersRequestSubmit);
+            this.ParametersRequestBeforeShow += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.CourseByParticipantList_ParametersRequestBeforeShow);
+            this.ParametersRequestValueChanged += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestValueChangedEventArgs>(this.CourseByParticipantList_ParametersRequestValueChanged);
+            this.ParametersRequestSubmit += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.CourseByParticipantList_ParametersRequestSubmit);
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.objectDataSource3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.table1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable3)).EndInit();
@@ -1031,5 +1092,9 @@
         private DevExpress.XtraReports.Parameters.Parameter paramReportTitle;
         private DevExpress.XtraReports.UI.XRCheckBox xrCheckBox1;
         private DevExpress.XtraReports.Parameters.Parameter prmFinancialStatus;
+        private DevExpress.XtraReports.Parameters.Parameter prmMinErolments;
+        private DevExpress.XtraReports.Parameters.Parameter prmShowWiatlistedOnly;
+        private DevExpress.XtraReports.Parameters.Parameter prmSelectedCourses;
+        private DevExpress.DataAccess.ObjectBinding.ObjectDataSource objectDataSource3;
     }
 }
