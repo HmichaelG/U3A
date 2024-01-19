@@ -37,7 +37,7 @@ else
                 </p>
             </li>
             <li>
-                <p><a class="btn-link" onclick="setQRCode()">Display &amp; Scan the QR Code</a> or enter this key <kbd>@sharedKey</kbd> into your two factor authenticator app. Spaces and casing do not matter.</p>
+                <p><a class="btn-link" onclick="setQRCode()">Display &amp; Scan the QR Code</a> or enter this key</p><div class="alert alert-info h5">@sharedKey</div><p>into your two factor authenticator app. Spaces and casing do not matter.</p>
                 <div class="mb-2" id="qrCode"></div>
                 <div id="qrCodeData" data-url="@authenticatorUri"></div>
             </li>
@@ -49,22 +49,22 @@ else
             </li>
         </ol>
         <div class="row">
-                    <div class="col-12">
-                        <EditForm Model="Input" FormName="send-code" OnValidSubmit="OnValidSubmitAsync" method="post">
-                            <DataAnnotationsValidator />
-                            <div class="w-100 form-floating mb-3">
-                                <InputText @bind-Value="Input.Code" class="form-control" autocomplete="off" placeholder="Please enter the code." />
-                                <label for="code" class="control-label form-label">Verification Code</label>
-                                <ValidationMessage For="() => Input.Code" class="text-danger" />
-                            <DxButton Text="Verify" CssClass="w-100"
-                                      SizeMode="SizeMode.Large"
-                                      SubmitFormOnClick=true
-                                      RenderStyle="ButtonRenderStyle.Primary" />
-                            </div>
-                            <ValidationSummary class="text-danger" role="alert" />
-                        </EditForm>
+            <div class="col-12">
+                <EditForm Model="Input" FormName="send-code" OnValidSubmit="OnValidSubmitAsync" method="post">
+                    <DataAnnotationsValidator />
+                    <div class="w-100 form-floating mb-3">
+                        <InputText @bind-Value="Input.Code" class="form-control" autocomplete="off" placeholder="Please enter the code." />
+                        <label for="code" class="control-label form-label">Verification Code</label>
+                        <ValidationMessage For="() => Input.Code" class="text-danger" />
+                        <DxButton Text="Verify" CssClass="w-100"
+                                  SizeMode="SizeMode.Large"
+                                  SubmitFormOnClick=true
+                                  RenderStyle="ButtonRenderStyle.Primary" />
                     </div>
-                </div>
+                    <ValidationSummary class="text-danger" role="alert" />
+                </EditForm>
+            </div>
+        </div>
     </div>
 }
 
@@ -86,7 +86,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-
         if (user is not null) await LoadSharedKeyAndQrCodeUriAsync(user);
     }
 

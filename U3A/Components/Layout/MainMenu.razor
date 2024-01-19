@@ -185,7 +185,8 @@
                                                 <input type="hidden" name="ReturnUrl" value="@currentUrl" />
                                                 <DxButton Text="Logout"
                                                           SubmitFormOnClick=true
-                                                          CssClass="h6 logout-button" IconCssClass="bi bi-door-open" />
+                                                          SizeMode="SizeMode.Medium"
+                                                          CssClass="logout-button" IconCssClass="bi bi-door-open" />
                                             </form>
                                         </Template>
                                     </DxMenuItem>
@@ -193,11 +194,12 @@
                                                 Click="@(() => OnChangeCredential("Email"))" />
                                     <DxMenuItem Text="Change Your Password" IconCssClass="bi bi-shield"
                                                 Click="@(() => OnChangeCredential("ChangePassword"))" />
-                                    <DxMenuItem Text="Enable 2FA" IconCssClass="bi bi-shield"
+                                    <DxMenuItem Text="Two-factor authentication" IconCssClass="bi bi-shield"
                                                 Click="@(() => OnChangeCredential("TwoFactorAuthentication"))" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem IconCssClass="bi bi-house" NavigateUrl="./" Visible="@(!IsOnHomePage())">
+                            <DxMenuItem IconCssClass="bi bi-house" NavigateUrl="./"
+                                        Position="@((isVertical) ? ItemPosition.Start : ItemPosition.End )" Visible="@(!IsOnHomePage())">
                                 <TextTemplate>
                                     @((isVertical) ? "Home" : "")
                                 </TextTemplate>
@@ -215,7 +217,7 @@
 }
 <style>
     .logout-button {
-        width: 15rem;
+        width: 15rem !important;
     }
     .sidebar {
         height: 100% !important;
