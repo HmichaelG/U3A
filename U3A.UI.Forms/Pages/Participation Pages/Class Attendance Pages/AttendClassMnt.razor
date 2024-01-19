@@ -85,7 +85,10 @@ else
             }
             else
             {
-                <DxFormLayoutGroup Caption="Attendance Details">
+                <DxFormLayoutGroup Caption="Attendance Details"
+                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
+                    Expanded="true"
+                    ExpandedChanged="() => StateHasChanged()">
                     <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="12">
                         <DxComboBox Data="@terms" NullText="Select the Term required..."
                             AllowUserInput=false
@@ -477,7 +480,7 @@ else
                 NavMan.NavigateTo("/");
             }
         }
-        var offset = (IsLargerLayout()) ? 0.02 : 0.4;
+        var offset = (IsLargerLayout()) ? 0.05 : 0.4;
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
         if (Convert(newHeight) > Convert(gridHeight)) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
     }

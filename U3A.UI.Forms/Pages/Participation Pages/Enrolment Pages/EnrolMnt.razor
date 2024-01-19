@@ -60,7 +60,10 @@ else
 
         <DxFormLayout>
             <div class="col col-12 col-md-9 p-2">
-                <DxFormLayoutGroup Caption="Enrolment Details">
+                <DxFormLayoutGroup Caption="Enrolment Details" 
+                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End" 
+                    ExpandedChanged="@(() => StateHasChanged())"
+                    Expanded="true" >
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                         <DxComboBox Data="@terms" NullText="Select the Term required..."
                                     AllowUserInput=false
@@ -612,6 +615,7 @@ else
 
     void ShowEnrolledTypeChanged(int Value)
     {
+        ShowEnrolmentType = Value;
         switch (Value)
         {
             case 1:
