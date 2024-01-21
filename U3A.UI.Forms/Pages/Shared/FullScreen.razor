@@ -1,0 +1,59 @@
+﻿@inject IJSRuntime js
+
+<div id="fullscreen-element" class="d-flex calculate-height">
+    @ContentTemplate
+    <DxButton Click="@OnClick"
+              CssClass="flex-grow-1"
+              IconCssClass="bi bi-arrows-fullscreen"
+              RenderStyle="ButtonRenderStyle.Secondary" />
+</div>
+
+<style>
+    .fullscreen {
+        width: 100%;
+        top: 0px;
+        left: 0px;
+        position: fixed;
+        background-color: var(--dxbl-btn-color);
+    }
+
+    .calculate-height {
+        height: @height
+    }
+
+</style>
+
+@code {
+    [Parameter]
+    public RenderFragment ContentTemplate { get; set; } = default;
+
+    string height = "100px";
+    bool isFullscreen = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await FitContents();
+        }
+    }
+
+    async Task OnClick()
+    {
+        await js.InvokeVoidAsync("toggleFullscreen");
+        isFullscreen = !isFullscreen;
+        if (isFullscreen)
+        {
+            height = "100vh";
+        }
+        else { await FitContents(); }
+        StateHasChanged();
+    }
+
+    async Task FitContents()
+    {
+        var newHeight = await Window.FitToRemainingHeight(js, "fullscreen-element", height);
+        if (newHeight != height) { height = newHeight; InvokeAsync(StateHasChanged); }
+    }
+}

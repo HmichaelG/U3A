@@ -6,10 +6,12 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <div class="row  align-content-start">
         <ContextHelpTitle Title="Venues" HelpTopic="add_edit-venues.html"></ContextHelpTitle>
@@ -26,89 +28,90 @@ else {
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <DxGrid Data="@Venues" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-            ShowFilterRow="false"
-            ShowAllRows="true"
-            KeyFieldName="ID"
-            ValidationEnabled="true"
-            EditMode="GridEditMode.PopupEditForm"
-            EditModelSaving="Grid_EditModelSaving"
-            SelectedDataItemsChanged="Grid_SelectedDataItemsChanged"
-            CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText">
-        <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridCommandColumnEx @ref="GridCommandColumn" Width="60px" EditButtonVisible="true" DeleteButtonVisible="false" />
-            <DxGridDataColumn Width="6rem" Caption="Discontinued" FieldName="Discontinued" />
-            <DxGridDataColumn Caption="Name" FieldName="Name" />
-            <DxGridDataColumn Caption="Address" FieldName="Address" />
-            <DxGridDataColumn Caption="Contact" FieldName="Coordinator" />
-            <DxGridDataColumn Caption="Email" FieldName="Email" />
-            <DxGridDataColumn Caption="Phone" FieldName="Phone" />
-        </Columns>
-        <TotalSummary>
-            <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom" FieldName="Discontinued" />
-        </TotalSummary>
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@Venues" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    EditMode="GridEditMode.PopupEditForm"
+                    EditModelSaving="Grid_EditModelSaving"
+                    SelectedDataItemsChanged="Grid_SelectedDataItemsChanged"
+                    CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridCommandColumnEx @ref="GridCommandColumn" Width="60px" EditButtonVisible="true" DeleteButtonVisible="false" />
+                    <DxGridDataColumn Width="6rem" Caption="Discontinued" FieldName="Discontinued" />
+                    <DxGridDataColumn Caption="Name" FieldName="Name" />
+                    <DxGridDataColumn Caption="Address" FieldName="Address" />
+                    <DxGridDataColumn Caption="Contact" FieldName="Coordinator" />
+                    <DxGridDataColumn Caption="Email" FieldName="Email" />
+                    <DxGridDataColumn Caption="Phone" FieldName="Phone" />
+                </Columns>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom" FieldName="Discontinued" />
+                </TotalSummary>
 
-        <EditFormTemplate Context="EditFormContext">
-            @{
-                var editItem = (Venue)EditFormContext.EditModel;
-            }
-            <DxFormLayout>
-                <DxFormLayoutItem ColSpanMd="12">
-                    <ValidationSummary />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Venue Name" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@editItem.Name" InputId="Venue-Name" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Venue Address" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@editItem.Address" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Can Map Address" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@editItem.CanMapAddress" />
-                </DxFormLayoutItem>
-                <DxFormLayoutGroup Caption="Contact Details">
-                    <DxFormLayoutItem Caption="Name" ColSpanMd="12">
-                        <DxTextBox @bind-Text="@editItem.Coordinator" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                        <DxTextBox @bind-Text="@editItem.Email" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
-                        <DxTextBox @bind-Text="@editItem.Phone" />
-                    </DxFormLayoutItem>
-                </DxFormLayoutGroup>
-                <DxFormLayoutGroup Caption="Access">
-                    <DxFormLayoutItem Caption="Key Code" ColSpanMd="12">
-                        <DxTextBox @bind-Text="@editItem.KeyCode" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Details" ColSpanMd="12">
-                        <DxTextBox @bind-Text="@editItem.AccessDetail" />
-                    </DxFormLayoutItem>
-                </DxFormLayoutGroup>
-                <DxFormLayoutItem Caption="Equipment Available" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                    <DxMemo @bind-Text="@editItem.Equipment" Rows="3" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Comment" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                    <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Discontinued">
-                    <DxCheckBox @bind-Checked="@editItem.Discontinued" />
-                </DxFormLayoutItem>
-            </DxFormLayout>
-        </EditFormTemplate>
-    </DxGrid>
+                <EditFormTemplate Context="EditFormContext">
+                    @{
+                        var editItem = (Venue)EditFormContext.EditModel;
+                    }
+                    <DxFormLayout>
+                        <DxFormLayoutItem ColSpanMd="12">
+                            <ValidationSummary />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Venue Name" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@editItem.Name" InputId="Venue-Name" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Venue Address" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@editItem.Address" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Can Map Address" ColSpanMd="12">
+                            <DxCheckBox @bind-Checked="@editItem.CanMapAddress" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutGroup Caption="Contact Details">
+                            <DxFormLayoutItem Caption="Name" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@editItem.Coordinator" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Email" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@editItem.Email" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@editItem.Phone" />
+                            </DxFormLayoutItem>
+                        </DxFormLayoutGroup>
+                        <DxFormLayoutGroup Caption="Access">
+                            <DxFormLayoutItem Caption="Key Code" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@editItem.KeyCode" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Details" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@editItem.AccessDetail" />
+                            </DxFormLayoutItem>
+                        </DxFormLayoutGroup>
+                        <DxFormLayoutItem Caption="Equipment Available" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                            <DxMemo @bind-Text="@editItem.Equipment" Rows="3" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Comment" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Discontinued">
+                            <DxCheckBox @bind-Checked="@editItem.Discontinued" />
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                </EditFormTemplate>
+            </DxGrid>
+
+        </ContentTemplate>
+    </FullScreen>
 
 
 }
 
 <style>
-    .grid-height {
-        height: @gridHeight;
-    }
-
     .removeWrapping {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -132,58 +135,62 @@ else {
     internal string ErrorMessage;
     U3ADbContext dbc { get; set; }
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         await RefreshData();
         IsReady = true;
     }
 
-    async Task RefreshData() {
+    async Task RefreshData()
+    {
         Venues = await BusinessRule.EditableVenuesAsync(dbc);
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-
     bool isBusy;
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
         if (isBusy) return;
         isBusy = true;
-        try {
+        try
+        {
             await SaveRecord(e);
         }
-        finally {
+        finally
+        {
             isBusy = false;
         }
     }
 
-    async Task SaveRecord(GridEditModelSavingEventArgs e) {
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
         var editModel = (Venue)e.EditModel;
         if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
         // Re-query a data item from the store.
         var dataItem = e.IsNew ? new Venue() : dbc.Venue.Find(editModel.ID);
         // Assign changes from the edit model to the data item.
-        if (dataItem != null) {
+        if (dataItem != null)
+        {
             editModel.CopyTo(dataItem);
-            try {
+            try
+            {
                 // Post changes to the database.
                 if (e.IsNew) await dbc.AddAsync(dataItem);
                 await dbc.SaveChangesAsync();
                 // update the Grid.
-                if (e.IsNew) {
+                if (e.IsNew)
+                {
                     Venues.Insert(0, dataItem);
                 }
-                else {
+                else
+                {
                     int idx = Venues.FindIndex(x => x.ID == dataItem.ID);
                     Venues[idx] = dataItem;
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 ErrorHeader = "Save to database error";
                 ErrorMessage = Helpers.GetErrorMessage(ex);
                 await ErrorPopup.ShowPopupAsync();
@@ -193,10 +200,12 @@ else {
         }
     }
 
-    async Task<bool> IsDataOk(Venue editItem) {
+    async Task<bool> IsDataOk(Venue editItem)
+    {
         bool result = true;
         var dup = await BusinessRule.DuplicateMarkUpAsync(dbc, editItem);
-        if (!string.IsNullOrWhiteSpace(dup)) {
+        if (!string.IsNullOrWhiteSpace(dup))
+        {
             await messageBox.ShowOkOnlyAsync("Duplicate Record", dup);
             result = false;
         }
@@ -204,18 +213,22 @@ else {
     }
 
 
-    async void Grid_CustomizeSummaryDisplayText(GridCustomizeSummaryDisplayTextEventArgs e) {
-        if (e.Item.Name == "Custom") {
+    async void Grid_CustomizeSummaryDisplayText(GridCustomizeSummaryDisplayTextEventArgs e)
+    {
+        if (e.Item.Name == "Custom")
+        {
             int count = Venues is null ? 0 : Venues.Where(x => !x.Discontinued).Count();
             e.DisplayText = $"Active: {count}";
         }
     }
 
-    void Grid_SelectedDataItemsChanged() {
+    void Grid_SelectedDataItemsChanged()
+    {
         mainGrid.RefreshSummary();
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
