@@ -3,14 +3,6 @@ function toggleFullscreen() {
     var e = document.getElementById('fullscreen-element');
     if (e != null) { e.classList.toggle('fullscreen'); }
 }
-function isFullscreen() {
-    var e = document.getElementById('fullscreen-element');
-    if (e != null && e.classList.contains('fullscreen')) { return true; } else { return false; }
-}
-function isFullscreenAvailable() {
-    var e = document.getElementById('fullscreen-element');
-    if (e != null) { return true; } else { return false; }
-}
 
 function closeSideBarMenu() {
     document.getElementById("sidebar").classList.remove("expanded");
