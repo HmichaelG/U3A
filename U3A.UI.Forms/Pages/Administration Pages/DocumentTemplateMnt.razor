@@ -28,7 +28,9 @@ else {
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <DxGrid Data="@DocumentTemplates" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+    <FullScreen>
+    <ContentTemplate>
+    <DxGrid Data="@DocumentTemplates" @ref=@mainGrid CssClass="grid-height"
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
             ShowFilterRow="false"
             ShowAllRows="true"
@@ -104,15 +106,14 @@ else {
             </DxFormLayout>
         </EditFormTemplate>
     </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 }
 
 <style>
     .popup {
         min-width: 65rem;
     }
-
-    .grid-height {
-        height: @gridHeight;
 </style>
 
 @code {
@@ -129,7 +130,6 @@ else {
 
     DxGridCommandColumnEx? GridCommandColumn;
     MessageBox? messageBox;
-    string gridHeight = "100px";
 
     IGrid? mainGrid { get; set; }
     DxRichEdit? richEdit;
@@ -154,12 +154,6 @@ else {
         docx2Html = new DocumentServer(dbc);
         IsReady = true;
         await base.OnInitializedAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task GetDocumentTemplatesAsync() {

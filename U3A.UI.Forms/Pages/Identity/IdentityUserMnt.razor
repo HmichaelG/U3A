@@ -60,81 +60,78 @@ else
             <DxTabPage Text="Email Not Confirmed" />
         </DxTabs>
 
-        <DxGrid id="mainGrid" Data="@AppUsers" @ref="mainGrid" CssClass="grid-height"
-                UnboundColumnData="Grid_CustomUnboundColumnData"
-        @bind-SelectedDataItems="@SelectedDataItems"
-                ShowFilterRow="false"
-                ShowAllRows="false"
-                KeyFieldName="Id"
-                PageSize="30"
-                PageSizeSelectorVisible="true"
-                PageSizeSelectorItems="@(new int[] {10,15, 20,30, 40,60,80, 100, 200,400 })"
-                PageSizeSelectorAllRowsItemVisible="true"
-                PagerSwitchToInputBoxButtonCount="10"
-                PagerVisibleNumericButtonCount="10"
-                PagerVisible="true"
-                PopupEditFormHeaderText="Edit User Details"
-                EditMode="GridEditMode.PopupEditForm"
-                EditModelSaving="Grid_EditModelSaving"
-                DataItemDeleting="Grid_DataItemDeleting"
-                CustomizeEditModel="Grid_CustomizeEditModel"
-                ValidationEnabled="true">
-            <ToolbarTemplate>
-                <GridToolbar LinkedGrid=@mainGrid />
-            </ToolbarTemplate>
-            <Columns>
-                <DxGridSelectionColumn Width="2rem" />
-                <DxGridCommandColumnEx Width="8rem" DeleteButtonVisible=true EditButtonVisible=true NewButtonVisible="false" />
-                <DxGridDataColumn Width="15rem" Caption="Email" FieldName="Email" />
-                <DxGridDataColumn Width="15rem" FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
-                <DxGridDataColumn Width="9em" Caption="Email Confirmed?" FieldName="EmailConfirmed" />
-                <DxGridDataColumn Width="7rem" Visible=false
-                                  Caption="Lockout Enabled?" FieldName="User.LockoutEnabled" />
-                <DxGridDataColumn Width="6rem" Caption="Lockout End" Visible=false DisplayFormat="d" FieldName="LockoutEnd" />
-                <DxGridDataColumn Width="5rem" Caption="Login Failures" Visible=false DisplayFormat="n0" FieldName="AccessFailedCount" />
-                <DxGridDataColumn FieldName="Roles" UnboundType="GridUnboundColumnType.String" />
-            </Columns>
-            <EditFormTemplate Context="EditFormContext">
-                @{
-                    var editItem = (ApplicationUser)EditFormContext.EditModel;
-                }
-                <DxFormLayout>
-                    <DxFormLayoutItem>
-                        <ValidationSummary />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="User Roles" ColSpanMd="12">
-                        <DxTagBox Data="@Roles" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                        @bind-Values="@SelectedRoles">
-                        </DxTagBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Is Email Confirmed?" ColSpanMd="12">
-                        <DxCheckBox @bind-Checked=editItem.EmailConfirmed Enabled=!editItem.EmailConfirmed />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Password" ColSpanMd="12">
-                        <DxTextBox @bind-Text=editItem.Password NullText="leave blank if unchanged" Password=true />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption=" Confirm Password" ColSpanMd="12">
-                        <DxTextBox @bind-Text=editItem.ConfirmPassword Password=true />
-                    </DxFormLayoutItem>
-                </DxFormLayout>
-            </EditFormTemplate>
+        <FullScreen>
+            <ContentTemplate>
+                <DxGrid Data="@AppUsers" @ref="mainGrid" CssClass="grid-height"
+                        UnboundColumnData="Grid_CustomUnboundColumnData"
+                        @bind-SelectedDataItems="@SelectedDataItems"
+                        ShowFilterRow="false"
+                        ShowAllRows="false"
+                        KeyFieldName="Id"
+                        PageSize="30"
+                        PageSizeSelectorVisible="true"
+                        PageSizeSelectorItems="@(new int[] {10,15, 20,30, 40,60,80, 100, 200,400 })"
+                        PageSizeSelectorAllRowsItemVisible="true"
+                        PagerSwitchToInputBoxButtonCount="10"
+                        PagerVisibleNumericButtonCount="10"
+                        PagerVisible="true"
+                        PopupEditFormHeaderText="Edit User Details"
+                        EditMode="GridEditMode.PopupEditForm"
+                        EditModelSaving="Grid_EditModelSaving"
+                        DataItemDeleting="Grid_DataItemDeleting"
+                        CustomizeEditModel="Grid_CustomizeEditModel"
+                        ValidationEnabled="true">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid />
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridSelectionColumn Width="2rem" />
+                        <DxGridCommandColumnEx Width="8rem" DeleteButtonVisible=true EditButtonVisible=true NewButtonVisible="false" />
+                        <DxGridDataColumn Width="15rem" Caption="Email" FieldName="Email" />
+                        <DxGridDataColumn Width="15rem" FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
+                        <DxGridDataColumn Width="9em" Caption="Email Confirmed?" FieldName="EmailConfirmed" />
+                        <DxGridDataColumn Width="7rem" Visible=false
+                                          Caption="Lockout Enabled?" FieldName="User.LockoutEnabled" />
+                        <DxGridDataColumn Width="6rem" Caption="Lockout End" Visible=false DisplayFormat="d" FieldName="LockoutEnd" />
+                        <DxGridDataColumn Width="5rem" Caption="Login Failures" Visible=false DisplayFormat="n0" FieldName="AccessFailedCount" />
+                        <DxGridDataColumn FieldName="Roles" UnboundType="GridUnboundColumnType.String" />
+                    </Columns>
+                    <EditFormTemplate Context="EditFormContext">
+                        @{
+                            var editItem = (ApplicationUser)EditFormContext.EditModel;
+                        }
+                        <DxFormLayout>
+                            <DxFormLayoutItem>
+                                <ValidationSummary />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="User Roles" ColSpanMd="12">
+                                <DxTagBox Data="@Roles" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                          @bind-Values="@SelectedRoles">
+                                </DxTagBox>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Is Email Confirmed?" ColSpanMd="12">
+                                <DxCheckBox @bind-Checked=editItem.EmailConfirmed Enabled=!editItem.EmailConfirmed />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Password" ColSpanMd="12">
+                                <DxTextBox @bind-Text=editItem.Password NullText="leave blank if unchanged" Password=true />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption=" Confirm Password" ColSpanMd="12">
+                                <DxTextBox @bind-Text=editItem.ConfirmPassword Password=true />
+                            </DxFormLayoutItem>
+                        </DxFormLayout>
+                    </EditFormTemplate>
 
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Total" FieldName="Email" />
-            </TotalSummary>
+                    <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Total" FieldName="Email" />
+                    </TotalSummary>
 
-        </DxGrid>
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
         @quickMessage
 
     </div>   @*Container*@
 }
-
-<style>
-    .grid-height {
-        height: @gridHeight;
-    }
-
-</style>
 
 @code {
     bool IsReady;
@@ -152,7 +149,6 @@ else
     U3ADbContext dbc { get; set; }
     Progress? ProgressBar;
     CreateDomainLogin? createDomainLogin;
-    string gridHeight = "100px";
     AuthenticationState? authenticationState;
 
     MessageBox? messageBox { get; set; }
@@ -183,13 +179,6 @@ else
         }
         mainGrid?.ClearSelection();
         mainGrid?.EndUpdate();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "mainGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
@@ -342,7 +331,7 @@ else
         if (!e.IsNew)
         {
             var appUser = (ApplicationUser)e.DataItem;
-            appUser.Password = appUser.ConfirmPassword = string.Empty;  
+            appUser.Password = appUser.ConfirmPassword = string.Empty;
             foreach (var role in Roles)
             {
                 if (await UserManager.IsInRoleAsync(appUser, role.Name))
