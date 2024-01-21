@@ -37,6 +37,8 @@ else {
 
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
+    <FullScreen>
+    <ContentTemplate>
         <DxGrid Data="@PublicHolidays" @ref=@mainGrid CssClass="grid-height" id="myGrid"
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
             ShowFilterRow="false"
@@ -75,13 +77,10 @@ else {
                 </DxFormLayout>
             </EditFormTemplate>
         </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
 }
-<style>
-    .grid-height {
-        height: @gridHeight;
-    }
-</style>
 
 
 @code {
@@ -96,7 +95,6 @@ else {
     internal string ErrorHeader;
     internal string ErrorMessage;
     U3ADbContext dbc { get; set; }
-    string gridHeight = "100px";
 
     string SpinnerVisibility = "hidden";
     string ProcessButtonText = "Rebuild The List";
@@ -110,13 +108,6 @@ else {
 
     async Task GetPublicHolidaysAsync() {
         PublicHolidays = await dbc.PublicHoliday.OrderBy(x => x.Date).ToListAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     bool isBusy;

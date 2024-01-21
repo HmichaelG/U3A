@@ -58,7 +58,9 @@ else {
         </div>
         <br />
     }
-    <div class="schedule-height" id="mySchedule">
+    <FullScreen>
+    <ContentTemplate>
+    <div class="schedule grid-height">
         <DxScheduler StartDate="@StartDate"
                  AllowCreateAppointment="false"
                  AllowDeleteAppointment="false"
@@ -100,12 +102,13 @@ else {
             </AppointmentTooltipTemplate>
         </DxScheduler>
     </div>
+        </ContentTemplate>
+    </FullScreen>
 }
 
 <style>
-    .schedule-height {
+    .schedule {
         overflow: auto;
-        height: @scheduleHeight;
     }
 
 </style>
@@ -130,7 +133,6 @@ else {
 
     string SpinnerVisibility = "hidden";
     string ProcessButtonText = "Process";
-    string scheduleHeight;
 
     DxSchedulerTimeSpanRange VisibleTime = new DxSchedulerTimeSpanRange(TimeSpan.FromHours(6), TimeSpan.FromHours(22));
 
@@ -159,8 +161,6 @@ else {
             localTime = new LocalTime(js);
             StartDate = (await localTime.GetLocalTimeAsync()).Date.AddHours(6);
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "mySchedule", scheduleHeight,0.05);
-        if (newHeight != scheduleHeight) { scheduleHeight = newHeight; InvokeAsync(StateHasChanged); }
     }
 
     async void OnStartDateChanged(DateTime newStartDate) => StartDate = (await localTime.GetLocalTimeAsync(newStartDate)).Date;

@@ -42,57 +42,61 @@ else
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <DxGrid Data="@Courses" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-            AutoCollapseDetailRow="true"
-            DetailRowDisplayMode="GridDetailRowDisplayMode.Auto"
-            KeyFieldName="ID"
-            ValidationEnabled="true"
-            EditStart="Grid_EditStart"
-            EditMode="GridEditMode.PopupEditForm"
-            EditModelSaving="Grid_EditModelSaving"
-            EditCanceling="Grid_EditCanceling"
-            PopupEditFormCssClass="popup-width"
-            PopupEditFormHeaderText="Add/Edit Course"
-            UnboundColumnData="Grid_CustomUnboundColumnData"
-            CustomizeEditModel="Grid_CustomizeEditModel"
-            DataItemDeleting="Grid_DataItemDeleting">
-        <ToolbarTemplate>
-            <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid IsMasterDetail=true />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridCommandColumnEx @ref="GridCommandColumn"
-                                   NewButtonVisible="true"
-                                   EditButtonVisible="true"
-                                   DeleteButtonVisible="true" />
-            <DxGridDataColumn Caption="Year" FieldName="Year" Width="3rem" DisplayFormat="####" />
-            <DxGridDataColumn Caption="ID" FieldName="ConversionID" Width="3rem" DisplayFormat="#####" />
-            <DxGridDataColumn Caption="Name" FieldName="Name" Width="20rem" />
-            <DxGridDataColumn Caption="Type" FieldName="CourseType.Name" />
-            <DxGridDataColumn Caption="Enrol In" FieldName="CourseParticipationType.ShortName" />
-            <DxGridDataColumn Caption="Addn-Info?" FieldName="Weblink" UnboundType="GridUnboundColumnType.Boolean" />
-            <DxGridDataColumn FieldName="SendReportsTo" UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn FieldName="ContactOrder" UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Caption="Course Fee" FieldName="CourseFeePerYear" DisplayFormat="{0:c}" />
-            <DxGridDataColumn Caption="Fee / Term" FieldName="CourseFeePerTerm" DisplayFormat="{0:c}" />
-            <DxGridDataColumn Caption="Duration" FieldName="Duration" DisplayFormat="{0:n2}" />
-            <DxGridDataColumn Caption="Required Participants" FieldName="RequiredStudents" DisplayFormat="{0:n0}" />
-            <DxGridDataColumn Caption="Maximum Allowed" FieldName="MaximumStudents" DisplayFormat="{0:n0}" />
-            <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" />
-        </Columns>
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@Courses" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    AutoCollapseDetailRow="true"
+                    DetailRowDisplayMode="GridDetailRowDisplayMode.Auto"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    EditStart="Grid_EditStart"
+                    EditMode="GridEditMode.PopupEditForm"
+                    EditModelSaving="Grid_EditModelSaving"
+                    EditCanceling="Grid_EditCanceling"
+                    PopupEditFormCssClass="popup-width"
+                    PopupEditFormHeaderText="Add/Edit Course"
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    CustomizeEditModel="Grid_CustomizeEditModel"
+                    DataItemDeleting="Grid_DataItemDeleting">
+                <ToolbarTemplate>
+                    <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid IsMasterDetail=true />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridCommandColumnEx @ref="GridCommandColumn"
+                                           NewButtonVisible="true"
+                                           EditButtonVisible="true"
+                                           DeleteButtonVisible="true" />
+                    <DxGridDataColumn Caption="Year" FieldName="Year" Width="3rem" DisplayFormat="####" />
+                    <DxGridDataColumn Caption="ID" FieldName="ConversionID" Width="3rem" DisplayFormat="#####" />
+                    <DxGridDataColumn Caption="Name" FieldName="Name" Width="20rem" />
+                    <DxGridDataColumn Caption="Type" FieldName="CourseType.Name" />
+                    <DxGridDataColumn Caption="Enrol In" FieldName="CourseParticipationType.ShortName" />
+                    <DxGridDataColumn Caption="Addn-Info?" FieldName="Weblink" UnboundType="GridUnboundColumnType.Boolean" />
+                    <DxGridDataColumn FieldName="SendReportsTo" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn FieldName="ContactOrder" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Caption="Course Fee" FieldName="CourseFeePerYear" DisplayFormat="{0:c}" />
+                    <DxGridDataColumn Caption="Fee / Term" FieldName="CourseFeePerTerm" DisplayFormat="{0:c}" />
+                    <DxGridDataColumn Caption="Duration" FieldName="Duration" DisplayFormat="{0:n2}" />
+                    <DxGridDataColumn Caption="Required Participants" FieldName="RequiredStudents" DisplayFormat="{0:n0}" />
+                    <DxGridDataColumn Caption="Maximum Allowed" FieldName="MaximumStudents" DisplayFormat="{0:n0}" />
+                    <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" />
+                </Columns>
 
-        <DetailRowTemplate>
-            <FrmClassDetailPopup Course="(Course)context.DataItem" AllowEdit="false" />
-        </DetailRowTemplate>
+                <DetailRowTemplate>
+                    <FrmClassDetailPopup Course="(Course)context.DataItem" AllowEdit="false" />
+                </DetailRowTemplate>
 
-        <EditFormTemplate Context="EditFormContext">
-            <CourseDetail @ref="@courseDetail" AnyEnrolmentsInYear="@anyEnrolmentsInYear"
-                          Settings=@settings
-                          Course="(Course)EditFormContext.EditModel"
-                          Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
-                          Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
-                          CourseParticipationTypes="@CourseParticipationTypes" />
-        </EditFormTemplate>
-    </DxGrid>
+                <EditFormTemplate Context="EditFormContext">
+                    <CourseDetail @ref="@courseDetail" AnyEnrolmentsInYear="@anyEnrolmentsInYear"
+                                  Settings=@settings
+                                  Course="(Course)EditFormContext.EditModel"
+                                  Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
+                                  Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
+                                  CourseParticipationTypes="@CourseParticipationTypes" />
+                </EditFormTemplate>
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
     <DxWindow @ref=@previewWindow Width="60vw"
               Visible=false
@@ -133,11 +137,6 @@ else
     .popup-width {
         min-width: 55rem;
     }
-
-    .grid-height {
-        height: @gridHeight;
-    }
-
 </style>
 
 
@@ -160,7 +159,6 @@ else
     Term? previewTerm;
     int Year;
     bool anyEnrolmentsInYear;
-    string gridHeight = "1000px";
     DxWindow? previewWindow;
 
     List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
@@ -219,8 +217,6 @@ else
     {
         // wire up the toolbar
         base.OnAfterRender(firstRender);
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         if (!firstRender)
         {
             if (currentTerm == null)

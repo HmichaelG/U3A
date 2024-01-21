@@ -7,10 +7,12 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <div class="row">
         <ContextHelpTitle Title="Course Types" HelpTopic="add_edit-course-types.html"></ContextHelpTitle>
@@ -27,51 +29,50 @@ else {
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <DxGrid Data="@CourseTypes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-        ShowFilterRow="false"
-        ShowAllRows="true"
-        KeyFieldName="ID"
-        ValidationEnabled="true"
-        SelectionMode="GridSelectionMode.Multiple"
-        EditMode="GridEditMode.PopupEditForm"
-        EditModelSaving="Grid_EditModelSaving">
-        <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridCommandColumnEx @ref="GridCommandColumn" Width="60px" EditButtonVisible="true" DeleteButtonVisible="false" />
-            <DxGridDataColumn Width="6rem" Caption="Discontinued" FieldName="Discontinued" />
-            <DxGridDataColumn Width="25rem" Caption="Name" FieldName="Name" />
-            <DxGridDataColumn Caption="Comment" FieldName="Comment" />
-        </Columns>
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@CourseTypes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    SelectionMode="GridSelectionMode.Multiple"
+                    EditMode="GridEditMode.PopupEditForm"
+                    EditModelSaving="Grid_EditModelSaving">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridCommandColumnEx @ref="GridCommandColumn" Width="60px" EditButtonVisible="true" DeleteButtonVisible="false" />
+                    <DxGridDataColumn Width="6rem" Caption="Discontinued" FieldName="Discontinued" />
+                    <DxGridDataColumn Width="25rem" Caption="Name" FieldName="Name" />
+                    <DxGridDataColumn Caption="Comment" FieldName="Comment" />
+                </Columns>
 
-        <EditFormTemplate Context="EditFormContext">
-            @{
-                var editItem = (CourseType)EditFormContext.EditModel;
-            }
-            <DxFormLayout>
-                <DxFormLayoutItem ColSpanMd="12">
-                    <ValidationSummary />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@editItem.Name" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
-                    <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Discontinued">
-                    <DxCheckBox @bind-Checked="@editItem.Discontinued" />
-                </DxFormLayoutItem>
-            </DxFormLayout>
-        </EditFormTemplate>
-    </DxGrid>
+                <EditFormTemplate Context="EditFormContext">
+                    @{
+                        var editItem = (CourseType)EditFormContext.EditModel;
+                    }
+                    <DxFormLayout>
+                        <DxFormLayoutItem ColSpanMd="12">
+                            <ValidationSummary />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@editItem.Name" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
+                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Discontinued">
+                            <DxCheckBox @bind-Checked="@editItem.Discontinued" />
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                </EditFormTemplate>
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 }
-<style>
-    .grid-height {
-        height: @gridHeight;
-    }
-</style>
 
 @code {
     bool IsReady;
@@ -85,56 +86,58 @@ else {
     internal string ErrorHeader;
     internal string ErrorMessage;
     U3ADbContext dbc { get; set; }
-    string gridHeight = "100px";
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         CourseTypes = await BusinessRule.EditableCourseTypesAsync(dbc);
         IsReady = true;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
     bool isBusy;
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
         if (isBusy) return;
         isBusy = true;
-        try {
+        try
+        {
             await SaveRecord(e);
         }
-        finally {
+        finally
+        {
             isBusy = false;
         }
     }
 
-    async Task SaveRecord(GridEditModelSavingEventArgs e) {
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
         var editModel = (CourseType)e.EditModel;
         if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
         // Re-query a data item from the store.
         var dataItem = e.IsNew ? new CourseType() : dbc.CourseType.Find(editModel.ID);
         // Assign changes from the edit model to the data item.
-        if (dataItem != null) {
+        if (dataItem != null)
+        {
             editModel.CopyTo(dataItem);
-            try {
+            try
+            {
                 // Post changes to the database.
                 if (e.IsNew) await dbc.AddAsync(dataItem);
                 await dbc.SaveChangesAsync();
                 // update the Grid.
-                if (e.IsNew) {
+                if (e.IsNew)
+                {
                     CourseTypes.Insert(0, dataItem);
                 }
-                else {
+                else
+                {
                     int idx = CourseTypes.FindIndex(x => x.ID == dataItem.ID);
                     CourseTypes[idx] = dataItem;
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 ErrorHeader = "Save to database error";
                 ErrorMessage = Helpers.GetErrorMessage(ex);
                 await ErrorPopup.ShowPopupAsync();
@@ -144,17 +147,20 @@ else {
         }
     }
 
-    async Task<bool> IsDataOk(CourseType editItem) {
+    async Task<bool> IsDataOk(CourseType editItem)
+    {
         bool result = true;
         var dup = await BusinessRule.DuplicateMarkUpAsync(dbc, editItem);
-        if (!string.IsNullOrWhiteSpace(dup)) {
+        if (!string.IsNullOrWhiteSpace(dup))
+        {
             await messageBox.ShowOkOnlyAsync("Duplicate Record", dup);
             result = false;
         }
         return result;
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
