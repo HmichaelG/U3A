@@ -15,20 +15,33 @@
 
 @using DevExpress.Blazor.Reporting
 @using Microsoft.Extensions.DependencyInjection
-<DxFormLayout CssClass="">
+
+
+<DxFormLayout>
     <DxReportViewer @ref="reportViewer"
                     Report="@Report" SizeMode="SizeMode.Small"
                     SinglePagePreview="false"
                     Zoom="1"
                     TabPanelMinWidth="100"
                     TabPanelMaxWidth="200"
-                    RootCssClasses="view-height" />
+                    CssClass="w-100"
+                    RootCssClasses="view-normal" />
 </DxFormLayout>
+
+
 <style>
-    .view-height {
+    .view-normal {
         margin-top: 0.1rem !important;
-        width: 100vw !important;
         height: 98vh !important;
+    }
+
+    .view-fullscreen {
+        z-index: 99999;
+        width: 100vw;
+        top: 30px;
+        left: 0px;
+        position: fixed;
+        background-color: white;
     }
 </style>
 
@@ -40,10 +53,17 @@
     XtraReport? Report { get; set; }
     U3ADbContext dbc { get; set; }
     bool isReady;
+    bool isFullscreen;
 
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
+    }
+
+    async Task OnClick()
+    {
+        isFullscreen = !isFullscreen;
+        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

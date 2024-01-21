@@ -26,7 +26,9 @@ else {
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <DxGrid Data="@CommitteePositions" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+    <FullScreen>
+    <ContentTemplate>
+    <DxGrid Data="@CommitteePositions" @ref=@mainGrid CssClass="grid-height"
         ColumnResizeMode="GridColumnResizeMode.Disabled"
         AllowSelectRowByClick="true"
         ShowFilterRow="false"
@@ -69,6 +71,8 @@ else {
             </DxFormLayout>
         </EditFormTemplate>
     </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
 
 }
@@ -76,11 +80,6 @@ else {
     .popup-width {
         min-width: 40rem;
     }
-
-    .grid-height {
-        height: @gridHeight;
-    }
-
 </style>
 
 
@@ -93,7 +92,6 @@ else {
     List<Committee> CommitteePositions { get; set; }
 
     MessageBox messageBox;
-    string gridHeight = "100px";
 
     internal IGrid? mainGrid { get; set; }
     internal ErrorPopup? ErrorPopup { get; set; }
@@ -118,13 +116,6 @@ else {
                                 .Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
         }
         CommitteePositions = await dbc.Committee.ToListAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     bool isBusy;

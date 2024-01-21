@@ -64,30 +64,34 @@ else
         </DxFormLayoutGroup>
     </DxFormLayout>
 
-    <DxGrid Data=@messages @ref=@mainGrid
-            CssClass="grid-height" id="myGrid">
-        <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-            <DxGridDataColumn Caption="From" FieldName="From" />
-            <DxGridDataColumn Caption="To" FieldName="To" Visible=@IsSearchByDateRange />
-            <DxGridDataColumn Caption="Subject" FieldName="Subject" />
-            <DxGridDataColumn Caption="Attachments" FieldName="Attachments" />
-            <DxGridDataColumn Caption="Status" FieldName="Status" />
-            <DxGridDataColumn Width="8rem" Caption="Details" FieldName="MessageID" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
-                <CellDisplayTemplate>
-                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
-                              RenderStyle="ButtonRenderStyle.Primary" Text="Details"
-                              Click="() => OnDetailsClick((EmailMessage)context.DataItem)"></DxButton>
-                </CellDisplayTemplate>
-            </DxGridDataColumn>
-        </Columns>
-        <TotalSummary>
-            <DxGridSummaryItem FieldName="Subject" FooterColumnName="Subject" SummaryType="GridSummaryItemType.Count" />
-        </TotalSummary>
-    </DxGrid>
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data=@messages @ref=@mainGrid
+                    CssClass="grid-height">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                    <DxGridDataColumn Caption="From" FieldName="From" />
+                    <DxGridDataColumn Caption="To" FieldName="To" Visible=@IsSearchByDateRange />
+                    <DxGridDataColumn Caption="Subject" FieldName="Subject" />
+                    <DxGridDataColumn Caption="Attachments" FieldName="Attachments" />
+                    <DxGridDataColumn Caption="Status" FieldName="Status" />
+                    <DxGridDataColumn Width="8rem" Caption="Details" FieldName="MessageID" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
+                        <CellDisplayTemplate>
+                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                      RenderStyle="ButtonRenderStyle.Primary" Text="Details"
+                                      Click="() => OnDetailsClick((EmailMessage)context.DataItem)"></DxButton>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+                <TotalSummary>
+                    <DxGridSummaryItem FieldName="Subject" FooterColumnName="Subject" SummaryType="GridSummaryItemType.Count" />
+                </TotalSummary>
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
     <DxWindow @ref=@emailDetailsForm Width="max(35vw, 400px)"
               AllowResize="true"
@@ -124,10 +128,6 @@ else
 
 }
 <style>
-    .grid-height {
-        height: @gridHeight;
-    }
-
     .window-height {
         height: 40vh;
     }
@@ -153,8 +153,6 @@ else
     string emailAddress;
     bool IsSearchByDateRange;
 
-    string gridHeight = "600px";
-
     IGrid? mainGrid { get; set; }
     IGrid? eventGrid { get; set; }
     GridToolbar? Toolbar;
@@ -179,8 +177,6 @@ else
             toDate = await localTime.GetLocalDateAsync();
             fromDate = toDate.AddDays(-6);
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
     }
 

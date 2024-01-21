@@ -29,10 +29,12 @@ else {
     <Progress @ref="@ProgressBar" />
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
+                    <FullScreen>
+                    <ContentTemplate>
 
     <DxGrid Data=@Queue @ref=@bounceGrid
             UnboundColumnData="Grid_CustomUnboundColumnData"
-            CssClass="grid-height" id="myGrid"
+            CssClass="grid-height"
             DataItemDeleting="Grid_DataItemDeleting">
         <ToolbarTemplate>
             <GridToolbar LinkedGrid=@bounceGrid />
@@ -63,21 +65,16 @@ else {
         </Columns>
 
     </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
 }
-<style>
-    .grid-height {
-        height: @gridHeight;
-    }
-</style>
-
 
 @code {
     bool IsReady;
     List<DocumentQueue> Queue { get; set; }
     MessageBox? messageBox;
     string? messageBoxWidth;
-    string gridHeight = "600px";
 
     IGrid? bounceGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }
@@ -104,8 +101,6 @@ else {
             localTime = new(js);
             timezoneOffset = await localTime.GetTimezoneOffsetAsync();
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
     }
 

@@ -29,7 +29,9 @@ else
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <DxGrid Data="@PaymentStatus" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                <FullScreen>
+                    <ContentTemplate>
+    <DxGrid Data="@PaymentStatus" @ref=@mainGrid CssClass="grid-height"
             AutoExpandAllGroupRows="true"
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
             UnboundColumnData="Grid_UnboundColumnData"
@@ -79,12 +81,9 @@ else
             </DxFormLayout>
         </EditFormTemplate>
     </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 }
-<style>
-    .grid-height {
-        height: @gridHeight;
-    }
-</style>
 
 @code {
     bool IsReady;
@@ -99,7 +98,6 @@ else
     internal string ErrorHeader;
     internal string ErrorMessage;
     U3ADbContext dbc { get; set; }
-    string gridHeight = "100px";
     TimeSpan? offset;
 
 
@@ -119,8 +117,6 @@ else
             var localTime = new LocalTime(js);
             offset = await localTime.GetTimezoneOffsetAsync();
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
     }
 

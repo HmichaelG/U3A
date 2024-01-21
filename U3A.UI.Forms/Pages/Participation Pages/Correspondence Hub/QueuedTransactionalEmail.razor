@@ -48,38 +48,37 @@ else
     </DxFormLayout>
 
     <div class="pb-1" />
-    <DxGrid Data="@SendMail" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-            @bind-SelectedDataItems="@SelectedDataItems"
-            UnboundColumnData="Grid_CustomUnboundColumnData"
-            ShowFilterRow="false"
-            ShowAllRows="false"
-            KeyFieldName="ID"
-            ValidationEnabled="true"
-            SelectionMode="GridSelectionMode.Multiple">
-        <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridSelectionColumn Width="2rem" />
-            <DxGridDataColumn Width="10rem" Caption="Email On/After"
-                              UnboundType=GridUnboundColumnType.DateTime
-                              FieldName="CreatedOnLocal"
-                              DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-            <DxGridDataColumn Width="12rem" Caption="Document" FieldName="DocumentName" />
-            <DxGridDataColumn Width="12rem" Caption="Send To" FieldName="Person.FullName" />
-            <DxGridDataColumn Width="6rem" Caption="Send Via" FieldName="Person.Communication" />
-            <DxGridDataColumn Caption="Email" FieldName="Person.Email" />
-            <DxGridDataColumn Caption="Status" FieldName="Status" />
-        </Columns>
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@SendMail" @ref=@mainGrid CssClass="grid-height"
+                    @bind-SelectedDataItems="@SelectedDataItems"
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    ShowFilterRow="false"
+                    ShowAllRows="false"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    SelectionMode="GridSelectionMode.Multiple">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridSelectionColumn Width="2rem" />
+                    <DxGridDataColumn Width="10rem" Caption="Email On/After"
+                                      UnboundType=GridUnboundColumnType.DateTime
+                                      FieldName="CreatedOnLocal"
+                                      DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                    <DxGridDataColumn Width="12rem" Caption="Document" FieldName="DocumentName" />
+                    <DxGridDataColumn Width="12rem" Caption="Send To" FieldName="Person.FullName" />
+                    <DxGridDataColumn Width="6rem" Caption="Send Via" FieldName="Person.Communication" />
+                    <DxGridDataColumn Caption="Email" FieldName="Person.Email" />
+                    <DxGridDataColumn Caption="Status" FieldName="Status" />
+                </Columns>
 
-    </DxGrid>
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
 }
-<style>
-    .grid-height {
-        height: @gridHeight;
-    }
-</style>
 
 
 @code {
@@ -89,7 +88,6 @@ else
     ProFormaReportFactory reportFactory;
     MessageBox? messageBox;
     string? messageBoxWidth;
-    string gridHeight = "600px";
 
     IGrid? mainGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }
@@ -127,8 +125,6 @@ else
             localTime = new LocalTime(js);
             localTimeOffset = await localTime.GetTimezoneOffsetAsync();
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
     }
 

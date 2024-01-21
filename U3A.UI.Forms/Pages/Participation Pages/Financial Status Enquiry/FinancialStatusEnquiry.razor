@@ -59,7 +59,9 @@
         <Progress @ref="@ProgressBar" />
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-        <DxGrid Data="@Persons" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                <FullScreen>
+                    <ContentTemplate>
+        <DxGrid Data="@Persons" @ref=@mainGrid CssClass="grid-height"
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
             CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
             CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
@@ -163,16 +165,10 @@
                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="TotalFees" />
             </TotalSummary>
         </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
     }
 </form>
-
-<style>
-    .grid-height {
-        height: @gridHeight;
-    }
-
-</style>
-
 
 @code {
     bool IsReady;
@@ -187,7 +183,6 @@
     IEnumerable<int>? selectedFinancialYears;
     string[] BalanceTypes = { "Debit (Money Owing)", "Credit (Refund Due)", "All Non-Zero" };
     string balanceType;
-    string gridHeight = "100px";
 
     IGrid? mainGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }
@@ -219,8 +214,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         if (!firstRender)
         {
             if (selectedTerm == null)

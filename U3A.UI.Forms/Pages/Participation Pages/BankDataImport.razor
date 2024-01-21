@@ -87,7 +87,9 @@ else
         }
 
         <div>@BankAccountDetails</div>
-        <DxGrid Data="@importData" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    <FullScreen>
+                        <ContentTemplate>
+        <DxGrid Data="@importData" @ref=@mainGrid CssClass="grid-height"
                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                 DetailRowDisplayMode="GridDetailRowDisplayMode.Always"
                 CustomizeElement="Grid_CustomizeElement"
@@ -155,15 +157,12 @@ else
                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Amount" ValueDisplayFormat="{0:c2}" />
             </TotalSummary>
         </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
 
     </div>
 }
 <style>
-
-    .grid-height {
-        height: @gridHeight;
-    }
-
     .popup-width {
         min-width: 65rem;
     }
@@ -203,7 +202,6 @@ else
     string UploadUrl;
     bool hideReceiptDateRangeMessage = true;
     string receiptDateRangeMessage;
-    string gridHeight = "100px";
 
     DxUpload? FileUploader;
     IGrid? mainGrid { get; set; }
@@ -312,8 +310,6 @@ else
             today = await localTime.GetLocalTimeAsync();
             endDate = today.Date.AddDays(-1);
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
     }
 

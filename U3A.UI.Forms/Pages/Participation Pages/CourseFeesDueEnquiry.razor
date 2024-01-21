@@ -71,7 +71,9 @@ else
                             IndicatorAreaVisible="false"
                             Text="Fetching Data...">
 
-                <DxGrid Data="@Enrolments" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                <FullScreen>
+                    <ContentTemplate>
+                <DxGrid Data="@Enrolments" @ref=@mainGrid CssClass="grid-height"
                         ShowAllRows="true"
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         KeyFieldName="ID"
@@ -105,6 +107,8 @@ else
                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Due" />
                     </TotalSummary>
                 </DxGrid>
+                    </ContentTemplate>
+                </FullScreen>
 
             </DxLoadingPanel>
 
@@ -140,10 +144,6 @@ else
 
 }
 <style>
-    .grid-height {
-        height: @gridHeight;
-    }
-
     .leader-height {
         height: 11vh;
     }
@@ -187,7 +187,6 @@ else
     private DxComboBox<Class, Class?> ClassComboBox;
 
     IGrid? mainGrid { get; set; }
-    string gridHeight { get; set; } = "100px";
     GridToolbar Toolbar;
     U3ADbContext dbc { get; set; }
     Progress? ProgressBar;
@@ -221,8 +220,6 @@ else
     {
         // wire up the toolbar
         base.OnAfterRender(firstRender);
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         if (!firstRender)
         {
             if (selectedTerm == null)

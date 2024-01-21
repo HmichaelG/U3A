@@ -19,6 +19,7 @@ else {
             Enter/Edit the participants who have offered to perform voluntary activities.
         </div>
         <div class="col-5  d-none d-md-inline">
+
             <DxFormLayout>
                 <DxFormLayoutItem Caption="Activity" ColSpanMd="9">
                     <DxComboBox Data="@Activities" NullText="Select Voluntary Activity"
@@ -45,7 +46,9 @@ else {
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <DxGrid Data="@Volunteers" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+    <FullScreen>
+    <ContentTemplate>
+    <DxGrid Data="@Volunteers" @ref=@mainGrid CssClass="grid-height" 
         ColumnResizeMode="GridColumnResizeMode.Disabled"
         @bind-SelectedDataItems="@SelectedDataItems"
         AllowSelectRowByClick="true"
@@ -91,16 +94,14 @@ else {
             </DxFormLayout>
         </EditFormTemplate>
     </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
 
 }
 <style>
     .popup-width {
         min-width: 40rem;
-    }
-
-    .grid-height {
-        height: @gridHeight;
     }
 </style>
 
@@ -112,7 +113,6 @@ else {
     List<Person> Persons;
     List<Volunteer> Volunteers { get; set; }
     string? selectedActivity;
-    string gridHeight = "100px";
 
     MessageBox messageBox;
 
@@ -165,13 +165,6 @@ else {
     async Task RefreshData() {
         Volunteers = await dbc.Volunteer.Where(x => x.Activity == selectedActivity).ToListAsync();
         StateHasChanged();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     bool isBusy;

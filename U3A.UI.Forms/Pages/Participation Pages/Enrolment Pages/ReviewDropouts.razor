@@ -51,7 +51,9 @@ else {
                 </DxFormLayoutItem>
             </DxFormLayoutGroup>
 
-            <DxGrid Data="@Dropouts" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                <FullScreen>
+                    <ContentTemplate>
+            <DxGrid Data="@Dropouts" @ref=@mainGrid CssClass="grid-height"
                 ShowAllRows="true"
                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                 KeyFieldName="ID"
@@ -81,15 +83,13 @@ else {
                                   UnboundType="GridUnboundColumnType.DateTime" />                    <DxGridDataColumn Caption="Dropped By" FieldName="DeletedBy" />
                 </Columns>
             </DxGrid>
+                </ContentTemplate>
+            </FullScreen>
         </DxFormLayout>
     </div>
 
 }
 <style>
-    .grid-height {
-        height: @gridHeight;
-    }
-
     .leader-height {
         height: 11vh;
     }
@@ -120,7 +120,6 @@ else {
     bool IsSetSelectionEnrolledEnabled;
 
     IGrid? mainGrid { get; set; }
-    string gridHeight { get; set; } = "100px";
     ErrorPopup? ErrorPopup { get; set; }
     GridToolbar Toolbar;
     string ErrorHeader;
@@ -158,8 +157,6 @@ else {
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         if (!firstRender)
         {
             if (selectedTerm == null)

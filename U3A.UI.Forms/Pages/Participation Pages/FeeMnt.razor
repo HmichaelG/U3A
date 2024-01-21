@@ -35,7 +35,9 @@ else
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 
-    <DxGrid Data="@Fees" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    <FullScreen>
+                        <ContentTemplate>
+    <DxGrid Data="@Fees" @ref=@mainGrid CssClass="grid-height"
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
             GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
             ShowFilterRow="false"
@@ -116,16 +118,13 @@ else
             </DxFormLayout>
         </EditFormTemplate>
     </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
 }<style>
      .popup-width {
          min-width: 40rem;
      }
-
-     .grid-height {
-         height: @gridHeight;
-     }
-
 </style>
 
 @code {
@@ -140,7 +139,6 @@ else
     DxGridCommandColumnEx? GridCommandColumn;
     MessageBox? messageBox;
     string? messageBoxWidth;
-    string gridHeight = "100px";
 
     IGrid? mainGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }
@@ -179,8 +177,6 @@ else
         {
             await RefreshData();
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
     }
 

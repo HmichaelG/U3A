@@ -37,7 +37,9 @@ else
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
     <Progress @ref="@ProgressBar" />
 
-    <DxGrid Data="@Receipts" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                <FullScreen>
+                    <ContentTemplate>
+    <DxGrid Data="@Receipts" @ref=@mainGrid CssClass="grid-height"
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
             GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
             ShowFilterRow="false"
@@ -148,16 +150,13 @@ else
             </DxFormLayout>
         </EditFormTemplate>
     </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
 
 }<style>
      .popup-width {
          min-width: 40rem;
      }
-
-     .grid-height {
-         height: @gridHeight;
-     }
-
 </style>
 
 @code {
@@ -176,7 +175,6 @@ else
     MessageBoxDialogResult messageDialogResult;
     Progress? ProgressBar;
     string? messageBoxWidth;
-    string gridHeight = "100px";
 
     IGrid? mainGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }
@@ -216,13 +214,8 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (Receipts == null || Receipts.Count == 0) { await RefreshData(); InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            await RefreshData();
-        }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
     }
 
 
@@ -338,13 +331,14 @@ else
 
     async Task RefreshData()
     {
-        if (yearComponent != null)
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            mainGrid.BeginUpdate();
-            ProcessingYear = yearComponent.Year;
-            Persons = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
-            Receipts = await BusinessRule.EditableReceiptsForYearAsync(dbc, ProcessingYear);
-            mainGrid.EndUpdate();
+            if (yearComponent != null)
+            {
+                ProcessingYear = yearComponent.Year;
+                Persons = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+                Receipts = await BusinessRule.EditableReceiptsForYearAsync(dbc, ProcessingYear);
+            }
         }
     }
 
