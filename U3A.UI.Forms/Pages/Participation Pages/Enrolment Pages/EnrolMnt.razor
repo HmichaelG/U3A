@@ -105,7 +105,9 @@ else
                                 IndicatorAreaVisible="false"
                                 Text="Fetching Data...">
 
-                    <DxGrid Data="@Enrolments" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    <FullScreen>
+                        <ContentTemplate>
+                            <DxGrid Data="@Enrolments" @ref=@mainGrid CssClass="grid-height"
                             ShowAllRows="true"
                             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                             KeyFieldName="ID"
@@ -176,7 +178,9 @@ else
                             <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FeesDue" ValueDisplayFormat="{0:c2}" />
                         </TotalSummary>
                     </DxGrid>
-                </DxLoadingPanel>
+            </ContentTemplate>
+        </FullScreen>
+        </DxLoadingPanel>
             </div>
             <div class="col-3  d-none d-md-inline p-2">
                 <DxListBox Data="@CourseLeaders" @bind-Values="@leaders" CssClass="leader-height m-1">
@@ -238,7 +242,7 @@ else
 }
 <style>
     .grid-height {
-        height: @gridHeight;
+        height: inherit;
     }
 
     .leader-height {
@@ -308,7 +312,6 @@ else
     ButtonRenderStyle buttonRenderStyle = ButtonRenderStyle.Light;
 
     IGrid? mainGrid { get; set; }
-    string gridHeight { get; set; } = "600px";
     ErrorPopup? ErrorPopup { get; set; }
     GridToolbar Toolbar;
     string ErrorHeader;
@@ -352,8 +355,6 @@ else
     {
         // wire up the toolbar
         base.OnAfterRender(firstRender);
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         if (!firstRender)
         {
             if (selectedTerm == null)
