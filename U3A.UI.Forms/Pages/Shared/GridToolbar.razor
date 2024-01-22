@@ -79,6 +79,7 @@
                      </DxToolbarItem>
                  </Items>
              </DxToolbarItem>
+             @CustomButtonContent
          </Items>
      </DxToolbar>
 }
@@ -91,6 +92,7 @@
     [Parameter] public bool HideSearchBox { get; set; }
     [Parameter] public bool IsMasterDetail { get; set; }
     [Parameter] public bool DisableVirtualScroll { get; set; }
+    [Parameter] public RenderFragment CustomButtonContent {get; set;}
 
     internal bool IsMobileLayout;
     internal bool IsToggleExpanded { get; set; } = false;

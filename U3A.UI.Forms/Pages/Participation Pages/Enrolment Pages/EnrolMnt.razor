@@ -19,12 +19,7 @@ else
             <ContextHelpTitle Title="Enrol Participants" HelpTopic="Enrol-Participants.html" />
         </div>
         <div class="row">
-            <div class="d-none col-lg-11 d-lg-inline">
                 Register participants in courses and/or activities offered in the selected term.
-            </div>
-            <DxButton Text="Communicate"
-                      Click="@OnCommunicate"
-                      RenderStyle="ButtonRenderStyle.Primary" CssClass="col col-lg-1" />
         </div>
 
         <MessageBox @ref="@messageBox" />
@@ -60,10 +55,10 @@ else
 
         <DxFormLayout>
             <div class="col col-12 col-md-9 p-2">
-                <DxFormLayoutGroup Caption="Enrolment Details" 
-                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End" 
-                    ExpandedChanged="@(() => StateHasChanged())"
-                    Expanded="true" >
+                <DxFormLayoutGroup Caption="Enrolment Details"
+                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
+                                   ExpandedChanged="@(() => StateHasChanged())"
+                                   Expanded="true">
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                         <DxComboBox Data="@terms" NullText="Select the Term required..."
                                     AllowUserInput=false
@@ -107,80 +102,91 @@ else
 
                     <FullScreen>
                         <ContentTemplate>
-                            <DxGrid Data="@Enrolments" @ref=@mainGrid CssClass="grid-height"
-                            ShowAllRows="true"
-                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                            KeyFieldName="ID"
-                            ValidationEnabled="true"
-                            SelectionMode="GridSelectionMode.Multiple"
-                            UnboundColumnData="Grid_CustomUnboundColumnData"
-                            AllowSelectRowByClick="true"
-                            @bind-SelectedDataItems="SelectedDataItems"
-                            EditMode="GridEditMode.EditCell"
-                            KeyboardNavigationEnabled=true
-                            CustomizeEditModel="Grid_CustomizeEditModel"
-                            DataItemDeleting="Grid_DataItemDeleting"
-                            EditModelSaving="Grid_EditModelSaving">
-                        <ToolbarTemplate>
-                            <GridToolbar LinkedGrid=@mainGrid />
-                        </ToolbarTemplate>
-                        <Columns>
-                            <DxGridSelectionColumn Width="2rem" />
-                            <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem"
-                                                   EditButtonVisible="true" DeleteButtonVisible="true" />
-                            <DxGridDataColumn Caption="Name" FieldName="Person.FullName" Width="10rem">
-                                <CellEditTemplate>
-                                    @{
-                                        var enrolment = (Enrolment)context.EditModel;
-                                    }
-                                    <DxComboBox Data="Persons"
-                                                FilteringMode="DataGridFilteringMode.Contains"
-                                                ListRenderMode="ListRenderMode.Virtual"
-                                                DropDownWidthMode="DropDownWidthMode.ContentOrEditorWidth"
-                                                @bind-Value="enrolment.Person"
-                                                TextFieldName="@nameof(Person.FullName)">
-                                        <DxListEditorColumn FieldName="@nameof(Person.FullName)"
-                                                            Caption="Name"
-                                                            Width="50%" />
-                                        <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
-                                                            Caption="Mobile"
-                                                            Width="25%" />
-                                        <DxListEditorColumn FieldName="@nameof(Person.Email)"
-                                                            Caption="Email"
-                                                            Width="25%" />
-                                    </DxComboBox>
-                                </CellEditTemplate>
-                            </DxGridDataColumn>
-                            <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />
-                            <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
-                            <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
-                                              Width="5rem" Visible="@settings.RequireVaxCertificate" />
-                            <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
-                            <DxGridDataColumn ReadOnly=true Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
-                            <DxGridDataColumn ReadOnly=true Caption="Email" FieldName="Person.Email" />
-                            <DxGridDataColumn ReadOnly=true Caption="Enrolled" FieldName="DateEnrolled"
-                                              DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
-                            <DxGridDataColumn ReadOnly=true Caption="Joined" FieldName="Person.DateJoined"
-                                              DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible=false />
-                            <DxGridDataColumn ReadOnly=true Caption="Created" FieldName="Created"
-                                              DisplayFormat="{0:dd-MMM-yy HH:mm:ss}" Width="8rem" Visible="false" />
-                            <DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
-                            <DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
-                                              Visible=@(selectedCourse?.CourseFeePerTerm > 0 || selectedCourse?.CourseFeePerYear > 0 )
-                                              UnboundType="GridUnboundColumnType.Decimal" />
-                        </Columns>
-                        <GroupSummary>
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
-                                               FieldName="FeesDue" ValueDisplayFormat="{0:c2}"
-                                               FooterColumnName="FeesDue" />
-                        </GroupSummary>
-                        <TotalSummary>
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FeesDue" ValueDisplayFormat="{0:c2}" />
-                        </TotalSummary>
-                    </DxGrid>
-            </ContentTemplate>
-        </FullScreen>
-        </DxLoadingPanel>
+                            <DxGrid Data="@Enrolments" @ref=@mainGrid
+                                    ShowAllRows="true"
+                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                    KeyFieldName="ID"
+                                    ValidationEnabled="true"
+                                    SelectionMode="GridSelectionMode.Multiple"
+                                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                                    AllowSelectRowByClick="true"
+                                    @bind-SelectedDataItems="SelectedDataItems"
+                                    EditMode="GridEditMode.EditCell"
+                                    KeyboardNavigationEnabled=true
+                                    CustomizeEditModel="Grid_CustomizeEditModel"
+                                    DataItemDeleting="Grid_DataItemDeleting"
+                                    EditModelSaving="Grid_EditModelSaving">
+                                <ToolbarTemplate>
+                                    <GridToolbar LinkedGrid=@mainGrid>
+                                        <CustomButtonContent>
+                                            <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+                                                           BeginGroup=true
+                                                           Click=@OnCommunicate
+                                                           RenderStyle="ButtonRenderStyle.Primary"
+                                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                           Alignment="ToolbarItemAlignment.Right"
+                                                           Tooltip="Send email and/or SMS to participants">
+                                            </DxToolbarItem>
+                                        </CustomButtonContent>
+                                    </GridToolbar>
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn Width="2rem" />
+                                    <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem"
+                                                           EditButtonVisible="true" DeleteButtonVisible="true" />
+                                    <DxGridDataColumn Caption="Name" FieldName="Person.FullName" Width="10rem">
+                                        <CellEditTemplate>
+                                            @{
+                                                var enrolment = (Enrolment)context.EditModel;
+                                            }
+                                            <DxComboBox Data="Persons"
+                                                        FilteringMode="DataGridFilteringMode.Contains"
+                                                        ListRenderMode="ListRenderMode.Virtual"
+                                                        DropDownWidthMode="DropDownWidthMode.ContentOrEditorWidth"
+                                                        @bind-Value="enrolment.Person"
+                                                        TextFieldName="@nameof(Person.FullName)">
+                                                <DxListEditorColumn FieldName="@nameof(Person.FullName)"
+                                                                    Caption="Name"
+                                                                    Width="50%" />
+                                                <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
+                                                                    Caption="Mobile"
+                                                                    Width="25%" />
+                                                <DxListEditorColumn FieldName="@nameof(Person.Email)"
+                                                                    Caption="Email"
+                                                                    Width="25%" />
+                                            </DxComboBox>
+                                        </CellEditTemplate>
+                                    </DxGridDataColumn>
+                                    <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />
+                                    <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
+                                    <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
+                                                      Width="5rem" Visible="@settings.RequireVaxCertificate" />
+                                    <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
+                                    <DxGridDataColumn ReadOnly=true Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
+                                    <DxGridDataColumn ReadOnly=true Caption="Email" FieldName="Person.Email" />
+                                    <DxGridDataColumn ReadOnly=true Caption="Enrolled" FieldName="DateEnrolled"
+                                                      DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
+                                    <DxGridDataColumn ReadOnly=true Caption="Joined" FieldName="Person.DateJoined"
+                                                      DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible=false />
+                                    <DxGridDataColumn ReadOnly=true Caption="Created" FieldName="Created"
+                                                      DisplayFormat="{0:dd-MMM-yy HH:mm:ss}" Width="8rem" Visible="false" />
+                                    <DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
+                                    <DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
+                                                      Visible=@(selectedCourse?.CourseFeePerTerm > 0 || selectedCourse?.CourseFeePerYear > 0 )
+                                                      UnboundType="GridUnboundColumnType.Decimal" />
+                                </Columns>
+                                <GroupSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
+                                                       FieldName="FeesDue" ValueDisplayFormat="{0:c2}"
+                                                       FooterColumnName="FeesDue" />
+                                </GroupSummary>
+                                <TotalSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FeesDue" ValueDisplayFormat="{0:c2}" />
+                                </TotalSummary>
+                            </DxGrid>
+                        </ContentTemplate>
+                    </FullScreen>
+                </DxLoadingPanel>
             </div>
             <div class="col-3  d-none d-md-inline p-2">
                 <DxListBox Data="@CourseLeaders" @bind-Values="@leaders" CssClass="leader-height m-1">

@@ -23,36 +23,37 @@
                   They are an essential part of maintaining good email reputation.<br/>
                   You may delete a suppression once you are sure...<br/>
                   the email address is valid, or the unsubscribe was accidental, the address is no longer associated with a participant, or the participant is unfinancial.")
-                  OnAlertCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                  OnAlertCollapsed="@(async() => await fullScreen.RefreshLayout())" />
 
-<div class="row">
-    <div class="d-none col-lg-10 d-lg-inline">
-    </div>
-    <DxButton Text="Reactivate Selected"
-              Click="@OnReset"
-              RenderStyle="ButtonRenderStyle.Primary" CssClass="col col-lg-2 my-2" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())" />
-</div>
+<FullScreen @ref=@fullScreen>
+    <ContentTemplate>
+        <DxGrid Data=@suppressions @ref=@mainGrid CssClass="grid-height"
+                @bind-SelectedDataItems="@SelectedDataItems">
+            <ToolbarTemplate>
+                <GridToolbar LinkedGrid=@mainGrid>
+                    <CustomButtonContent>
+                        <DxToolbarItem Text="Reactivate Selected"
+                                       Click="@OnReset"
+                                       RenderStyle="ButtonRenderStyle.Primary"
+                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                       Tooltip="Reactivate selected participant email addresses."
+                                       Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())" />
+                    </CustomButtonContent>
+                </GridToolbar>
+            </ToolbarTemplate>
+            <Columns>
+                <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left" Width="2rem" />
+                <DxGridDataColumn Caption="Date" FieldName="CreatedAt" DisplayFormat="dd-MMM-yyyy hh:mm tt" Visible=true />
+                <DxGridDataColumn Width="8rem" Caption="Stream" FieldName="Stream" />
+                <DxGridDataColumn Caption="Reason" FieldName="Reason" />
+                <DxGridDataColumn Caption="Email" FieldName="Email" />
+                <DxGridDataColumn Caption="Participant" FieldName="Person.FullName" />
+                <DxGridDataColumn Caption="Mobile" FieldName="Person.Mobile" />
+                <DxGridDataColumn Caption="Home" FieldName="Person.HomePhone" />
+                <DxGridDataColumn Caption="Financial To" FieldName="Person.FinancialTo" DisplayFormat="{0:D}" />
+            </Columns>
 
-                <FullScreen>
-                    <ContentTemplate>
-<DxGrid Data=@suppressions @ref=@mainGrid CssClass="grid-height"
-        @bind-SelectedDataItems="@SelectedDataItems">
-    <ToolbarTemplate>
-        <GridToolbar LinkedGrid=@mainGrid />
-    </ToolbarTemplate>
-    <Columns>
-        <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left" Width="2rem" />
-        <DxGridDataColumn Caption="Date" FieldName="CreatedAt" DisplayFormat="dd-MMM-yyyy hh:mm tt" Visible=true />
-        <DxGridDataColumn Width="8rem" Caption="Stream" FieldName="Stream" />
-        <DxGridDataColumn Caption="Reason" FieldName="Reason" />
-        <DxGridDataColumn Caption="Email" FieldName="Email" />
-        <DxGridDataColumn Caption="Participant" FieldName="Person.FullName" />
-        <DxGridDataColumn Caption="Mobile" FieldName="Person.Mobile" />
-        <DxGridDataColumn Caption="Home" FieldName="Person.HomePhone" />
-        <DxGridDataColumn Caption="Financial To" FieldName="Person.FinancialTo" DisplayFormat="{0:D}" />
-    </Columns>
-
-</DxGrid>
+        </DxGrid>
     </ContentTemplate>
 </FullScreen>
 
@@ -69,6 +70,7 @@
     IReadOnlyList<object>? SelectedDataItems { get; set; }
     MessageBox? messageBox;
     string? messageBoxWidth;
+    FullScreen? fullScreen;
 
     ErrorPopup? ErrorPopup { get; set; }
     IGrid? mainGrid { get; set; }
@@ -123,7 +125,7 @@
         if (count > 0)
         {
             result = (await messageBox.ShowAsync("Reset Spam Complaint(s)",
-                            @"<div class='alert alert-danger pb-2'>Spam complaints <strong>are not to be reactivated without a thorough investigation into the reason for the complaint</strong>.
+                                @"<div class='alert alert-danger pb-2'>Spam complaints <strong>are not to be reactivated without a thorough investigation into the reason for the complaint</strong>.
                             Doing otherwise may cause email delivery to be suspended or at worst, halted completely.<br/><br/>
                             Please be careful. If the complaint has been permanently deactivated by Postmark, contact their support for reactivation.</div>
                             <p>Do your wish to continue?</p>"));

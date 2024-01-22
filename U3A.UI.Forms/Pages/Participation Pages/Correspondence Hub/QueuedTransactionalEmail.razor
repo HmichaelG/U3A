@@ -25,30 +25,14 @@ else
                   Cash Receipts and Enrolments are sent daily, Leader Reports are sent within 48 hours of the next class.<br/>
                   Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.<br />
                   Processed correspondence is deleted after 30 days.")
-                      OnAlertCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                      OnAlertCollapsed="@(async() => await fullScreen.RefreshLayout())" />
 
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
     <Progress @ref="@ProgressBar" />
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-
-    <DxFormLayout>
-        <div class="col col-8"></div>
-        <div class="col col-4">
-            <DxButton Text="Delete"
-                      Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                      RenderStyle="ButtonRenderStyle.Primary" CssClass="col-3 me-1" />
-            <DxButton Text="Preview"
-                      Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                      RenderStyle="ButtonRenderStyle.Primary" CssClass="col-3 me-1" />
-            <DxButton Text="Send Mail"
-                      Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                      RenderStyle="ButtonRenderStyle.Primary" CssClass="col-4 me-1" />
-        </div>
-    </DxFormLayout>
-
     <div class="pb-1" />
-    <FullScreen>
+    <FullScreen @ref=@fullScreen>
         <ContentTemplate>
             <DxGrid Data="@SendMail" @ref=@mainGrid CssClass="grid-height"
                     @bind-SelectedDataItems="@SelectedDataItems"
@@ -59,7 +43,25 @@ else
                     ValidationEnabled="true"
                     SelectionMode="GridSelectionMode.Multiple">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid />
+                    <GridToolbar LinkedGrid=@mainGrid>
+                        <CustomButtonContent>
+                            <DxToolbarItem Text="Preview" IconCssClass="bi bi-eyeglasses"
+                                           Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                           Tooltip="Preview the email to be sent to selected participants."
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
+                            <DxToolbarItem Text="Send Mail" IconCssClass="bi bi-envelope"
+                                           Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                           Tooltip="Send email to selected participants, now."
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
+                            <DxToolbarItem Text="Delete" IconCssClass="bi bi-trash"
+                                           Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                           Tooltip="Delete the selected email."
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
+                        </CustomButtonContent>
+                    </GridToolbar>
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridSelectionColumn Width="2rem" />
@@ -88,6 +90,7 @@ else
     ProFormaReportFactory reportFactory;
     MessageBox? messageBox;
     string? messageBoxWidth;
+    FullScreen? fullScreen;
 
     IGrid? mainGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }

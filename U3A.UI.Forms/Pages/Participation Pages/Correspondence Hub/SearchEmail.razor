@@ -17,7 +17,7 @@
 else
 {
     <DxFormLayout CssClass="w-100 mx-auto">
-        <DxFormLayoutGroup Caption="Participant Details" ColSpanMd="6">
+        <DxFormLayoutGroup Caption="Participant Details" ColSpanMd="8">
             <DxFormLayoutItem Caption="Search for participant" ColSpanLg="12">
                 <DxComboBox Data="@people"
                             AllowUserInput=true
@@ -36,15 +36,21 @@ else
             </DxFormLayoutItem>
 
             <DxFormLayoutItem Caption="Or, email address" ColSpanLg="12">
-                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                           @bind-Text="@emailAddress">
+                <DxComboBox Id="emailId" Data="@email"                             
+                            AllowUserInput=true
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            ListRenderMode="ListRenderMode.Virtual"
+                            @bind-Value="@emailAddressValue"
+                            Text="@emailAddress"
+                            TextChanged="@OnEnailChnaged">
                     <Buttons>
                         <DxEditorButton Text="Search" CssClass="text-primary"
                                         IconCssClass="h5 bi bi-search"
                                         Tooltip="Click to search for the selected member"
                                         Click="@OnEmailSearch" />
                     </Buttons>
-                </DxTextBox>
+                </DxComboBox>
             </DxFormLayoutItem>
 
             <DxFormLayoutItem Caption="Or, Date Range" ColSpanLg="6">
@@ -141,6 +147,7 @@ else
 @code {
     IEnumerable<EmailMessage> messages;
     IEnumerable<EmailMessageEvent> messageEvents;
+    IEnumerable<string> email;
     EmailMessage selectedEmail;
     List<Person> people { get; set; }
     Person selectedPerson { get; set; }
@@ -151,6 +158,7 @@ else
     bool IsReady;
     bool isSearchByEmailAddress;
     string emailAddress;
+    string emailAddressValue;
     bool IsSearchByDateRange;
 
     IGrid? mainGrid { get; set; }
@@ -185,6 +193,10 @@ else
         using (dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+            email = people
+                        .Where(x => !string.IsNullOrWhiteSpace(x.Email))
+                        .OrderBy(x => x.Email)
+                        .Select(x => x.Email).ToArray();
         }
     }
 
@@ -208,6 +220,11 @@ else
             await SearchMessagesAsync(selectedPerson.Email);
         }
         else await messageBox.ShowOkOnlyAsync("Select a participant", "You must select a participant before you click the Search button.");
+    }
+
+    void OnEnailChnaged(string newVaule)
+    {
+        emailAddress = newVaule;
     }
 
     async Task OnEmailSearch()

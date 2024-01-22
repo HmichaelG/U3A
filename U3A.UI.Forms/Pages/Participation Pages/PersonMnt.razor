@@ -28,9 +28,6 @@
             <div class="d-none col-lg-11 d-lg-inline">
                 Participants are any persons participating in your U3A. This may include students, staff, volunteers, course leaders etc.
             </div>
-            <DxButton Text="Communicate"
-                      Click="@OnCommunicate"
-                      RenderStyle="ButtonRenderStyle.Primary" CssClass="col col-lg-1 m-auto" />
         </div>
 
 
@@ -83,7 +80,18 @@
                         PopupEditFormHeaderText="Add/Edit Participant"
                         DataItemDeleting="Grid_DataItemDeleting">
                     <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid />
+                        <GridToolbar LinkedGrid=@mainGrid >
+                            <CustomButtonContent>
+                                <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+                                               BeginGroup=true
+                                               Click=@OnCommunicate
+                                               RenderStyle="ButtonRenderStyle.Primary"
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               Alignment="ToolbarItemAlignment.Right"
+                                               Tooltip="Send email and/or SMS to participants">
+                                </DxToolbarItem>
+                            </CustomButtonContent>
+                        </GridToolbar>
                     </ToolbarTemplate>
                     <Columns>
                         <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"

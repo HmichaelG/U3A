@@ -38,7 +38,7 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            await FitContents();
+            await RefreshLayout();
         }
     }
 
@@ -51,12 +51,12 @@
             height = "100vh";
         }
         else {
-            await FitContents(); 
+            await RefreshLayout(); 
         }
         StateHasChanged();
     }
 
-    async Task FitContents()
+    public async Task RefreshLayout()
     {
         var newHeight = await Window.FitToRemainingHeight(js, "fullscreen-element", height);
         if (newHeight != height) { height = newHeight; InvokeAsync(StateHasChanged); }

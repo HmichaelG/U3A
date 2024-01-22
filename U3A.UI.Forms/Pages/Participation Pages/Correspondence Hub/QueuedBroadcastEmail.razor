@@ -15,56 +15,58 @@
 @implements IDisposable
 
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <CollapsableAlert AlertText=@($@"<strong>Broadcast email</strong> queued and processed overnight.<br />
                   That is, those email with attachments or merge codes that could not be sent immediately.<br/>
                   Processed correspondence is deleted after 7 days.")
-                      OnAlertCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                      OnAlertCollapsed="@(async() => await fullScreen.RefreshLayout())" />
 
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
     <Progress @ref="@ProgressBar" />
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-                    <FullScreen>
-                    <ContentTemplate>
+    <FullScreen @ref=@fullScreen>
+        <ContentTemplate>
 
-    <DxGrid Data=@Queue @ref=@bounceGrid
-            UnboundColumnData="Grid_CustomUnboundColumnData"
-            CssClass="grid-height"
-            DataItemDeleting="Grid_DataItemDeleting">
-        <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@bounceGrid />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridCommandColumnEx Caption="Delete" EditButtonVisible=false NewButtonVisible=false
-                              FixedPosition="GridColumnFixedPosition.Right"  />
-            <DxGridDataColumn Width="8rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Queued"
-                              UnboundType="GridUnboundColumnType.DateTime"
-                              FieldName="Created" DisplayFormat="{0:dd-MMM-yy hh:mm tt}" />
-            <DxGridDataColumn Caption="Subject" FieldName="Subject" FixedPosition="GridColumnFixedPosition.Left"
-                              UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Caption="From" FieldName="From"
-                              UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Width="6rem" Caption="MergeCode #" FieldName="MergeCodeCount"
-                              UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Width="6rem" Caption="Attachment #" FieldName="AttachmnetCount"
-                              UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
-                              UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
-            <DxGridDataColumn Width="6rem" Caption="Recipients" FieldName="Recipients"
-                              UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
-            <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
-                              UnboundType="GridUnboundColumnType.DateTime"
-                              DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-            <DxGridDataColumn Caption="Result" FieldName="Result" />
-        </Columns>
+            <DxGrid Data=@Queue @ref=@bounceGrid
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    CssClass="grid-height"
+                    DataItemDeleting="Grid_DataItemDeleting">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@bounceGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridCommandColumnEx Caption="Delete" EditButtonVisible=false NewButtonVisible=false
+                                           FixedPosition="GridColumnFixedPosition.Right" />
+                    <DxGridDataColumn Width="8rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Queued"
+                                      UnboundType="GridUnboundColumnType.DateTime"
+                                      FieldName="Created" DisplayFormat="{0:dd-MMM-yy hh:mm tt}" />
+                    <DxGridDataColumn Caption="Subject" FieldName="Subject" FixedPosition="GridColumnFixedPosition.Left"
+                                      UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Caption="From" FieldName="From"
+                                      UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Width="6rem" Caption="MergeCode #" FieldName="MergeCodeCount"
+                                      UnboundType="GridUnboundColumnType.Integer" />
+                    <DxGridDataColumn Width="6rem" Caption="Attachment #" FieldName="AttachmnetCount"
+                                      UnboundType="GridUnboundColumnType.Integer" />
+                    <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
+                                      UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
+                    <DxGridDataColumn Width="6rem" Caption="Recipients" FieldName="Recipients"
+                                      UnboundType="GridUnboundColumnType.Integer" />
+                    <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
+                    <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
+                                      UnboundType="GridUnboundColumnType.DateTime"
+                                      DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                    <DxGridDataColumn Caption="Result" FieldName="Result" />
+                </Columns>
 
-    </DxGrid>
+            </DxGrid>
         </ContentTemplate>
     </FullScreen>
 
@@ -75,6 +77,7 @@ else {
     List<DocumentQueue> Queue { get; set; }
     MessageBox? messageBox;
     string? messageBoxWidth;
+    FullScreen? fullScreen;
 
     IGrid? bounceGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }
@@ -88,7 +91,8 @@ else {
     U3ADbContext dbc { get; set; }
     DocumentServer server;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         server = new DocumentServer(dbc);
@@ -96,52 +100,64 @@ else {
         IsReady = true;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-        if (firstRender) {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
             localTime = new(js);
             timezoneOffset = await localTime.GetTimezoneOffsetAsync();
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    async Task GetData() {
+    async Task GetData()
+    {
         Queue = await dbc.DocumentQueue.Include(x => x.DocumentAttachments).OrderByDescending(x => x.CreatedOn).ToListAsync();
     }
 
-    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e) {
+    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
         DocumentQueue q = e.DataItem as DocumentQueue;
         var doc = JsonSerializer.Deserialize<DocumentTemplate>(q.DocumentTemplateJSON);
-        if (e.FieldName == "Processed") {
+        if (e.FieldName == "Processed")
+        {
             e.Value = (q.Status != DocumentQueueStatus.ReadyToSend) ? q.UpdatedOn + timezoneOffset : null;
         }
-        if (e.FieldName == "Created") {
+        if (e.FieldName == "Created")
+        {
             e.Value = q.CreatedOn + timezoneOffset;
         }
-        if (e.FieldName == "Subject") {
+        if (e.FieldName == "Subject")
+        {
             e.Value = doc.Subject;
         }
-        if (e.FieldName == "From") {
+        if (e.FieldName == "From")
+        {
             e.Value = doc.FromEmailAddress;
         }
         if (e.FieldName == "MergeCodeCount") { e.Value = server.MergeCodeCount(doc.Content); }
         if (e.FieldName == "AttachmnetCount") { e.Value = q.DocumentAttachments?.Count(); }
-        if (e.FieldName == "AttachmnetSize") {
+        if (e.FieldName == "AttachmnetSize")
+        {
             var size = 0M;
             foreach (var a in q.DocumentAttachments) { size += a.Attachment.Length; }
             e.Value = size / 1000000M;
         }
-        if (e.FieldName == "Recipients") {
+        if (e.FieldName == "Recipients")
+        {
             e.Value = JsonSerializer.Deserialize<IEnumerable<ExportData>>(q.ExportDataJSON).Count();
         }
     }
 
-    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e) {
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
         var dq = (DocumentQueue)e.DataItem;
         dbc.Remove(dq);
         await dbc.SaveChangesAsync();
         await GetData();
     }
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
