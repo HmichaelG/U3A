@@ -37,7 +37,7 @@ else
 
         <DxFlyout @bind-IsOpen=IsFlyoutOpen
                   PositionTarget="@FlyoutTargetID"
-                  Position="FlyoutPosition.Bottom"
+                  Position="FlyoutPosition.Left"
                   FitToRestriction=false
                   CloseMode="FlyoutCloseMode.Close"
                   HeaderVisible="true"
@@ -57,7 +57,7 @@ else
             <div class="col col-12 col-md-9 p-2">
                 <DxFormLayoutGroup Caption="Enrolment Details"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                                   ExpandedChanged="@(() => StateHasChanged())"
+                                   ExpandedChanged="@(async () => await fullScreen.RefreshLayout())"
                                    Expanded="true">
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                         <DxComboBox Data="@terms" NullText="Select the Term required..."
@@ -100,7 +100,7 @@ else
                                 IndicatorAreaVisible="false"
                                 Text="Fetching Data...">
 
-                    <FullScreen>
+                    <FullScreen @ref="@fullScreen" >
                         <ContentTemplate>
                             <DxGrid Data="@Enrolments" @ref=@mainGrid
                                     ShowAllRows="true"
@@ -289,6 +289,7 @@ else
     bool EmailWaitlisted = false;
     DxGridDataColumn? FeesDueColumn;
     bool loadingPanelVisible;
+    FullScreen? fullScreen;
 
     bool IsFlyoutOpen = false;
     string FlyoutTargetID;
