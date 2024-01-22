@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime js
 
-<div id="fullscreen-element" class="d-flex calculate-height">
+<div id="fullscreen-element" class="d-flex normalscreen">
     @ContentTemplate
     <DxButton Click="@OnClick"
               CssClass="flex-grow-1"
@@ -11,14 +11,16 @@
 <style>
     .fullscreen {
         z-index: 99;
-        width: 100%;
+        width: 100vw;
+        height: 100vh;
         top: 0px;
         left: 0px;
         position: fixed;
         background-color: var(--dxbl-btn-color);
     }
 
-    .calculate-height {
+    .normalscreen {
+        width: inherit;
         height: @height
     }
 
@@ -48,7 +50,9 @@
         {
             height = "100vh";
         }
-        else { await FitContents(); }
+        else {
+            await FitContents(); 
+        }
         StateHasChanged();
     }
 

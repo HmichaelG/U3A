@@ -1,7 +1,10 @@
 ﻿
 function toggleFullscreen() {
     var e = document.getElementById('fullscreen-element');
-    if (e != null) { e.classList.toggle('fullscreen'); }
+    if (e != null) {
+        e.classList.toggle('normalscreen');
+        e.classList.toggle('fullscreen');
+    }
 }
 
 function closeSideBarMenu() {
