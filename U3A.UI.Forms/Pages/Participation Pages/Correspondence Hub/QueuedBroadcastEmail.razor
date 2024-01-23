@@ -25,7 +25,7 @@ else
     <CollapsableAlert AlertText=@($@"<strong>Broadcast email</strong> queued and processed overnight.<br />
                   That is, those email with attachments or merge codes that could not be sent immediately.<br/>
                   Processed correspondence is deleted after 7 days.")
-                      OnAlertCollapsed="@(async() => await fullScreen.RefreshLayout())" />
+                      OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
     <Progress @ref="@ProgressBar" />

@@ -23,7 +23,7 @@ else
     <CollapsableAlert AlertText=@(@"<strong>Leader Reports</strong> is now an automated procedure.<br />
                   All reports are automatically sent to leaders one day prior (Sunday) to the
                   start of term.")
-                      OnAlertCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                      OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
     <DxFormLayout>
         <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="4">
             <DxComboBox Data="@terms" NullText="Select the Term required..."

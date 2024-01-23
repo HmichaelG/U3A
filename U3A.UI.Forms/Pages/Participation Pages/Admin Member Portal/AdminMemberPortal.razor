@@ -30,14 +30,15 @@ else
             <DxTabs RenderMode="TabsRenderMode.OnDemand">
                 <DxTabPage Text="Process On Behalf Of">
                     <DxFormLayout CssClass="mt-3 px-2 col-12 px-sm-0 col-sm-10 col-md-9 mx-auto">
-                        <CollapsableAlert AlertType="secondary" CssClass="p-0 m-0">
+                        <CollapsableAlert AlertType="secondary" CssClass="p-0 m-0"
+                                OnToggleAlert="@(async() => await OnRefresh())">
                             <ContentTemplate>
                                 <div class="h3 text-center">Member Portal (Administration)</div>
                                 <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
                                 <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" ColSpanMd="12">
                                     <HeaderContentTemplate>
                                         <div class="d-flex input-group">
-                                            <div class="flex-grow-1">
+                                            <div class="text-start flex-grow-1">
                                                 Process Member
                                             </div>
                                             <div class="flex-grow-0">

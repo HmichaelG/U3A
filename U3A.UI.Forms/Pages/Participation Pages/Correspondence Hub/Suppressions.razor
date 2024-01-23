@@ -23,7 +23,7 @@
                   They are an essential part of maintaining good email reputation.<br/>
                   You may delete a suppression once you are sure...<br/>
                   the email address is valid, or the unsubscribe was accidental, the address is no longer associated with a participant, or the participant is unfinancial.")
-                  OnAlertCollapsed="@(async() => await fullScreen.RefreshLayout())" />
+                  OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
 <FullScreen @ref=@fullScreen>
     <ContentTemplate>

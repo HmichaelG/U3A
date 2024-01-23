@@ -18,7 +18,7 @@ else {
     <h3>Print Leader Report</h3>
     <CollapsableAlert AlertText=@(@"Creating a PDF report places a heavy burden on the server.<br />
                   Please be a good digital citizen and use judiciously.")
-                      OnAlertCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                      OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
 
     <DxFormLayout>
         <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="4">

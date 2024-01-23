@@ -17,7 +17,7 @@ else
     <div class="container-md py-2">
         <CollapsableAlert AlertText=@($@"<strong>Bring Forward Enrolments</strong> is now an automated procedure.<br />
                       The next expected run date is on or before: {automationMsg}.")
-                          OnAlertCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                          OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
         <div class="row">
             <div class="col col-md-2" />
             <div class="col col-md-8 border border-primary py-2">

@@ -21,7 +21,7 @@ else {
                               It is executed daily to move waitlisted students into active enrolment if available.<br />
                               Randomised automatic enrolment occurs {autoEnrolOccirence.ToLower()} on
                               {autoEnrolDay} in week {-settings?.AutoEnrolAllocationWeek} prior to term start.")
-                                  OnAlertCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                                  OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
                 <p>
                     This procedure will automatically enrol participants into their selected courses.<br />
                     Auto-enrolment is considered a fair and equitable way of allocating participants to an oversubscribed course.

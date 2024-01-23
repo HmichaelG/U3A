@@ -19,7 +19,7 @@
 @code {
     [Parameter] public string AlertType { get; set; } = "danger";
     [Parameter] public string AlertText { get; set; }
-    [Parameter] public EventCallback OnAlertCollapsed { get; set; }
+    [Parameter] public EventCallback OnToggleAlert { get; set; }
     [Parameter] public RenderFragment ContentTemplate { get; set; }
     [Parameter] public string CssClass { get; set; }
 
@@ -29,7 +29,7 @@
     {
         isHidden = !isHidden;
         InvokeAsync(StateHasChanged);
-        await OnAlertCollapsed.InvokeAsync();
+        await OnToggleAlert.InvokeAsync();
     }
 }
 
