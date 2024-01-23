@@ -17,7 +17,7 @@ else {
             <div class="col col-md-2" />
             <div class="col col-md-8 border border-primary py-2">
                 <ContextHelpTitle Title="Auto-Enrol Participants" HelpTopic="Auto-Enrol-Participants.html"></ContextHelpTitle>
-                <CollapsableAlert AlertText=@($@"<strong>Auto-Enrol Participants</strong> is now an automated procedure.<br />
+                <CollapsableContent AlertText=@($@"<strong>Auto-Enrol Participants</strong> is now an automated procedure.<br />
                               It is executed daily to move waitlisted students into active enrolment if available.<br />
                               Randomised automatic enrolment occurs {autoEnrolOccirence.ToLower()} on
                               {autoEnrolDay} in week {-settings?.AutoEnrolAllocationWeek} prior to term start.")

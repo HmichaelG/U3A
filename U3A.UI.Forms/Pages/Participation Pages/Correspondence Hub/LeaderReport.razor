@@ -20,7 +20,7 @@ else
 {
     <h3>Queue Leader Reports for email</h3>
     <p>Queue Class reports for selected courses/leaders.</p>
-    <CollapsableAlert AlertText=@(@"<strong>Leader Reports</strong> is now an automated procedure.<br />
+    <CollapsableContent AlertText=@(@"<strong>Leader Reports</strong> is now an automated procedure.<br />
                   All reports are automatically sent to leaders one day prior (Sunday) to the
                   start of term.")
                       OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
