@@ -1,11 +1,15 @@
-﻿
-<section class="alert alert-danger text-center" hidden="@isHidden">
+﻿<section class="@($"{CssClass} alert alert-{AlertType} text-center")" hidden="@isHidden">
     <button class="btn-close" onclick="@onButtonClick" />
+    @ContentTemplate
     @(new MarkupString(AlertText))
 </section>
+<div class="w-100" hidden="@(!isHidden)">
+    <button class="btn-close" onclick="@onButtonClick" />
+</div>
 
 <style>
     section {
+        width: 100%;
     }
 
     button {
@@ -13,15 +17,18 @@
     }
 </style>
 @code {
-
-    [Parameter, EditorRequired] public string AlertText { get; set; }
+    [Parameter] public string AlertType { get; set; } = "danger";
+    [Parameter] public string AlertText { get; set; }
     [Parameter] public EventCallback OnAlertCollapsed { get; set; }
+    [Parameter] public RenderFragment ContentTemplate { get; set; }
+    [Parameter] public string CssClass { get; set; }
 
     bool isHidden = false;
 
-    async Task onButtonClick() {
-        isHidden = true;
-        InvokeAsync( StateHasChanged);
+    async Task onButtonClick()
+    {
+        isHidden = !isHidden;
+        InvokeAsync(StateHasChanged);
         await OnAlertCollapsed.InvokeAsync();
     }
 }
