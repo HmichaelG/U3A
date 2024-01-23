@@ -3,17 +3,24 @@
 <div id="fullscreen-element" class="d-flex normalscreen">
     @ContentTemplate
     <DxButton Click="@OnClick"
-              CssClass="flex-grow-1"
-              IconCssClass="bi bi-arrows-fullscreen"
+              CssClass="toggle-button"
+              IconCssClass="bi bi-arrows-fullscreen"             
               RenderStyle="ButtonRenderStyle.Secondary" />
 </div>
 
 <style>
+    .toggle-button {
+        height: 1.5rem;
+        top: 0;
+        right: 0.75rem;
+        position:sticky; 
+    }
     .fullscreen {
         z-index: 99;
         width: 100vw;
         height: 100vh;
         top: 0px;
+        right: 0;
         left: 0px;
         position: fixed;
         background-color: var(--dxbl-btn-color);

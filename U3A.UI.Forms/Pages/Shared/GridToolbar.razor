@@ -9,7 +9,9 @@
 
 @if (!IsMobileLayout)
 {
-    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" ItemClick="OnItemClick">
+    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" 
+            CssClass="me-2"            
+            ItemClick="OnItemClick">
         <Items>
             <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
                            Alignment="ToolbarItemAlignment.Left">
