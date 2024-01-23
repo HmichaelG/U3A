@@ -1,14 +1,18 @@
 ﻿<section class="@($"{CssClass} alert alert-{AlertType} text-center")" hidden="@isHidden">
-    <button class="btn-close" onclick="@onButtonClick" />
+    <button class="btn-close" onclick="@onButtonClick" hidden="@(!ShowCollapseButton)" />
     @ContentTemplate
     @(new MarkupString(AlertText))
 </section>
-<div class="w-100" hidden="@(!isHidden)">
+<div class="w-100 bg-primary muted" hidden="@(!isHidden)">
     <button class="btn-close" onclick="@onButtonClick" />
 </div>
 
 <style>
+    .muted {
+        --bs-bg-opacity: 0.1;
+    }
     section {
+
         width: 100%;
     }
 
@@ -17,6 +21,7 @@
     }
 </style>
 @code {
+    [Parameter] public bool ShowCollapseButton { get; set; } = true;
     [Parameter] public string AlertType { get; set; } = "danger";
     [Parameter] public string AlertText { get; set; }
     [Parameter] public EventCallback OnToggleAlert { get; set; }
@@ -30,14 +35,25 @@
     async Task onButtonClick()
     {
         isHidden = !isHidden;
-        InvokeAsync(StateHasChanged);
-        if (isHidden) 
-        { 
-            await OnContentCollapsed.InvokeAsync(); 
+        await toggleLayout();
+    }
+
+    public async Task ToggleLayoutAsync(bool isCollapsed)
+    {
+        isHidden = isCollapsed;
+        await toggleLayout();
+    }
+
+    async Task toggleLayout()
+    {
+        await InvokeAsync(StateHasChanged);
+        if (isHidden)
+        {
+            await OnContentCollapsed.InvokeAsync();
         }
-       else
-        { 
-            await OnContentExpanded.InvokeAsync(); 
+        else
+        {
+            await OnContentExpanded.InvokeAsync();
         }
         await OnToggleAlert.InvokeAsync();
     }
