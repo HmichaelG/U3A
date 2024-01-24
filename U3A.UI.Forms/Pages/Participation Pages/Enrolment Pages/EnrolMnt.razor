@@ -94,12 +94,6 @@ else
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
 
-                <DxLoadingPanel @bind-Visible="loadingPanelVisible"
-                                IsContentBlocked="true"
-                                ApplyBackgroundShading="false"
-                                IndicatorAreaVisible="false"
-                                Text="Fetching Data...">
-
                     <FullScreen @ref="@fullScreen" >
                         <ContentTemplate>
                             <DxGrid Data="@Enrolments" @ref=@mainGrid
@@ -186,7 +180,6 @@ else
                             </DxGrid>
                         </ContentTemplate>
                     </FullScreen>
-                </DxLoadingPanel>
             </div>
             <div class="col-3  d-none d-md-inline p-2">
                 <DxListBox Data="@CourseLeaders" @bind-Values="@leaders" CssClass="leader-height m-1">
@@ -288,7 +281,6 @@ else
     bool EmailActiveParticipants = false;
     bool EmailWaitlisted = false;
     DxGridDataColumn? FeesDueColumn;
-    bool loadingPanelVisible;
     FullScreen? fullScreen;
 
     bool IsFlyoutOpen = false;
@@ -460,7 +452,6 @@ else
 
     async Task SetupGrid()
     {
-        loadingPanelVisible = true;
         mainGrid.BeginUpdate();
         ClearSelection();
         GridCommandColumn.Visible = false;
@@ -482,7 +473,6 @@ else
         }
         UpdateStatistics();
         mainGrid.EndUpdate();
-        loadingPanelVisible = false;
     }
 
     void ClearSelection()
