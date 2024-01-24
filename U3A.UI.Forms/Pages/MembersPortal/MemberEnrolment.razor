@@ -80,23 +80,10 @@ else
             <Columns>
                 <DxGridDataColumn Width="100%">
                     <HeaderCaptionTemplate>
-                        <div class="d-flex">
-                            <div class="flex-grow-1 my-auto">
-                                @if (IsEnrolmentRequestView)
-                                {
-                                    <span class="h6 text-info">Request course enrolments</span>
-                                }
-                                @if (IsEnrolmentWithdrawalView)
-                                {
-                                    <span class="h6 text-danger">Withdraw from course enrolments</span>
-                                }
-                                @if (IsReadOnly)
-                                {
-                                    <span class="h6 text-info">View your course enrolments</span>
-                                }
-                            </div>
+                        <div class="d-flex my-auto">
                             @if (IsEnrolmentRequestView)
                             {
+                                <div class="flex-grow-1" />
                                 <DxButton @ref=@listboxViewButton Text="@ListboxViewButtonText"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Text"
@@ -591,7 +578,7 @@ else
                 }
                 else if (IsPreview)
                 {
-                    isListboxShowingSummary = true; // force a flip
+                   isListboxShowingSummary = true; // force a flip
                 }
             }
         }
@@ -640,7 +627,7 @@ else
         {
             if (Classes != null && ClassID != Guid.Empty)
             {
-                // We have a class ID passed in via QuerRequest
+                // We have a class ID passed in via QueryRequest
                 var Class = Classes.Find(x => x.ID == ClassID);
                 if (Class != null)
                 {
@@ -742,7 +729,7 @@ else
         {
             if (selectedClasses.Contains(context))
             {
-                result = "Click to remove";
+                result = "Click to withdraw";
             }
             else
             {
@@ -878,7 +865,7 @@ else
     async Task ShowSelectedClasses()
     {
         selectedClass = null;
-        if (IsEnrolmentRequestView)
+        if (IsEnrolmentRequestView || IsPreview)
         {
             //Enrolment request view
             filterText = null;
@@ -928,7 +915,7 @@ else
     async void SelectedDataItemChanged(object value)
     {
         if (showingWebLink) { return; }
-        if (IsReadOnly) { return; }
+        if (IsReadOnly || IsPreview) { return; }
         selectedClass = (Class)value;
         if (selectedClass == null) { return; }
         if (isNotInEnrolmentPeriod) { listGrid.ClearSelection(); return; }
