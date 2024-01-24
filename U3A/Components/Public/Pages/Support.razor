@@ -29,15 +29,15 @@ else
                     IndicatorAreaVisible="false"
                     Text="Sending support request">
 
-        <EditForm Model="@supportModel" class="px-2 col-12 px-sm-0 col-sm-10 col-md-9 col-lg-6 mx-auto"
+        <EditForm Model="@supportModel" class="card col-12 p-2 col-sm-10 col-md-9 col-lg-6 mx-auto"
                   OnValidSubmit=@ValidFormSubmitted
                   Context="editContext">
+            <h3>Request Support</h3>
+            <p>
+                Please enter or confirm your contact details and provide a <strong>clear, succinct</strong>
+                description of your issue.
+            </p>
             <DxFormLayout CssClass="">
-                <h3 class="w-100">Request Support</h3>
-                <p class="w-100">
-                    Please enter or confirm your contact details and provide a <strong>clear, succinct</strong>
-                    description of your issue.
-                </p>
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <DxFormLayoutItem Caption="Your Name" ColSpanMd="12">
