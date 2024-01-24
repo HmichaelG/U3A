@@ -6,17 +6,15 @@
 <div class="container">
     <main role="main" align="center">
         <div align="center">
-            <div class="card p-2 my-4 col col-sm-8 col-md-6 col-lg-5">
+            <div class="card p-2 my-4 col col-12 col-sm-8 col-md-6 col-lg-5">
                 @Body
             </div>
         </div>
     </main>
 </div>
-<footer class="footer pl-3 text-muted">
-    <div class="container" align="center">
+<footer class="footer pl-3 text-muted" align="center">
         &copy; @(DateTime.Today.Year) - U3Admin.org.au
         <a href="Public/Support/true">Click for support</a>  @* true == require Captcha *@
-    </div>
 </footer>
 
 @code {
