@@ -1073,7 +1073,14 @@ else
                     await SaveChanges();
                 }
             }
-            await ReturnToMenu(PortalMenuResult.EnrolmentSubmenuOptionCancelled);
+            if (IsReadOnly)
+            {
+                await ReturnToMenu(PortalMenuResult.MenuOptionCompleted);
+            }
+            else
+            {
+                await ReturnToMenu(PortalMenuResult.EnrolmentSubmenuOptionCancelled);
+            }
         }
         else
         {
