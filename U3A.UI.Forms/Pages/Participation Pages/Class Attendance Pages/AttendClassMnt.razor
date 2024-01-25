@@ -518,6 +518,9 @@ else
 
     async Task SelectedCourseChanged(Course course)
     {
+        SelectedClass = null;
+        selectedDate = null;
+        classComboNullText = null;
         if (ClassAttendance != null) { ClassAttendance.Clear(); }
         ClearSelection();
         if (IsMemberPortal)
@@ -528,11 +531,11 @@ else
         {
             SelectedCourse = course;
             classes = SelectedCourse?.Classes;
-            await SetupClassToEnrol();
+            await SetupClassToMark();
         }
     }
 
-    async Task SetupClassToEnrol()
+    async Task SetupClassToMark()
     {
         SelectedClass = null;
         selectedDate = null;

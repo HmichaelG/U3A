@@ -433,9 +433,11 @@ else
 
     async Task SelectedCourseChanged(Course course)
     {
-        selectedCourse = course;
+        selectedClass = null;
         CourseLeaders = null;
+        classComboNullText = null;
         if (Enrolments != null) { Enrolments.Clear(); }
+        selectedCourse = course;
         if (selectedCourse != null)
         {
             classes = selectedCourse.Classes;
@@ -452,8 +454,8 @@ else
 
     async Task SetupGrid()
     {
-        mainGrid.BeginUpdate();
         ClearSelection();
+        mainGrid.BeginUpdate();
         GridCommandColumn.Visible = false;
         if (selectedCourse != null)
         {
@@ -471,8 +473,9 @@ else
                 }
             }
         }
-        UpdateStatistics();
         mainGrid.EndUpdate();
+        UpdateStatistics();
+        await InvokeAsync(StateHasChanged);
     }
 
     void ClearSelection()
@@ -489,6 +492,7 @@ else
     void SetupClassToEnrol()
     {
         selectedClass = null;
+        classComboNullText = null;
         if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
         {
             classComboEnabled = false;
@@ -503,7 +507,10 @@ else
         }
         else
         {
-            classComboNullText = string.Empty;
+            if (selectedCourse.Classes.Count >= 1)
+            {
+                selectedClass = classes[0];
+            }
             classComboEnabled = true;
         }
     }
