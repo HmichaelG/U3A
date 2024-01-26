@@ -175,21 +175,9 @@
                             </DxMenuItem>
                             <DxMenuItem IconCssClass="bi bi-shield">
                                 <TextTemplate>
-                                    @((isVertical) ? "Logout & Security" : "")
+                                    @((isVertical) ? "Manage Credentials" : "")
                                 </TextTemplate>
                                 <Items>
-                                    <DxMenuItem>
-                                        <Template>
-                                            <form action="Account/Logout" method="post">
-                                                <AntiforgeryToken />
-                                                <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                                                <DxButton Text="Logout"
-                                                          SubmitFormOnClick=true
-                                                          SizeMode="SizeMode.Medium"
-                                                          CssClass="logout-button" IconCssClass="bi bi-door-open" />
-                                            </form>
-                                        </Template>
-                                    </DxMenuItem>
                                     <DxMenuItem Text="Change Email Address" IconCssClass="bi bi-shield"
                                                 Click="@(() => OnChangeCredential("Email"))" />
                                     <DxMenuItem Text="Change Your Password" IconCssClass="bi bi-shield"
@@ -197,6 +185,19 @@
                                     <DxMenuItem Text="Two-factor authentication" IconCssClass="bi bi-shield"
                                                 Click="@(() => OnChangeCredential("TwoFactorAuthentication"))" />
                                 </Items>
+                            </DxMenuItem>
+                            <DxMenuItem>
+                                <TextTemplate>
+                                    <form action="Account/Logout" method="post">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                                        <DxButton Text="@((IsTopMenu) ? "" : "Logout")"
+                                                  SubmitFormOnClick=true
+                                                  SizeMode="SizeMode.Medium"
+                                                  RenderStyle="ButtonRenderStyle.None"
+                                                  CssClass="logout-button menu-item" IconCssClass="bi bi-door-open" />
+                                    </form>
+                                </TextTemplate>
                             </DxMenuItem>
                             <DxMenuItem Click="OnCloseMenu" IconCssClass="bi bi-house" NavigateUrl="./"
                                         Position="@((isVertical) ? ItemPosition.Start : ItemPosition.End )" Visible="@(!IsOnHomePage())">
@@ -216,9 +217,13 @@
 
 }
 <style>
-    .logout-button {
-        width: 15rem !important;
+    .logout-button span {
+        display: flex;
+        text-align: start;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
     }
+
     .sidebar {
         height: 100% !important;
     }

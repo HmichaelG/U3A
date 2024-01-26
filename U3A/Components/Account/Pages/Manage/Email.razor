@@ -48,11 +48,9 @@
                 <label for="new-email" class="form-label">New email</label>
                 <ValidationMessage For="() => Input.NewEmail" class="text-danger" />
             </div>
-            <div>
-                <DxButton Text="Change email address" CssClass="w-100 my-2"
-                          SizeMode="SizeMode.Large"
-                          SubmitFormOnClick=true
-                          RenderStyle="ButtonRenderStyle.Primary" />
+            <div class="row p-2">
+                <button type="submit" class="w-50 btn btn-primary">Change Email</button>
+                <a type="button" href="~/" class="w-50 btn btn-secondary">Cancel</a>
             </div>
         </EditForm>
     </div>

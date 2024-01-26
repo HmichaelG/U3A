@@ -18,12 +18,12 @@ else {
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" />
 
-    <div class="col-12 col-lg-8 m-auto">
+    <div class="col col-12 col-lg-8 m-auto">
         <EditForm Model="@person"
                   OnValidSubmit=@ValidFormSubmitted
                   Context="editContext">
             <DataAnnotationsValidator />
-            <DxFormLayout CssClass="scrollable px-2 border-top border-bottom" id="myForm">
+            <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
                 @if (loginState.SelectedPerson == null) {
                     <span class="text-center alert alert-success col-12">
                         <div>
@@ -32,13 +32,11 @@ else {
                     </span>
                 }
                 @if (IsNewLinkedMember) {
-                    <span class="text-center alert alert-info">
-                        <div>
+                    <div class="text-center alert alert-info">
                             You are about to create a new linked member for whom you will
                             assume responsibility for membership fees and course enrolment.
-                        </div>
-                    </span>
-                    <DxFormLayoutItem Visible="@(!isDatabaseCheckDone)" Context="ThisContext" ColSpanMd="12">
+                    </div>
+                    <div hidden="@(isDatabaseCheckDone)">
                         <DxFormLayoutGroup Caption="Is the person to link already on file?">
                             <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
                                 <DxTextBox @bind-Text="@FirstName" />
@@ -54,7 +52,7 @@ else {
                             <DxButton CssClass="col-3 me-2" Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
                             <DxButton CssClass="col-3" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnCancel" />
                         </DxFormLayoutItem>
-                    </DxFormLayoutItem>
+                    </div>
                 }
                 <div hidden="@(IsNewLinkedMember && !isDatabaseCheckDone)">
                     <DxFormLayoutGroup Caption="Personal">
@@ -183,10 +181,16 @@ else {
 
 <style>
     .scrollable {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        width: 100%;
+        min-width: 1px;
         height: @formHeight;
         overflow-y: auto;
-        overflow-x: hidden;
         border-bottom: thin;
+        
     }
 
 </style>

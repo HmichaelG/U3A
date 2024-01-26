@@ -14,7 +14,7 @@ else {
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" />
 
-    <DxFormLayout CssClass="col col-8 m-auto">
+    <DxFormLayout CssClass="col col-md-8 col-lg-6 m-auto">
         <div class="h5 text-center col-12">Link an existing member</div>
         <div class="alert alert-info col-12 text-center">
             <p>
@@ -29,35 +29,32 @@ else {
         </div>
         <DxFormLayout CssClass="col-12">
             <DxFormLayoutGroup Caption="Member Identity to link">
-                <DxFormLayoutItem Caption="Enter the member's Member Identity:" CssClass="find-textbox">
-                    <DxTextBox @bind-Text="@personIdentity" />
+                <DxFormLayoutItem Caption="Enter the member's Member Identity:" ColSpanXs="12">
+                    <DxTextBox @bind-Text="@personIdentity" CssClass="flex-grow-0" >
+                        <Buttons>
+                                <DxEditorButton Text="Find"
+                                          IconCssClass="bi bi-glasses"
+                                          Click="@OnFind"
+                                          Visible="@(!canSave)" />
+                            </Buttons>
+                    </DxTextBox>
                 </DxFormLayoutItem>
-                <DxButton Text="Find" CssClass="find-button m-auto mt-2"
-                      RenderStyle="@ButtonRenderStyle.Primary"
-                      Click="@OnFind"
-                      Visible="@(!canSave)" />
                 <DxFormLayoutItem Caption="You are about to link to:" ColSpanXs="12" Visible="@canSave">
                     <DxTextBox @bind-Text="@fullName" ReadOnly=true />
                 </DxFormLayoutItem>
             </DxFormLayoutGroup>
-            <DxButton CssClass="col-12 col-md-3 me-2 mt-2" Enabled="@canSave"
+            <div class="d-flex w-100 mt-2 px-2">
+            <DxButton CssClass="flex-grow-1" Enabled="@canSave"
                   Text="Save" RenderStyle="@ButtonRenderStyle.Primary" Click="@OnSave" />
-            <DxButton CssClass="col-12 col-md-3 mt-2"
+            <DxButton CssClass="flex-grow-1"
                   Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnCancel" />
+            </div>
         </DxFormLayout>
         <div class="container">
         </div>
     </DxFormLayout>
 }
-<style>
-    .find-textbox {
-        width: 85%;
-    }
 
-    .find-button {
-        width: 12%;
-    }
-</style>
 @code {
     [CascadingParameter]
     LoginState loginState { get; set; }
