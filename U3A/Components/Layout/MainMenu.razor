@@ -42,7 +42,7 @@
                         if (isAuthenticated)
                         {
 
-                            <DxMenuItem Click="OnCloseMenu" IconCssClass="bi bi-house" NavigateUrl="./">
+                            <DxMenuItem CloseMenuOnClick="true" IconCssClass="bi bi-house" NavigateUrl="./">
                                 <TextTemplate>
                                     @((isVertical) ? "Home" : "")
                                 </TextTemplate>
@@ -50,16 +50,16 @@
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
-                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear" >
+                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear">
                                     <Items>
                                         @if (isSecurityAdminRole)
                                         {
-                                            <DxMenuItem Click="OnCloseMenu" Text="Login Security &amp; Role Assignment" NavigateUrl="IdentityUserMnt" />
+                                            <DxMenuItem CloseMenuOnClick="true" Text="Login Security &amp; Role Assignment" NavigateUrl="IdentityUserMnt" />
                                         }
-                                        <DxMenuItem Click="OnCloseMenu" Text="Organisation Details" NavigateUrl="OrganisationDetailsMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Membership Fees" NavigateUrl="MembershipFeesMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Document Templates" NavigateUrl="DocumentTemplateMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Setup an Office PC" IconCssClass="bi bi-display" NavigateUrl="/OfficePC.html" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Organisation Details" NavigateUrl="OrganisationDetailsMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Membership Fees" NavigateUrl="MembershipFeesMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Document Templates" NavigateUrl="DocumentTemplateMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Setup an Office PC" IconCssClass="bi bi-display" NavigateUrl="/OfficePC.html" />
                                     </Items>
                                 </DxMenuItem>
                             }
@@ -68,15 +68,15 @@
                             {
                                 <DxMenuItem Text="Course" IconCssClass="bi bi-menu-button-fill">
                                     <Items>
-                                        <DxMenuItem Click="OnCloseMenu" Text="Enter/Exit Maintenance Mode" NavigateUrl="EnterExitMaintenance" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Course Types" NavigateUrl="CourseTypeMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Venues" NavigateUrl="VenueMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Enrolment Terms" NavigateUrl="TermMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Public Holidays" NavigateUrl="PublicHolidayMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Courses" NavigateUrl="CourseMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Bring Forward Courses" NavigateUrl="BringForwardCourses" BeginGroup="true" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Cancel Class" NavigateUrl="CancelClassMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Course Schedule" NavigateUrl="CourseSchedule" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Enter/Exit Maintenance Mode" NavigateUrl="EnterExitMaintenance" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Course Types" NavigateUrl="CourseTypeMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Venues" NavigateUrl="VenueMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Enrolment Terms" NavigateUrl="TermMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Public Holidays" NavigateUrl="PublicHolidayMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Courses" NavigateUrl="CourseMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Bring Forward Courses" NavigateUrl="BringForwardCourses" BeginGroup="true" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Cancel Class" NavigateUrl="CancelClassMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Course Schedule" NavigateUrl="CourseSchedule" />
                                     </Items>
                                 </DxMenuItem>
                             }
@@ -89,34 +89,34 @@
                                     <Items>
                                         <DxMenuItem Text="Fees &amp; Receipting">
                                             <Items>
-                                                <DxMenuItem Click="OnCloseMenu" Text="Bank Data Import" NavigateUrl="BankDataImport" Enabled="@(isSystemAdminRole | isAccountingRole)" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Receipts" NavigateUrl="ReceiptMnt" Enabled="@(isSystemAdminRole | isAccountingRole)" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Fees" NavigateUrl="FeeMnt" Enabled="@(isSystemAdminRole | isAccountingRole)" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Complimentary Membership" NavigateUrl="AssignComplimentaryMembership" Enabled="@(isSystemAdminRole | isAccountingRole)" />
-                                                <DxMenuItem Click="OnCloseMenu" BeginGroup="true" Text="Receipts By Participant" NavigateUrl="XtraReportViewer/CashReceiptsByParticipantRpt" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Receipts By Date" NavigateUrl="XtraReportViewer/CashReceiptsByDateRpt" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Review Online Payment Status" NavigateUrl="ReviewOnlinePaymentStatus" Enabled="@(isSystemAdminRole | isAccountingRole)" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Complimentary Membership Report" NavigateUrl="XtraReportViewer/ComplimentaryMembershipRpt" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Financial Status Enquiry" NavigateUrl="FinancialStatusEnquiry" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Course Fees Due Enquiry" NavigateUrl="CourseFeesDueEnquiry" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Bank Data Import" NavigateUrl="BankDataImport" Enabled="@(isSystemAdminRole | isAccountingRole)" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Receipts" NavigateUrl="ReceiptMnt" Enabled="@(isSystemAdminRole | isAccountingRole)" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Fees" NavigateUrl="FeeMnt" Enabled="@(isSystemAdminRole | isAccountingRole)" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Complimentary Membership" NavigateUrl="AssignComplimentaryMembership" Enabled="@(isSystemAdminRole | isAccountingRole)" />
+                                                <DxMenuItem CloseMenuOnClick="true" BeginGroup="true" Text="Receipts By Participant" NavigateUrl="XtraReportViewer/CashReceiptsByParticipantRpt" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Receipts By Date" NavigateUrl="XtraReportViewer/CashReceiptsByDateRpt" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Review Online Payment Status" NavigateUrl="ReviewOnlinePaymentStatus" Enabled="@(isSystemAdminRole | isAccountingRole)" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Complimentary Membership Report" NavigateUrl="XtraReportViewer/ComplimentaryMembershipRpt" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Financial Status Enquiry" NavigateUrl="FinancialStatusEnquiry" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Course Fees Due Enquiry" NavigateUrl="CourseFeesDueEnquiry" />
                                             </Items>
                                         </DxMenuItem>
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Participants" NavigateUrl="PersonMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Committee" NavigateUrl="CommitteeMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Add/Edit Volunteers" NavigateUrl="VolunteerMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Enrol Participants" NavigateUrl="EnrolMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Review Class Dropouts" NavigateUrl="ReviewDropouts" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Class Attendance" NavigateUrl="AttendClassMnt" />
-                                        <DxMenuItem Click="OnCloseMenu" BeginGroup=true Text="Bring Forward Enrolments" NavigateUrl="BringForwardEnrolments" Enabled="@(isSystemAdminRole)" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Auto-Enrol Participants" NavigateUrl="AutoEnrolParticipants" Enabled="@(isSystemAdminRole)" />
-                                        <DxMenuItem Click="OnCloseMenu" Text="Correspondence Hub" NavigateUrl="CorrespondenceHub" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Participants" NavigateUrl="PersonMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Committee" NavigateUrl="CommitteeMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Add/Edit Volunteers" NavigateUrl="VolunteerMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Enrol Participants" NavigateUrl="EnrolMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Review Class Dropouts" NavigateUrl="ReviewDropouts" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Class Attendance" NavigateUrl="AttendClassMnt" />
+                                        <DxMenuItem CloseMenuOnClick="true" BeginGroup=true Text="Bring Forward Enrolments" NavigateUrl="BringForwardEnrolments" Enabled="@(isSystemAdminRole)" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Auto-Enrol Participants" NavigateUrl="AutoEnrolParticipants" Enabled="@(isSystemAdminRole)" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Correspondence Hub" NavigateUrl="CorrespondenceHub" />
                                     </Items>
                                 </DxMenuItem>
                             }
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole | isOfficeRole)
                             {
-                                <DxMenuItem Click="OnCloseMenu" Text="Portal (Admin)" IconCssClass="bi bi-people" NavigateUrl="AdminMemberPortal" />
+                                <DxMenuItem CloseMenuOnClick="true" Text="Portal (Admin)" IconCssClass="bi bi-people" NavigateUrl="AdminMemberPortal" />
                             }
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole)
@@ -125,42 +125,42 @@
                                     <Items>
                                         <DxMenuItem Text="Listings">
                                             <Items>
-                                                <DxMenuItem Click="OnCloseMenu" Text="Course Type List" NavigateUrl="XtraReportViewer/CourseTypeList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Venue List" NavigateUrl="XtraReportViewer/VenueList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Public Holiday List" NavigateUrl="XtraReportViewer/PublicHolidayList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Course Type List" NavigateUrl="XtraReportViewer/CourseTypeList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Venue List" NavigateUrl="XtraReportViewer/VenueList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Public Holiday List" NavigateUrl="XtraReportViewer/PublicHolidayList" />
                                             </Items>
                                         </DxMenuItem>
                                         <DxMenuItem Text="Participant Reports">
                                             <Items>
-                                                <DxMenuItem Click="OnCloseMenu" Text="New Participant List" NavigateUrl="XtraReportViewer/NewParticipantList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Life Member List" NavigateUrl="XtraReportViewer/LifeMembersList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Ceased Participant List" NavigateUrl="XtraReportViewer/CeasedParticipantList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Volunteer List" NavigateUrl="XtraReportViewer/VolunteerList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Participant Skills List" NavigateUrl="XtraReportViewer/SkillsList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Summary Participant List" NavigateUrl="XtraReportViewer/SummaryParticipantList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Duplicate Participant List" NavigateUrl="XtraReportViewer/DuplicateParticipantList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Mail Labels" NavigateUrl="XtraReportViewer/MaillingLabels" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="New Participant List" NavigateUrl="XtraReportViewer/NewParticipantList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Life Member List" NavigateUrl="XtraReportViewer/LifeMembersList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Ceased Participant List" NavigateUrl="XtraReportViewer/CeasedParticipantList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Volunteer List" NavigateUrl="XtraReportViewer/VolunteerList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Participant Skills List" NavigateUrl="XtraReportViewer/SkillsList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Summary Participant List" NavigateUrl="XtraReportViewer/SummaryParticipantList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Duplicate Participant List" NavigateUrl="XtraReportViewer/DuplicateParticipantList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Mail Labels" NavigateUrl="XtraReportViewer/MaillingLabels" />
                                             </Items>
                                         </DxMenuItem>
                                         <DxMenuItem Text="Course, Class &amp; Schedule">
                                             <Items>
-                                                <DxMenuItem Click="OnCloseMenu" Text="Course Listing" NavigateUrl="XtraReportViewer/CourseList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Class Schedule" NavigateUrl="XtraReportViewer/ClassScheduleRpt" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Course By Venue List" NavigateUrl="XtraReportViewer/CourseByVenueList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Course By Leader List" NavigateUrl="XtraReportViewer/CourseByLeaderList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Course By Participant List" NavigateUrl="XtraReportViewer/CourseByParticipantList" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Enrolment Report" NavigateUrl="XtraReportViewer/EnrolmentReport" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Venue Conflicts List" NavigateUrl="XtraReportViewer/VenueConflictList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Course Listing" NavigateUrl="XtraReportViewer/CourseList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Class Schedule" NavigateUrl="XtraReportViewer/ClassScheduleRpt" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Course By Venue List" NavigateUrl="XtraReportViewer/CourseByVenueList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Course By Leader List" NavigateUrl="XtraReportViewer/CourseByLeaderList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Course By Participant List" NavigateUrl="XtraReportViewer/CourseByParticipantList" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Enrolment Report" NavigateUrl="XtraReportViewer/EnrolmentReport" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Venue Conflicts List" NavigateUrl="XtraReportViewer/VenueConflictList" />
                                             </Items>
                                         </DxMenuItem>
                                         <DxMenuItem Text="Attendance Reports">
                                             <Items>
-                                                <DxMenuItem Click="OnCloseMenu" Text="Attendance Analysis" NavigateUrl="XtraReportViewer/AttendanceAnalysis" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Attendance Summary" NavigateUrl="XtraReportViewer/AttendanceSummary" />
-                                                <DxMenuItem Click="OnCloseMenu" Text="Attendance By Member" NavigateUrl="XtraReportViewer/AttendanceByMemberRpt" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Attendance Analysis" NavigateUrl="XtraReportViewer/AttendanceAnalysis" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Attendance Summary" NavigateUrl="XtraReportViewer/AttendanceSummary" />
+                                                <DxMenuItem CloseMenuOnClick="true" Text="Attendance By Member" NavigateUrl="XtraReportViewer/AttendanceByMemberRpt" />
                                             </Items>
                                         </DxMenuItem>
-                                        <DxMenuItem Click="OnCloseMenu" Text="Data Import Error Report" NavigateUrl="XtraReportViewer/DataImportErrorReport" />
+                                        <DxMenuItem CloseMenuOnClick="true" Text="Data Import Error Report" NavigateUrl="XtraReportViewer/DataImportErrorReport" />
                                     </Items>
                                 </DxMenuItem>
                             }
@@ -170,10 +170,10 @@
                                     @((isVertical) ? "Theme & Settings" : "")
                                 </TextTemplate>
                                 <Items>
-                                    <DxMenuItem Click="OnCloseMenu" Text="Office White" />
-                                    <DxMenuItem Click="OnCloseMenu" Text="Blazing Berry" />
-                                    <DxMenuItem Click="OnCloseMenu" Text="Blazing Dark" />
-                                    <DxMenuItem Click="OnCloseMenu" Text="Purple" />
+                                    <DxMenuItem CloseMenuOnClick="true" Text="Office White" />
+                                    <DxMenuItem CloseMenuOnClick="true" Text="Blazing Berry" />
+                                    <DxMenuItem CloseMenuOnClick="true" Text="Blazing Dark" />
+                                    <DxMenuItem CloseMenuOnClick="true" Text="Purple" />
                                     <DxMenuItem BeginGroup=true
                                                 Text="Swicth Menu Position"
                                                 Click="OnSwitchMenu" />
@@ -192,17 +192,10 @@
                                                 Click="@(() => OnChangeCredential("TwoFactorAuthentication"))" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem Click="@OnCloseMenu">
+                            <DxMenuItem CloseMenuOnClick="true" Click="OnLogout" Text="Logout"
+                                        IconCssClass="bi bi-door-open">
                                 <TextTemplate>
-                                    <form action="Account/Logout" method="post">
-                                        <AntiforgeryToken />
-                                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                                        <DxButton Text="@((IsTopMenu) ? "" : "Logout")"
-                                                  SubmitFormOnClick=true
-                                                  SizeMode="SizeMode.Medium"
-                                                  RenderStyle="ButtonRenderStyle.None"
-                                                  CssClass="logout-button menu-item" IconCssClass="bi bi-door-open me-2" />
-                                    </form>
+                                    @((isVertical) ? "Logout" : "")
                                 </TextTemplate>
                             </DxMenuItem>
                         }
@@ -241,7 +234,7 @@
 
     private string? currentUrl;
 
-    U3ADbContext dbc { get; set; }
+    U3ADbContext? dbc { get; set; }
     MessageBox? messageBox;
 
     bool isAuthenticated { get; set; }
@@ -314,6 +307,12 @@
     {
         // forces a close of the menu when it is in mobile mode & expanded.
         if (isVertical) { await js.InvokeVoidAsync("closeSideBarMenu"); await InvokeAsync(StateHasChanged); }
+    }
+
+    private async Task OnLogout()
+    {
+        // forces a close of the menu when it is in mobile mode & expanded.
+        await js.InvokeVoidAsync("logout"); await InvokeAsync(StateHasChanged);
     }
 
 

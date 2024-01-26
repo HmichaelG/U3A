@@ -41,6 +41,13 @@
                     {
                         <MainLayoutTopMenu Body="@Body" />
                     }
+
+                    @* For logout *@
+                    <form id="logoutForm" action="Account/Logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                    </form>
+
                 </CascadingValue>
             </CascadingValue>
         </CascadingValue>
@@ -61,6 +68,7 @@
     bool? useTopMenu = null; // default is sidebar
     U3ADbContext? dbc { get; set; }
     bool isReady = false;
+    string? currentUrl;
 
     private DotNetObjectReference<MainLayout>? dotNetObjectReference;
 
@@ -121,6 +129,8 @@
         var ch = circuitHandler as CircuitHandlerService;
         ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count;
+        currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
+
         isReady = true;
         await base.OnInitializedAsync();
     }

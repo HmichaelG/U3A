@@ -1,4 +1,10 @@
-﻿
+﻿// system logout
+function logout() {
+    var f = document.getElementById('logoutForm');
+    if (f != null) {
+        f.submit();
+    }
+}
 
 // Full screen / normal screen functions
 function toggleFullscreen() {
@@ -8,7 +14,7 @@ function toggleFullscreen() {
         e.classList.toggle('fullscreen');
     }
 }
-// Full screen / normal screen functions
+
 function refreshNormalscreen() {
     var e = document.getElementById('fullscreen-element');
     if (e != null) {
