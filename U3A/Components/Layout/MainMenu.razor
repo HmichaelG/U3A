@@ -42,6 +42,12 @@
                         if (isAuthenticated)
                         {
 
+                            <DxMenuItem Click="OnCloseMenu" IconCssClass="bi bi-house" NavigateUrl="./">
+                                <TextTemplate>
+                                    @((isVertical) ? "Home" : "")
+                                </TextTemplate>
+                            </DxMenuItem>
+
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
                                 <DxMenuItem Text="Admin" IconCssClass="bi bi-gear" >
@@ -186,7 +192,7 @@
                                                 Click="@(() => OnChangeCredential("TwoFactorAuthentication"))" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem>
+                            <DxMenuItem Click="@OnCloseMenu">
                                 <TextTemplate>
                                     <form action="Account/Logout" method="post">
                                         <AntiforgeryToken />
@@ -195,14 +201,8 @@
                                                   SubmitFormOnClick=true
                                                   SizeMode="SizeMode.Medium"
                                                   RenderStyle="ButtonRenderStyle.None"
-                                                  CssClass="logout-button menu-item" IconCssClass="bi bi-door-open" />
+                                                  CssClass="logout-button menu-item" IconCssClass="bi bi-door-open me-2" />
                                     </form>
-                                </TextTemplate>
-                            </DxMenuItem>
-                            <DxMenuItem Click="OnCloseMenu" IconCssClass="bi bi-house" NavigateUrl="./"
-                                        Position="@((isVertical) ? ItemPosition.Start : ItemPosition.End )" Visible="@(!IsOnHomePage())">
-                                <TextTemplate>
-                                    @((isVertical) ? "Home" : "")
                                 </TextTemplate>
                             </DxMenuItem>
                         }
@@ -222,6 +222,10 @@
         text-align: start;
         margin-left: 0 !important;
         padding-left: 0 !important;
+    }
+
+    .logout-button:hover {
+        color: var(--bs-white) !important;
     }
 
     .sidebar {
@@ -309,14 +313,9 @@
     private async Task OnCloseMenu()
     {
         // forces a close of the menu when it is in mobile mode & expanded.
-        if (isVertical) { await js.InvokeVoidAsync("closeSideBarMenu"); }
+        if (isVertical) { await js.InvokeVoidAsync("closeSideBarMenu"); await InvokeAsync(StateHasChanged); }
     }
 
-
-    bool IsOnHomePage()
-    {
-        return (string.IsNullOrEmpty(navMan.ToBaseRelativePath(navMan.Uri)));
-    }
 
     async Task ShowHelp()
     {
