@@ -1,13 +1,13 @@
 ﻿@page "/Public/Support"
-@page "/Public/Support/{IsCaptchaRequired?}"
 
 @using U3A.Model
+@using U3A.Services;
 @using System.Text;
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@inject NavigationManager navMan;
-@using BlazorCaptcha
-
+@inject NavigationManager navMan
+@inject ReCaptchaV2API reCaptchaAPI
+@inject IJSRuntime js
 
 @if (!isReady)
 {
@@ -15,7 +15,7 @@
 }
 else
 {
-    <MessageBox @ref=@messageBox>
+    <MessageBox @ref=@successMessageBox>
         <TextTemplate>
             <p>
                 Your request has been sent to your U3A's support representative and will be responded to.
@@ -23,6 +23,16 @@ else
             </p>
         </TextTemplate>
     </MessageBox>
+    <MessageBox @ref=@failedMessageBox>
+        <TextTemplate>
+            <p>
+                Your support request has failed reCAPTCHA evrification.
+                If you are not a robot, please feel free to try again.
+            </p>
+        </TextTemplate>
+    </MessageBox>
+    <MessageBox @ref=@errorMessageBox />
+
     <DxLoadingPanel @bind-Visible="@isBusy"
                     IsContentBlocked="true"
                     ApplyBackgroundShading="true"
@@ -55,19 +65,14 @@ else
                 <DxFormLayoutItem Caption="Problem Description" ColSpanMd="12">
                     <DxMemo Rows="8" @bind-Text="@supportModel!.Description" />
                 </DxFormLayoutItem>
-                @if (IsCaptchaRequired == "true")
-                {
-                    <div class="mt-2 mx-auto">
-                        <Captcha CaptchaWord="@supportModel!.Captcha" CaptchaWordChanged="@((w) => OnCaptchaChanged(w))"
-                                 CharNumber="@CaptchaLetters" />
+                    <div class="mt-2 mx-auto">                    
+                    <ReCAPTCHA @ref="@reCAPTCHAComponent" SiteKey="6LcT11spAAAAAEc0vtGQmtI2Kv5jII5kB2pz5Gnn" OnSuccess="OnSuccess" OnExpired="OnExpired" />
                     </div>
-                    <DxFormLayoutItem Caption="Prove you are real" ColSpanMd="12">
-                        <DxTextBox @bind-Text="@supportModel.CaptchaResponse" NullText="Enter the above code exactly as given." />
-                    </DxFormLayoutItem>
-                }
             </DxFormLayout>
             <footer class="input-group px-2 mt-2" id="footer">
-                <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
+                <DxButton 
+                    Enabled="@enableSubmitButton"
+                    CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
                 <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" onclick="window.location = '/';" />
             </footer>
         </EditForm>
@@ -78,16 +83,18 @@ else
     [CascadingParameter]
     public LoginState? LoginState { get; set; }
 
-    [Parameter]
-    public string? IsCaptchaRequired { get; set; }
-
     bool isReady;
 
     SystemSettings? settings;
-    MessageBox? messageBox;
-    SupportModel? supportModel;
+    MessageBox? successMessageBox;
+    MessageBox? failedMessageBox;
+    MessageBox? errorMessageBox;
+    SupportModel? supportModel; 
 
-    private int CaptchaLetters = 5;
+    private ReCAPTCHA? reCAPTCHAComponent;
+    private bool ValidReCAPTCHA = false;
+    private bool ServerVerificatiing = false;
+    private bool enableSubmitButton => ValidReCAPTCHA && !ServerVerificatiing;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,7 +103,6 @@ else
             settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
         }
         supportModel = new();
-        supportModel!.Captcha = BlazorCaptcha.Tools.GetCaptchaWord(CaptchaLetters);
         if (LoginState != null)
         {
             if (LoginState.SelectedPerson != null)
@@ -106,7 +112,6 @@ else
                 supportModel.Mobile = LoginState.SelectedPerson.Mobile!;
                 supportModel.Email = LoginState.SelectedPerson.Email;
             }
-            if (IsCaptchaRequired != null) supportModel.IsCaptchaRequired = (IsCaptchaRequired == "true") ? true : false;
         }
         isReady = true;
         await base.OnInitializedAsync();
@@ -118,27 +123,36 @@ else
     {
         if (isBusy) return;
         isBusy = true;
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        if (await IsValidReCAPTCHAok())
         {
-            var emailSender = EmailFactory.GetEmailSender(dbc);
-            var sendTo = settings!.SupportEmailAddesss ?? settings.SendEmailAddesss;
-            var msg = BuildMessage();
-            var subject = $"!!!HEADS UP!!! {supportModel!.Name} requires your support.";
-            await emailSender!.SendEmailAsync(
-                            EmailType.Transactional,
-                            "system@u3admin.org.au",
-                            "System Postman",
-                            sendTo,
-                            "System Support & Assistance",
-                            subject,
-                            msg,
-                            string.Empty
-                            );
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                var emailSender = EmailFactory.GetEmailSender(dbc);
+                var sendTo = settings!.SupportEmailAddesss ?? settings.SendEmailAddesss;
+                var msg = BuildMessage();
+                var subject = $"!!!HEADS UP!!! {supportModel!.Name} requires your support.";
+                await emailSender!.SendEmailAsync(
+                                EmailType.Transactional,
+                                "system@u3admin.org.au",
+                                "System Postman",
+                                sendTo,
+                                "System Support & Assistance",
+                                subject,
+                                msg,
+                                string.Empty
+                                );
+            }
+            isBusy = false;
+            await InvokeAsync(StateHasChanged);
+            await successMessageBox!.ShowOkOnlyAsync("Support Request Sent");
+            navMan.NavigateTo("/", true);
         }
-        isBusy = false;
-        await InvokeAsync(StateHasChanged);
-        await messageBox!.ShowOkOnlyAsync("Support Request Sent");
-        navMan.NavigateTo("/", true);
+        else
+        {
+            isBusy = false;
+            await InvokeAsync(StateHasChanged);
+            await failedMessageBox!.ShowOkOnlyAsync("Support Request Failed");
+        }
     }
 
     string BuildMessage()
@@ -195,4 +209,46 @@ else
         supportModel!.Captcha = newWord;
         supportModel.CaptchaResponse = "";
     }
+
+
+    private void OnSuccess()
+    {
+        ValidReCAPTCHA = true;
+    }
+
+    private void OnExpired()
+    {
+        ValidReCAPTCHA = false;
+    }
+
+    private async Task<bool> IsValidReCAPTCHAok()
+    {
+        bool ok = false;
+        if (ValidReCAPTCHA)
+        {
+            var response = await reCAPTCHAComponent!.GetResponseAsync();
+            try
+            {
+                ServerVerificatiing = true;
+                StateHasChanged();
+                var result = await reCaptchaAPI.Post(response);
+                if (result.Success)
+                {
+                    ok = true;
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                await errorMessageBox!.ShowOkOnlyAsync("System Error", e.Message);
+            }
+            finally
+            {
+                ServerVerificatiing = false;
+                StateHasChanged();
+            }
+        }
+        return ok;
+    }
+
+
 }

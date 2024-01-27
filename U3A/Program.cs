@@ -13,6 +13,8 @@ using DevExpress.Blazor.RichEdit.SpellCheck;
 using Microsoft.Extensions.FileProviders;
 using System.Reflection;
 using Azure.Identity;
+using Microsoft.AspNetCore.Builder;
+using DevExpress.XtraCharts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,29 +79,6 @@ builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
     });
 });
 
-//builder.Services.AddDevExpressBlazorReporting();
-
-//// Register the storage after the AddDevExpressBlazorReporting method call.
-//builder.Services.AddScoped<ReportStorageWebExtension, CustomReportStorageWebExtension>();
-
-//builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddSingleton<IScopedDbContextProvider<U3ADbContext>, ScopedDbContextProvider<U3ADbContext>>();
-//builder.Services.AddSingleton<IObjectDataSourceInjector, ObjectDataSourceInjector>();
-//builder.Services.AddSingleton<PreviewReportCustomizationService, CustomPreviewReportCustomizationService>();
-//builder.Services.AddTransient<ReportRepository>();
-//builder.Services.ConfigureReportingServices(configurator =>
-//{
-//    configurator.ConfigureReportDesigner((reportDesignerConfigurator) =>
-//    {
-//        reportDesignerConfigurator.RegisterObjectDataSourceConstructorFilterService<ObjectDataSourceConstructorFilterService>();
-//        reportDesignerConfigurator.RegisterObjectDataSourceWizardTypeProvider<ObjectDataSourceWizardTypeProvider>();
-//    });
-//    configurator.ConfigureWebDocumentViewer(viewerConfigurator =>
-//    {
-//        viewerConfigurator.UseCachedReportSourceBuilder();
-//    });
-//});
-
 
 builder.Services.AddDevExpressServerSideBlazorReportViewer();
 builder.Services.Configure<DevExpress.Blazor.Configuration.GlobalOptions>(options =>
@@ -107,6 +86,16 @@ builder.Services.Configure<DevExpress.Blazor.Configuration.GlobalOptions>(option
     options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
     options.SizeMode = DevExpress.Blazor.SizeMode.Small;
 });
+
+
+
+builder.Services.Configure<reCAPTCHAVerificationOptions>(o =>
+{
+    o.Secret = builder.Configuration.GetValue<String>("GoogleReCAPTCHAv2Key")!;
+});
+
+builder.Services.AddTransient<ReCaptchaV2API>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddRazorPages();
 
