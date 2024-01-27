@@ -526,7 +526,8 @@
         switch (TabIndex)
         {
             case 0:             // All financial participants not Ceased
-                co = CriteriaOperator.FromLambda<Person>(x => x.DateCeased == null && x.FinancialTo >= currentTerm.Year);
+                co = CriteriaOperator.FromLambda<Person>(x => x.DateCeased == null 
+                        && (x.FinancialTo >= currentTerm.Year || x.FinancialTo == constants.START_OF_TIME));
                 break;
             case 1:             // Leaders
                 co = CriteriaOperator.FromLambda<Person>(x => x.IsCourseLeader && x.DateCeased == null && x.FinancialTo >= currentTerm.Year);
