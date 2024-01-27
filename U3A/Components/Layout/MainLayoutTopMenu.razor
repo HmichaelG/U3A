@@ -22,12 +22,11 @@
                     @bind-IsActive="@IsLargeLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
                     @bind-IsActive="@IsXtraLargeLayout" />
-<div class="page w-100">
-    <DxGridLayout CssClass="page-layout">
+
+    <DxGridLayout CssClass="">
         <Rows>
             <DxGridLayoutRow Areas="Left-Blank header Right-Blank" Height="auto" />
             <DxGridLayoutRow Areas="Left-Blank content Right-Blank" />
-            <DxGridLayoutRow Areas="footer footer footer" Height="1rem" />
         </Rows>
         <Columns>
             @{
@@ -62,11 +61,11 @@
                     }
                 </Template>
             </DxGridLayoutItem>
-            <DxGridLayoutItem Area="content" CssClass="content">
+            <DxGridLayoutItem Area="content" CssClass="main">
                 <Template>
                     <ErrorBoundary @ref="@errorBoundary">
                         <ChildContent>
-                            <div class="@((hasRole) ? "w-100 content-padding" : "" )">
+                            <div class="@((hasRole) ? "content-padding" : "" )">
                                 @if (!string.IsNullOrWhiteSpace(messageText))
                                 {
                                     <div class="alert alert-danger text-center mx-auto">
@@ -89,11 +88,11 @@
             <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none vh-100" />
         </Items>
     </DxGridLayout>
-</div>
+
 
 <style>
     .content-padding {
-    padding-top: 2.5rem !important;
+        padding-top: 3rem !important;
     }
 </style>
 

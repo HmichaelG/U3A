@@ -30,7 +30,7 @@ else
         else
         {
             <div class="input-group align-items-center">
-                <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"There are {openCircuits} users logged in.")</div>
+                <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                   ButtonIconCssClass="bi bi-check2-circle"
                                   HelpTopic="Version-History.html"
@@ -40,6 +40,10 @@ else
                                   HelpTopic="Introduction.html"
                                   IncludeTableOfContents=true
                                   ActivationStyle="HelpActivationStyle.ButtonOnly" />
+                <DxButton Text="Support"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                  NavigateUrl="Public/Support"
+                          CssClass="bi bi-person" />
             </div>
             <DxTabs CssClass="mb-2 vw-100">
                 <DxTabPage Text="Member Summary">
