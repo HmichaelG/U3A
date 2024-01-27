@@ -145,12 +145,11 @@
                         @{
                             var editItem = (Person)EditFormContext.EditModel;
                         }
-                        <DxFormLayout>
+                        <DxFormLayout CssClass="container-fluid" style="white-space:nowrap">
                             <DxFormLayoutItem ColSpanMd="12">
                                 <ValidationSummary />
                             </DxFormLayoutItem>
-                            <div class="m-2 text-danger"
-                                 style="width: 95%; font-size: 0.9em">
+                            <div class="w-100 m-2 text-danger" >
                                 <strong>NB:</strong> Changing the Email address requires Member Portal re-registration.
                             </div>
                             <DxFormLayoutGroup Caption="Personal" ColSpanMd="6">
