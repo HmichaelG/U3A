@@ -34,12 +34,12 @@ else
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                   ButtonIconCssClass="bi bi-check2-circle"
                                   HelpTopic="Version-History.html"
-                                  ActivationStyle="HelpActivationStyle.ButtonOnly" />
+                                  ActivationStyle="@HelpActivationStyle.ButtonOnly" />
                 <ContextHelpTitle Title="help"                                  
                                   ButtonIconCssClass="bi bi-question"
                                   HelpTopic="Introduction.html"
                                   IncludeTableOfContents=true
-                                  ActivationStyle="HelpActivationStyle.ButtonOnly" />
+                                  ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMaintenanceWarning" />
                 <DxButton Text="Support"
                                   RenderStyleMode="ButtonRenderStyleMode.Outline"
                                   NavigateUrl="Public/Support"

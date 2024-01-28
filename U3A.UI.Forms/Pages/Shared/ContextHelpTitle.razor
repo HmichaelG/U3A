@@ -10,8 +10,9 @@
     {
         case HelpActivationStyle.None:
             break;
-        case HelpActivationStyle.ButtonOnly:
-            if (settings?.InMaintenanceTill != null)
+        case HelpActivationStyle.ButtonOnly: 
+        case HelpActivationStyle.ButtonOnlyNoMaintenanceWarning:
+            if (settings?.InMaintenanceTill != null && ActivationStyle == HelpActivationStyle.ButtonOnly)
             {
                 <div class="alert alert-danger text-center text-danger">Warning: You are in Member Portal Maintenance Mode</div>
             }

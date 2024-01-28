@@ -10,6 +10,7 @@ namespace U3A.Model
     {
         StandardButtonAndTitle = 0,
         ButtonOnly = 1,
+        ButtonOnlyNoMaintenanceWarning = 2,
         None = 99
     }
 }
