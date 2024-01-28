@@ -165,7 +165,7 @@ else
         ErrorMessage = "";
         await ProcessReportsAsync(false);
         var msg = $"<p>The selected documents have been queued and will be sent via email overnight.</p>";
-        if (ErrorMessage != "") { msg += $"<div class='alert alert-danger'>{ErrorMessage}</div>"; }
+        if (ErrorMessage != "") { msg += $"<div class='alert alert-danger text-danger'>{ErrorMessage}</div>"; }
         await messageBox.SetPopupWidth("30%");
         await messageBox.ShowOkOnlyAsync("Communication Complete", msg);
     }

@@ -36,7 +36,7 @@ else
         </div>
         @if (isNotInEnrolmentPeriod)
         {
-            <p class="alert alert-danger col-12 my-2" align="center">
+            <p class="alert alert-danger text-danger col-12 my-2" align="center">
                 @(enrolmentLockoutText)
             </p>
         }
@@ -1003,7 +1003,7 @@ else
             if (!selectedClass.Course.AllowAutoEnrol) reason = "Closed";
             var extendedReason = "Full";
             if (!selectedClass.Course.AllowAutoEnrol) extendedReason = "Closed.<br/>A closed class means the leader has requested that new enrolments be suspended";
-            result = $@"<div class='alert alert-danger text-center'><h5>Class is {reason}</h5>
+            result = $@"<div class='alert alert-danger text-danger text-center'><h5>Class is {reason}</h5>
                         You have requested enrolment in a class that is {extendedReason}.<br/>
                         Your request will be <strong>Waitlisted</strong> meaning you will
                         be notified should a place become available in the future.
@@ -1014,7 +1014,7 @@ else
             &&
         !BusinessRule.IsClassInTerm(selectedClass, prevTerm.TermNumber))
         {
-            result = @"<div class='alert alert-danger text-center'><h5>Class is not currently available this term</h5>
+            result = @"<div class='alert alert-danger text-danger text-center'><h5>Class is not currently available this term</h5>
                         You have requested enrolment in a class that is not available this term.<br/>
                         Your request will be <strong>Waitlisted</strong> until enrolment opens and allocation occurs.
                         </div>";

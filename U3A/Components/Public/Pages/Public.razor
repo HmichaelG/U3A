@@ -30,7 +30,7 @@
     <div class="webkit-prefix">
         @if ((AppleOSversion?[0] <= 12))
         {
-            <div class="card text-center p-4 alert-danger">
+            <div class="card text-center p-4 alert-danger text-danger">
                 <h3>Apple OS: Safari version: @AppleOSversion?[0].@AppleOSversion?[1].@AppleOSversion?[2] </h3>
                 <p>
                     We're sorry. <strong>Member Portal</strong> is a new web application that requires
@@ -142,7 +142,7 @@
                                     </DxFormLayoutGroup>
                                     @if (isBeforeEnrolmentDay || isNoEnrolmentTermAvailable)
                                     {
-                                        <div class="card card-body border-info alert-info w-100 text-center h5">
+                                        <div class="card card-body border-info alert-info text-info w-100 text-center h5">
                                             @(new MarkupString(lockoutMessage))
                                         </div>
 

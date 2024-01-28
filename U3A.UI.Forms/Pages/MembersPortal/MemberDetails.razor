@@ -25,14 +25,14 @@ else {
             <DataAnnotationsValidator />
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
                 @if (loginState.SelectedPerson == null) {
-                    <span class="text-center alert alert-success col-12">
+                    <span class="text-center alert alert-success text-success col-12">
                         <div>
                             Welcome! Let's start by getting to know you.
                         </div>
                     </span>
                 }
                 @if (IsNewLinkedMember) {
-                    <div class="text-center alert alert-info">
+                    <div class="text-center alert alert-info text-info">
                             You are about to create a new linked member for whom you will
                             assume responsibility for membership fees and course enrolment.
                     </div>
@@ -116,7 +116,7 @@ else {
                                                     IconCssClass="bi bi-question"
                                                     Click="@(async () => await messageBox?
                                                             .ShowOkOnlyAsync("Email Address",
-                                @"<div class='text-center alert alert-info col-12'>
+                                @"<div class='text-center alert alert-info text-info col-12'>
                                 <p>Your email address and password is the key to access your U3A details.
                                     It must be protected and kept secure at all times.
                                 <p>To change your wmail address or password, return to the menu and click <strong>Manage Credentials</strong>.
@@ -141,7 +141,7 @@ else {
                                                     IconCssClass="bi bi-question"
                                                     Click="@(async () => await messageBox?
                                                             .ShowOkOnlyAsync("Silent Contacts",
-                                @"<div class='text-center alert alert-info col-12'>
+                                @"<div class='text-center alert alert-info text-info col-12'>
                                 <p>Silent phone numbers are not visible to leaders, clerks or students.
                                 <p>A <strong>leader/clerk's</strong> silent email is not visible to students.
                                 <p>A <strong>student's</strong> silent email remains visible to leaders/clerks so that communication is possible.
@@ -327,7 +327,7 @@ else {
         }
         var msg = "";
         if (person.Communication != Communication[0] && systemSettings.MailSurcharge > 0) {
-            msg += "<div class='text-center alert alert-danger col-12'>" +
+            msg += "<div class='text-center alert alert-danger text-danger col-12'>" +
                       $"A Post mail preference incurs an additional <strong>{surcharge}</strong> postal surcharge per year.<br />" +
                       "Click <strong>Cancel</strong> and change to <strong>Email</strong> which is free, or<br />" +
                       "Click <strong>Ok</strong> again to confirm your choice." +

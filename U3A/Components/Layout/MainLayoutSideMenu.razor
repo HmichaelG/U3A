@@ -36,7 +36,7 @@
                         <ChildContent>
                             @if (!string.IsNullOrWhiteSpace(messageText))
                             {
-                                <div class="alert alert-danger text-center mx-auto">
+                                <div class="alert alert-danger text-danger text-center mx-auto">
                                     @(new MarkupString(messageText))
                                 </div>
                             }

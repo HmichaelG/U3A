@@ -162,13 +162,13 @@ else
                                 switch (status)
                                 {
                                     case AttendClassStatusType.Present:
-                                        css = "alert-success";
+                                        css = "alert-success text-success";
                                         break;
                                     case AttendClassStatusType.AbsentFromClassWithApology:
-                                        css = "alert-warning";
+                                        css = "alert-warning text-warning";
                                         break;
                                     default:
-                                        css = "alert-danger";
+                                        css = "alert-danger text-danger";
                                         break;
                                 }
                                 <div class=@css>@context.Value</div>
@@ -290,15 +290,15 @@ else
                 <div class="input-group mb-1">
                     <InputRadioGroup @bind-Value=@selectedStatusType>
                         <ChildContent>
-                            <div class="flex-grow-1 alert-success btn">
+                            <div class="flex-grow-1 alert-success text-success btn">
                                 <InputRadio Value=AttendClassStatusType.Present />
                                 Present
                             </div>
-                            <div class="flex-grow-1 alert-warning btn">
+                            <div class="flex-grow-1 alert-warning text-warning btn">
                                 <InputRadio Value=AttendClassStatusType.AbsentFromClassWithApology />
                                 Apology
                             </div>
-                            <div class="flex-grow-1 alert-danger btn">
+                            <div class="flex-grow-1 alert-danger text-danger btn">
                                 <InputRadio Value=AttendClassStatusType.AbsentFromClassWithoutApology />
                                 No Apology
                             </div>

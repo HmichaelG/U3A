@@ -1,4 +1,4 @@
-﻿<section class="@($"{CssClass} alert alert-{AlertType} text-center")" hidden="@isHidden">
+﻿<section class="@($"{CssClass} alert alert-{AlertType} text-{AlertType} text-center")" hidden="@isHidden">
     <button class="btn-close" onclick="@onButtonClick" hidden="@(!ShowCollapseButton)" />
     @ContentTemplate
     @(new MarkupString(AlertText))
@@ -22,7 +22,7 @@
 </style>
 @code {
     [Parameter] public bool ShowCollapseButton { get; set; } = true;
-    [Parameter] public string AlertType { get; set; } = "danger";
+    [Parameter] public string AlertType { get; set; } = "info";
     [Parameter] public string AlertText { get; set; }
     [Parameter] public EventCallback OnToggleAlert { get; set; }
     [Parameter] public EventCallback OnContentExpanded { get; set; }
