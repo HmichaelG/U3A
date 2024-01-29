@@ -39,7 +39,7 @@ else
                     IndicatorAreaVisible="false"
                     Text="Sending support request">
 
-        <EditForm Model="@supportModel" class="card card-body col-12 p-2 col-sm-10 col-md-9 col-lg-6 mx-auto"
+        <EditForm Model="@supportModel" class="card card-body col-12 p-2 col-sm-10 col-lg-6 mx-auto"
                   OnValidSubmit=@ValidFormSubmitted
                   Context="editContext">
             <h3>Request Support</h3>
@@ -47,9 +47,9 @@ else
                 Please enter or confirm your contact details and provide a <strong>clear, succinct</strong>
                 description of your issue.
             </p>
-            <DxFormLayout>
             <DataAnnotationsValidator />
             <ValidationSummary />
+            <DxFormLayout>
                 <DxFormLayoutItem Caption="Your Name" ColSpanMd="12">
                     <DxTextBox @bind-Text="@supportModel!.Name" />
                 </DxFormLayoutItem>
@@ -65,16 +65,16 @@ else
                 <DxFormLayoutItem Caption="Problem Description" ColSpanMd="12">
                     <DxMemo Rows="8" @bind-Text="@supportModel!.Description" />
                 </DxFormLayoutItem>
-                    <div class="mt-2 mx-auto">                    
+                    <div class="flex mt-2 mx-auto">                    
                     <ReCAPTCHA @ref="@reCAPTCHAComponent" SiteKey="6LcT11spAAAAAEc0vtGQmtI2Kv5jII5kB2pz5Gnn" OnSuccess="OnSuccess" OnExpired="OnExpired" />
                     </div>
-            </DxFormLayout>
             <footer class="input-group px-2 mt-2" id="footer">
                 <DxButton 
                     Enabled="@enableSubmitButton"
                     CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
                 <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" onclick="window.location = '/';" />
             </footer>
+            </DxFormLayout>
         </EditForm>
     </DxLoadingPanel>
 }

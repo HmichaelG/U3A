@@ -158,5 +158,7 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
+
+//Error 404 fallback
 app.MapFallbackToFile("/fallback.html");
 app.Run();

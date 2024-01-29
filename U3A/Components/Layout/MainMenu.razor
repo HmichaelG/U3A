@@ -50,7 +50,7 @@
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
-                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear">
+                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear" NavigateUrl="Public/AdminIntroduction">
                                     <Items>
                                         @if (isSecurityAdminRole)
                                         {
@@ -66,7 +66,7 @@
 
                             if (isSystemAdminRole | isCourseAdminRole)
                             {
-                                <DxMenuItem Text="Course" IconCssClass="bi bi-menu-button-fill">
+                                <DxMenuItem Text="Course" IconCssClass="bi bi-menu-button-fill" NavigateUrl="Public/CourseIntroduction">
                                     <Items>
                                         <DxMenuItem Click="@OnCloseMenu" Text="Enter/Exit Maintenance Mode" NavigateUrl="EnterExitMaintenance" />
                                         <DxMenuItem Click="@OnCloseMenu" Text="Add/Edit Course Types" NavigateUrl="CourseTypeMnt" />
@@ -121,7 +121,7 @@
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole)
                             {
-                                <DxMenuItem Text="Reports" IconCssClass="bi bi-printer" NavigateUrl="/">
+                                <DxMenuItem Text="Reports" IconCssClass="bi bi-printer" NavigateUrl="/Public/ReportsIntroduction">
                                     <Items>
                                         <DxMenuItem Text="Listings">
                                             <Items>

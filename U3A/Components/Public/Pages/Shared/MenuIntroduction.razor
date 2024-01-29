@@ -1,0 +1,35 @@
+﻿
+<div class="welcome">
+    <DxGridLayout CssClass="welcome-gridlayout" RowSpacing="3rem">
+        <Rows>
+            <DxGridLayoutRow Height="auto" Areas="cards"></DxGridLayoutRow>
+            <DxGridLayoutRow Height="auto" Areas="footer"></DxGridLayoutRow>
+        </Rows>
+        <Items>
+            <DxGridLayoutItem Area="cards" CssClass="welcome-cards">
+                <Template>
+                    <div class="welcome-card" href="/counter">
+                        <svg class="welcome-card-img" alt="printer card" >
+                            <use href="@VectorUri"></use>
+                        </svg>
+                        <div class="welcome-card-text">@Title</div>
+                        <div class="welcome-card-back"></div>
+                    </div>
+                </Template>
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="footer" CssClass="welcome-title">
+                <Template>
+                    <div class="welcome-title-content">@Introduction</div>
+                </Template>
+            </DxGridLayoutItem>
+        </Items>
+    </DxGridLayout>
+</div>
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+    [Parameter]
+    public string? Introduction { get; set; }
+    [Parameter]
+    public string? VectorUri { get; set; }
+}
