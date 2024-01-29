@@ -42,11 +42,7 @@
                         if (isAuthenticated)
                         {
 
-                            <DxMenuItem Click="@OnCloseMenu" IconCssClass="bi bi-house" NavigateUrl="./">
-                                <TextTemplate>
-                                    @((isVertical) ? "Home" : "")
-                                </TextTemplate>
-                            </DxMenuItem>
+                            <DxMenuItem Text="@((isVertical) ? "Home" : "")" Click="@OnCloseMenu" IconCssClass="bi bi-house" NavigateUrl="./" />
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
@@ -165,10 +161,7 @@
                                 </DxMenuItem>
                             }
 
-                            <DxMenuItem IconCssClass="bi bi-palette">
-                                <TextTemplate>
-                                    @((isVertical) ? "Theme & Settings" : "")
-                                </TextTemplate>
+                            <DxMenuItem Text="@((isVertical) ? "Theme & Settings" : "")" IconCssClass="bi bi-palette" >
                                 <Items>
                                     <DxMenuItem Click="@OnCloseMenu" Text="Office White" />
                                     <DxMenuItem Click="@OnCloseMenu" Text="Blazing Berry" />
@@ -179,10 +172,7 @@
                                                 Click="OnSwitchMenu" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem IconCssClass="bi bi-shield">
-                                <TextTemplate>
-                                    @((isVertical) ? "Manage Credentials" : "")
-                                </TextTemplate>
+                            <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")" IconCssClass="bi bi-shield">
                                 <Items>
                                     @if (IsTopMenu)
                                     {
@@ -198,12 +188,7 @@
                             </DxMenuItem>
                             @if (!IsTopMenu)
                             {
-                                <DxMenuItem Click="OnLogout" Text="Logout"
-                                            IconCssClass="bi bi-door-open">
-                                    <TextTemplate>
-                                        @((isVertical) ? "Logout" : "")
-                                    </TextTemplate>
-                                </DxMenuItem>
+                                <DxMenuItem Click="OnLogout" Text="Logout" IconCssClass="bi bi-door-open" />
                             }
                         }
                     }
