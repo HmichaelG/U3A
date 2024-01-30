@@ -46,7 +46,7 @@
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
-                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear" NavigateUrl="Public/AdminIntroduction">
+                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear" NavigateUrl="AdminIntroduction">
                                     <Items>
                                         @if (isSecurityAdminRole)
                                         {
@@ -62,7 +62,7 @@
 
                             if (isSystemAdminRole | isCourseAdminRole)
                             {
-                                <DxMenuItem Text="Course" IconCssClass="bi bi-menu-button-fill" NavigateUrl="Public/CourseIntroduction">
+                                <DxMenuItem Text="Course" IconCssClass="bi bi-menu-button-fill" NavigateUrl="CourseIntroduction">
                                     <Items>
                                         <DxMenuItem Click="@OnCloseMenu" Text="Enter/Exit Maintenance Mode" NavigateUrl="EnterExitMaintenance" />
                                         <DxMenuItem Click="@OnCloseMenu" Text="Add/Edit Course Types" NavigateUrl="CourseTypeMnt" />
@@ -81,7 +81,7 @@
 
                             if (isSystemAdminRole | isClericalRole)
                             {
-                                <DxMenuItem Text="Participation" IconCssClass="bi bi-menu-button">
+                                <DxMenuItem Text="Participation" IconCssClass="bi bi-menu-button" NavigateUrl="ParticipationIntroduction">
                                     <Items>
                                         <DxMenuItem Text="Fees &amp; Receipting">
                                             <Items>
@@ -117,7 +117,7 @@
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole)
                             {
-                                <DxMenuItem Text="Reports" IconCssClass="bi bi-printer" NavigateUrl="/Public/ReportsIntroduction">
+                                <DxMenuItem Text="Reports" IconCssClass="bi bi-printer" NavigateUrl="ReportsIntroduction">
                                     <Items>
                                         <DxMenuItem Text="Listings">
                                             <Items>
@@ -172,7 +172,7 @@
                                                 Click="OnSwitchMenu" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")" IconCssClass="bi bi-shield">
+                            <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")" IconCssClass="bi bi-shield" NavigateUrl="SecurityIntroduction">
                                 <Items>
                                     @if (IsTopMenu)
                                     {

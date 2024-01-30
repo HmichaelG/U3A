@@ -1,33 +1,34 @@
-﻿<DxPopup Visible="@PopupVisible" @ref="@messageBox" Width="@PopupWidth"
-         ApplyBackgroundShading="true"
-         CloseButtonClick="@OnNegativeButtonClicked"
-         CloseOnEscape="false"
-         CloseOnOutsideClick="false"
-         ShowFooter="true"
-         AllowDrag=true
-         AllowResize=true
-         HeaderText=@mCaption>
-    <BodyContentTemplate Context="PopupContext">
-        @TextTemplate
-        <div class="messagebox-body-height">
-            @(new MarkupString(mMessage))
-        </div>
-    </BodyContentTemplate>
-    <FooterContentTemplate>
-        <DxButton CssClass="popup-button" Visible="@mShowOkButton"
-                  RenderStyle="ButtonRenderStyle.Primary"
-                  Text="@mOKButtonText"
-                  Click="@OnAffirmativeButtonClicked" />
-        <DxButton CssClass="popup-button ms-1" Visible="@mShowNoButton"
-                  RenderStyle="ButtonRenderStyle.Light"
-                  Text="@mNoButtonText"
-                  Click="@OnNoButtonClicked" />
-        <DxButton CssClass="popup-button ms-1" Visible="@mShowCancelButton"
-                  RenderStyle="ButtonRenderStyle.Secondary"
-                  Text="@mCancelButtonText"
-                  Click="@OnNegativeButtonClicked" />
-    </FooterContentTemplate>
-</DxPopup>
+﻿    <DxPopup Visible="@PopupVisible" @ref="@messageBox" Width="@PopupWidth"
+             ApplyBackgroundShading="true"
+             CloseButtonClick="@OnNegativeButtonClicked"
+             CloseOnEscape="false"
+             CloseOnOutsideClick="false"
+             ShowFooter="true"
+             AllowDrag=true
+             AllowResize=true
+             HeaderText=@mCaption>
+        <BodyContentTemplate Context="PopupContext">
+            @TextTemplate
+            <div class="messagebox-body-height">
+                @(new MarkupString(mMessage))
+            </div>
+        </BodyContentTemplate>
+        <FooterContentTemplate>
+            <DxButton CssClass="popup-button" Visible="@mShowOkButton"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      Text="@mOKButtonText"
+                      Click="@OnAffirmativeButtonClicked" />
+            <DxButton CssClass="popup-button ms-1" Visible="@mShowNoButton"
+                      RenderStyle="ButtonRenderStyle.Light"
+                      Text="@mNoButtonText"
+                      Click="@OnNoButtonClicked" />
+            <DxButton CssClass="popup-button ms-1" Visible="@mShowCancelButton"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="@mCancelButtonText"
+                      Click="@OnNegativeButtonClicked" />
+        </FooterContentTemplate>
+    </DxPopup>
+
 <style>
     .messagebox-body-height {
         max-height: 75vh;
