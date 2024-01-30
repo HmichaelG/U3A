@@ -29,17 +29,24 @@ namespace U3A.BusinessRules
             if (enrolment.ClassID != null)
             {
                 classes.Add(dbc.Class
-                                .Include(x => x.Course)
+                                .Include(x => x.Leader)
+                                .Include(x => x.Leader2)
+                                .Include(x => x.Leader3)
+                                .Include(x => x.Course).ThenInclude(c => c.Enrolments).ThenInclude(e => e.Person)
                                 .Include(x => x.Occurrence)
                                 .Where(x => x.ID == enrolment.ClassID).FirstOrDefault());
             }
             else
             {
                 classes.AddRange(dbc.Class
-                                    .Include(x => x.Course)
-                                    .Include(x => x.Occurrence)
-                                    .Where(x => x.CourseID == cr.ID).ToList());
+                                .Include(x => x.Leader)
+                                .Include(x => x.Leader2)
+                                .Include(x => x.Leader3)
+                                .Include(x => x.Course).ThenInclude(c => c.Enrolments).ThenInclude(e => e.Person)
+                                .Include(x => x.Occurrence)
+                                .Where(x => x.CourseID == cr.ID).ToList());
             }
+            BusinessRule.AssignClassContacts(classes, t, settings);
             var termEnrolments = dbc.Enrolment.AsNoTracking().Where(x => x.TermID == t.ID);
             foreach (var c in classes)
             {
@@ -89,16 +96,8 @@ namespace U3A.BusinessRules
                     EnrolmentStatus = GetEnrolmentStatus(enrolment, t, settings),
                     WaitlistSort = enrolment.WaitlistSort
                 };
-                if (l != null)
-                {
-                    ed.ClassLeader = l.FullName;
-                    if (!string.IsNullOrWhiteSpace(l.AdjustedMobile)) { ed.ClassLeader += $"{Environment.NewLine}Mobile: {l.AdjustedMobile}"; }
-                    if (!string.IsNullOrWhiteSpace(l.AdjustedHomePhone)) { ed.ClassLeader += $"{Environment.NewLine}Phone: {l.AdjustedHomePhone}"; }
-                    if (!string.IsNullOrWhiteSpace(l.AdjustedEmail)) { ed.ClassLeader += $"{Environment.NewLine}Email: {l.AdjustedEmail}"; }
-                    ed.ClassLeaderFirstName = l.FirstName;
-                    ed.LeaderSummary = l.PersonSummary;
-                }
-                else { ed.ClassLeader = ""; }
+                ed.ClassLeader = c.LeaderNamesOnly;
+                ed.ClassContact = c.CourseContactDetails;
                 if (enrolment.IsWaitlisted)
                 {
                     if (IsPreRandomAllocationPeriod)

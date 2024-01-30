@@ -380,6 +380,19 @@ namespace U3A.Model
                 return result.Trim();
             }
         }
+        [NotMapped]
+        public string LeaderNamesOnly
+        {
+            get
+            {
+                var result = string.Empty;
+                if (!string.IsNullOrWhiteSpace(GuestLeader)) result = $"{GuestLeader}{Environment.NewLine}";
+                result += $"{Leader?.FullNameWithPostNominals}{Environment.NewLine}";
+                result += $"{Leader2?.FullNameWithPostNominals}{Environment.NewLine}";
+                result += $"{Leader3?.FullNameWithPostNominals}{Environment.NewLine}";
+                return result.Trim();
+            }
+        }
 
         [NotMapped]
         public string PrimaryLeader
@@ -397,6 +410,20 @@ namespace U3A.Model
 
         [NotMapped]
         public List<CourseContact> CourseContacts { get; set; } = new List<CourseContact>();
+
+        public string CourseContactDetails
+        { get { 
+                var result = string.Empty;
+                var type = string.Empty;
+                foreach (var contact in CourseContacts)
+                {
+                    type = (contact.ContactType == CourseContactType.Leader) ? "Leader" : "Clerk";
+                    result += $"({type}) {contact.Person.PersonSummary}{Environment.NewLine}";
+                }
+                return result.Trim();
+            } 
+        }
+
         [NotMapped]
         public CourseContact? SelectedCourseContact
         {

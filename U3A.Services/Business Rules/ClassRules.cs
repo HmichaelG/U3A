@@ -187,11 +187,12 @@ namespace U3A.BusinessRules
             return (d < endDate) && (d > startDate);
         }
 
-        private static void AssignClassContacts(List<Class> classes, Term term, SystemSettings settings)
+        public static void AssignClassContacts(List<Class> classes, Term term, SystemSettings settings)
         {
             //Parallel.ForEach(classes, c =>
             foreach (var c in classes)
             {
+                c.CourseContacts = new();
                 List<Person> clerks;
                 var course = c.Course;
                 var contactOrder = (course.CourseContactOrder == null)
@@ -202,15 +203,15 @@ namespace U3A.BusinessRules
                     clerks = course.Enrolments.Where(x => x.CourseID == course.ID &&
                                                       x.TermID == term.ID &&
                                                       x.IsCourseClerk && !x.IsWaitlisted)
-                                                      .Select(x => x.Person).OrderBy(x => x.FullNameAlpha).ToList();
+                                                      .Select(x => x.Person).OrderBy(x => x?.FullNameAlpha).ToList();
                 }
                 else
                 {
                     clerks = course.Enrolments.Where(x => x.CourseID == course.ID && x.ClassID == c.ID &&
                                                     x.TermID == term.ID &&
                                                     x.IsCourseClerk && !x.IsWaitlisted)
-                                                    .Select(x => x.Person).OrderBy(x => x.FullNameAlpha).ToList();
-                }
+                                                    .Select(x => x.Person).OrderBy(x => x?.FullNameAlpha).ToList();
+                }                
                 if (contactOrder == CourseContactOrder.LeadersThenClerks)
                 {
                     AddContact(c, CourseContactType.Leader, c.Leader);
@@ -227,9 +228,12 @@ namespace U3A.BusinessRules
                     {
                         AddContact(c, CourseContactType.Clerk, clerk);
                     }
-                    AddContact(c, CourseContactType.Leader, c.Leader3);
-                    AddContact(c, CourseContactType.Leader, c.Leader2);
-                    AddContact(c, CourseContactType.Leader, c.Leader);
+                    if (c.CourseContacts.Count <= 0)
+                    {
+                        if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader3); }
+                        if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader2); }
+                        if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader); }
+                    }
                 }
             }
             //});

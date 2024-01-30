@@ -167,16 +167,22 @@ namespace U3A.BusinessRules
             {
                 foreach (var c in e.Person.LeaderOf)
                 {
-                    c.Occurrence = occurrence.FirstOrDefault(x => x.ID == c.OccurrenceID);
-                    c.Venue = venues.FirstOrDefault(x => x.ID == c.VenueID);
-                    c.OnDay = day.FirstOrDefault(x => x.ID == c.OnDayID);
+                    if (c != null)
+                    {
+                        c.Occurrence = occurrence.FirstOrDefault(x => x.ID == c.OccurrenceID);
+                        c.Venue = venues.FirstOrDefault(x => x.ID == c.VenueID);
+                        c.OnDay = day.FirstOrDefault(x => x.ID == c.OnDayID);
+                    }
                 }
             }
             foreach (var e in clerkEnrolments)
             {
                 foreach (var c in e.Person.LeaderOf)
                 {
-                    c.Enrolments.AddRange(BusinessRule.SelectableEnrolmentsByClass(dbc, c, term, c.Course));
+                    if (c != null)
+                    {
+                        c.Enrolments.AddRange(BusinessRule.SelectableEnrolmentsByClass(dbc, c, term, c.Course));
+                    }
                 }
             }
             return clerkEnrolments.Select(x => x.Person).ToList();

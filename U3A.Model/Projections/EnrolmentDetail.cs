@@ -45,8 +45,7 @@ namespace U3A.Model
         public string ClassVenue { get; set; }
         public string ClassVenueAddress { get; set; }
         public string ClassLeader { get; set; }
-        public string ClassLeaderFirstName { get; set; }
-        public string LeaderSummary { get; set; }
+        public String ClassContact { get; set; }
         public DateTime EnrolmentDateReceived { get; set; }
         public DateTime? EnrolmentDateEnrolled { get; set; }
         public bool EnrolmentIsWaitlisted { get; set; }
