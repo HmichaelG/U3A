@@ -130,7 +130,7 @@ namespace U3A.UI.Reports
             {
                 var person = await dbc.Person.FindAsync(kvp.Key);
                 var personsFiles = new List<string>();
-                foreach (var enrolment in kvp.Value)
+                foreach (var enrolment in kvp.Value.OrderBy(x => x.Course.Name))
                 {
                     var detail = BusinessRule.GetEnrolmentDetail(dbc, enrolment);
                     using (var participantEnrolmentProForma = new ParticipantEnrolment())

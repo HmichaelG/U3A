@@ -41,6 +41,7 @@ namespace U3A.WebFunctions.Procedures
                             break;
                         case "Participant Enrolment":
                             var enrolment = await dbc.Enrolment
+                                                .Include(x => x.Course)
                                                 .Include(x => x.Person)
                                                 .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
                             if (enrolment != null)
