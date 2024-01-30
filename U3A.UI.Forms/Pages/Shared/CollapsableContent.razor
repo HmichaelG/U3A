@@ -1,10 +1,10 @@
 ﻿<section class="@($"{CssClass} alert alert-{AlertType} text-{AlertType} text-center")" hidden="@isHidden">
-    <button class="btn-close" onclick="@onButtonClick" hidden="@(!ShowCollapseButton)" />
+    <button class="btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
     @ContentTemplate
     @(new MarkupString(AlertText))
 </section>
 <div class="w-100 bg-primary muted" hidden="@(!isHidden)">
-    <button class="btn-close" onclick="@onButtonClick" />
+    <button class="btn-close" onclick="@onOpenButtonClick" />
 </div>
 
 <style>
@@ -32,21 +32,26 @@
 
     bool isHidden = false;
 
-    async Task onButtonClick()
+    async Task onOpenButtonClick()
     {
-        isHidden = !isHidden;
-        await toggleLayout();
+        isHidden = false;
+        await RaiseToggleLayoutEvent();
+    }
+    async Task onCloseButtonClick()
+    {
+        isHidden = true;
+        await RaiseToggleLayoutEvent();
     }
 
     public async Task ToggleLayoutAsync(bool isCollapsed)
     {
         isHidden = isCollapsed;
-        await toggleLayout();
+        await RaiseToggleLayoutEvent();
     }
 
-    async Task toggleLayout()
+    async Task RaiseToggleLayoutEvent()
     {
-        await InvokeAsync(StateHasChanged);
+        InvokeAsync(StateHasChanged);
         if (isHidden)
         {
             await OnContentCollapsed.InvokeAsync();
