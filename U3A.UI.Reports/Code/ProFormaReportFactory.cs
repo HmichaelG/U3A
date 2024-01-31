@@ -1,4 +1,5 @@
-﻿using DevExpress.DataAccess.Json;
+﻿using DevExpress.CodeParser;
+using DevExpress.DataAccess.Json;
 using DevExpress.DataAccess.ObjectBinding;
 using DevExpress.DataAccess.Sql;
 using DevExpress.ReportServer.ServiceModel.DataContracts;
@@ -126,19 +127,25 @@ namespace U3A.UI.Reports
         public async Task<Dictionary<Guid, string>> CreateEnrolmentProForma(Dictionary<Guid, List<Enrolment>> Enrolments)
         {
             var result = new Dictionary<Guid, string>();
+            List<(Guid CourseID,Guid? ClassID)> onFile = new();
             foreach (var kvp in Enrolments)
             {
                 var person = await dbc.Person.FindAsync(kvp.Key);
                 var personsFiles = new List<string>();
                 foreach (var enrolment in kvp.Value.OrderBy(x => x.Course.Name))
                 {
-                    var detail = BusinessRule.GetEnrolmentDetail(dbc, enrolment);
-                    using (var participantEnrolmentProForma = new ParticipantEnrolment())
+                    (Guid, Guid?) onfileKey = (enrolment.CourseID, enrolment.ClassID);
+                    if (!onFile.Contains(onfileKey)) // one report per enrolment / class
                     {
-                        participantEnrolmentProForma.DataSource = detail;
-                        string pdf = GetTempPdfFile();
-                        participantEnrolmentProForma.ExportToPdf(pdf, options);
-                        personsFiles.Add(pdf);
+                        onFile.Add(onfileKey);
+                        var detail = BusinessRule.GetEnrolmentDetail(dbc, enrolment);
+                        using (var participantEnrolmentProForma = new ParticipantEnrolment())
+                        {
+                            participantEnrolmentProForma.DataSource = detail;
+                            string pdf = GetTempPdfFile();
+                            participantEnrolmentProForma.ExportToPdf(pdf, options);
+                            personsFiles.Add(pdf);
+                        }
                     }
                 }
                 var pdfFilename = CreateMergedPDF(personsFiles);
@@ -328,9 +335,15 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             var term = dbc.Term.Find(Enrolments[0].TermID);
             var leaderDetail = BusinessRule.GetLeaderDetail(dbc, Leader, term);
             var enrolmentDetails = new List<EnrolmentDetail>();
+            List<(Guid, Guid?)> onFile = new();
             foreach (var enrolment in Enrolments)
             {
-                enrolmentDetails.AddRange(BusinessRule.GetEnrolmentDetail(dbc, enrolment));
+                (Guid, Guid?) onFileKey = (enrolment.CourseID, enrolment.ClassID);
+                if (!onFile.Contains(onFileKey)) // one report per course / class
+                {
+                    onFile.Add(onFileKey);
+                    enrolmentDetails.AddRange(BusinessRule.GetEnrolmentDetail(dbc, enrolment));
+                }
             }
             var dataSources = DataSourceManager.GetDataSources<ObjectDataSource>(
                 report: report,
