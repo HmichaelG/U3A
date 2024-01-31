@@ -19,7 +19,8 @@
             </DxGridLayoutItem>
             <DxGridLayoutItem Area="footer" CssClass="welcome-title">
                 <Template>
-                    <div class="welcome-title-content">@Introduction</div>
+                    <div class="welcome-title-content">
+                        @(new MarkupString(Introduction))</div>
                 </Template>
             </DxGridLayoutItem>
         </Items>
