@@ -17,6 +17,8 @@ namespace U3A.WebFunctions.Procedures
             IList<SendMail> mailItems;
             using (var dbc = new U3ADbContext(tenant))
             {
+                List<(Guid, Guid, Guid?)> onFile = new();
+                (Guid, Guid, Guid?) onFileKey;
                 var today = await DailyProcedures.GetTodayAsync(dbc);
                 var utcTime = DateTime.UtcNow;                
                 mailItems = await dbc.SendMail
@@ -89,22 +91,27 @@ namespace U3A.WebFunctions.Procedures
                             }
                             if (leader != null && enrolments.Count > 0)
                             {
-                                if (DailyProcedures.RandomAllocationExecuted[tenant.Identifier] || 
-                                    (classOnDayID >= todayID && classOnDayID <= todayID + 1))
+                                onFileKey = (leader.ID, enrolments[0].CourseID, enrolments[0].ClassID);
+                                if (!onFile.Contains(onFileKey))
                                 {
-                                    if (course != null) courseName = course.Name;
-                                    sm.Status = await reportFactory.CreateLeaderReportProForma(leader, 
-                                                        courseName, 
-                                                        enrolments.ToArray(),
-                                                        DailyProcedures.RandomAllocationExecuted[tenant.Identifier]);
-                                    logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
+                                    onFile.Add(onFileKey);
+                                    if (DailyProcedures.RandomAllocationExecuted[tenant.Identifier!] ||
+                                        (classOnDayID >= todayID && classOnDayID <= todayID + 1))
+                                    {
+                                        if (course != null) courseName = course.Name;
+                                        sm.Status = await reportFactory.CreateLeaderReportProForma(leader,
+                                                            courseName,
+                                                            enrolments.ToArray(),
+                                                            DailyProcedures.RandomAllocationExecuted[tenant.Identifier!]);
+                                        logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
+                                    }
                                 }
                             }
                             else { sm.Status = "Enrolments not found."; }
                             break;
                         case "U3A Leaders Reports":
                             var thisClass = await dbc.Class.FindAsync(sm.RecordKey);
-                            course = await dbc.Course.FindAsync(thisClass.CourseID);
+                            course = await dbc.Course.FindAsync(thisClass!.CourseID);
                             if (dbc.Enrolment.Any(x => x.ClassID == thisClass.ID && x.TermID == sm.TermID))
                             {
                                 enrolments = await dbc.Enrolment.Include(x => x.Person)
@@ -114,7 +121,7 @@ namespace U3A.WebFunctions.Procedures
                             else
                             {
                                 enrolments = await dbc.Enrolment.Include(x => x.Person)
-                                                            .Where(x => x.CourseID == course.ID
+                                                            .Where(x => x.CourseID == course!.ID
                                                                             && x.TermID == sm.TermID).ToListAsync();
                             };
                             if (enrolments?.Count > 0)
@@ -126,7 +133,7 @@ namespace U3A.WebFunctions.Procedures
                                           sm.PrintICEList,
                                           sm.PrintCSVFile,
                                           sm.PrintAttendanceAnalysis,
-                                          course.ID,
+                                          course!.ID,
                                           "U3A Report Package",
                                           course.Name,
                                           sm.Person, enrolments.OrderBy(x => x.IsWaitlisted)

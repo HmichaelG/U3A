@@ -22,10 +22,10 @@ else
 {
 
     <CollapsableContent AlertText=@($@"<strong>Transactional email</strong> queued and processed overnight.<br />
-                  Cash Receipts and Enrolments are sent daily, Leader Reports are sent within 48 hours of the next class.<br/>
-                  Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.<br />
-                  Processed correspondence is deleted after 30 days.")
-                      OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+                    Cash Receipts and Enrolments are sent daily, Leader Reports are sent within 48 hours of the next class.<br/>
+                    Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.<br />
+                    Processed correspondence is deleted after 30 days.")
+                        OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
     <Progress @ref="@ProgressBar" />
@@ -84,7 +84,7 @@ else
 
 
 @code {
-        bool IsReady;
+    bool IsReady;
     private List<SendMail> SendMail { get; set; }
     IReadOnlyList<object>? SelectedDataItems { get; set; }
     ProFormaReportFactory reportFactory;
@@ -154,6 +154,8 @@ else
         var s = new System.Diagnostics.Stopwatch();
         var items = SelectedDataItems.Count();
         var personEnrolments = new Dictionary<Guid, List<Enrolment>>();
+        List<(Guid, Guid, Guid?)> onFile = new();
+        (Guid, Guid, Guid?) onFileKey;
         s.Start();
         reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
         var msg = (IsPreview) ? "Preparing Preview" : "Creating Mail Items";
@@ -212,7 +214,12 @@ else
                     if (leader != null && enrolments.Count > 0)
                     {
                         if (course != null) courseName = course.Name;
-                        sm.Status = await reportFactory.CreateLeaderReportProForma(leader, courseName, enrolments.ToArray());
+                        onFileKey = (leader.ID, enrolments[0].CourseID, enrolments[0].ClassID);
+                        if (!onFile.Contains(onFileKey))
+                        {
+                            onFile.Add(onFileKey);
+                            sm.Status = await reportFactory.CreateLeaderReportProForma(leader, courseName, enrolments.ToArray());
+                        }
                     }
                     else { sm.Status = "Enrolments not found."; }
                     break;
