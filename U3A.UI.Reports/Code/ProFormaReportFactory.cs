@@ -442,7 +442,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             if (pdfFilenames.Count > 0)
             {
                 PdfDocument outputDocument = new PdfDocument();
-                foreach (string file in pdfFilenames)
+                foreach (string file in pdfFilenames.Where(x => !string.IsNullOrWhiteSpace(x)))
                 {
                     PdfDocument inputDocument = PdfReader.Open(file, PdfDocumentOpenMode.Import);
                     int count = inputDocument.PageCount;
