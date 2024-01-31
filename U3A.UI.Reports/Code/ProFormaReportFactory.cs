@@ -127,7 +127,7 @@ namespace U3A.UI.Reports
         public async Task<Dictionary<Guid, string>> CreateEnrolmentProForma(Dictionary<Guid, List<Enrolment>> Enrolments)
         {
             var result = new Dictionary<Guid, string>();
-            List<(Guid CourseID,Guid? ClassID)> onFile = new();
+            List<(Guid CourseID, Guid? ClassID)> onFile = new();
             foreach (var kvp in Enrolments)
             {
                 var person = await dbc.Person.FindAsync(kvp.Key);
@@ -302,18 +302,18 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             }
             return outputFilename;
         }
-        public async Task<string> CreateLeaderReportProForma(Person Leader, 
-                                    string CourseName, 
+        public async Task<string> CreateLeaderReportProForma(Person Leader,
+                                    string CourseName,
                                     Enrolment[] Enrolments,
-                                    bool RandomAllocationExecuted = true )
+                                    bool RandomAllocationExecuted = true)
         {
             using (var leaderReportProForma = new LeaderReport())
             {
                 var report = await CreateLeaderReportAsync(leaderReportProForma, Leader, Enrolments);
-                return await ProcessLeaderReport(Leader, 
-                                "U3A Leader's Report", 
-                                CourseName, 
-                                new string[] { report }, 
+                return await ProcessLeaderReport(Leader,
+                                "U3A Leader's Report",
+                                CourseName,
+                                new string[] { report },
                                 new string[] { "Leader Report.pdf" },
                                 RandomAllocationExecuted);
             }
@@ -335,15 +335,9 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             var term = dbc.Term.Find(Enrolments[0].TermID);
             var leaderDetail = BusinessRule.GetLeaderDetail(dbc, Leader, term);
             var enrolmentDetails = new List<EnrolmentDetail>();
-            List<(Guid, Guid?)> onFile = new();
             foreach (var enrolment in Enrolments)
             {
-                (Guid, Guid?) onFileKey = (enrolment.CourseID, enrolment.ClassID);
-                if (!onFile.Contains(onFileKey)) // one report per course / class
-                {
-                    onFile.Add(onFileKey);
-                    enrolmentDetails.AddRange(BusinessRule.GetEnrolmentDetail(dbc, enrolment));
-                }
+                enrolmentDetails.AddRange(BusinessRule.GetEnrolmentDetail(dbc, enrolment));
             }
             var dataSources = DataSourceManager.GetDataSources<ObjectDataSource>(
                 report: report,
