@@ -35,42 +35,10 @@ namespace U3A.Model
         bool mIsCourseClerk;
         [Required]
         [DefaultValue(false)]
-        public bool IsCourseClerk
-        {
-            get
-            {
-                return mIsCourseClerk;
-            }
-            set
-            {
-                if (value && mIsWaitlisted) { mIsWaitlisted = false; }
-                mIsCourseClerk = value;
-            }
-        }
+        public bool IsCourseClerk { get; set; } = false;
 
-        private bool mIsWaitlisted;
         [Required]
-        public bool IsWaitlisted
-        {
-            get { return mIsWaitlisted; }
-            set
-            {
-                if (value)
-                {
-                    DateEnrolled = null;// Waitlisted, therefore not enrolled.
-                    if (mIsCourseClerk)
-                    {
-                        mIsCourseClerk = false;
-                    }
-                    else
-                    {
-                        // Not Waitlisted, therefore set DateEnrolled if required.
-                        if (DateEnrolled == null) { DateEnrolled = DateTime.Now; }
-                    }
-                }
-                mIsWaitlisted = value;
-            }
-        }
+        public bool IsWaitlisted { get; set; }  = true;
 
         [NotMapped]
         public DateTime? WaitlistSort

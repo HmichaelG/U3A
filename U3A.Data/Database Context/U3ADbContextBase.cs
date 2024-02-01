@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
 using U3A.Model;
 using U3A.Data;
+using Newtonsoft.Json.Linq;
 
 namespace U3A.Database
 {
@@ -118,6 +119,19 @@ namespace U3A.Database
             var rnd = new Random(utcNow.Millisecond);
             foreach (var entry in entries)
             {
+                if (entry.Entity is Enrolment e)
+                {
+                    if (e.IsWaitlisted)
+                    {
+                        e.DateEnrolled = null;// Waitlisted, therefore not enrolled.
+                        e.IsCourseClerk = false;
+                    }
+                    else
+                    {
+                        // Not Waitlisted, therefore set DateEnrolled if required.
+                        if (e.DateEnrolled == null) { e.DateEnrolled = DateTime.Now; }
+                    }                    
+                }
                 // for entities that inherit from BaseEntity,
                 // set UpdatedOn / CreatedOn appropriately
                 if (entry.Entity is BaseEntity trackable)
