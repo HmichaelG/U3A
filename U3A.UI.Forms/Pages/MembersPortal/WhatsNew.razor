@@ -4,15 +4,15 @@
             <Items>
             <DxAccordionItem Text="New Support Option" CssClass="text-info" IconCssClass="bi bi-check-circle">
                 <ContentTemplate>
-                    <div class="card card-body pb-0 mb-0">
-                        <p>We've added a new link at the botton of the menu to allow you to contact your U3A to obtain support.<br/>
-                        Simply click <strong>Click for support</strong>, complete and submit the support request form.</p>
+                    <div class="card card-body pb-0 mb-0 scroll">
+                        <p>We've added a new link at the botton of the menu to allow you to contact your U3A to obtain support.
+                        Simply click <strong>Click for support</strong> with your mouse, complete and submit the support request form.</p>
                     </div>
                 </ContentTemplate>
             </DxAccordionItem>
             <DxAccordionItem Text="Enrolment Improvements" CssClass="text-info" IconCssClass="bi bi-check-circle">
                 <ContentTemplate>
-                    <div class="card card-body pb-0 mb-0">
+                    <div class="card card-body pb-0 mb-0 scroll">
                         <div class="h5">Navigation</div>
                         <ul>
                             <li><strong>Change your course enrolments</strong> is now titled <strong>Manage your course enrolments</strong>.</li>
@@ -30,10 +30,50 @@
                     </div>
                 </ContentTemplate>
             </DxAccordionItem>
+            <DxAccordionItem Text="View your course enrolments" CssClass="text-info" IconCssClass="bi bi-check-circle">
+                <ContentTemplate>
+                    <div class="card card-body pb-0 mb-0 scroll">
+                        <p>
+                            To conserve resources, the Google map is no longer automatically displayed for each class. 
+                            To display the map, click the <strong>Map</strong> button.
+                        </p>
+                    </div>
+                </ContentTemplate>
+            </DxAccordionItem>
+            <DxAccordionItem Text="Helpful Hints" CssClass="text-info" IconCssClass="bi bi-lightbulb">
+                <ContentTemplate>
+                    <div class="card card-body pb-0 mb-0 scroll">
+                        <p>When requesting new enrolments...</p>
+                        <ul>
+                            <li>
+                                Avoid Scrolling the class schedule when requesting additional enrolments. Scrolling large lists within a web browser is not a pleasant experience.
+                                Use <strong>search</strong> if you know the class you are after.
+                                Click a <strong>weekday</strong> to filter the class list to a given day.
+                            </li>
+                            <li>
+                                Choose the style of class list to display.
+                                <ul>
+                                    <li>A <strong>Detail</strong> list provides full detail on all courses.</li>
+                                    <li>A <strong>Summary</strong> list displays all detail except the course description.</li>
+                                    <li>A <strong>Brief</strong> list displays the course name and the weekday held only.</li>
+                                </ul>
+
+                            </li>
+                        </ul>
+                    </div>
+                </ContentTemplate>
+            </DxAccordionItem>
         </Items>
         </DxAccordion>
 
 </div>
+
+<style>
+    .scroll {
+        max-height: 15rem;
+        overflow:auto;
+    }
+</style>
 
 @code {
 

@@ -184,6 +184,15 @@ else
 
                                                     <div class="col-12" hidden="@(!IsReadOnly)">
                                                         <div class="input-group mb-1">
+                                                            @if (c.Venue.CanMapAddress)
+                                                            {
+                                                                <DxButton CssClass="flex-grow-1"
+                                                                          IconCssClass="bi bi-globe"
+                                                                          Text="Map"
+                                                                          RenderStyle="@ButtonRenderStyle.Primary"
+                                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                          Click="() => c.ShowMap = !c.ShowMap" />
+                                                            }
                                                             @if (!p.IsEmailSilent && !string.IsNullOrWhiteSpace(p.Email))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
@@ -255,7 +264,7 @@ else
                                                       Text="Additional Information" RenderStyle="@ButtonRenderStyle.Primary"
                                                       RenderStyleMode="ButtonRenderStyleMode.Outline"
                                                       Click="async () => await OnAddnInfoURLClick(c)" />
-                                            <div class="px-2 pt-2 w-100" hidden="@(!IsReadOnly)">
+                                            <div class="px-2 pt-2 w-100" hidden="@(!IsReadOnly || !c.ShowMap)">
                                                 @if (c.Venue.CanMapAddress)
                                                 {
                                                     var link = $"https://www.google.com/maps/embed/v1/place?key={googleMapAPIKey}&q={HttpUtility.UrlEncode($"{c.Venue?.Name} {c.Venue?.Address}")}";
