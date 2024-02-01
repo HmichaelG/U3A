@@ -37,7 +37,7 @@ else
 
     @if (!hideReceiptDateRangeMessage)
     {
-        <h4 class="col col-12 alert alert-warning text-warning text-center p-2">@receiptDateRangeMessage</h4>
+        <h4 class="col col-12 alert alert-warning text-dark text-center p-2">@receiptDateRangeMessage</h4>
     }
     @if (!isHeaderHidden)
     {
@@ -288,7 +288,7 @@ else
                 {
                     OKButtonText = "Yes, I'm Ok with that!",
                     Caption = "Unexpected date range in Bank OFX file",
-                    Message = $"<div class='text-center alert alert-danger alert text-danger p-2'><p>The OFX Bank date range <strong>{extract.InitialDate.ToShortDateString()}</strong> to <strong>{extract.FinalDate.ToShortDateString()}</strong>.<br>" +
+                    Message = $"<div class='text-center alert alert-danger alert text-dark p-2'><p>The OFX Bank date range <strong>{extract.InitialDate.ToShortDateString()}</strong> to <strong>{extract.FinalDate.ToShortDateString()}</strong>.<br>" +
                                                                                                                             $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
                                                                                                                                 "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
                 };

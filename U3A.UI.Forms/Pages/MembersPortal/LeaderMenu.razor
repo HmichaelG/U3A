@@ -24,7 +24,7 @@ else {
     @if (menuSelection != MenuOptions.RecordAttendance) {
         <DxFormLayout class="mx-4 w-100 d-block">
             <div class="card p-2 col-12 col-md-8 mx-auto mb-2 my-1">
-                <div class="text-center alert alert-success text-success col-12">@welcomeText</div>
+                <div class="text-center alert alert-success text-dark col-12">@welcomeText</div>
                 <TermAndCourse @ref="termAndCourse"
                                Enabled=@(menuSelection == MenuOptions.Nothing)
                                OnTermAndCourseCancelled="OnTermAndCourseCancelled" />

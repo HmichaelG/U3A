@@ -21,7 +21,7 @@
                                 Caption="Identity" />
         </DxListBox>
         <div hidden="@(selectedPerson == null)">
-            <div class="alert alert-info text-info text-center">
+            <div class="alert alert-info text-dark text-center">
                 You are about to unlink <strong>@selectedPerson?.FullName</strong> from your login.<br />
                 This means your email address will be removed from @selectedPerson?.FirstName's record.<br />
                 Enter below @selectedPerson?.FirstName's email address, or leave blank if they wish to receive mail by post.<br />

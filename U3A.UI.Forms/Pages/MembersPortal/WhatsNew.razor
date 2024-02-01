@@ -1,0 +1,40 @@
+﻿<div class="p-1">
+
+    <DxAccordion ExpandMode="AccordionExpandMode.Single">
+            <Items>
+            <DxAccordionItem Text="New Support Option" CssClass="text-info" IconCssClass="bi bi-check-circle">
+                <ContentTemplate>
+                    <div class="card card-body pb-0 mb-0">
+                        <p>We've added a new link at the botton of the menu to allow you to contact your U3A to obtain support.<br/>
+                        Simply click <strong>Click for support</strong>, complete and submit the support request form.</p>
+                    </div>
+                </ContentTemplate>
+            </DxAccordionItem>
+            <DxAccordionItem Text="Enrolment Improvements" CssClass="text-info" IconCssClass="bi bi-check-circle">
+                <ContentTemplate>
+                    <div class="card card-body pb-0 mb-0">
+                        <div class="h5">Navigation</div>
+                        <ul>
+                            <li><strong>Change your course enrolments</strong> is now titled <strong>Manage your course enrolments</strong>.</li>
+                            <li>When clicked, <strong>Manage your course enrolments</strong> will display a submenu...</li>
+                            <ul>
+                                <li>Use <strong>Request course enrolments</strong> to request additional classes to attend.</li>
+                                <li>Use <strong>Withdraw from course enrolments</strong> to permanently withdraw from one or more classes.</li>
+                            </ul>
+                        </ul>
+                        <div class="h5">Streamlined Processing</div>
+                        <ul>
+                        <li>New enrolment requests are now saved to the database immediately after clicking the <em>Ok</em> button to accept your selection</li>
+                        <li>The <strong>Save</strong> button has been removed because it is no longer required.</li>
+                        </ul>
+                    </div>
+                </ContentTemplate>
+            </DxAccordionItem>
+        </Items>
+        </DxAccordion>
+
+</div>
+
+@code {
+
+}

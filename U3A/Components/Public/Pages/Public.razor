@@ -4,6 +4,7 @@
 
 <PageTitle>Welcome to U3Admin</PageTitle>
 
+@using U3A.Components.Account.Pages
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
@@ -30,7 +31,7 @@
     <div class="webkit-prefix">
         @if ((AppleOSversion?[0] <= 12))
         {
-            <div class="card text-center p-4 alert-danger text-danger">
+            <div class="card text-center p-4 alert-danger text-dark">
                 <h3>Apple OS: Safari version: @AppleOSversion?[0].@AppleOSversion?[1].@AppleOSversion?[2] </h3>
                 <p>
                     We're sorry. <strong>Member Portal</strong> is a new web application that requires
@@ -115,6 +116,7 @@
                                                 If you wish to join our U3A, register an account to securely use the membership system and protect your privacy. You will need an email address to do so.
                                                 If you have problems, contact the office for assistance.
                                             </p>
+                                            <Register />
                                             <DxButton Text="Click to register" Enabled="@(!isBeforeEnrolmentDay && !isNoEnrolmentTermAvailable)"
                                                       IconCssClass="bi bi-person-plus menu-icon me-3 h2"
                                                       CssClass="col-12 mx-auto"
@@ -142,7 +144,7 @@
                                     </DxFormLayoutGroup>
                                     @if (isBeforeEnrolmentDay || isNoEnrolmentTermAvailable)
                                     {
-                                        <div class="card card-body border-info alert-info text-info w-100 text-center h5">
+                                        <div class="card card-body border-info alert-info text-dark w-100 text-center h5">
                                             @(new MarkupString(lockoutMessage))
                                         </div>
 

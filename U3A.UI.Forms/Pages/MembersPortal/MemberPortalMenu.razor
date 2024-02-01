@@ -20,11 +20,12 @@
     <Progress @ref=@progress />
     <div class="vw-100">
         <div class="px-2 col-12 px-sm-0 col-md-10 col-lg-6 mx-auto">
-            <div class="text-center alert alert-success text-success col-12">
+            <div class="text-center alert alert-success text-dark col-12">
                 @welcomeText @classText
             </div>
             <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="col col-12"
                          ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
+                         
                 <Items>
                     @if (ShowEnrolmentSubMneu)
                     {
@@ -59,12 +60,16 @@
                     }
                     else
                     {
-
-                        <DxAccordionItem Text="Main Menu">
+                        <DxAccordionItem Text="What's New" Expanded=false CssClass="text-info" IconCssClass="bi bi-emoji-smile">
+                            <ContentTemplate>
+                                <WhatsNew />
+                            </ContentTemplate>
+                        </DxAccordionItem>
+                        <DxAccordionItem Text="Main Menu" Expanded=true>
                             <ContentTemplate>
                                 @if (settings?.InMaintenanceTill != null)
                                 {
-                                    <div class="alert alert-info text-info text-center">
+                                    <div class="alert alert-info text-dark text-center">
                                         <h5>Member Portal Maintenance Mode</h5>
                                         <p>Access to the system is currently disabled while we perform important work on our database.</p>
                                         <p>@(new MarkupString($"We expect the system to resume normal operations on or after <br/><strong>{settings?.InMaintenanceTill.Value.ToString("dd-MMM-yyyy hh:mm tt")}</strong>.")) </p>
@@ -163,7 +168,7 @@
 
                         <DxAccordionItem Text="Linked Members">
                             <ContentTemplate>
-                                <div class="text-center alert alert-info text-info">
+                                <div class="text-center alert alert-info text-dark">
                                     <p>
                                         A <strong>linked member</strong> is one who shares your email address.
                                         It is mainly intended for your spouse or partner but might also

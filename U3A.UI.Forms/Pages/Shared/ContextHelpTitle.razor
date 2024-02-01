@@ -14,7 +14,7 @@
         case HelpActivationStyle.ButtonOnlyNoMaintenanceWarning:
             if (settings?.InMaintenanceTill != null && ActivationStyle == HelpActivationStyle.ButtonOnly)
             {
-                <div class="alert alert-danger text-center text-danger">Warning: You are in Member Portal Maintenance Mode</div>
+                <div class="alert alert-danger text-center text-dark">Warning: You are in Member Portal Maintenance Mode</div>
             }
             <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
                       SizeMode=SizeMode.Small
@@ -26,7 +26,7 @@
             <PageTitle>@Title</PageTitle>
             if (settings?.InMaintenanceTill != null)
             {
-                <div class="alert alert-danger text-center text-danger">Warning: You are in Member Portal Maintenance Mode</div>
+                <div class="alert alert-danger text-center text-dark">Warning: You are in Member Portal Maintenance Mode</div>
             }
             <h3 class="@TitleCssClass">
                 <DxButton IconCssClass="@ButtonIconCssClass" Text="Help" SizeMode=SizeMode.Small CssClass="@ButtonCssClass"
