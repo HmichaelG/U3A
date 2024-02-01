@@ -127,9 +127,9 @@ namespace U3A.UI.Reports
         public async Task<Dictionary<Guid, string>> CreateEnrolmentProForma(Dictionary<Guid, List<Enrolment>> Enrolments)
         {
             var result = new Dictionary<Guid, string>();
-            List<(Guid CourseID, Guid? ClassID)> onFile = new();
             foreach (var kvp in Enrolments)
             {
+                List<(Guid CourseID, Guid? ClassID)> onFile = new();
                 var person = await dbc.Person.FindAsync(kvp.Key);
                 var personsFiles = new List<string>();
                 foreach (var enrolment in kvp.Value.OrderBy(x => x.Course.Name))
@@ -149,6 +149,7 @@ namespace U3A.UI.Reports
                     }
                 }
                 var pdfFilename = CreateMergedPDF(personsFiles);
+                if (string.IsNullOrWhiteSpace(pdfFilename)) { continue; }
                 if (!isPreview && person.Communication.ToLower() == "email")
                 {
                     result.Add(kvp.Key, await emailSender.SendEmailAsync(
