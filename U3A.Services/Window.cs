@@ -36,7 +36,7 @@ namespace U3A.Services
         }
         public static async Task<string> FitToRemainingHeight(IJSRuntime js, string ElementID, string currentHeight)
         {
-            return await FitToRemainingHeight(js, ElementID, currentHeight, 0.02);
+            return await FitToRemainingHeight(js, ElementID, currentHeight, 0.03);
         }
 
         public static async Task<string> FitToRemainingHeight(IJSRuntime js, string ElementID, string currentHeight, double Offset)
