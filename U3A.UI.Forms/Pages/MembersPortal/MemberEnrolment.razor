@@ -3,6 +3,8 @@
 @inject IJSRuntime js
 @inject NavigationManager NavMan
 @inject IConfiguration config
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
 @using System.Web
 @using Microsoft.AspNetCore.Builder
 @using Microsoft.Extensions.Configuration;
@@ -52,6 +54,7 @@ else
                            NullText="Search">
                 </DxTextBox>
                 <DxComboBox Data="@ReportStyleList" CssClass="combo-list-box"
+                            Value="@reportStyle"
                             ValueChanged="@((ReportStyle style) => OnReportStyleChanged(style))"
                             TextFieldName="@nameof(ReportStyleWrapper.ListText)"
                             ValueFieldName="@nameof(ReportStyleWrapper.Type)" />
@@ -86,7 +89,6 @@ else
                                 <div class="flex-grow-1" />
                                 <DxButton @ref=@listboxViewButton Text="@ListboxViewButtonText"
                                           RenderStyle="ButtonRenderStyle.Primary"
-                                          RenderStyleMode="ButtonRenderStyleMode.Text"
                                           Click="ToggleListboxViewButton" CssClass="flex-grow-0" />
                             }
                         </div>
@@ -336,7 +338,6 @@ else
     .selected-box {
         width: 100%;
         position: relative;
-        padding: 0.25rem 0.25rem;
         border: 1px solid transparent;
         border-radius: 0.25rem;
     }
@@ -587,7 +588,7 @@ else
                 }
                 else if (IsPreview)
                 {
-                   isListboxShowingSummary = true; // force a flip
+                    isListboxShowingSummary = true; // force a flip
                 }
             }
         }
@@ -634,6 +635,8 @@ else
         }
         else
         {
+            var style = await localStorage.GetItemAsync<int?>("ClassListStyle");
+            if (style != null) reportStyle = (ReportStyle)style;
             if (Classes != null && ClassID != Guid.Empty)
             {
                 // We have a class ID passed in via QueryRequest
@@ -665,6 +668,7 @@ else
     async Task OnReportStyleChanged(ReportStyle value)
     {
         reportStyle = value;
+        await localStorage.SetItemAsync<int>("ClassListStyle", (int)reportStyle);
         InvokeAsync(StateHasChanged);
     }
 
