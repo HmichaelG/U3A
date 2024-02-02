@@ -116,6 +116,7 @@ else
 
     void FinalisePaymentIfReqd()
     {
+        if (!hasRole) { return; }
         var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
         if (queryStringCollection.Count > 0) {
             if (queryStringCollection.GetKey(0) == "Eway")
