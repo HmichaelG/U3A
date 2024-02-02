@@ -243,7 +243,6 @@
             this.xrTableCell2.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Person].[FullName]")});
             this.xrTableCell2.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F);
-            this.xrTableCell2.ForeColor = System.Drawing.Color.Black;
             this.xrTableCell2.Multiline = true;
             this.xrTableCell2.Name = "xrTableCell2";
             this.xrTableCell2.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 6, 0, 0, 100F);
@@ -265,7 +264,7 @@
             this.xrTableCell3.Borders = DevExpress.XtraPrinting.BorderSide.Left;
             this.xrTableCell3.BorderWidth = 2F;
             this.xrTableCell3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[DateJoined]")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Person].[DateJoined]")});
             this.xrTableCell3.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F);
             this.xrTableCell3.ForeColor = System.Drawing.Color.Black;
             this.xrTableCell3.Multiline = true;
@@ -918,7 +917,7 @@
             this.GrandTotalData2,
             this.GrandTotalBackground2,
             this.PageInfo});
-            this.Version = "23.1";
+            this.Version = "23.2";
             this.DataSourceDemanded += new System.EventHandler<System.EventArgs>(this.CashReceiptsByDate_DataSourceDemanded);
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).EndInit();
