@@ -4,6 +4,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject ILogger<LeaderReport> Logger
 @inject IWebHostEnvironment Environment
+@inject NavigationManager navMan;
 @implements IDisposable
 
 
@@ -175,9 +176,7 @@ else {
         var pdfFilename = reportFactory.CreatePostalPDF();
         if (pdfFilename != null) {
             var pdfPath = "Temp/" + pdfFilename;
-            await messageBox.SetPopupWidth("80%");
-            var msg = "Print Report";
-            await messageBox.ShowOkOnlyAsync(msg, @$"<iframe src='{pdfPath}' width='100%' height='800rem' />");
+            await js.InvokeVoidAsync("open", pdfPath, "_blank");
         }
     }
 

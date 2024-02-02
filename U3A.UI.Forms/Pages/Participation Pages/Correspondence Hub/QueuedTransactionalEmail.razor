@@ -305,9 +305,7 @@ else
         if (pdfFilename != null)
         {
             var pdfPath = "Temp/" + pdfFilename;
-            await messageBox.SetPopupWidth("80%");
-            msg = (IsPreview) ? "Preview Mail Documents" : "Print Postal Documents";
-            await messageBox.ShowOkOnlyAsync(msg, @$"<iframe src='{pdfPath}' width='100%' height='800rem' />");
+            await js.InvokeVoidAsync("open", pdfPath, "_blank");
         }
     }
 
