@@ -1,6 +1,10 @@
 ﻿@page "/XtraReportViewer"
 @page "/XtraReportViewer/{ReportName?}"
 
+@using Microsoft.AspNetCore.Components.Forms
+
+<AntiforgeryToken />
+
 @inject NavigationManager NavMan
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable

@@ -20,66 +20,91 @@
 }
 else
 {
+    if (showPDF)
+    {
+        <FullScreen>
+            <ContentTemplate>
+                <table class="w-100 h-100">
+                    <div class="row">
+                        <DxToolbar CssClass="bg-secondary">
+                            <Items>
+                                <DxToolbarItem Text="Close" 
+                                    CssClass="me-5 mb-1"
+                                    Alignment="ToolbarItemAlignment.Right"
+                                    IconCssClass="bi bi-x-lg" 
+                                    Click="@(() => showPDF = false)" />
+                            </Items>
+                        </DxToolbar>
+                    </div>
+                    <div class="row">
+                        <iframe src='@pdfPath' height="1000" />
+                    </div>
+                </table>
+            </ContentTemplate>
+        </FullScreen>
 
-    <CollapsableContent AlertText=@($@"<strong>Transactional email</strong> queued and processed overnight.<br />
+    }
+    else
+    {
+        <CollapsableContent AlertText=@($@"<strong>Transactional email</strong> queued and processed overnight.<br />
                     Cash Receipts and Enrolments are sent daily, Leader Reports are sent within 48 hours of the next class.<br/>
                     Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.<br />
                     Processed correspondence is deleted after 30 days.")
-                        OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+                            OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
-    <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
-    <Progress @ref="@ProgressBar" />
-    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+        <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
+        <Progress @ref="@ProgressBar" />
+        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <div class="pb-1" />
-    <FullScreen @ref=@fullScreen>
-        <ContentTemplate>
-            <DxGrid Data="@SendMail" @ref=@mainGrid CssClass="grid-height"
-                    @bind-SelectedDataItems="@SelectedDataItems"
-                    UnboundColumnData="Grid_CustomUnboundColumnData"
-                    ShowFilterRow="false"
-                    ShowAllRows="false"
-                    KeyFieldName="ID"
-                    ValidationEnabled="true"
-                    SelectionMode="GridSelectionMode.Multiple">
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid>
-                        <CustomButtonContent>
-                            <DxToolbarItem Text="Preview" IconCssClass="bi bi-eyeglasses"
-                                           Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                           Tooltip="Preview the email to be sent to selected participants."
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary" />
-                            <DxToolbarItem Text="Send Mail" IconCssClass="bi bi-envelope"
-                                           Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                           Tooltip="Send email to selected participants, now."
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary" />
-                            <DxToolbarItem Text="Delete" IconCssClass="bi bi-trash"
-                                           Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                           Tooltip="Delete the selected email."
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary" />
-                        </CustomButtonContent>
-                    </GridToolbar>
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridSelectionColumn Width="2rem" />
-                    <DxGridDataColumn Width="10rem" Caption="Email On/After"
-                                      UnboundType=GridUnboundColumnType.DateTime
-                                      FieldName="CreatedOnLocal"
-                                      DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-                    <DxGridDataColumn Width="12rem" Caption="Document" FieldName="DocumentName" />
-                    <DxGridDataColumn Width="12rem" Caption="Send To" FieldName="Person.FullName" />
-                    <DxGridDataColumn Width="6rem" Caption="Send Via" FieldName="Person.Communication" />
-                    <DxGridDataColumn Caption="Email" FieldName="Person.Email" />
-                    <DxGridDataColumn Caption="Status" FieldName="Status" />
-                </Columns>
+        <div class="pb-1" />
+        <FullScreen @ref=@fullScreen>
+            <ContentTemplate>
+                <DxGrid Data="@SendMail" @ref=@mainGrid CssClass="grid-height"
+                        @bind-SelectedDataItems="@SelectedDataItems"
+                        UnboundColumnData="Grid_CustomUnboundColumnData"
+                        ShowFilterRow="false"
+                        ShowAllRows="false"
+                        KeyFieldName="ID"
+                        ValidationEnabled="true"
+                        SelectionMode="GridSelectionMode.Multiple">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid>
+                            <CustomButtonContent>
+                                <DxToolbarItem Text="Preview" IconCssClass="bi bi-eyeglasses"
+                                               Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                               Tooltip="Preview the email to be sent to selected participants."
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               RenderStyle="ButtonRenderStyle.Primary" />
+                                <DxToolbarItem Text="Send Mail" IconCssClass="bi bi-envelope"
+                                               Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                               Tooltip="Send email to selected participants, now."
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               RenderStyle="ButtonRenderStyle.Primary" />
+                                <DxToolbarItem Text="Delete" IconCssClass="bi bi-trash"
+                                               Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                               Tooltip="Delete the selected email."
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               RenderStyle="ButtonRenderStyle.Primary" />
+                            </CustomButtonContent>
+                        </GridToolbar>
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridSelectionColumn Width="2rem" />
+                        <DxGridDataColumn Width="10rem" Caption="Email On/After"
+                                          UnboundType=GridUnboundColumnType.DateTime
+                                          FieldName="CreatedOnLocal"
+                                          DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                        <DxGridDataColumn Width="12rem" Caption="Document" FieldName="DocumentName" />
+                        <DxGridDataColumn Width="12rem" Caption="Send To" FieldName="Person.FullName" />
+                        <DxGridDataColumn Width="6rem" Caption="Send Via" FieldName="Person.Communication" />
+                        <DxGridDataColumn Caption="Email" FieldName="Person.Email" />
+                        <DxGridDataColumn Caption="Status" FieldName="Status" />
+                    </Columns>
 
-            </DxGrid>
-        </ContentTemplate>
-    </FullScreen>
-
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
+    }
 }
 
 
@@ -100,6 +125,8 @@ else
     Progress? ProgressBar;
     LocalTime localTime;
     TimeSpan? localTimeOffset;
+    bool showPDF = false;
+    string pdfPath;
 
     U3ADbContext dbc { get; set; }
     SystemSettings? settings;
@@ -304,8 +331,8 @@ else
         var pdfFilename = reportFactory.CreatePostalPDF();
         if (pdfFilename != null)
         {
-            var pdfPath = "Temp/" + pdfFilename;
-            await js.InvokeVoidAsync("open", pdfPath, "_blank");
+            pdfPath = "Temp/" + pdfFilename;
+            showPDF = true;
         }
     }
 
