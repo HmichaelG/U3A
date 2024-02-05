@@ -105,7 +105,7 @@ else
                                     </div>
                                     @if (IsEnrolmentRequestView)
                                     {
-                                        <DxCheckBox Checked="c.IsSelected" />
+                                        <DxCheckBox Checked="@c.IsSelected" ReadOnly=true  />
                                     }
                                 </div>
                             }
@@ -788,7 +788,7 @@ else
             && isListboxShowingSummary
             && classEndDate?.Date >= today)
             {
-                result += " - Click to remove";
+                result += " - Click to withdarw";
             }
         }
         return result;
@@ -944,8 +944,8 @@ else
                 listGrid.ClearSelection(); return;
             }
 
-            if (await messageBox.ShowAsync("Class will be removed",
-                       $"<p>The class, <strong>{selectedClass.Course.Name}</strong> will be <strong>removed</strong> from your selection.</p>" +
+            if (await messageBox.ShowAsync("Class will be withdrawn",
+                       $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be <strong>withdrawn</strong>.</p>" +
                        "Do you wish to continue?"))
             {
                 selectedClasses.Remove(selectedClass);
@@ -956,8 +956,8 @@ else
         }
         else
         {
-            var caption = "Add to selection";
-            var message = $"<p>The class, <strong>{selectedClass.Course.Name}</strong> will be added to your selection.</p>" +
+            var caption = "Request enrolment";
+            var message = $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be requested.</p>" +
                         WaitlistWarning() +
                        "<p>Do you wish to continue?</p>";
             bool result;
@@ -993,7 +993,7 @@ else
             var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
             await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
             await dbc.SaveChangesAsync();
-            if (addedEnrolments.Count() > 0 || deletedEnrolments.Count() > 0)
+            if (addedEnrolments.Count() > 0)
             {
                 await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, deletedEnrolments, term, settings));
             }

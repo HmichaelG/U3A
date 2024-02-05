@@ -41,7 +41,8 @@ namespace U3A.BusinessRules
                                                     x.PersonID == person.ID);
                 if (a == null) { continue; }
                 var e = ((await BusinessRule.EditableEnrolmentsAsync(dbc, term, c.Course, c))
-                        .Where(x => x.PersonID == person.ID)).FirstOrDefault();
+                        .Where(x => !x.IsWaitlisted && x.PersonID == person.ID)).FirstOrDefault();
+                if (e == null) { continue; }
                 var onfile = result.Any(x => x.Class.ID == c.ID &&
                                             x.AttendClass.ID == a.ID &&
                                             x.Enrolment.ID == e.ID);
@@ -98,7 +99,7 @@ namespace U3A.BusinessRules
             {
                 var addClass = false;
                 var e = ((await BusinessRule.EditableEnrolmentsAsync(dbc, term, c.Class.Course, c.Class))
-                        .Where(x => x.PersonID == person.ID)).FirstOrDefault();
+                        .Where(x => !x.IsWaitlisted && x.PersonID == person.ID)).FirstOrDefault();
                 if (e != null) { addClass = true; }
                 if (c.Class.LeaderID == person.ID) { addClass = true; }
                 if (c.Class.Leader2ID == person.ID) { addClass = true; }

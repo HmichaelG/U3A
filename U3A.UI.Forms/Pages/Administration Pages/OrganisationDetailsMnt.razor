@@ -9,20 +9,27 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <div class="container h-100">
         <div class="row  align-content-start">
             <ContextHelpTitle Title="Organisation Details" HelpTopic="organistaion-details.html" />
         </div>
-        <div class="row">
-            <div class="col-11 d-none d-md-inline">
-                Organisation-wide parameters used throughout the system.
+        <div class="d-flex w-100">
+            <div class="flex-grow-1">
+                <p>Organisation-wide parameters used throughout the system.</p>
             </div>
-
+            <DxFormLayout>
+                <DxFormLayoutItem CssClass="flex-grow-0"
+                                  Caption="Disable Overnight Background Processing?">
+                    <DxCheckBox @bind-Checked="@systemSettings.DisableBackgroundProcessing" />
+                </DxFormLayoutItem>
+            </DxFormLayout>
         </div>
 
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
@@ -33,9 +40,6 @@ else {
             <DxFormLayout>
                 <DxFormLayoutTabPages>
                     <DxTabPage Text="Your Group's Details">
-                        <DxFormLayoutItem Caption="Disable Overnight Background Processing?" ColSpanMd="12">
-                            <DxCheckBox @bind-Checked="@systemSettings.DisableBackgroundProcessing" />
-                        </DxFormLayoutItem>
                         <DxStackLayout CssClass="w-100" Orientation="Orientation.Horizontal">
                             <Items>
                                 <DxStackLayoutItem>
@@ -70,17 +74,17 @@ else {
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Send Email Address" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@systemSettings.SendEmailAddesss"
-                                                      NullText="The email address from which transaction email is sent."/>
+                                                           NullText="The email address from which transaction email is sent." />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Send Email Display Name" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@systemSettings.SendEmailDisplayName" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Support Email Address" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@systemSettings.SupportEmailAddesss"
-                                                    NullText="The email address to which member support requuests are sent."/>
+                                                           NullText="The email address to which member support requuests are sent." />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="System Postman CC Email" ColSpanMd="12">
-                                                <DxMemo @bind-Text="@systemSettings.SystemPostmanCCAddresses" 
+                                                <DxMemo @bind-Text="@systemSettings.SystemPostmanCCAddresses"
                                                         Rows="3" NullText="Optional. One email address per line" CssClass="w-100" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
@@ -126,7 +130,7 @@ else {
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Rule 2: Remainder Allocation Method" ColSpanMd="12">
                                                 <DxComboBox Data="@AutoEnrolAllocationMethods"
-                                                @bind-Value="@systemSettings.AutoEnrolRemainderMethod" />
+                                                            @bind-Value="@systemSettings.AutoEnrolRemainderMethod" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutGroup Caption="Enrolment Allocation Day" ColSpanLg="12">
                                                 <DxFormLayoutItem Caption="Week(s) Before Term Start" ColSpanMd="12">
@@ -136,14 +140,14 @@ else {
                                                 <DxFormLayoutItem Caption="On Day" ColSpanMd="12">
                                                     <DxComboBox Data="WeekDays"
                                                                 FilteringMode="DataGridFilteringMode.Contains"
-                                                    @bind-Value="@systemSettings.AutoEnrolAllocationDay"
+                                                                @bind-Value="@systemSettings.AutoEnrolAllocationDay"
                                                                 ValueFieldName="@nameof(WeekDay.ID)"
                                                                 TextFieldName="@nameof(WeekDay.Day)">
                                                     </DxComboBox>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Occurrence" ColSpanMd="12">
                                                     <DxComboBox Data="autoEnrollOccurrences"
-                                                    @bind-Value="@systemSettings.AutoEnrolAllocationOccurs"
+                                                                @bind-Value="@systemSettings.AutoEnrolAllocationOccurs"
                                                                 ValueFieldName="Key"
                                                                 TextFieldName="Value">
                                                     </DxComboBox>
@@ -153,14 +157,14 @@ else {
                                         <DxFormLayoutGroup Caption="Leader / Clerk Options" ColSpanLg="12">
                                             <DxFormLayoutItem Caption="Send Leader Reports To" ColSpanMd="12">
                                                 <DxComboBox Data="sendLeaderReportsToList"
-                                                @bind-Value="@systemSettings.SendLeaderReportsTo"
+                                                            @bind-Value="@systemSettings.SendLeaderReportsTo"
                                                             ValueFieldName="@nameof(SendLeaderReportsToWrapper.Type)"
                                                             TextFieldName="@nameof(SendLeaderReportsToWrapper.DisplayText)">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Course Contact Order" ColSpanMd="12">
                                                 <DxComboBox Data="contactOrder"
-                                                @bind-Value="@systemSettings.CourseContactOrder"
+                                                            @bind-Value="@systemSettings.CourseContactOrder"
                                                             ValueFieldName="@nameof(CourseContactOrderWrapper.Type)"
                                                             TextFieldName="@nameof(CourseContactOrderWrapper.DisplayText)">
                                                 </DxComboBox>
@@ -173,14 +177,6 @@ else {
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Allow leader/clerk to change enrolment?" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@systemSettings.AllowLeaderToChangeEnrolment" Alignment="CheckBoxContentAlignment.Right" />
-                                            </DxFormLayoutItem>
-                                        </DxFormLayoutGroup>
-                                        <DxFormLayoutGroup Caption="Other Settings">
-                                            <DxFormLayoutItem Caption="Require Vax Certificate?" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@systemSettings.RequireVaxCertificate" Alignment="CheckBoxContentAlignment.Right" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Allow Person Post-Nominal Letters?" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@systemSettings.AllowPostNominalLetters" Alignment="CheckBoxContentAlignment.Right" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
                                     </Template>
@@ -208,6 +204,14 @@ else {
                                                 <DxMaskedInput @bind-Value="@systemSettings.MailLabelWidth" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup><br />
+                                        <DxFormLayoutGroup Caption="Other Settings">
+                                            <DxFormLayoutItem Caption="Require Vax Certificate?" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@systemSettings.RequireVaxCertificate" Alignment="CheckBoxContentAlignment.Right" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Allow Person Post-Nominal Letters?" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@systemSettings.AllowPostNominalLetters" Alignment="CheckBoxContentAlignment.Right" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
                                     </Template>
                                 </DxStackLayoutItem>
 
@@ -261,7 +265,8 @@ else {
     DocumentServer server;
 
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         AutoEnrolAllocationMethods = new List<string>();
         AutoEnrolAllocationMethods.Add("Random");
@@ -269,7 +274,8 @@ else {
         dbc = await U3Adbfactory.CreateDbContextAsync();
         WeekDays = await dbc.WeekDay.ToListAsync();
         systemSettings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        if (systemSettings == null) {
+        if (systemSettings == null)
+        {
             systemSettings = new SystemSettings()
                 {
                     AutoEnrolNewParticipantPercent = 15M,
@@ -289,10 +295,13 @@ else {
         IsReady = true;
     }
 
-    async void ValidFormSubmitted(EditContext editContext) {
+    async void ValidFormSubmitted(EditContext editContext)
+    {
         bool isNew = false;
-        try {
-            if (richEdit != null) {
+        try
+        {
+            if (richEdit != null)
+            {
                 await richEdit.SaveDocumentAsync();
             }
         }
@@ -300,21 +309,25 @@ else {
         var editModel = (SystemSettings)editContext.Model;
         // Re-query a data item from the store.
         var dataItem = dbc.SystemSettings.Find(editModel.ID);
-        if (dataItem == null) {
+        if (dataItem == null)
+        {
             dataItem = new SystemSettings();
             isNew = true;
         }
         // Assign changes from the edit model to the data item.
-        if (dataItem != null) {
+        if (dataItem != null)
+        {
             editModel.CopyTo(dataItem);
             dataItem.TermsAndConditionsHTML = server.GetHTMLText(systemSettings.TermsAndConditions);
-            try {
+            try
+            {
                 // Post changes to the database.
                 if (isNew) await dbc.AddAsync(dataItem);
                 await dbc.SaveChangesAsync();
                 Close();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 ErrorHeader = "Save to database error";
                 ErrorMessage = Helpers.GetErrorMessage(ex);
                 await ErrorPopup.ShowPopupAsync();
@@ -323,16 +336,19 @@ else {
         }
     }
 
-    async Task OnDocumentContentChanged(Byte[] content) {
+    async Task OnDocumentContentChanged(Byte[] content)
+    {
         systemSettings.TermsAndConditions = richEdit.DocumentContent;
     }
 
 
-    void Close() {
+    void Close()
+    {
         NavigationManager.NavigateTo("/");
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
