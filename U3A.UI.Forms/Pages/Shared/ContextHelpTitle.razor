@@ -111,7 +111,7 @@
 
     public async Task ShowTopicAsync()
     {
-        standardWidth = (IncludeTableOfContents) ? "max(45vw, 400px)" : "max(40vw, 400px)";
+        standardWidth = (IncludeTableOfContents) ? "max(60vw, 400px)" : "max(40vw, 400px)";
         if (string.IsNullOrWhiteSpace(windowWidth)) { windowWidth = standardWidth; }
         if (helpWindow.Visible) { await helpWindow.CloseAsync(); }
         helpFile = $"help/index.html?{HelpTopic}";
