@@ -25,7 +25,7 @@ namespace U3A.BusinessRules
             var pt = dbc.CourseParticpationType.Find(cr.CourseParticipationTypeID);
             var ct = dbc.CourseType.Find(cr.CourseTypeID);
             var classes = new List<Class>();
-            var IsPreRandomAllocationPeriod = BusinessRule.IsPreRandomAllocationEmailDay(t, settings, enrolment.Created.Date);
+            var IsPreRandomAllocationPeriod = BusinessRule.IsPreRandomAllocationEmailDay(t, settings, TimezoneAdjustment.GetLocalTime());
             if (enrolment.ClassID != null)
             {
                 classes.Add(dbc.Class
