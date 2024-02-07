@@ -1,4 +1,4 @@
-﻿<section class="@($"{CssClass} alert alert-{AlertType} text-center")" hidden="@isHidden">
+﻿<section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
     <button class="btn-close btn-close-white" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
     @ContentTemplate
     <div class="@($"strong {AlertTextRender}")">@(new MarkupString(AlertText))</div>
@@ -15,7 +15,6 @@
         --bs-bg-opacity: 0.1;
     }
     section {
-        width: calc(100% - 3rem);
         margin: auto;
     }
 
@@ -35,11 +34,19 @@
 
     bool isHidden = false;
     string AlertTextRender;
+    string alertRender;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (AlertType.ToLower().Trim() != "none") { AlertTextRender = $"text-dark"; }
+        if (AlertType.ToLower().Trim() != "none") { 
+            AlertTextRender = $"text-dark";
+            alertRender = $"alert alert-{AlertType}";
+        }
+        else
+        {
+            alertRender = "";
+        }
     }
 
     async Task onOpenButtonClick()
