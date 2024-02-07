@@ -244,12 +244,37 @@ else
                     }
                 }
                 break;
+            case PortalMenuSelection.DoLinkNewMember:
+                result = await HasEmailAsync();
+                break;
+            case PortalMenuSelection.DoLinkExistingMember:
+                result = await HasEmailAsync();
+                break;
+            case PortalMenuSelection.DoUnlinkMember:
+                result = await HasEmailAsync();
+                break;
             case PortalMenuSelection.DoMemberPayment:
                 result = await AreMemberDetailsOK();
                 break;
             default:
                 result = await AreMemberDetailsOK();
                 break;
+        }
+        return result;
+    }
+
+    async Task<bool> HasEmailAsync()
+    {
+        bool result = false;
+        var person = await GetPersonAsync();
+        if (person != null && !string.IsNullOrWhiteSpace( person.Email))
+        {
+            result = true;
+        }
+        else
+        {
+            await messageBox.ShowOkOnlyAsync("You have no email address",
+            "<p>You must have a valid email address to link/unlink another member.<p>");
         }
         return result;
     }
