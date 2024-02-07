@@ -32,7 +32,7 @@ else
             <DxTabs RenderMode="TabsRenderMode.OnDemand">
                 <DxTabPage Text="Process On Behalf Of">
                     <DxFormLayout CssClass="mt-3 px-2 col-12 px-sm-0 col-sm-10 col-md-9 mx-auto">
-                        <CollapsableContent AlertType="none" CssClass="p-0 m-0"
+                        <CollapsableContent AlertType="none"
                                 ShowCollapseButton=false
                                 OnContentExpanded="@(async() => await OnRefresh())"
                                 @ref=@collapsableContent >
@@ -85,7 +85,7 @@ else
                         }
                         else
                         {
-                            <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="col col-12"
+                            <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
                                          ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
                                 <Items>
                                     <DxAccordionItem Text="Add/Edit Member Details" Expanded="false">
