@@ -18,9 +18,9 @@ else
 {
 
     <DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
-                    @bind-IsActive="@IsLargeLayout" />
+                        @bind-IsActive="@IsLargeLayout" />
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
-                    @bind-IsActive="@IsXtraLargeLayout" />
+                        @bind-IsActive="@IsXtraLargeLayout" />
 
     @if (!IsMemberPortal)
     {
@@ -32,13 +32,13 @@ else
                 Mark the class attendance roll.
             </div>
             <DxButton Text="Communicate"
-              Click="@OnCommunicate"
-              RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-1" />
+                      Click="@OnCommunicate"
+                      RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-1" />
         </div>
     }
 
     <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-                             DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+                                 DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
     <Progress @ref="@ProgressBar" />
 
     <MessageBox @ref="@messageBox" />
@@ -48,14 +48,14 @@ else
     <AdHocAttendanceMnt @ref="adHocAttendanceMnt" AvailablePersons=Persons IsLargerLayout=@(IsLargerLayout()) />
 
     <DxFlyout @bind-IsOpen=IsFlyoutOpen
-          PositionTarget="@FlyoutTargetID"
-          Position="FlyoutPosition.Left"
-          FitToRestriction=false
-          CloseMode="FlyoutCloseMode.Close"
-          HeaderVisible="true"
-          HeaderText="@HeaderContent"
-          Width="max(25vw, 250px)"
-          PreventCloseOnPositionTargetClick="false">
+              PositionTarget="@FlyoutTargetID"
+              Position="FlyoutPosition.Left"
+              FitToRestriction=false
+              CloseMode="FlyoutCloseMode.Close"
+              HeaderVisible="true"
+              HeaderText="@HeaderContent"
+              Width="max(25vw, 250px)"
+              PreventCloseOnPositionTargetClick="false">
         <BodyTemplate>
             <div class="card">
                 <div class="card-body">
@@ -75,86 +75,86 @@ else
                 <div class="input-group my-2">
                     <div class="flex-grow-1">Class Date</div>
                     <DxComboBox @ref="@DateComboBox" Data="@ClassDates" CssClass="flex-grow-4"
-                        AllowUserInput=false
-                        Enabled="@dateComboEnabled"
-                        NullText="@dateComboNullText"
-                        TextFieldName="@nameof(ClassDate.WeekDateName)"
-                        Value="@selectedDate"
-                        ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))" />
+                                AllowUserInput=false
+                                Enabled="@dateComboEnabled"
+                                NullText="@dateComboNullText"
+                                TextFieldName="@nameof(ClassDate.WeekDateName)"
+                                Value="@selectedDate"
+                                ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))" />
                 </div>
             }
             else
             {
                 <DxFormLayoutGroup Caption="Attendance Details"
-                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                    Expanded="true"
-                    ExpandedChanged="() => StateHasChanged()">
+                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
+                                   Expanded="true"
+                                   ExpandedChanged="() => StateHasChanged()">
                     <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="12">
                         <DxComboBox Data="@terms" NullText="Select the Term required..."
-                            AllowUserInput=false
-                            FilteringMode="DataGridFilteringMode.Contains"
-                            TextFieldName="@nameof(Term.TermSummary)"
-                            Value="@SelectedTerm"
-                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                                    Enabled="@(!IsMemberPortal)"
+                                    AllowUserInput=false
+                                    FilteringMode="DataGridFilteringMode.Contains"
+                                    TextFieldName="@nameof(Term.TermSummary)"
+                                    Value="@SelectedTerm"
+                                    ValueChanged="@((Term term) => SelectedTermChanged(term))" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Course Attended" ColSpanMd="12">
                         <DxComboBox Data="@courses"
-                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                            Enabled="@courseComboEnabled"
-                            NullText="@courseComboNullText"
-                            FilteringMode="DataGridFilteringMode.Contains"
-                            ListRenderMode="ListRenderMode.Virtual"
-                            TextFieldName="@nameof(Course.Name)"
-                            Value="@SelectedCourse"
-                            ValueChanged="@((Course course) => SelectedCourseChanged(course))">
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    Enabled="@courseComboEnabled"
+                                    NullText="@courseComboNullText"
+                                    FilteringMode="DataGridFilteringMode.Contains"
+                                    ListRenderMode="ListRenderMode.Virtual"
+                                    TextFieldName="@nameof(Course.Name)"
+                                    Value="@SelectedCourse"
+                                    ValueChanged="@((Course course) => SelectedCourseChanged(course))">
                         </DxComboBox>
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Class Attended" ColSpanMd="8">
                         <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
-                            AllowUserInput=false
-                            TextFieldName="@nameof(Class.ClassSummary)"
-                            Value="@SelectedClass"
-                            ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
+                                    AllowUserInput=false
+                                    TextFieldName="@nameof(Class.ClassSummary)"
+                                    Value="@SelectedClass"
+                                    ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Class Date" ColSpanMd="4">
                         <DxComboBox @ref="@DateComboBox" Data="@ClassDates"
-                            Enabled="@dateComboEnabled"
-                            NullText="@dateComboNullText"
-                            TextFieldName="@nameof(ClassDate.WeekDateName)"
-                            Value="@selectedDate"
-                            ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))" />
+                                    Enabled="@dateComboEnabled"
+                                    NullText="@dateComboNullText"
+                                    TextFieldName="@nameof(ClassDate.WeekDateName)"
+                                    Value="@selectedDate"
+                                    ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))" />
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
             }
 
             @quickMessage
 
+            @if (!IsLargeLayout)
+            {
+                <GridToolbar LinkedGrid=@mainGrid />
+            }
             <DxGrid Data="@ClassAttendance" @ref=@mainGrid id="myGrid"
-                CustomizeElement="OnCustomizeElement"
-                CssClass="grid-height"
-                ShowAllRows="true"
-                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                KeyFieldName="ID"
-                ValidationEnabled="true"
-                SelectionMode="GridSelectionMode.Multiple"
-                AllowSelectRowByClick="true"
-                @bind-SelectedDataItems="SelectedDataItems"
-                EditMode="GridEditMode.PopupEditForm"
-                DataItemDeleting="Grid_DataItemDeleting"
-                EditModelSaving="Grid_EditModelSaving">
-                <ToolbarTemplate>
-                    @if (!IsMemberPortal){
-                        <GridToolbar LinkedGrid=@mainGrid />
-                    }
-                </ToolbarTemplate>
-
+                    ShowSearchBox=true
+                    CustomizeElement="OnCustomizeElement"
+                    CssClass="grid-height"
+                    ShowAllRows="true"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    SelectionMode="GridSelectionMode.Multiple"
+                    AllowSelectRowByClick="true"
+                    @bind-SelectedDataItems="SelectedDataItems"
+                    EditMode="GridEditMode.PopupEditForm"
+                    DataItemDeleting="Grid_DataItemDeleting"
+                    EditModelSaving="Grid_EditModelSaving">
                 <Columns>
                     <DxGridSelectionColumn Width="1rem" />
                     <DxGridCommandColumnEx @ref="GridCommandColumn"
-                                       EditButtonVisible="true" NewButtonVisible="false" DeleteButtonVisible="false" />
+                                           EditButtonVisible="true" NewButtonVisible="false" DeleteButtonVisible="false" />
                     <DxGridDataColumn Caption="Name"
-                                  FieldName="Person.FullName"
-                                  Width="12rem">
+                                      FieldName="Person.FullName"
+                                      Width="12rem">
                         <CellDisplayTemplate>
                             @{
                                 var status = (AttendClassStatusType)((AttendClass)context.DataItem).AttendClassStatusID;
@@ -182,27 +182,27 @@ else
                         </CellDisplayTemplate>
                         <FilterRowCellTemplate>
                             <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                    CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                    AllowIndeterminateStateByClick="true"
-                                    Alignment="CheckBoxContentAlignment.Center" />
+                                        CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                                        AllowIndeterminateStateByClick="true"
+                                        Alignment="CheckBoxContentAlignment.Center" />
                         </FilterRowCellTemplate>
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
-                                  Width="5rem" Visible="@settings.RequireVaxCertificate">
+                                      Width="5rem" Visible="@settings.RequireVaxCertificate">
                         <CellDisplayTemplate>
                             <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
                         </CellDisplayTemplate>
                         <FilterRowCellTemplate>
                             <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                    CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                    AllowIndeterminateStateByClick="true"
-                                    Alignment="CheckBoxContentAlignment.Center" />
+                                        CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                                        AllowIndeterminateStateByClick="true"
+                                        Alignment="CheckBoxContentAlignment.Center" />
                         </FilterRowCellTemplate>
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Attendance"
-                                  FieldName="AttendClassStatus.Status"
-                                  Width="10rem"
-                                  Visible=@(IsLargerLayout()) />
+                                      FieldName="AttendClassStatus.Status"
+                                      Width="10rem"
+                                      Visible=@(IsLargerLayout()) />
                     <DxGridDataColumn Caption="Comment" FieldName="Comment" />
                 </Columns>
 
@@ -216,8 +216,8 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Class Attendance" ColSpanMd="12">
                             <DxComboBox Data="ClassAttendanceStatus"
-                                    @bind-Value="@editItem.AttendClassStatus"
-                                    TextFieldName="@nameof(AttendClassStatus.Status)">
+                                        @bind-Value="@editItem.AttendClassStatus"
+                                        TextFieldName="@nameof(AttendClassStatus.Status)">
                             </DxComboBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
@@ -258,30 +258,30 @@ else
             <DxFormLayoutGroup Caption="Quick Rollcall" ColSpanSm="12">
                 <DxFormLayoutItem Caption="Attendance?" ColSpanSm="12">
                     <DxComboBox Data="ClassAttendanceStatus"
-                            @bind-Value="QuickSelectionStatus"
-                            TextFieldName="@nameof(AttendClassStatus.Status)">
+                                @bind-Value="QuickSelectionStatus"
+                                TextFieldName="@nameof(AttendClassStatus.Status)">
                     </DxComboBox>
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Comment" ColSpanSm="12">
                     <DxTextBox @bind-Text="QuickAttendanceComment" />
                 </DxFormLayoutItem>
                 <DxButton Text="Set Selection" CssClass="col-12 mt-1"
-                      Id="SetSelectionStatus"
-                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                      RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionStatusAsync" />
+                          Id="SetSelectionStatus"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionStatusAsync" />
                 <DxButton Text="Apply Student Leave" CssClass="col-12 mt-1"
-                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                      RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Caption="Ad Hoc Attendees">
                 <DxButton Text="Add Ad Hoc Attendee(s)" CssClass="col-12 mt-1"
-                      Id="AddAdHocAttendee"
-                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                      RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
+                          Id="AddAdHocAttendee"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
                 <DxButton Text="Delete Ad Hoc Attendee(s)" CssClass="col-12 mt-1"
-                      Id="DeleteAdHocAttendee"
-                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                      RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
+                          Id="DeleteAdHocAttendee"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
             </DxFormLayoutGroup>
         </div>
         @if (!IsLargerLayout())
@@ -309,32 +309,32 @@ else
                     <div class="flex-grow-1">Comment</div>
                     <div class="flex-grow-4">
                         <DxTextBox @bind-Text="QuickAttendanceComment"
-                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                     </div>
                 </div>
                 <div class="input-group">
                     <DxButton Text="Set Selected" CssClass="flex-grow-1"
-                      Id="SetSelected"
-                      IconCssClass="bi bi-mortarboard menu-icon"
-                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                      RenderStyle="ButtonRenderStyle.Primary" Click="SetSmallScreenSelectionStatusAsync" />
+                              Id="SetSelected"
+                              IconCssClass="bi bi-mortarboard menu-icon"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                              RenderStyle="ButtonRenderStyle.Primary" Click="SetSmallScreenSelectionStatusAsync" />
                 </div>
             </div>
             <div class="input-group px-2">
                 <DxButton Text="+ Ad Hoc" CssClass="flex-grow-1"
-                  Id="AddAdHoc"
-                  IconCssClass="bi bi-person-add menu-icon"
-                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                  RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
+                          Id="AddAdHoc"
+                          IconCssClass="bi bi-person-add menu-icon"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
                 <DxButton Text="- Ad Hoc" CssClass="flex-grow-1"
-                  Id="DeleteAdHoc"
-                  IconCssClass="bi bi-person-dash menu-icon"
-                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                  RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
+                          Id="DeleteAdHoc"
+                          IconCssClass="bi bi-person-dash menu-icon"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
                 <DxButton Text="Apply Leave" CssClass="flex-grow-1"
-                  IconCssClass="bi bi-airplane menu-icon"
-                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                  RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
+                          IconCssClass="bi bi-airplane menu-icon"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
             </div>
         }
     </DxFormLayout>
@@ -461,7 +461,14 @@ else
         if (SelectedTerm != null)
         {
             Persons = await BusinessRule.SelectablePersonsAsync(dbc, SelectedTerm);
-            await SelectedTermChanged(SelectedTerm);
+            if (IsMemberPortal)
+            {
+                await SetupClassDates();
+            }
+            else
+            {
+                await SelectedTermChanged(SelectedTerm);
+            }
         }
         IsReady = true;
     }
@@ -480,7 +487,7 @@ else
                 NavMan.NavigateTo("/");
             }
         }
-        var offset = (IsLargerLayout()) ? 0.05 : 0.4;
+        var offset = (IsLargerLayout()) ? 0.075 : 0.4;
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
         if (Convert(newHeight) > Convert(gridHeight)) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
     }
@@ -495,25 +502,18 @@ else
     {
         ClearSelection();
         SelectedTerm = term;
-        if (IsMemberPortal)
-        {
-            SelectedCourseChanged(SelectedCourse);
-        }
-        else
-        {
-            SelectedCourse = null;
-            SelectedClass = null;
-            classComboEnabled = false;
-            courseComboEnabled = false;
-            dateComboEnabled = false;
-            if (ClassAttendance != null) { ClassAttendance.Clear(); }
-            courseComboNullText = "Loading Course & AttendClass data ... please wait";
-            StateHasChanged();
-            courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
-            courseComboNullText = string.Empty;
-            courseComboEnabled = true;
-            StateHasChanged();
-        }
+        SelectedCourse = null;
+        SelectedClass = null;
+        classComboEnabled = false;
+        courseComboEnabled = false;
+        dateComboEnabled = false;
+        if (ClassAttendance != null) { ClassAttendance.Clear(); }
+        courseComboNullText = "Loading Course & AttendClass data ... please wait";
+        StateHasChanged();
+        courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
+        courseComboNullText = string.Empty;
+        courseComboEnabled = true;
+        StateHasChanged();
     }
 
     async Task SelectedCourseChanged(Course course)
@@ -523,16 +523,9 @@ else
         classComboNullText = null;
         if (ClassAttendance != null) { ClassAttendance.Clear(); }
         ClearSelection();
-        if (IsMemberPortal)
-        {
-            SelectedClassChanged(SelectedClass);
-        }
-        else
-        {
-            SelectedCourse = course;
-            classes = SelectedCourse?.Classes;
-            await SetupClassToMark();
-        }
+        SelectedCourse = course;
+        classes = SelectedCourse?.Classes;
+        await SetupClassToMark();
     }
 
     async Task SetupClassToMark()
@@ -551,18 +544,24 @@ else
 
     async Task SelectedClassChanged(Class Class)
     {
-        ClearSelection();
         SelectedClass = Class;
+        await SetupClassDates();
+    }
+
+    async Task SetupClassDates()
+    {
+        ClearSelection();
         ClassDates = await BusinessRule.SelectableAttendanceDatesAsync(dbc, SelectedTerm, SelectedClass, now);
         dateComboEnabled = true;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     async Task SelectedDateChanged(ClassDate ClassDate)
     {
-        if (ClassDate.Date.Date > now.Date) {
+        if (ClassDate.Date.Date > now.Date)
+        {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                @"The class date you have selected is in the future.<br/>
+                                    @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
@@ -594,18 +593,22 @@ else
     }
 
     bool isBusy;
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
         if (isBusy) return;
         isBusy = true;
-        try {
+        try
+        {
             await SaveRecord(e);
         }
-        finally {
+        finally
+        {
             isBusy = false;
         }
     }
 
-    async Task SaveRecord(GridEditModelSavingEventArgs e) {
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
         quickMessage = (MarkupString)string.Empty;
         var editModel = (AttendClass)e.EditModel;
         if (!await IsDataOk(editModel))
