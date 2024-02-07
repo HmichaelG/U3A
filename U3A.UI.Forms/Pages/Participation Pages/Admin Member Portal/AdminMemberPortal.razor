@@ -31,52 +31,59 @@ else
 
             <DxTabs RenderMode="TabsRenderMode.OnDemand">
                 <DxTabPage Text="Process On Behalf Of">
-                    <DxFormLayout CssClass="mt-3 px-2 col-12 px-md-0 col-md-8 mx-auto">
+                    <DxFormLayout CssClass="my-2">
                         <CollapsableContent AlertType="none" CssClass="w-100"
-                                ShowCollapseButton=false
-                                OnContentExpanded="@(async() => await OnRefresh())"
-                                @ref=@collapsableContent >
+                                            ShowCollapseButton=false
+                                            OnContentExpanded="@(async() => await OnRefresh())"
+                                            @ref=@collapsableContent>
                             <ContentTemplate>
-                                <div class="h3 text-center">Member Portal (Administration)</div>
-                                <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
-                                <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" ColSpanMd="12">
-                                    <HeaderContentTemplate>
-                                        <div class="d-flex input-group">
-                                            <div class="text-start flex-grow-1">
-                                                Process Member
+                                <div class="@formWidth" >
+                                    <div class="h3 text-center">Member Portal (Administration)</div>
+                                    <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
+                                    <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" ColSpanMd="12">
+                                        <HeaderContentTemplate>
+                                            <div class="d-flex input-group">
+                                                <div class="text-start flex-grow-1">
+                                                    Process Member
+                                                </div>
+                                                <div class="flex-grow-0">
+                                                    <DxButton Text="Refresh" Click="OnRefresh" IconCssClass="bi bi-arrow-clockwise" Tooltip="Click to refresh lookup data" />
+                                                </div>
+                                                <div class="flex-grow-0 ps-1">
+                                                    <DxButton Click="OnMaximiseFormWidth"
+                                                              RenderStyle="ButtonRenderStyle.Secondary"
+                                                              IconCssClass="bi bi-arrows-fullscreen" tooltip="Click ro maximise width" />
+                                                </div>
                                             </div>
-                                            <div class="flex-grow-0">
-                                                <DxButton Text="Refresh" Click="OnRefresh" Tooltip="Clcik to refresh lookup data" />
+                                        </HeaderContentTemplate>
+                                        <Items>
+                                            <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
+                                                <DxComboBox Data="@people"
+                                                            AllowUserInput=true
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                            FilteringMode="DataGridFilteringMode.Contains"
+                                                            ListRenderMode="ListRenderMode.Virtual"
+                                                            TextFieldName="@nameof(Person.PersonSummary)"
+                                                            @bind-Value="@selectedPerson">
+                                                    <Buttons>
+                                                        <DxEditorButton Text="Process" CssClass="text-primary"
+                                                                        IconCssClass="h5 bi bi-check-lg"
+                                                                        Tooltip="Click to process on behalf of the selected member"
+                                                                        Click="@OnProcess" />
+                                                        <DxEditorButton CssClass="text-info"
+                                                                        IconCssClass="h5 bi bi-x-circle"
+                                                                        Tooltip="Click to clear the selection editor"
+                                                                        Click="@OnRefresh">
+                                                        </DxEditorButton>
+                                                    </Buttons>
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                            <div class="d-flex justify-content-end pt-2">
+                                                <DxWaitIndicator Visible=@showWaitIndicator />
                                             </div>
-                                        </div>
-                                    </HeaderContentTemplate>
-                                    <Items>
-                                        <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
-                                            <DxComboBox Data="@people"
-                                                        AllowUserInput=true
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                        FilteringMode="DataGridFilteringMode.Contains"
-                                                        ListRenderMode="ListRenderMode.Virtual"
-                                                        TextFieldName="@nameof(Person.PersonSummary)"
-                                                        @bind-Value="@selectedPerson">
-                                                <Buttons>
-                                                    <DxEditorButton Text="Process" CssClass="text-primary"
-                                                                    IconCssClass="h5 bi bi-check-lg"
-                                                                    Tooltip="Click to process on behalf of the selected member"
-                                                                    Click="@OnProcess" />
-                                                    <DxEditorButton CssClass="text-info"
-                                                                    IconCssClass="h5 bi bi-x-circle"
-                                                                    Tooltip="Click to clear the selection editor"
-                                                                    Click="@OnRefresh">
-                                                    </DxEditorButton>
-                                                </Buttons>
-                                            </DxComboBox>
-                                        </DxFormLayoutItem>
-                                        <div class="d-flex justify-content-end pt-2">
-                                            <DxWaitIndicator Visible=@showWaitIndicator />
-                                        </div>
-                                    </Items>
-                                </DxFormLayoutGroup>
+                                        </Items>
+                                    </DxFormLayoutGroup>
+                                </div>
                             </ContentTemplate>
                         </CollapsableContent>
                         @if (isSelected)
@@ -85,48 +92,50 @@ else
                         }
                         else
                         {
-                            <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
-                                         ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
-                                <Items>
-                                    <DxAccordionItem Text="Add/Edit Member Details" Expanded="false">
-                                        <ContentTemplate>
-                                            <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
-                                            <div class="mx-2"><PersonMnt IsEmbedded="true" /></div>
-                                        </ContentTemplate>
-                                    </DxAccordionItem>
-                                    <DxAccordionItem Text="Received Today" Expanded="true">
-                                        <ContentTemplate>
-                                            <div class="m-2">
-                                                <DxGrid Data="@RecevivedToday" CssClass="member-grid-height"
-                                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                                        UnboundColumnData="Grid_UnboundColumnData"
-                                                        TextWrapEnabled="false"
-                                                        ShowFilterRow="false"
-                                                        ShowAllRows="true"
-                                                        KeyFieldName="ID">
-                                                    <Columns>
-                                                        <DxGridDataColumn Width="5rem" Caption="Time"
-                                                                          FieldName="CreatedTime"
-                                                                          DisplayFormat="hh:mm tt"
-                                                                          UnboundType="GridUnboundColumnType.DateTime" />
-                                                        <DxGridDataColumn Width="10rem" Caption="Name" FieldName="Person.FullName" />
-                                                        <DxGridDataColumn Width="12rem" Caption="Description" FieldName="Description" />
-                                                        <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
-                                                        <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="FinancialTo" DisplayFormat="f0" />
-                                                        <DxGridDataColumn Width="5rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
-                                                    </Columns>
-                                                    <TotalSummary>
-                                                        <DxGridSummaryItem FieldName="Amount"
-                                                                           SummaryType="GridSummaryItemType.Sum"
-                                                                           FooterColumnName="Amount"
-                                                                           ValueDisplayFormat="c2" />
-                                                    </TotalSummary>
-                                                </DxGrid>
-                                            </div>
-                                        </ContentTemplate>
-                                    </DxAccordionItem>
-                                </Items>
-                            </DxAccordion>
+                            <div class="@formWidth">
+                                <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
+                                             ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
+                                    <Items>
+                                        <DxAccordionItem Text="Add/Edit Member Details" Expanded="false">
+                                            <ContentTemplate>
+                                                <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
+                                                <div class="mx-2"><PersonMnt IsEmbedded="true" /></div>
+                                            </ContentTemplate>
+                                        </DxAccordionItem>
+                                        <DxAccordionItem Text="Received Today" Expanded="true">
+                                            <ContentTemplate>
+                                                <div class="m-2">
+                                                    <DxGrid Data="@RecevivedToday" CssClass="member-grid-height"
+                                                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                            UnboundColumnData="Grid_UnboundColumnData"
+                                                            TextWrapEnabled="false"
+                                                            ShowFilterRow="false"
+                                                            ShowAllRows="true"
+                                                            KeyFieldName="ID">
+                                                        <Columns>
+                                                            <DxGridDataColumn Width="5rem" Caption="Time"
+                                                                              FieldName="CreatedTime"
+                                                                              DisplayFormat="hh:mm tt"
+                                                                              UnboundType="GridUnboundColumnType.DateTime" />
+                                                            <DxGridDataColumn Width="10rem" Caption="Name" FieldName="Person.FullName" />
+                                                            <DxGridDataColumn Width="12rem" Caption="Description" FieldName="Description" />
+                                                            <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
+                                                            <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="FinancialTo" DisplayFormat="f0" />
+                                                            <DxGridDataColumn Width="5rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
+                                                        </Columns>
+                                                        <TotalSummary>
+                                                            <DxGridSummaryItem FieldName="Amount"
+                                                                               SummaryType="GridSummaryItemType.Sum"
+                                                                               FooterColumnName="Amount"
+                                                                               ValueDisplayFormat="c2" />
+                                                        </TotalSummary>
+                                                    </DxGrid>
+                                                </div>
+                                            </ContentTemplate>
+                                        </DxAccordionItem>
+                                    </Items>
+                                </DxAccordion>
+                            </div>
                         }
                     </DxFormLayout>
                 </DxTabPage>
@@ -183,6 +192,8 @@ else
     bool showWaitIndicator;
     TimeSpan offset;
     CollapsableContent? collapsableContent;
+    string formWidth = "col col-12 px-lg-0 col-lg-10 col-xl-8 mt-3 px-1 mx-auto";
+    int currentWidth = 12;
 
     protected override async Task OnInitializedAsync()
     {
@@ -255,6 +266,14 @@ else
             }
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async Task OnMaximiseFormWidth()
+    {
+        formWidth = $"col col-{currentWidth}";
+        currentWidth -= 1;
+        if (currentWidth < 6) { currentWidth = 12; }
+        await OnRefresh();
     }
 
     async Task OnRefresh()

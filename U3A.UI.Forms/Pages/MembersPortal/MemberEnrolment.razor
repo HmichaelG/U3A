@@ -31,9 +31,8 @@ else
     <MessageBox @ref="messageBox" />
     <div class=@((IsPreview)
      ? "col-10 mx-auto"
-     : ((bool)loginState?.IsAdminOnBehalfOfMember) ? ""
-     : "col col-sm-10 col-md-9 col-lg-7 mx-auto")>
-        <div class="h6 pt-2 col-12" align="center">
+     : "col col-md-11 col-lg-8 mx-auto")>
+            <div class="h6 pt-2 col-12" align="center">
             @term?.TermSummary
         </div>
         @if (isNotInEnrolmentPeriod)
