@@ -197,13 +197,12 @@ namespace U3A.BusinessRules
 
         public static bool IsCourseLeader(U3ADbContext dbc, Person person, Term term)
         {
-            var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
             return dbc.Class
                             .Include(x => x.Course).AsEnumerable()
                             .Any(x => (x.LeaderID == person.ID ||
                                             x.Leader2ID == person.ID ||
                                             x.Leader3ID == person.ID) &&
-                                            x.Course.Year == term.Year && IsClassInYear(dbc, x, term, defaultTerm));
+                                            x.Course.Year == term.Year && IsClassInYear(dbc, x));
         }
         public static bool IsCourseLeader(U3ADbContext dbc, Person person, DateTime LocalNow)
         {
@@ -215,7 +214,7 @@ namespace U3A.BusinessRules
                             .Any(x => (x.LeaderID == person.ID ||
                                             x.Leader2ID == person.ID ||
                                             x.Leader3ID == person.ID) &&
-                                            x.Course.Year == term.Year && IsClassInYear(dbc, x, term, defaultTerm));
+                                            x.Course.Year == term.Year && IsClassInRemainingYear(dbc, x, term, defaultTerm));
         }
         public static async Task<bool> IsCourseClerk(U3ADbContext dbc, Person person, Term term)
         {

@@ -81,7 +81,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
                             .Where(x => x.Course.Year == term.Year)
-                            .AsEnumerable().Where(x => IsClassInYear(dbc, x, term, defaultTerm)).ToList();
+                            .AsEnumerable().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm)).ToList();
             Parallel.ForEach(classes, c =>
             {
                 c.TermNumber = GetRequiredTerm( term.TermNumber,c);
@@ -108,7 +108,7 @@ namespace U3A.BusinessRules
                                 .Where(x => x.Course.Year == prevTerm.Year && x.OccurrenceID != 999)
                                 .AsEnumerable()
                                 .Where(x => IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)
-                                                && IsClassInYear(dbc, x, prevTerm, defaultTerm)).ToList();
+                                                && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm)).ToList();
                 Parallel.ForEach(prevTermShoulderClasses, c =>
                 {
                     c.TermNumber = prevTerm.TermNumber;
@@ -337,7 +337,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.Venue)
                             .Where(x => x.Course.Year == term.Year)
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime)
-                            .AsEnumerable().Where(x => IsClassInYear(dbc, x, term, defaultTerm)).ToList();
+                            .AsEnumerable().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm)).ToList();
             Parallel.ForEach(classes, c =>
             {
                 Parallel.ForEach(c.Course.Enrolments, e =>
@@ -364,7 +364,7 @@ namespace U3A.BusinessRules
                                 .AsEnumerable()
                                 .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                                 && x.StartDate.GetValueOrDefault() < term.StartDate
-                                                && IsClassInYear(dbc, x, prevTerm, defaultTerm)).ToList();
+                                                && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm)).ToList();
                 Parallel.ForEach(prevTermShoulderClasses, c =>
                 {
                     Parallel.ForEach(c.Course.Enrolments, e =>
@@ -493,7 +493,11 @@ namespace U3A.BusinessRules
             }
             return result;
         }
-        public static bool IsClassInYear(U3ADbContext dbc, Class Class, Term term, Term defaultTerm)
+        public static bool IsClassInYear(U3ADbContext dbc, Class Class)
+        {
+            return (Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4);
+        }
+        public static bool IsClassInRemainingYear(U3ADbContext dbc, Class Class, Term term, Term defaultTerm)
         {
             bool result = false;
             switch (term.TermNumber)

@@ -49,11 +49,6 @@ else
                                                 <div class="flex-grow-0">
                                                     <DxButton Text="Refresh" Click="OnRefresh" IconCssClass="bi bi-arrow-clockwise" Tooltip="Click to refresh lookup data" />
                                                 </div>
-                                                <div class="flex-grow-0 ps-1">
-                                                    <DxButton Click="OnMaximiseFormWidth"
-                                                              RenderStyle="ButtonRenderStyle.Secondary"
-                                                              IconCssClass="bi bi-arrows-fullscreen" tooltip="Click ro maximise width" />
-                                                </div>
                                             </div>
                                         </HeaderContentTemplate>
                                         <Items>
@@ -193,7 +188,6 @@ else
     TimeSpan offset;
     CollapsableContent? collapsableContent;
     string formWidth = "col col-12 px-lg-0 col-lg-10 col-xl-8 mt-3 px-1 mx-auto";
-    int currentWidth = 12;
 
     protected override async Task OnInitializedAsync()
     {
@@ -266,14 +260,6 @@ else
             }
         }
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    async Task OnMaximiseFormWidth()
-    {
-        formWidth = $"col col-{currentWidth}";
-        currentWidth -= 1;
-        if (currentWidth < 6) { currentWidth = 12; }
-        await OnRefresh();
     }
 
     async Task OnRefresh()
