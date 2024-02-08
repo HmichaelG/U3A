@@ -7,13 +7,15 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-    @bind-IsActive="@IsMobileLayout" />
+                        @bind-IsActive="@IsMobileLayout" />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" />
@@ -24,17 +26,19 @@ else {
                   Context="editContext">
             <DataAnnotationsValidator />
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
-                @if (loginState.SelectedPerson == null) {
+                @if (loginState.SelectedPerson == null)
+                {
                     <span class="text-center alert alert-success text-dark w-100 mt-2">
                         <div>
                             Welcome! Let's start by getting to know you.
                         </div>
                     </span>
                 }
-                @if (IsNewLinkedMember) {
-                    <div class="text-center alert alert-info text-dark w-100 mt-2">
-                            You are about to create a new linked member for whom you will
-                            assume responsibility for membership fees and course enrolment.
+                @if (IsNewLinkedMember)
+                {
+                    <div class="text-center text-wrap alert alert-info text-dark w-100 mt-2">
+                        You are about to create a new linked member for whom you will
+                        assume responsibility for membership fees and course enrolment.
                     </div>
                     <div hidden="@(isDatabaseCheckDone)">
                         <DxFormLayoutGroup Caption="Is the person to link already on file?" ColSpanMd="12">
@@ -47,10 +51,9 @@ else {
                             <DxFormLayoutItem Caption="City" ColSpanMd="12">
                                 <DxTextBox @bind-Text="@City" />
                             </DxFormLayoutItem>
+                            <DxButton CssClass="mt-2 ms-2" IconCssClass="bi bi-search"
+                                Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
                         </DxFormLayoutGroup>
-                        <DxFormLayoutItem>
-                            <DxButton CssClass="col-3" Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
-                        </DxFormLayoutItem>
                     </div>
                 }
                 <div hidden="@(IsNewLinkedMember && !isDatabaseCheckDone)">
@@ -63,7 +66,7 @@ else {
                             <DxComboBox TData="string" TValue="string"
                                         NullText="(Optional) Select or Enter Title"
                                         Data="@titles"
-                            @bind-Text="@person.Title"
+                                        @bind-Text="@person.Title"
                                         AllowUserInput="true" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
@@ -76,7 +79,7 @@ else {
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12" Visible=@systemSettings.AllowPostNominalLetters>
                             <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
-                            @bind-Text="@person.PostNominals" />
+                                       @bind-Text="@person.PostNominals" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
                             <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
@@ -109,7 +112,7 @@ else {
                             <ValidationMessage For="@(() => person.Postcode)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@person.Email" ReadOnly="true" >
+                            <DxTextBox @bind-Text="@person.Email" ReadOnly="true">
                                 <Buttons>
                                     <DxEditorButton Text="Help" CssClass="text-info"
                                                     IconCssClass="bi bi-question"
@@ -132,7 +135,7 @@ else {
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
                             <DxComboBox Data="silentContactList"
-                            @bind-Value="@person.SilentContact"
+                                        @bind-Value="@person.SilentContact"
                                         ValueFieldName="@nameof(SilentContactWrapper.Type)"
                                         TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
                                 <Buttons>
@@ -189,7 +192,6 @@ else {
         height: @formHeight;
         overflow-y: auto;
         border-bottom: thin;
-        
     }
 
 </style>
@@ -235,7 +237,8 @@ else {
     internal string? ErrorMessage;
     MessageBox? messageBox;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         states = new AUState();
         gender = new Gender();
@@ -248,19 +251,23 @@ else {
         await base.OnInitializedAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
         var formBounds = await Window.GetElementBounds(js, "myForm");
-        var newHeight = await Window.FitToRemainingHeight(js, "myForm", formHeight,0.05);
-        if (newHeight != formHeight) {
+        var newHeight = await Window.FitToRemainingHeight(js, "myForm", formHeight, 0.05);
+        if (newHeight != formHeight)
+        {
             formHeight = newHeight;
             InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    protected override async Task OnParametersSetAsync() {
+    protected override async Task OnParametersSetAsync()
+    {
         person = await dbc.Person.FindAsync(loginState.SelectedPerson?.ID);
-        if (person == null || IsNewLinkedMember) {
+        if (person == null || IsNewLinkedMember)
+        {
             person = new Person()
                 {
                     Email = loginState.LoginEmail,
@@ -274,39 +281,47 @@ else {
     }
 
     bool isBusy;
-    async Task ValidFormSubmitted(EditContext editContext) {
+    async Task ValidFormSubmitted(EditContext editContext)
+    {
         if (isBusy) return;
         isBusy = true;
-        try {
+        try
+        {
             isNew = false;
             var editModel = (Person)editContext.Model;
             if (!await IsDataOK(editModel)) return;
             // Re-query a data item from the store.
             var dataItem = dbc.Person.Find(editModel.ID);
-            if (dataItem == null) {
+            if (dataItem == null)
+            {
                 dataItem = new Person();
                 isNew = true;
             }
             // Assign changes from the edit model to the data item.
-            if (dataItem != null) {
+            if (dataItem != null)
+            {
                 editModel.CopyTo(dataItem);
-                try {
+                try
+                {
                     // Post changes to the database.
                     if (isNew) await dbc.AddAsync(dataItem);
                     await dbc.SaveChangesAsync();
                     loginState.SelectedPerson = dataItem;
-                    if (IsNewLinkedMember) {
+                    if (IsNewLinkedMember)
+                    {
                         await messageBox.ShowOkOnlyAsync("Link Succeeded", "You must now re-login for the change to take affect.<br>" +
                                                             "Click Ok to logout");
                         loginState.SelectedPerson = null;
                         await OnCancel();
                     }
-                    else {
+                    else
+                    {
                         if (isNew) await DoFeePaymentRequest();
                         else await ReturnToMenu(PortalMenuResult.MemberDetailsCompleted);
                     }
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     ErrorHeader = "Save to database error";
                     ErrorMessage = Helpers.GetErrorMessage(ex);
                     await ErrorPopup.ShowPopupAsync();
@@ -317,15 +332,18 @@ else {
         finally { isBusy = false; }
     }
 
-    async Task<bool> IsDataOK(Person person) {
+    async Task<bool> IsDataOK(Person person)
+    {
         bool result = true;
         var dupHTML = await BusinessRule.GetDuplicateMarkupToProhibit(dbc, person);
-        if (!string.IsNullOrWhiteSpace(dupHTML)) {
+        if (!string.IsNullOrWhiteSpace(dupHTML))
+        {
             await messageBox.ShowOkOnlyAsync("Duplicate Participant?", dupHTML);
             result = false;
         }
         var msg = "";
-        if (person.Communication != Communication[0] && systemSettings.MailSurcharge > 0) {
+        if (person.Communication != Communication[0] && systemSettings.MailSurcharge > 0)
+        {
             msg += "<div class='text-center alert alert-danger text-dark col-12'>" +
                       $"A Post mail preference incurs an additional <strong>{surcharge}</strong> postal surcharge per year.<br />" +
                       "Click <strong>Cancel</strong> and change to <strong>Email</strong> which is free, or<br />" +
@@ -336,7 +354,8 @@ else {
         return result;
     }
 
-    async Task DoFeePaymentRequest() {
+    async Task DoFeePaymentRequest()
+    {
         var result = PortalMenuResult.MenuOptionCompleted;
         var msg = @"<p>Thank you for sharing your details with us.<br/>
                     Only financial members may participate in U3A courses.</p>
@@ -353,12 +372,15 @@ else {
         if (await messageBox.ShowAsync(args)) result = PortalMenuResult.NewMemberFeePayment;
         await OnSelectedOptionCompleted.InvokeAsync(result);
     }
-    async Task ReturnToMenu(PortalMenuResult result) {
+    async Task ReturnToMenu(PortalMenuResult result)
+    {
         await OnSelectedOptionCompleted.InvokeAsync(result);
     }
 
-    async Task OnSearch() {
-        if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(City)) {
+    async Task OnSearch()
+    {
+        if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(City))
+        {
             await messageBox.ShowOkOnlyAsync("Complete all fields", "Enter the First Name, Last Name and City of the person to be linked.");
             return;
         }
@@ -367,10 +389,12 @@ else {
         var city = City.ToLower().Trim();
         if (dbc.Person.Any(x => x.LastName.ToLower().Trim() == lastName &&
                                     x.FirstName.ToLower().Trim() == firstName &&
-                                    x.City.ToLower().Trim() == city)) {
+                                    x.City.ToLower().Trim() == city))
+        {
             await messageBox.ShowOkOnlyAsync("Already on file", "A person with First Name, Last Name and City already exists in our database.");
         }
-        else {
+        else
+        {
             person = new Person()
                 {
                     LastName = LastName,
@@ -386,11 +410,13 @@ else {
 
     }
 
-    async Task OnCancel() {
+    async Task OnCancel()
+    {
         await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
