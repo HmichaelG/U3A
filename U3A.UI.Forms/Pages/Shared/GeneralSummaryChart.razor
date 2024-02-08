@@ -1,8 +1,9 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @using System.Drawing
 
+<div class="align-content-center">
     <div class="row">
-        <DxPieChart Data="@memberData" CssClass="col-lg-4 my-2"
+        <DxPieChart Data="@memberData" CssClass="col-lg-4"
                     InnerDiameter="0.5"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     CustomizeSeriesPoint="CustomizeGenderSeriesPoint"
@@ -35,7 +36,7 @@
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
 
-        <DxChart Data="attritionData" CssClass="col-lg-4 my-2"
+        <DxChart Data="attritionData" CssClass="col-lg-4"
                  T="MemberSummary"
                  CustomizeSeriesPoint="CustomizeAttritionSeriesPoint"
                  LabelOverlap="ChartLabelOverlap.Hide">
@@ -62,7 +63,7 @@
             </DxChartTooltip>
         </DxChart>
 
-        <DxPieChart Data="@membershipLengthData" CssClass="col-lg-4 my-2"
+        <DxPieChart Data="@membershipLengthData" CssClass="col-lg-4"
                     InnerDiameter="0.5"
                     Palette="@memberLengthTheme"
                     LabelOverlap="PieChartLabelOverlap.Hide"
@@ -162,6 +163,7 @@
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
 
+    </div>
 </div>
 
 @code {
