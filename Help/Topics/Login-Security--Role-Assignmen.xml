@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2023-06-20T16:57:44.247+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
-  <title>Login Security &amp; Role Assignment</title>
+<topic template="Default" modified="2024-02-08T11:03:21.586+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Login &amp; Role Assignment</title>
   <body>
     <header>
-      <para styleclass="Heading1">Login Security &amp; position Assignment</para>
+      <para styleclass="Heading1">Login &amp; Role Assignment</para>
     </header>
     <para styleclass="Normal"><text style="font-weight:bold;">Login Security &amp; Role Assignment</text> provides access to the login parameters used to authenticate and authorise system users.</para>
     <para styleclass="Heading2">Login</para>
@@ -40,7 +40,7 @@
           <para styleclass="Normal">Security Admin</para>
         </td>
         <td style="width:990px;">
-          <para styleclass="Normal">Access to this procedure and <link displaytype="text" defaultstyle="true" type="topiclink" href="Tenant-Details">Tenant Details</link> procedure.</para>
+          <para styleclass="Normal">Access to this procedure and Tenant Details procedure.</para>
         </td>
       </tr>
       <tr style="vertical-align:top">
@@ -48,7 +48,7 @@
           <para styleclass="Normal">System Admin</para>
         </td>
         <td style="width:990px;">
-          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Admin-Menu">Admin Menu</link> column except this procedure and <link displaytype="text" defaultstyle="true" type="topiclink" href="Tenant-Details">Tenant Details</link> procedure.</para>
+          <para styleclass="Normal">Access to the <text style="font-weight:bold;">Admin </text>menu column except this procedure.</para>
         </td>
       </tr>
       <tr style="vertical-align:top">
@@ -56,7 +56,7 @@
           <para styleclass="Normal">Course &amp; Class</para>
         </td>
         <td style="width:990px;">
-          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Chapter-2">Course Menu</link> column</para>
+          <para styleclass="Normal">Access to the <text style="font-weight:bold;">Course </text>menu column</para>
         </td>
       </tr>
       <tr style="vertical-align:top">
@@ -64,7 +64,7 @@
           <para styleclass="Normal">Membership</para>
         </td>
         <td style="width:990px;">
-          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Participation-Menu">Participation Menu</link> column but not it&apos;s <link displaytype="text" defaultstyle="true" type="topiclink" href="Fees--Receipting">Fees &amp; Receipting</link> sub-menu</para>
+          <para styleclass="Normal">Access to the <text style="font-weight:bold;">Participation</text> menu column but not it&apos;s <link displaytype="text" defaultstyle="true" type="topiclink" href="Fees--Receipting">Fees &amp; Receipting</link> sub-menu</para>
         </td>
       </tr>
       <tr style="vertical-align:top">
@@ -72,7 +72,7 @@
           <para styleclass="Normal">Accounting</para>
         </td>
         <td style="width:990px;">
-          <para styleclass="Normal">Access to the <link displaytype="text" defaultstyle="true" type="topiclink" href="Participation-Menu">Participation Menu</link> and it&apos;s <link displaytype="text" defaultstyle="true" type="topiclink" href="Fees--Receipting">Fees &amp; Receipting</link> sub-menu</para>
+          <para styleclass="Normal">Access to the <text style="font-weight:bold;">Participation</text> menu and it&apos;s <link displaytype="text" defaultstyle="true" type="topiclink" href="Fees--Receipting">Fees &amp; Receipting</link> sub-menu</para>
         </td>
       </tr>
       <tr style="vertical-align:top">
@@ -95,7 +95,7 @@
     <para styleclass="Normal">A login may have multiple roles. In this case the authorisations will be combined. Thus a login with the Security Admin role and the System Admin role will have access to all items on the Admin menu column.</para>
     <para styleclass="Normal">The above table also identifies a hierarchy that for the most part is honoured. Thus, the System Admin has access not only to the Admin menu column but also all menu items to the right of it (or, below it in the table above). The exceptions to this are... </para>
     <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
-      <li styleclass="Normal">The Security Admin role has no access to anything other than this procedure and <link displaytype="text" defaultstyle="true" type="topiclink" href="Tenant-Details">Tenant Details</link> procedure. A purist would consider it a security risk assigning a Security Admin access to any other role. It is also possible for the U3A group to outsource the Security Admin role to a third party without granting access to any other system function.</li>
+      <li styleclass="Normal">The Security Admin role has no access to anything other than this procedure. A purist would consider it a security risk assigning a Security Admin access to any other role. It is also possible for the U3A group to outsource the Security Admin role to a third party without granting access to any other system function.</li>
       <li styleclass="Normal">The Office role has no access to any other menu columns.</li>
     </list>
     <para styleclass="Normal">The role with the least access is the Report View role. It has read-only access to the reports menu column only.</para>
