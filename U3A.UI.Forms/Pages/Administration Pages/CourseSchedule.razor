@@ -61,56 +61,55 @@ else
         </div>
         <br />
     }
-    <FullScreen>
-        <ContentTemplate>
-            <DxScheduler StartDate="@StartDate"
-                         AllowCreateAppointment="false"
-                         AllowDeleteAppointment="false"
-                         AllowEditAppointment="false"
-                         ShowAppointmentTooltip="true"
-                         ActiveViewType=@viewType
-                         DataStorage="@DataStorage"
-                         StartDateChanged="OnStartDateChanged"
-                         ActiveViewTypeChanged="OnViewTypeChanged">
-                <Views>
-                    <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
-                    @if (!IsPortal)
-                    {
-                        <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
-                        <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
-                        <DxSchedulerMonthView ShowWorkDaysOnly="true" MonthCount="1"></DxSchedulerMonthView>
-                        <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(14)" CellMinWidth="80">
-                            <Scales>
-                                <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1"></DxSchedulerTimeScale>
-                                <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Hour" UnitCount="2"></DxSchedulerTimeScale>
-                            </Scales>
-                        </DxSchedulerTimelineView>
-                    }
-                </Views>
-                <AppointmentTooltipHeaderTemplate>
-                    <h4>Class Detail</h4>
-                </AppointmentTooltipHeaderTemplate>
-                <AppointmentTooltipTemplate>
-                    <div class="container">
-                        <span style="vertical-align: middle;">
-                            <strong>Subject:</strong>  @context.Appointment.Subject<br />
-                            <strong>Leader:</strong>  @context.Appointment.Description<br />
-                            <strong>Location:</strong>  @context.Appointment.Location<br />
-                            <strong>From:</strong>  @context.Appointment.Start.ToString("hh:mm tt") <strong>To:</strong>
-                            @context.Appointment.End.ToString("hh:mm tt")<br />
-                            <strong>Status:</strong>  @context.Label?.Caption<br />
-                        </span>
-                    </div>
-                </AppointmentTooltipTemplate>
-            </DxScheduler>
-        </ContentTemplate>
-    </FullScreen>
+    <div class="schedule-height" id="mySchedule">
+        <DxScheduler StartDate="@StartDate"
+                     AllowCreateAppointment="false"
+                     AllowDeleteAppointment="false"
+                     AllowEditAppointment="false"
+                     ShowAppointmentTooltip="true"
+                     ActiveViewType=@viewType
+                     DataStorage="@DataStorage"
+                     StartDateChanged="OnStartDateChanged"
+                     ActiveViewTypeChanged="OnViewTypeChanged"
+                     CssClass="w-100">
+            <Views>
+                <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
+                @if (!IsPortal)
+                {
+                    <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
+                    <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
+                    <DxSchedulerMonthView ShowWorkDaysOnly="true" MonthCount="1"></DxSchedulerMonthView>
+                    <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(14)" CellMinWidth="80">
+                        <Scales>
+                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1"></DxSchedulerTimeScale>
+                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Hour" UnitCount="2"></DxSchedulerTimeScale>
+                        </Scales>
+                    </DxSchedulerTimelineView>
+                }
+            </Views>
+            <AppointmentTooltipHeaderTemplate>
+                <h4>Class Detail</h4>
+            </AppointmentTooltipHeaderTemplate>
+            <AppointmentTooltipTemplate>
+                <div class="container">
+                    <span style="vertical-align: middle;">
+                        <strong>Subject:</strong>  @context.Appointment.Subject<br />
+                        <strong>Leader:</strong>  @context.Appointment.Description<br />
+                        <strong>Location:</strong>  @context.Appointment.Location<br />
+                        <strong>From:</strong>  @context.Appointment.Start.ToString("hh:mm tt") <strong>To:</strong>
+                        @context.Appointment.End.ToString("hh:mm tt")<br />
+                        <strong>Status:</strong>  @context.Label?.Caption<br />
+                    </span>
+                </div>
+            </AppointmentTooltipTemplate>
+        </DxScheduler>
+    </div>
 }
 
 <style>
-    .schedule {
+    .schedule-height {
         overflow: auto;
-        width: calc(100% - 20rem);
+        height: @scheduleHeight;
     }
 
 </style>
@@ -135,6 +134,8 @@ else
 
     string SpinnerVisibility = "hidden";
     string ProcessButtonText = "Process";
+    string scheduleHeight;
+
 
     DxSchedulerTimeSpanRange VisibleTime = new DxSchedulerTimeSpanRange(TimeSpan.FromHours(6), TimeSpan.FromHours(22));
 
@@ -167,6 +168,8 @@ else
             localTime = new LocalTime(js);
             StartDate = (await localTime.GetLocalTimeAsync()).Date.AddHours(6);
         }
+        var newHeight = await Window.FitToRemainingHeight(js, "mySchedule", scheduleHeight, 0.05);
+        if (newHeight != scheduleHeight) { scheduleHeight = newHeight; InvokeAsync(StateHasChanged); }
     }
 
     async void OnStartDateChanged(DateTime newStartDate) => StartDate = (await localTime.GetLocalTimeAsync(newStartDate)).Date;
