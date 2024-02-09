@@ -27,6 +27,12 @@
     transition: transform 0.1s ease-out;
 }
 
+
+@media (min-width: 768px) {
+    ::deep .layout-sidebar {
+        height: 100vh;
+    }
+}
 @media (max-width: 768px) {
     ::deep .layout-sidebar {
         grid-area: header / header / header / header !important;
