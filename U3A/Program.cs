@@ -18,15 +18,15 @@ using DevExpress.XtraCharts;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (!builder.Environment.IsDevelopment())
-{
-    var uri = Environment.GetEnvironmentVariable("VaultUri");
-    if (uri != null )
-    {
-        var keyVaultEndpoint = new Uri(uri);
-        builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
-    }
-}
+//if (!builder.Environment.IsDevelopment())
+//{
+//    var uri = Environment.GetEnvironmentVariable("VaultUri");
+//    if (uri != null )
+//    {
+//        var keyVaultEndpoint = new Uri(uri);
+//        builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+//    }
+//}
 
 // **** Start local modifications ****
 

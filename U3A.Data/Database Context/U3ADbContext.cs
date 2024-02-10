@@ -51,12 +51,12 @@ namespace U3A.Database
             {
                 TenantInfo = dbc.TenantInfo.AsNoTracking()
                     .FirstOrDefault(x => x.Identifier == identifirer);
-                //if (TenantInfo == null)
-                //{
-                //    TenantInfo = dbc.TenantInfo
-                //        .AsNoTracking()
-                //        .FirstOrDefault(x => x.Identifier == "demo"); //finbuckle leftover
-                //}
+                if (TenantInfo == null)
+                {
+                    TenantInfo = dbc.TenantInfo
+                        .AsNoTracking()
+                        .FirstOrDefault(x => x.Identifier == "demo"); //finbuckle leftover
+                }
             }
         }
     }
