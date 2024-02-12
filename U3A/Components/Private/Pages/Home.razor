@@ -22,7 +22,7 @@ else
 {
 
     <MessageBox @ref="@messageBox" />
-    <DxFormLayout CssClass="px-4">
+    <DxFormLayout CssClass="px-2">
         @if (!hasRole)
         {
             <U3A.UI.Forms.Pages.MembersPortal.MemberPortal />
@@ -70,10 +70,9 @@ else
                         <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-height"></iframe>
                 </DxTabPage>
             </DxTabs>
-             <footer class="footer vw-100 text-muted">
+             <footer class="footer vw-100 text-muted mt-4">
                 <div align="center">
                     &copy; @(DateTime.Today.Year) - U3Admin.org.au
-                    <a href="Public/Support">Click for support</a>
                 </div>
             </footer> 
         }

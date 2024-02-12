@@ -334,6 +334,7 @@ else
         {
             pdfPath = "Temp/" + pdfFilename;
             showPDF = true;
+            await InvokeAsync(StateHasChanged);
         }
     }
 

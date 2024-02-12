@@ -1,5 +1,5 @@
 ﻿<section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
-    <button class="btn-close btn-close-white" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
+    <button class="btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
     @ContentTemplate
     <div class="@($"strong {AlertTextRender}")">@(new MarkupString(AlertText))</div>
 </section>
@@ -21,6 +21,8 @@
     button {
         float: right;
     }
+
+
 </style>
 @code {
     [Parameter] public bool ShowCollapseButton { get; set; } = true;

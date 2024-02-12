@@ -5,10 +5,7 @@
 @using System.Text.Json
 @using DevExpress.Blazor
 
-<DxLayoutBreakpoint MaxWidth="768" @bind-IsActive="@IsMobileLayout" />
 
-@if (!IsMobileLayout)
-{
     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" 
             CssClass="me-4"            
             ItemClick="OnItemClick">
@@ -84,7 +81,6 @@
              @CustomButtonContent
          </Items>
      </DxToolbar>
-}
 
 @code {
 
@@ -96,7 +92,6 @@
     [Parameter] public bool DisableVirtualScroll { get; set; }
     [Parameter] public RenderFragment CustomButtonContent {get; set;}
 
-    internal bool IsMobileLayout;
     internal bool IsToggleExpanded { get; set; } = false;
     internal string ExpandCollapseText { get; set; }
 

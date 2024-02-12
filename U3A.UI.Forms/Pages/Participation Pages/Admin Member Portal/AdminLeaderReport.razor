@@ -12,68 +12,98 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
-    <h3>Print Leader Report</h3>
-    <CollapsableContent AlertText=@(@"Creating a PDF report places a heavy burden on the server.<br />
-                  Please be a good digital citizen and use judiciously.")
-                      OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+else
+{
+    if (showPDF)
+    {
+        <FullScreen>
+            <ContentTemplate>
+                <table class="w-100 h-100">
+                    <div class="row">
+                        <DxToolbar CssClass="bg-secondary">
+                            <Items>
+                                <DxToolbarItem Text="Close"
+                                               CssClass="me-5 mb-1"
+                                               Alignment="ToolbarItemAlignment.Right"
+                                               IconCssClass="bi bi-x-lg"
+                                               Click="@(() => showPDF = false)" />
+                            </Items>
+                        </DxToolbar>
+                    </div>
+                    <div class="row">
+                        <iframe src='@pdfPath' height="1000" />
+                    </div>
+                </table>
+            </ContentTemplate>
+        </FullScreen>
 
-    <DxFormLayout>
-        <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="4">
-            <DxComboBox Data="@terms" NullText="Select the Term required..."
-                        FilteringMode="DataGridFilteringMode.Contains"
-                        TextFieldName="@nameof(Term.TermSummary)"
-                        Value="@selectedTerm"
-                        ValueChanged="@((Term term) => SelectedTermChanged(term))" />
-        </DxFormLayoutItem>
-    </DxFormLayout>
-    <br />
+    }
+    else
+    {
 
-    <MessageBox @ref="@messageBox" />
-    <Progress @ref="@progressBar" />
-    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+        <h3>Print Leader Report</h3>
+        <CollapsableContent AlertText=@(@"Creating a PDF report places a heavy burden on the server.<br />
+                    Please be a good digital citizen and use judiciously.")
+                            OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
 
-    <DxFormLayout>
-        <div class="col-10 p-2">
-            <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    ShowFilterRow="false"
-                    ShowAllRows="true"
-                    KeyFieldName="ID"
-                    SelectionMode="GridSelectionMode.Single"
-                    UnboundColumnData="Grid_CustomUnboundColumnData"
-                    SelectedDataItemChanged="OnSelectedDataItemChanged"
-            @bind-SelectedDataItems="SelectedDataItems"
-                    ValidationEnabled="true">
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid />
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridSelectionColumn Width="2rem" />
-                    <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
-                    <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
-                    <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
-                    <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
-                    <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
-                    <DxGridDataColumn Caption="Send To" FieldName="Recipient"
-                                      UnboundType="GridUnboundColumnType.String" Width="10rem" />
-                </Columns>
-                <TotalSummary>
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
-                </TotalSummary>
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="4">
+                <DxComboBox Data="@terms" NullText="Select the Term required..."
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            TextFieldName="@nameof(Term.TermSummary)"
+                            Value="@selectedTerm"
+                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+        <br />
 
-            </DxGrid>
-        </div>
-        <div class="col col-2">
-            <SelectLeaderReports @ref=@rptSelect SingleReportOnly=true
-                                 AreSelectionsMade="@AreSelectionsMade"
-                                 OnQueueReportsSelected="OnQueueReportsSelected" />
-        </div>
-    </DxFormLayout>
+        <MessageBox @ref="@messageBox" />
+        <Progress @ref="@progressBar" />
+        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
+        <DxFormLayout>
+            <div class="col-10 p-2">
+                <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        ShowFilterRow="false"
+                        ShowAllRows="true"
+                        KeyFieldName="ID"
+                        SelectionMode="GridSelectionMode.Single"
+                        UnboundColumnData="Grid_CustomUnboundColumnData"
+                        SelectedDataItemChanged="OnSelectedDataItemChanged"
+                        @bind-SelectedDataItems="SelectedDataItems"
+                        ValidationEnabled="true">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid />
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridSelectionColumn Width="2rem" />
+                        <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
+                        <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
+                        <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
+                        <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
+                        <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
+                        <DxGridDataColumn Caption="Send To" FieldName="Recipient"
+                                          UnboundType="GridUnboundColumnType.String" Width="10rem" />
+                    </Columns>
+                    <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
+                    </TotalSummary>
+
+                </DxGrid>
+            </div>
+            <div class="col col-2">
+                <SelectLeaderReports @ref=@rptSelect SingleReportOnly=true
+                                     AreSelectionsMade="@AreSelectionsMade"
+                                     OnQueueReportsSelected="OnQueueReportsSelected" />
+            </div>
+        </DxFormLayout>
+
+    }
 }
 <style>
     .grid-height {
@@ -109,9 +139,11 @@ else {
     string ErrorHeader;
     string ErrorMessage;
     U3ADbContext dbc { get; set; }
+    bool showPDF;
+    string pdfPath;
 
-
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
@@ -122,35 +154,41 @@ else {
         IsReady = true;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
         if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    async Task SelectedTermChanged(Term term) {
+    async Task SelectedTermChanged(Term term)
+    {
         selectedTerm = term;
         Classes = (await BusinessRule.GetClassDetailsAsync(dbc, selectedTerm, settings))
                         .OrderBy(x => x.Course.Name).ThenBy(x => x.OnDayID).ToList();
         reportRecipients = await BusinessRule.GetLeaderReportRecipientsByClass(dbc, settings, currentTerm, Classes);
     }
 
-    void OnSelectedDataItemChanged() {
+    void OnSelectedDataItemChanged()
+    {
         AreSelectionsMade = true;
     }
 
-    async Task OnQueueReportsSelected() {
+    async Task OnQueueReportsSelected()
+    {
         var Class = SelectedDataItems[0] as Class;
         var Course = Class.Course;
         await progressBar.ShowSmallSpinnerAsync();
         var recipients = await BusinessRule.GetLeaderReportRecipients(dbc, settings, currentTerm, Class);
         var enrolments = new List<Enrolment>();
-        if (dbc.Enrolment.Any(x => x.ClassID == Class.ID && x.TermID == selectedTerm.ID)) {
+        if (dbc.Enrolment.Any(x => x.ClassID == Class.ID && x.TermID == selectedTerm.ID))
+        {
             enrolments = dbc.Enrolment.Include(x => x.Person)
                                       .Where(x => x.ClassID == Class.ID
                                                 && x.TermID == selectedTerm.ID).ToList();
         }
-        else {
+        else
+        {
             enrolments = dbc.Enrolment.Include(x => x.Person)
                                         .Where(x => x.CourseID == Course.ID
                                                         && x.TermID == selectedTerm.ID).ToList();
@@ -174,40 +212,49 @@ else {
                                          .ThenBy(x => x.Person.LastName)
                                          .ThenBy(x => x.Person.FirstName).ToArray());
         var pdfFilename = reportFactory.CreatePostalPDF();
-        if (pdfFilename != null) {
-            var pdfPath = "Temp/" + pdfFilename;
-            await js.InvokeVoidAsync("open", pdfPath, "_blank");
+        if (pdfFilename != null)
+        {
+            pdfPath = "Temp/" + pdfFilename;
+            showPDF = true;
+            InvokeAsync(StateHasChanged);
         }
     }
 
-    async Task<bool> IsDataOk(IEnumerable<Person> p, IEnumerable<Enrolment> e) {
+    async Task<bool> IsDataOk(IEnumerable<Person> p, IEnumerable<Enrolment> e)
+    {
         var result = true;
         var enrolmentReqd = rptSelect.RequireEnrolements;
         var msg = "";
-        if (p.Count() <= 0) {
+        if (p.Count() <= 0)
+        {
             result = false;
             msg += "This course has no leader or clerk with a visible email address.<br/>";
         }
-        if (enrolmentReqd && e.Count() <= 0) {
+        if (enrolmentReqd && e.Count() <= 0)
+        {
             result = false;
             msg += "The course has no enrolments in the current term";
         }
-        if (!result) {
+        if (!result)
+        {
             await messageBox.SetPopupWidth("30%");
             await messageBox.ShowOkOnlyAsync("Cannot Print Retport", msg);
         }
         return result;
     }
 
-    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e) {
-        if (e.FieldName == "Recipient") {
+    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        if (e.FieldName == "Recipient")
+        {
             var Class = e.DataItem as Class;
             var recipient = reportRecipients.Where(x => x.Class.ID == Class.ID).OrderBy(x => x.SortOrder).FirstOrDefault();
             e.Value = recipient?.Person.FullName;
         }
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
