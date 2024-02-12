@@ -48,19 +48,7 @@ namespace U3A.WebFunctions.Procedures
 
         static async Task ProcessReportAsync(U3ADbContext dbc, Term selectedTerm, Person Leader, Course Course, Class Class)
         {
-            var enrolments = new List<Enrolment>();
-            if (dbc.Enrolment.Any(x => x.ClassID == Class.ID && x.TermID == selectedTerm.ID))
-            {
-                enrolments = dbc.Enrolment.Include(x => x.Person)
-                                          .Where(x => x.ClassID == Class.ID
-                                                    && x.TermID == selectedTerm.ID).ToList();
-            }
-            else
-            {
-                enrolments = dbc.Enrolment.Include(x => x.Person)
-                                            .Where(x => x.CourseID == Course.ID
-                                                            && x.TermID == selectedTerm.ID).ToList();
-            };
+            var enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc,Course,Class,selectedTerm);
             if (enrolments.Count > 0)
             {
                 var PrintLeaderReport = true;

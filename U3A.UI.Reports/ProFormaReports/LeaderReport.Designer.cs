@@ -210,7 +210,7 @@
             this.xrTableCell1.Name = "xrTableCell1";
             this.xrTableCell1.StylePriority.UseFont = false;
             this.xrTableCell1.Text = "xrTableCell1";
-            this.xrTableCell1.Weight = 0.73453801435081156D;
+            this.xrTableCell1.Weight = 0.871845694483659D;
             // 
             // xrTableCell3
             // 
@@ -219,7 +219,7 @@
             this.xrTableCell3.Multiline = true;
             this.xrTableCell3.Name = "xrTableCell3";
             this.xrTableCell3.Text = "xrTableCell3";
-            this.xrTableCell3.Weight = 1.1530369049390632D;
+            this.xrTableCell3.Weight = 1.1241299818240762D;
             // 
             // xrTableCell4
             // 
@@ -228,7 +228,7 @@
             this.xrTableCell4.Multiline = true;
             this.xrTableCell4.Name = "xrTableCell4";
             this.xrTableCell4.Text = "xrTableCell4";
-            this.xrTableCell4.Weight = 0.37257814478412293D;
+            this.xrTableCell4.Weight = 0.26417738776626243D;
             // 
             // xrTableCell19
             // 
@@ -275,7 +275,7 @@
             this.xrTableCell35.StylePriority.UsePadding = false;
             this.xrTableCell35.Text = " ";
             this.xrTableCell35.TextFormatString = "{0:dd-MMM-yyyy}";
-            this.xrTableCell35.Weight = 0.73453798592534758D;
+            this.xrTableCell35.Weight = 0.871845529615968D;
             // 
             // xrTableCell38
             // 
@@ -284,7 +284,7 @@
             this.xrTableCell38.Multiline = true;
             this.xrTableCell38.Name = "xrTableCell38";
             this.xrTableCell38.Text = "xrTableCell38";
-            this.xrTableCell38.Weight = 1.5256153510331043D;
+            this.xrTableCell38.Weight = 1.3883078073424839D;
             // 
             // xrTableCell39
             // 
@@ -410,7 +410,7 @@
             this.xrTableCell24.StylePriority.UseTextAlignment = false;
             this.xrTableCell24.Text = "Participant";
             this.xrTableCell24.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            this.xrTableCell24.Weight = 1.1949692847451292D;
+            this.xrTableCell24.Weight = 1.4183462403057128D;
             // 
             // xrTableCell23
             // 
@@ -422,7 +422,7 @@
             this.xrTableCell23.StylePriority.UseTextAlignment = false;
             this.xrTableCell23.Text = "Email";
             this.xrTableCell23.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            this.xrTableCell23.Weight = 1.8757958124023246D;
+            this.xrTableCell23.Weight = 1.8287690206618596D;
             // 
             // xrTableCell28
             // 
@@ -434,7 +434,7 @@
             this.xrTableCell28.StylePriority.UseTextAlignment = false;
             this.xrTableCell28.Text = "Status";
             this.xrTableCell28.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            this.xrTableCell28.Weight = 0.606122156343629D;
+            this.xrTableCell28.Weight = 0.42977199252351039D;
             // 
             // xrTableCell29
             // 
@@ -485,7 +485,7 @@
             this.xrTableCell37.StylePriority.UseTextAlignment = false;
             this.xrTableCell37.Text = "Date Enrolled";
             this.xrTableCell37.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            this.xrTableCell37.Weight = 1.1949692847451292D;
+            this.xrTableCell37.Weight = 1.4183459073530307D;
             // 
             // xrTableCell40
             // 
@@ -497,7 +497,7 @@
             this.xrTableCell40.StylePriority.UseTextAlignment = false;
             this.xrTableCell40.Text = "Emergency Contact";
             this.xrTableCell40.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            this.xrTableCell40.Weight = 2.4819175248090444D;
+            this.xrTableCell40.Weight = 2.2585409022011431D;
             // 
             // xrTableCell42
             // 
@@ -948,7 +948,7 @@
             this.PageHeight = 1169;
             this.PageWidth = 827;
             this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
-            this.Version = "23.1";
+            this.Version = "23.2";
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).EndInit();

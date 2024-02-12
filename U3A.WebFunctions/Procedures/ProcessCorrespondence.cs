@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 using U3A.UI.Reports;
@@ -112,18 +113,8 @@ namespace U3A.WebFunctions.Procedures
                         case "U3A Leaders Reports":
                             var thisClass = await dbc.Class.FindAsync(sm.RecordKey);
                             course = await dbc.Course.FindAsync(thisClass!.CourseID);
-                            if (dbc.Enrolment.Any(x => x.ClassID == thisClass.ID && x.TermID == sm.TermID))
-                            {
-                                enrolments = await dbc.Enrolment.Include(x => x.Person)
-                                                          .Where(x => x.ClassID == thisClass.ID
-                                                                    && x.TermID == sm.TermID).ToListAsync();
-                            }
-                            else
-                            {
-                                enrolments = await dbc.Enrolment.Include(x => x.Person)
-                                                            .Where(x => x.CourseID == course!.ID
-                                                                            && x.TermID == sm.TermID).ToListAsync();
-                            };
+                            var thisTerm = await dbc.Term.FindAsync(sm.TermID);
+                            enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
                             if (enrolments?.Count > 0)
                             {
                                 sm.Status = await reportFactory.CreateLeaderReports(

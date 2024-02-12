@@ -38,7 +38,7 @@ namespace U3A.Model
         public bool IsCourseClerk { get; set; } = false;
 
         [Required]
-        public bool IsWaitlisted { get; set; }  = true;
+        public bool IsWaitlisted { get; set; } = true;
 
         [NotMapped]
         public DateTime? WaitlistSort
@@ -46,5 +46,7 @@ namespace U3A.Model
             get { return (IsWaitlisted) ? Created : null; }
         }
 
+        [NotMapped]
+        public bool isLeader {  get; set; }
     }
 }

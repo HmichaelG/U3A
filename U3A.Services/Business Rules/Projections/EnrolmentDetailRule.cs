@@ -93,6 +93,8 @@ namespace U3A.BusinessRules
                     EnrolmentDateReceived = enrolment.Created,
                     EnrolmentDateEnrolled = enrolment.DateEnrolled,
                     EnrolmentIsWaitlisted = enrolment.IsWaitlisted,
+                    EnrolmentIsClerk = enrolment.IsCourseClerk,
+                    EnrolmentIsLeader = enrolment.isLeader,
                     EnrolmentStatus = GetEnrolmentStatus(enrolment, t, settings),
                     WaitlistSort = enrolment.WaitlistSort
                 };
@@ -120,6 +122,8 @@ Your request has been <b>Waitlisted</b> meaning you will be notified should a pl
                 }
                 else { ed.WaitlistMessage = string.Empty; }
                 GetOrganisationPersonDetail(dbc, ed, t, p);
+                if (ed.EnrolmentIsLeader) { ed.PersonFullName += " (Leader)"; }
+                if (ed.EnrolmentIsClerk) { ed.PersonFullName += " (Clerk)"; }
                 result.Add(ed);
             }
             return result;

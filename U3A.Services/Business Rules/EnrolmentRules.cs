@@ -51,6 +51,49 @@ namespace U3A.BusinessRules
             }
         }
 
+        public static async Task<List<Enrolment>> GetEnrolmentIncludeLeadersAsync(U3ADbContext dbc,
+                                                  Course thisCourse,  Class thisClass,Term thisTerm)
+        {
+            var enrolments = new List<Enrolment>();
+            if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == thisTerm.ID))
+            {
+                enrolments = await dbc.Enrolment.AsNoTracking().Include(x => x.Person)
+                                          .Where(x => x.ClassID == thisClass.ID
+                                                    && x.TermID == thisTerm.ID).ToListAsync();
+            }
+            else
+            {
+                enrolments = await dbc.Enrolment.AsNoTracking().Include(x => x.Person)
+                                            .Where(x => x.CourseID == thisCourse.ID
+                                                            && x.TermID == thisTerm.ID).ToListAsync();
+            };
+            Enrolment? dummy;
+            if (enrolments.Count > 0)
+            {
+                var template = enrolments[0];
+                dummy = await CreateDummyLeaderEnrolment(dbc,template, thisClass.LeaderID);
+                if (dummy != null) enrolments.Add(dummy);
+                dummy = await CreateDummyLeaderEnrolment(dbc,template, thisClass.Leader2ID);
+                if (dummy != null) enrolments.Add(dummy);
+                dummy = await CreateDummyLeaderEnrolment(dbc,template, thisClass.Leader3ID);
+                if (dummy != null) enrolments.Add(dummy);
+            }
+            return enrolments;
+        }
+
+        private static async Task<Enrolment?> CreateDummyLeaderEnrolment(U3ADbContext dbc, Enrolment template, Guid? LeaderID)
+        {
+            if (LeaderID == null) return null;
+            var person = await dbc.Person.FindAsync(LeaderID);
+            if (person == null) return null;
+            var result = new Enrolment();
+            template.CopyTo(result);
+            result.PersonID = person.ID;
+            result.Person = person;
+            result.isLeader = true;
+            result.IsWaitlisted = false;
+            return result;
+        }
         public static async Task<List<Dropout>> EditableDropoutsAsync(U3ADbContext dbc, Term SelectedTerm)
         {
             return await dbc.Dropout

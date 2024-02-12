@@ -49,6 +49,8 @@ namespace U3A.Model
         public DateTime EnrolmentDateReceived { get; set; }
         public DateTime? EnrolmentDateEnrolled { get; set; }
         public bool EnrolmentIsWaitlisted { get; set; }
+        public bool EnrolmentIsLeader { get; set; }
+        public bool EnrolmentIsClerk { get; set; }
 
         public string EnrolmentStatus { get; set; }
 

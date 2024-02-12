@@ -180,19 +180,7 @@ else
         var Course = Class.Course;
         await progressBar.ShowSmallSpinnerAsync();
         var recipients = await BusinessRule.GetLeaderReportRecipients(dbc, settings, currentTerm, Class);
-        var enrolments = new List<Enrolment>();
-        if (dbc.Enrolment.Any(x => x.ClassID == Class.ID && x.TermID == selectedTerm.ID))
-        {
-            enrolments = dbc.Enrolment.Include(x => x.Person)
-                                      .Where(x => x.ClassID == Class.ID
-                                                && x.TermID == selectedTerm.ID).ToList();
-        }
-        else
-        {
-            enrolments = dbc.Enrolment.Include(x => x.Person)
-                                        .Where(x => x.CourseID == Course.ID
-                                                        && x.TermID == selectedTerm.ID).ToList();
-        };
+        var enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, Course, Class, selectedTerm);
         await progressBar.Close();
         if (!await IsDataOk(recipients, enrolments)) return;
         var Leader = recipients[0];

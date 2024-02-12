@@ -243,7 +243,9 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                     using (var leaderAttendanceList = new LeaderAttendanceList())
                     {
                         createdFilenames.Add(await CreateLeaderReportAsync(leaderAttendanceList,
-                                                Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
+                                                Leader, Enrolments
+                                                            .Where(x => !x.IsWaitlisted && !x.isLeader)
+                                                            .ToArray()));
                         reportNames.Add("Student Attendance Record.pdf");
                     }
                 }
