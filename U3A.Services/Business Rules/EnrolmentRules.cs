@@ -602,16 +602,19 @@ namespace U3A.BusinessRules
                 Term thisTerm = term;
                 if (c.TermNumber == term.TermNumber)
                 {
+                    //current term
                     thisYear = term.Year;
                     thisTermNo = term.TermNumber;
                 }
                 else if (c.TermNumber == prevTerm.TermNumber) 
                 {
+                    //last term
                     thisYear = prevTerm.Year;
                     thisTermNo = prevTerm.TermNumber;
                 }
                 else
                 {
+                    //future term
                     thisYear = term.Year;
                     thisTermNo = term.TermNumber;
                     thisTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.Year == term.Year && x.TermNumber == thisTermNo);
