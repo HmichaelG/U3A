@@ -28,10 +28,6 @@ else
         </div>
         <div class="col col-lg-2">
             <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" />
-            <DxButton CssClass="w-100" IconCssClass="bi bi-check-circle"
-                      Text="Preview Enrolment List"
-                      RenderStyle="@ButtonRenderStyle.Info"
-                      Click="@(() => OnPreview(1))" />
         </div>
     </div>
 
@@ -59,7 +55,15 @@ else
                     CustomizeEditModel="Grid_CustomizeEditModel"
                     DataItemDeleting="Grid_DataItemDeleting">
                 <ToolbarTemplate>
-                    <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid IsMasterDetail=true />
+                    <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid IsMasterDetail=true>
+                        <CustomButtonContent>
+                            <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-check-circle"
+                                      Text="Preview Schedule"
+                                      RenderStyle="@ButtonRenderStyle.Info"
+                                      RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                      Click="@(() => OnPreview(1))" />
+                        </CustomButtonContent>
+                    </GridToolbar>
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridCommandColumnEx @ref="GridCommandColumn"
