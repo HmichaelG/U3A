@@ -57,13 +57,17 @@ namespace U3A.BusinessRules
             var enrolments = new List<Enrolment>();
             if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == thisTerm.ID))
             {
-                enrolments = await dbc.Enrolment.AsNoTracking().Include(x => x.Person)
+                enrolments = await dbc.Enrolment.AsNoTracking()
+                                          .Include(x => x.Person)
+                                          .Include(x => x.Course)
                                           .Where(x => x.ClassID == thisClass.ID
                                                     && x.TermID == thisTerm.ID).ToListAsync();
             }
             else
             {
-                enrolments = await dbc.Enrolment.AsNoTracking().Include(x => x.Person)
+                enrolments = await dbc.Enrolment.AsNoTracking()
+                                            .Include(x => x.Person)
+                                            .Include(x => x.Course)
                                             .Where(x => x.CourseID == thisCourse.ID
                                                             && x.TermID == thisTerm.ID).ToListAsync();
             };
@@ -78,7 +82,7 @@ namespace U3A.BusinessRules
                 dummy = await CreateDummyLeaderEnrolment(dbc,template, thisClass.Leader3ID);
                 if (dummy != null) enrolments.Add(dummy);
             }
-            return enrolments;
+            return enrolments.OrderBy(x => x.Person.FullNameAlpha).ToList();
         }
 
         private static async Task<Enrolment?> CreateDummyLeaderEnrolment(U3ADbContext dbc, Enrolment template, Guid? LeaderID)
@@ -92,6 +96,7 @@ namespace U3A.BusinessRules
             result.Person = person;
             result.isLeader = true;
             result.IsWaitlisted = false;
+            result.Course = await dbc.Course.FindAsync(result.CourseID);
             return result;
         }
         public static async Task<List<Dropout>> EditableDropoutsAsync(U3ADbContext dbc, Term SelectedTerm)

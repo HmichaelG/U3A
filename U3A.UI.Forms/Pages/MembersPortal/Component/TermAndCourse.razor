@@ -70,6 +70,7 @@ else {
     public Course? selectedCourse { get; set; }
     public Class? selectedClass { get; set; }
     public List<Enrolment>? Enrolments { get; set; }
+    public List<Enrolment>? EnrolmentsWithLeaders { get; set; }
     string nullCourseText = "Processing ... please wait";
 
     bool IsReady;
@@ -181,6 +182,7 @@ else {
         if (selectedCourse == null) return;
         if (selectedClass == null) return;
         using (var dbContext = await U3Adbfactory.CreateDbContextAsync()) {
+            EnrolmentsWithLeaders = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbContext, selectedCourse, selectedClass, selectedTerm);
             Enrolments = await BusinessRule.EditableEnrolmentsAsync(dbContext, selectedTerm, selectedCourse, selectedClass);
         }
     }
