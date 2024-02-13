@@ -547,6 +547,9 @@ namespace U3A.BusinessRules
                 if (c.DoNotAllowEdit) continue;
                 var termNumber = c.TermNumber;
                 thisTerm = (term.TermNumber == termNumber) ? term : prevTerm;
+                if (thisTerm.TermNumber != termNumber) { thisTerm = await dbc.Term
+                                                                .Where(x => x.Year == term.Year && x.TermNumber == termNumber)
+                                                                .FirstOrDefaultAsync(); }
                 var course = await dbc.Course.FindAsync(c.CourseID);
                 if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
                 {
@@ -610,7 +613,7 @@ namespace U3A.BusinessRules
                 else
                 {
                     thisYear = term.Year;
-                    thisTermNo = GetRequiredTerm(term.TermNumber,c);
+                    thisTermNo = term.TermNumber;
                     thisTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.Year == term.Year && x.TermNumber == thisTermNo);
                 }
                 var course = await dbc.Course.FindAsync(c.CourseID);
@@ -695,13 +698,6 @@ namespace U3A.BusinessRules
             bool result = false;
             if (person.FinancialTo < CurrentTerm.Year) return true;
             if (!CurrentTerm.IsClassAllocationFinalised) return true;
-
-            // If there are any waitlisted, then this enrolment must be waitlisted.
-            int waitlisted = await dbc.Enrolment
-                                .Where(x => x.CourseID == CourseID && x.ClassID == ClassID &&
-                                                x.TermID == CurrentTerm.ID &&
-                                                x.IsWaitlisted).CountAsync();
-            if (waitlisted > 0) return true;
 
             // Otherwise, set enrolled if enrolled count less than Max count
             var course = await dbc.Course.FindAsync(CourseID);
