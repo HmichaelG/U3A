@@ -185,12 +185,15 @@ else
         List<(Guid, Guid, Guid?)> onFile = new();
         (Guid, Guid, Guid?) onFileKey;
         s.Start();
-        reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
         var msg = (IsPreview) ? "Preparing Preview" : "Creating Mail Items";
         await ProgressBar.ShowAsync($"{msg} ... Please Wait", items);
+        await InvokeAsync(StateHasChanged);
+        reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
         var enrolments = new List<Enrolment>();
         foreach (SendMail sm in SelectedDataItems)
         {
+            mailItems++;
+            await ProgressBar.SetValueAsync(mailItems);
             switch (sm.DocumentName)
             {
                 case "Cash Receipt":
@@ -282,9 +285,7 @@ else
                 default:
                     break;
             }
-            mailItems++;
             if (!IsPreview) await dbc.SaveChangesAsync();
-            await ProgressBar.SetValueAsync(mailItems);
         }
         await ProgressBar.ShowSpinnerAsync("Processing Enrolment Emails");
         // process enrolments because they receive one email per member
