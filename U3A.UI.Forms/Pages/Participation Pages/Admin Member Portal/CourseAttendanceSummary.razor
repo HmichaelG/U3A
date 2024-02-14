@@ -2,89 +2,92 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
 
-<h3>Course Attendance Summary</h3>
+<div class="p-2">
 
-<MessageBox @ref=@messageBox />
-<Progress @ref=@progress />
-<DxFormLayout>
-    <div class="w-100">
-        <DxFormLayoutItem Caption="Attendance Term" CssClass="my-4">
-            <DxComboBox Data="@terms" NullText="Select the Term required..."
-                        FilteringMode="DataGridFilteringMode.Contains"
-                        TextFieldName="@nameof(Term.TermSummary)"
-            @bind-Value="@SelectedTerm">
-                <Buttons>
-                    <DxEditorButton Text="Process" CssClass="text-primary"
-                                    IconCssClass="h5 bi bi-check-lg"
-                                    Tooltip="Click to process the selected term"
-                                    Click="@OnProcess" />
-                </Buttons>
-            </DxComboBox>
-        </DxFormLayoutItem>
-    </div>
+    <h3>Course Attendance Summary</h3>
 
-    <div class="w-100 text-info"><strong>Hint:</strong> Click rows on either grid to drill into detail.</div>
-    <div class="col col-7 px-1">
-        <DxGrid Data="@termSummary" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                FocusedRowEnabled="true"
-                FocusedRowChanged="OnFocusedRowChanged"
-                ShowGroupPanel="false"
-                ShowSearchBox="false"
-                ShowAllRows="true">
-            <ToolbarTemplate>
-                <GridToolbar LinkedGrid=@mainGrid HideGroupPanel=true HideSearchBox=true />
-            </ToolbarTemplate>
-            <Columns>
-                <DxGridDataColumn Caption="Course" FieldName="Course" />
-                <DxGridDataColumn Caption="Class Time" FieldName="DateSummary" Width="6rem" />
-                <DxGridDataColumn Caption="Classes" FieldName="ClassesRecorded" Width="4rem" />
-                <DxGridDataColumn Caption="Present" FieldName="Present" DisplayFormat="{0:n0}" Width="5rem" />
-                <DxGridDataColumn Caption="Apology" FieldName="AbsentWithApology" DisplayFormat="{0:n0}" Width="5rem" />
-                <DxGridDataColumn Caption="No Apology" FieldName="AbsentWithoutApology" DisplayFormat="{0:n0}" Width="5rem" />
-                <DxGridDataColumn Caption="Total" FieldName="Total" DisplayFormat="{0:n0}" Width="5rem" />
-            </Columns>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Course" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="ClassesRecorded" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Present" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithApology" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithoutApology" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
-            </TotalSummary>
-        </DxGrid>
-    </div>
-    <div class="col col-5 px-1">
-        <DxGrid Data="@selectedClassSummary" @ref=@classGrid CssClass="grid-height" id="myGrid"
-                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                SelectionMode="GridSelectionMode.Single"
-                SelectedDataItemChanged="OnSelectedDataItemChanged"
-                AllowSelectRowByClick=true
-                ShowAllRows="true">
-            <ToolbarTemplate>
-                <GridToolbar LinkedGrid=@classGrid HideGroupPanel=true HideSearchBox=true />
-            </ToolbarTemplate>
-            <Columns>
-                <DxGridDataColumn Caption="Date" FieldName="ClassDate" DisplayFormat="ddd, dd-MMM-yyyy" />
-                <DxGridDataColumn Caption="Cancelled?" FieldName="IsCancelled" Width="5rem">
-                    <CellDisplayTemplate>
-                        <DxCheckBox Enabled="false" Checked="(bool)context.Value" />
-                    </CellDisplayTemplate>
-                </DxGridDataColumn>
-                <DxGridDataColumn Caption="Present" FieldName="Present" DisplayFormat="{0:n0}" Width="4rem" />
-                <DxGridDataColumn Caption="Apology" FieldName="AbsentWithApology" DisplayFormat="{0:n0}" Width="4rem" />
-                <DxGridDataColumn Caption="No Apology" FieldName="AbsentWithoutApology" DisplayFormat="{0:n0}" Width="5rem" />
-                <DxGridDataColumn Caption="Total" FieldName="Total" DisplayFormat="{0:n0}" Width="4rem" />
-            </Columns>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Present" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithApology" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithoutApology" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
-            </TotalSummary>
-        </DxGrid>
-    </div>
-</DxFormLayout>
+    <MessageBox @ref=@messageBox />
+    <Progress @ref=@progress />
+    <DxFormLayout>
+        <div class="w-100">
+            <DxFormLayoutItem Caption="Attendance Term" CssClass="my-4">
+                <DxComboBox Data="@terms" NullText="Select the Term required..."
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            TextFieldName="@nameof(Term.TermSummary)"
+                            @bind-Value="@SelectedTerm">
+                    <Buttons>
+                        <DxEditorButton Text="Process" CssClass="text-primary"
+                                        IconCssClass="h5 bi bi-check-lg"
+                                        Tooltip="Click to process the selected term"
+                                        Click="@OnProcess" />
+                    </Buttons>
+                </DxComboBox>
+            </DxFormLayoutItem>
+        </div>
+
+        <div class="w-100 text-info"><strong>Hint:</strong> Click rows on either grid to drill into detail.</div>
+        <div class="col col-7 px-1">
+            <DxGrid Data="@termSummary" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    FocusedRowEnabled="true"
+                    FocusedRowChanged="OnFocusedRowChanged"
+                    ShowGroupPanel="false"
+                    ShowSearchBox="false"
+                    ShowAllRows="true">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid HideGroupPanel=true HideSearchBox=true />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridDataColumn Caption="Course" FieldName="Course" />
+                    <DxGridDataColumn Caption="Class Time" FieldName="DateSummary" Width="6rem" />
+                    <DxGridDataColumn Caption="Classes" FieldName="ClassesRecorded" Width="4rem" />
+                    <DxGridDataColumn Caption="Present" FieldName="Present" DisplayFormat="{0:n0}" Width="5rem" />
+                    <DxGridDataColumn Caption="Apology" FieldName="AbsentWithApology" DisplayFormat="{0:n0}" Width="5rem" />
+                    <DxGridDataColumn Caption="No Apology" FieldName="AbsentWithoutApology" DisplayFormat="{0:n0}" Width="5rem" />
+                    <DxGridDataColumn Caption="Total" FieldName="Total" DisplayFormat="{0:n0}" Width="5rem" />
+                </Columns>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Course" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="ClassesRecorded" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Present" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithApology" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithoutApology" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+                </TotalSummary>
+            </DxGrid>
+        </div>
+        <div class="col col-5 px-1">
+            <DxGrid Data="@selectedClassSummary" @ref=@classGrid CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    SelectionMode="GridSelectionMode.Single"
+                    SelectedDataItemChanged="OnSelectedDataItemChanged"
+                    AllowSelectRowByClick=true
+                    ShowAllRows="true">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@classGrid HideGroupPanel=true HideSearchBox=true />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridDataColumn Caption="Date" FieldName="ClassDate" DisplayFormat="ddd, dd-MMM-yyyy" />
+                    <DxGridDataColumn Caption="Cancelled?" FieldName="IsCancelled" Width="5rem">
+                        <CellDisplayTemplate>
+                            <DxCheckBox Enabled="false" Checked="(bool)context.Value" />
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn Caption="Present" FieldName="Present" DisplayFormat="{0:n0}" Width="4rem" />
+                    <DxGridDataColumn Caption="Apology" FieldName="AbsentWithApology" DisplayFormat="{0:n0}" Width="4rem" />
+                    <DxGridDataColumn Caption="No Apology" FieldName="AbsentWithoutApology" DisplayFormat="{0:n0}" Width="5rem" />
+                    <DxGridDataColumn Caption="Total" FieldName="Total" DisplayFormat="{0:n0}" Width="4rem" />
+                </Columns>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Present" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithApology" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithoutApology" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+                </TotalSummary>
+            </DxGrid>
+        </div>
+    </DxFormLayout>
+</div>
 
 <DxWindow @ref=@detailsForm Width="max(35vw, 400px)"
           AllowResize="true"
@@ -99,7 +102,6 @@
     <BodyTextTemplate>
         <div class="p-4">
             <DxFormLayout>
-                <GridToolbar @ref="attendanceToolbar" LinkedGrid=@attendanceGrid />
                 <DxGrid Data="@ClassAttendance" @ref=@attendanceGrid
                         ShowAllRows="true"
                         AutoExpandAllGroupRows=true
@@ -169,25 +171,29 @@
     DateTime now;
 
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         dbc = await U3Adbfactory.CreateDbContextAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         SelectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         await base.OnInitializedAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
         if (ClassToolbar != null && classGrid != null) { ClassToolbar.LinkedGrid = classGrid; }
         if (attendanceToolbar != null && attendanceGrid != null) { attendanceToolbar.LinkedGrid = attendanceGrid; }
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) {
+        if (newHeight != gridHeight)
+        {
             gridHeight = newHeight;
             InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    async Task OnProcess() {
+    async Task OnProcess()
+    {
         await progress.ShowSmallSpinnerAsync();
         mainGrid.BeginUpdate();
         var localTime = new U3A.Services.LocalTime(js);
@@ -199,19 +205,23 @@
         await progress.Close();
     }
 
-    void OnFocusedRowChanged(GridFocusedRowChangedEventArgs e) {
+    void OnFocusedRowChanged(GridFocusedRowChangedEventArgs e)
+    {
         var a = e.DataItem as AttendClassSummaryByCourse;
         selectedClassSummary = classSummary?.Where(x => x.ClassID == a?.ClassID);
         InvokeAsync(StateHasChanged);
     }
 
-    async Task OnSelectedDataItemChanged(object DataItem) {
+    async Task OnSelectedDataItemChanged(object DataItem)
+    {
         var a = DataItem as AttendanceRecorded;
         if (a == null) return;
-        if (a.Total == 0) {
+        if (a.Total == 0)
+        {
             await messageBox.ShowOkOnlyAsync("No Attendance", "There is no attednance detail to display.");
         }
-        else {
+        else
+        {
             detailsFormTitle = $"{a.CourseName} {a.ClassDate.ToString("dddd, dd-MMM-yyyy")}";
             await detailsForm.ShowAsync();
             attendanceGrid?.BeginUpdate();
@@ -220,13 +230,15 @@
         }
     }
 
-    void OnDetailFormClosed() {
+    void OnDetailFormClosed()
+    {
         classGrid.BeginUpdate();
         classGrid.ClearSelection();
         classGrid.EndUpdate();
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 }
