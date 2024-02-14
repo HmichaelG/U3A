@@ -33,10 +33,7 @@ namespace U3A.Database
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (TenantInfo == null)
-            {
-                GetTenantInfo();
-            }
+            GetTenantInfo();
             // Use the connection string to connect to the per-tenant database.
             optionsBuilder.EnableSensitiveDataLogging(true);
             optionsBuilder.UseSqlServer(TenantInfo.ConnectionString);
