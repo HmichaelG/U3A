@@ -64,6 +64,8 @@ namespace U3A.Services
 
         public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc, Person person, Term term)
         {
+            BillingTerm = term;
+            BillingYear = term.Year;
             var result = decimal.Zero;
             MemberFees = new List<MemberFee>();
             PersonWithFinancialStatus = new PersonFinancialStatus()

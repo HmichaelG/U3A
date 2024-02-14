@@ -65,54 +65,47 @@ else
                 <DxTabPage Text="Withdrawn Participants" />
             </DxTabs>
 
-            <DxLoadingPanel @bind-Visible="loadingPanelVisible"
-                            IsContentBlocked="true"
-                            ApplyBackgroundShading="true"
-                            IndicatorAreaVisible="false"
-                            Text="Fetching Data...">
 
-                <FullScreen>
-                    <ContentTemplate>
-                <DxGrid Data="@Enrolments" @ref=@mainGrid CssClass="grid-height"
-                        ShowAllRows="true"
-                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                        KeyFieldName="ID"
-                        ValidationEnabled="true"
-                        UnboundColumnData="Grid_CustomUnboundColumnData"
-                        CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
-                        CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
-                        FocusedRowEnabled="true"
-                        FocusedRowChanged="OnFocusedRowChanged"
-                        AllowSelectRowByClick="true">
-                    <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid />
-                    </ToolbarTemplate>
-                    <Columns>
-                        <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
-                        <DxGridDataColumn Caption="Leader/Clerk?" FieldName="IsCourseClerk" Width="6rem" />
-                        <DxGridDataColumn Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
-                        <DxGridDataColumn Caption="Mobile" FieldName="Person.AdjustedMobile" Width="6rem" />
-                        <DxGridDataColumn Caption="Home" FieldName="Person.AdjustedHome" Width="6rem" />
-                        <DxGridDataColumn Caption="Email" FieldName="Person.Email" Width="12rem" />
-                        <DxGridDataColumn Caption="Fees Due" Width="5rem" FieldName="Due"
-                                          DisplayFormat="c2"
-                                          UnboundType="GridUnboundColumnType.Decimal" />
-                    </Columns>
-                    <GroupSummary>
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Due" />
-                    </GroupSummary>
-                    <TotalSummary>
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Due" />
-                    </TotalSummary>
-                </DxGrid>
-                    </ContentTemplate>
-                </FullScreen>
-
-            </DxLoadingPanel>
-
+            <FullScreen>
+                <ContentTemplate>
+                    <DxGrid Data="@Enrolments" @ref=@mainGrid
+                            ShowAllRows="true"
+                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                            KeyFieldName="ID"
+                            ValidationEnabled="true"
+                            UnboundColumnData="Grid_CustomUnboundColumnData"
+                            CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
+                            CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
+                            FocusedRowEnabled="true"
+                            FocusedRowChanged="OnFocusedRowChanged"
+                            AllowSelectRowByClick="true">
+                        <ToolbarTemplate>
+                            <GridToolbar LinkedGrid=@mainGrid />
+                        </ToolbarTemplate>
+                        <Columns>
+                            <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
+                            <DxGridDataColumn Caption="Leader/Clerk?" FieldName="IsCourseClerk" Width="6rem" />
+                            <DxGridDataColumn Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
+                            <DxGridDataColumn Caption="Mobile" FieldName="Person.AdjustedMobile" Width="6rem" />
+                            <DxGridDataColumn Caption="Home" FieldName="Person.AdjustedHome" Width="6rem" />
+                            <DxGridDataColumn Caption="Email" FieldName="Person.Email" Width="12rem" />
+                            <DxGridDataColumn Caption="Fees Due" Width="5rem" FieldName="Due"
+                                              DisplayFormat="c2"
+                                              UnboundType="GridUnboundColumnType.Decimal" />
+                        </Columns>
+                        <GroupSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Due" />
+                        </GroupSummary>
+                        <TotalSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Due" />
+                        </TotalSummary>
+                    </DxGrid>
+                </ContentTemplate>
+            </FullScreen>
         </div>
+
         <div class="col col-12 col-md-4 p-2">
             <DxFormLayoutGroup Caption="@($"Statement of Account for: {selectedPerson?.FullName}")" HeaderCssClass="h4">
                 <table class="table table-bordered">
@@ -143,12 +136,6 @@ else
     </DxFormLayout>
 
 }
-<style>
-    .leader-height {
-        height: 11vh;
-    }
-
-</style>
 
 
 @code {
@@ -177,7 +164,6 @@ else
 
     MessageBox? messageBox { get; set; }
     bool IsSetSelectionEnrolledEnabled;
-    bool loadingPanelVisible;
 
     private string classComboNullText;
     private bool classComboEnabled;
@@ -266,8 +252,7 @@ else
 
     async Task SetupGrid()
     {
-        //ProgressBar.ShowSmallSpinnerAsync();
-        loadingPanelVisible = true;
+        await ProgressBar.ShowSmallSpinnerAsync();
         mainGrid.BeginUpdate();
         if (selectedCourse != null)
         {
@@ -283,9 +268,9 @@ else
                 }
             }
         }
+        mainGrid.SetFocusedRowIndex(0);
         mainGrid.EndUpdate();
-        loadingPanelVisible = false;
-        //ProgressBar.Close();
+        await ProgressBar.Close();
     }
 
     async void OnTabClick(TabClickEventArgs e)
@@ -412,7 +397,7 @@ else
         if (e.Item.FieldName == "Due")
             e.DisplayText = string.Format("{0:c2}", e.Value);
         if (e.Item.FieldName == "Person.FullName")
-            e.DisplayText = string.Format("{0:N0} members", e.Value);
+            e.DisplayText = string.Format("{0:N0} students", e.Value);
     }
 
     void Grid_CustomizeGroupValueDisplayText(GridCustomizeGroupValueDisplayTextEventArgs e)
