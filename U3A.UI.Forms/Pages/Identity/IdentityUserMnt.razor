@@ -35,18 +35,6 @@ else
         <div class="col-3 align-content-start">
             Review login security and assign roles to logins.
         </div>
-        <DxButton Text="Create Domain Login"
-                  Click="@OnCreateDomainLogin"
-                  RenderStyle="ButtonRenderStyle.Primary" CssClass="col col-lg-2 m-auto" />
-        <DxButton Text="Populate Logins"
-                  Click="@OnPopulateLogins"
-                  RenderStyle="ButtonRenderStyle.Primary" CssClass="col col-lg-2 m-auto" />
-        <DxButton Text="Set Email Confirmed"
-                  Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
-                  RenderStyle="ButtonRenderStyle.Primary" CssClass="col col-lg-2 m-auto" />
-        <DxButton Text="Reset Password"
-                  Click="@OnResetPassword" Enabled="@AreItemsSelected()"
-                  RenderStyle="ButtonRenderStyle.Primary" CssClass="col col-lg-2 m-auto" />
     </div>
 
     <MessageBox @ref="@messageBox" />
@@ -81,7 +69,26 @@ else
                     CustomizeEditModel="Grid_CustomizeEditModel"
                     ValidationEnabled="true">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid />
+                    <GridToolbar LinkedGrid=@mainGrid >
+                        <CustomButtonContent>
+                            <DxToolbarItem Text="Create Domain Login"
+                                      Click="@OnCreateDomainLogin"
+                                      RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                      RenderStyle="ButtonRenderStyle.Primary" />
+                            <DxToolbarItem Text="Populate Logins"
+                                      Click="@OnPopulateLogins"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
+                            <DxToolbarItem Text="Set Email Confirmed"
+                                      Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
+                            <DxToolbarItem Text="Reset Password"
+                                      Click="@OnResetPassword" Enabled="@AreItemsSelected()"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
+                        </CustomButtonContent>
+                    </GridToolbar>
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridSelectionColumn Width="2rem" />
