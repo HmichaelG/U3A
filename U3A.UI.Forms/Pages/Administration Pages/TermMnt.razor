@@ -9,10 +9,12 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <NavigationLock OnBeforeInternalNavigation="OnBeforeNavigation" />
 
@@ -20,17 +22,13 @@ else {
         <ContextHelpTitle Title="Enrolment Terms" HelpTopic="add_edit-enrolment-terms.html"></ContextHelpTitle>
     </div>
     <div class="row">
-        <div class="col-9 d-none d-md-inline">
+        <div class="d-none d-md-inline">
             Enrolment Terms are the periods of time in which courses and/or activities are offered to participants.
             <br />A Term is preceded by an enrolment period in which participants are allowed to enrol in courses.
-        </div>
-        <div class="col-3 d-none d-md-inline">
-            <DxButton Text="Print Class Schedule For Current Enrolment Period (Public View)" Click="OnPrint" />
         </div>
 
     </div>
     <br />
-
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 
@@ -44,7 +42,19 @@ else {
             EditMode="GridEditMode.PopupEditForm"
             EditModelSaving="Grid_EditModelSaving">
         <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
+            <GridToolbar LinkedGrid=@mainGrid>
+                <CustomButtonContent>
+                    <DxToolbarItem Text="@((showTimeline) ? "Hide Timeline" : "Show Timeline" )"
+                                   Click="OnShowTimelineChanged"
+                                   Tooltip="Click to show / hide the term timeline"
+                                   RenderStyle="ButtonRenderStyle.Primary"
+                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained" />
+                    <DxToolbarItem Text="Print Class Schedule" Click="OnPrint"
+                                   Tooltip="Click to print the current class schedule (public view)."
+                                   RenderStyle="ButtonRenderStyle.Primary"
+                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained" />
+                </CustomButtonContent>
+            </GridToolbar>
         </ToolbarTemplate>
         <Columns>
             <DxGridCommandColumnEx @ref="GridCommandColumn" Width="6rem" EditButtonVisible="true" DeleteButtonVisible="false" />
@@ -109,45 +119,47 @@ else {
             </DxFormLayout>
         </EditFormTemplate>
     </DxGrid>
-
-    <DxScheduler StartDate="@(new DateTime(DateTime.Today.Year,1,1))"
-                 AllowCreateAppointment="false"
-                 AllowDeleteAppointment="false"
-                 AllowEditAppointment="false"
-                 ShowAppointmentTooltip="true"
-                 ActiveViewType=SchedulerViewType.Timeline
-                 DataStorage="@TermDataStorage">
-        <Views>
-            <DxSchedulerTimelineView SnapToCellsMode="SchedulerSnapToCellsMode.Never" Duration="@(TimeSpan.FromDays(365))">
-                <Scales>
-                    <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" UnitCount="1" />
-                </Scales>
-                <DateHeaderCellTemplate>
-                    <div style="width: 100%; text-align:center;">
-                        <span>@context.Interval.Start.ToString("MMM yyyy")</span>
-                    </div>
-                </DateHeaderCellTemplate>
-            </DxSchedulerTimelineView>
-        </Views>
-        <AppointmentTooltipHeaderTemplate>
-            <h4>@context.Label?.Caption</h4>
-        </AppointmentTooltipHeaderTemplate>
-        <AppointmentTooltipTemplate>
-            <div class="container">
-                <span style="vertical-align: middle;">
-                    <strong>Period:</strong>  @context.Appointment.Subject<br />
-                    <strong>From:</strong>  @context.Appointment.Start.ToString("ddd, dd-MMM-yyyy") <strong>To:</strong>
-                    @context.Appointment.End.ToString("ddd, dd-MMM-yyyy")<br />
-                </span>
-            </div>
-        </AppointmentTooltipTemplate>
-    </DxScheduler>
+    if (showTimeline)
+    {
+        <DxScheduler StartDate="@(new DateTime(DateTime.Today.Year,1,1))"
+                     AllowCreateAppointment="false"
+                     AllowDeleteAppointment="false"
+                     AllowEditAppointment="false"
+                     ShowAppointmentTooltip="true"
+                     ActiveViewType=SchedulerViewType.Timeline
+                     DataStorage="@TermDataStorage">
+            <Views>
+                <DxSchedulerTimelineView SnapToCellsMode="SchedulerSnapToCellsMode.Never" Duration="@(TimeSpan.FromDays(365))">
+                    <Scales>
+                        <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" UnitCount="1" />
+                    </Scales>
+                    <DateHeaderCellTemplate>
+                        <div style="width: 100%; text-align:center;">
+                            <span>@context.Interval.Start.ToString("MMM yyyy")</span>
+                        </div>
+                    </DateHeaderCellTemplate>
+                </DxSchedulerTimelineView>
+            </Views>
+            <AppointmentTooltipHeaderTemplate>
+                <h4>@context.Label?.Caption</h4>
+            </AppointmentTooltipHeaderTemplate>
+            <AppointmentTooltipTemplate>
+                <div class="container">
+                    <span style="vertical-align: middle;">
+                        <strong>Period:</strong>  @context.Appointment.Subject<br />
+                        <strong>From:</strong>  @context.Appointment.Start.ToString("ddd, dd-MMM-yyyy") <strong>To:</strong>
+                        @context.Appointment.End.ToString("ddd, dd-MMM-yyyy")<br />
+                    </span>
+                </div>
+            </AppointmentTooltipTemplate>
+        </DxScheduler>
+    }
 }
 
 <style>
     .grid-height {
         overflow: auto;
-        height: 40vh;
+        height: @gridHeight;
     }
 
 </style>
@@ -173,41 +185,60 @@ else {
     internal string? ErrorMessage;
     U3ADbContext? dbc { get; set; }
     SystemSettings settings;
+    bool showTimeline;
+    string gridHeight = "80vh";
 
-    protected override async Task OnInitializedAsync() {
+
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         Terms = await BusinessRule.EditableTermsAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         Years = new List<int>();
-        for (int i = -1; i < 5; i++) {
+        for (int i = -1; i < 5; i++)
+        {
             Years.Add(DateTime.Now.AddYears(i).Year);
         }
         TermNumbers = new List<int>();
-        for (int i = 1; i < 5; i++) {
+        for (int i = 1; i < 5; i++)
+        {
             TermNumbers.Add(i);
         }
         await GetSchedule();
         IsReady = true;
     }
 
-    async Task GetSchedule() {
+    async Task OnShowTimelineChanged()
+    {
+        showTimeline = !showTimeline;
+        gridHeight = (showTimeline) ? "40vh" : "80vh";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task GetSchedule()
+    {
         if (Terms != null) TermDataStorage = await BusinessRule.GetTermScheduleDataStorageAsync(dbc);
     }
 
 
-    async Task OnCustomizeEditModel(GridCustomizeEditModelEventArgs e) {
-        if (e is null) {
+    async Task OnCustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e is null)
+        {
             throw new ArgumentNullException(nameof(e));
         }
 
         var editModel = (Term)e.EditModel;
         var lastTerm = await BusinessRule.GetLastTermAsync(dbc);
-        if (e.IsNew) {
-            if (lastTerm != null) {
+        if (e.IsNew)
+        {
+            if (lastTerm != null)
+            {
                 editModel.Year = lastTerm.Year;
                 editModel.TermNumber = lastTerm.TermNumber + 1;
-                if (editModel.TermNumber > 4) {
+                if (editModel.TermNumber > 4)
+                {
                     editModel.Year += 1;
                     editModel.TermNumber = 1;
                 }
@@ -218,7 +249,8 @@ else {
                 editModel.EnrolmentStarts = span.Days / -7;
                 editModel.EnrolmentEnds = editModel.Duration;
             }
-            else {
+            else
+            {
                 var today = DateTime.Now;
                 editModel.Year = today.Year;
                 editModel.TermNumber = 1;
@@ -231,42 +263,52 @@ else {
     }
 
     bool isBusy;
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
         if (isBusy) return;
         isBusy = true;
-        try {
+        try
+        {
             await SaveRecord(e);
         }
-        finally {
+        finally
+        {
             isBusy = false;
         }
     }
 
-    async Task SaveRecord(GridEditModelSavingEventArgs e) {
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
         var editModel = (Term)e.EditModel;
         e.Cancel = !(await IsDataOK(editModel));
-        if (!e.Cancel) {
+        if (!e.Cancel)
+        {
             if (editModel.IsDefaultTerm) { ClearDefaultTerm(); }
             // Re-query a data item from the store.
             var dataItem = e.IsNew ? new Term() : dbc.Term.Find(editModel.ID);
             // Assign changes from the edit model to the data item.
-            if (dataItem != null) {
+            if (dataItem != null)
+            {
                 editModel.CopyTo(dataItem);
-                try {
+                try
+                {
                     // Post changes to the database.
                     if (e.IsNew) await dbc.AddAsync(dataItem);
                     await dbc.SaveChangesAsync();
                     // update the Grid.
-                    if (e.IsNew) {
+                    if (e.IsNew)
+                    {
                         Terms.Insert(0, dataItem);
                     }
-                    else {
+                    else
+                    {
                         int idx = Terms.FindIndex(x => x.ID == dataItem.ID);
                         Terms[idx] = dataItem;
                     }
                     await GetSchedule();
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     ErrorHeader = "Save to database error";
                     ErrorMessage = Helpers.GetErrorMessage(ex);
                     await ErrorPopup.ShowPopupAsync();
@@ -277,14 +319,17 @@ else {
         }
     }
 
-    void ClearDefaultTerm() {
+    void ClearDefaultTerm()
+    {
         // Allow only on default term at a time
-        foreach (var t in Terms) {
+        foreach (var t in Terms)
+        {
             t.IsDefaultTerm = false;
         }
     }
 
-    async Task<bool> IsDataOK(Term term) {
+    async Task<bool> IsDataOK(Term term)
+    {
         bool result = true;
         mainGrid.BeginUpdate();
         customValidations.Caption = string.Empty;
@@ -293,15 +338,18 @@ else {
         DateTime maxDate = new DateTime(term.Year, 12, 31);
         if (term.StartDate < minDate ||
             term.StartDate > maxDate ||
-            term.StartDate.DayOfWeek != DayOfWeek.Monday) {
+            term.StartDate.DayOfWeek != DayOfWeek.Monday)
+        {
             customValidations.Caption = $"The Start Date must be Monday and in range {minDate.ToShortDateString()} to {maxDate.ToShortDateString()}";
             customValidations.Visible = true;
             result = false;
         }
         mainGrid.EndUpdate();
-        if (term.TermNumber != 1) {
+        if (term.TermNumber != 1)
+        {
             Term prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
-            if (prevTerm != null && term.EnrolmentStartDate >= prevTerm.EndDate) {
+            if (prevTerm != null && term.EnrolmentStartDate >= prevTerm.EndDate)
+            {
                 await messageBox.ShowOkOnlyAsync("Invalid Enrolment Date",
                                     $"The enrolment Start Date ({term.EnrolmentStartDate.ToShortDateString()}) must be at least one week prior to last term's End Date ({prevTerm.EndDate.ToShortDateString()}).");
                 result = false;
@@ -310,18 +358,22 @@ else {
         return result;
     }
 
-    public void OnPrint() {
+    public void OnPrint()
+    {
         NavManager.NavigateTo("Public/ClassScheduleView");
     }
 
-    async Task OnBeforeNavigation(LocationChangingContext context) {
-        if (Terms.Count > 0 && !Terms.Any(x => x.IsDefaultTerm)) {
+    async Task OnBeforeNavigation(LocationChangingContext context)
+    {
+        if (Terms.Count > 0 && !Terms.Any(x => x.IsDefaultTerm))
+        {
             await messageBox.ShowOkOnlyAsync("Set the Current Term", "One term must be chosen as the current or default term.<br/>Please set the current term before exit.");
             context.PreventNavigation();
         }
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 

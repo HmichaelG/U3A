@@ -7,10 +7,12 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <MessageBox @ref="@messageBox" />
     <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
@@ -18,90 +20,75 @@ else {
     <Progress @ref="@ProgressBar" />
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <DxFormLayout>
-        <DxStackLayout CssClass="w-100 mt-2" Orientation="Orientation.Horizontal">
-                <Items>
-                    <DxStackLayoutItem>
-                    <Template>
-                            <ContextHelpTitle Title="Current Cancellations" HelpTopic="cancel-class.html"></ContextHelpTitle>
-                            <p>Current cancellations for the selected term. Click a cancellation to edit it.</p>
-                        <DxFormLayoutGroup Caption="Term Summary">
-                            <DxGrid @ref="displayGrid" Data="@CancellationsThisTerm" CssClass="display-grid-height" id="displayGrid"
-                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                    ShowFilterRow="false"
-                                    ShowAllRows="true"
-                                    AutoExpandAllGroupRows="true"
-                                    KeyFieldName="ID"
-                                    AllowSelectRowByClick="true"
-                                    SelectionMode="GridSelectionMode.Single"
-                                    SelectedDataItemChanged="DisplayGrid_SelectedDataItemChanged"
-                                    ValidationEnabled="false">
-                                <ToolbarTemplate>
-                                    <GridToolbar LinkedGrid=@displayGrid />
-                                </ToolbarTemplate>
-                                <Columns>
-                                    <DxGridDataColumn Caption="Course" FieldName="Class.Course.Name" GroupIndex="0" />
-                                    <DxGridDataColumn Caption="Class" FieldName="Class.ClassSummary" GroupIndex="1" />
-                                    <DxGridDataColumn Width="6rem" Caption="Start Date" FieldName="StartDate" />
-                                    <DxGridDataColumn Width="6rem" Caption="End Date" FieldName="EndDate" />
-                                    <DxGridDataColumn Caption="Reason" FieldName="Reason" />
-                                </Columns>
-                            </DxGrid>
-                        </DxFormLayoutGroup>
-                    </Template>
-                    </DxStackLayoutItem>
-
-                    <DxStackLayoutItem>
-                        <Template>
-                        <ContextHelpTitle Title="Cancel Class" HelpTopic="cancel-class.html"></ContextHelpTitle>
-                        <div class="input-group">
-                            <div class="flex-grow-3">
-                                Cancel a class for one or a range of dates.
-                            </div>
-                            <DxButton Text="Communicate"
-                                      Click="@OnCommunicate"
-                                      RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-1" />
-                        </div>
+    <div class="container">
+        <ContextHelpTitle Title="Cancel Class" HelpTopic="cancel-class.html"></ContextHelpTitle>
+        <div class="h6">
+            Cancel a class for one or a range of dates.
+        </div>
+        <DxFormLayout>
+            <DxTabs CssClass="mt-2">
+                <DxTabPage Text="Cancel Class">
+                    <ChildContent>
                         <DxFormLayoutGroup Caption="Cancellation Details">
                             <DxFormLayoutItem Caption="Term" ColSpanMd="12">
-                                    <DxComboBox Data="@terms" NullText="Select the Term required..."
-                                                FilteringMode="DataGridFilteringMode.Contains"
-                                                TextFieldName="@nameof(Term.TermSummary)"
-                                                Value="@selectedTerm"
-                                                ValueChanged="@((Term term) => SelectedTermChanged(term))" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Course" ColSpanMd="12">
-                                    <DxComboBox Data="@courses"
-                                                Enabled="@courseComboEnabled"
-                                                NullText="Select the Course required..."
-                                                FilteringMode="DataGridFilteringMode.Contains"
-                                                ListRenderMode="ListRenderMode.Virtual"
-                                                TextFieldName="@nameof(Course.Name)"
-                                                Value="@selectedCourse"
-                                                ValueChanged="@((Course course) => SelectedCourseChanged(course))">
-                                    </DxComboBox>
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Class To Cancel" ColSpanMd="12">
-                                    <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="Select the Class required..."
-                                                TextFieldName="@nameof(Class.ClassSummary)"
-                                                Value="@selectedClass"
-                                                ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
-                                </DxFormLayoutItem>
+                                <DxComboBox Data="@terms" NullText="Select the Term required..."
+                                            FilteringMode="DataGridFilteringMode.Contains"
+                                            TextFieldName="@nameof(Term.TermSummary)"
+                                            Value="@selectedTerm"
+                                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Course" ColSpanMd="12">
+                                <DxComboBox Data="@courses"
+                                            Enabled="@courseComboEnabled"
+                                            NullText="Select the Course required..."
+                                            FilteringMode="DataGridFilteringMode.Contains"
+                                            ListRenderMode="ListRenderMode.Virtual"
+                                            TextFieldName="@nameof(Course.Name)"
+                                            Value="@selectedCourse"
+                                            ValueChanged="@((Course course) => SelectedCourseChanged(course))">
+                                </DxComboBox>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Class To Cancel" ColSpanMd="12">
+                                <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="Select the Class required..."
+                                            TextFieldName="@nameof(Class.ClassSummary)"
+                                            Value="@selectedClass"
+                                            ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
+                            </DxFormLayoutItem>
+                        </DxFormLayoutGroup>
 
-                                @quickMessage
-
-                                <DxGrid @ref="mainGrid" Data="@Cancellations" CssClass="main-grid-height mt-2" id="mainGrid"
+                        <FullScreen>
+                            <ContentTemplate>
+                                <DxGrid @ref="mainGrid" Data="@Cancellations"
                                         ShowFilterRow="false"
                                         ShowAllRows="true"
                                         KeyFieldName="ID"
                                         ValidationEnabled="true"
                                         SelectionMode="GridSelectionMode.Multiple"
                                         AllowSelectRowByClick="true"
-                                @bind-SelectedDataItems="SelectedDataItems"
+                                        @bind-SelectedDataItems="SelectedDataItems"
                                         CustomizeEditModel="Grid_CustomizeEditModel"
                                         EditMode="GridEditMode.PopupEditForm"
                                         DataItemDeleting="Grid_DataItemDeleting"
                                         EditModelSaving="Grid_EditModelSaving">
+                                    <ToolbarTemplate>
+                                        <GridToolbar LinkedGrid=@mainGrid>
+                                            <CustomButtonContent>
+                                                <DxToolbarItem Text="Add Cancellation"
+                                                               Tooltip="Add a date or range of dates to cancel"
+                                                               IconCssClass="bi bi-calendar"
+                                                               Enabled=@(selectedClass != null)
+                                                               Click="@OnAddCancellation"
+                                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                               RenderStyle="ButtonRenderStyle.Primary" />
+                                                <DxToolbarItem Text="Communicate"
+                                                               Click="@OnCommunicate"
+                                                               Enabled=@(selectedClass != null)
+                                                               IconCssClass="bi bi-envelope"
+                                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                               RenderStyle="ButtonRenderStyle.Primary" />
+                                            </CustomButtonContent>
+                                        </GridToolbar>
+                                    </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="2rem" />
                                         <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem"
@@ -113,30 +100,84 @@ else {
 
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
-                                        var editItem = (CancelClass)EditFormContext.EditModel;
-                                    }
-                                    <DxFormLayout>
-                                        <DxFormLayoutItem ColSpanMd="12">
-                                            <ValidationSummary />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
-                                            <DxDateEdit @bind-Date="@editItem.StartDate" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="End Date" ColSpanMd="12">
-                                            <DxDateEdit @bind-Date="@editItem.EndDate" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Reason" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@editItem.Reason" />
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </EditFormTemplate>
-                            </DxGrid>
-                        </DxFormLayoutGroup>
-                        </Template>
-                    </DxStackLayoutItem>
-                </Items>
-        </DxStackLayout>
-    </DxFormLayout>
+                                            var editItem = (CancelClass)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <ValidationSummary />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@editItem.StartDate" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="End Date" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@editItem.EndDate" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Reason" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.Reason" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            </ContentTemplate>
+                        </FullScreen>
+                    </ChildContent>
+                </DxTabPage>
+
+                <DxTabPage Text="Current Cancellations">
+                    <ChildContent>
+                        <FullScreen>
+                            <ContentTemplate>
+                                <DxGrid @ref="displayGrid" Data="@CancellationsThisTerm"
+                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                        ValidationEnabled="true"
+                                        ShowFilterRow="false"
+                                        ShowAllRows="true"
+                                        AutoExpandAllGroupRows="true"
+                                        KeyFieldName="ID"
+                                        AllowSelectRowByClick="true"
+                                        SelectionMode="GridSelectionMode.Single"
+                                        EditMode="GridEditMode.PopupEditForm"
+                                        DataItemDeleting="DisplayGrid_DataItemDeleting"
+                                        EditModelSaving="DisplayGrid_EditModelSaving">
+                                    <ToolbarTemplate>
+                                        <GridToolbar LinkedGrid=@displayGrid />
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem"
+                                                               EditButtonVisible="true" DeleteButtonVisible="true" NewButtonVisible="false" />
+                                        <DxGridDataColumn Caption="Course" FieldName="Class.Course.Name" GroupIndex="0" />
+                                        <DxGridDataColumn Caption="Class" FieldName="Class.ClassSummary" GroupIndex="1" />
+                                        <DxGridDataColumn Width="6rem" Caption="Start Date" FieldName="StartDate" />
+                                        <DxGridDataColumn Width="6rem" Caption="End Date" FieldName="EndDate" />
+                                        <DxGridDataColumn Caption="Reason" FieldName="Reason" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var editItem = (CancelClass)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout>
+                                            <DxFormLayoutItem ColSpanMd="12">
+                                                <ValidationSummary />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@editItem.StartDate" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="End Date" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@editItem.EndDate" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Reason" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.Reason" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                </DxGrid>
+                            </ContentTemplate>
+                        </FullScreen>
+                    </ChildContent>
+                </DxTabPage>
+            </DxTabs>
+        </DxFormLayout>
+    </div>
 
 }
 <style>
@@ -170,7 +211,6 @@ else {
     string? MessageContent;
     MessageBox? messageBox { get; set; }
     bool MessageBoxShowCancelButton;
-    MarkupString quickMessage;
     string displayGridHeight;
     string mainGridHeight;
 
@@ -205,7 +245,8 @@ else {
     int documentsSent;
     internal Progress? ProgressBar;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
 
@@ -221,9 +262,11 @@ else {
         IsReady = true;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
         var newHeight = await Window.FitToRemainingHeight(js, "displayGrid", displayGridHeight);
-        if (newHeight != displayGridHeight) {
+        if (newHeight != displayGridHeight)
+        {
             displayGridHeight = newHeight;
             newHeight = await Window.FitToRemainingHeight(js, "mainGrid", mainGridHeight);
             if (newHeight != mainGridHeight) mainGridHeight = newHeight;
@@ -232,7 +275,8 @@ else {
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    async Task SelectedTermChanged(Term term) {
+    async Task SelectedTermChanged(Term term)
+    {
         ClearSelection();
         selectedTerm = term;
         selectedCourse = null;
@@ -247,117 +291,174 @@ else {
         StateHasChanged();
     }
 
-    async Task SelectedCourseChanged(Course course) {
+    async Task SelectedCourseChanged(Course course)
+    {
         selectedCourse = course;
         classes = selectedCourse.Classes;
         if (Cancellations != null) { Cancellations.Clear(); }
-        SetupClassToEnrol();
+        SetupClassToCancel();
         await SetupGrid();
     }
 
-    async Task SelectedClassChanged(Class Class) {
+    async Task SelectedClassChanged(Class Class)
+    {
         selectedClass = Class;
         await SetupGrid();
     }
 
-    async Task SetupGrid() {
+    async Task SetupGrid()
+    {
         mainGrid?.BeginUpdate();
         ClearSelection();
         GridCommandColumn.Visible = false;
-        if (selectedCourse != null && selectedClass != null) {
+        if (selectedCourse != null && selectedClass != null)
+        {
             GridCommandColumn.Visible = true;
-            await GetCancellations();
+            await GetCancellationsAsync();
         }
         mainGrid?.EndUpdate();
         StateHasChanged();
     }
 
-    void ClearSelection() {
+    void ClearSelection()
+    {
         SendTo = null;
         SelectedDataItems = null;
     }
 
-    async Task GetCancellationsForTermAsync() {
+    async Task GetCancellationsForTermAsync()
+    {
+        if (selectedTerm == null) return;
         CancellationsThisTerm = await BusinessRule.CancelledClassForTermAsync(dbc, selectedTerm);
     }
-    async Task GetCancellations() {
+    async Task GetCancellationsAsync()
+    {
+        if (selectedTerm == null) return;
+        if (selectedClass == null) return;
         Cancellations = await BusinessRule.EditableCancelClassAsync(dbc, selectedTerm, selectedClass);
     }
 
-    void SetupClassToEnrol() {
+    void SetupClassToCancel()
+    {
         selectedClass = null;
         classComboEnabled = true;
-        if (selectedCourse?.Classes.Count >= 1) {
+        if (selectedCourse?.Classes.Count >= 1)
+        {
             selectedClass = classes?[0];
         }
     }
 
     bool isBusy;
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
         if (isBusy) return;
         isBusy = true;
-        try {
-            await SaveRecord(e);
+        try
+        {
+            await SaveRecord(e, false);
         }
-        finally {
+        finally
+        {
+            isBusy = false;
+        }
+    }
+    async Task DisplayGrid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (isBusy) return;
+        isBusy = true;
+        try
+        {
+            await SaveRecord(e, true);
+        }
+        finally
+        {
             isBusy = false;
         }
     }
 
-    async Task SaveRecord(GridEditModelSavingEventArgs e) {
-        quickMessage = (MarkupString)string.Empty;
+    async Task SaveRecord(GridEditModelSavingEventArgs e, bool isDisplayGrid)
+    {
         var editModel = (CancelClass)e.EditModel;
-        if (!await IsDataOk(editModel)) {
+        if (!await IsDataOk(editModel))
+        {
             e.Cancel = true; return;
         }
         // Re-query a data item from the store.
         var dataItem = e.IsNew ? new CancelClass() : dbc.CancelClass.Find(editModel.ID);
         // Assign changes from the edit model to the data item.
-        if (dataItem != null) {
+        if (dataItem != null)
+        {
             editModel.CopyTo(dataItem);
             if (selectedClass != null) { dataItem.Class = dbc.Class.Find(selectedClass.ID); }
             // Post changes to the database.
             if (e.IsNew) await dbc.AddAsync(dataItem);
-            if (await SaveChangesAsync()) {
-                // update the Grid.
-                if (e.IsNew) {
-                    Cancellations?.Insert(0, dataItem);
-                }
-                else {
-                    int idx = Cancellations.FindIndex(x => x.ID == dataItem.ID);
-                    Cancellations[idx] = dataItem;
+            if (await SaveChangesAsync())
+            {
+                if (!isDisplayGrid)
+                {
+                    // update the Grid.
+                    if (e.IsNew)
+                    {
+                        Cancellations?.Insert(0, dataItem);
+                    }
+                    else
+                    {
+                        int idx = Cancellations.FindIndex(x => x.ID == dataItem.ID);
+                        Cancellations[idx] = dataItem;
+                    }
+                    await SetupGrid();
                 }
                 await GetCancellationsForTermAsync();
-                await SetupGrid();
+                await GetCancellationsAsync();
             }
             else { e.Cancel = true; }
         }
     }
-    async Task<bool> IsDataOk(CancelClass editItem) {
+    async Task<bool> IsDataOk(CancelClass editItem)
+    {
         bool result = true;
-        if (editItem.StartDate > editItem.EndDate) {
+        if (editItem.StartDate > editItem.EndDate)
+        {
             await messageBox.ShowOkOnlyAsync("Invalid Dates", "Start Date must be equal to or earlier than End Date.");
             result = false;
         }
         return result;
     }
 
-    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e) {
-        dbc?.Remove<CancelClass>((CancelClass)e.DataItem);
-        await SaveChangesAsync();
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var c = (CancelClass)e.DataItem;
+        await DeleteItem(c);
         mainGrid?.ClearSelection();
-        await GetCancellationsForTermAsync();
         await SetupGrid();
     }
 
-    async Task<bool> SaveChangesAsync() {
+    async Task DisplayGrid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var c = (CancelClass)e.DataItem;
+        await DeleteItem(c);
+    }
+
+    async Task DeleteItem(CancelClass c)
+    {
+        dbc?.Remove<CancelClass>(await dbc.CancelClass.FindAsync(c.ID));
+        await SaveChangesAsync();
+        await GetCancellationsForTermAsync();
+        await GetCancellationsAsync();
+    }
+
+
+    async Task<bool> SaveChangesAsync()
+    {
         bool result = false;
-        try {
+        try
+        {
             // Post changes to the database.
             await dbc.SaveChangesAsync();
             result = true;
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             ErrorHeader = "Save to database error";
             ErrorMessage = Helpers.GetErrorMessage(ex);
             await ErrorPopup.ShowPopupAsync();
@@ -366,16 +467,20 @@ else {
         return result;
     }
 
-    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e) {
-        if (e.EditModel == null) {
-            await messageBox.ShowAsync("Course / Class is undefined",
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (selectedClass == null)
+        {
+            await messageBox.ShowOkOnlyAsync("Course / Class is undefined",
                 "Please ensure you have selected the course / class before clicking the + button.");
             return;
         };
-        if (e.IsNew) {
+        if (e.IsNew)
+        {
             var editModel = (CancelClass)e.EditModel;
             editModel.StartDate = DateTime.Today;
-            if (selectedTerm?.StartDate > DateTime.Today) {
+            if (selectedTerm?.StartDate > DateTime.Today)
+            {
                 editModel.StartDate = selectedTerm.StartDate;
             }
             else { editModel.StartDate = DateTime.Today; }
@@ -383,26 +488,26 @@ else {
         }
     }
 
-    async Task DisplayGrid_SelectedDataItemChanged(object newSelection) {
-        if (newSelection != null) {
-            selectedCourse = (newSelection as CancelClass).Class.Course;
-            selectedClass = (newSelection as CancelClass).Class;
-            await SetupGrid();
-            await mainGrid.StartEditDataItemAsync(newSelection);
-        }
+    async Task OnAddCancellation()
+    {
+        await mainGrid.StartEditNewRowAsync();
     }
 
-    async Task OnCommunicate() {
+    async Task OnCommunicate()
+    {
 
-        if (SelectedDataItems == null || SelectedDataItems.Count <= 0) {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
             await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
             return;
         }
         SendTo = new List<Person>();
-        foreach (var e in SelectedDataItems.Cast<CancelClass>().ToList()) {
+        foreach (var e in SelectedDataItems.Cast<CancelClass>().ToList())
+        {
             SendTo.AddRange(await BusinessRule.GetPersonsInClassAsync(dbc, e.ClassID));
         };
-        if (await selectDocumentTemplatePopup.ShowAsync()) {
+        if (await selectDocumentTemplatePopup.ShowAsync())
+        {
             documentsSent = 0;
             await ProgressBar.ShowAsync("Sending ... Please Wait", SelectedDataItems.Count);
             List<ExportData> exportData = await BusinessRule.GetExportDataAsync(dbc, SendTo);
@@ -413,13 +518,15 @@ else {
         }
     }
 
-    async void Server_DocumentSent(object sender, DocumentSentEventArgs e) {
+    async void Server_DocumentSent(object sender, DocumentSentEventArgs e)
+    {
         documentsSent += e.DocumentsSent;
         await ProgressBar.SetValueAsync(documentsSent);
     }
 
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
