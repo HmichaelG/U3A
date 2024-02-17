@@ -897,7 +897,7 @@ else
     void GetData()
     {
         // only show this term's classes & inter-term classes from last term.
-        ListboxData = Classes.Where(x => x.TermNumber == term?.TermNumber
+        ListboxData = Classes.Where(x => x.TermNumber >= term?.TermNumber
                                        || (x.TermNumber == prevTerm.TermNumber
                                                 && BusinessRule.IsClassEndDateInInterTermPeriod(
                                                     dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))

@@ -23,7 +23,7 @@ namespace U3A.Services
         }
         public async Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink)
         {
-            var emailText = $"<a href='{confirmationLink}'>Click here to confirm your changed email address.</a>";
+            var emailText = $"<a href='{confirmationLink}'>Click here to confirm your email address.</a>";
             await SendEmailAsync(email,"U3A Member Portal email confirmation", emailText);
         }
 
