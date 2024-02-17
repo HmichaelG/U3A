@@ -555,7 +555,7 @@ namespace U3A.BusinessRules
                 {
                     var e = dbc.Enrolment.Where(x =>
                                         x.PersonID == person.ID &&
-                                        x.Term.Year == thisTerm.Year && x.Term.TermNumber >= termNumber &&
+                                        x.Term.Year == thisTerm.Year && x.Term.TermNumber == thisTerm.TermNumber &&
                                         x.CourseID == c.CourseID).ToImmutableList();
                     if (e.Count > 0)
                     {
@@ -567,7 +567,7 @@ namespace U3A.BusinessRules
                 {
                     var e = dbc.Enrolment.Where(x =>
                                         x.PersonID == person.ID &&
-                                        x.Term.Year == term.Year && x.Term.TermNumber >= termNumber &&
+                                        x.Term.Year == term.Year && x.Term.TermNumber == thisTerm.TermNumber &&
                                         x.CourseID == c.CourseID &&
                                         x.ClassID == c.ID).ToImmutableList();
                     if (e.Count > 0)
@@ -616,7 +616,7 @@ namespace U3A.BusinessRules
                 {
                     //future term
                     thisYear = term.Year;
-                    thisTermNo = term.TermNumber;
+                    thisTermNo = c.TermNumber;
                     thisTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.Year == term.Year && x.TermNumber == thisTermNo);
                 }
                 var course = await dbc.Course.FindAsync(c.CourseID);
