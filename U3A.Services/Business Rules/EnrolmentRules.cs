@@ -597,6 +597,7 @@ namespace U3A.BusinessRules
             foreach (var c in RequestedClasses)
             {
                 if (c.DoNotAllowEdit) continue;
+                bool isFutureTerm = false;
                 int thisYear;
                 int thisTermNo;
                 Term thisTerm = term;
@@ -617,6 +618,7 @@ namespace U3A.BusinessRules
                     //future term
                     thisYear = term.Year;
                     thisTermNo = c.TermNumber;
+                    isFutureTerm = true;
                     thisTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.Year == term.Year && x.TermNumber == thisTermNo);
                 }
                 var course = await dbc.Course.FindAsync(c.CourseID);
@@ -632,6 +634,7 @@ namespace U3A.BusinessRules
                             Created = DateTime.Now,
                             IsWaitlisted = await BusinessRule.SetWaitlistStatusAsync(dbc, course.ID, thisTerm, person)
                         };
+                        if (isFutureTerm) { e.IsWaitlisted = true; }
                         if (!BusinessRule.IsClassInTerm(c, thisTermNo)) { e.IsWaitlisted = true; }
                         e.Person = await dbc.Person.FindAsync(person.ID);
                         e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
