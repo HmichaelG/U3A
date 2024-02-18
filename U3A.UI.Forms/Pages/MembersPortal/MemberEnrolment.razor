@@ -736,12 +736,14 @@ else
     string GetStatus(Class context)
     {
         var result = string.Empty;
+        DateTime? classEndDate = null;
         if (IsPreview) { result = "Preview Only"; return result; }
         if (!IsReadOnly && !isListboxShowingSummary && !isNotInEnrolmentPeriod)
         {
             if (selectedClasses.Contains(context))
             {
-                result = "Click to withdraw";
+                (result, classEndDate) = getEnrolmentStatus(context);
+                result = $"{result} - Click to withdraw";
             }
             else
             {
@@ -750,37 +752,7 @@ else
         }
         else
         {
-            var c = context;
-            c.DoNotAllowEdit = false;
-            DateTime? classEndDate = null;
-            string status;
-            Enrolment? e = GetEnrolment(c, term);
-            if (e != null)
-            {
-                // Enrolled in class - display the status
-                status = BusinessRule.GetMemberPortalEnrolmentStatus(e, term, settings);
-                classEndDate = term.EndDate;
-            }
-            else
-            {
-                e = GetEnrolment(c, prevTerm);
-                status = BusinessRule.GetMemberPortalEnrolmentStatus(e, prevTerm, settings);
-                if (status != "Pending")
-                {
-                    // Enrolled in previous term - not current. Term is complete, do not allow edits.
-                    classEndDate = BusinessRule.GetClassEndDate(dbc, c, prevTerm);
-                    if (classEndDate < today) { c.DoNotAllowEdit = true; } // cannot delete an expired class
-                }
-            };
-
-            if (e != null)
-            {
-                result = $"Term {c.TermNumber}: {status}";
-            }
-            else
-            {
-                result = status;
-            };
+            (result, classEndDate) = getEnrolmentStatus(context);
 
             if (!IsReadOnly
             && !isNotInEnrolmentPeriod
@@ -791,6 +763,43 @@ else
             }
         }
         return result;
+    }
+
+    (string,DateTime?) getEnrolmentStatus(Class context)
+    {
+        var c = context;
+        var result = string.Empty;
+        c.DoNotAllowEdit = false;
+        DateTime? classEndDate = null;
+        string status;
+        Enrolment? e = GetEnrolment(c, term);
+        if (e != null)
+        {
+            // Enrolled in class - display the status
+            status = BusinessRule.GetMemberPortalEnrolmentStatus(e, term, settings);
+            classEndDate = term.EndDate;
+        }
+        else
+        {
+            e = GetEnrolment(c, prevTerm);
+            status = BusinessRule.GetMemberPortalEnrolmentStatus(e, prevTerm, settings);
+            if (status != "Pending")
+            {
+                // Enrolled in previous term - not current. Term is complete, do not allow edits.
+                classEndDate = BusinessRule.GetClassEndDate(dbc, c, prevTerm);
+                if (classEndDate < today) { c.DoNotAllowEdit = true; } // cannot delete an expired class
+            }
+        };
+        if (e != null)
+        {
+            result = $"Term {c.TermNumber}: {status}";
+        }
+        else
+        {
+            result = status;
+        };
+
+        return (result, classEndDate);
     }
 
     Enrolment? GetEnrolment(Class thisClass, Term thisTerm)
@@ -977,7 +986,7 @@ else
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(filterText) || isListboxShowingSummary) { filterText = null; }
+        //if (!string.IsNullOrWhiteSpace(filterText) || isListboxShowingSummary) { filterText = null; }
         listGrid.ClearSelection();
         if (isDirty) { await SaveChanges(); }
     }
@@ -988,7 +997,7 @@ else
         {
             // Post changes to the database.
             var acceptableClasses = await GetAcceptableClasses();
-            var deletedEnrolments = await BusinessRule.DeleteEnrolmentsRescinded(dbc, deletedClasses, loginState.SelectedPerson, term, prevTerm);
+            await BusinessRule.DeleteEnrolmentsRescinded(dbc, deletedClasses, loginState.SelectedPerson, term, prevTerm);
             var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
             await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
             await dbc.SaveChangesAsync();
@@ -996,6 +1005,7 @@ else
             {
                 await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, term, settings));
             }
+            InvokeAsync(StateHasChanged);
             isDirty = false;
         }
         catch (Exception ex)

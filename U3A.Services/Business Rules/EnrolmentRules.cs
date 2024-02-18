@@ -535,12 +535,11 @@ namespace U3A.BusinessRules
         /// <param name="dbc"></param>
         /// <param name="person"></param>
         /// <param name="term"></param>
-        public static async Task<List<Enrolment>> DeleteEnrolmentsRescinded(U3ADbContext dbc,
+        public static async Task DeleteEnrolmentsRescinded(U3ADbContext dbc,
                                             IEnumerable<Class> DeletedClasses,
                                             Person person,
                                             Term term, Term prevTerm)
         {
-            var result = new List<Enrolment>();
             Term thisTerm = term;
             foreach (var c in DeletedClasses)
             {
@@ -550,8 +549,8 @@ namespace U3A.BusinessRules
                 if (thisTerm.TermNumber != termNumber)
                 {
                     thisTerm = await dbc.Term
-                                                                .Where(x => x.Year == term.Year && x.TermNumber == termNumber)
-                                                                .FirstOrDefaultAsync();
+                                .Where(x => x.Year == term.Year && x.TermNumber == termNumber)
+                                .FirstOrDefaultAsync();
                 }
                 var course = await dbc.Course.FindAsync(c.CourseID);
                 if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
@@ -563,7 +562,6 @@ namespace U3A.BusinessRules
                     if (e.Count > 0)
                     {
                         dbc.RemoveRange(e);
-                        result.AddRange(e);
                     }
                 }
                 else
@@ -576,11 +574,9 @@ namespace U3A.BusinessRules
                     if (e.Count > 0)
                     {
                         dbc.RemoveRange(e);
-                        result.AddRange(e);
                     }
                 }
             }
-            return result;
         }
 
         /// <summary>
@@ -642,11 +638,8 @@ namespace U3A.BusinessRules
                         e.Person = await dbc.Person.FindAsync(person.ID);
                         e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
                         e.Course = await dbc.Course.FindAsync(c.Course.ID);
-                        if (c.Course.CourseParticipationTypeID == 1)
-                        {
-                            e.Class = await dbc.Class.FindAsync(c.ID);
-                        }
                         result.Add(e);
+                        c.Course.Enrolments.Add(e);
                         await dbc.AddAsync<Enrolment>(e);
                     }
                 }
@@ -668,6 +661,7 @@ namespace U3A.BusinessRules
                         e.Course = await dbc.Course.FindAsync(c.Course.ID);
                         e.Class = await dbc.Class.FindAsync(c.ID);
                         result.Add(e);
+                        c.Course.Enrolments.Add(e);
                         await dbc.AddAsync<Enrolment>(e);
                     }
                 }
