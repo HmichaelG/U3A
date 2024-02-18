@@ -52,7 +52,7 @@ namespace U3A.BusinessRules
         }
 
         public static async Task<List<Enrolment>> GetEnrolmentIncludeLeadersAsync(U3ADbContext dbc,
-                                                  Course thisCourse,  Class thisClass,Term thisTerm)
+                                                  Course thisCourse, Class thisClass, Term thisTerm)
         {
             var enrolments = new List<Enrolment>();
             if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == thisTerm.ID))
@@ -75,11 +75,11 @@ namespace U3A.BusinessRules
             if (enrolments.Count > 0)
             {
                 var template = enrolments[0];
-                dummy = await CreateDummyLeaderEnrolment(dbc,template, thisClass.LeaderID);
+                dummy = await CreateDummyLeaderEnrolment(dbc, template, thisClass.LeaderID);
                 if (dummy != null) enrolments.Add(dummy);
-                dummy = await CreateDummyLeaderEnrolment(dbc,template, thisClass.Leader2ID);
+                dummy = await CreateDummyLeaderEnrolment(dbc, template, thisClass.Leader2ID);
                 if (dummy != null) enrolments.Add(dummy);
-                dummy = await CreateDummyLeaderEnrolment(dbc,template, thisClass.Leader3ID);
+                dummy = await CreateDummyLeaderEnrolment(dbc, template, thisClass.Leader3ID);
                 if (dummy != null) enrolments.Add(dummy);
             }
             return enrolments.OrderBy(x => x.Person.FullNameAlpha).ToList();
@@ -547,9 +547,12 @@ namespace U3A.BusinessRules
                 if (c.DoNotAllowEdit) continue;
                 var termNumber = c.TermNumber;
                 thisTerm = (term.TermNumber == termNumber) ? term : prevTerm;
-                if (thisTerm.TermNumber != termNumber) { thisTerm = await dbc.Term
+                if (thisTerm.TermNumber != termNumber)
+                {
+                    thisTerm = await dbc.Term
                                                                 .Where(x => x.Year == term.Year && x.TermNumber == termNumber)
-                                                                .FirstOrDefaultAsync(); }
+                                                                .FirstOrDefaultAsync();
+                }
                 var course = await dbc.Course.FindAsync(c.CourseID);
                 if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
                 {
@@ -607,7 +610,7 @@ namespace U3A.BusinessRules
                     thisYear = term.Year;
                     thisTermNo = term.TermNumber;
                 }
-                else if (c.TermNumber == prevTerm.TermNumber) 
+                else if (c.TermNumber == prevTerm.TermNumber)
                 {
                     //last term
                     thisYear = prevTerm.Year;
@@ -729,7 +732,7 @@ namespace U3A.BusinessRules
         }
 
         public static async Task<string> GetEnrolmentStatusMarkup(U3ADbContext dbc,
-                IEnumerable<Enrolment> enrolments, IEnumerable<Enrolment> deletions, Term term, SystemSettings settings)
+                IEnumerable<Enrolment> enrolments, Term term, SystemSettings settings)
         {
             var result = new StringBuilder();
             if (enrolments.Count() > 0)
@@ -742,26 +745,16 @@ namespace U3A.BusinessRules
                 }
                 result.AppendLine("</tbody></table>");
             }
-            if (deletions.Count() > 0)
-            {
-                createEnrolmentSummaryTable(result, "Course Removed");
-                foreach (var e in deletions)
-                {
-                    result.AppendLine($"<tr><td>{e.Course.Name}</td><td>Removed</td></tr>");
-                }
-                result.AppendLine("</tbody></table>");
-            }
             return result.ToString();
-
-            static void createEnrolmentSummaryTable(StringBuilder result, string header)
-            {
-                result.AppendLine("<table class='table'>");
-                result.AppendLine("<thead><tr>");
-                result.AppendLine($"<th scope='col'>{header}</th>");
-                result.AppendLine("<th scope='col'>Status</th>");
-                result.AppendLine("</tr></thead>");
-                result.AppendLine("<tbody>");
-            }
+        }
+        static void createEnrolmentSummaryTable(StringBuilder result, string header)
+        {
+            result.AppendLine("<table class='table'>");
+            result.AppendLine("<thead><tr>");
+            result.AppendLine($"<th scope='col'>{header}</th>");
+            result.AppendLine("<th scope='col'>Status</th>");
+            result.AppendLine("</tr></thead>");
+            result.AppendLine("<tbody>");
         }
 
         public static async Task<DateTime?> IsEnrolmentDayLockoutPeriod(U3ADbContext dbc, DateTime Today)

@@ -994,7 +994,7 @@ else
             await dbc.SaveChangesAsync();
             if (addedEnrolments.Count() > 0)
             {
-                await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, deletedEnrolments, term, settings));
+                await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, term, settings));
             }
             isDirty = false;
         }
