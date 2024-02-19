@@ -14,8 +14,10 @@
              CloseOnOutsideClick="false"
              ShowFooter="true"
              AllowDrag=true
+             AllowResize=true
              HeaderText="Communicate">
         <BodyContentTemplate Context="PopupContext">
+            <div class="small">Document is blank? Check <strong>Override Communication Preference.</strong></div>
             <XtraReportViewer Report=@pdfReport />
         </BodyContentTemplate>
         <FooterContentTemplate>
@@ -28,20 +30,27 @@
 }
 else
 {
-    <DxPopup Visible="@popupVisible" @ref="@popup" Width="75vw"
+    <DxPopup Visible="@popupVisible" @ref="@popup" Width="95vw"
              CloseButtonClick="@NegativeButtonClicked"
              CloseOnEscape="false"
              CloseOnOutsideClick="false"
              ShowFooter="true"
              AllowDrag=true
              HeaderText="Communicate">
+        <HeaderContentTemplate>
+            <DxButton Click="@OnCollapseClick"
+                      tooltip="Click to display full screen"
+                      CssClass="toggle-button"
+                      IconCssClass="bi bi-arrow-left-circle"
+                      RenderStyle="ButtonRenderStyle.Secondary" />
+            <div class="h6">Communicate</div>
+        </HeaderContentTemplate>
         <BodyContentTemplate Context="PopupContext">
-            <DxFormLayout CssClass="px-2 pt-2 col-12">
-                <CollapsableContent AlertType="secondary" CssClass="w-100"
-                                    ShowCollapseButton=true>
-                    <ContentTemplate>
-                        <DxFormLayout>
-                            <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
+            <DxFormLayout>
+                <div class="row w-100 m-1 m-auto">
+                    <div class="col col-5 show-hide">
+                        <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
+                        <DxFormLayoutGroup Caption="Parameters">
                             <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
                                 <DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
                                             Value="@SelectedDocumentTemplate"
@@ -86,40 +95,41 @@ else
                                           ValuesChanged="OnAttachedItemsChanged" />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem ColSpanMd="2" Visible="@IsEmail">
-                                <DxButton Text="Attach File"
+                                <DxButton Text="Pdf"
                                           Click="OnAttachFile"
                                           IconCssClass="bi bi-upload" />
                             </DxFormLayoutItem>
-                            <DxFormLayout CssClass="px-2 pt-2 col-12">
-                                <DxFormLayoutItem Caption="Override Communication Preference?" ColSpanMd="12">
+                            <DxFormLayout CssClass="m-2">
+                                <DxFormLayoutItem Caption="Override Communication Preference?"
+                                                  Visible="@(IsEmailOrSMS || !IsEmailOrPostal)"
+                                                  ColSpanMd="12">
                                     <DxCheckBox @bind-Checked="@OverrideCommunicationPreference" />
                                 </DxFormLayoutItem>
                             </DxFormLayout>
-                        </DxFormLayout>
-                    </ContentTemplate>
-                </CollapsableContent>
+                        </DxFormLayoutGroup>
+                    </div>
 
-                <DxFormLayoutItem ColSpanMd="12">
-                    <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
-                    <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
-                                ActiveRibbonTabIndex="ActiveTabIndex"
-                                CheckSpelling=true
-                                BarMode=BarMode.Ribbon
-                                DocumentContent="@SelectedDocumentTemplate.Content"
-                                DocumentFormat="DocumentFormat.Rtf"
-                                CustomizeRibbon="OnCustomizeRichEditToolbar"
-                                DocumentLoaded="OnDocumentLoaded"
-                                DocumentContentChanged="OnDocumentContentChanged"
-                                CssClass="w-100">
-                        <MailMergeSettings>
-                            <DxMailMergeSettings Data="@ExportData" />
-                        </MailMergeSettings>
-                    </DxRichEdit>
-                </DxFormLayoutItem>
+                    <div class="@($"{editorDiv} {editorOpacity}")">
+                        <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
+                        <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
+                                    ActiveRibbonTabIndex="ActiveTabIndex"
+                                    CheckSpelling=true
+                                    BarMode=BarMode.Ribbon
+                                    DocumentContent="@SelectedDocumentTemplate.Content"
+                                    DocumentFormat="DocumentFormat.Rtf"
+                                    CustomizeRibbon="OnCustomizeRichEditToolbar"
+                                    DocumentLoaded="OnDocumentLoaded"
+                                    DocumentContentChanged="OnDocumentContentChanged"
+                                    CssClass="w-100">
+                            <MailMergeSettings>
+                                <DxMailMergeSettings Data="@ExportData" />
+                            </MailMergeSettings>
+                        </DxRichEdit>
+                    </div>
+                </div>
             </DxFormLayout>
         </BodyContentTemplate>
         <FooterContentTemplate>
-            <div class="small">Document is blank? Check <strong>Override Communication Preference.</strong></div>
             <DxButton CssClass="popup-button" Visible="allowOk"
                       RenderStyle="ButtonRenderStyle.Primary"
                       Text=@OkButtonText
@@ -136,6 +146,17 @@ else
         font-size: 16px;
     }
 
+    .opacity-enabled {
+        opacity: 1;
+    }
+
+    .opacity-disabled {
+        opacity: 0.2;
+    }
+
+    .show-hide {
+        display: @showHideText;
+    }
 </style>
 
 @code {
@@ -172,7 +193,9 @@ else
     List<string?> attachments = new List<string>();
     AttachFile attachFile;
     PDFReport? pdfReport;
-
+    string showHideText = "block";
+    string editorDiv = "col col-7 h-auto";
+    string editorOpacity = "opacity-disabled";
 
     TaskCompletionSource<bool>? tcs;
 
@@ -184,6 +207,7 @@ else
         IsEmail = false;
         ActiveTabIndex = 1;
         pdfVisible = false;
+        editorOpacity = "opacity-disabled";
         SelectedDocumentTemplate = new DocumentTemplate();
         emailAddresses = DocumentTemplates
                             .OrderBy(x => x.FromEmailAddress)
@@ -197,6 +221,12 @@ else
         });
         StateHasChanged();
         return tcs.Task;
+    }
+
+    void OnCollapseClick()
+    {
+        showHideText = (showHideText == "block") ? "none" : "block";
+        editorDiv = (showHideText == "block") ? "col col-7 h-auto" : "col col-12 h-auto";
     }
 
     void OnAttachedItemsChanged(IEnumerable<string> items)
@@ -305,6 +335,7 @@ else
         }
         allowOk = true;
         SelectedEmailAddressChanged(SelectedDocumentTemplate.FromEmailAddress);
+        editorOpacity = "opacity-enabled";
         StateHasChanged();
     }
 
