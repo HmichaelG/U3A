@@ -54,7 +54,9 @@
     [Inject] public EditingFieldModelFactory EditingFieldModelFactory { get; set; }
     [Parameter]
     public string ReportName { get; set; }
-    XtraReport? Report { get; set; }
+    [Parameter]
+    public XtraReport? Report { get; set; }
+    
     U3ADbContext dbc { get; set; }
     bool isReady;
     bool isFullscreen;

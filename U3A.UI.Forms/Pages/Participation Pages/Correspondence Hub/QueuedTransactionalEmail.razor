@@ -5,6 +5,7 @@
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Logging
 @using Microsoft.EntityFrameworkCore.Query
+@using U3A.UI.Reports.Pages
 
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
@@ -24,20 +25,20 @@ else
     {
         <FullScreen>
             <ContentTemplate>
-                <table class="w-100 h-100">
+                <table class="w-100 me-2 bg-secondary">
                     <div class="row">
                         <DxToolbar CssClass="bg-secondary">
                             <Items>
-                                <DxToolbarItem Text="Close" 
-                                    CssClass="me-5 mb-1"
-                                    Alignment="ToolbarItemAlignment.Right"
-                                    IconCssClass="bi bi-x-lg" 
-                                    Click="@(() => showPDF = false)" />
+                                <DxToolbarItem Text="Close"
+                                               CssClass="me-5 mb-1"
+                                               Alignment="ToolbarItemAlignment.Right"
+                                               IconCssClass="bi bi-x-lg"
+                                               Click="@(() => showPDF = false)" />
                             </Items>
                         </DxToolbar>
                     </div>
                     <div class="row">
-                        <iframe src='@pdfPath' height="1000" />
+                        <XtraReportViewer Report=@pdfReport />
                     </div>
                 </table>
             </ContentTemplate>
@@ -130,6 +131,7 @@ else
 
     U3ADbContext dbc { get; set; }
     SystemSettings? settings;
+    PDFReport? pdfReport;
 
     protected override async Task OnInitializedAsync()
     {
@@ -322,7 +324,9 @@ else
         var pdfFilename = reportFactory.CreatePostalPDF();
         if (pdfFilename != null)
         {
-            pdfPath = "Temp/" + pdfFilename;
+            pdfPath = $"{NavigationManager.BaseUri}Temp/" + pdfFilename;
+            pdfReport = new();
+            pdfReport.PdfContent.SourceUrl = pdfPath;
             showPDF = true;
             await InvokeAsync(StateHasChanged);
         }

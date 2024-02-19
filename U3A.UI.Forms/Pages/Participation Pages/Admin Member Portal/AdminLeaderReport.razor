@@ -1,6 +1,8 @@
 ﻿@inject IJSRuntime js
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Logging
+@using U3A.UI.Reports.Pages
+
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject ILogger<LeaderReport> Logger
 @inject IWebHostEnvironment Environment
@@ -35,7 +37,7 @@ else
                         </DxToolbar>
                     </div>
                     <div class="row">
-                        <iframe src='@pdfPath' height="1000" />
+                        <XtraReportViewer Report=@pdfReport />
                     </div>
                 </table>
             </ContentTemplate>
@@ -141,6 +143,7 @@ else
     U3ADbContext dbc { get; set; }
     bool showPDF;
     string pdfPath;
+    PDFReport pdfReport;
 
     protected override async Task OnInitializedAsync()
     {
@@ -202,7 +205,9 @@ else
         var pdfFilename = reportFactory.CreatePostalPDF();
         if (pdfFilename != null)
         {
-            pdfPath = "Temp/" + pdfFilename;
+            pdfPath = $"{navMan.BaseUri}Temp/" + pdfFilename;
+            pdfReport = new();
+            pdfReport.PdfContent.SourceUrl = pdfPath;
             showPDF = true;
             InvokeAsync(StateHasChanged);
         }
