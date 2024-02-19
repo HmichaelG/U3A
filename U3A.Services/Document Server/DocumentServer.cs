@@ -423,10 +423,10 @@ namespace U3A.Services
             result.HtmlText = resultServer.HtmlText;
             return result;
         }
-        public string MergeDocumentAsPdf(DocumentTemplate DocumentTemplate, List<ExportData> mergeData,
+        public byte[] MergeDocumentAsPdf(DocumentTemplate DocumentTemplate, List<ExportData> mergeData,
                                         bool OverrideCommunicationPreference)
         {
-            string result = "data:application/pdf;base64,";
+            byte[] result = default;
             server.RtfText = System.Text.Encoding.UTF8.GetString(DocumentTemplate.Content);
             server.Options.Export.Html.EmbedImages = true;
             resultServer.Options.MailMerge.ViewMergedData = true;
@@ -440,7 +440,7 @@ namespace U3A.Services
                 var opts = new PdfExportOptions() { ImageQuality = PdfJpegImageQuality.Highest };
                 resultServer.ExportToPdf(ms, opts);
                 ms.Position = 0;
-                result += System.Convert.ToBase64String(ms.ToArray());
+                result = ms.ToArray();
             }
             return result;
         }
