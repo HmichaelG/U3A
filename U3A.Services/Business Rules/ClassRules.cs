@@ -92,7 +92,7 @@ namespace U3A.BusinessRules
                 });
             });
             AssignClassContacts(classes, term, settings);
-            await AssignClassCountsAsync(dbc, term, classes);
+            AssignClassCounts(dbc, term, classes);
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
             if (prevTerm != null)
             {
@@ -119,7 +119,7 @@ namespace U3A.BusinessRules
                     });
                 });
                 AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
-                await AssignClassCountsAsync(dbc, prevTerm, prevTermShoulderClasses);
+                AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
                 classes.AddRange(prevTermShoulderClasses);
             }
             return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)
@@ -302,6 +302,80 @@ namespace U3A.BusinessRules
             });
         }
 
+        private static void AssignClassCounts(U3ADbContext dbc, Term term, List<Class> Classes)
+        {
+            var enrolmentCountByCourse = dbc.Enrolment
+                                            .Include(x => x.Term)
+                                            .Where(x => x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber &&
+                                                    x.ClassID == null)
+                                            .GroupBy(e => new
+                                            {
+                                                ID = e.CourseID,
+                                                Year = e.Term.Year,
+                                                TermNumber = e.Term.TermNumber,
+                                                IsWaitlisted = e.IsWaitlisted
+                                            })
+                                            .Select(g => new
+                                            {
+                                                ID = g.Key.ID,
+                                                Year = g.Key.Year,
+                                                TermNumber = g.Key.TermNumber,
+                                                IsWaitlisted = g.Key.IsWaitlisted,
+                                                Count = g.Count()
+                                            });
+            var enrolmentCountByCLass = dbc.Enrolment
+                                            .Include(x => x.Term)
+                                            .Where(x => x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber &&
+                                                    x.ClassID != null)
+                                            .GroupBy(e => new
+                                            {
+                                                ID = e.ClassID,
+                                                Year = e.Term.Year,
+                                                TermNumber = e.Term.TermNumber,
+                                                IsWaitlisted = e.IsWaitlisted
+                                            })
+                                            .Select(g => new
+                                            {
+                                                ID = g.Key.ID,
+                                                Year = g.Key.Year,
+                                                TermNumber = g.Key.TermNumber,
+                                                IsWaitlisted = g.Key.IsWaitlisted,
+                                                Count = g.Count()
+                                            });
+            foreach (var c in Classes)
+            {
+                var nextTerm = GetNextTermOffered(c, term.TermNumber);
+                double maxStudents = c.Course.MaximumStudents; ;
+                c.ParticipationRate = 0;
+                if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+                {
+                    var result = enrolmentCountByCourse.FirstOrDefault(x => x.ID == c.CourseID &&
+                                                                            x.Year == term.Year &&
+                                                                            x.TermNumber == nextTerm &&
+                                                                            !x.IsWaitlisted);
+                    c.TotalActiveStudents = (result == null) ? 0 : result.Count;
+                    result = enrolmentCountByCourse.FirstOrDefault(x => x.ID == c.CourseID &&
+                                                                            x.Year == term.Year &&
+                                                                            x.TermNumber == nextTerm &&
+                                                                            x.IsWaitlisted);
+                    c.TotalWaitlistedStudents = (result == null) ? 0 : result.Count;
+                }
+                else
+                {
+                    var result = enrolmentCountByCLass.FirstOrDefault(x => x.ID == c.ID &&
+                                                                            x.Year == term.Year &&
+                                                                            x.TermNumber == nextTerm &&
+                                                                            !x.IsWaitlisted);
+                    c.TotalActiveStudents = (result == null) ? 0 : result.Count;
+                    result = enrolmentCountByCLass.FirstOrDefault(x => x.ID == c.ID &&
+                                                                            x.Year == term.Year &&
+                                                                            x.TermNumber == nextTerm &&
+                                                                            x.IsWaitlisted);
+                    c.TotalWaitlistedStudents = (result == null) ? 0 : result.Count;
+                }
+                if (maxStudents != 0) c.ParticipationRate = (double)((c.TotalActiveStudents + c.TotalWaitlistedStudents) / maxStudents);
+            }
+        }
         public static void AssignClassClerks(U3ADbContext dbc, Term term, IEnumerable<Class> classes)
         {
             var enrolments = dbc.Enrolment
@@ -380,57 +454,6 @@ namespace U3A.BusinessRules
             return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes).ToList();
         }
 
-        private static void AssignClassCounts(U3ADbContext dbc, Term term, List<Class> Classes)
-        {
-            var enrolmentCountByCourse = dbc.Enrolment
-                                            .Where(x => x.TermID == term.ID &&
-                                                    x.ClassID == null)
-                                            .GroupBy(e => new
-                                            {
-                                                ID = e.CourseID,
-                                                IsWaitlisted = e.IsWaitlisted
-                                            })
-                                            .Select(g => new
-                                            {
-                                                ID = g.Key.ID,
-                                                IsWaitlisted = g.Key.IsWaitlisted,
-                                                Count = g.Count()
-                                            });
-            var enrolmentCountByCLass = dbc.Enrolment
-                                            .Where(x => x.TermID == term.ID &&
-                                                    x.ClassID != null)
-                                            .GroupBy(e => new
-                                            {
-                                                ID = e.ClassID,
-                                                IsWaitlisted = e.IsWaitlisted
-                                            })
-                                            .Select(g => new
-                                            {
-                                                ID = g.Key.ID,
-                                                IsWaitlisted = g.Key.IsWaitlisted,
-                                                Count = g.Count()
-                                            });
-            foreach (var c in Classes)
-            {
-                double maxStudents = c.Course.MaximumStudents; ;
-                c.ParticipationRate = 0;
-                if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
-                {
-                    var result = enrolmentCountByCourse.FirstOrDefault(x => x.ID == c.CourseID && !x.IsWaitlisted);
-                    c.TotalActiveStudents = (result == null) ? 0 : result.Count;
-                    result = enrolmentCountByCourse.FirstOrDefault(x => x.ID == c.CourseID && x.IsWaitlisted);
-                    c.TotalWaitlistedStudents = (result == null) ? 0 : result.Count;
-                }
-                else
-                {
-                    var result = enrolmentCountByCLass.FirstOrDefault(x => x.ID == c.ID && !x.IsWaitlisted);
-                    c.TotalActiveStudents = (result == null) ? 0 : result.Count;
-                    result = enrolmentCountByCLass.FirstOrDefault(x => x.ID == c.ID && x.IsWaitlisted);
-                    c.TotalWaitlistedStudents = (result == null) ? 0 : result.Count;
-                }
-                if (maxStudents != 0) c.ParticipationRate = (double)((c.TotalActiveStudents + c.TotalWaitlistedStudents) / maxStudents);
-            }
-        }
         public static List<Class> GetClassDetailsForStudent(IEnumerable<Class> Classes, Person Student)
         {
             List<Class> result;
@@ -469,6 +492,19 @@ namespace U3A.BusinessRules
                                     .Where(x => x.CourseID == course.ID && x.ClassID == ClassID && !x.IsWaitlisted)
                                     .Select(x => x.Person).ToListAsync();
                 }
+            }
+            return result;
+        }
+
+        public static int GetNextTermOffered(Class Class, int TermNumber)
+        {
+            int result = 0;
+            for (int i = TermNumber; i < 4; i++ )
+            {
+                if (i == 1 && Class.OfferedTerm1) { result = i; break; }
+                if (i == 2 && Class.OfferedTerm2) { result = i; break; }
+                if (i == 3 && Class.OfferedTerm3) { result = i; break; }
+                if (i == 4 && Class.OfferedTerm4) { result = i; break; }
             }
             return result;
         }
