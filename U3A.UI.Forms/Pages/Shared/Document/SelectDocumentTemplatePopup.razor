@@ -6,48 +6,53 @@
 <AttachFile @ref=@attachFile Attachments="@attachments" />
 <MessageBox @ref="messageBox" />
 
-@if (pdfVisible)
-{
-    <DxPopup Visible="@popupVisible" @ref="@popup" Width="75vw"
-             CloseButtonClick="@OnReturnToTemplate"
-             CloseOnEscape="false"
-             CloseOnOutsideClick="false"
-             ShowFooter="true"
-             AllowDrag=true
-             AllowResize=true
-             HeaderText="Communicate">
-        <BodyContentTemplate Context="PopupContext">
-            <div class="small">Document is blank? Check <strong>Override Communication Preference.</strong></div>
-            <XtraReportViewer Report=@pdfReport />
-        </BodyContentTemplate>
-        <FooterContentTemplate>
-            <DxButton CssClass="popup-button"
-                      RenderStyle="ButtonRenderStyle.Primary"
-                      Text="Return to Template"
-                      Click="@OnReturnToTemplate" />
-        </FooterContentTemplate>
-    </DxPopup>
-}
-else
-{
-    <DxPopup Visible="@popupVisible" @ref="@popup" Width="95vw"
-             CloseButtonClick="@NegativeButtonClicked"
-             CloseOnEscape="false"
-             CloseOnOutsideClick="false"
-             ShowFooter="true"
-             AllowDrag=true
-             HeaderText="Communicate">
-        <HeaderContentTemplate>
-            <DxButton Click="@OnCollapseClick"
-                      tooltip="Click to display full screen"
-                      CssClass="toggle-button"
-                      IconCssClass="bi bi-arrow-left-circle"
-                      RenderStyle="ButtonRenderStyle.Secondary" />
-            <div class="h6">Communicate</div>
-        </HeaderContentTemplate>
-        <BodyContentTemplate Context="PopupContext">
+<Progress @ref=@progressBar />
+<DxPopup Visible="@popupVisible" @ref="@popup" Width="95vw" CssClass="editor-popup"
+         CloseButtonClick="@NegativeButtonClicked"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         AllowDrag=true
+         HeaderText="Communicate">
+    <HeaderContentTemplate>
+        <DxButton Click="@OnCollapseClick"
+                  tooltip="Click to display full screen"
+                  CssClass="toggle-button"
+                  IconCssClass="bi bi-arrow-left-circle"
+                  RenderStyle="ButtonRenderStyle.Secondary" />
+        <div class="h6">Communicate</div>
+    </HeaderContentTemplate>
+    <BodyContentTemplate Context="PopupContext">
+        @if (pdfVisible)
+        {
+            <div class="d-inline">
+                <DxToolbar CssClass="mb-1 w-100 bg-secondary">
+                    <Items>
+                        <DxToolbarItem Visible="IsEmailOrSMS"
+                                       BeginGroup="true"
+                                       RenderStyle="ButtonRenderStyle.Primary"
+                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                       Alignment="ToolbarItemAlignment.Right"
+                                       Text="Process Email"
+                                       IconCssClass="bi bi-envelope"
+                                       Click="@AffirmativeButtonClicked" />
+                        <DxToolbarItem Text="Close"
+                                       BeginGroup="true"
+                                       RenderStyle="ButtonRenderStyle.Primary"
+                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                       Alignment="ToolbarItemAlignment.Right"
+                                       IconCssClass="bi bi-x-lg"
+                                       Click="@MailMergeDocumentAsync" />
+                    </Items>
+                </DxToolbar>
+                <div class="preview">
+                    <XtraReportViewer Report=@pdfReport />
+                </div>
+            </div>
+        }
+        else
+        {
             <DxFormLayout>
-                <div class="row w-100 m-1 m-auto">
+                <div class="row vw-100 m-1">
                     <div class="col col-5 show-hide">
                         <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
                         <DxFormLayoutGroup Caption="Parameters">
@@ -106,12 +111,27 @@ else
                                 </DxFormLayoutItem>
                             </DxFormLayout>
                         </DxFormLayoutGroup>
+                        <div class="d-flex mx-2">
+                            <DxButton CssClass="flex-grow-1 mx-1" Enabled="allowOk"
+                                      RenderStyle="ButtonRenderStyle.Primary"
+                                      Text="Print/Preview"
+                                      IconCssClass="bi bi-printer"
+                                      Click="@MailMergeDocumentAsync" />
+                            <DxButton CssClass="flex-grow-1 mx-1" Enabled="IsEmailOrSMS"
+                                      RenderStyle="ButtonRenderStyle.Primary"
+                                      Text="Process Email"
+                                      IconCssClass="bi bi-envelope"
+                                      Click="@AffirmativeButtonClicked" />
+                            <DxButton CssClass="flex-grow-1 mx-1"
+                                      RenderStyle="ButtonRenderStyle.Secondary"
+                                      Text="Cancel" Click="@NegativeButtonClicked" />
+                        </div>
                     </div>
 
                     <div class="@($"{editorDiv} {editorOpacity}")">
                         <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
                         <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
-                                    ActiveRibbonTabIndex="ActiveTabIndex"
+                                    ActiveRibbonTabIndex="@ActiveTabIndex"
                                     CheckSpelling=true
                                     BarMode=BarMode.Ribbon
                                     DocumentContent="@SelectedDocumentTemplate.Content"
@@ -121,26 +141,25 @@ else
                                     DocumentContentChanged="OnDocumentContentChanged"
                                     CssClass="w-100">
                             <MailMergeSettings>
-                                <DxMailMergeSettings Data="@ExportData" />
+                                <DxMailMergeSettings Data="@ExportData" ViewMergedData=@pdfVisible />
                             </MailMergeSettings>
                         </DxRichEdit>
                     </div>
                 </div>
             </DxFormLayout>
-        </BodyContentTemplate>
-        <FooterContentTemplate>
-            <DxButton CssClass="popup-button" Visible="allowOk"
-                      RenderStyle="ButtonRenderStyle.Primary"
-                      Text=@OkButtonText
-                      Click="@AffirmativeButtonClicked" />
-            <DxButton CssClass="popup-button"
-                      RenderStyle="ButtonRenderStyle.Secondary"
-                      Text="Cancel" Click="@NegativeButtonClicked" />
-        </FooterContentTemplate>
-    </DxPopup>
-}
+        }
+    </BodyContentTemplate>
+</DxPopup>
 
 <style>
+    .editor-popup {
+        height: 96vh !important;
+    }
+
+    .preview {
+        height: 95% !important;
+    }
+
     .icon-size {
         font-size: 16px;
     }
@@ -150,11 +169,15 @@ else
     }
 
     .opacity-disabled {
-        opacity: 0.2;
+        opacity: 0.4;
     }
 
     .show-hide {
         display: @showHideText;
+    }
+
+    .dxreRoot {
+        height: 90vh;
     }
 </style>
 
@@ -192,9 +215,10 @@ else
     List<string?> attachments = new List<string>();
     AttachFile attachFile;
     PDFReport? pdfReport;
-    string showHideText = "block";
-    string editorDiv = "col col-7 h-auto";
+    string showHideText = "inline";
+    string editorDiv = "col col-7";
     string editorOpacity = "opacity-disabled";
+    Progress? progressBar;
 
     TaskCompletionSource<bool>? tcs;
 
@@ -224,8 +248,8 @@ else
 
     void OnCollapseClick()
     {
-        showHideText = (showHideText == "block") ? "none" : "block";
-        editorDiv = (showHideText == "block") ? "col col-7 h-auto" : "col col-12 h-auto";
+        showHideText = (showHideText == "inline") ? "none" : "inline";
+        editorDiv = (showHideText == "inline") ? "col col-7 h-100" : "col col-12 h-100";
     }
 
     void OnAttachedItemsChanged(IEnumerable<string> items)
@@ -395,30 +419,42 @@ else
 
     void OnCustomizeRichEditToolbar(IRibbon ribbon)
     {
-        ribbon.Tabs.Clear();
-        IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab("File");
-        IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
-        IBarButton mm = newFileGroup.Items.AddCustomButton("Mail Merge", MailMergeDocumentAsync);
-        mm.IconCssClass = "icon-size bi-envelope";
-        ribbon.Tabs.Add("Home");
-        ribbon.Tabs.Add("Insert");
-        ribbon.Tabs.Add("View");
-        ribbon.Tabs.Add("MailMerge");
+        // ribbon.Tabs.Clear();
+        // IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab("File");
+        // IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
+        // IBarButton mm = newFileGroup.Items.AddCustomButton("Mail Merge", MailMergeDocumentAsync);
+        // mm.IconCssClass = "icon-size bi-envelope";
+        // ribbon.Tabs.Add("Home");
+        // ribbon.Tabs.Add("Insert");
+        // ribbon.Tabs.Add("View");
+        // ribbon.Tabs.Add("MailMerge");
     }
 
     async Task MailMergeDocumentAsync()
     {
         if (SelectedDocumentTemplate != null)
         {
-            richEdit.DocumentAPI.BeginUpdate();
-            await richEdit.SaveDocumentAsync();
-            var server = new DocumentServer(dbContext);
-            var pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
-                                                        ExportData, OverrideCommunicationPreference);
-            richEdit.DocumentAPI.EndUpdate();
-            pdfReport = new();
-            pdfReport.PdfContent.Source = pdfContent;
-            pdfVisible = true;
+            pdfVisible = !pdfVisible;
+            if (pdfVisible)
+            {
+                await richEdit.SaveDocumentAsync();
+                if (SelectedDocumentTemplate.Content != null)
+                {
+                    await progressBar.ShowSmallSpinnerAsync();
+                    richEdit.DocumentAPI.BeginUpdate();
+                    var server = new DocumentServer(dbContext);
+                    var pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
+                                                                ExportData, OverrideCommunicationPreference);
+                    richEdit.DocumentAPI.EndUpdate();
+                    pdfReport = new();
+                    pdfReport.PdfContent.Source = pdfContent;
+                    await progressBar.Close();
+                }
+                else
+                {
+                    pdfVisible = false;
+                }
+            }
             StateHasChanged();
         }
     }

@@ -21,32 +21,20 @@
 @using Microsoft.Extensions.DependencyInjection
 
 
-<DxFormLayout>
     <DxReportViewer @ref="reportViewer"
-                    Report="@Report" SizeMode="SizeMode.Small"
+                    Report="@Report"
                     SinglePagePreview="false"
                     Zoom="1"
                     TabPanelMinWidth="100"
                     TabPanelMaxWidth="200"
                     CssClass="w-100"
-                    RootCssClasses="view-normal" />
-</DxFormLayout>
-
+                    RootCssClasses="@RootCssClass" />
 
 <style>
     .view-normal {
-        margin-top: 0.1rem !important;
-        height: 98vh !important;
+        height: 100% !important;
     }
 
-    .view-fullscreen {
-        z-index: 900;
-        width: 100vw;
-        top: 30px;
-        left: 0px;
-        position: fixed;
-        background-color: white;
-    }
 </style>
 
 @code {
@@ -56,7 +44,9 @@
     public string ReportName { get; set; }
     [Parameter]
     public XtraReport? Report { get; set; }
-    
+    [Parameter]
+    public string RootCssClass { get; set; } = "view-normal";
+
     U3ADbContext dbc { get; set; }
     bool isReady;
     bool isFullscreen;
