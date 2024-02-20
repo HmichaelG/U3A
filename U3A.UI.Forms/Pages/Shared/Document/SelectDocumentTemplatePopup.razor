@@ -112,11 +112,6 @@
                             </DxFormLayout>
                         </DxFormLayoutGroup>
                         <div class="d-flex mx-2">
-                            <DxButton CssClass="flex-grow-1 mx-1" Enabled="allowOk"
-                                      RenderStyle="ButtonRenderStyle.Primary"
-                                      Text="Print/Preview"
-                                      IconCssClass="bi bi-printer"
-                                      Click="@MailMergeDocumentAsync" />
                             <DxButton CssClass="flex-grow-1 mx-1" Enabled="IsEmailOrSMS"
                                       RenderStyle="ButtonRenderStyle.Primary"
                                       Text="Process Email"
@@ -128,7 +123,7 @@
                         </div>
                     </div>
 
-                    <div class="@($"{editorDiv} {editorOpacity}")">
+                    <div class="@($"{editorDiv}")">
                         <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
                         <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
                                     ActiveRibbonTabIndex="@ActiveTabIndex"
@@ -141,7 +136,7 @@
                                     DocumentContentChanged="OnDocumentContentChanged"
                                     CssClass="w-100">
                             <MailMergeSettings>
-                                <DxMailMergeSettings Data="@ExportData" ViewMergedData=@pdfVisible />
+                                <DxMailMergeSettings Data="@ExportData" />
                             </MailMergeSettings>
                         </DxRichEdit>
                     </div>
@@ -162,14 +157,6 @@
 
     .icon-size {
         font-size: 16px;
-    }
-
-    .opacity-enabled {
-        opacity: 1;
-    }
-
-    .opacity-disabled {
-        opacity: 0.4;
     }
 
     .show-hide {
@@ -217,7 +204,6 @@
     PDFReport? pdfReport;
     string showHideText = "inline";
     string editorDiv = "col col-7";
-    string editorOpacity = "opacity-disabled";
     Progress? progressBar;
 
     TaskCompletionSource<bool>? tcs;
@@ -230,7 +216,6 @@
         IsEmail = false;
         ActiveTabIndex = 1;
         pdfVisible = false;
-        editorOpacity = "opacity-disabled";
         SelectedDocumentTemplate = new DocumentTemplate();
         emailAddresses = DocumentTemplates
                             .OrderBy(x => x.FromEmailAddress)
@@ -365,7 +350,6 @@
         }
         allowOk = true;
         SelectedEmailAddressChanged(SelectedDocumentTemplate.FromEmailAddress);
-        editorOpacity = "opacity-enabled";
         StateHasChanged();
     }
 
@@ -399,7 +383,7 @@
         }
     }
 
-    async Task OnDocumentContentChanged()
+    void OnDocumentContentChanged()
     {
         SelectedDocumentTemplate.Content = richEdit.DocumentContent;
     }
@@ -426,15 +410,15 @@
 
     void OnCustomizeRichEditToolbar(IRibbon ribbon)
     {
-        // ribbon.Tabs.Clear();
-        // IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab("File");
-        // IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
-        // IBarButton mm = newFileGroup.Items.AddCustomButton("Mail Merge", MailMergeDocumentAsync);
-        // mm.IconCssClass = "icon-size bi-envelope";
-        // ribbon.Tabs.Add("Home");
-        // ribbon.Tabs.Add("Insert");
-        // ribbon.Tabs.Add("View");
-        // ribbon.Tabs.Add("MailMerge");
+        ribbon.Tabs.Clear();
+        IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab("File");
+        IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
+        IBarButton mm = newFileGroup.Items.AddCustomButton("Mail Merge", MailMergeDocumentAsync);
+        mm.IconCssClass = "icon-size bi-envelope";
+        ribbon.Tabs.Add("Home");
+        ribbon.Tabs.Add("Insert");
+        ribbon.Tabs.Add("View");
+        ribbon.Tabs.Add("MailMerge");
     }
 
     async Task MailMergeDocumentAsync()
@@ -448,11 +432,9 @@
                 if (SelectedDocumentTemplate.Content != null)
                 {
                     await progressBar.ShowSmallSpinnerAsync();
-                    richEdit.DocumentAPI.BeginUpdate();
                     var server = new DocumentServer(dbContext);
                     var pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
                                                                 ExportData, OverrideCommunicationPreference);
-                    richEdit.DocumentAPI.EndUpdate();
                     pdfReport = new();
                     pdfReport.PdfContent.Source = pdfContent;
                     await progressBar.Close();
