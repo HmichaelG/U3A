@@ -25,7 +25,7 @@
         @if (pdfVisible)
         {
             <div class="d-inline">
-                <DxToolbar CssClass="mb-1 w-100 bg-secondary">
+                <DxToolbar CssClass="mb-1 w-100 me-2 bg-secondary">
                     <Items>
                         <DxToolbarItem Visible="IsEmailOrSMS"
                                        BeginGroup="true"
@@ -248,8 +248,15 @@
 
     void OnCollapseClick()
     {
-        showHideText = (showHideText == "inline") ? "none" : "inline";
-        editorDiv = (showHideText == "inline") ? "col col-7 h-100" : "col col-12 h-100";
+        if (pdfVisible)
+        {
+            pdfVisible = false;
+        }
+        else
+        {
+            showHideText = (showHideText == "inline") ? "none" : "inline";
+            editorDiv = (showHideText == "inline") ? "col col-7 h-100" : "col col-12 h-100";
+        }
     }
 
     void OnAttachedItemsChanged(IEnumerable<string> items)
