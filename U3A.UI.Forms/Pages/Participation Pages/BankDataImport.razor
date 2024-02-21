@@ -26,63 +26,53 @@ else
 
     <div class="col col-12">
         <ContextHelpTitle Title="Bank Data Import" HelpTopic="Bank-Data-Import.html" />
-        <DxButton Text=@showHideButtonText CssClass="button-style" Click="ButtonHideShow" />
     </div>
-    <style>
-        .button-style {
-            vertical-align: top;
-            float: right;
-        }
-    </style>
 
     @if (!hideReceiptDateRangeMessage)
     {
         <h4 class="col col-12 alert alert-warning text-dark text-center p-2">@receiptDateRangeMessage</h4>
     }
-    @if (!isHeaderHidden)
-    {
-        <div class="row">
-            <div class="col col-lg-6">
-                <div id="overviewDemoDropZone" class="card custom-drop-zone bg-light rounded-3 m-0" hidden="@(SelectedFilesCount > 0)">
-                    <span class="bi bi-upload icon-size mb-3"></span>
-                    <span>Drag and Drop <strong>OFX</strong> File Here</span><span class="m-1">or</span>
-                    <button id="overviewDemoSelectButton" class="btn border-primary btn-primary m-1">Select File</button>
-                </div>
-                <DxUpload Name="myFile" @ref="FileUploader"
-                          ExternalSelectButtonCssSelector="#overviewDemoSelectButton"
-                          ExternalDropZoneCssSelector="#overviewDemoDropZone"
-                          ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
-                          UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
-                          AllowedFileExtensions="@(new List<string> { ".ofx" })"
-                          FileUploaded="FileUploaded"
-                          SelectedFilesChanged="SelectedFilesChanged"
-                          AllowMultiFileUpload="false"
-                          MaxFileSize="15000000" CssClass="w-100">
-                </DxUpload>
-            </div> @*col*@
-
-            <div class="col-lg-2" />
-            <div class="col col-lg-4">
-                <div class="row">
-                    <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" CssClass="col" />
-                </div>
-                <div class="fs-6 text-center mb-2">@FinancialToMessage</div>
-                <div class="d-flex">
-                    <DxButton Text="Apply Payments to the Participant Records" CssClass="flex-grow-1"
-                              Click="@ProcessRequests" Enabled="@(importData.Where(x => x.Person != null).Any())"
-                              RenderStyle="ButtonRenderStyle.Primary" />
-                </div>
-                <div class="d-flex mt-2">
-                    <DxButton Text="@ShowAllButtonText" CssClass="me-1 flex-grow-1"
-                              Click="@ShowAllButtonClicked"
-                              RenderStyle="ButtonRenderStyle.Primary" />
-                    <DxButton Text="Clear Bank OFX File" CssClass="ms-1 flex-grow-1"
-                              Click="@ClearAllBankData"
-                              RenderStyle="ButtonRenderStyle.Primary" />
-                </div>
+    <div class="row">
+        <div class="col col-lg-6">
+            <div id="overviewDemoDropZone" class="card custom-drop-zone bg-light rounded-3 m-0" hidden="@(SelectedFilesCount > 0)">
+                <span class="bi bi-upload icon-size mb-3"></span>
+                <span>Drag and Drop <strong>OFX</strong> File Here</span><span class="m-1">or</span>
+                <button id="overviewDemoSelectButton" class="btn border-primary btn-primary m-1">Select File</button>
             </div>
-        </div> @*row*@
-    }
+            <DxUpload Name="myFile" @ref="FileUploader"
+                      ExternalSelectButtonCssSelector="#overviewDemoSelectButton"
+                      ExternalDropZoneCssSelector="#overviewDemoDropZone"
+                      ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                      UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
+                      AllowedFileExtensions="@(new List<string> { ".ofx" })"
+                      FileUploaded="FileUploaded"
+                      SelectedFilesChanged="SelectedFilesChanged"
+                      AllowMultiFileUpload="false"
+                      MaxFileSize="15000000" CssClass="w-100">
+            </DxUpload>
+        </div> @*col*@
+
+        <div class="col-lg-2" />
+        <div class="col col-lg-4">
+            <div class="row">
+                <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" CssClass="col" />
+            </div>
+            <div class="fs-6 text-center mb-2">@FinancialToMessage</div>
+            <div class="d-flex">
+                <DxButton Text="Apply Payments to the Participant Records" CssClass="flex-grow-1"
+                          Click="@ProcessRequests" Enabled="@(importData.Where(x => x.Person != null).Any())"
+                          RenderStyle="ButtonRenderStyle.Primary" />
+            </div>
+            <div class="d-flex mt-2">
+                <DxButton Text="@ShowAllButtonText" CssClass="me-1 flex-grow-1"
+                          Click="@ShowAllButtonClicked"
+                          RenderStyle="ButtonRenderStyle.Primary" />
+                <DxButton Text="Clear Bank OFX File" CssClass="ms-1 flex-grow-1"
+                          Click="@ClearAllBankData"
+                          RenderStyle="ButtonRenderStyle.Primary" />
+            </div>
+        </div>
+    </div> @*row*@
 
     <div>@BankAccountDetails</div>
     <FullScreen>
@@ -227,8 +217,6 @@ else
     bool ShowAllBankTransactions = true;
     LocalTime localTime;
     DateTime today;
-    bool isHeaderHidden = false;
-    string showHideButtonText = "Hide";
 
     DateTime? startDate;
     DateTime endDate;
@@ -289,8 +277,8 @@ else
                     OKButtonText = "Yes, I'm Ok with that!",
                     Caption = "Unexpected date range in Bank OFX file",
                     Message = $"<div class='text-center alert alert-danger alert text-dark p-2'><p>The OFX Bank date range <strong>{extract.InitialDate.ToShortDateString()}</strong> to <strong>{extract.FinalDate.ToShortDateString()}</strong>.<br>" +
-                                                                                                                            $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
-                                                                                                                                "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
+                                                                                                                                $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
+                                                                                                                                    "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
                 };
             result = await messageBox.ShowAsync(args);
             hideReceiptDateRangeMessage = true;
@@ -307,12 +295,6 @@ else
             endDate = today.Date.AddDays(-1);
         }
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    void ButtonHideShow()
-    {
-        isHeaderHidden = !isHeaderHidden;
-        showHideButtonText = (isHeaderHidden) ? "Show" : "Hide";
     }
 
     void SelectedYearChanged(int NewYear)
