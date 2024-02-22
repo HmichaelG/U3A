@@ -102,7 +102,8 @@ builder.Services.AddRazorPages();
 //**** End local modifications ****
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
+builder.Services.AddRazorComponents(options =>
+    options.DetailedErrors = builder.Environment.IsDevelopment())
     .AddInteractiveServerComponents();
 
 builder.Services.AddAuthorization();
@@ -130,8 +131,12 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
-builder.Services.AddApplicationInsightsTelemetry(options =>
-   options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddApplicationInsightsTelemetry(options =>
+       options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+}
 
 var app = builder.Build();
 app.UseRequestLocalization("en-AU");
