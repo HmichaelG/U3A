@@ -8,7 +8,9 @@
 
 <Progress @ref=@progressBar />
 
-<DxPopup Visible="@popupVisible" @ref="@popup" Width="95vw" CssClass="editor-popup"
+<DxPopup Visible="@popupVisible" @ref="@popup" Width="100vw" CssClass="editor-popup"
+         PositionY="0"
+         PositionX="0"
          CloseButtonClick="@NegativeButtonClicked"
          CloseOnEscape="false"
          CloseOnOutsideClick="false"
@@ -128,7 +130,7 @@
                                         CustomizeRibbon="OnCustomizeRichEditToolbar"
                                         DocumentLoaded="OnDocumentLoaded"
                                         DocumentContentChanged="OnDocumentContentChanged"
-                                        CssClass="w-100 rtf-viewer">
+                                        CssClass="w-100">
                                 <MailMergeSettings>
                                     <DxMailMergeSettings Data="@ExportData" />
                                 </MailMergeSettings>
@@ -143,23 +145,19 @@
 
 <style>
     .editor-popup {
-        height: 96vh !important;
+        height: 100vh !important;
     }
 
     .preview {
-        height: calc(100% - 6rem) !important;
+        height: calc(100vh - 3.5rem) !important;
         overflow: hidden;
     }
 
     .rtf-content {
-        height: calc(100vh - 6rem) !important;
+        height: calc(100vh - 5rem) !important;
         overflow: hidden;
     }
 
-    .rtf-viewer {
-        height: calc(100vh - 6rem) !important;
-        overflow: hidden;
-    }
 
     .icon-size {
         font-size: 16px;
@@ -414,6 +412,7 @@
         IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab("File");
         IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
         IBarButton mm = newFileGroup.Items.AddCustomButton("Mail Merge", MailMergeDocumentAsync);
+        newFileGroup.Items.Add("FullScreen");
         mm.IconCssClass = "icon-size bi-envelope";
         ribbon.Tabs.Add("Home");
         ribbon.Tabs.Add("Insert");
