@@ -24,7 +24,7 @@
     <BodyContentTemplate Context="PopupContext">
         @if (pdfVisible)
         {
-            <div class="d-inline">
+            <div class="preview">
                 <DxToolbar CssClass="mb-1 w-100 me-2 bg-secondary">
                     <Items>
                         <DxToolbarItem Visible="IsEmailOrSMS"
@@ -44,8 +44,8 @@
                                        Click="@MailMergeDocumentAsync" />
                     </Items>
                 </DxToolbar>
-                <div class="preview">
-                    <XtraReportViewer Report=@pdfReport />
+                <div class="">
+                    <XtraReportViewer Report=@pdfReport ReportName="none" />
                 </div>
             </div>
         }
@@ -152,7 +152,8 @@
     }
 
     .preview {
-        height: 95% !important;
+        height: 90% !important;
+        overflow: hidden;
     }
 
     .icon-size {
@@ -318,6 +319,10 @@
                 _ = await messageBox.ShowOkOnlyAsync("Input required", msg);
                 result = false;
             }
+        }
+        if (result)
+        {
+            result = await messageBox.ShowAsync("Porcess Documents", "Are you sure you are ready to process this communication to the selected members?");
         }
         return result;
     }
