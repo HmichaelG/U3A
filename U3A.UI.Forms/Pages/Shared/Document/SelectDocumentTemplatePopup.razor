@@ -7,6 +7,7 @@
 <MessageBox @ref="messageBox" />
 
 <Progress @ref=@progressBar />
+
 <DxPopup Visible="@popupVisible" @ref="@popup" Width="95vw" CssClass="editor-popup"
          CloseButtonClick="@NegativeButtonClicked"
          CloseOnEscape="false"
@@ -22,127 +23,121 @@
         <div class="h6">Communicate</div>
     </HeaderContentTemplate>
     <BodyContentTemplate Context="PopupContext">
-        @if (pdfVisible)
-        {
-            <div class="preview">
-                <DxToolbar CssClass="mb-1 w-100 me-2 bg-secondary">
-                    <Items>
-                        <DxToolbarItem Visible="IsEmailOrSMS"
-                                       BeginGroup="true"
-                                       RenderStyle="ButtonRenderStyle.Primary"
-                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                       Alignment="ToolbarItemAlignment.Right"
-                                       Text="Process Email"
-                                       IconCssClass="bi bi-envelope"
-                                       Click="@AffirmativeButtonClicked" />
-                        <DxToolbarItem Text="Close"
-                                       BeginGroup="true"
-                                       RenderStyle="ButtonRenderStyle.Primary"
-                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                       Alignment="ToolbarItemAlignment.Right"
-                                       IconCssClass="bi bi-x-lg"
-                                       Click="@MailMergeDocumentAsync" />
-                    </Items>
-                </DxToolbar>
-                <div class="">
-                    <XtraReportViewer Report=@pdfReport ReportName="none" />
+        <DxFormLayout>
+            <div class="row vw-100 m-1">
+                <div class="col col-5 show-hide">
+                    <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
+                    <DxFormLayoutGroup Caption="Parameters">
+                        <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
+                            <DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
+                                        Value="@SelectedDocumentTemplate"
+                                        ValueChanged="@((DocumentTemplate template) => SelectedTemplateChanged(template))"
+                                        EditFormat="{0}">
+                                <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Name)"
+                                                    Caption="Template" Width="15rem" />
+                                <DxListEditorColumn FieldName="@nameof(DocumentTemplate.DocumentTypeName)"
+                                                    Caption="Type" Width="15rem" />
+                                <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Subject)" />
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Email Subject" ColSpanMd="12" Visible="@IsEmail">
+                            <DxTextBox @bind-Text="@SelectedDocumentTemplate.Subject"
+                                       NullText="Enter a Subject" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="From Address" ColSpanMd="12" Visible="@IsEmail">
+                            <DxComboBox Data="@emailAddresses" AllowUserInput="true"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        NullText="Enter the email address to send from..."
+                                        TData="string"
+                                        TValue="string"
+                                        Text="@SelectedDocumentTemplate.FromEmailAddress"
+                                        TextExpression="@(() => SelectedDocumentTemplate.FromEmailAddress)"
+                                        TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress))" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="@FromDisplayNameText" ColSpanMd="12" Visible="@IsEmailOrSMS">
+                            <DxComboBox Data="@displayNames" AllowUserInput="true"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        NullText="Enter a friendly name to send from..."
+                                        TData="string"
+                                        TValue="string"
+                                        @bind-Text="@SelectedDocumentTemplate.FromDisplayName" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Attachments" ColSpanMd="10" Visible="@IsEmail">
+                            <DxTagBox Data="@attachments" DropDownVisible=false
+                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                      NullText="Upload attachments, if required."
+                                      TData="String"
+                                      TValue="String"
+                                      Values="@SelectedDocumentTemplate.Attachments"
+                                      ValuesChanged="OnAttachedItemsChanged" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem ColSpanMd="2" Visible="@IsEmail">
+                            <DxButton Text="Pdf"
+                                      Click="OnAttachFile"
+                                      IconCssClass="bi bi-upload" />
+                        </DxFormLayoutItem>
+                        <DxFormLayout CssClass="m-2">
+                            <DxFormLayoutItem Caption="Override Communication Preference?"
+                                              ColSpanMd="12">
+                                <DxCheckBox @bind-Checked="@OverrideCommunicationPreference" />
+                            </DxFormLayoutItem>
+                        </DxFormLayout>
+                    </DxFormLayoutGroup>
+                    <div class="d-flex mx-2 mt-5">
+                        <DxButton CssClass="flex-grow-1 mx-1" Enabled="IsEmailOrSMS"
+                                  RenderStyle="ButtonRenderStyle.Primary"
+                                  Text="Process Email"
+                                  IconCssClass="bi bi-envelope"
+                                  Click="@AffirmativeButtonClicked" />
+                        <DxButton CssClass="flex-grow-1 mx-1"
+                                  RenderStyle="ButtonRenderStyle.Secondary"
+                                  Text="Cancel" Click="@NegativeButtonClicked" />
+                    </div>
+                </div>
+
+                <div class="@($"{editorDiv}")">
+                    @if (pdfVisible)
+                    {
+                        <div class="preview">
+                            <DxToolbar CssClass="mb-1 w-100 me-2 bg-secondary">
+                                <Items>
+                                    <DxToolbarItem Text="Close"
+                                                   BeginGroup="true"
+                                                   RenderStyle="ButtonRenderStyle.Primary"
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   Alignment="ToolbarItemAlignment.Right"
+                                                   IconCssClass="bi bi-x-lg"
+                                                   Click="@MailMergeDocumentAsync" />
+                                </Items>
+                            </DxToolbar>
+                            <div class="">
+                                <XtraReportViewer Report=@pdfReport ReportName="none" />
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
+                        <div class="rtf-content">
+                            <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
+                                        ActiveRibbonTabIndex="@ActiveTabIndex"
+                                        CheckSpelling=true
+                                        BarMode=BarMode.Ribbon
+                                        DocumentContent="@SelectedDocumentTemplate.Content"
+                                        DocumentFormat="DocumentFormat.Rtf"
+                                        CustomizeRibbon="OnCustomizeRichEditToolbar"
+                                        DocumentLoaded="OnDocumentLoaded"
+                                        DocumentContentChanged="OnDocumentContentChanged"
+                                        CssClass="w-100 rtf-viewer">
+                                <MailMergeSettings>
+                                    <DxMailMergeSettings Data="@ExportData" />
+                                </MailMergeSettings>
+                            </DxRichEdit>
+                        </div>
+                    }
                 </div>
             </div>
-        }
-        else
-        {
-            <DxFormLayout>
-                <div class="row vw-100 m-1">
-                    <div class="col col-5 show-hide">
-                        <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
-                        <DxFormLayoutGroup Caption="Parameters">
-                            <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
-                                <DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
-                                            Value="@SelectedDocumentTemplate"
-                                            ValueChanged="@((DocumentTemplate template) => SelectedTemplateChanged(template))"
-                                            EditFormat="{0}">
-                                    <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Name)"
-                                                        Caption="Template" Width="15rem" />
-                                    <DxListEditorColumn FieldName="@nameof(DocumentTemplate.DocumentTypeName)"
-                                                        Caption="Type" Width="15rem" />
-                                    <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Subject)" />
-                                </DxComboBox>
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Email Subject" ColSpanMd="12" Visible="@IsEmail">
-                                <DxTextBox @bind-Text="@SelectedDocumentTemplate.Subject"
-                                           NullText="Enter a Subject" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="From Address" ColSpanMd="12" Visible="@IsEmail">
-                                <DxComboBox Data="@emailAddresses" AllowUserInput="true"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            NullText="Enter the email address to send from..."
-                                            TData="string"
-                                            TValue="string"
-                                            Text="@SelectedDocumentTemplate.FromEmailAddress"
-                                            TextExpression="@(() => SelectedDocumentTemplate.FromEmailAddress)"
-                                            TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress))" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="@FromDisplayNameText" ColSpanMd="12" Visible="@IsEmailOrSMS">
-                                <DxComboBox Data="@displayNames" AllowUserInput="true"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            NullText="Enter a friendly name to send from..."
-                                            TData="string"
-                                            TValue="string"
-                                            @bind-Text="@SelectedDocumentTemplate.FromDisplayName" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Attachments" ColSpanMd="10" Visible="@IsEmail">
-                                <DxTagBox Data="@attachments" DropDownVisible=false
-                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                          NullText="Upload attachments, if required."
-                                          TData="String"
-                                          TValue="String"
-                                          Values="@SelectedDocumentTemplate.Attachments"
-                                          ValuesChanged="OnAttachedItemsChanged" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem ColSpanMd="2" Visible="@IsEmail">
-                                <DxButton Text="Pdf"
-                                          Click="OnAttachFile"
-                                          IconCssClass="bi bi-upload" />
-                            </DxFormLayoutItem>
-                            <DxFormLayout CssClass="m-2">
-                                <DxFormLayoutItem Caption="Override Communication Preference?"
-                                                  ColSpanMd="12">
-                                    <DxCheckBox @bind-Checked="@OverrideCommunicationPreference" />
-                                </DxFormLayoutItem>
-                            </DxFormLayout>
-                        </DxFormLayoutGroup>
-                        <div class="d-flex mx-2">
-                            <DxButton CssClass="flex-grow-1 mx-1" Enabled="IsEmailOrSMS"
-                                      RenderStyle="ButtonRenderStyle.Primary"
-                                      Text="Process Email"
-                                      IconCssClass="bi bi-envelope"
-                                      Click="@AffirmativeButtonClicked" />
-                            <DxButton CssClass="flex-grow-1 mx-1"
-                                      RenderStyle="ButtonRenderStyle.Secondary"
-                                      Text="Cancel" Click="@NegativeButtonClicked" />
-                        </div>
-                    </div>
-
-                    <div class="@($"{editorDiv}")">
-                        <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
-                        <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
-                                    ActiveRibbonTabIndex="@ActiveTabIndex"
-                                    CheckSpelling=true
-                                    BarMode=BarMode.Ribbon
-                                    DocumentContent="@SelectedDocumentTemplate.Content"
-                                    DocumentFormat="DocumentFormat.Rtf"
-                                    CustomizeRibbon="OnCustomizeRichEditToolbar"
-                                    DocumentLoaded="OnDocumentLoaded"
-                                    DocumentContentChanged="OnDocumentContentChanged"
-                                    CssClass="w-100">
-                            <MailMergeSettings>
-                                <DxMailMergeSettings Data="@ExportData" />
-                            </MailMergeSettings>
-                        </DxRichEdit>
-                    </div>
-                </div>
-            </DxFormLayout>
-        }
+        </DxFormLayout>
     </BodyContentTemplate>
 </DxPopup>
 
@@ -152,7 +147,17 @@
     }
 
     .preview {
-        height: 90% !important;
+        height: calc(100% - 6rem) !important;
+        overflow: hidden;
+    }
+
+    .rtf-content {
+        height: calc(100vh - 6rem) !important;
+        overflow: hidden;
+    }
+
+    .rtf-viewer {
+        height: calc(100vh - 6rem) !important;
         overflow: hidden;
     }
 
@@ -164,9 +169,6 @@
         display: @showHideText;
     }
 
-    .dxreRoot {
-        height: 90vh;
-    }
 </style>
 
 @code {
@@ -234,15 +236,8 @@
 
     void OnCollapseClick()
     {
-        if (pdfVisible)
-        {
-            pdfVisible = false;
-        }
-        else
-        {
-            showHideText = (showHideText == "inline") ? "none" : "inline";
-            editorDiv = (showHideText == "inline") ? "col col-7 h-100" : "col col-12 h-100";
-        }
+        showHideText = (showHideText == "inline") ? "none" : "inline";
+        editorDiv = (showHideText == "inline") ? "col col-7" : "col col-12";
     }
 
     void OnAttachedItemsChanged(IEnumerable<string> items)
