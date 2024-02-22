@@ -6,7 +6,12 @@
 </head>
 <body>
     <script>
-        location.replace(location.origin);
+        if (location != "~/" && location != "/") {
+            location.replace(location.origin + "?Page=" + location.pathname);
+        }
+        else {
+            location.replace(location.origin);
+        }
     </script>
 </body>
 </html>
