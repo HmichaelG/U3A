@@ -276,10 +276,12 @@ namespace U3A.Services.Email
             var details = await client.GetOutboundMessageDetailsAsync(message.MessageID);
             foreach (var detail in details.MessageEvents.Where(x => x.Recipient.ToLower() == recipient.ToLower()))
             {
+
                 var ev = new EmailMessageEvent()
                 {
                     Type = detail.Type,
                     ReceivedAt = detail.ReceivedAt + offset,
+                    HtmlBody = details.HtmlBody,
                 };
                 result.Add(ev);
             }

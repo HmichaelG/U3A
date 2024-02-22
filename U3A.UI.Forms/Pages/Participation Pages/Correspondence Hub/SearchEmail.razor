@@ -36,7 +36,7 @@ else
             </DxFormLayoutItem>
 
             <DxFormLayoutItem Caption="Or, email address" ColSpanLg="12">
-                <DxComboBox Id="emailId" Data="@email"                             
+                <DxComboBox Id="emailId" Data="@email"
                             AllowUserInput=true
                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                             FilteringMode="DataGridFilteringMode.Contains"
@@ -99,14 +99,13 @@ else
         </ContentTemplate>
     </FullScreen>
 
-    <DxWindow @ref=@emailDetailsForm Width="max(35vw, 400px)"
+    <DxWindow @ref=@emailDetailsForm Width="60vw" Height="90vh"
               AllowResize="true"
               Context="windowContext"
               CloseOnEscape=true
               ShowCloseButton=true
               ShowFooter=true
               Scrollable=true
-              CssClass="window-height"
               HeaderText="Email Message Details">
         <BodyTextTemplate>
             <DxFormLayout>
@@ -128,6 +127,11 @@ else
                         <DxGridDataColumn Caption="Event" FieldName="Type" />
                     </Columns>
                 </DxGrid>
+                <DxFormLayoutGroup Caption="Message">
+                    <div class="p-4">
+                        @(new MarkupString(messageEvents.FirstOrDefault()?.HtmlBody))
+                    </div>
+                </DxFormLayoutGroup>
             </DxFormLayout>
         </BodyTextTemplate>
     </DxWindow>
