@@ -639,10 +639,10 @@ else
             if (Classes != null && ClassID != Guid.Empty)
             {
                 // We have a class ID passed in via QueryRequest
-                var Class = Classes.Find(x => x.ID == ClassID);
-                if (Class != null)
+                selectedClass = Classes.Find(x => x.ID == ClassID);
+                if (selectedClass != null)
                 {
-                    SelectedDataItemChanged(Class);
+                    SelectedDataItemChanged(selectedClass);
                 }
                 else
                 {
@@ -933,62 +933,75 @@ else
         }
     }
 
+    bool isBusy = false;
     async void SelectedDataItemChanged(object value)
     {
+        if (isBusy) { return; }
+        if (value == null) { return; }
         if (showingWebLink) { return; }
         if (IsReadOnly || IsPreview) { return; }
-        selectedClass = (Class)value;
-        if (selectedClass == null) { return; }
-        if (isNotInEnrolmentPeriod) { listGrid.ClearSelection(); return; }
-        if (selectedClasses.Contains(selectedClass))
+        try
         {
-
-            // Edge case: enrolled in previous term but not in current.
-            if (selectedClass.DoNotAllowEdit)
+            isBusy = true;
+            selectedClass = (Class)value;
+            if (isNotInEnrolmentPeriod) { listGrid.ClearSelection(); return; }
+            if (selectedClasses.Contains(selectedClass))
             {
-                await messageBox.ShowOkOnlyAsync("Class is complete",
-                        $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
+
+                // Edge case: enrolled in previous term but not in current.
+                if (selectedClass.DoNotAllowEdit)
+                {
+                    await messageBox.ShowOkOnlyAsync("Class is complete",
+                                $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
                         and is now complete. Therefore, it cannot be deleted.</p><p>There are no enrolments in future terms to delete.");
-                listGrid.ClearSelection(); return;
-            }
+                    listGrid.ClearSelection(); return;
+                }
 
-            if (await messageBox.ShowAsync("Class will be withdrawn",
-                       $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be <strong>withdrawn</strong>.</p>" +
-                       "Do you wish to continue?"))
-            {
-                selectedClasses.Remove(selectedClass);
-                if (!deletedClasses.Contains(selectedClass)) { deletedClasses.Insert(0, selectedClass); }
-                selectedClass.IsSelected = false;
-                isDirty = true;
-            }
-        }
-        else
-        {
-            var caption = "Request enrolment";
-            var message = $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be requested.</p>" +
-                        WaitlistWarning() +
-                       "<p>Do you wish to continue?</p>";
-            bool result;
-            if (reportStyle == ReportStyle.Detail)
-            {
-                result = await messageBox.ShowAsync(caption, message);
+                if (await messageBox.ShowAsync("Class will be withdrawn",
+                           $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be <strong>withdrawn</strong>.</p>" +
+                           "Do you wish to continue?"))
+                {
+                    selectedClasses.Remove(selectedClass);
+                    if (!deletedClasses.Contains(selectedClass)) { deletedClasses.Insert(0, selectedClass); }
+                    selectedClass.IsSelected = false;
+                    isDirty = true;
+                }
             }
             else
             {
-                result = await messageBoxWithClassDetail.ShowAsync(caption, message);
+                var caption = "Request enrolment";
+                var message = $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be requested.</p>" +
+                            WaitlistWarning() +
+                           "<p>Do you wish to continue?</p>";
+                bool result = true;
+                if (ClassID == null)
+                {
+                    if (reportStyle == ReportStyle.Detail)
+                    {
+                        result = await messageBox.ShowAsync(caption, message);
+                    }
+                    else
+                    {
+                        result = await messageBoxWithClassDetail.ShowAsync(caption, message);
+                    }
+                }
+                if (result)
+                {
+                    selectedClasses.Insert(0, selectedClass);
+                    if (deletedClasses.Contains(selectedClass)) { deletedClasses.Remove(selectedClass); }
+                    selectedClass.IsSelected = true;
+                    isDirty = true;
+                }
             }
-            if (result)
-            {
-                selectedClasses.Insert(0, selectedClass);
-                if (deletedClasses.Contains(selectedClass)) { deletedClasses.Remove(selectedClass); }
-                selectedClass.IsSelected = true;
-                isDirty = true;
-            }
-        }
 
-        //if (!string.IsNullOrWhiteSpace(filterText) || isListboxShowingSummary) { filterText = null; }
-        listGrid.ClearSelection();
-        if (isDirty) { await SaveChanges(); }
+            listGrid.ClearSelection();
+            if (isDirty) { await SaveChanges(); }
+        }
+        catch (Exception e) { throw e; }
+        finally
+        {
+            isBusy = false;
+        }
     }
 
     async Task SaveChanges()

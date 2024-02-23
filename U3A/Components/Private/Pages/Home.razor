@@ -112,13 +112,16 @@ else
         await base.OnInitializedAsync();
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        ParseQueryString();
-        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            await ParseQueryString();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
-    void ParseQueryString()
+    async Task ParseQueryString()
     {
         if (!hasRole) { return; }
         var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
@@ -133,7 +136,14 @@ else
                 if (page != null && page.Count() > 0)
                 {
                     var path = page[0];
-                    if (path != "~/" && path != "/") { navMan.NavigateTo(path); }
+                    if (path.StartsWith("/EnrolClass="))
+                    {
+                        await messageBox!.ShowOkOnlyAsync("Not Available", "QR scanning is only available in the Member Portal. Login with an email address not assigned to an administrative role.");
+                    }
+                    else
+                    {
+                        if (path != "~/" && path != "/") { navMan.NavigateTo(path); }
+                    }
                 }                
             }
         }

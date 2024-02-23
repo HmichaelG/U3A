@@ -3,11 +3,12 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
 @implements IDisposable
-@inject NavigationManager NavigationManager
+@inject NavigationManager navMan
 @inject SignInManager<ApplicationUser> SignInMgr
 @using Microsoft.AspNetCore.Identity
 @using U3A.Data
 @using U3A.UI.Forms
+@using System.Web
 
 @attribute [Authorize]
 
@@ -149,7 +150,14 @@ else
 
     bool isEnrolClassRequest()
     {
-        return (QueryResult != null && QueryResult.StartsWith("EnrolClass=", StringComparison.CurrentCultureIgnoreCase));
+        bool result = false;
+        var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
+        if (queryStringCollection != null && queryStringCollection.Count > 0)
+        {
+            var page = queryStringCollection.GetValues("Page");
+            if (page != null  && page.Length > 0) { result = true; }
+        }
+        return result;
     }
 
     Guid GetRequestedClass()
@@ -158,7 +166,8 @@ else
         Guid result = Guid.Empty;
         if (isEnrolClassRequest())
         {
-            classID = QueryResult.Remove(0, "EnrolClass=".Length);
+            var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
+            classID = queryStringCollection.GetValues("Page")[0].Remove(0,"/EnrolClass=".Length);
             Guid.TryParse(classID, out result);
         }
         return result;
@@ -192,7 +201,7 @@ else
 
     void OnChangeCredential(MouseEventArgs e, string page)
     {
-        NavigationManager.NavigateTo("Identity/Account/Manage/" + page, true);
+        navMan.NavigateTo("Identity/Account/Manage/" + page, true);
     }
 
     async Task OnMenuOptionSelected(PortalMenuSelection selection)

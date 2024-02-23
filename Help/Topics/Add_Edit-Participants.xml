@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2023-10-22T17:13:50.868+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-02-23T12:28:05.822+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Add/Edit Participants</title>
   <body>
     <header>
@@ -20,6 +20,16 @@
     <para styleclass="Normal" style="margin-bottom:0px;"></para>
     <para styleclass="Normal" style="margin-bottom:0px;">For further detail on selection and filtering please review the <link displaytype="text" defaultstyle="true" type="topiclink" href="Grid">Grid</link> topic. For detail on communication the <link displaytype="text" defaultstyle="true" type="topiclink" href="Communicate">Communicate</link> topic is available.</para>
     <para styleclass="Normal" style="margin-bottom:0px;"></para>
+    <para styleclass="Heading3">A note on filtering</para>
+    <para styleclass="Normal">This procedure contains two data filtering facilities...</para>
+    <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:0px;">the tab strip above the grid, and</li>
+      <li styleclass="Normal" style="margin-bottom:0px;">the standard filter button on the grid&apos;s toolbar</li>
+    </list>
+    <para styleclass="Normal" style="margin-bottom:0px;"></para>
+    <para styleclass="Normal" style="margin-bottom:0px;">These filters are additive meaning an AND operator is applied. Thus, if the <text style="font-style:italic;">Leaders</text> tab is active and a <text style="font-style:italic;">Financial To</text> filter of 2024 selected the result will be those members who are leaders AND Financial To 2024.</para>
+    <para styleclass="Normal" style="margin-bottom:0px;"></para>
+    <para styleclass="Normal" style="margin-bottom:0px;">Importantly, when the toolbar filter is closed, all filters are cleared and the tab strip active tab is reset to <text style="font-style:italic;">Participants</text>.</para>
     <para styleclass="Heading2">The Participant record</para>
     <para styleclass="Heading3">The Personal group</para>
     <para styleclass="Normal"><table styleclass="Default" rowcount="8" colcount="2">
@@ -190,7 +200,7 @@
           <para styleclass="Normal">This field determines the visibility of electronic addresses. Select from the list, Email, Phone, both Email &amp; Phone or accept the default of None.</para>
           <para styleclass="Normal">If phone numbers are silent, they will not be visible the Member Portal and cannot be used by leaders/clerks to contact the members.</para>
           <para styleclass="Normal" style="margin-bottom:0px; line-height:1.15;">If the email address is silent...</para>
-          <list id="2" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:Symbol; font-size:11pt; color:#000000;">
+          <list id="3" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:Symbol; font-size:11pt; color:#000000;">
             <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Leaders</text>. The email address will not be displayed in the Member Portal or Class Schedule.</li>
             <li styleclass="Normal"><text style="font-weight:bold;">Students. </text>The email address remains visible to leaders/clerks to allow communication with class participants.</li>
           </list>
