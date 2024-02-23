@@ -142,7 +142,14 @@ else
                     }
                     else
                     {
-                        if (path != "~/" && path != "/") { navMan.NavigateTo(path); }
+                        if (path != "/~/" && path != "~/") 
+                        { 
+                            navMan.NavigateTo(path); 
+                        }
+                        else
+                        {
+                            navMan.NavigateTo("/");
+                        }
                     }
                 }                
             }
