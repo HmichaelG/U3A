@@ -68,9 +68,9 @@ else
             break;
 
         case PortalMenuSelection.DoRequestMemberEnrolment:
-            Guid classID = GetRequestedClass();
+            Guid classID = GetQRRequestedClass();
             <MemberEnrolment IsEnrolmentRequestView=true
-                             ClassID=classID
+                             QRClassID=classID
                              OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
             break;
 
@@ -139,7 +139,7 @@ else
         {
             menuSelection = PortalMenuSelection.DoMemberPayment;
         }
-        else if (isEnrolClassRequest())
+        else if (isQREnrolClassRequest())
         {
             menuSelection = PortalMenuSelection.DoRequestMemberEnrolment;
         }
@@ -148,23 +148,23 @@ else
         await base.OnInitializedAsync();
     }
 
-    bool isEnrolClassRequest()
+    bool isQREnrolClassRequest()
     {
         bool result = false;
         var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
         if (queryStringCollection != null && queryStringCollection.Count > 0)
         {
             var page = queryStringCollection.GetValues("Page");
-            if (page != null  && page.Length > 0) { result = true; }
+            if (page != null  && page.Length > 0 && page[0].StartsWith("/EnrolClass=")) { result = true; }
         }
         return result;
     }
 
-    Guid GetRequestedClass()
+    Guid GetQRRequestedClass()
     {
         string classID;
         Guid result = Guid.Empty;
-        if (isEnrolClassRequest())
+        if (isQREnrolClassRequest())
         {
             var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
             classID = queryStringCollection.GetValues("Page")[0].Remove(0,"/EnrolClass=".Length);

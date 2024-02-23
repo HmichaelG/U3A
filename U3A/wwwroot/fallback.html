@@ -8,6 +8,7 @@
     <script>
         if (location != "~/" && location != "/") {
             location.replace(location.origin + "?Page=" + location.pathname);
+            window.history.pushState({}, document.title, "/");
         }
         else {
             location.replace(location.origin);

@@ -153,7 +153,7 @@
                                 {
                                     <form action="Account/Logout" @formname="logout" method="post">
                                         <AntiforgeryToken />
-                                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                                        <input type="hidden" name="ReturnUrl" value="~/" />
                                         <DxButton Text="Logout, when you're finished"
                                                   IconCssClass="bi-door-closed menu-icon me-3 h2"
                                                   CssClass="col-12 my-1"

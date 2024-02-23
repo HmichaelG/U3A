@@ -410,7 +410,7 @@ else
     public bool IsEnrolmentWithdrawalView { get; set; }
 
     [Parameter]
-    public Guid ClassID { get; set; }
+    public Guid? QRClassID { get; set; }
 
     [Parameter]
     public Term PreviewTerm { get; set; }
@@ -636,10 +636,10 @@ else
         {
             var style = await localStorage.GetItemAsync<int?>("ClassListStyle");
             if (style != null) reportStyle = (ReportStyle)style;
-            if (Classes != null && ClassID != Guid.Empty)
+            if (Classes != null && QRClassID != Guid.Empty)
             {
                 // We have a class ID passed in via QueryRequest
-                selectedClass = Classes.Find(x => x.ID == ClassID);
+                selectedClass = Classes.Find(x => x.ID == QRClassID);
                 if (selectedClass != null)
                 {
                     SelectedDataItemChanged(selectedClass);
@@ -649,7 +649,7 @@ else
                     await messageBox?.ShowOkOnlyAsync("Selected class is not available",
                             $"We're very sorry. Your selected class is no longer available.");
                 }
-                ClassID = Guid.Empty;
+                QRClassID = Guid.Empty;
                 await js.InvokeVoidAsync("clearQueryString");
             }
             var offset = (loginState.IsAdminOnBehalfOfMember) ? 0.175 : 0.15;
@@ -974,7 +974,7 @@ else
                             WaitlistWarning() +
                            "<p>Do you wish to continue?</p>";
                 bool result = true;
-                if (ClassID == null)
+                if (QRClassID == null)
                 {
                     if (reportStyle == ReportStyle.Detail)
                     {
