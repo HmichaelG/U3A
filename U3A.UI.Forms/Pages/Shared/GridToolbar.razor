@@ -91,6 +91,7 @@
     [Parameter] public bool IsMasterDetail { get; set; }
     [Parameter] public bool DisableVirtualScroll { get; set; }
     [Parameter] public RenderFragment CustomButtonContent {get; set;}
+    [Parameter] public EventCallback ToolbarFilterClosed { get; set; }
 
     internal bool IsToggleExpanded { get; set; } = false;
     internal string ExpandCollapseText { get; set; }
@@ -188,7 +189,6 @@
                 await ExcelExport(true);
                 break;
             case "Filter":
-                //LinkedGrid.ShowFilterRow = !LinkedGrid.ShowFilterRow;
                 if (LinkedGrid.FilterMenuButtonDisplayMode == GridFilterMenuButtonDisplayMode.Default)
                 {
                     LinkedGrid.FilterMenuButtonDisplayMode = GridFilterMenuButtonDisplayMode.Always;
@@ -197,6 +197,7 @@
                 {
                     LinkedGrid.FilterMenuButtonDisplayMode = GridFilterMenuButtonDisplayMode.Default;
                     LinkedGrid.ClearFilter();
+                    await ToolbarFilterClosed.InvokeAsync();
                 }
                 break;
         }

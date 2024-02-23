@@ -42,7 +42,7 @@
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
         <div hidden="@IsEmbedded">
-            <DxTabs @ref="dxTabs" TabClick="@OnTabClick">
+            <DxTabs @ref="@dxTabs" TabClick="@OnTabClick">
                 <DxTabPage Text="Participants" />
                 <DxTabPage Text="Leaders" />
                 <DxTabPage Text="Clerks" />
@@ -69,7 +69,7 @@
                         PopupEditFormHeaderText="Add/Edit Participant"
                         DataItemDeleting="Grid_DataItemDeleting">
                     <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid >
+                        <GridToolbar LinkedGrid=@mainGrid ToolbarFilterClosed="@(OnToolbarFilterClosed)">
                             <CustomButtonContent>
                                 <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
                                                BeginGroup=true
@@ -515,6 +515,13 @@
         await SetupTab(e.TabIndex);
     }
 
+    async void OnToolbarFilterClosed()
+    {
+        dxTabs.ActiveTabIndex = 0;
+        await SetupTab(0);
+        await InvokeAsync(StateHasChanged);
+    }
+
     async Task SetupTab(int TabIndex)
     {
         if (mainGrid == null) return;
@@ -527,7 +534,7 @@
         {
             case 0:             // All financial participants not Ceased
                 co = CriteriaOperator.FromLambda<Person>(x => x.DateCeased == null 
-                        && (x.FinancialTo >= currentTerm.Year || x.FinancialTo == constants.START_OF_TIME));
+                        && (x.FinancialTo >= currentTerm.Year));
                 break;
             case 1:             // Leaders
                 co = CriteriaOperator.FromLambda<Person>(x => x.IsCourseLeader && x.DateCeased == null && x.FinancialTo >= currentTerm.Year);
