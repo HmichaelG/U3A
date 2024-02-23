@@ -109,11 +109,16 @@ else
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
         homePage = dbc.TenantInfo.Website;
-        FinalisePaymentIfReqd();
         await base.OnInitializedAsync();
     }
 
-    void FinalisePaymentIfReqd()
+    protected override void OnAfterRender(bool firstRender)
+    {
+        ParseQueryString();
+        base.OnAfterRender(firstRender);
+    }
+
+    void ParseQueryString()
     {
         if (!hasRole) { return; }
         var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
