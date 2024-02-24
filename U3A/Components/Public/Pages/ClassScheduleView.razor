@@ -25,13 +25,18 @@ else
     <DxReportViewer @ref="reportViewer" Id="reportViewer"
                     Report="@rpt" SizeMode="SizeMode.Small"
                     SinglePagePreview="false"
-                    RootCssClasses="w-100"
+                    RootCssClasses="w-100 view-normal"
                     TabPanelMinWidth="200"
                     TabPanelMaxWidth="200"                    
                     Zoom="1"
                     OnCustomizeToolbar="@OnCustomizeToolbar" />
 }
+<style>
+    .view-normal {
+        height: calc(100vh - 8rem) !important;
+    }
 
+</style>
 
 @code {
     bool IsReady;
