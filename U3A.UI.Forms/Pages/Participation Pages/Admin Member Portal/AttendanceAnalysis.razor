@@ -50,7 +50,7 @@
         </DxTabs>
 
         <DxPivotGrid @ref=pivotGrid Data="@pivotData"
-                     CssClass="w-100"
+                     CssClass="w-100" PageSize=13 ShowPager=true
                      ShowFieldHeaders="true">
             @{
                 switch (selectedIndex) {
@@ -87,7 +87,6 @@
             </DxPivotGridField>
             }
         </DxPivotGrid>
-
     </DxFormLayout>
 }
 
