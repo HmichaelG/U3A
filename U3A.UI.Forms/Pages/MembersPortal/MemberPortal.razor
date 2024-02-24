@@ -1,14 +1,17 @@
 ﻿@page "/MemberPortal"
 
+@using Microsoft.AspNetCore.Identity
+@using U3A.Data
+@using U3A.UI.Forms
+@using System.Web
+@using Microsoft.AspNetCore.Http
+@using Blazored.LocalStorage
+
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
 @implements IDisposable
 @inject NavigationManager navMan
 @inject SignInManager<ApplicationUser> SignInMgr
-@using Microsoft.AspNetCore.Identity
-@using U3A.Data
-@using U3A.UI.Forms
-@using System.Web
 
 @attribute [Authorize]
 
@@ -68,9 +71,8 @@ else
             break;
 
         case PortalMenuSelection.DoRequestMemberEnrolment:
-            Guid classID = GetQRRequestedClass();
             <MemberEnrolment IsEnrolmentRequestView=true
-                             QRClassID=classID
+                             QRClassID=QRClassID
                              OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
             break;
 
@@ -123,6 +125,7 @@ else
     MemberPayment? memberPayment;
     string Title;
     string? SuccessMsg = null;
+    Guid? QRClassID = default;
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,46 +142,17 @@ else
         {
             menuSelection = PortalMenuSelection.DoMemberPayment;
         }
-        else if (isQREnrolClassRequest())
+        else if (!IsReady)
         {
-            menuSelection = PortalMenuSelection.DoRequestMemberEnrolment;
+            await GetQRRequestedClass();
+            if (QRClassID != null)
+            {
+                menuSelection = PortalMenuSelection.DoRequestMemberEnrolment;
+            }
+            else { menuSelection = PortalMenuSelection.ShowMenu; }
         }
-        else { menuSelection = PortalMenuSelection.ShowMenu; }
         IsReady = true;
         await base.OnInitializedAsync();
-    }
-
-    bool isQREnrolClassRequest()
-    {
-        bool result = false;
-        var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
-        if (queryStringCollection != null && queryStringCollection.Count > 0)
-        {
-            var page = queryStringCollection.GetValues("Page");
-            if (page != null  && page.Length > 0 && page[0].StartsWith("/EnrolClass=")) { result = true; }
-        }
-        return result;
-    }
-
-    Guid GetQRRequestedClass()
-    {
-        string classID;
-        Guid result = Guid.Empty;
-        if (isQREnrolClassRequest())
-        {
-            var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
-            classID = queryStringCollection.GetValues("Page")[0].Remove(0,"/EnrolClass=".Length);
-            Guid.TryParse(classID, out result);
-        }
-        return result;
-    }
-
-    void EnsureSelectedPersonSet()
-    {
-        if (loginState.LinkedPeople.Count() > 1 && loginState.SelectedPerson == null)
-        {
-            menuSelection = PortalMenuSelection.GetLinkedPerson;
-        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -196,6 +170,29 @@ else
                 }
             }
             if (person == null) menuSelection = PortalMenuSelection.DoMemberMaintenance;
+        }
+    }
+
+
+    async Task GetQRRequestedClass()
+    {
+        string classID;
+        Guid result = default;
+        var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
+        var page = queryStringCollection.GetValues("Page");
+        if (page != null && page.Length > 0 && page[0].StartsWith("/EnrolClass="))
+        {
+            classID = queryStringCollection.GetValues("Page")[0].Remove(0, "/EnrolClass=".Length);
+            Guid.TryParse(classID, out result);
+            QRClassID = (result == default) ? null : result;
+        }
+    }
+
+    void EnsureSelectedPersonSet()
+    {
+        if (loginState.LinkedPeople.Count() > 1 && loginState.SelectedPerson == null)
+        {
+            menuSelection = PortalMenuSelection.GetLinkedPerson;
         }
     }
 
@@ -276,7 +273,7 @@ else
     {
         bool result = false;
         var person = await GetPersonAsync();
-        if (person != null && !string.IsNullOrWhiteSpace( person.Email))
+        if (person != null && !string.IsNullOrWhiteSpace(person.Email))
         {
             result = true;
         }
