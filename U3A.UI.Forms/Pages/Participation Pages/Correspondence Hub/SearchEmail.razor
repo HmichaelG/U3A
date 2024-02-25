@@ -172,6 +172,7 @@ else
     DateTime fromDate;
     DateTime toDate;
     TimeSpan tzOffset;
+    LocalTime? localTime;
 
     protected override async Task OnInitializedAsync()
     {
@@ -182,12 +183,13 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (localTime == null)
         {
-            var localTime = new LocalTime(js);
+            localTime = new LocalTime(js);
             tzOffset = await localTime.GetTimezoneOffsetAsync();
             toDate = await localTime.GetLocalDateAsync();
             fromDate = toDate.AddDays(-6);
+            await InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
