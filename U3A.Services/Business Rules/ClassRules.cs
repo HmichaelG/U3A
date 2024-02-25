@@ -92,7 +92,7 @@ namespace U3A.BusinessRules
                 });
             });
             AssignClassContacts(classes, term, settings);
-            AssignClassCounts(dbc, term, classes);
+            await AssignClassCountsAsync(dbc, term, classes);
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
             if (prevTerm != null)
             {
@@ -119,7 +119,7 @@ namespace U3A.BusinessRules
                     });
                 });
                 AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
-                AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
+                await AssignClassCountsAsync(dbc, prevTerm, prevTermShoulderClasses);
                 classes.AddRange(prevTermShoulderClasses);
             }
             return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)
@@ -250,98 +250,103 @@ namespace U3A.BusinessRules
                 c.CourseContacts.Add(new CourseContact() { ContactType = contactType, Person = person });
             }
         }
+
+        internal record EnrolmentCount
+        {
+            internal Guid ID;
+            internal int Year;
+            internal int TermNumber;
+            internal bool IsWaitlisted;
+            internal int Count;
+        }
+
+        private static IQueryable<EnrolmentCount> GetEnrolmentCountByCourse(U3ADbContext dbc, Term term)
+        {
+            return dbc.Enrolment
+                        .Include(x => x.Term)
+                        .Where(x => x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber &&
+                                x.ClassID == null)
+                        .GroupBy(e => new
+                        {
+                            ID = e.CourseID,
+                            Year = e.Term.Year,
+                            TermNumber = e.Term.TermNumber,
+                            IsWaitlisted = e.IsWaitlisted
+                        })
+                        .Select(g => new EnrolmentCount
+                        {
+                            ID = g.Key.ID,
+                            Year = g.Key.Year,
+                            TermNumber = g.Key.TermNumber,
+                            IsWaitlisted = g.Key.IsWaitlisted,
+                            Count = g.Count()
+                        });
+        }
+        private static IQueryable<EnrolmentCount> GetEnrolmentCountByCLass(U3ADbContext dbc, Term term)
+        {
+            return dbc.Enrolment
+                        .Include(x => x.Term)
+                        .Where(x => x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber &&
+                                x.ClassID != null)
+                        .GroupBy(e => new
+                        {
+                            ID = e.ClassID,
+                            Year = e.Term.Year,
+                            TermNumber = e.Term.TermNumber,
+                            IsWaitlisted = e.IsWaitlisted
+                        })
+                        .Select(g => new EnrolmentCount
+                        {
+                            ID = g.Key.ID.Value,
+                            Year = g.Key.Year,
+                            TermNumber = g.Key.TermNumber,
+                            IsWaitlisted = g.Key.IsWaitlisted,
+                            Count = g.Count()
+                        });
+        }
         private static async Task AssignClassCountsAsync(U3ADbContext dbc, Term term, List<Class> Classes)
         {
-            var enrolmentCountByCourse = await dbc.Enrolment
-                                            .Where(x => x.TermID == term.ID &&
-                                                    x.ClassID == null)
-                                            .GroupBy(e => new
-                                            {
-                                                ID = e.CourseID,
-                                                IsWaitlisted = e.IsWaitlisted
-                                            })
-                                            .Select(g => new
-                                            {
-                                                ID = g.Key.ID,
-                                                IsWaitlisted = g.Key.IsWaitlisted,
-                                                Count = g.Count()
-                                            }).ToListAsync();
-            var enrolmentCountByCLass = await dbc.Enrolment
-                                            .Where(x => x.TermID == term.ID &&
-                                                    x.ClassID != null)
-                                            .GroupBy(e => new
-                                            {
-                                                ID = e.ClassID,
-                                                IsWaitlisted = e.IsWaitlisted
-                                            })
-                                            .Select(g => new
-                                            {
-                                                ID = g.Key.ID,
-                                                IsWaitlisted = g.Key.IsWaitlisted,
-                                                Count = g.Count()
-                                            }).ToListAsync();
-            Parallel.ForEach(Classes, c =>
+            var enrolmentCountByCourse = GetEnrolmentCountByCourse(dbc, term);
+            var enrolmentCountByCLass = GetEnrolmentCountByCLass(dbc, term);
+            foreach (var c in Classes)
             {
+                var nextTerm = GetNextTermOffered(c, term.TermNumber);
                 double maxStudents = c.Course.MaximumStudents; ;
                 c.ParticipationRate = 0;
                 if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                 {
-                    var result = enrolmentCountByCourse.FirstOrDefault(x => x.ID == c.CourseID && !x.IsWaitlisted);
+                    var result = await enrolmentCountByCourse.FirstOrDefaultAsync(x => x.ID == c.CourseID &&
+                                                                            x.Year == term.Year &&
+                                                                            x.TermNumber == nextTerm &&
+                                                                            !x.IsWaitlisted);
                     c.TotalActiveStudents = (result == null) ? 0 : result.Count;
-                    result = enrolmentCountByCourse.FirstOrDefault(x => x.ID == c.CourseID && x.IsWaitlisted);
+                    result = await enrolmentCountByCourse.FirstOrDefaultAsync(x => x.ID == c.CourseID &&
+                                                                            x.Year == term.Year &&
+                                                                            x.TermNumber == nextTerm &&
+                                                                            x.IsWaitlisted);
                     c.TotalWaitlistedStudents = (result == null) ? 0 : result.Count;
                 }
                 else
                 {
-                    var result = enrolmentCountByCLass.FirstOrDefault(x => x.ID == c.ID && !x.IsWaitlisted);
+                    var result = await enrolmentCountByCLass.FirstOrDefaultAsync(x => x.ID == c.ID &&
+                                                                            x.Year == term.Year &&
+                                                                            x.TermNumber == nextTerm &&
+                                                                            !x.IsWaitlisted);
                     c.TotalActiveStudents = (result == null) ? 0 : result.Count;
-                    result = enrolmentCountByCLass.FirstOrDefault(x => x.ID == c.ID && x.IsWaitlisted);
+                    result = await enrolmentCountByCLass.FirstOrDefaultAsync(x => x.ID == c.ID &&
+                                                                            x.Year == term.Year &&
+                                                                            x.TermNumber == nextTerm &&
+                                                                            x.IsWaitlisted);
                     c.TotalWaitlistedStudents = (result == null) ? 0 : result.Count;
                 }
                 if (maxStudents != 0) c.ParticipationRate = (double)((c.TotalActiveStudents + c.TotalWaitlistedStudents) / maxStudents);
-            });
+            }
         }
 
         private static void AssignClassCounts(U3ADbContext dbc, Term term, List<Class> Classes)
         {
-            var enrolmentCountByCourse = dbc.Enrolment
-                                            .Include(x => x.Term)
-                                            .Where(x => x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber &&
-                                                    x.ClassID == null)
-                                            .GroupBy(e => new
-                                            {
-                                                ID = e.CourseID,
-                                                Year = e.Term.Year,
-                                                TermNumber = e.Term.TermNumber,
-                                                IsWaitlisted = e.IsWaitlisted
-                                            })
-                                            .Select(g => new
-                                            {
-                                                ID = g.Key.ID,
-                                                Year = g.Key.Year,
-                                                TermNumber = g.Key.TermNumber,
-                                                IsWaitlisted = g.Key.IsWaitlisted,
-                                                Count = g.Count()
-                                            });
-            var enrolmentCountByCLass = dbc.Enrolment
-                                            .Include(x => x.Term)
-                                            .Where(x => x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber &&
-                                                    x.ClassID != null)
-                                            .GroupBy(e => new
-                                            {
-                                                ID = e.ClassID,
-                                                Year = e.Term.Year,
-                                                TermNumber = e.Term.TermNumber,
-                                                IsWaitlisted = e.IsWaitlisted
-                                            })
-                                            .Select(g => new
-                                            {
-                                                ID = g.Key.ID,
-                                                Year = g.Key.Year,
-                                                TermNumber = g.Key.TermNumber,
-                                                IsWaitlisted = g.Key.IsWaitlisted,
-                                                Count = g.Count()
-                                            });
+            var enrolmentCountByCourse = GetEnrolmentCountByCourse(dbc, term);
+            var enrolmentCountByCLass = GetEnrolmentCountByCLass(dbc, term);
             foreach (var c in Classes)
             {
                 var nextTerm = GetNextTermOffered(c, term.TermNumber);
