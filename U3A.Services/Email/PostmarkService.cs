@@ -212,7 +212,7 @@ namespace U3A.Services.Email
                     MessageID = message.MessageID,
                     Attachments = message.Attachments.Count(),
                     From = message.From,
-                    ReceivedAt = message.ReceivedAt + offset,
+                    ReceivedAt = message.ReceivedAt,
                     Status = message.Status,
                     Subject = message.Subject
                 };
@@ -280,7 +280,7 @@ namespace U3A.Services.Email
                 var ev = new EmailMessageEvent()
                 {
                     Type = detail.Type,
-                    ReceivedAt = detail.ReceivedAt + offset,
+                    ReceivedAt = detail.ReceivedAt,
                     HtmlBody = details.HtmlBody,
                 };
                 result.Add(ev);
