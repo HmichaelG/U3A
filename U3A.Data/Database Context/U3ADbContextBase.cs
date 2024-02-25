@@ -129,7 +129,7 @@ namespace U3A.Database
                     else
                     {
                         // Not Waitlisted, therefore set DateEnrolled if required.
-                        if (e.DateEnrolled == null) { e.DateEnrolled = DateTime.Now; }
+                        if (e.DateEnrolled == null) { e.DateEnrolled = utcNow; }
                     }                    
                 }
                 // for entities that inherit from BaseEntity,
