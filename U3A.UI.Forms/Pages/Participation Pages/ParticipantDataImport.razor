@@ -494,7 +494,7 @@ else {
                                     DateEnrolled = DateTime.Today,
                                     Person = person,
                                     Term = term,
-                                    IsWaitlisted = await BusinessRule.SetWaitlistStatusAsync(dbc, course.ID, currentTerm,person)
+                                    IsWaitlisted = true
                                 };
                             await dbc.AddAsync(enrolment);
                         }
