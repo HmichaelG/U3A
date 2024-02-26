@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DevExpress.Office.Utils;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,12 @@ namespace U3A.Database
 
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDbContextFactory<TenantStoreDbContext> _TenantDbFactory;
+        private readonly bool useCachedTenentInfo = false;
 
         public U3ADbContext(TenantInfo tenantInfo)
         {
             TenantInfo = tenantInfo;
+            useCachedTenentInfo = true;
         }
 
         [ActivatorUtilitiesConstructor] // force DI to use this constructor
@@ -41,6 +44,7 @@ namespace U3A.Database
 
         private void GetTenantInfo()
         {
+            if (useCachedTenentInfo) { return;  }
             HostStrategy hs = new HostStrategy();
 
             var identifirer = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);

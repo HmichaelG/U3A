@@ -717,6 +717,7 @@ namespace U3A.BusinessRules
                     result.AppendLine($"<tr><td>{e.Course.Name}</td><td>{status}</td></tr>");
                 }
                 result.AppendLine("</tbody></table>");
+                result.AppendLine("<div class='alert alert-info text-center'>Pending allocations are processed hourly</div>");
             }
             return result.ToString();
         }
