@@ -404,7 +404,7 @@ namespace U3A.BusinessRules
         private static bool IsAllocationDone(DateTime EnrolmentCreated)
         {
             // backgorund processing to occur every hour on the hour
-            var now = TimezoneAdjustment.GetLocalTime();
+            var now = DateTime.UtcNow;
             var minute = now.Minute;
             var second = now.Second;
             var lastProcessed = now.AddMinutes(-minute).AddSeconds(-second);
