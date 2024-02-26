@@ -13,7 +13,7 @@ namespace U3A.WebFunctions.Procedures
         {
             using (var dbc = new U3ADbContext(tenant))
             {
-                var today = await DailyProcedures.GetTodayAsync(dbc);
+                var today = await Common.GetTodayAsync(dbc);
                 var term = await BusinessRule.FindTermAsync(dbc, today);
                 if (term == null) { return; }
 
@@ -49,7 +49,7 @@ namespace U3A.WebFunctions.Procedures
                                     List<AttendClass> ClassAttendance,
                                     Course course)
         {
-            DateTime now = await DailyProcedures.GetNowAsync(dbc);
+            DateTime now = await Common.GetNowAsync(dbc);
             foreach (var ac in ClassAttendance.Where(x => x.DateProcessed == null))
             {
                 var leave = await BusinessRule.GetLeaveForPersonForCourseForClass(dbc, ac.Person, course, ac.Date.Date);

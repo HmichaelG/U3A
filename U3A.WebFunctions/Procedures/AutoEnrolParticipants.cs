@@ -16,8 +16,8 @@ namespace U3A.WebFunctions.Procedures
                 var forceEmailQueue = false;
                 DateTime? emailDate = null;
                 // Get system settings
-                var today = await DailyProcedures.GetTodayAsync(dbc);
-                var now = await DailyProcedures.GetNowAsync(dbc);
+                var today = await Common.GetTodayAsync(dbc);
+                var now = await Common.GetNowAsync(dbc);
                 var settings = await dbc.SystemSettings
                                     .OrderBy(x => x.ID)
                                     .FirstOrDefaultAsync();

@@ -20,7 +20,7 @@ namespace U3A.WebFunctions.Procedures
             {
                 List<(Guid, Guid, Guid?)> onFile = new();
                 (Guid, Guid, Guid?) onFileKey;
-                var today = await DailyProcedures.GetTodayAsync(dbc);
+                var today = await Common.GetTodayAsync(dbc);
                 var utcTime = DateTime.UtcNow;                
                 mailItems = await dbc.SendMail
                                         .Include(x => x.Person)

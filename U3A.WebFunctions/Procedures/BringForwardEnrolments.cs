@@ -12,7 +12,7 @@ namespace U3A.WebFunctions.Procedures
         {
             using (var dbc = new U3ADbContext(tenant))
             {
-                var today = await DailyProcedures.GetTodayAsync(dbc);
+                var today = await Common.GetTodayAsync(dbc);
                 var sourceTerm = await BusinessRule.CurrentTermAsync(dbc);
                 if (sourceTerm != null)
                 {

@@ -76,7 +76,7 @@ namespace U3A.WebFunctions.Procedures
         private static async Task<string> CreateEmailMessage(U3ADbContext dbc)
         {
             var msg = "";
-            var now = await DailyProcedures.GetNowAsync(dbc);
+            var now = await Common.GetNowAsync(dbc);
             var today = now.Date;
             var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault() ?? throw new ArgumentNullException(nameof(SystemSettings));
 
