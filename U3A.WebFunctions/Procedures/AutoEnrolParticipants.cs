@@ -34,7 +34,7 @@ namespace U3A.WebFunctions.Procedures
                     DateTime allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
                     if (BusinessRule.IsPreRandomAllocationDay(currentTerm, settings, today))
                     {
-                        logger.LogInformation($"No Auto-Allocation performed - Date prior to allocation date: {allocationDate.ToLongDateString()}");
+                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Auto-Allocation performed - Date prior to allocation date: {allocationDate.ToLongDateString()}");
                         return;
                     }
                     else
@@ -42,7 +42,7 @@ namespace U3A.WebFunctions.Procedures
                         IsClassAllocationFinalised = currentTerm.IsClassAllocationFinalised;
                         if (today == allocationDate)
                         {
-                            logger.LogInformation($"!!! Random Auto-Allocation Day !!!");
+                            logger.LogInformation($"!!! [{dbc.TenantInfo.Identifier}]: Random Auto-Allocation Day !!!");
                             var utcNow = DateTime.UtcNow;
                             // emailDate will be 3 days from now less two hours to ensure it occurs.
                             emailDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, 0, 0, 0) +
@@ -66,11 +66,12 @@ namespace U3A.WebFunctions.Procedures
                 await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm,
                                                 IsClassAllocationFinalised,
                                                 forceEmailQueue, emailDate);
-                logger.LogInformation($">>>> {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
+                logger.LogInformation($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
                 foreach (var log in BusinessRule.AutoEnrolments)
                 {
                     logger.LogInformation(log);
                 }
+                BusinessRule.AutoEnrolments.Clear();
             }
             return;
         }
