@@ -63,7 +63,7 @@ pageinfo = [[0,0,0,0,null],
 	[0,0,0,0,null],
 	[0,0,0,0,null]];
 pagedata = [ ["./2023-version-history.html","2023 Version History","version 2023.12 Add/Edit Receipts Added the ability to set/reset the participant&#39;s Financial Year. Please refer to Add/Edit Receipts for details. ...",""],
-["./2024-version-history.html","2024 Version History","Version 2024.2.Current Communication Hub - Search Corrected Date Received UTC issue An issue that caused the From and To date ranges to default to...",""],
+["./2024-version-history.html","2024 Version History","Version 2024.2.Current Member Portal - Course Enrolment All new enrolment requests are now marked Waitlisted: (Pending Allocation) until allocatio...",""],
 ["./add_edit-committee.html","Participation Menu &#62; Add/Edit Committee","This procedure allows you to assign a Committee position to a participant.",""],
 ["./add_edit-course-types.html","Course Menu &#62; Add/Edit Course Types","A Course Type categorizes Courses &#38; Activities into groups. Common Course Types might include...",""],
 ["./add_edit-courses.html","Course Menu &#62; Add/Edit Courses","A Course is an activity organised by the U3A group. ",""],
