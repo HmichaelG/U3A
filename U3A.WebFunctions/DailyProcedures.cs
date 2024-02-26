@@ -41,7 +41,8 @@ namespace U3A.WebFunctions
             //Retrieve the tenants
             _logger.LogInformation($"Retrieve tenant list from database.");
             var tenants = new List<TenantInfo>();
-            Common.GetTeanats(tenants,Common.TENANT_CN_CONFIG);
+            var cn = _config.GetConnectionString(Common.TENANT_CN_CONFIG);
+            Common.GetTeanats(tenants, cn!);
             _logger.LogInformation($"{tenants.Count} tenants retrieved from database.");
 
             _logger.LogInformation("UTC Time: {0}", DateTime.UtcNow);
@@ -73,7 +74,7 @@ namespace U3A.WebFunctions
                 isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                 if (isBackgroundProcessingEnabled)
                 {
-                    await ProcessCorrespondence.Process(tenant, _logger);
+                    await ProcessCorrespondence.Process(tenant, _logger, IsHourlyProcedure: false);
                     await SendLeaderReports.Process(tenant, _logger);
 #if !DEBUG
                     await ProcessMembershipCoordinatorEmail.Process(tenant, _logger);

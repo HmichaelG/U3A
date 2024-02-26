@@ -32,7 +32,7 @@ namespace U3A.WebFunctions.Procedures
                             await dbc.SaveChangesAsync();
                             if (queueItem.DocumentAttachments != null)
                             {
-                                documentTemplate.AttachmentBytes = new List<byte[]>();
+                                documentTemplate!.AttachmentBytes = new List<byte[]>();
                                 foreach (var attachment in queueItem.DocumentAttachments)
                                 {
                                     documentTemplate.AttachmentBytes.Add(attachment.Attachment);
@@ -40,11 +40,11 @@ namespace U3A.WebFunctions.Procedures
                             }
                             if (queueItem.SendToMultipleRecipients)
                             {
-                                await server.SendQueuedEmailToMultipleRecipientsAsync(documentTemplate, exportData, queueItem.OverrideCommunicationPreference);
+                                await server.SendQueuedEmailToMultipleRecipientsAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
                             }
                             else
                             {
-                                await server.SendQueuedEmailToSingleRecipientAsync(documentTemplate, exportData, queueItem.OverrideCommunicationPreference);
+                                await server.SendQueuedEmailToSingleRecipientAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
                             }
                             s.Stop();
                             queueItem.Status = DocumentQueueStatus.Complete;
@@ -53,7 +53,7 @@ namespace U3A.WebFunctions.Procedures
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError(ex, $"Error Processing: {documentTemplate.Subject}");
+                            logger.LogError(ex, $"Error Processing: {documentTemplate!.Subject}");
                             queueItem.Status = DocumentQueueStatus.Error;
                             queueItem.Result = "Processing Error";
                         }

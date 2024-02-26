@@ -9,7 +9,7 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class ProcessCorrespondence
     {
-        public static async Task Process(TenantInfo tenant, ILogger logger)
+        public static async Task Process(TenantInfo tenant, ILogger logger, bool IsHourlyProcedure)
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
@@ -32,6 +32,7 @@ namespace U3A.WebFunctions.Procedures
                     switch (sm.DocumentName)
                     {
                         case "Cash Receipt":
+                            if (IsHourlyProcedure) { break; }
                             var receipt = await dbc.Receipt
                                                 .Include(x => x.Person)
                                                 .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
@@ -62,6 +63,7 @@ namespace U3A.WebFunctions.Procedures
                             else sm.Status = "Enrolment not found";
                             break;
                         case "Leader Report":
+                            if (IsHourlyProcedure) { break; }
                             string courseName = "";
                             Course? course = null;
                             var leader = await dbc.Person

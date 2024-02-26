@@ -9,6 +9,7 @@ using System.Text;
 using Twilio.Rest.Trunking.V1;
 using U3A.Database;
 using U3A.Model;
+using U3A.Services;
 
 namespace U3A.BusinessRules
 {
@@ -365,6 +366,13 @@ namespace U3A.BusinessRules
                 {
                     result += " (Awaiting Random Allocation)";
                 }
+                else if (enrolment.IsWaitlisted)
+                {
+                    if (!IsAllocationDone(enrolment.Created))
+                    {
+                        result = "Waitlisted: (Pending Allocation)";
+                    }
+                }
             }
             return result;
         }
@@ -381,9 +389,27 @@ namespace U3A.BusinessRules
                 else
                 {
                     result = (enrolment.IsWaitlisted) ? "Waitlisted" : "Enrolled";
+                    if (enrolment.IsWaitlisted)
+                    {
+                        if (!IsAllocationDone(enrolment.Created))
+                        {
+                            result = "Waitlisted: (Pending Allocation)";
+                        }
+                    }
                 }
             }
             return result;
+        }
+
+        private static bool IsAllocationDone(DateTime EnrolmentCreated)
+        {
+            // backgorund processing to occur every hour on the hour
+            var now = TimezoneAdjustment.GetLocalTime();
+            var minute = now.Minute;
+            var second = now.Second;
+            var lastProcessed = now.AddMinutes(-minute).AddSeconds(-second);
+            // do the test
+            return (EnrolmentCreated <= lastProcessed) ? true : false;
         }
 
         public static string GetCourseEnrolmentStatus(Course course, List<Enrolment> enrolments)
@@ -630,11 +656,8 @@ namespace U3A.BusinessRules
                     {
                         var e = new Enrolment()
                         {
-                            Created = DateTime.Now,
-                            IsWaitlisted = await BusinessRule.SetWaitlistStatusAsync(dbc, course.ID, thisTerm, person)
+                            IsWaitlisted = true
                         };
-                        if (isFutureTerm) { e.IsWaitlisted = true; }
-                        if (!BusinessRule.IsClassInTerm(c, thisTermNo)) { e.IsWaitlisted = true; }
                         e.Person = await dbc.Person.FindAsync(person.ID);
                         e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
                         e.Course = await dbc.Course.FindAsync(c.Course.ID);
@@ -653,8 +676,7 @@ namespace U3A.BusinessRules
                     {
                         var e = new Enrolment()
                         {
-                            Created = DateTime.Now,
-                            IsWaitlisted = await BusinessRule.SetWaitlistStatusAsync(dbc, course.ID, c.ID, thisTerm, person)
+                            IsWaitlisted = true
                         };
                         e.Person = await dbc.Person.FindAsync(person.ID);
                         e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
@@ -666,49 +688,6 @@ namespace U3A.BusinessRules
                     }
                 }
             }
-            return result;
-        }
-
-        // Same participants in all classes
-        public static async Task<bool> SetWaitlistStatusAsync(U3ADbContext dbc,
-                                    Guid CourseID,
-                                    Term CurrentTerm,
-                                    Person person)
-        {
-            bool result = false;
-            if (person.FinancialTo < CurrentTerm.Year) return true;
-            if (!CurrentTerm.IsClassAllocationFinalised) return true;
-
-            // Otherwise, set enrolled if enrolled count less than Max count
-            var course = await dbc.Course.FindAsync(CourseID);
-            if (!course.AllowAutoEnrol) return true;
-
-            int enrolments = await dbc.Enrolment
-                                .Where(x => x.CourseID == CourseID &&
-                                            x.TermID == CurrentTerm.ID &&
-                                            !x.IsWaitlisted).CountAsync();
-            result = (enrolments >= course.MaximumStudents);
-            return result;
-        }
-
-        // Different participants in each class
-        public static async Task<bool> SetWaitlistStatusAsync(U3ADbContext dbc,
-                                    Guid CourseID,
-                                    Guid ClassID,
-                                    Term CurrentTerm,
-                                    Person person)
-        {
-            bool result = false;
-            if (person.FinancialTo < CurrentTerm.Year) return true;
-            if (!CurrentTerm.IsClassAllocationFinalised) return true;
-
-            // Otherwise, set enrolled if enrolled count less than Max count
-            var course = await dbc.Course.FindAsync(CourseID);
-            int enrolments = await dbc.Enrolment
-                                .Where(x => x.CourseID == CourseID && x.ClassID == ClassID &&
-                                                x.TermID == CurrentTerm.ID &&
-                                                !x.IsWaitlisted).CountAsync();
-            result = (enrolments >= course.MaximumStudents);
             return result;
         }
 

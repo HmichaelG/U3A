@@ -34,8 +34,8 @@ namespace U3A.BusinessRules
         {
             return await dbc.Leave.FirstOrDefaultAsync(x => x.PersonID == person.ID &&
                                 (x.CourseID == null || x.CourseID == course.ID) &&
-                                x.StartDate <= classDate &&
-                                x.EndDate.AddDays(1) > classDate);
+                                x.StartDate.Date <= classDate &&
+                                x.EndDate.Date.AddDays(1) > classDate);
         }
     }
 }

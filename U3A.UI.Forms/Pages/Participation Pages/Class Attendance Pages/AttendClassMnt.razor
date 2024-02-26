@@ -841,7 +841,7 @@ else
 
     private async Task OnApplyStudentLeaveClicked()
     {
-        var count = await ApplyStudentLeaveAsync();
+        var count = await ApplyStudentLeaveAsync(ForceAcceptLeave: true);
         if (await SaveChangesAsync())
         {
             mainGrid?.ClearSelection();
@@ -851,7 +851,7 @@ else
     }
 
     bool isLeaveBusy;
-    private async Task<int> ApplyStudentLeaveAsync()
+    private async Task<int> ApplyStudentLeaveAsync(bool ForceAcceptLeave = false)
     {
         var result = 0;
         if (ClassAttendance == null) { return result; }
@@ -859,7 +859,10 @@ else
         isLeaveBusy = true;
         try
         {
-            foreach (var ac in ClassAttendance.Where(x => x.DateProcessed == null))
+            var attendance = (ForceAcceptLeave) 
+                                ? ClassAttendance 
+                                : ClassAttendance.Where(x => x.DateProcessed == null);
+            foreach (var ac in attendance)
             {
                 var leave = await BusinessRule.GetLeaveForPersonForCourseForClass(dbc, ac.Person, SelectedCourse, selectedDate.Date);
                 if (leave != null)
