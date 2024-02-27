@@ -221,13 +221,13 @@ namespace U3A.BusinessRules
             switch (autoEnrollOccurrence)
             {
                 case AutoEnrollOccurrence.Annually:
-                    termArray = new int[] { term.TermNumber };
+                    termArray = new int[] { 1, 2, 3, 4 };
                     break;
                 case AutoEnrollOccurrence.Semester:
                     termArray = new int[] { term.TermNumber, term.TermNumber + 1 };
                     break;
                 case AutoEnrollOccurrence.Term:
-                    termArray = new int[] { 1, 2, 3, 4 };
+                    termArray = new int[] { term.TermNumber };
                     break;
                 default: return;
             }
@@ -238,6 +238,12 @@ namespace U3A.BusinessRules
                     t.IsClassAllocationFinalised = IsAllocationDone;
                     dbc.Update(t);
                 }
+            };
+            // and for completeness...
+            foreach (var t in dbc.Term.Where(x => x.Year < term.Year))
+            {
+                t.IsClassAllocationFinalised = IsAllocationDone;
+                dbc.Update(t);
             };
         }
         private static async Task ProcessEnrolments(U3ADbContext dbc,
@@ -296,7 +302,7 @@ namespace U3A.BusinessRules
                 places = course.MaximumStudents - enrolled;
                 if (places > 0)
                 {
-                    if (isRandomEnrol)
+                    if (DoRandomEnrol)
                     {
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Random)
