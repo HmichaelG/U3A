@@ -29,10 +29,11 @@ namespace U3A.BusinessRules
             if (enrolment.ClassID != null)
             {
                 classes.Add(dbc.Class
+                                .Include(c => c.Enrolments).ThenInclude(e => e.Person)
                                 .Include(x => x.Leader)
                                 .Include(x => x.Leader2)
                                 .Include(x => x.Leader3)
-                                .Include(x => x.Course).ThenInclude(c => c.Enrolments).ThenInclude(e => e.Person)
+                                .Include(x => x.Course)
                                 .Include(x => x.Occurrence)
                                 .Where(x => x.ID == enrolment.ClassID).FirstOrDefault());
             }

@@ -76,6 +76,9 @@ namespace U3A.BusinessRules
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
             var classes = (await dbc.Class.AsNoTracking()
+                                .Include(x => x.Enrolments
+                                        .Where(e => e.Term.Year == term.Year && e.Term.TermNumber >= e.Term.TermNumber))
+                                .ThenInclude(e => e.Person)
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Course)
@@ -102,6 +105,9 @@ namespace U3A.BusinessRules
             {
                 //OccurenceID == 99 is Unscheduled.
                 var prevTermShoulderClasses = dbc.Class.AsNoTracking()
+                                .Include(x => x.Enrolments
+                                        .Where(e => e.Term.Year == term.Year && e.Term.TermNumber >= e.Term.TermNumber))
+                                .ThenInclude(e => e.Person)
                                 .Include(x => x.OnDay)
                                 .Include(x => x.Course).ThenInclude(x => x.CourseType)
                                 .Include(x => x.Course)
@@ -252,64 +258,8 @@ namespace U3A.BusinessRules
                 c.CourseContacts.Add(new CourseContact() { ContactType = contactType, Person = person });
             }
         }
-
-        internal record EnrolmentCount
-        {
-            internal Guid ID;
-            internal int Year;
-            internal int TermNumber;
-            internal bool IsWaitlisted;
-            internal int Count;
-        }
-
-        private static IEnumerable<EnrolmentCount> GetEnrolmentCountByCourse(U3ADbContext dbc, Term term)
-        {
-            return dbc.Enrolment
-                        .Include(x => x.Term)
-                        .Where(x => x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber &&
-                                x.ClassID == null)
-                        .GroupBy(e => new
-                        {
-                            ID = e.CourseID,
-                            Year = e.Term.Year,
-                            TermNumber = e.Term.TermNumber,
-                            IsWaitlisted = e.IsWaitlisted
-                        })
-                        .Select(g => new EnrolmentCount
-                        {
-                            ID = g.Key.ID,
-                            Year = g.Key.Year,
-                            TermNumber = g.Key.TermNumber,
-                            IsWaitlisted = g.Key.IsWaitlisted,
-                            Count = g.Count()
-                        }).ToList();
-        }
-        private static IEnumerable<EnrolmentCount> GetEnrolmentCountByCLass(U3ADbContext dbc, Term term)
-        {
-            return dbc.Enrolment
-                        .Include(x => x.Term)
-                        .Where(x => x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber &&
-                                x.ClassID != null)
-                        .GroupBy(e => new
-                        {
-                            ID = e.ClassID,
-                            Year = e.Term.Year,
-                            TermNumber = e.Term.TermNumber,
-                            IsWaitlisted = e.IsWaitlisted
-                        })
-                        .Select(g => new EnrolmentCount
-                        {
-                            ID = g.Key.ID.Value,
-                            Year = g.Key.Year,
-                            TermNumber = g.Key.TermNumber,
-                            IsWaitlisted = g.Key.IsWaitlisted,
-                            Count = g.Count()
-                        }).ToList();
-        }
         private static void AssignClassCounts(U3ADbContext dbc, Term term, List<Class> Classes)
         {
-            var enrolmentCountByCourse = GetEnrolmentCountByCourse(dbc, term);
-            var enrolmentCountByCLass = GetEnrolmentCountByCLass(dbc, term);
             Parallel.ForEach(Classes, c =>
             {
                 var nextTerm = GetNextTermOffered(c, term.TermNumber);
@@ -317,29 +267,13 @@ namespace U3A.BusinessRules
                 c.ParticipationRate = 0;
                 if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                 {
-                    var result = enrolmentCountByCourse.FirstOrDefault(x => x.ID == c.CourseID &&
-                                                                                x.Year == term.Year &&
-                                                                                x.TermNumber == nextTerm &&
-                                                                                !x.IsWaitlisted);
-                    c.TotalActiveStudents = (result == null) ? 0 : result.Count;
-                    result = enrolmentCountByCourse.FirstOrDefault(x => x.ID == c.CourseID &&
-                                                                                x.Year == term.Year &&
-                                                                                x.TermNumber == nextTerm &&
-                                                                                x.IsWaitlisted);
-                    c.TotalWaitlistedStudents = (result == null) ? 0 : result.Count;
+                    c.TotalActiveStudents = c.Course.Enrolments.Where(e => !e.IsWaitlisted).Count();
+                    c.TotalWaitlistedStudents = c.Course.Enrolments.Where(e => e.IsWaitlisted).Count();
                 }
                 else
                 {
-                    var result = enrolmentCountByCLass.FirstOrDefault(x => x.ID == c.ID &&
-                                                                                x.Year == term.Year &&
-                                                                                x.TermNumber == nextTerm &&
-                                                                                !x.IsWaitlisted);
-                    c.TotalActiveStudents = (result == null) ? 0 : result.Count;
-                    result = enrolmentCountByCLass.FirstOrDefault(x => x.ID == c.ID &&
-                                                                                x.Year == term.Year &&
-                                                                                x.TermNumber == nextTerm &&
-                                                                                x.IsWaitlisted);
-                    c.TotalWaitlistedStudents = (result == null) ? 0 : result.Count;
+                    c.TotalActiveStudents = c.Enrolments.Where(e => !e.IsWaitlisted).Count();
+                    c.TotalWaitlistedStudents  = c.Enrolments.Where(e => e.IsWaitlisted).Count();
                 }
                 if (maxStudents != 0) c.ParticipationRate = (double)((c.TotalActiveStudents + c.TotalWaitlistedStudents) / maxStudents);
             });
@@ -367,6 +301,8 @@ namespace U3A.BusinessRules
                             x.TermNumber >= term.TermNumber);
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
             var classes = dbc.Class.AsNoTracking()
+                                .Include(x => x.Enrolments.Where(x => terms.Contains(x.Term)))
+                                .ThenInclude(e => e.Person)
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Course)
@@ -387,20 +323,22 @@ namespace U3A.BusinessRules
             if (prevTerm != null)
             {
                 var prevTermShoulderClasses = dbc.Class.AsNoTracking()
-                                .Include(x => x.OnDay)
-                                .Include(x => x.Course).ThenInclude(x => x.CourseType)
-                                .Include(x => x.Course)
-                                    .ThenInclude(x => x.Enrolments.Where(x => x.TermID == prevTerm.ID))
-                                    .ThenInclude(e => e.Person)
-                                .Include(x => x.Leader)
-                                .Include(x => x.Occurrence)
-                                .Include(x => x.Venue)
-                                .Where(x => x.Course.Year == prevTerm.Year)
-                                .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
-                                .ToList()
-                                .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
-                                                && x.StartDate.GetValueOrDefault() < term.StartDate
-                                                && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
+                                .Include(x => x.Enrolments.Where(x => terms.Contains(x.Term)))
+                                .ThenInclude(e => e.Person)
+                            .Include(x => x.OnDay)
+                            .Include(x => x.Course).ThenInclude(x => x.CourseType)
+                            .Include(x => x.Course)
+                                .ThenInclude(x => x.Enrolments.Where(x => x.TermID == prevTerm.ID))
+                                .ThenInclude(e => e.Person)
+                            .Include(x => x.Leader)
+                            .Include(x => x.Occurrence)
+                            .Include(x => x.Venue)
+                            .Where(x => x.Course.Year == prevTerm.Year)
+                            .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
+                            .ToList()
+                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
+                                            && x.StartDate.GetValueOrDefault() < term.StartDate
+                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
                 AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
                 AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
                 AssignClassClerks(dbc, prevTerm, prevTermShoulderClasses);
