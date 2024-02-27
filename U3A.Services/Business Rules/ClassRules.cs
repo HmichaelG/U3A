@@ -13,6 +13,7 @@ using U3A.Services;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http.Json;
 using System.Text.Json.Serialization;
+using System.Runtime.InteropServices;
 
 namespace U3A.BusinessRules
 {
@@ -84,7 +85,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
                             .Where(x => x.Course.Year == term.Year)
-                            .ToListAsync()).Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm)).ToList();
+                            .ToListAsync()).Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm,terms)).ToList();
             Parallel.ForEach(classes, c =>
             {
                 c.TermNumber = GetRequiredTerm(term.TermNumber, c);
@@ -111,7 +112,7 @@ namespace U3A.BusinessRules
                                 .Where(x => x.Course.Year == prevTerm.Year && x.OccurrenceID != 999)
                                 .AsEnumerable()
                                 .Where(x => IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)
-                                                && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm)).ToList();
+                                                && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
                 Parallel.ForEach(prevTermShoulderClasses, c =>
                 {
                     c.TermNumber = prevTerm.TermNumber;
@@ -381,7 +382,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.Venue)
                             .Where(x => x.Course.Year == term.Year)
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime)
-                            .AsEnumerable().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm)).ToList();
+                            .AsEnumerable().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
             Parallel.ForEach(classes, c =>
             {
                 Parallel.ForEach(c.Course.Enrolments, e =>
@@ -408,7 +409,7 @@ namespace U3A.BusinessRules
                                 .AsEnumerable()
                                 .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                                 && x.StartDate.GetValueOrDefault() < term.StartDate
-                                                && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm)).ToList();
+                                                && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
                 Parallel.ForEach(prevTermShoulderClasses, c =>
                 {
                     Parallel.ForEach(c.Course.Enrolments, e =>
@@ -503,7 +504,8 @@ namespace U3A.BusinessRules
         {
             return (Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4);
         }
-        public static bool IsClassInRemainingYear(U3ADbContext dbc, Class Class, Term term, Term defaultTerm)
+        public static bool IsClassInRemainingYear(U3ADbContext dbc, 
+                                Class Class, Term term, Term defaultTerm, IEnumerable<Term> allTerms = null )
         {
             bool result = false;
             switch (term.TermNumber)
@@ -524,7 +526,14 @@ namespace U3A.BusinessRules
             // no more tests if term is in previous year
             if (term.Year < defaultTerm.Year) return result;
             // otherwise, only print classes that have not yet ended
-            DateTime? endDate = GetClassEndDate(Class, term);
+            var nextTerm = term;
+            if (allTerms != null)
+            {
+                var nextTermNo = GetNextTermOffered(Class, term.TermNumber);
+                var t = allTerms.FirstOrDefault(x => x.TermNumber == nextTermNo && x.Year == term.Year);
+                if (t != null) { nextTerm = t; }
+            }
+            DateTime? endDate = GetClassEndDate(Class, nextTerm);
             var localTime = TimezoneAdjustment.GetLocalTime();
             if (endDate == null || endDate <= localTime) result = false;
             return result;
