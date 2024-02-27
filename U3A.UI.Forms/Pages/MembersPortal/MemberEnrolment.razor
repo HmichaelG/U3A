@@ -785,7 +785,7 @@ else
             if (status != "Pending")
             {
                 // Enrolled in previous term - not current. Term is complete, do not allow edits.
-                classEndDate = BusinessRule.GetClassEndDate(dbc, c, prevTerm);
+                classEndDate = BusinessRule.GetClassEndDate(c, prevTerm);
                 if (classEndDate < today) { c.DoNotAllowEdit = true; } // cannot delete an expired class
             }
         };

@@ -152,7 +152,7 @@ namespace U3A.BusinessRules
             }
             else
             {
-                var endDate = BusinessRule.GetClassEndDate(dbc, c, targetTerm);
+                var endDate = BusinessRule.GetClassEndDate(c, targetTerm);
                 if (endDate != null && endDate >= targetTerm.StartDate) { result = true; }
             }
             return result;

@@ -162,9 +162,10 @@ namespace U3A.BusinessRules
             return list;
         }
 
-        public static DateTime? GetClassEndDate(U3ADbContext dbc, Class c, Term selectedTerm)
+        public static DateTime? GetClassEndDate(Class c, Term selectedTerm)
         {
             DateTime? result = null;
+            Term thisTerm = selectedTerm;
             List<ClassSchedule> list = new List<ClassSchedule>();
             var schedule = new ClassSchedule();
             if (c.StartDate.HasValue)
@@ -173,7 +174,8 @@ namespace U3A.BusinessRules
             }
             else
             {
-                schedule.StartDate = GetDateTime(selectedTerm.StartDate, c.StartTime);
+                var termOffered = GetNextTermOffered(c, thisTerm.TermNumber);
+                schedule.StartDate = GetDateTime(thisTerm.StartDate, c.StartTime);
             }
             schedule.EndDate = GetDateTime(schedule.StartDate, c.Course.Duration);
 
@@ -185,7 +187,7 @@ namespace U3A.BusinessRules
             {
                 schedule.AppointmentType = 0;
             }
-            schedule.Recurrence = GetRecurrence(c, selectedTerm);
+            schedule.Recurrence = GetRecurrence(c, thisTerm);
             list.Add(schedule);
             DxSchedulerDataStorage dataStorage = new DxSchedulerDataStorage()
             {
@@ -207,8 +209,8 @@ namespace U3A.BusinessRules
                 },
                 AppointmentLabelsSource = new List<LabelObject>()
             };
-            var range = new DxSchedulerDateTimeRange(selectedTerm.StartDate,
-                            new DateTime(selectedTerm.Year, 12, 31));
+            var range = new DxSchedulerDateTimeRange(thisTerm.StartDate,
+                            new DateTime(thisTerm.Year, 12, 31));
             var a = dataStorage.GetAppointments(range)
                         .OrderByDescending(x => x.End).FirstOrDefault();
             if (a != null) result = a.End;

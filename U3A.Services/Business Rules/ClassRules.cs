@@ -186,7 +186,7 @@ namespace U3A.BusinessRules
 
         public static bool IsClassEndDateInInterTermPeriod(U3ADbContext dbc, Class c, Term t, DateTime startDate, DateTime endDate)
         {
-            var d = BusinessRule.GetClassEndDate(dbc, c, t);
+            var d = BusinessRule.GetClassEndDate(c, t);
             return (d < endDate) && (d > startDate);
         }
 
@@ -524,7 +524,7 @@ namespace U3A.BusinessRules
             // no more tests if term is in previous year
             if (term.Year < defaultTerm.Year) return result;
             // otherwise, only print classes that have not yet ended
-            DateTime? endDate = GetClassEndDate(dbc, Class, term);
+            DateTime? endDate = GetClassEndDate(Class, term);
             var localTime = TimezoneAdjustment.GetLocalTime();
             if (endDate == null || endDate <= localTime) result = false;
             return result;
