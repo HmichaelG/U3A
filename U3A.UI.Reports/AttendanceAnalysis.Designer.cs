@@ -151,7 +151,7 @@
             this.xrChart1.BorderColor = System.Drawing.Color.Black;
             this.xrChart1.Borders = DevExpress.XtraPrinting.BorderSide.None;
             xyDiagram1.AxisX.DateTimeScaleOptions.AutoGrid = false;
-            xyDiagram1.AxisX.DateTimeScaleOptions.ScaleMode = DevExpress.XtraCharts.ScaleMode.Automatic;
+            xyDiagram1.AxisX.DateTimeScaleOptions.MeasureUnit = DevExpress.XtraCharts.DateTimeMeasureUnit.Week;
             xyDiagram1.AxisX.Label.TextAlignment = System.Drawing.StringAlignment.Near;
             xyDiagram1.AxisX.Label.TextPattern = "{A: MMM-yy}";
             xyDiagram1.AxisX.Tickmarks.MinorVisible = false;
@@ -324,7 +324,7 @@
             this.prmCourseID,
             this.prmCourseFilter,
             this.prmMinMonths});
-            this.Version = "23.1";
+            this.Version = "23.2";
             this.ParametersRequestBeforeShow += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.AttendanceAnalysis_ParametersRequestBeforeShow);
             this.DataSourceDemanded += new System.EventHandler<System.EventArgs>(this.AttendanceAnalysis_DataSourceDemanded);
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).EndInit();
