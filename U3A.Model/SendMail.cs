@@ -16,6 +16,8 @@ namespace U3A.Model
         public Guid? TermID { get; set; }
         public string Status { get; set; } = String.Empty;
 
+        public bool IsUserRequested { get; set; } = false;
+
         // leaders Pack only
         public bool PrintLeaderReport { get; set; }
         public bool PrintAttendanceRecord { get; set; }

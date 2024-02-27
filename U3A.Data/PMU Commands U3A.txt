@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Occurence_Varies
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_SystemSettings_SupportEmail
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_SystemSettings_SupportEmail
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_SendMail_IsUserRequested
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_SystemSettings_SupportEmail
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_SendMail_IsUserRequested
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

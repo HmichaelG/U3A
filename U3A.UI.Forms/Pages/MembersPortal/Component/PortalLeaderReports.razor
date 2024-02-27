@@ -40,7 +40,7 @@
 
     async Task OnQueueReportsSelected() {
         var msg = await ProcessReportsAsync(false);
-        if (msg == string.Empty) msg = $"<p>The selected documents have been queued and will be sent via email overnight.</p>";
+        if (msg == string.Empty) msg = $"<p>The selected documents have been queued and will be sent via email within the hour.</p>";
         await messageBox.ShowOkOnlyAsync("Leaders Reports", msg);
     }
 
@@ -73,7 +73,8 @@
                         PrintICEList = rptSelect.PrintICEList,
                         PrintLeaderReport = rptSelect.PrintLeaderReport,
                         PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
-                        RecordKey = selectedClass.ID
+                        RecordKey = selectedClass.ID,
+                        IsUserRequested = true
                     };
                 dbc.Add(mail);
                 await dbc.SaveChangesAsync();

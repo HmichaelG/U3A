@@ -113,6 +113,7 @@ namespace U3A.WebFunctions.Procedures
                             else { sm.Status = "Enrolments not found."; }
                             break;
                         case "U3A Leaders Reports":
+                            if (IsHourlyProcedure && !sm.IsUserRequested) { break; }
                             var thisClass = await dbc.Class.FindAsync(sm.RecordKey);
                             course = await dbc.Course.FindAsync(thisClass!.CourseID);
                             var thisTerm = await dbc.Term.FindAsync(sm.TermID);

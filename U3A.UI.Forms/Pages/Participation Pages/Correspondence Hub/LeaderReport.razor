@@ -99,13 +99,6 @@ else
     IReadOnlyList<object> SelectedDataItems { get; set; }
     List<LeaderReportRecipientsByClass> reportRecipients;
 
-
-    //bool PrintLeaderReport { get; set; }
-    //bool PrintClassList { get; set; }
-    //bool PrintICEList { get; set; }
-    //bool PrintAttendanceRecord { get; set; }
-    //bool PrintCSVFile { get; set; }
-    //bool PrintAttendanceAnalysis { get; set; }
     bool AreSelectionsMade { get; set; }
     SelectLeaderReports? rptSelect;
     ProFormaReportFactory reportFactory;
@@ -156,15 +149,9 @@ else
 
     async Task OnQueueReportsSelected()
     {
-        //PrintLeaderReport = rptSelect.PrintLeaderReport;
-        //PrintClassList = rptSelect.PrintClassList;
-        //PrintICEList = rptSelect.PrintICEList;
-        //PrintAttendanceRecord = rptSelect.PrintAttendanceRecord;
-        //PrintCSVFile = rptSelect.PrintCSVFile;
-        //PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis;
         ErrorMessage = "";
         await ProcessReportsAsync(false);
-        var msg = $"<p>The selected documents have been queued and will be sent via email overnight.</p>";
+        var msg = $"<p>The selected documents have been queued and will be sent via email within the hour.</p>";
         if (ErrorMessage != "") { msg += $"<div class='alert alert-danger text-dark'>{ErrorMessage}</div>"; }
         await messageBox.SetPopupWidth("30%");
         await messageBox.ShowOkOnlyAsync("Communication Complete", msg);
@@ -222,7 +209,8 @@ else
                     PrintCSVFile = rptSelect.PrintCSVFile,
                     PrintICEList = rptSelect.PrintICEList,
                     PrintLeaderReport = rptSelect.PrintLeaderReport,
-                    RecordKey = Class.ID
+                    RecordKey = Class.ID,
+                    IsUserRequested = true
                 };
             dbc.Add(mail);
         }
