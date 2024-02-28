@@ -153,10 +153,10 @@
             xyDiagram1.AxisX.DateTimeScaleOptions.AutoGrid = false;
             xyDiagram1.AxisX.DateTimeScaleOptions.MeasureUnit = DevExpress.XtraCharts.DateTimeMeasureUnit.Week;
             xyDiagram1.AxisX.Label.TextAlignment = System.Drawing.StringAlignment.Near;
-            xyDiagram1.AxisX.Label.TextPattern = "{A: MMM-yy}";
+            xyDiagram1.AxisX.Label.TextPattern = "{A: dd--MMM}";
             xyDiagram1.AxisX.Tickmarks.MinorVisible = false;
             xyDiagram1.AxisX.Title.MaxLineCount = 1;
-            xyDiagram1.AxisX.Title.Text = "Week Ending";
+            xyDiagram1.AxisX.Title.Text = "Week";
             xyDiagram1.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True;
             xyDiagram1.AxisX.VisibleInPanesSerializable = "-1";
             xyDiagram1.AxisY.Label.TextPattern = "{V:0%}";
@@ -308,7 +308,7 @@
             this.ReportFooter});
             this.ComponentStorage.AddRange(new System.ComponentModel.IComponent[] {
             this.objectDataSource1,
-            this.objectDataSource2});
+            this.objectDataSource2 });
             this.DataSource = this.objectDataSource1;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Landscape = true;

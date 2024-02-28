@@ -21,12 +21,13 @@ namespace U3A.UI.Reports
         string[] courseFilter;
         private void AttendanceAnalysis_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
-            xrChart1.Titles[0].Text = $"{DateTime.Today.Year} Attendance Analysis";
-            data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext);
-            objectDataSource1.DataSource = data;
+            //xrChart1.Titles[0].Text = $"{DateTime.Today.Year} Attendance Analysis";
+            //data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext);
+            //objectDataSource1.DataSource = data;
         }
         private void AttendanceAnalysis_DataSourceDemanded(object sender, EventArgs e)
         {
+            xrChart1.Titles[0].Text = $"{DateTime.Today.Year} Attendance Analysis";
             if (data == null)
             {
                 data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext);
