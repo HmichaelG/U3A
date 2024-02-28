@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Drawing;
 using U3A.BusinessRules;
 using U3A.Database;
+using U3A.Model;
 
 namespace U3A.UI.Reports
 {
@@ -17,6 +18,7 @@ namespace U3A.UI.Reports
         public LeaderReport()
         {
             InitializeComponent();
+            prmFromDate.Value = TimezoneAdjustment.GetLocalTime().Date.AddDays(-7);
         }
 
     }
