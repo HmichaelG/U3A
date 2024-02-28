@@ -19,7 +19,8 @@ namespace U3A.UI.Reports
         public U3ADbContext DbContext { get; set; }
         private void AttendanceAnalysis_DataSourceDemanded(object sender, EventArgs e)
         {
-            objectDataSource1.DataSource = BusinessRule.GetClassAttendanceDetailByWeek(DbContext);
+            int year = TimezoneAdjustment.GetLocalTime().Year;
+            objectDataSource1.DataSource = BusinessRule.GetClassAttendanceDetailByWeek(DbContext,year);
         }
 
         Guid LastClass { get; set; } = Guid.Empty;

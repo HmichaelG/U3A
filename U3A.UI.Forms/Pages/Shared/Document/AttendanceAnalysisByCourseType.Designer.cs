@@ -136,13 +136,13 @@
             this.xrChart1.BorderColor = System.Drawing.Color.Black;
             this.xrChart1.Borders = DevExpress.XtraPrinting.BorderSide.None;
             xyDiagram1.AxisX.DateTimeScaleOptions.AutoGrid = false;
-            xyDiagram1.AxisX.DateTimeScaleOptions.ScaleMode = DevExpress.XtraCharts.ScaleMode.Automatic;
+            xyDiagram1.AxisX.DateTimeScaleOptions.MeasureUnit = DevExpress.XtraCharts.DateTimeMeasureUnit.Week;
             xyDiagram1.AxisX.Label.Staggered = true;
             xyDiagram1.AxisX.Label.TextAlignment = System.Drawing.StringAlignment.Near;
             xyDiagram1.AxisX.Label.TextPattern = "{A: dd-MMM-yy}";
             xyDiagram1.AxisX.Tickmarks.MinorVisible = false;
             xyDiagram1.AxisX.Title.MaxLineCount = 1;
-            xyDiagram1.AxisX.Title.Text = "Week Ending";
+            xyDiagram1.AxisX.Title.Text = "Week";
             xyDiagram1.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True;
             xyDiagram1.AxisX.VisibleInPanesSerializable = "-1";
             xyDiagram1.AxisY.Label.TextPattern = "{V:0%}";
@@ -288,7 +288,7 @@
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmCourseID, DevExpress.XtraReports.Parameters.Orientation.Horizontal)});
             this.Parameters.AddRange(new DevExpress.XtraReports.Parameters.Parameter[] {
             this.prmCourseID});
-            this.Version = "23.1";
+            this.Version = "23.2";
             this.DataSourceDemanded += new System.EventHandler<System.EventArgs>(this.AttendanceAnalysis_DataSourceDemanded);
             ((System.ComponentModel.ISupportInitialize)(xyDiagram1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(pointSeriesLabel1)).EndInit();

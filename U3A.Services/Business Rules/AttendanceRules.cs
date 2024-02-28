@@ -81,13 +81,13 @@ namespace U3A.BusinessRules
             };
             return result.OrderBy(x => x.WeekEnd).ToList();
         }
-        public static List<AttendClassDetailByWeek> GetClassAttendanceDetailByWeek(U3ADbContext dbc)
+        public static List<AttendClassDetailByWeek> GetClassAttendanceDetailByWeek(U3ADbContext dbc, int Year)
         {
             var classes = dbc.Class.Include(x => x.OnDay).ToImmutableList();
             var courses = dbc.Course.ToImmutableList();
             var courseTypes = dbc.CourseType.ToImmutableList();
-            var endDate = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + 6);
-            var startDate = new DateTime(endDate.Year, 1, 1);
+            var endDate = new DateTime(Year, 12, 31);
+            var startDate = new DateTime(Year, 1, 1);
             // A class with valid attendance has at least 1 present
             var validAttendance = (dbc.AttendClass.Include(x => x.Class)
                 .Where(ac => ac.Date >= startDate && ac.Date <= endDate)

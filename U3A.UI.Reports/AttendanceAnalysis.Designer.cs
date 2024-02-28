@@ -57,6 +57,7 @@
             this.xrLabel1 = new DevExpress.XtraReports.UI.XRLabel();
             this.prmCourseFilter = new DevExpress.XtraReports.Parameters.Parameter();
             this.prmMinMonths = new DevExpress.XtraReports.Parameters.Parameter();
+            this.prmYear = new DevExpress.XtraReports.Parameters.Parameter();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrChart1)).BeginInit();
@@ -299,6 +300,13 @@
             this.prmMinMonths.Type = typeof(int);
             this.prmMinMonths.ValueInfo = "0";
             // 
+            // prmYear
+            // 
+            this.prmYear.Description = "Report for year";
+            this.prmYear.Name = "prmYear";
+            this.prmYear.Type = typeof(int);
+            this.prmYear.ValueInfo = "0";
+            // 
             // AttendanceAnalysis
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -308,7 +316,7 @@
             this.ReportFooter});
             this.ComponentStorage.AddRange(new System.ComponentModel.IComponent[] {
             this.objectDataSource1,
-            this.objectDataSource2 });
+            this.objectDataSource2});
             this.DataSource = this.objectDataSource1;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Landscape = true;
@@ -317,10 +325,12 @@
             this.PageWidth = 1169;
             this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmYear, DevExpress.XtraReports.Parameters.Orientation.Vertical),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmCourseID, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmCourseFilter, DevExpress.XtraReports.Parameters.Orientation.Vertical),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmMinMonths, DevExpress.XtraReports.Parameters.Orientation.Vertical)});
             this.Parameters.AddRange(new DevExpress.XtraReports.Parameters.Parameter[] {
+            this.prmYear,
             this.prmCourseID,
             this.prmCourseFilter,
             this.prmMinMonths});
@@ -367,5 +377,6 @@
         private DevExpress.XtraReports.Parameters.Parameter prmCourseFilter;
         private DevExpress.DataAccess.ObjectBinding.ObjectDataSource objectDataSource2;
         private DevExpress.XtraReports.Parameters.Parameter prmMinMonths;
+        private DevExpress.XtraReports.Parameters.Parameter prmYear;
     }
 }
