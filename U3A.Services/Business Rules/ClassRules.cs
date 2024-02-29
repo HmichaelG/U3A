@@ -85,11 +85,10 @@ namespace U3A.BusinessRules
         private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc, Term term)
         {
             return dbc.Class.AsNoTracking()
-                                .Include(x => x.Enrolments.Where(e => e.ClassID != null))
+                            .Include(x => x.Enrolments.Where(e => e.ClassID != null))
                                 .ThenInclude(e => e.Person)
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
-                            .Include(x => x.Course)
                             .Include(x => x.Leader)
                             .Include(x => x.Leader2)
                             .Include(x => x.Leader3)
@@ -100,14 +99,18 @@ namespace U3A.BusinessRules
 
         private static void AssignClassTerm(IEnumerable<Class> classes, IEnumerable<Term> terms, Term term)
         {
-            Parallel.ForEach(classes, c =>
+            foreach (var c in classes)
             {
                 c.TermNumber = GetRequiredTerm(term.TermNumber, c);
-                Parallel.ForEach(c.Course.Enrolments, e =>
+                foreach (var e in c.Course.Enrolments)
                 {
                     e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-                });
-            });
+                };
+                foreach (var e in c.Enrolments)
+                {
+                    e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
+                };
+            }
         }
 
         /// <summary>
@@ -161,6 +164,7 @@ namespace U3A.BusinessRules
             classes.AddRange(GetDifferentParticipantClasses(dbc, term)
                             .ToList().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList()
                             );
+            AssignClassTerm(classes, terms, term);
             AssignClassContacts(classes, term, settings);
             AssignClassCounts(dbc, term, classes);
             AssignClassClerks(dbc, term, classes);
@@ -178,6 +182,7 @@ namespace U3A.BusinessRules
                                             && x.StartDate.GetValueOrDefault() < term.StartDate
                                             && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList()
                             );
+                AssignClassTerm(classes, terms, prevTerm);
                 AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
                 AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
                 AssignClassClerks(dbc, prevTerm, prevTermShoulderClasses);
@@ -316,13 +321,17 @@ namespace U3A.BusinessRules
                 c.ParticipationRate = 0;
                 if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                 {
-                    c.TotalActiveStudents = c.Course.Enrolments.Where(e => !e.IsWaitlisted).Count();
-                    c.TotalWaitlistedStudents = c.Course.Enrolments.Where(e => e.IsWaitlisted).Count();
+                    c.TotalActiveStudents = c.Course.Enrolments
+                                            .Where(e => !e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
+                    c.TotalWaitlistedStudents = c.Course.Enrolments
+                                            .Where(e => e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
                 }
                 else
                 {
-                    c.TotalActiveStudents = c.Enrolments.Where(e => !e.IsWaitlisted).Count();
-                    c.TotalWaitlistedStudents = c.Enrolments.Where(e => e.IsWaitlisted).Count();
+                    c.TotalActiveStudents = c.Enrolments
+                                                .Where(e => !e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
+                    c.TotalWaitlistedStudents = c.Enrolments
+                                                .Where(e => e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
                 }
                 if (maxStudents != 0) c.ParticipationRate = (double)((c.TotalActiveStudents + c.TotalWaitlistedStudents) / maxStudents);
             });
