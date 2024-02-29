@@ -85,10 +85,11 @@ namespace U3A.BusinessRules
         private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc, Term term)
         {
             return dbc.Class.AsNoTracking()
-                            .Include(x => x.Enrolments.Where(e => e.ClassID != null))
+                                .Include(x => x.Enrolments.Where(e => e.ClassID != null))
                                 .ThenInclude(e => e.Person)
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
+                            .Include(x => x.Course)
                             .Include(x => x.Leader)
                             .Include(x => x.Leader2)
                             .Include(x => x.Leader3)
@@ -99,18 +100,18 @@ namespace U3A.BusinessRules
 
         private static void AssignClassTerm(IEnumerable<Class> classes, IEnumerable<Term> terms, Term term)
         {
-            foreach (var c in classes)
+            Parallel.ForEach(classes, c =>
             {
                 c.TermNumber = GetRequiredTerm(term.TermNumber, c);
-                foreach (var e in c.Course.Enrolments)
+                Parallel.ForEach(c.Course.Enrolments, e =>
                 {
                     e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-                };
-                foreach (var e in c.Enrolments)
+                });
+                Parallel.ForEach(c.Enrolments, e =>
                 {
                     e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-                };
-            }
+                });
+            });
         }
 
         /// <summary>
@@ -128,11 +129,11 @@ namespace U3A.BusinessRules
             classes.AddRange((await GetDifferentParticipantClasses(dbc, term)
                         .ToListAsync()).Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList()
                         );
-            AssignClassTerm(classes,terms,term);
+            AssignClassTerm(classes, terms, term);
             AssignClassContacts(classes, term, settings);
             AssignClassCounts(dbc, term, classes);
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
-            if (prevTerm != null)
+            if (prevTerm != null && prevTerm.Year == term.Year)
             {
                 var prevTermShoulderClasses = (await GetSameParticipantClasses(dbc, prevTerm)
                             .ToListAsync())
@@ -157,7 +158,7 @@ namespace U3A.BusinessRules
         public static List<Class> GetClassDetails(U3ADbContext dbc, Term term, SystemSettings settings)
         {
             var terms = dbc.Term.AsNoTracking().Where(x => x.Year == term.Year &&
-                            x.TermNumber >= term.TermNumber);
+                            x.TermNumber >= term.TermNumber).ToList();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
             var classes = GetSameParticipantClasses(dbc, term)
                             .ToList().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
@@ -169,20 +170,20 @@ namespace U3A.BusinessRules
             AssignClassCounts(dbc, term, classes);
             AssignClassClerks(dbc, term, classes);
             var prevTerm = GetPreviousTerm(dbc, term.Year, term.TermNumber);
-            if (prevTerm != null)
+            if (prevTerm != null && prevTerm.Year == term.Year)
             {
-                var prevTermShoulderClasses = GetSameParticipantClasses(dbc,prevTerm)
+                var prevTermShoulderClasses = GetSameParticipantClasses(dbc, prevTerm)
                             .ToList()
                             .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                             && x.StartDate.GetValueOrDefault() < term.StartDate
                                             && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                prevTermShoulderClasses.AddRange(GetDifferentParticipantClasses(dbc,prevTerm)
+                prevTermShoulderClasses.AddRange(GetDifferentParticipantClasses(dbc, prevTerm)
                             .ToList()
                             .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                             && x.StartDate.GetValueOrDefault() < term.StartDate
                                             && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList()
                             );
-                AssignClassTerm(classes, terms, prevTerm);
+                AssignClassTerm(prevTermShoulderClasses, terms, prevTerm);
                 AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
                 AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
                 AssignClassClerks(dbc, prevTerm, prevTermShoulderClasses);
