@@ -26,6 +26,7 @@ namespace U3A.UI.Reports
         private void AttendanceAnalysis_DataSourceDemanded(object sender, EventArgs e)
         {
             int year = (int)prmYear.Value;
+            if (year == 0) { year = TimezoneAdjustment.GetLocalTime().Year; }
             xrChart1.Titles[0].Text = $"{year} Attendance Analysis";
             data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext, year);
             objectDataSource1.DataSource = data;
@@ -54,8 +55,8 @@ namespace U3A.UI.Reports
             }
 
             // Course filter for individual leader report
-            Guid? prmCourseID = (this.prmCourseID.Value != null) ? (Guid)this.prmCourseID.Value : null;
-            if (prmCourseID.HasValue && prmCourseID != ac.CourseID) { e.Cancel = true; return; }
+            Guid? thisCourseID = (this.prmCourseID.Value != null) ? (Guid)this.prmCourseID.Value : null;
+            if (thisCourseID.HasValue && thisCourseID != ac.CourseID) { e.Cancel = true; return; }
 
             // Course selection filter
             if (courseFilter != null && (!courseFilter.Contains(ac.ID))) { e.Cancel = true; return; }
@@ -63,7 +64,7 @@ namespace U3A.UI.Reports
             LastClass = ac.ClassID;
             hasPrinted = true;
             string courseIDFilter = ac.CourseID.ToString();
-            if (prmCourseID != null) { courseIDFilter = prmCourseID.ToString(); }
+            if (thisCourseID != null) { courseIDFilter = thisCourseID.ToString(); }
             lblTitle.Text = $"{ac.CourseDescription}{Environment.NewLine}Course Type: {ac.CourseTypeDescription}";
             var occurrenceFilter = $"OccurrenceTypeID == {(int)OccurrenceType.Weekly}";
             // All U3A

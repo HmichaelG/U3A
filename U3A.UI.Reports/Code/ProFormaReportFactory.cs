@@ -271,7 +271,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 {
                     using (var AttendanceAnalysis = new AttendanceAnalysis())
                     {
-                        createdFilenames.Add(await CreateAttendanceAnalysisReportAsync(AttendanceAnalysis,
+                        createdFilenames.Add(CreateAttendanceAnalysisReport(AttendanceAnalysis,
                                                 Leader, CourseID));
                         reportNames.Add("Attendance Analysis.pdf");
                     }
@@ -321,7 +321,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                 RandomAllocationExecuted);
             }
         }
-        async Task<string> CreateAttendanceAnalysisReportAsync(AttendanceAnalysis report,
+        string CreateAttendanceAnalysisReport(AttendanceAnalysis report,
                 Person Leader,
                 Guid CourseID)
         {

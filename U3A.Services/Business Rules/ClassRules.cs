@@ -14,6 +14,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http.Json;
 using System.Text.Json.Serialization;
 using System.Runtime.InteropServices;
+using Twilio.Rest.Trunking.V1;
 
 namespace U3A.BusinessRules
 {
@@ -65,6 +66,50 @@ namespace U3A.BusinessRules
             return classes;
         }
 
+        private static IQueryable<Class> GetSameParticipantClasses(U3ADbContext dbc, Term term)
+        {
+            return dbc.Class.AsNoTracking()
+                            .Include(x => x.OnDay)
+                            .Include(x => x.Course).ThenInclude(x => x.CourseType)
+                            .Include(x => x.Course)
+                                .ThenInclude(x => x.Enrolments.Where(e => e.ClassID == null))
+                                .ThenInclude(e => e.Person)
+                            .Include(x => x.Leader)
+                            .Include(x => x.Leader2)
+                            .Include(x => x.Leader3)
+                            .Include(x => x.Occurrence)
+                            .Include(x => x.Venue)
+                            .Where(x => x.Course.Year == term.Year && !x.Enrolments.Any())
+                            .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime);
+        }
+        private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc, Term term)
+        {
+            return dbc.Class.AsNoTracking()
+                                .Include(x => x.Enrolments.Where(e => e.ClassID != null))
+                                .ThenInclude(e => e.Person)
+                            .Include(x => x.OnDay)
+                            .Include(x => x.Course).ThenInclude(x => x.CourseType)
+                            .Include(x => x.Course)
+                            .Include(x => x.Leader)
+                            .Include(x => x.Leader2)
+                            .Include(x => x.Leader3)
+                            .Include(x => x.Occurrence)
+                            .Include(x => x.Venue)
+                            .Where(x => x.Course.Year == term.Year && x.Enrolments.Any());
+        }
+
+        private static void AssignClassTerm(IEnumerable<Class> classes, IEnumerable<Term> terms, Term term)
+        {
+            Parallel.ForEach(classes, c =>
+            {
+                c.TermNumber = GetRequiredTerm(term.TermNumber, c);
+                Parallel.ForEach(c.Course.Enrolments, e =>
+                {
+                    e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
+                });
+            });
+        }
+
         /// <summary>
         /// Get available classes for the current year
         /// </summary>
@@ -75,59 +120,29 @@ namespace U3A.BusinessRules
         {
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
-            var classes = (await dbc.Class.AsNoTracking()
-                                .Include(x => x.Enrolments
-                                        .Where(e => e.Term.Year == term.Year && e.Term.TermNumber >= e.Term.TermNumber))
-                                .ThenInclude(e => e.Person)
-                            .Include(x => x.OnDay)
-                            .Include(x => x.Course).ThenInclude(x => x.CourseType)
-                            .Include(x => x.Course)
-                                .ThenInclude(x => x.Enrolments
-                                        .Where(e => e.Term.Year == term.Year && e.Term.TermNumber >= e.Term.TermNumber))
-                                .ThenInclude(e => e.Person)
-                            .Include(x => x.Leader)
-                            .Include(x => x.Occurrence)
-                            .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == term.Year)
+            var classes = (await GetSameParticipantClasses(dbc, term)
                             .ToListAsync()).Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            Parallel.ForEach(classes, c =>
-            {
-                c.TermNumber = GetRequiredTerm(term.TermNumber, c);
-                Parallel.ForEach(c.Course.Enrolments, e =>
-                {
-                    e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-                });
-            });
+            classes.AddRange((await GetDifferentParticipantClasses(dbc, term)
+                        .ToListAsync()).Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList()
+                        );
+            AssignClassTerm(classes,terms,term);
             AssignClassContacts(classes, term, settings);
             AssignClassCounts(dbc, term, classes);
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
             if (prevTerm != null)
             {
-                //OccurenceID == 99 is Unscheduled.
-                var prevTermShoulderClasses = dbc.Class.AsNoTracking()
-                                .Include(x => x.Enrolments
-                                        .Where(e => e.Term.Year == term.Year && e.Term.TermNumber >= e.Term.TermNumber))
-                                .ThenInclude(e => e.Person)
-                                .Include(x => x.OnDay)
-                                .Include(x => x.Course).ThenInclude(x => x.CourseType)
-                                .Include(x => x.Course)
-                                    .ThenInclude(x => x.Enrolments.Where(x => x.TermID == prevTerm.ID))
-                                    .ThenInclude(e => e.Person)
-                                .Include(x => x.Leader)
-                                .Include(x => x.Occurrence)
-                                .Include(x => x.Venue)
-                                .Where(x => x.Course.Year == prevTerm.Year && x.OccurrenceID != 999)
-                                .AsEnumerable()
-                                .Where(x => IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)
-                                                && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                Parallel.ForEach(prevTermShoulderClasses, c =>
-                {
-                    c.TermNumber = prevTerm.TermNumber;
-                    Parallel.ForEach(c.Course.Enrolments, e =>
-                    {
-                        e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-                    });
-                });
+                var prevTermShoulderClasses = (await GetSameParticipantClasses(dbc, prevTerm)
+                            .ToListAsync())
+                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
+                                            && x.StartDate.GetValueOrDefault() < term.StartDate
+                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
+                prevTermShoulderClasses.AddRange((await GetDifferentParticipantClasses(dbc, prevTerm)
+                        .ToListAsync())
+                        .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
+                                        && x.StartDate.GetValueOrDefault() < term.StartDate
+                                        && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList()
+                        );
+                AssignClassTerm(prevTermShoulderClasses, terms, prevTerm);
                 AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
                 AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
                 classes.AddRange(prevTermShoulderClasses);
@@ -136,6 +151,40 @@ namespace U3A.BusinessRules
                         .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name).ToList();
         }
 
+        public static List<Class> GetClassDetails(U3ADbContext dbc, Term term, SystemSettings settings)
+        {
+            var terms = dbc.Term.AsNoTracking().Where(x => x.Year == term.Year &&
+                            x.TermNumber >= term.TermNumber);
+            var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
+            var classes = GetSameParticipantClasses(dbc, term)
+                            .ToList().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
+            classes.AddRange(GetDifferentParticipantClasses(dbc, term)
+                            .ToList().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList()
+                            );
+            AssignClassContacts(classes, term, settings);
+            AssignClassCounts(dbc, term, classes);
+            AssignClassClerks(dbc, term, classes);
+            var prevTerm = GetPreviousTerm(dbc, term.Year, term.TermNumber);
+            if (prevTerm != null)
+            {
+                var prevTermShoulderClasses = GetSameParticipantClasses(dbc,prevTerm)
+                            .ToList()
+                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
+                                            && x.StartDate.GetValueOrDefault() < term.StartDate
+                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
+                prevTermShoulderClasses.AddRange(GetDifferentParticipantClasses(dbc,prevTerm)
+                            .ToList()
+                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
+                                            && x.StartDate.GetValueOrDefault() < term.StartDate
+                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList()
+                            );
+                AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
+                AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
+                AssignClassClerks(dbc, prevTerm, prevTermShoulderClasses);
+                classes.AddRange(prevTermShoulderClasses);
+            }
+            return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes).ToList();
+        }
         public static int GetRequiredTerm(int termNumber, Class c)
         {
             int Result = termNumber - 1;
@@ -273,7 +322,7 @@ namespace U3A.BusinessRules
                 else
                 {
                     c.TotalActiveStudents = c.Enrolments.Where(e => !e.IsWaitlisted).Count();
-                    c.TotalWaitlistedStudents  = c.Enrolments.Where(e => e.IsWaitlisted).Count();
+                    c.TotalWaitlistedStudents = c.Enrolments.Where(e => e.IsWaitlisted).Count();
                 }
                 if (maxStudents != 0) c.ParticipationRate = (double)((c.TotalActiveStudents + c.TotalWaitlistedStudents) / maxStudents);
             });
@@ -292,59 +341,6 @@ namespace U3A.BusinessRules
                     c.Clerks.Add(e.Person);
                 }
             });
-        }
-
-
-        public static List<Class> GetClassDetails(U3ADbContext dbc, Term term, SystemSettings settings)
-        {
-            var terms = dbc.Term.AsNoTracking().Where(x => x.Year == term.Year &&
-                            x.TermNumber >= term.TermNumber);
-            var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
-            var classes = dbc.Class.AsNoTracking()
-                                .Include(x => x.Enrolments.Where(x => terms.Contains(x.Term)))
-                                .ThenInclude(e => e.Person)
-                            .Include(x => x.OnDay)
-                            .Include(x => x.Course).ThenInclude(x => x.CourseType)
-                            .Include(x => x.Course)
-                                .ThenInclude(x => x.Enrolments.Where(x => terms.Contains(x.Term)))
-                                .ThenInclude(e => e.Person)
-                            .Include(x => x.Leader)
-                            .Include(x => x.Leader2)
-                            .Include(x => x.Leader3)
-                            .Include(x => x.Occurrence)
-                            .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == term.Year)
-                            .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime)
-                            .ToList().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            AssignClassContacts(classes, term, settings);
-            AssignClassCounts(dbc, term, classes);
-            AssignClassClerks(dbc, term, classes);
-            var prevTerm = GetPreviousTerm(dbc, term.Year, term.TermNumber);
-            if (prevTerm != null)
-            {
-                var prevTermShoulderClasses = dbc.Class.AsNoTracking()
-                                .Include(x => x.Enrolments.Where(x => terms.Contains(x.Term)))
-                                .ThenInclude(e => e.Person)
-                            .Include(x => x.OnDay)
-                            .Include(x => x.Course).ThenInclude(x => x.CourseType)
-                            .Include(x => x.Course)
-                                .ThenInclude(x => x.Enrolments.Where(x => x.TermID == prevTerm.ID))
-                                .ThenInclude(e => e.Person)
-                            .Include(x => x.Leader)
-                            .Include(x => x.Occurrence)
-                            .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == prevTerm.Year)
-                            .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
-                            .ToList()
-                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
-                                            && x.StartDate.GetValueOrDefault() < term.StartDate
-                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
-                AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
-                AssignClassClerks(dbc, prevTerm, prevTermShoulderClasses);
-                classes.AddRange(prevTermShoulderClasses);
-            }
-            return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes).ToList();
         }
 
         public static List<Class> GetClassDetailsForStudent(IEnumerable<Class> Classes, Person Student)
