@@ -37,12 +37,33 @@
 </style>
 
 @code {
+    bool _isInputBox;
+
     [Parameter]
     public bool PopupVisible { get; set; }
+    [Parameter]
+    public bool IsInputBox { get
+        {
+            return _isInputBox;   
+        } 
+        set
+        {
+            _isInputBox = true;        
+            mOKButtonText = "Ok";
+            mCancelButtonText = "Cancel";
+            mShowOkButton = true;
+            mShowCancelButton = true;
+        }
+    }
+
     [Parameter]
     public string PopupWidth { get; set; }
     [Parameter]
     public RenderFragment TextTemplate { get; set; } = default;
+    [Parameter]
+    public EventCallback AffirmativeButtonClicked { get; set; }
+    [Parameter]
+    public EventCallback NegativeButtonClicked { get; set; }
 
     public MessageBoxDialogResult MessageBoxResult { get; set; }
 
@@ -110,17 +131,19 @@
         return tcs.Task;
     }
 
-    void OnAffirmativeButtonClicked()
+    async Task OnAffirmativeButtonClicked()
     {
         MessageBoxResult = MessageBoxDialogResult.OkButtonClicked;
         PopupVisible = false;
         tcs?.TrySetResult(true);
+        await AffirmativeButtonClicked.InvokeAsync();
     }
-    void OnNegativeButtonClicked()
+    async Task OnNegativeButtonClicked()
     {
         MessageBoxResult = MessageBoxDialogResult.CancelButtonClicked;
         PopupVisible = false;
         tcs?.TrySetResult(false);
+        await NegativeButtonClicked.InvokeAsync();
     }
     void OnNoButtonClicked()
     {
