@@ -130,6 +130,12 @@ namespace U3A.UI.Reports
             foreach (var kvp in Enrolments)
             {
                 List<(Guid CourseID, Guid? ClassID)> onFile = new();
+                List<Term> terms = new();
+                var currentTerm = BusinessRule.CurrentTerm(dbc);
+                if (currentTerm != null)
+                {
+                    terms = await dbc.Term.Where(x => x.Year == currentTerm.Year).ToListAsync();
+                }
                 var person = await dbc.Person.FindAsync(kvp.Key);
                 var personsFiles = new List<string>();
                 foreach (var enrolment in kvp.Value.OrderBy(x => x.Course.Name))
@@ -142,6 +148,15 @@ namespace U3A.UI.Reports
                         using (var participantEnrolmentProForma = new ParticipantEnrolment())
                         {
                             participantEnrolmentProForma.DataSource = detail;
+                            var dataSources = DataSourceManager.GetDataSources(participantEnrolmentProForma, includeSubReports: false);
+                            foreach (var dataSource in dataSources)
+                            {
+                                if (dataSource  is ObjectDataSource)
+                                {
+                                   var ds = (dataSource as ObjectDataSource);
+                                    if (ds.Name.ToLower() == "objectdatasource2") { ds.DataSource = terms; }
+                                }
+                            }
                             string pdf = GetTempPdfFile();
                             participantEnrolmentProForma.ExportToPdf(pdf, options);
                             personsFiles.Add(pdf);
