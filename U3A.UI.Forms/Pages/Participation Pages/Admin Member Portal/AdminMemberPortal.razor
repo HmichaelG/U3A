@@ -91,12 +91,6 @@ else
                                 <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
                                              ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
                                     <Items>
-                                        <DxAccordionItem Text="Add/Edit Member Details" Expanded="false">
-                                            <ContentTemplate>
-                                                <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
-                                                <div class="mx-2"><PersonMnt IsEmbedded="true" /></div>
-                                            </ContentTemplate>
-                                        </DxAccordionItem>
                                         <DxAccordionItem Text="Received Today" Expanded="true">
                                             <ContentTemplate>
                                                 <div class="m-2">
@@ -126,6 +120,12 @@ else
                                                         </TotalSummary>
                                                     </DxGrid>
                                                 </div>
+                                            </ContentTemplate>
+                                        </DxAccordionItem>
+                                        <DxAccordionItem Text="Add/Edit Member Details" Expanded="false">
+                                            <ContentTemplate>
+                                                <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
+                                                <div class="mx-2"><PersonMnt IsEmbedded="true" /></div>
                                             </ContentTemplate>
                                         </DxAccordionItem>
                                     </Items>
