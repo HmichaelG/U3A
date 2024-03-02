@@ -16,6 +16,8 @@
 @using DevExpress.XtraReports.UI;
 @using DevExpress.Blazor.Reporting.EditingFields;
 @using DevExpress.XtraReports.Web.Native.ClientControls;
+@using DevExpress.Blazor.Reporting
+@using DevExpress.Blazor.Reporting.Models
 
 @attribute [Authorize]
 
@@ -23,14 +25,15 @@
 @using Microsoft.Extensions.DependencyInjection
 
 
-    <DxReportViewer @ref="reportViewer"
-                    Report="@Report"
-                    SinglePagePreview="false"
-                    Zoom="1"
-                    TabPanelMinWidth="100"
-                    TabPanelMaxWidth="200"
-                    CssClass="w-100"
-                    RootCssClasses="@RootCssClass" />
+<DxReportViewer @ref="reportViewer"
+                Report="@Report"
+                SinglePagePreview="false"
+                Zoom="1"
+                TabPanelMinWidth="100"
+                TabPanelMaxWidth="200"
+                CssClass="w-100"
+                OnCustomizeToolbar="OnCustomizeToolbar"
+                RootCssClasses="@RootCssClass" />
 
 <style>
     .view-normal {
@@ -48,6 +51,8 @@
     public XtraReport? Report { get; set; }
     [Parameter]
     public string RootCssClass { get; set; } = "view-normal";
+    [Parameter]
+    public EventCallback OnCloseButtonClick { get; set; }
 
     U3ADbContext dbc { get; set; }
     bool isReady;
@@ -115,6 +120,29 @@
             }
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    void OnCustomizeToolbar(ToolbarModel toolbarModel)
+    {
+        toolbarModel.AllItems.Add(new ToolbarItem()
+            {
+                IconCssClass = "bi bi-door-open",
+                BeginGroup = true,
+                Text = "Close Report",
+                AdaptiveText = "Close Report",
+                AdaptivePriority = 1,                  
+                Click = async (args) =>
+                {
+                    if (OnCloseButtonClick.HasDelegate)
+                    {
+                        await OnCloseButtonClick.InvokeAsync();
+                    }
+                    else
+                    {
+                        NavMan.NavigateTo("/");
+                    }
+                }
+            });
     }
 
     public void Dispose()

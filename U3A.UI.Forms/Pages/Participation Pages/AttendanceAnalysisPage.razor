@@ -48,7 +48,9 @@
     </TextTemplate>
 </MessageBox>
 
-<XtraReportViewer @ref=@viewer Report="@report" />
+<XtraReportViewer @ref=@viewer 
+        OnCloseButtonClick="@(() => {CoursesToReport = new List<Course>(); isPopupVisible=true;})"
+        Report="@report" />
 
 @code {
     MessageBox? messageBox;
