@@ -15,12 +15,23 @@
             PopupVisible=@isPopupVisible>
     <TextTemplate>
         <DxFormLayout>
-            <DxFormLayoutItem Caption="Report for year" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical" >
+            <DxFormLayoutItem Caption="Report for year" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                 <DxSpinEdit Value=@ReportForYear
                             ValueChanged="@((int newValue) => OnReportForYearChanged(newValue))"
                             MinValue="@constants.START_OF_TIME" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Courses to print" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+            <DxFormLayoutItem Caption="Course Types to print (select multiple items, if required)" ColSpanMd="12"
+                              CaptionPosition="CaptionPosition.Vertical">
+                <DxTagBox Data="@CourseTypes"
+                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                          NullText="leave blank for all"
+                          Values="@CourseTypesToReport"
+                          ValuesChanged="@((IEnumerable<CourseType> newValues) => OnCourseTypesChanged(newValues))"
+                          TextFieldName="@nameof(Course.Name)">
+                </DxTagBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Courses to print (select multiple items, if required)" ColSpanMd="12"
+                              CaptionPosition="CaptionPosition.Vertical">
                 <DxTagBox Data="@Courses"
                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                           NullText="leave blank for all"
@@ -28,8 +39,8 @@
                           TextFieldName="@nameof(Course.Name)">
                 </DxTagBox>
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Minimum months to report (Leave 0 for all)" 
-                CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+            <DxFormLayoutItem Caption="Minimum months to report (Leave 0 for all)"
+                              CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
                 <DxSpinEdit @bind-Value=@MinimumMonthsToReport
                             MinValue=0 MaxValue="12" />
             </DxFormLayoutItem>
@@ -49,11 +60,14 @@
     int ReportForYear = TimezoneAdjustment.GetLocalTime().Year;
     int MinimumMonthsToReport = 0;
     IEnumerable<Course> Courses;
+    IEnumerable<CourseType> CourseTypes;
     IEnumerable<Course> CoursesToReport;
+    IEnumerable<CourseType> CourseTypesToReport;
 
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        CourseTypes = await BusinessRule.SelectableCourseTypesAsync(dbc);
         await OnReportForYearChanged(ReportForYear);
         await base.OnInitializedAsync();
     }
@@ -66,6 +80,11 @@
                 DbContext = dbc,
             };
         report.Parameters["prmYear"].Value = ReportForYear;
+        if ((CoursesToReport == null || CoursesToReport.Count() <= 0)
+            &&
+            (CourseTypesToReport == null || CourseTypesToReport.Count() > 0))
+        { CoursesToReport = Courses; }
+        
         report.Parameters["prmCourseFilter"].Value = CoursesToReport.Select(x => x.ID.ToString()).ToArray();
         report.Parameters["prmMinMonths"].Value = MinimumMonthsToReport;
     }
@@ -74,7 +93,21 @@
     {
         ReportForYear = newValue;
         CoursesToReport = new List<Course>();
-        Courses = await dbc.Course.Where(x => x.Year == ReportForYear).ToListAsync();
+        Courses = await dbc.Course
+                        .Include(x => x.CourseType)
+                        .Where(x => x.Year == ReportForYear)
+                        .OrderBy(x => x.Name)
+                        .ToListAsync();
+        if (CourseTypesToReport != null)
+        {
+            Courses = Courses.Where(x => CourseTypesToReport.Select(t => t.ID).ToList().Contains(x.CourseTypeID.GetValueOrDefault()));
+        }
+    }
+
+    async Task OnCourseTypesChanged(IEnumerable<CourseType> newValues)
+    {
+        CourseTypesToReport = newValues;
+        await OnReportForYearChanged(ReportForYear);
     }
 
     void OnCancelButtonClicked() => NavMan.NavigateTo("/");
