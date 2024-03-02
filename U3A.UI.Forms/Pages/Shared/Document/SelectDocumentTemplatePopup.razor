@@ -101,20 +101,9 @@
                     @if (pdfVisible)
                     {
                         <div class="preview">
-                            <DxToolbar CssClass="mb-1 w-100 me-2 bg-secondary">
-                                <Items>
-                                    <DxToolbarItem Text="Close"
-                                                   BeginGroup="true"
-                                                   RenderStyle="ButtonRenderStyle.Primary"
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   Alignment="ToolbarItemAlignment.Right"
-                                                   IconCssClass="bi bi-x-lg"
-                                                   Click="@MailMergeDocumentAsync" />
-                                </Items>
-                            </DxToolbar>
-                            <div class="">
-                                <XtraReportViewer Report=@pdfReport ReportName="none" />
-                            </div>
+                            <XtraReportViewer Report=@pdfReport
+                                              ReportName="none"
+                                              OnCloseButtonClick="@(() => pdfVisible = false)" />
                         </div>
                     }
                     else
@@ -425,24 +414,21 @@
     {
         if (SelectedDocumentTemplate != null)
         {
-            pdfVisible = !pdfVisible;
-            if (pdfVisible)
+            pdfVisible = true;
+            await richEdit.SaveDocumentAsync();
+            if (SelectedDocumentTemplate.Content != null)
             {
-                await richEdit.SaveDocumentAsync();
-                if (SelectedDocumentTemplate.Content != null)
-                {
-                    await progressBar.ShowSmallSpinnerAsync();
-                    var server = new DocumentServer(dbContext);
-                    var pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
-                                                                ExportData, OverrideCommunicationPreference);
-                    pdfReport = new();
-                    pdfReport.PdfContent.Source = pdfContent;
-                    await progressBar.Close();
-                }
-                else
-                {
-                    pdfVisible = false;
-                }
+                await progressBar.ShowSmallSpinnerAsync();
+                var server = new DocumentServer(dbContext);
+                var pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
+                                                            ExportData, OverrideCommunicationPreference);
+                pdfReport = new();
+                pdfReport.PdfContent.Source = pdfContent;
+                await progressBar.Close();
+            }
+            else
+            {
+                pdfVisible = false;
             }
             StateHasChanged();
         }

@@ -23,27 +23,9 @@ else
 {
     if (showPDF)
     {
-        <FullScreen>
-            <ContentTemplate>
-                <table class="w-100 h-100 me-2 bg-secondary">
-                    <div class="row">
-                        <DxToolbar CssClass="bg-secondary">
-                            <Items>
-                                <DxToolbarItem Text="Close"
-                                               CssClass="me-5 mb-1"
-                                               Alignment="ToolbarItemAlignment.Right"
-                                               IconCssClass="bi bi-x-lg"
-                                               Click="@(() => showPDF = false)" />
-                            </Items>
-                        </DxToolbar>
-                    </div>
-                    <div class="row h-100">
-                        <XtraReportViewer Report=@pdfReport />
-                    </div>
-                </table>
-            </ContentTemplate>
-        </FullScreen>
-
+        <div class="row w-100 viewer-height bg-secondary">
+            <XtraReportViewer Report=@pdfReport OnCloseButtonClick="@(() => showPDF = false)" />
+        </div>
     }
     else
     {
@@ -106,8 +88,12 @@ else
             </ContentTemplate>
         </FullScreen>
     }
+    <style>
+        .viewer-height {
+            height: 10rem !important;
+        }
+    </style>
 }
-
 
 @code {
     bool IsReady;
