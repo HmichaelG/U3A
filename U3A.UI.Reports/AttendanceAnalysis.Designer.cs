@@ -277,6 +277,7 @@
             this.prmCourseFilter.Description = "Select Courses to print (leave blank for all)";
             this.prmCourseFilter.MultiValue = true;
             this.prmCourseFilter.Name = "prmCourseFilter";
+            this.prmCourseFilter.Type = typeof(global::System.Guid);
             dynamicListLookUpSettings1.DataMember = null;
             dynamicListLookUpSettings1.DataSource = this.objectDataSource1;
             dynamicListLookUpSettings1.DisplayMember = "FullDescription";
@@ -285,6 +286,7 @@
             dynamicListLookUpSettings1.SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
             dynamicListLookUpSettings1.ValueMember = "ID";
             this.prmCourseFilter.ValueSourceSettings = dynamicListLookUpSettings1;
+            this.prmCourseFilter.Visible = false;
             // 
             // prmMinMonths
             // 
@@ -292,6 +294,7 @@
             this.prmMinMonths.Name = "prmMinMonths";
             this.prmMinMonths.Type = typeof(int);
             this.prmMinMonths.ValueInfo = "0";
+            this.prmMinMonths.Visible = false;
             // 
             // prmYear
             // 
@@ -299,6 +302,7 @@
             this.prmYear.Name = "prmYear";
             this.prmYear.Type = typeof(int);
             this.prmYear.ValueInfo = "0";
+            this.prmYear.Visible = false;
             // 
             // AttendanceAnalysis
             // 

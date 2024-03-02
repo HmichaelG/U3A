@@ -42,17 +42,32 @@
     [Parameter]
     public bool PopupVisible { get; set; }
     [Parameter]
-    public bool IsInputBox { get
+    public bool IsInputBox
+    {
+        get
         {
-            return _isInputBox;   
-        } 
+            return _isInputBox;
+        }
         set
         {
-            _isInputBox = true;        
+            _isInputBox = true;
             mOKButtonText = "Ok";
             mCancelButtonText = "Cancel";
             mShowOkButton = true;
             mShowCancelButton = true;
+        }
+    }
+
+    [Parameter]
+    public string Caption
+    {
+        get
+        {
+            return mCaption;
+        }
+        set
+        {
+            mCaption = value;            
         }
     }
 
@@ -133,11 +148,12 @@
 
     async Task OnAffirmativeButtonClicked()
     {
-        MessageBoxResult = MessageBoxDialogResult.OkButtonClicked;
+        await AffirmativeButtonClicked.InvokeAsync();
         PopupVisible = false;
         tcs?.TrySetResult(true);
-        await AffirmativeButtonClicked.InvokeAsync();
+        MessageBoxResult = MessageBoxDialogResult.OkButtonClicked;
     }
+
     async Task OnNegativeButtonClicked()
     {
         MessageBoxResult = MessageBoxDialogResult.CancelButtonClicked;
@@ -158,7 +174,7 @@
         {
             PopupVisible = false;
         });
-        StateHasChanged();
+       await InvokeAsync( StateHasChanged);
     }
 
 }

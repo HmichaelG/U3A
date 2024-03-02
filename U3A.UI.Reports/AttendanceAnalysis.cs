@@ -3,6 +3,7 @@ using DevExpress.XtraReports.UI;
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using U3A.BusinessRules;
 using U3A.Database;
@@ -18,10 +19,10 @@ namespace U3A.UI.Reports
         }
         public U3ADbContext DbContext { get; set; }
         List<AttendClassDetailByWeek> data;
-        string[] courseFilter;
+        string[] courseFilter = new string[]{};
         private void AttendanceAnalysis_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
-            prmYear.Value = TimezoneAdjustment.GetLocalTime().Year;
+            //prmYear.Value = TimezoneAdjustment.GetLocalTime().Year;
         }
         private void AttendanceAnalysis_DataSourceDemanded(object sender, EventArgs e)
         {
@@ -32,9 +33,8 @@ namespace U3A.UI.Reports
             objectDataSource1.DataSource = data;
             if (prmCourseFilter.Value != null)
             {
-                courseFilter = prmCourseFilter.Value as string[];
+                courseFilter = (string[])prmCourseFilter.Value;
             }
-            else { courseFilter = null; }
         }
 
         Guid LastClass { get; set; } = Guid.Empty;
@@ -59,7 +59,7 @@ namespace U3A.UI.Reports
             if (thisCourseID.HasValue && thisCourseID != ac.CourseID) { e.Cancel = true; return; }
 
             // Course selection filter
-            if (courseFilter != null && (!courseFilter.Contains(ac.ID))) { e.Cancel = true; return; }
+            if (courseFilter.Length > 0 && !courseFilter.Contains(ac.CourseID.ToString())) { e.Cancel = true; return; }
 
             LastClass = ac.ClassID;
             hasPrinted = true;
