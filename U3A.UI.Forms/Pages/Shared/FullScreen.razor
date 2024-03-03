@@ -69,6 +69,6 @@
     public async Task RefreshLayout()
     {
         var newHeight = await Window.FitToRemainingHeight(js, "fullscreen-element", height);
-        if (newHeight != height) { height = newHeight; InvokeAsync(StateHasChanged); }
+        if (newHeight != height) { height = newHeight; await InvokeAsync(StateHasChanged); }
     }
 }

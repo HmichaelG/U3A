@@ -56,17 +56,41 @@
 
     U3ADbContext dbc { get; set; }
     bool isReady;
-    bool isFullscreen;
 
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
-    }
-
-    async Task OnClick()
-    {
-        isFullscreen = !isFullscreen;
-        StateHasChanged();
+        if (Report == null)
+        {
+            Type? thisType = Type.GetType($"U3A.UI.Reports.{ReportName}");
+            if (thisType != null)
+            {
+                Report = (XtraReport?)Activator.CreateInstance(thisType);
+                ReportName = Report.Name;
+                if (Report is IXtraReportWithNavManager)
+                {
+                    (Report as IXtraReportWithNavManager).NavManager = NavMan;
+                }
+                if (Report is IXtraReportWithDbContext || Report is IXtraReportWithDbContextFactory)
+                {
+                    if (Report is IXtraReportWithDbContext)
+                    {
+                        (Report as IXtraReportWithDbContext).DbContext = dbc;
+                    }
+                    if (Report is IXtraReportWithDbContextFactory)
+                    {
+                        (Report as IXtraReportWithDbContextFactory).U3Adbfactory = U3Adbfactory;
+                    }
+                }
+                else
+                {
+                    if (Report.DataSource is EFDataSource)
+                    {
+                        (Report.DataSource as EFDataSource).ConnectionParameters.ConnectionString = dbc.TenantInfo.ConnectionString;
+                    }
+                }
+            }
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -82,42 +106,6 @@
             EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
             reportViewer.LoadingPanelVisible = true;
             await InvokeAsync(StateHasChanged);
-        }
-        else
-        {
-            if (Report == null)
-            {
-                Type? thisType = Type.GetType($"U3A.UI.Reports.{ReportName}");
-                if (thisType != null)
-                {
-                    Report = (XtraReport?)Activator.CreateInstance(thisType);
-                    ReportName = Report.Name;
-                    if (Report is IXtraReportWithNavManager)
-                    {
-                        (Report as IXtraReportWithNavManager).NavManager = NavMan;
-                    }
-                    if (Report is IXtraReportWithDbContext || Report is IXtraReportWithDbContextFactory)
-                    {
-                        if (Report is IXtraReportWithDbContext)
-                        {
-                            (Report as IXtraReportWithDbContext).DbContext = dbc;
-                        }
-                        if (Report is IXtraReportWithDbContextFactory)
-                        {
-                            (Report as IXtraReportWithDbContextFactory).U3Adbfactory = U3Adbfactory;
-                        }
-                    }
-                    else
-                    {
-                        if (Report.DataSource is EFDataSource)
-                        {
-                            (Report.DataSource as EFDataSource).ConnectionParameters.ConnectionString = dbc.TenantInfo.ConnectionString;
-                        }
-                    }
-                }
-                // force a refresh to display the report.
-                await InvokeAsync(StateHasChanged);
-            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }

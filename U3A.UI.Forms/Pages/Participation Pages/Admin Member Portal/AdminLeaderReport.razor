@@ -22,8 +22,8 @@ else
 {
     if (showPDF)
     {
-        <div class="row w-100 viewer-height bg-secondary">
-            <XtraReportViewer Report=@pdfReport OnCloseButtonClick="@(() => showPDF = false)" />
+        <div class="row w-100 bg-secondary">
+            <XtraReportViewer RootCssClass="viewer-height" Report=@pdfReport OnCloseButtonClick="@(() => showPDF = false)" />
         </div>
     }
     else
@@ -95,8 +95,9 @@ else
     }
 
     .viewer-height {
-        height: 10rem !important;
+        height: calc(100vh - 5rem) !important;
     }
+
 </style>
 
 

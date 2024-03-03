@@ -20,37 +20,37 @@
     <div class="page">
         <AntiforgeryToken />
 
-        <CascadingValue Value=@openCircuits Name="OpenCircuits">
-            <CascadingValue Value="@loginState">
-                <CascadingValue Value="@hasRole" Name="HasRole">
-                    @if (hasRole)
-                    {
-                        if (useTopMenu.HasValue)
+            <CascadingValue Value=@openCircuits Name="OpenCircuits">
+                <CascadingValue Value="@loginState">
+                    <CascadingValue Value="@hasRole" Name="HasRole">
+                        @if (hasRole)
                         {
-                            if (useTopMenu.Value)
+                            if (useTopMenu.HasValue)
                             {
-                                <MainLayoutTopMenu Body="@Body" />
-                            }
-                            else
-                            {
-                                <MainLayoutSideMenu Body="@Body" />
+                                if (useTopMenu.Value)
+                                {
+                                    <MainLayoutTopMenu Body="@Body" />
+                                }
+                                else
+                                {
+                                    <MainLayoutSideMenu Body="@Body" />
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        <MainLayoutTopMenu Body="@Body" />
-                    }
+                        else
+                        {
+                            <MainLayoutTopMenu Body="@Body" />
+                        }
 
-                    @* For logout *@
-                    <form id="logoutForm" action="Account/Logout" method="post">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="~/" />
-                    </form>
+                        @* For logout *@
+                        <form id="logoutForm" action="Account/Logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="~/" />
+                        </form>
 
+                    </CascadingValue>
                 </CascadingValue>
             </CascadingValue>
-        </CascadingValue>
 
     </div>
 }
@@ -61,11 +61,11 @@
 
     public int openCircuits { get; set; }
     public bool hasRole { get; set; }
+    public bool? useTopMenu = null; // default is sidebar
 
     [CascadingParameter]
     public LoginState? loginState { get; set; }
 
-    bool? useTopMenu = null; // default is sidebar
     U3ADbContext? dbc { get; set; }
     bool isReady = false;
     string? currentUrl;
@@ -150,7 +150,7 @@
             // Set the workstation ID
             await Workstation.SetWorkstationID(js, localStorage);
 
-            var key = "use-topmenu";
+            var key = constants.USE_TOP_MENU_KEY;
             if (await localStorage.ContainKeyAsync(key))
             {
                 bool value = await localStorage.GetItemAsync<bool>(key);
