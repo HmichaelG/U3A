@@ -359,6 +359,9 @@ namespace U3A.BusinessRules
             result = Classes.Where(c => c.Course.Enrolments
                                 .Any(e => e.PersonID == Student.ID &&
                                     (e.ClassID == null || e.ClassID == c.ID))).ToList();
+            result.AddRange(Classes.Where(c => c.Enrolments
+                                .Any(e => e.PersonID == Student.ID &&
+                                    (e.ClassID == null || e.ClassID == c.ID))).ToList());
             return result;
         }
         public static bool IsCourseInTerm(Course course, Term term)
