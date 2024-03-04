@@ -54,10 +54,10 @@ else
             </DxFormLayoutItem>
 
             <DxFormLayoutItem Caption="Or, Date Range" ColSpanLg="6">
-                <DxDateEdit @bind-Date="@fromDate" />
+                <DxDateEdit @bind-Date="@fromDate" MinDate="@minDate" MaxDate="@maxDate" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="To" ColSpanLg="6">
-                <DxDateEdit @bind-Date="@toDate">
+                <DxDateEdit @bind-Date="@toDate" MinDate="@minDate" MaxDate="@maxDate" >
                     <Buttons>
                         <DxEditorButton Text="Search" CssClass="text-primary"
                                         IconCssClass="h5 bi bi-search"
@@ -73,12 +73,14 @@ else
     <FullScreen>
         <ContentTemplate>
             <DxGrid Data=@messages @ref=@mainGrid
+                    AutoExpandAllGroupRows=false
                     CssClass="grid-height">
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                    <DxGridDataColumn Caption="Stream" FieldName="Stream" />
                     <DxGridDataColumn Caption="From" FieldName="From" />
                     <DxGridDataColumn Caption="To" FieldName="To" Visible=@IsSearchByDateRange />
                     <DxGridDataColumn Caption="Subject" FieldName="Subject" />
@@ -171,6 +173,8 @@ else
     DxWindow emailDetailsForm;
     DateTime fromDate;
     DateTime toDate;
+    DateTime minDate;
+    DateTime maxDate;
     TimeSpan tzOffset;
     LocalTime? localTime;
 
@@ -188,7 +192,9 @@ else
             localTime = new LocalTime(js);
             tzOffset = await localTime.GetTimezoneOffsetAsync();
             toDate = await localTime.GetLocalDateAsync();
-            fromDate = toDate.AddDays(-6);
+            fromDate = toDate.AddDays(-6).Date;
+            minDate = toDate.AddDays(-30).Date;
+            maxDate = toDate;
             await InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);

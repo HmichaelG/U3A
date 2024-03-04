@@ -72,6 +72,7 @@ namespace U3A.Model
         public int Attachments { get; set; }
         public List<string> Recipients { get; set; } = new();
         public string Status { get; set; }
+        public string Stream { get; set; }
 
     }
 

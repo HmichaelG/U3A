@@ -7,6 +7,7 @@ using Microsoft.JSInterop;
 using Postmark.Model.Suppressions;
 using PostmarkDotNet;
 using PostmarkDotNet.Model;
+using Postmark.Model.MessageStreams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -204,20 +205,26 @@ namespace U3A.Services.Email
         public async Task<List<EmailMessage>> SearchMessagesAsync(TimeSpan offset, String recipient)
         {
             var result = new List<EmailMessage>();
-            var messageResult = await client.GetOutboundMessagesAsync(recipient: recipient);
-            foreach (var message in messageResult.Messages)
+            PostmarkMessageStreamListing streams = await client.ListMessageStreams();
+            foreach (var stream in streams.MessageStreams)
             {
-                var msg = new EmailMessage()
+                var streamID = stream.ID;
+                var messageResult = await client.GetOutboundMessagesAsync(recipient: recipient, messagestream: streamID);
+                foreach (var message in messageResult.Messages)
                 {
-                    MessageID = message.MessageID,
-                    Attachments = message.Attachments.Count(),
-                    From = message.From,
-                    ReceivedAt = message.ReceivedAt,
-                    Status = message.Status,
-                    Subject = message.Subject
-                };
-                msg.Recipients.AddRange(message.Recipients);
-                result.Add(msg);
+                    var msg = new EmailMessage()
+                    {
+                        MessageID = message.MessageID,
+                        Attachments = message.Attachments.Count(),
+                        From = message.From,
+                        ReceivedAt = message.ReceivedAt + offset,
+                        Status = message.Status,
+                        Subject = message.Subject,
+                        Stream = stream.Name
+                    };
+                    msg.Recipients.AddRange(message.Recipients);
+                    result.Add(msg);
+                }
             }
             return result;
         }
@@ -240,7 +247,6 @@ namespace U3A.Services.Email
                         result.Add(msg);
                     }
                 }
-                //result.AddRange(thisSet);
                 if (thisSet.Count < count) { break; }
                 recordOffset += count;
             }
@@ -249,23 +255,36 @@ namespace U3A.Services.Email
 
         public async Task<List<EmailMessage>> SearchMessagesAsync(TimeSpan offset, int recordOffset, int Count, DateTime From, DateTime To)
         {
+            PostmarkMessageStreamListing streams = await client.ListMessageStreams();
             var result = new List<EmailMessage>();
             var sFrom = From.ToString("yyyy-MM-ddT00:00:00");
             var sTo = To.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-ddThh:mm:ss");
-            var messageResult = await client.GetOutboundMessagesAsync(offset: recordOffset, count: 100, fromDate: sFrom, toDate: sTo);
-            foreach (var message in messageResult.Messages)
+            foreach (var stream in streams.MessageStreams)
             {
-                var msg = new EmailMessage()
+
+                var streamID = stream.ID;
+                var messageResult = await client.GetOutboundMessagesAsync(
+                                        offset: recordOffset,
+                                        count: Count,
+                                        fromDate: sFrom,
+                                        toDate: sTo,
+                                        messagestream: streamID
+                                        );
+                foreach (var message in messageResult.Messages)
                 {
-                    MessageID = message.MessageID,
-                    Attachments = message.Attachments.Count(),
-                    From = message.From,
-                    ReceivedAt = message.ReceivedAt,
-                    Status = message.Status,
-                    Subject = message.Subject
-                };
-                msg.Recipients.AddRange(message.Recipients);
-                result.Add(msg);
+                    var msg = new EmailMessage()
+                    {
+                        MessageID = message.MessageID,
+                        Attachments = message.Attachments.Count(),
+                        From = message.From,
+                        ReceivedAt = message.ReceivedAt + offset,
+                        Status = message.Status,
+                        Subject = message.Subject,
+                        Stream = stream.Name
+                    };
+                    msg.Recipients.AddRange(message.Recipients);
+                    result.Add(msg);
+                }
             }
             return result;
         }
@@ -280,7 +299,7 @@ namespace U3A.Services.Email
                 var ev = new EmailMessageEvent()
                 {
                     Type = detail.Type,
-                    ReceivedAt = detail.ReceivedAt,
+                    ReceivedAt = detail.ReceivedAt + offset,
                     HtmlBody = details.HtmlBody,
                 };
                 result.Add(ev);

@@ -126,6 +126,7 @@
             // lblTitle
             // 
             this.lblTitle.CanGrow = false;
+            this.lblTitle.EditOptions.Enabled = true;
             this.lblTitle.Font = new DevExpress.Drawing.DXFont("Tahoma", 18F);
             this.lblTitle.ForeColor = System.Drawing.Color.Gray;
             this.lblTitle.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);

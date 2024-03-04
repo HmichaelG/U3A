@@ -1,114 +1,132 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-03-01T13:10:23.809+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-03-04T16:33:14.313+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>2024 Version History</title>
   <body>
     <header>
       <para styleclass="Heading1">2024 Version History (Version 3)</para>
     </header>
     <para styleclass="Heading2">Version 2024.3.Current</para>
-    <para styleclass="Heading3">Participant Enrolment PDF</para>
+    <para styleclass="Heading3">Attendance Analysis</para>
     <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">You can now select the report for Year and filter by Course Type.</li>
+    </list>
+    <para styleclass="Heading3">Report Viewer</para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">The report viewer&apos;s toolbar now has a <text style="font-style:italic;">Close Report</text> (door icon) on the far right. Clicking this button will return you to the parent form which the report was executed. Mostly, this will be the system&apos;s <text style="font-style:italic;">Home </text>page with the following exceptions...</li>
+      <list id="1" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+        <li styleclass="Normal"><text style="font-weight:bold;">Correspondence Hub | Queued Transactional Email</text>. Exit from Preview will return to the email transactions page.</li>
+        <li styleclass="Normal"><text style="font-weight:bold;">Portal (Admin) | Leader Report</text>. Exit from <text style="font-style:italic;">Print Report</text> will return to the class selection list, and</li>
+        <li styleclass="Normal"><text style="font-weight:bold;">Communication</text>. Exit from <text style="font-style:italic;">Mail Merge</text> will return to the document editing form.</li>
+      </list>
+    </list>
+    <para styleclass="Heading3">Correspondence Hub | Email Search</para>
+    <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">The search results list now includes the email stream (transaction or broadcast).</li>
+    </list>
+    <para styleclass="Heading2">Version 2024.3.1</para>
+    <para styleclass="Heading3">Participant Enrolment PDF</para>
+    <list id="3" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">The Participant Enrolment PDF emailed to members now includes the term start &amp; end date and the duration in weeks.</li>
     </list>
     <para styleclass="Heading2">Version 2024.2.29</para>
     <para styleclass="Heading3">Attendance Analysis Chart</para>
-    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="4" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Chart x-axis interval is now correctly set to one week. Previously it was set to one day causing spurious results for small datasets. </li>
     </list>
     <para styleclass="Heading3">Leader Reports</para>
-    <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Leader reports <text style="font-style:italic;">requested by a leader/clerk</text> are now sent within the hour. System generated leader reports continue to be sent overnight. </li>
       <li styleclass="Normal">The Leader Report now prints <text style="font-weight:bold;">*New*</text> when a student has been enrolled in the last 7 days.</li>
     </list>
     <para styleclass="Heading2">Version 2024.2.27</para>
     <para styleclass="Heading3">Class Schedule Report / Member Portal - Manage Enrolment</para>
-    <list id="3" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="6" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Small performance improvement calculating class counts. </li>
       <li styleclass="Normal">An issue that caused some future classes not to display on the class schedule has been corrected.</li>
     </list>
     <para styleclass="Heading3">Member Portal - Course Enrolment</para>
-    <list id="4" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="7" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">All new enrolment requests are now marked <text style="font-weight:bold;">Waitlisted: (Pending Allocation)</text> until allocation is performed. As discussed at the recent debrief meeting, this has been done to prevent members from jumping the queue.</li>
       <li styleclass="Normal">Allocation will be performed within the hour of the enrolment request being received. This is a background process and requires no intervention. The process runs between 5am and 11pm only so as not to interfere with the primary overnight process which currently runs at 4 am.</li>
       <li styleclass="Normal">The random enrolment allocation procedure will continue to run overnight only. </li>
       <li styleclass="Normal">Enrolment email will be sent hourly, <text style="font-style:italic;">for enrolment reports only.</text></li>
     </list>
     <para styleclass="Heading3">Record Attendance</para>
-    <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="8" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">An issue when applying leave has been corrected.</li>
     </list>
     <para styleclass="Heading3">Communication Hub - Search</para>
-    <list id="6" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="9" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Corrected Date Received UTC issue</li>
       <li styleclass="Normal">An issue that caused the From and To date ranges to default to 1st Jan 0000 has been corrected.</li>
     </list>
     <para styleclass="Heading2">Version 2024.2.24</para>
     <para styleclass="Heading3">System</para>
     <para styleclass="Normal">Page refresh &amp; display issues corrected...</para>
-    <list id="7" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="10" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Page refresh (F5 or CTRL-F5) now refreshes to the page currently displayed rather than the home page.</li>
       <li styleclass="Normal">Right-click a menu item now opens that menu item&apos;s page rather than the home page.</li>
       <li styleclass="Normal">Class QR scanning is now working as expected.</li>
     </list>
     <para styleclass="Normal"><text style="font-weight:bold;">Known Issues</text></para>
-    <list id="8" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:11pt; color:#000000;">
+    <list id="11" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Logging out in multiple tabs opened via the right-click method in 2 above will result in an error on all pages but one. Close all tabs but one and then logout.</li>
     </list>
     <para styleclass="Heading3">Communications procedure</para>
-    <list id="9" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="12" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Layout changes to maximise available screen space.</li>
     </list>
     <para styleclass="Heading3">Communications hub - Search</para>
-    <list id="10" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="13" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Click on mail items displayed in a search will now retrieve the email text as stored on Postmark&apos;s server.</li>
     </list>
     <para styleclass="Heading3">Member Portal - Member Enrolment</para>
-    <list id="11" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="14" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">(user request) The highlight for classes in future terms has been changed to <text style="font-style:italic;">Enrol for ...</text> rather than <text style="font-style:italic;">Offered</text>.</li>
     </list>
     <para styleclass="Heading3">Add/Edit Participants</para>
-    <list id="12" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="15" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">(user request) The <text style="font-style:italic;">Participants</text> tab no longer includes new members not financial.</li>
       <li styleclass="Normal">The active tab is now set to <text style="font-style:italic;">Participants</text> and the grid filter recalculated when the toolbar filter is closed.</li>
       <li styleclass="Normal">Revised documentation to explain filtering behaviour.</li>
     </list>
     <para styleclass="Heading2">Version 2024.2.20</para>
     <para styleclass="Heading3">Class Schedule</para>
-    <list id="13" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="16" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">An issue that prevented class counts to be zero for future terms has been corrected.</li>
     </list>
     <para styleclass="Heading2">Version 2024.2.19</para>
     <para styleclass="Heading3">All PDF reports</para>
-    <list id="14" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="17" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">PDF reports are now displayed in the standard DevExpress report viewer. This provides consistency for all reports and corrects display issues on Android tablets. PDF reports are generated in...</li>
-      <list id="14" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <list id="17" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
         <li styleclass="Normal">Preview transactional email in Communications Hub,</li>
         <li styleclass="Normal">Leader reports display in the administration member portal, and</li>
         <li styleclass="Normal">mail-merge preview within the Communications dialogue. </li>
       </list>
     </list>
     <para styleclass="Heading3">Communications dialogue</para>
-    <list id="15" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="18" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">The page layout of the Communications dialogue has been rearranged. The parameter selection is now to the left of the word editor rather than on top. This provides a better uses of available screen space on laptop and tablet displays.</li>
     </list>
     <para styleclass="Heading3">Course Leader&apos;s Report</para>
-    <list id="16" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="19" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Status of Waitlisted is no longer word-wrapped.</li>
     </list>
     <para styleclass="Heading3">All Leader&apos;s Reports</para>
-    <list id="17" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="20" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">A page break now occurs between pages when a course has multiple classes and there are different participants in each class.</li>
     </list>
     <para styleclass="Heading2">Version 2024.2.18</para>
     <para styleclass="Heading2"><text styleclass="Heading3">Member Portal - Request Course Enrolments</text></para>
-    <list id="18" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="21" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">The enrolment status (enrolled, waitlisted, pending etc) is now updated on the selection list immediately an enrolment request is saved.</li>
       <li styleclass="Normal">Selection filters are no longer cleared when an enrolment request is saved. This results in the requested class remaining visible on the display after it is saved.</li>
     </list>
     <para styleclass="Heading2">Version 2024.2.17</para>
     <para styleclass="Heading2"><text styleclass="Heading3">Member Portal - Request Course Enrolments</text></para>
-    <list id="18" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="21" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">An issue that caused classes in future terms to be omitted from the selection list has been corrected. </li>
       <li styleclass="Normal">An issue that prevented enrolments in future terms from deletion has been corrected.</li>
       <li styleclass="Normal">An issue that caused enrolments in future terms to be automatically enrolled rather than waitlisted has been corrected.</li>
@@ -132,14 +150,14 @@
     <para styleclass="Normal">Announcing the third major release of the U3Admin software. This version introduces major infrastructure changes made possible by the introduction of Microsoft.NET version 8 the major benefit of which is the elimination of many lines of code. In addition, our software now fully supports the many security improvements made possible by .NET 8 including protection from Cross-Site Request Forgery (CSRF).</para>
     <para styleclass="Normal">There are also many user interface changes, including</para>
     <para styleclass="Heading3">Member Portal</para>
-    <list id="19" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="22" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">New support link</li>
       <li styleclass="Normal">New menu help topic</li>
       <li styleclass="Normal">New enrolment request and withdrawal procedures</li>
     </list>
     <para styleclass="Heading3"> Administration Website</para>
     <para styleclass="Normal">The emphasis in this release is to ensure an optimal experience when using smaller screen sizes or screens with 16:9 aspect ratios as are most modern laptops.</para>
-    <list id="20" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="23" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">New, optional sidebar menu. Change to top menu via <text style="font-style:italic;">Themes &amp; Settings</text>.</li>
       <li styleclass="Normal">New information cards when a menu group is clicked.</li>
       <li styleclass="Normal">Options to expand grids to full screen</li>
