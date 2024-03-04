@@ -4,13 +4,20 @@
 @using System.Text.Json
 
 <Progress @ref=@progress />
+
+<DxToolbar CssClass="my-1">
+    <DxToolbarItem Alignment="ToolbarItemAlignment.Left">
+        <Template>
+            <DxFormLayoutItem Caption="Y-Axis chart breaks" Context="thisContext">
+                <DxSpinEdit @bind-Value=@chartBreaks InputCssClass="col col-1" MinValue="0" MaxValue="5" />
+            </DxFormLayoutItem>
+        </Template>
+    </DxToolbarItem>
+    <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
+                   Alignment="ToolbarItemAlignment.Right"
+                   IconCssClass="bi bi-database menu-icon" />
+</DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutItem ColSpanMd="12">
-        <div class="float-end">
-            <DxButton Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
-                      IconCssClass="bi bi-database menu-icon" CssClass="col m-2" />
-        </div>
-    </DxFormLayoutItem>
     <DxFormLayoutGroup Caption="Enrolment Request Summary" ColSpanLg="9" CssClass="enrolControlHeight">
         <DxChart Data="enrolmentData" Id="enrolChart"
                  Width="100%" Height=@controlHeight
@@ -28,7 +35,7 @@
                                              ValueField="x => x.Count" />
                 }
             }
-            <DxChartValueAxis>
+            <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks">
                 <DxChartAxisTitle Text="Requests including Waitlist" />
             </DxChartValueAxis>
             <DxChartArgumentAxis TickInterval="ChartAxisTickInterval.Month" />
@@ -81,6 +88,7 @@
     Progress? progress;
 
     string controlHeight = "350px";
+    int chartBreaks = 0;
 
     protected override async void OnAfterRender(bool firstRender)
     {

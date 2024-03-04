@@ -1,36 +1,54 @@
-﻿
-@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
 
 <Progress @ref=@progress />
+<DxToolbar CssClass="my-1">
+    <DxToolbarItem Alignment="ToolbarItemAlignment.Left">
+        <Template>
+            <DxFormLayoutItem Caption="Y-Axis chart breaks" Context="thisContext">
+                <DxSpinEdit @bind-Value=@chartBreaks InputCssClass="col col-1" MinValue="0" MaxValue="5" />
+            </DxFormLayoutItem>
+        </Template>
+    </DxToolbarItem>
+    <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
+                   Alignment="ToolbarItemAlignment.Right"
+                   IconCssClass="bi bi-database menu-icon" />
+</DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutItem ColSpanMd="12">
-        <div class="float-end">
-            <DxButton Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
-                      IconCssClass="bi bi-database menu-icon" CssClass="col m-2" />
-        </div>
-    </DxFormLayoutItem>
     <DxFormLayoutGroup Caption="New Member Summary" ColSpanLg="9" CssClass="newMemberControlHeight">
         <DxChart Data="memberData" Id="newMemberChart"
                  Width="100%" Height="@controlHeight"
                  LabelOverlap="ChartLabelOverlap.Hide">
             <DxChartStackedBarSeries Name="Male"
-                              Color="System.Drawing.Color.Blue"
-                              T="MemberSummary"
-                              TArgument="DateTime"
-                              TValue="int"
-                              ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
-                              ValueField="x => x.Count"
-                              Filter='x => x.Group.ToLower() == "male"' />
+                                     Stack="true"
+                                     Color="System.Drawing.Color.Blue"
+                                     T="MemberSummary"
+                                     TArgument="DateTime"
+                                     TValue="int"
+                                     ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
+                                     ValueField="x => x.Count"
+                                     Filter='x => x.Group.ToLower() == "male"'>
+            </DxChartStackedBarSeries>
             <DxChartStackedBarSeries Name="Female"
-                              Color=System.Drawing.Color.HotPink
-                              T="MemberSummary"
-                              TArgument="DateTime"
-                              TValue="int"
-                              ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
-                              ValueField="x => x.Count"
-                              Filter='x => x.Group.ToLower() == "female"' />
-
+                                     Stack="true"
+                                     Color=System.Drawing.Color.HotPink
+                                     T="MemberSummary"
+                                     TArgument="DateTime"
+                                     TValue="int"
+                                     ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
+                                     ValueField="x => x.Count"
+                                     Filter='x => x.Group.ToLower() == "female"'>
+            </DxChartStackedBarSeries>
+            <DxChartStackedBarSeries Name="Other"
+                                     Stack="true"
+                                     Color=System.Drawing.Color.Purple
+                                     T="MemberSummary"
+                                     TArgument="DateTime"
+                                     TValue="int"
+                                     ArgumentField="x => new DateTime(x.Year, x.Month, 1)"
+                                     ValueField="x => x.Count"
+                                     Filter='x => x.Group.ToLower() == "other"'>
+            </DxChartStackedBarSeries>
             <DxChartLegend Position="RelativePosition.Outside"
                            HorizontalAlignment="HorizontalAlignment.Right" />
             <DxChartTooltip Enabled="true">
@@ -40,21 +58,25 @@
                         <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
                         <span>@($"{seriesPoint.Value: 0,0}")</span>
                     </div>
-                )
+                         )
             </DxChartTooltip>
+            <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks" />
+            <DxChartArgumentAxis TickInterval="ChartAxisTickInterval.Month" MinorTickInterval="ChartAxisTickInterval.Month">
+                <DxChartAxisLabel Format="ChartElementFormat.MonthAndYear"></DxChartAxisLabel>
+            </DxChartArgumentAxis>
         </DxChart>
     </DxFormLayoutGroup>
     <DxFormLayoutGroup Caption="New Members by Month" ColSpanLg="3">
-        <DxGrid Data="@memberData" CssClass="newMemberControlHeight"
+        <DxGrid Data="@(memberData?.Where(x => x.Count != 0))" CssClass="newMemberControlHeight"
                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                 AutoExpandAllGroupRows="true"
                 ShowFilterRow="false"
                 ShowAllRows="true">
             <Columns>
                 <DxGridDataColumn Caption="Gender" FieldName="Group" GroupIndex="0" />
-                <DxGridDataColumn Width="15%" Caption="Year" FieldName="Year" DisplayFormat="{0:D4}" />
-                <DxGridDataColumn Width="30%" Caption="Month" FieldName="MonthName" />
-                <DxGridDataColumn Width="45%" Caption="Members" FieldName="Count" DisplayFormat="{0:n0}" />
+                <DxGridDataColumn Caption="Year" FieldName="Year" GroupIndex="1" DisplayFormat="{0:D4}" />
+                <DxGridDataColumn Caption="Month" FieldName="MonthName" />
+                <DxGridDataColumn Caption="Members" FieldName="Count" DisplayFormat="{0:n0}" />
             </Columns>
             <GroupSummary>
                 <DxGridSummaryItem FooterColumnName="Count"
@@ -78,12 +100,15 @@
     IEnumerable<MemberSummary> memberData;
     Progress? progress;
     string controlHeight = "350px";
+    int chartBreaks = 0;
 
-    protected override async void OnAfterRender(bool firstRender) {
+    protected override async void OnAfterRender(bool firstRender)
+    {
         // wire up the toolbar
         base.OnAfterRender(firstRender);
         var newHeight = await Window.FitToRemainingHeight(js, "newMemberChart", controlHeight);
-        if (newHeight != controlHeight) {
+        if (newHeight != controlHeight)
+        {
             controlHeight = newHeight;
             InvokeAsync(StateHasChanged);
         }

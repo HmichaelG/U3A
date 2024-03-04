@@ -2,13 +2,19 @@
 @inject IJSRuntime js
 
 <Progress @ref=@progress />
+<DxToolbar CssClass="my-1">
+    <DxToolbarItem Alignment="ToolbarItemAlignment.Left">
+        <Template>
+            <DxFormLayoutItem Caption="Y-Axis chart breaks" Context="thisContext" >
+                <DxSpinEdit @bind-Value=@chartBreaks InputCssClass="col col-1" MinValue="0" MaxValue="5" />
+            </DxFormLayoutItem>
+        </Template>
+    </DxToolbarItem>
+    <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
+                   Alignment="ToolbarItemAlignment.Right"
+                   IconCssClass="bi bi-database menu-icon" />
+</DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutItem ColSpanMd="12">
-        <div class="float-end">
-            <DxButton Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
-                      IconCssClass="bi bi-database menu-icon" CssClass="col m-2" />
-        </div>
-    </DxFormLayoutItem>
     <DxFormLayoutGroup Caption="Cash Receipts Summary" ColSpanLg="9" CssClass="receiptControlHeight">
         <DxChart Data="receiptData" Id="receiptChart"
                  Width="100%" Height="@controlHeight"
@@ -22,7 +28,7 @@
                                      ValueField="r => r.Total"
                                      Filter="@(r => r.Type == "Online")">
                 <DxChartSeriesLabel Visible=ShowSeriesLabels
-                                    Format="ChartElementFormat.Thousands(1)" />
+                                    Format="ChartElementFormat.Thousands()" />
             </DxChartStackedBarSeries>
             <DxChartStackedBarSeries Name="Other"
                                      Color="System.Drawing.Color.DarkGreen"
@@ -33,7 +39,7 @@
                                      ValueField="r => r.Total"
                                      Filter="@(r => r.Type != "Online")">
                 <DxChartSeriesLabel Visible=ShowSeriesLabels
-                                    Format="ChartElementFormat.Thousands(1)" />
+                                    Format="ChartElementFormat.Thousands()" />
             </DxChartStackedBarSeries>
             <DxChartLegend Position="RelativePosition.Outside"
                            HorizontalAlignment="HorizontalAlignment.Right" />
@@ -44,8 +50,12 @@
                         <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
                         <span>@($"{seriesPoint.Value: $0,.0}K")</span>
                     </div>
-                )
+                         )
             </DxChartTooltip>
+            <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks" />
+            <DxChartArgumentAxis TickInterval="ChartAxisTickInterval.Month" MinorTickInterval="ChartAxisTickInterval.Month">
+                <DxChartAxisLabel Format="ChartElementFormat.MonthAndYear"></DxChartAxisLabel>
+            </DxChartArgumentAxis>
         </DxChart>
     </DxFormLayoutGroup>
     <DxFormLayoutGroup Caption="Cash Receipts by Month" ColSpanLg="3">
@@ -56,13 +66,13 @@
                 ShowAllRows="true">
             <Columns>
                 <DxGridDataColumn Caption="Type" FieldName="Type" GroupIndex="0" />
-                <DxGridDataColumn Width="15%" Caption="Year" FieldName="Year" DisplayFormat="{0:D4}" />
-                <DxGridDataColumn Width="30%" Caption="Month" FieldName="MonthName" />
-                <DxGridDataColumn Width="45%" Caption="Amount" FieldName="Total" DisplayFormat="{0:c2}" />
+                <DxGridDataColumn Caption="Year" FieldName="Year" GroupIndex="1" DisplayFormat="{0:D4}" />
+                <DxGridDataColumn Caption="Month" FieldName="MonthName" />
+                <DxGridDataColumn Caption="Amount" FieldName="Total" DisplayFormat="{0:c2}" />
             </Columns>
             <GroupSummary>
-                <DxGridSummaryItem FooterColumnName="Total" 
-                    SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+                <DxGridSummaryItem FooterColumnName="Total"
+                                   SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
             </GroupSummary>
             <TotalSummary>
                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
@@ -82,12 +92,15 @@
     [Parameter] public bool ShowSeriesLabels { get; set; }
     Progress? progress;
     string controlHeight = "350px";
+    int chartBreaks = 0;
 
-    protected override async void OnAfterRender(bool firstRender) {
+    protected override async void OnAfterRender(bool firstRender)
+    {
         // wire up the toolbar
         base.OnAfterRender(firstRender);
         var newHeight = await Window.FitToRemainingHeight(js, "receiptChart", controlHeight);
-        if (newHeight != controlHeight) {
+        if (newHeight != controlHeight)
+        {
             controlHeight = newHeight;
             InvokeAsync(StateHasChanged);
         }

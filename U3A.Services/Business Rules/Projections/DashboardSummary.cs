@@ -1,4 +1,5 @@
-﻿using DevExpress.Xpo.Logger;
+﻿using DevExpress.Blazor.Internal.Editors;
+using DevExpress.Xpo.Logger;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -14,7 +15,7 @@ namespace U3A.BusinessRules
         public static List<ReceiptSummary> GetReceiptSummaryByMonth(U3ADbContext dbc)
         {
             var to = DateTime.Today.AddMonths(1).AddDays(-DateTime.Today.Day);
-            var start = to.AddMonths(-13).AddDays(1);
+            var start = to.AddMonths(-25).AddDays(1);
             while (start.Day != 1) { start = start.AddDays(1); }
             var monthlyTotals = dbc.Receipt
                 .Where(r => r.Date >= start).AsEnumerable()
@@ -55,7 +56,7 @@ namespace U3A.BusinessRules
                 start = start.AddMonths(1);
             }
             monthlyTotals.AddRange(emptyMonths);
-            return monthlyTotals;
+            return monthlyTotals.OrderBy(x => x.Year).ThenBy(x => x.Month).ToList(); ;
         }
         public static async Task<List<EnrolmentSummary>> GetEnrolmentSummaryByTerm(U3ADbContext dbc, Term term)
         {
@@ -285,7 +286,7 @@ namespace U3A.BusinessRules
         {
 
             var endDate = DateTime.Today.AddMonths(1).AddDays(-DateTime.Today.Day);
-            var startDate = endDate.AddMonths(-13).AddDays(1);
+            var startDate = endDate.AddMonths(-25).AddDays(1);
             while (startDate.Day != 1) { startDate = startDate.AddDays(1); }
 
             var counts = await dbc.Person
@@ -300,7 +301,7 @@ namespace U3A.BusinessRules
                 })
                 .ToListAsync();
 
-            var allMonths = Enumerable.Range(0, 13)
+            var allMonths = Enumerable.Range(0, 25)
                 .Select(i => startDate.AddMonths(i))
                 .Select(d => new { Year = d.Year, Month = d.Month })
                 .Distinct()
@@ -327,7 +328,30 @@ namespace U3A.BusinessRules
                 .ThenBy(c => c.Group)
                 .ToList();
 
-            return result;
+            var emptyMonths = new List<MemberSummary>();
+            while (startDate < endDate)
+            {
+                if (!result.Any(x => x.Year == startDate.Year && x.Month == startDate.Month))
+                {
+                    emptyMonths.Add(new()
+                    {
+                        Count = 0,
+                        Year = startDate.Year,
+                        Month = startDate.Month,
+                        Group = "Male"
+                    });
+                    emptyMonths.Add(new()
+                    {
+                        Count = 0,
+                        Year = startDate.Year,
+                        Month = startDate.Month,
+                        Group = "Female"
+                    });
+                }
+                startDate = startDate.AddMonths(1);
+            }
+            result.AddRange(emptyMonths);
+            return result.OrderBy(x => x.Year).ThenBy(x => x.Month).ToList();
         }
 
 
