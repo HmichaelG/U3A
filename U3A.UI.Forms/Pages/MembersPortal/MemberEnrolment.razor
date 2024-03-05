@@ -807,14 +807,20 @@ else
         if (!IsPreview)
         {
             var c = thisClass;
-            if (c.Course.Enrolments.Count > 0)
+            e = c.Course.Enrolments
+                    .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
+                    .FirstOrDefault(x => x.CourseID == thisClass.Course.ID &&
+                            x.Term.Year == thisTerm.Year &&
+                            x.Term.TermNumber >= thisTerm.TermNumber &&
+                            x.PersonID == loginState.SelectedPerson.ID);
+            if (e == null)
             {
-                e = c.Course.Enrolments
-                .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
-                .FirstOrDefault(x => x.CourseID == thisClass.Course.ID &&
-                x.Term.Year == thisTerm.Year &&
-                x.Term.TermNumber >= thisTerm.TermNumber &&
-                x.PersonID == loginState.SelectedPerson.ID);
+                e = c.Enrolments
+                        .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
+                        .FirstOrDefault(x => x.CourseID == thisClass.Course.ID &&
+                            x.Term.Year == thisTerm.Year &&
+                            x.Term.TermNumber >= thisTerm.TermNumber &&
+                            x.PersonID == loginState.SelectedPerson.ID);
             }
         }
         return e;
