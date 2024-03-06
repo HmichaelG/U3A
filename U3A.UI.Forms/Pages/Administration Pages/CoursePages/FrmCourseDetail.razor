@@ -14,13 +14,17 @@
                     TextFieldName="@nameof(CourseType.NameWithStatus)">
         </DxComboBox>
     </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Participation Type" ColSpanMd="12">
+    <DxFormLayoutItem Caption="Participation Type" ColSpanMd="8">
         <DxComboBox Data="CourseParticipationTypes"
                     Value="Course.CourseParticipationType"
                     ValueChanged="@((CourseParticipationType type) => OnCourseParticipationTypeChange(type))"
                     ValueExpression="@(() => Course.CourseParticipationType)"
                     TextFieldName="@nameof(CourseParticipationType.Name)">
         </DxComboBox>
+    </DxFormLayoutItem>
+    <DxFormLayoutItem Caption="Enforce One Class Per Student?" ColSpanMd="4" Context="context" >
+        <DxCheckBox @bind-Checked="Course.EnforceOneStudentPerClass"
+                    Alignment=CheckBoxContentAlignment.Right Enabled=@isDifferentParticipantsInEachClass />
     </DxFormLayoutItem>
     <DxFormLayoutItem Caption="Course Name" ColSpanMd="12">
         <DxTextBox @bind-Text="Course.Name" />
@@ -102,9 +106,11 @@
     MessageBox? messageBox;
     string leaderReportsToNullText;
     string contactOrderNullText;
+    bool isDifferentParticipantsInEachClass = false;
 
     protected override async Task OnParametersSetAsync()
     {
+        isDifferentParticipantsInEachClass = (Course.CourseParticipationTypeID == 1) ? true : false;
         await base.OnParametersSetAsync();
     }
 
@@ -113,13 +119,14 @@
         if (AnyEnrolmentsInYear)
         {
             await messageBox.ShowOkOnlyAsync("Participation Type cannot be changed",
-                                           @"<p>The course participation type cannot be changed because enrolments
+                                               @"<p>The course participation type cannot be changed because enrolments
                    have already been assigned to it in the current year.</p>
                    <p>The safest way to to implement this change is...</p>
                    <ol><li>Create a completely new course, and then</li>
                    <li>Transfer enrolments from the old to the new via <em>Enrol Participants</em>.</li></ol>");
         }
         else { Course.CourseParticipationType = participationType; }
+        isDifferentParticipantsInEachClass = (participationType.ID == 1) ? true : false;
     }
 
 }

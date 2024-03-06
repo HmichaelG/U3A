@@ -114,7 +114,7 @@ namespace U3A.BusinessRules
                                                          && x.AllowAutoEnrol)
                                             .ToListAsync())
             {
-                CourseLeaders = new List<Person>();
+                CourseLeaders = new();
                 foreach (var c in course.Classes)
                 {
                     if (c.Leader != null && !CourseLeaders.Contains(c.Leader)) { CourseLeaders.Add(c.Leader); }
@@ -130,10 +130,15 @@ namespace U3A.BusinessRules
                                                                 && x.Person.DateCeased == null
                                                                 && !CourseLeaders.Contains(x.Person)
                                                                 && x.Person.FinancialTo >= SelectedTerm.Year)
-                                                .ToList();
+                                            .ToList();
                     if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                     {
-                        await ProcessEnrolments(dbc, SelectedTerm, course, enrolmentsToProcess, peoplePreviouslyEnrolled, ForceEmailQueue);
+                        await ProcessEnrolments(dbc, 
+                                        SelectedTerm, 
+                                        course, 
+                                        enrolmentsToProcess, 
+                                        peoplePreviouslyEnrolled, 
+                                        ForceEmailQueue);
                     }
                 }
                 else
@@ -147,15 +152,23 @@ namespace U3A.BusinessRules
                                                                     && x.Person.DateCeased == null
                                                                     && !CourseLeaders.Contains(x.Person)
                                                                     && x.Person.FinancialTo >= SelectedTerm.Year)
-                                                    .ToList();
+                                                .ToList();
                         if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                         {
-                            await ProcessEnrolments(dbc, SelectedTerm, course, enrolmentsToProcess, peoplePreviouslyEnrolled, ForceEmailQueue);
+                            await ProcessEnrolments(dbc, 
+                                                SelectedTerm, 
+                                                course, 
+                                                enrolmentsToProcess, 
+                                                peoplePreviouslyEnrolled, 
+                                                ForceEmailQueue);
+                            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
+                            await dbc.SaveChangesAsync();
                         }
                     }
                 }
+                await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
+                await dbc.SaveChangesAsync();
             }
-            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
             var term = await dbc.Term.FindAsync(SelectedTerm.ID);
             await SetClassAllocationDone(dbc, term, IsClassAllocationDone);
             await dbc.SaveChangesAsync();
@@ -254,6 +267,16 @@ namespace U3A.BusinessRules
                                     bool ForceEmailQueue)
         {
             var today = DateTime.Today;
+            var AlreadyEnrolledInCourse = new List<Guid>();
+            if (course.EnforceOneStudentPerClass
+                && course.CourseParticipationTypeID == (int?)ParticipationType.DifferentParticipantsInEachClass)
+            {
+                AlreadyEnrolledInCourse = await dbc.Enrolment.Where(x => x.CourseID == course.ID
+                                                                && x.TermID == term.ID
+                                                                && !x.IsWaitlisted)
+                                                            .Select(x => x.PersonID).ToListAsync();
+            }
+            // Set the enrolment method
             var settings = await dbc.SystemSettings
                                     .OrderBy(x => x.ID)
                                     .FirstAsync();
@@ -267,11 +290,13 @@ namespace U3A.BusinessRules
 
             int enrolled = enrolments.Where(x => !x.IsWaitlisted).Count();
             if (enrolled >= course.MaximumStudents) { return; }
-            int waitlisted = enrolments.Where(x => x.IsWaitlisted).Count();
+            int waitlisted = enrolments.Where(x => x.IsWaitlisted
+                                && (!IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))).Count();
             // If available places is less than waitlisted then enrol everyone.
             if (waitlisted <= course.MaximumStudents - enrolled)
             {
-                foreach (var e in enrolments.Where(x => x.IsWaitlisted))
+                foreach (var e in enrolments.Where(x => x.IsWaitlisted
+                                && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse)))
                 {
                     e.IsWaitlisted = false;
                     LogEnrolment(e);
@@ -289,7 +314,9 @@ namespace U3A.BusinessRules
                     {
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Random)
-                                            .Where(x => x.IsWaitlisted && !PeoplePreviouslyEnrolled.Contains(x.Person.ID))
+                                            .Where(x => x.IsWaitlisted
+                                                            && !PeoplePreviouslyEnrolled.Contains(x.PersonID)
+                                                            && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
                             LogEnrolment(e);
@@ -306,7 +333,8 @@ namespace U3A.BusinessRules
                     {
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Random)
-                                            .Where(x => x.IsWaitlisted)
+                                            .Where(x => x.IsWaitlisted
+                                                        && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
                             LogEnrolment(e);
@@ -317,7 +345,8 @@ namespace U3A.BusinessRules
                     {
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Created)
-                                            .Where(x => x.IsWaitlisted)
+                                            .Where(x => x.IsWaitlisted
+                                                        && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
                             LogEnrolment(e);
@@ -333,6 +362,16 @@ namespace U3A.BusinessRules
                     if (dbc.Entry(e).State == EntityState.Unchanged) { dbc.Entry(e).State = EntityState.Modified; }
                 }
             }
+        }
+
+        private static bool IsAlreadyEnrolledInCourse(Guid PersonID, Course course, List<Guid> enrolledPeopleID)
+        {
+            var result = false;
+            if (course.CourseParticipationTypeID == (int?)ParticipationType.DifferentParticipantsInEachClass)
+            {
+                result = (enrolledPeopleID.Contains(PersonID)) ? true : false;
+            }
+            return result;
         }
 
         private static void LogEnrolment(Enrolment enrolment)
