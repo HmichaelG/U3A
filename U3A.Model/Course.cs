@@ -34,7 +34,7 @@ namespace U3A.Model
         [DefaultValue(0)]
         public int? CourseParticipationTypeID { get; set; } = (int)ParticipationType.SameParticipantsInAllClasses;
         public CourseParticipationType CourseParticipationType { get; set; }
-        public bool EnforceOneStudentPerClass { get; set; } = true;
+        public bool EnforceOneStudentPerClass { get; set; } = true; // Ooops! One Class Per Student
 
         [Required]
         [Precision(precision: 18, 2)]
