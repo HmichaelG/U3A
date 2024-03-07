@@ -205,10 +205,16 @@ namespace U3A.Services.Email
 
         public async Task<bool> DeleteSuppression(string EmailAddress)
         {
+            PostmarkReactivationRequestStatus status = PostmarkReactivationRequestStatus.Failed;
             List<PostmarkSuppressionChangeRequest> list = new();
             list.Add(new PostmarkSuppressionChangeRequest { EmailAddress = EmailAddress });
-            var result = await client.DeleteSuppressions(list);
-            var status = result.Suppressions.FirstOrDefault()?.Status;
+            PostmarkMessageStreamListing streams = await client.ListMessageStreams();
+            foreach (var stream in streams.MessageStreams.OrderByDescending(x => x.ID))
+            {
+                var result = await client.DeleteSuppressions(list, stream.ID);
+                status = result.Suppressions.First().Status;
+                if (status == PostmarkReactivationRequestStatus.Deleted) { break; }
+            }
             return (status == PostmarkReactivationRequestStatus.Deleted) ? true : false;
         }
 
