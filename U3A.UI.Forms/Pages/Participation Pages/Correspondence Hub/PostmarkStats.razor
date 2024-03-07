@@ -136,23 +136,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><th scope="row" class="col-2">Type</th> <td>@selectedBounce.Name</td></tr>
-                        <tr><th scope="row" class="col-2">Subject</th> <td>@selectedBounce.Subject</td></tr>
-                        <tr><th scope="row" class="col-2">From</th> <td>@selectedBounce.From</td></tr>
-                        <tr><th scope="row" class="col-2">To</th> <td>@selectedBounce.Email</td></tr>
-                        <tr><th scope="row" class="col-2">Date</th> <td>@selectedBounce.BouncedAt.ToString("dd-MMM-yy hh:mm tt")</td></tr>
+                        <tr><th scope="row" class="col-3">Type</th> <td>@selectedBounce.Name</td></tr>
+                        <tr><th scope="row" class="col-3">Subject</th> <td>@selectedBounce.Subject</td></tr>
+                        <tr><th scope="row" class="col-3">From</th> <td>@selectedBounce.From</td></tr>
+                        <tr><th scope="row" class="col-3">To</th> <td>@selectedBounce.Email</td></tr>
+                        <tr><th scope="row" class="col-3">Date</th> <td>@selectedBounce.BouncedAt.ToString("dd-MMM-yy hh:mm tt")</td></tr>
                     </tbody>
                 </table>
                 <table class="table">
                     <thead>
                         <tr>
-                            <td class="h6 text-left" colspan="2">Bounce Details</td>
+                            <td class="h6 text-left" colspan="3">Bounce Details</td>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><th scope="row" class="col-2">Reason</th> <td>@selectedBounce.Details</td></tr>
+                        <tr><th scope="row" class="col-3">Reason</th> <td>@selectedBounce.Details</td></tr>
                         <tr>
-                            <th scope="row" class="col-2">Status</th>
+                            <th scope="row" class="col-3">Status</th>
                             <td>
                                 @((selectedBounce.Inactive)
                                     ? "The email address has been deactiveted."
@@ -161,7 +161,24 @@
                         </tr>
                         @if (selectedBounce.Inactive)
                         {
-                            <tr><th scope="row" class="col-2">Can Reactivate?</th> <td>@selectedBounce.CanActivate</td></tr>
+                            <tr>
+                                <th scope="row" class="col-3">Can Reactivate?</th>
+                                <td>
+                                    
+                                    @if (selectedBounce.CanActivate)
+                                    {
+                                    <span>Yes.</span> <DxButton Text="Reactivate Now!" Click="OnReactivate"  />
+                                    }
+                                    else
+                                    {
+                                        <div class='alert alert-danger text-dark pb-2'>
+                                        <p>No. A spam complaint is recorded when a subscriber clicks “This is Spam” or “Mark as Spam” in email clients like Outlook, Gmail, and other similar services.
+                                        In the email industry, spam complaints are a clear metric to determine abuse and poor sending practices.
+                                        If you feel a spam complaint has a reason for being reactivated, please <a href='https://postmarkapp.com/contact'>contact Postmark support</a> directly.</p>
+                                        <p>Reduce your spam rate to less than 0.1% of email. if your spam complaint rate remains higher than normal Postmark may pause sending on your account while they work with you to fix the issue.</p>                                        </div>
+                                    }
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -174,10 +191,10 @@
                     <tbody>
                         @if (selectedBounce.Person != null)
                         {
-                            <tr><th scope="row" class="col-2">Name</th> <td>@selectedBounce.Person.FullName</td></tr>
-                            <tr><th scope="row" class="col-2">Joined</th> <td>@selectedBounce.Person.DateJoined?.ToString("dd-MMM-yyyy")</td></tr>
-                            <tr><th scope="row" class="col-2">Mobile</th> <td>@selectedBounce.Person.Mobile</td></tr>
-                            <tr><th scope="row" class="col-2">Home Phone</th> <td>@selectedBounce.Person.HomePhone</td></tr>
+                            <tr><th scope="row" class="col-3">Name</th> <td>@selectedBounce.Person.FullName</td></tr>
+                            <tr><th scope="row" class="col-3">Joined</th> <td>@selectedBounce.Person.DateJoined?.ToString("dd-MMM-yyyy")</td></tr>
+                            <tr><th scope="row" class="col-3">Mobile</th> <td>@selectedBounce.Person.Mobile</td></tr>
+                            <tr><th scope="row" class="col-3">Home Phone</th> <td>@selectedBounce.Person.HomePhone</td></tr>
                         }
                         else
                         {
@@ -274,6 +291,26 @@
     {
         selectedBounce = dataItem;
         await bounceDetailsForm.ShowAsync();
+    }
+
+    async Task OnReactivate()
+    {
+        await ProgressBar.ShowSmallSpinnerAsync();
+        var result = await service.DeleteSuppression(selectedBounce.Email);
+        await service.GetOverviewStatisticsAsync(tzOffset);
+        await bounceDetailsForm.CloseAsync();
+        string msg = "";
+        if (result)
+        {
+            msg = "The email address has been reactivated.";
+        }
+        else
+        {
+            msg = "The email address could not be reactivated.";
+        }
+        await messageBox.ShowOkOnlyAsync("Operation complete", msg);
+        await ProgressBar.Close();
+
     }
 
 }

@@ -199,9 +199,19 @@ namespace U3A.Services.Email
             }
             foreach (var kvp in streams)
             {
-                client.DeleteSuppressions(kvp.Value, kvp.Key);
+                await client.DeleteSuppressions(kvp.Value, kvp.Key);
             }
         }
+
+        public async Task<bool> DeleteSuppression(string EmailAddress)
+        {
+            List<PostmarkSuppressionChangeRequest> list = new();
+            list.Add(new PostmarkSuppressionChangeRequest { EmailAddress = EmailAddress });
+            var result = await client.DeleteSuppressions(list);
+            var status = result.Suppressions.FirstOrDefault()?.Status;
+            return (status == PostmarkReactivationRequestStatus.Deleted) ? true : false;
+        }
+
         public async Task<List<EmailMessage>> SearchMessagesAsync(TimeSpan offset, String recipient)
         {
             var result = new List<EmailMessage>();

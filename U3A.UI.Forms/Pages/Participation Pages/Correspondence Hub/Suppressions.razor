@@ -124,11 +124,13 @@
         foreach (var o in SelectedDataItems) { if (((EmailSuppression)o).Reason == "SpamComplaint") count++; }
         if (count > 0)
         {
-            result = (await messageBox.ShowAsync("Reset Spam Complaint(s)",
-                           @"<div class='alert alert-danger text-dark pb-2'>Spam complaints <strong>are not to be reactivated without a thorough investigation into the reason for the complaint</strong>.
-                            Doing otherwise may cause email delivery to be suspended or at worst, halted completely.<br/><br/>
-                            Please be careful. If the complaint has been permanently deactivated by Postmark, contact their support for reactivation.</div>
-                            <p>Do your wish to continue?</p>"));
+            result = (await messageBox.ShowAsync("Spam complaints can’t be reactivated",
+                           @"<div class='alert alert-danger text-dark pb-2'>
+                            <p>A spam complaint is recorded when a subscriber clicks “This is Spam” or “Mark as Spam” in email clients like Outlook, Gmail, and other similar services. 
+                                In the email industry, spam complaints are a clear metric to determine abuse and poor sending practices. 
+                                If you feel a spam complaint has a reason for being reactivated, please <a href='https://postmarkapp.com/contact'>contact Postmark support</a> directly.</p>
+                             <p>Reduce your spam rate to less than 0.1% of email. if your spam complaint rate remains higher than normal Postmark may pause sending on your account while they work with you to fix the issue."
+                       ));
         }
 
         return result;
