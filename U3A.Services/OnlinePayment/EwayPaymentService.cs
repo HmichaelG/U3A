@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -139,10 +140,47 @@ namespace U3A.Services
             }
         }
 
-        public async Task FinaliseEwayPyamentAsync(U3ADbContext dbc, Guid personID, Term term)
+        public async Task FinaliseEwayPyamentAsync(U3ADbContext dbc, OnlinePaymentStatus payment, Term term)
         {
             GetClient(dbc);
             var feeService = new MemberFeeCalculationService();
+            var person = await dbc.Person.FindAsync(payment.PersonID);
+            var doneCodes = new List<string>();
+            PaymentResult? result = null;
+            var response = await ewayClient.QueryAccessCode(payment.AccessCode);
+            if (response.Errors == null)
+            {
+                if (response.AccessCode == null ||  response.AccessCode != payment.AccessCode)
+                        { throw new Exception("Payment details no longer exist at Eway."); }
+                var receipts = await dbc.Receipt.Where(x => x.PersonID == person.ID).ToListAsync();
+                var receipt = receipts.Where(x => x.PersonID == person.ID
+                                && x.Description.EndsWith(response.AuthorisationCode)
+                                && x.Identifier.EndsWith(response.TransactionID.ToString())).FirstOrDefault();
+                if (receipt != null)
+                        { throw new Exception("A cash receipt already exists for this transaction."); }
+                result = new PaymentResult()
+                {
+                    Date = payment.CreatedOn.Value.Add(TimezoneAdjustment.TimezoneOffset),
+                    AccessCode = response.AccessCode,
+                    AuthorizationCode = response.AuthorisationCode,
+                    TransactionID = response.TransactionID.GetValueOrDefault(),
+                    Amount = (decimal)(response.TotalAmount.GetValueOrDefault() / 100.00),
+                    ResponseCode = response.ResponseCode ?? "",
+                    ResponseMessage = response.ResponseMessage ?? ""
+                };
+            }
+            if (result != null)
+            {
+                await CreateReceipt(dbc, result, person, term);
+            }
+        }
+
+        MemberFeeCalculationService feeService = new ();
+
+        public async Task FinaliseEwayPyamentAsync(U3ADbContext dbc, Guid personID, Term term)
+        {
+            GetClient(dbc);
+            feeService = new MemberFeeCalculationService();
             var person = await dbc.Person.FindAsync(personID);
             var doneCodes = new List<string>();
             while (true)
@@ -151,58 +189,56 @@ namespace U3A.Services
                 if (result == null) return;
                 if (doneCodes.Contains(result.AccessCode)) { return; }
                 doneCodes.Add(result.AccessCode);
-                if (result.AccessCode != null && !string.IsNullOrWhiteSpace(result.AuthorizationCode))
-                {
-                    var receipt = new Receipt()
-                    {
-                        Amount = result.Amount,
-                        Date = TimezoneAdjustment.GetLocalTime(DateTime.Now).Date,
-                        Description = $"Eway online payment Auth: {result.AuthorizationCode}",
-                        Identifier = $"TransID: {result.TransactionID}",
-                        Person = person
-                    };
-
-                    var processingYear = term.Year;
-                    var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(dbc, person);
-
-                    // Special Rule: set Financial To if amount paid greater than minimum amount
-                    var previouslyPaid = BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, processingYear, DateTime.Now);
-                    if (receipt.Amount + previouslyPaid >= minMembershipFee)
-                    {
-                        receipt.FinancialTo = (person.FinancialTo >= processingYear) ? person.FinancialTo : processingYear;
-                    }
-                    else { receipt.FinancialTo = person.FinancialTo; }
-
-                    // Special Rule: reset join date if difference between current Financial To and previous is more than 1 year
-                    // if (receipt.Person.DateJoined != null)
-                    // {
-                    //     receipt.DateJoined = (receipt.Person.PreviousFinancialTo.GetValueOrDefault() == 2020 || receipt.FinancialTo - receipt.Person.PreviousFinancialTo <= 1)
-                    //         ? receipt.Person.DateJoined.Value
-                    //         : receipt.Date;
-                    // }
-                    // else { receipt.DateJoined = receipt.Date; }
-                    if (receipt.Person.DateJoined == null)
-                    {
-                        receipt.DateJoined = receipt.Date;
-                    }
-                    else
-                    {
-                        receipt.DateJoined = receipt.Person.DateJoined.Value;
-                    }
-
-                    receipt.ProcessingYear = processingYear;
-                    person.PreviousFinancialTo = person.FinancialTo;
-                    person.PreviousDateJoined = person.DateJoined;
-                    person.FinancialTo = receipt.FinancialTo;
-                    person.DateJoined = receipt.DateJoined;
-                    await dbc.AddAsync(receipt);
-                    dbc.Update(person);
-                }
-                await SetPaymentStatusProcessed(dbc, result, person);
-                await dbc.SaveChangesAsync();
+                await CreateReceipt(dbc,result,person,term);
             }
         }
 
+        private async Task CreateReceipt(U3ADbContext dbc,PaymentResult result, Person person, Term term)
+        {
+            if (result.AccessCode != null && !string.IsNullOrWhiteSpace(result.AuthorizationCode))
+            {
+                var receipt = new Receipt()
+                {
+                    Amount = result.Amount,
+                    Date = (result.Date == null) 
+                            ? TimezoneAdjustment.GetLocalTime(DateTime.Now).Date 
+                            : result.Date.Value,
+                    Description = $"Eway online payment Auth: {result.AuthorizationCode}",
+                    Identifier = $"TransID: {result.TransactionID}",
+                    Person = person
+                };
+
+                var processingYear = term.Year;
+                var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(dbc, person);
+
+                // Special Rule: set Financial To if amount paid greater than minimum amount
+                var previouslyPaid = BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, processingYear, DateTime.Now);
+                if (receipt.Amount + previouslyPaid >= minMembershipFee)
+                {
+                    receipt.FinancialTo = (person.FinancialTo >= processingYear) ? person.FinancialTo : processingYear;
+                }
+                else { receipt.FinancialTo = person.FinancialTo; }
+
+                if (receipt.Person.DateJoined == null)
+                {
+                    receipt.DateJoined = receipt.Date;
+                }
+                else
+                {
+                    receipt.DateJoined = receipt.Person.DateJoined.Value;
+                }
+
+                receipt.ProcessingYear = processingYear;
+                person.PreviousFinancialTo = person.FinancialTo;
+                person.PreviousDateJoined = person.DateJoined;
+                person.FinancialTo = receipt.FinancialTo;
+                person.DateJoined = receipt.DateJoined;
+                await dbc.AddAsync(receipt);
+                dbc.Update(person);
+            }
+            await SetPaymentStatusProcessed(dbc, result, person);
+            await dbc.SaveChangesAsync();
+        }
         public async Task<PaymentResult?> ProcessPaymentResponse(U3ADbContext dbc, Person person)
         {
             PaymentResult? result = null;
@@ -254,6 +290,7 @@ namespace U3A.Services
 
     public record PaymentResult
     {
+        public DateTime? Date { get; set; }
         public string AccessCode { get; set; }
         public string AuthorizationCode { get; set; }
         public int TransactionID { get; set; }

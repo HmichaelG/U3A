@@ -26,61 +26,68 @@ else
     <br />
 
     <MessageBox @ref="@messageBox" />
+    <Progress @ref=@progressBar />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-                <FullScreen>
-                    <ContentTemplate>
-    <DxGrid Data="@PaymentStatus" @ref=@mainGrid CssClass="grid-height"
-            AutoExpandAllGroupRows="true"
-            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-            UnboundColumnData="Grid_UnboundColumnData"
-            ShowAllRows="true"
-            KeyFieldName="ID">
-        <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridDataColumn Width="10rem" Caption="Date"
-                              FieldName="Created"
-                              DisplayFormat="dd-MMM-yyyy"
-                              UnboundType="GridUnboundColumnType.DateTime"
-                              SortOrder="GridColumnSortOrder.Descending" />
-            <DxGridDataColumn Width="10rem" Caption="Time"
-                              FieldName="CreatedTime"
-                              DisplayFormat="hh:mm tt"
-                              UnboundType="GridUnboundColumnType.DateTime" />
-            <DxGridDataColumn Width="6rem" Caption="Status" FieldName="Status" />
-            <DxGridDataColumn Width="6rem" Caption="Result Code" FieldName="ResultCode" />
-            <DxGridDataColumn Width="6rem" Caption="Result Msg" FieldName="ResultMessage" />
-            <DxGridDataColumn Caption="Participant" FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Width="6rem" Caption="Mobile" FieldName="Mobile" UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Width="6rem" Caption="Phone" FieldName="Phone" UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Caption="Email" FieldName="Email" UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Caption="Processed By" FieldName="ProcessedBy" UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Caption="W/Station ID" FieldName="WorkstationID" Visible=false />
-        </Columns>
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@PaymentStatus" @ref=@mainGrid CssClass="grid-height"
+                    AutoExpandAllGroupRows="true"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    UnboundColumnData="Grid_UnboundColumnData"
+                    ShowAllRows="true"
+                    KeyFieldName="ID">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridDataColumn Width="5rem">
+                        <CellDisplayTemplate>
+                            <DxButton Text="Re-Ssubmit" CssClass="w-100"
+                                Click="() => OnResubmit((OnlinePaymentStatus)context.DataItem)" />
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn Width="10rem" Caption="Date"
+                                      FieldName="Created"
+                                      DisplayFormat="dd-MMM-yyyy"
+                                      UnboundType="GridUnboundColumnType.DateTime"
+                                      SortOrder="GridColumnSortOrder.Descending" />
+                    <DxGridDataColumn Width="10rem" Caption="Time"
+                                      FieldName="CreatedTime"
+                                      DisplayFormat="hh:mm tt"
+                                      UnboundType="GridUnboundColumnType.DateTime" />
+                    <DxGridDataColumn Width="6rem" Caption="Status" FieldName="Status" />
+                    <DxGridDataColumn Width="6rem" Caption="Result Code" FieldName="ResultCode" />
+                    <DxGridDataColumn Width="6rem" Caption="Result Msg" FieldName="ResultMessage" />
+                    <DxGridDataColumn Caption="Participant" FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Width="6rem" Caption="Mobile" FieldName="Mobile" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Width="6rem" Caption="Phone" FieldName="Phone" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Caption="Email" FieldName="Email" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Caption="Processed By" FieldName="ProcessedBy" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Caption="W/Station ID" FieldName="WorkstationID" Visible=false />
+                </Columns>
 
-        <EditFormTemplate Context="EditFormContext">
-            @{
-                var editItem = (CourseType)EditFormContext.EditModel;
-            }
-            <DxFormLayout>
-                <DxFormLayoutItem ColSpanMd="12">
-                    <ValidationSummary />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@editItem.Name" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
-                    <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Discontinued">
-                    <DxCheckBox @bind-Checked="@editItem.Discontinued" />
-                </DxFormLayoutItem>
-            </DxFormLayout>
-        </EditFormTemplate>
-    </DxGrid>
+                <EditFormTemplate Context="EditFormContext">
+                    @{
+                        var editItem = (CourseType)EditFormContext.EditModel;
+                    }
+                    <DxFormLayout>
+                        <DxFormLayoutItem ColSpanMd="12">
+                            <ValidationSummary />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@editItem.Name" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
+                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Discontinued">
+                            <DxCheckBox @bind-Checked="@editItem.Discontinued" />
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                </EditFormTemplate>
+            </DxGrid>
         </ContentTemplate>
     </FullScreen>
 }
@@ -100,14 +107,20 @@ else
     U3ADbContext dbc { get; set; }
     TimeSpan? offset;
 
+    Progress? progressBar;
 
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        await GetDataAsync();
+        IsReady = true;
+    }
+
+    async Task GetDataAsync()
+    {
         PaymentStatus = await BusinessRule.GetOnlinePaymentStatus(dbc);
         People = await BusinessRule.EditablePersonAsync(dbc);
-        IsReady = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -154,6 +167,33 @@ else
         }
     }
 
+    async Task OnResubmit(OnlinePaymentStatus payment)
+    {
+        await progressBar.ShowSmallSpinnerAsync();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
+            if (term == null) { return; }
+            var paymentService = new EwayPaymentService(dbc);
+            try
+            {
+                await paymentService.FinaliseEwayPyamentAsync(dbc, payment, term);
+                await GetDataAsync();
+                await messageBox.ShowOkOnlyAsync("Payment Resubmitted", "The payment has been successfully resubmitted.");
+            }
+            catch (Exception ex)
+            {
+                var person = await dbc.Person.FindAsync(payment.PersonID);
+                await messageBox.ShowOkOnlyAsync("Resubmit error", 
+                            $"Error processing online payment for {person.FullName}.<br/>{ex.Message}");
+            }
+            finally
+            {
+                await progressBar.Close();
+            }
+        }
+    }
 
     public void Dispose()
     {
