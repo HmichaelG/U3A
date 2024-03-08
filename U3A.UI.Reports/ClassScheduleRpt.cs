@@ -53,7 +53,7 @@ namespace U3A.UI.Reports
             var term = DbContext.Term.Find(id);
             if (term != null)
             {
-                DataSource = BusinessRule.GetClassDetails(DbContext, term, settings);
+                DataSource = BusinessRule.GetClassDetails(DbContext, term, settings, ExludeOffScheduleActivities: true);
             }
             prmTermSummary.Value = term?.TermSummary;
             lblWatermark.Text = (string)prmWatermark.Value;

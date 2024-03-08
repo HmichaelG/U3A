@@ -432,10 +432,9 @@ namespace U3A.BusinessRules
                 {
                     result = "Oversubscribed";
                 }
-                if (EnrolledParticipants < course.MaximumStudents
-                        && WaitlistedParticipants > 0)
+                if (course.IsOffScheduleActivity)
                 {
-                    result = "Places Available - Assign Waitlisted";
+                    result = "Off-Schedule Activity";
                 }
             }
             return result;
@@ -460,8 +459,7 @@ namespace U3A.BusinessRules
                 {
                     result = ButtonRenderStyle.Danger;
                 }
-                if (EnrolledParticipants < course.MaximumStudents
-                        && WaitlistedParticipants > 0)
+                if (course.IsOffScheduleActivity)
                 {
                     result = ButtonRenderStyle.Info;
                 }

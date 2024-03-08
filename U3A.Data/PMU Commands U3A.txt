@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_SendMail_IsUserRequested
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_EnforceOneStudentPerClass
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_EnforceOneStudentPerClass
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_IsOffScheduleActivity
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_EnforceOneStudentPerClass
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_IsOffScheduleActivity
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

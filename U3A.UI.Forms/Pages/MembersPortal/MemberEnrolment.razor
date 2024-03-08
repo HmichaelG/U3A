@@ -574,7 +574,8 @@ else
         if (term != null)
         {
             prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
-            Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
+            var exludeOffScheduleActivities = (IsReadOnly) ? false : true;
+            Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
             if (Classes != null)
             {
                 if (loginState?.SelectedPerson != null)

@@ -53,7 +53,7 @@ namespace U3A.BusinessRules
             },
             new LabelObject() {
                 Id = 3,
-                LabelCaption = "Places Available - Assign Waitlisted",
+                LabelCaption = "Off-Schedule Activity",
                 BackgroundCssClass = "bg-info",
                 TextCssClass = "text-white"
             },
@@ -227,7 +227,7 @@ namespace U3A.BusinessRules
             if (ClassStatus.ToLower() == "undersubscribed") { result = 0; }
             if (ClassStatus.ToLower() == "good to go") { result = 1; }
             if (ClassStatus.ToLower() == "oversubscribed") { result = 2; }
-            if (ClassStatus.ToLower() == "places available - assign waitlisted") { result = 3; }
+            if (ClassStatus.ToLower() == "off-schedule activity") { result = 3; }
             return result;
         }
         static string GetRecurrence(Class c, Term term)

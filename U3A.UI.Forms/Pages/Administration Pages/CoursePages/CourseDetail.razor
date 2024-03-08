@@ -8,8 +8,14 @@
     <DxFormLayoutItem ColSpanMd="12">
         <ValidationSummary />
     </DxFormLayoutItem>
+    <div class="w-100 d-flex">
+        <div class="flex-grow-1" />
+        <div class="flex-grow-0 me-2">
+            <DxCheckBox @bind-Checked="@Course.IsOffScheduleActivity"
+                        LabelPosition="LabelPosition.Left">Off-Schedule Activity?</DxCheckBox>
+        </div>
+    </div>
     <DxTabs @ref=@TabPages CssClass="page-height" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
-
         <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>
             <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
                              Settings=@Settings CourseEditView="@CourseEditViewType.Simplified"
@@ -55,7 +61,7 @@
                 <DxFormLayoutItem Caption="Send Leader Reports To" ColSpanMd="12">
                     <DxComboBox Data="sendLeaderReportsToList" NullText=@leaderReportsToNullText
                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    @bind-Value="@Course.SendLeaderReportsTo"
+                                @bind-Value="@Course.SendLeaderReportsTo"
                                 ValueFieldName="@nameof(SendLeaderReportsToWrapper.Type)"
                                 TextFieldName="@nameof(SendLeaderReportsToWrapper.DisplayText)">
                     </DxComboBox>
@@ -63,7 +69,7 @@
                 <DxFormLayoutItem Caption="Course Contact Order" ColSpanMd="12">
                     <DxComboBox Data="contactOrder" NullText=@contactOrderNullText
                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                    @bind-Value="@Course.CourseContactOrder"
+                                @bind-Value="@Course.CourseContactOrder"
                                 ValueFieldName="@nameof(CourseContactOrderWrapper.Type)"
                                 TextFieldName="@nameof(CourseContactOrderWrapper.DisplayText)">
                     </DxComboBox>
@@ -75,7 +81,6 @@
                 </DxFormLayout>
             </DxFormLayoutGroup>
         </DxTabPage>
-
     </DxTabs>
 </DxFormLayout>
 <style>

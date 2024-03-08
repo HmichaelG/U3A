@@ -31,6 +31,8 @@ namespace U3A.Model
         [DefaultValue(" ")]
         public string? Description { get; set; }
 
+        public bool IsOffScheduleActivity { get; set; }
+
         [DefaultValue(0)]
         public int? CourseParticipationTypeID { get; set; } = (int)ParticipationType.SameParticipantsInAllClasses;
         public CourseParticipationType CourseParticipationType { get; set; }
