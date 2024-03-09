@@ -37,7 +37,7 @@ else
                                             OnContentExpanded="@(async() => await OnRefresh())"
                                             @ref=@collapsableContent>
                             <ContentTemplate>
-                                <div class="@formWidth" >
+                                <div class="@formWidth">
                                     <div class="h3 text-center">Member Portal (Administration)</div>
                                     <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
                                     <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" ColSpanMd="12">
@@ -227,21 +227,21 @@ else
             authEmail = authenticationState.User.Identity.Name;
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, authEmail);
+                bool hasUnprocessedPayments = BusinessRule.HasUnprocessedOnlinePayment(dbc, authEmail);
                 if (hasUnprocessedPayments)
                 {
                     isProcessing = true;
                     InvokeAsync(StateHasChanged);
                     var term = BusinessRule.CurrentEnrolmentTerm(dbc);
                     if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
-                    foreach (var payment in await BusinessRule.GetUnprocessedOnlinePayment(dbc, authEmail))
+                    foreach (var payment in BusinessRule.GetUnprocessedOnlinePayment(dbc, authEmail))
                     {
-                        var service = new EwayPaymentService();
-                        selectedPerson = await dbc.Person.FindAsync(payment.PersonID);
-                        if (selectedPerson != null)
+                        try
                         {
-                            await service.DoFinaliseEwayPyamentAsync(U3Adbfactory, payment.PersonID, term);
+                            var service = new EwayPaymentService();
+                            await service.FinaliseEwayPyamentAsync(U3Adbfactory, payment, term);
                         }
+                        catch (Exception ex) { }
                     }
                 }
             }

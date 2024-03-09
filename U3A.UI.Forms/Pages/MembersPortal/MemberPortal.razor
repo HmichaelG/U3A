@@ -137,7 +137,7 @@ else
         }
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         Title = settings?.U3AGroup;
-        bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, await GetPersonAsync());
+        bool hasUnprocessedPayments = BusinessRule.HasUnprocessedOnlinePayment(dbc, await GetPersonAsync());
         if (hasUnprocessedPayments)
         {
             menuSelection = PortalMenuSelection.DoMemberPayment;
@@ -164,7 +164,7 @@ else
             var person = await GetPersonAsync();
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                if (person != null && await BusinessRule.HasUnprocessedOnlinePayment(dbc, person))
+                if (person != null && BusinessRule.HasUnprocessedOnlinePayment(dbc, person))
                 {
                     menuSelection = PortalMenuSelection.DoMemberPayment;
                 }

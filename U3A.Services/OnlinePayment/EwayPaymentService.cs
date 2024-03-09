@@ -20,6 +20,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Twilio.TwiML.Fax;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -119,48 +120,42 @@ namespace U3A.Services
         }
 
         static SemaphoreSlim? semaphore = new(1);
-        public async Task DoFinaliseEwayPyamentAsync(IDbContextFactory<U3ADbContext> U3Adbfactory, Guid personID, Term term)
+        public async Task FinaliseEwayPyamentAsync(IDbContextFactory<U3ADbContext> U3Adbfactory, OnlinePaymentStatus paymentStatus, Term term)
         {
             await semaphore.WaitAsync();
             try
             {
-                await FinaliseEwayPyamentAsync(U3Adbfactory, personID, term);
+                using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+                {
+                    GetClient(dbc);
+                    await FinaliseEwayPyamentAsync(dbc, paymentStatus, term);
+                }
             }
             finally
             {
                 semaphore.Release();
             }
         }
-        public async Task FinaliseEwayPyamentAsync(IDbContextFactory<U3ADbContext> U3Adbfactory, Guid personID, Term term)
-        {
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-            {
-                GetClient(dbc);
-                await FinaliseEwayPyamentAsync(dbc, personID, term);
-            }
-        }
 
-        public async Task FinaliseEwayPyamentAsync(U3ADbContext dbc, OnlinePaymentStatus payment, Term term)
+        public async Task FinaliseEwayPyamentAsync(U3ADbContext dbc, OnlinePaymentStatus paymentStatus, Term term)
         {
             GetClient(dbc);
-            var feeService = new MemberFeeCalculationService();
-            var person = await dbc.Person.FindAsync(payment.PersonID);
-            var doneCodes = new List<string>();
+            var person = await dbc.Person.FindAsync(paymentStatus.PersonID);
+            if (person == null)
+            {
+                throw new Exception("The participant for this payment no longer exists.");
+            }
             PaymentResult? result = null;
-            var response = await ewayClient.QueryAccessCode(payment.AccessCode);
+            var response = await ewayClient.QueryAccessCode(paymentStatus.AccessCode);
             if (response.Errors == null)
             {
-                if (response.AccessCode == null ||  response.AccessCode != payment.AccessCode)
-                        { throw new Exception("Payment details no longer exist at Eway."); }
-                var receipts = await dbc.Receipt.Where(x => x.PersonID == person.ID).ToListAsync();
-                var receipt = receipts.Where(x => x.PersonID == person.ID
-                                && x.Description.EndsWith(response.AuthorisationCode)
-                                && x.Identifier.EndsWith(response.TransactionID.ToString())).FirstOrDefault();
-                if (receipt != null)
-                        { throw new Exception("A cash receipt already exists for this transaction."); }
+                if (response.AccessCode == null || response.AccessCode != paymentStatus.AccessCode)
+                {
+                    throw new Exception("Payment details no longer exist at Eway.");
+                }
                 result = new PaymentResult()
                 {
-                    Date = payment.CreatedOn.Value.Add(TimezoneAdjustment.TimezoneOffset),
+                    Date = paymentStatus.LocalCreatedOn.Value,
                     AccessCode = response.AccessCode,
                     AuthorizationCode = response.AuthorisationCode,
                     TransactionID = response.TransactionID.GetValueOrDefault(),
@@ -171,38 +166,35 @@ namespace U3A.Services
             }
             if (result != null)
             {
-                await CreateReceipt(dbc, result, person, term);
+                if (await DoesReceiptExist(dbc, person.ID, result))
+                {
+                    throw new Exception("A cash receipt already exists for this transaction.");
+                }
+                else
+                {
+                    await CreateReceipt(dbc, result, person, term);
+                }
             }
         }
 
-        MemberFeeCalculationService feeService = new ();
-
-        public async Task FinaliseEwayPyamentAsync(U3ADbContext dbc, Guid personID, Term term)
+        private async Task<bool> DoesReceiptExist(U3ADbContext dbc, Guid PersonID, PaymentResult paymentResult)
         {
-            GetClient(dbc);
-            feeService = new MemberFeeCalculationService();
-            var person = await dbc.Person.FindAsync(personID);
-            var doneCodes = new List<string>();
-            while (true)
-            {
-                PaymentResult? result = await ProcessPaymentResponse(dbc, person);
-                if (result == null) return;
-                if (doneCodes.Contains(result.AccessCode)) { return; }
-                doneCodes.Add(result.AccessCode);
-                await CreateReceipt(dbc,result,person,term);
-            }
+            var receipts = await dbc.Receipt.Where(x => x.PersonID == PersonID).ToListAsync();
+            return receipts.Where(x => x.PersonID == PersonID
+                            && x.Description.EndsWith(paymentResult.AuthorizationCode)
+                            && x.Identifier.EndsWith(paymentResult.TransactionID.ToString())).Any();
         }
 
-        private async Task CreateReceipt(U3ADbContext dbc,PaymentResult result, Person person, Term term)
+        private async Task CreateReceipt(U3ADbContext dbc, PaymentResult result, Person person, Term term)
         {
-            if (result.AccessCode != null && !string.IsNullOrWhiteSpace(result.AuthorizationCode))
+            var feeService = new MemberFeeCalculationService();
+
+            if (result.AccessCode != null && result.ResponseCode == "00")
             {
                 var receipt = new Receipt()
                 {
                     Amount = result.Amount,
-                    Date = (result.Date == null) 
-                            ? TimezoneAdjustment.GetLocalTime(DateTime.Now).Date 
-                            : result.Date.Value,
+                    Date = result.Date,
                     Description = $"Eway online payment Auth: {result.AuthorizationCode}",
                     Identifier = $"TransID: {result.TransactionID}",
                     Person = person
@@ -242,7 +234,7 @@ namespace U3A.Services
         public async Task<PaymentResult?> ProcessPaymentResponse(U3ADbContext dbc, Person person)
         {
             PaymentResult? result = null;
-            var reqDetails = await BusinessRule.GetUnprocessedOnlinePayment(dbc, person);
+            var reqDetails = BusinessRule.GetUnprocessedOnlinePayment(dbc, person);
             if (reqDetails != null)
             {
                 var response = await ewayClient.QueryAccessCode(reqDetails.AccessCode);
@@ -290,7 +282,7 @@ namespace U3A.Services
 
     public record PaymentResult
     {
-        public DateTime? Date { get; set; }
+        public DateTime Date { get; set; }
         public string AccessCode { get; set; }
         public string AuthorizationCode { get; set; }
         public int TransactionID { get; set; }

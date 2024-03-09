@@ -3,7 +3,7 @@
 @inject ILogger<MemberPayment> Logger
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@inject NavigationManager NavigationManager
+@inject NavigationManager navMan
 
 
 @implements IDisposable
@@ -32,128 +32,128 @@ else
 
     <Progress @ref="@progressBar" />
 
-        <div class="px-2 col-12 px-sm-0 col-md-10 col-lg-6 mx-auto">
-            <DxLoadingPanel @bind-Visible="IsProcessing"
-                            IsContentBlocked="true"
-                            ApplyBackgroundShading="true"
-                            IndicatorAreaVisible="false"
-                            Text="Calculating fees due...">
+    <div class="px-2 col-12 px-sm-0 col-md-10 col-lg-6 mx-auto">
+        <DxLoadingPanel @bind-Visible="IsProcessing"
+                        IsContentBlocked="true"
+                        ApplyBackgroundShading="true"
+                        IndicatorAreaVisible="false"
+                        Text="Calculating fees due...">
 
-                @switch (menuSelection)
-                {
-                    case PortalMenuSelection.DoMemberPaymentPreamble:
-                        <DxFormLayoutGroup Caption="@($"Membership Fees for: {loginState.SelectedPerson.FullName}")" HeaderCssClass="h4">
-                            @if (showFeesDueToggle)
-                            {
-                                <table class="table table-bordered">
-                                    <thead>
+            @switch (menuSelection)
+            {
+                case PortalMenuSelection.DoMemberPaymentPreamble:
+                    <DxFormLayoutGroup Caption="@($"Membership Fees for: {loginState.SelectedPerson.FullName}")" HeaderCssClass="h4">
+                        @if (showFeesDueToggle)
+                        {
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Description</th>
+                                        <th scope="col" style="text-align: right">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var fee in memberFees)
+                                    {
                                         <tr>
-                                            <th scope="col">Description</th>
-                                            <th scope="col" style="text-align: right">Amount</th>
+                                            <td>@fee.Description</td>
+                                            <td style="text-align: right">@(fee.Amount.ToString("c2"))</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var fee in memberFees)
-                                        {
-                                            <tr>
-                                                <td>@fee.Description</td>
-                                                <td style="text-align: right">@(fee.Amount.ToString("c2"))</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            }
-                            else
-                            {
-                                <div class="px-2 pt-2">
-                                    <div class="h6">It's your choice!</div>
-                                    <ul>
-                                        <li><strong>Secure Online Payment</strong> is safe, fast and reliable. It is the recommended method of payment.</li>
-                                        <li><strong>Direct Bank Payment</strong> is much slower due to additional reconciliation procedures required by our volunteer staff.</li>
-                                    </ul>
-                                </div>
-                            }
-                            <div class="m-auto">
-                                <TermsAndConditions SystemSettings="@settings" OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="px-2 pt-2">
+                                <div class="h6">It's your choice!</div>
+                                <ul>
+                                    <li><strong>Secure Online Payment</strong> is safe, fast and reliable. It is the recommended method of payment.</li>
+                                    <li><strong>Direct Bank Payment</strong> is much slower due to additional reconciliation procedures required by our volunteer staff.</li>
+                                </ul>
                             </div>
-                        </DxFormLayoutGroup>
-                        <DxButton Text="@AmountDueText"
-                                  CssClass="col-12 my-2"
-                                  Click="@(e => DoShowFeesDue())"
-                                  RenderStyle="ButtonRenderStyle.Light"
-                                  RenderStyleMode="ButtonRenderStyleMode.Contained">
-                        </DxButton>
-                        <DxButton Text="Pay by Secure Online Payment"
-                                  IconCssClass="bi-credit-card menu-icon me-3 h2"
-                                  CssClass="col-12 my-1"
-                                  Click="@(e => OnPayOnline(e))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Pay by Direct Bank Payment"
-                                  IconCssClass="bi-bank menu-icon me-3 h2"
-                                  CssClass="col-12 my-1"
-                                  Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberPaymentDirectDebit))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        break;
+                        }
+                        <div class="m-auto">
+                            <TermsAndConditions SystemSettings="@settings" OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                        </div>
+                    </DxFormLayoutGroup>
+                    <DxButton Text="@AmountDueText"
+                              CssClass="col-12 my-2"
+                              Click="@(e => DoShowFeesDue())"
+                              RenderStyle="ButtonRenderStyle.Light"
+                              RenderStyleMode="ButtonRenderStyleMode.Contained">
+                    </DxButton>
+                    <DxButton Text="Pay by Secure Online Payment"
+                              IconCssClass="bi-credit-card menu-icon me-3 h2"
+                              CssClass="col-12 my-1"
+                              Click="@(e => OnPayOnline(e))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Pay by Direct Bank Payment"
+                              IconCssClass="bi-bank menu-icon me-3 h2"
+                              CssClass="col-12 my-1"
+                              Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberPaymentDirectDebit))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    break;
 
-                    case PortalMenuSelection.DoMemberPaymentDirectDebit:
-                        <DxFormLayoutGroup Caption="Direct Bank Payment" HeaderCssClass="h4">
-                            <div class="p-2">
-                                <div class="h5">Payment Instruction</div>
-                                <p>Please create a payment using your banking software with the following detail... </p>
-                                <div class="row">
-                                    <div class="col col-5"><strong>Amount Due:</strong></div>
-                                    <div class="col col-7">@GetFeeAsString()</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col col-5"><strong>A/cc Name:</strong></div>
-                                    <div class="col col-7">@settings.U3AGroup</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col col-5"><strong>A/cc BSB:</strong></div>
-                                    <div class="col col-7">@settings.BankBSB</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col col-5"><strong>A/cc No:</strong></div>
-                                    <div class="col col-7">@settings.BankAccountNo</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col col-5"><strong>Description:</strong></div>
-                                    <div class="col col-7">@($"{loginState.SelectedPerson.FullName} {term.Year}")</div>
-                                </div>
-                                <br />
+                case PortalMenuSelection.DoMemberPaymentDirectDebit:
+                    <DxFormLayoutGroup Caption="Direct Bank Payment" HeaderCssClass="h4">
+                        <div class="p-2">
+                            <div class="h5">Payment Instruction</div>
+                            <p>Please create a payment using your banking software with the following detail... </p>
+                            <div class="row">
+                                <div class="col col-5"><strong>Amount Due:</strong></div>
+                                <div class="col col-7">@GetFeeAsString()</div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-5"><strong>A/cc Name:</strong></div>
+                                <div class="col col-7">@settings.U3AGroup</div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-5"><strong>A/cc BSB:</strong></div>
+                                <div class="col col-7">@settings.BankBSB</div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-5"><strong>A/cc No:</strong></div>
+                                <div class="col col-7">@settings.BankAccountNo</div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-5"><strong>Description:</strong></div>
+                                <div class="col col-7">@($"{loginState.SelectedPerson.FullName} {term.Year}")</div>
+                            </div>
+                            <br />
                             <p align="center" class="alert alert-info text-dark">
-                                    <em>
-                                        <strong>Please Note:</strong><br>It is vital that the direct payment be completed with the above detail exactly as shown.
-                                        Doing otherwise will incur unnecessary work for our volunteer staff and delay finalising your payment in our systems.<br />
-                                        Please allow up to 5 working days to clear your payment.<br />
-                                        <strong>Pay exactly the amount shown.</strong>
-                                    </em>
-                                </p>
-                            </div>
-                        </DxFormLayoutGroup>
-                        <DxButton Text="Changed your mind? Let's pay online"
-                                  IconCssClass="bi-emoji-smile menu-icon me-3 h2"
-                                  CssClass="col-12 my-1"
-                                  Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberPaymentPreamble))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        break;
-                }
+                                <em>
+                                    <strong>Please Note:</strong><br>It is vital that the direct payment be completed with the above detail exactly as shown.
+                                    Doing otherwise will incur unnecessary work for our volunteer staff and delay finalising your payment in our systems.<br />
+                                    Please allow up to 5 working days to clear your payment.<br />
+                                    <strong>Pay exactly the amount shown.</strong>
+                                </em>
+                            </p>
+                        </div>
+                    </DxFormLayoutGroup>
+                    <DxButton Text="Changed your mind? Let's pay online"
+                              IconCssClass="bi-emoji-smile menu-icon me-3 h2"
+                              CssClass="col-12 my-1"
+                              Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberPaymentPreamble))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    break;
+            }
 
-                <DxButton Text="Return to menu"
-                          IconCssClass="bi-door-closed menu-icon me-3 h2"
-                          CssClass="col-12 my-1"
-                          Click="@(e => OnCancel())"
-                          RenderStyle="ButtonRenderStyle.Primary"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline">
-                </DxButton>
-            </DxLoadingPanel>
-        </div>
+            <DxButton Text="Return to menu"
+                      IconCssClass="bi-door-closed menu-icon me-3 h2"
+                      CssClass="col-12 my-1"
+                      Click="@(e => OnCancel())"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline">
+            </DxButton>
+        </DxLoadingPanel>
+    </div>
 
 }
 
@@ -189,7 +189,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
+        IsProcessing = true;
         feeService = new MemberFeeCalculationService();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
@@ -200,6 +200,7 @@ else
         Title = settings?.U3AGroup;
         menuSelection = PortalMenuSelection.DoMemberPaymentPreamble;
         IsReady = true;
+        await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -209,30 +210,35 @@ else
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 // Process Eway response, if any
-                bool hasUnprocessedPayment = await BusinessRule.HasUnprocessedOnlinePayment(dbc, loginState.SelectedPerson);
+                bool hasUnprocessedPayment = BusinessRule.HasUnprocessedOnlinePayment(dbc, loginState.SelectedPerson);
                 if (hasUnprocessedPayment)
                 {
-                    IsProcessing = true;
+                    FinaliseEwayPayment();
+                }
+                else
+                {
+                    //Calculate fees
+                    await CalculateFees();
                     InvokeAsync(StateHasChanged);
-                    await FinaliseEwayPayment();                    
                 }
             }
-
-            //Calculate fees
-            decimal fee = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
-            int billingYear = feeService.BillingYear;
-            var payType = "fees payable";
-            if (fee < 0)
-            {
-                fee = Math.Abs(fee);
-                payType = "account credit";
-            }
-            AmountDueText = $"{billingYear} {payType} is: {fee.ToString("c2")}. {clickText}";
-            if (loginState.IsAdminOnBehalfOfMember) await DoShowFeesDue();
-            IsProcessing = false;
-            InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async Task CalculateFees()
+    {
+        decimal fee = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+        int billingYear = feeService.BillingYear;
+        var payType = "fees payable";
+        if (fee < 0)
+        {
+            fee = Math.Abs(fee);
+            payType = "account credit";
+        }
+        AmountDueText = $"{billingYear} {payType} is: {fee.ToString("c2")}. {clickText}";
+        if (loginState.IsAdminOnBehalfOfMember) await DoShowFeesDue();
+        IsProcessing = false;
     }
 
     async Task DoShowFeesDue()
@@ -272,7 +278,7 @@ else
         }
         else
         {
-            NavigationManager.NavigateTo("Identity/Account/Logout", true);
+            navMan.NavigateTo("Identity/Account/Logout", true);
         }
     }
 
@@ -308,7 +314,7 @@ else
                                 : loginState.SelectedPerson.Email;
                 var paymentURL = await paymentService.CreatePayment(dbc,
                                                 loginState.AdminEmail,
-                                                NavigationManager.BaseUri,
+                                                navMan.BaseUri,
                                                 loginState.SelectedPerson,
                                                 email,
                                                 loginState.SelectedPerson.PersonIdentity,
@@ -316,7 +322,7 @@ else
                                                 term.Name,
                                                 await CalculateFee()
                     );
-                if (paymentURL != null) { NavigationManager.NavigateTo(paymentURL); }
+                if (paymentURL != null) { navMan.NavigateTo(paymentURL); }
             }
             catch (EwayResponseException ex)
             {
@@ -398,7 +404,28 @@ else
     async Task FinaliseEwayPayment()
     {
         var service = new EwayPaymentService();
-        await service.DoFinaliseEwayPyamentAsync(U3Adbfactory, loginState.SelectedPerson.ID, term);
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var payment = BusinessRule.GetUnprocessedOnlinePayment(dbc, loginState.SelectedPerson);
+            try
+            {
+                await service.FinaliseEwayPyamentAsync(dbc, payment, term);
+                await CalculateFees();
+                IsProcessing = false;
+                InvokeAsync(StateHasChanged);
+                await messageBox.ShowOkOnlyAsync("Thank you!", "Your payment has been completed, and your support is appreciated.");
+            }
+            catch (Exception ex)
+            {
+                IsProcessing = false;
+                InvokeAsync(StateHasChanged);
+                await messageBox.ShowOkOnlyAsync("Payment was not completed", ex.Message);
+            }
+            finally
+            {
+                ReturnToMenu(PortalMenuResult.MenuOptionCompleted);
+            }
+        }
     }
 
     async Task<bool> AreThereFeesToBePaid()

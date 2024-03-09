@@ -9,43 +9,57 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
-        public static async Task<bool> HasUnprocessedOnlinePayment(U3ADbContext dbc, Person person)
+        public static bool HasUnprocessedOnlinePayment(U3ADbContext dbc, Person person)
         {
             if (person == null) { return false; }
-            return await dbc.OnlinePaymentStatus.AnyAsync(x => x.PersonID == person.ID &&
-                                                                x.AccessCode != string.Empty &&
-                                                                x.Status == String.Empty);
+            return dbc.OnlinePaymentStatus.Where(x => x.PersonID == person.ID).AsEnumerable()
+                                                                .Any(x =>
+                                                                (x.AccessCode != string.Empty && x.Status == string.Empty)
+                                                                ||
+                                                                (x.ResultCode == "06" && (DateTime.Now - x.CreatedOn.Value).TotalHours <= 24)
+                                                                );
         }
-        public static async Task<bool> HasUnprocessedOnlinePayment(U3ADbContext dbc, string AdminEmail)
+        public static bool HasUnprocessedOnlinePayment(U3ADbContext dbc, string AdminEmail)
         {
-            return await dbc.OnlinePaymentStatus.AnyAsync(x => x.AdminEmail == AdminEmail &&
-                                                                x.WorkstationID == Workstation.ID &&
-                                                                x.AccessCode != string.Empty &&
-                                                                x.Status == String.Empty);
+            return dbc.OnlinePaymentStatus.Where(x => x.AdminEmail == AdminEmail).AsEnumerable()
+                                                                .Any(x =>
+                                                                (x.AccessCode != string.Empty && x.Status == string.Empty)
+                                                                ||
+                                                                (x.ResultCode == "06" && (DateTime.Now - x.CreatedOn.Value).TotalHours <= 24)
+                                                                );
         }
-        public static async Task<List<OnlinePaymentStatus>> GetUnprocessedOnlinePayment(U3ADbContext dbc)
+        public static List<OnlinePaymentStatus> GetUnprocessedOnlinePayment(U3ADbContext dbc)
         {
-            return await dbc.OnlinePaymentStatus
-                .Where(x => x.AccessCode != string.Empty &&
-                                            x.Status == String.Empty)
-                .ToListAsync();
+            return dbc.OnlinePaymentStatus.AsEnumerable()
+                            .Where(x =>
+                            (x.AccessCode != string.Empty && x.Status == string.Empty)
+                            ||
+                            (x.ResultCode == "06" && (DateTime.Now - x.CreatedOn.Value).TotalHours <= 24)
+                            )
+                        .OrderBy(x => x.CreatedOn)
+                        .ToList();
         }
-        public static async Task<OnlinePaymentStatus> GetUnprocessedOnlinePayment(U3ADbContext dbc, Person person)
+        
+        public static OnlinePaymentStatus GetUnprocessedOnlinePayment(U3ADbContext dbc, Person person)
         {
-            return await dbc.OnlinePaymentStatus.OrderBy(x => x.CreatedOn)
-                .FirstOrDefaultAsync(x => x.PersonID == person.ID &&
-                                            x.AccessCode != string.Empty &&
-                                            x.Status == String.Empty);
+            return dbc.OnlinePaymentStatus.Where(x => x.PersonID == person.ID).AsEnumerable()
+                        .OrderBy(x => x.CreatedOn).FirstOrDefault(x =>
+                            (x.AccessCode != string.Empty && x.Status == string.Empty)
+                            ||
+                            (x.ResultCode == "06" && (DateTime.Now - x.CreatedOn.Value).TotalHours <= 24)
+                        );
         }
-        public static async Task<List<OnlinePaymentStatus>> GetUnprocessedOnlinePayment(U3ADbContext dbc, string AdminEmail)
+        public static List<OnlinePaymentStatus> GetUnprocessedOnlinePayment(U3ADbContext dbc, string AdminEmail)
         {
-            return await dbc.OnlinePaymentStatus
-                                            .OrderBy(x => x.CreatedOn)
-                                            .Where(x => x.AdminEmail == AdminEmail &&
-                                                x.WorkstationID == Workstation.ID &&
-                                                x.AccessCode != string.Empty &&
-                                                x.Status == String.Empty)
-                                            .ToListAsync();
+            return dbc.OnlinePaymentStatus.Where(x => x.AdminEmail == AdminEmail &&
+                        x.WorkstationID == Workstation.ID).AsEnumerable()
+                        .Where(x =>
+                        (x.AccessCode != string.Empty && x.Status == string.Empty)
+                        ||
+                        (x.ResultCode == "06" && (DateTime.Now - x.CreatedOn.Value).TotalHours <= 24)
+                        )
+                    .OrderBy(x => x.CreatedOn)
+                    .ToList();
         }
         public static async Task<List<OnlinePaymentStatus>> GetOnlinePaymentStatus(U3ADbContext dbc)
         {

@@ -18,18 +18,18 @@ namespace U3A.WebFunctions.Procedures
                 if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
                 if (term == null) { return; }
                 var paymentService = new EwayPaymentService(dbc);
-                foreach (var payment in await BusinessRule.GetUnprocessedOnlinePayment(dbc))
+                foreach (var payment in BusinessRule.GetUnprocessedOnlinePayment(dbc))
                 {
                     var person = await dbc.Person.FindAsync(payment.PersonID);
                     if (person == null) { continue; }
                     try
                     {
-                        await paymentService.FinaliseEwayPyamentAsync(dbc, payment.PersonID, term);
+                        await paymentService.FinaliseEwayPyamentAsync(dbc, payment, term);
                         logger.LogInformation($"Online payment for {person.FullName} finalised.");
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError($"Error processing online payment for {person.FullName}.{Environment.NewLine}{ex.ToString()}");
+                        logger.LogError($"Error processing online payment for {person.FullName}. {ex.Message}");
                     }
                 }
             }

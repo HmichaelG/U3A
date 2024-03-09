@@ -212,7 +212,7 @@ else
         if (e.FieldName == "Participant")
         {
             result = string.Empty;
-            foreach (var p in People.Where(x => x.Email == appUser.Email))
+            foreach (var p in People.Where(x => x.Email != null && x.Email.ToUpper() == appUser.NormalizedEmail))
             {
                 result += $"{p.FullName}, ";
             }
