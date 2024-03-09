@@ -26,7 +26,7 @@ namespace U3A.WebFunctions
         [Function("DailyProcedures")]
         public async Task Run([TimerTrigger("0 0 17 * * *"      
 #if DEBUG
-            , RunOnStartup=false
+            , RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
@@ -57,7 +57,7 @@ namespace U3A.WebFunctions
                 {
                     _logger.LogInformation("Local Time for {0} is: {1}", tenant.Identifier, await Common.GetNowAsync(dbc));
                 }
-                RandomAllocationExecuted.Add(tenant.Identifier, false);
+                RandomAllocationExecuted.Add(tenant.Identifier!, false);
                 TaskList.Add(FinaliseOnlinePayment.Process(tenant, _logger));
                 TaskList.Add(AutoEnrolParticipants.Process(tenant, _logger));
                 await BringForwardEnrolments.Process(tenant, _logger);
@@ -89,87 +89,6 @@ namespace U3A.WebFunctions
             _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             _logger.LogInformation($"Next timer schedule at: {myTimer!.ScheduleStatus!.Next}");
         }
-
-        //async Task<bool> isBackgroundProcessingDisabled(TenantInfo tenant)
-        //{
-        //    bool result = false;
-        //    using (var dbc = new U3ADbContext(tenant))
-        //    {
-        //        var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-        //        if (settings != null) { result = settings.DisableBackgroundProcessing; }
-        //    }
-        //    return result;
-        //}
-
-        //private void GetTeanats(List<TenantInfo> tenants)
-        //{
-        //    var cn = _config.GetConnectionString("TenantConnectionString");
-        //    using (var cnn = new SqlConnection(cn))
-        //    {
-        //        var cmdText = @"SELECT Identifier, 
-        //                                Name, 
-        //                                ConnectionString,
-        //                                EwayAPIKey,
-        //                                EwayPassword,
-        //                                UseEwayTestEnviroment,
-        //                                PostmarkAPIKey, 
-        //                                PostmarkSandboxAPIKey, 
-        //                                UsePostmarkTestEnviroment FROM TenantInfo";
-        //        using (var cmd = new SqlCommand(cmdText, cnn))
-        //        {
-        //            SqlDataReader? rdr;
-        //            try
-        //            {
-        //                cnn.Open();
-        //                rdr = cmd.ExecuteReader();
-        //                if (rdr != null)
-        //                {
-        //                    while (rdr.Read())
-        //                    {
-        //                        var t = new TenantInfo()
-        //                        {
-        //                            Identifier = rdr[0].ToString(),
-        //                            Name = rdr[1].ToString(),
-        //                            ConnectionString = rdr[2].ToString(),
-        //                            EwayAPIKey = rdr[3].ToString(),
-        //                            EwayPassword = rdr[4].ToString(),
-        //                            UseEwayTestEnviroment = rdr.GetBoolean(5),
-        //                            PostmarkAPIKey = rdr[6].ToString(),
-        //                            PostmarkSandboxAPIKey = rdr[7].ToString(),
-        //                            UsePostmarkTestEnviroment = rdr.GetBoolean(8)
-        //                        };
-        //                        tenants.Add(t);
-        //                    }
-        //                    rdr.Close();
-        //                }
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                var eID = new EventId(10000);
-        //                _logger.LogError(eID, ex.Message, "Error retrieving TenantInfo");
-        //            }
-        //            finally
-        //            {
-        //                cnn.Close();
-        //            }
-        //        }
-        //    }
-        //}
-
-        //public static async Task<DateTime> GetTodayAsync(U3ADbContext dbc)
-        //{
-        //    return (await GetNowAsync(dbc)).Date;
-        //}
-        //public static async Task<DateTime> GetNowAsync(U3ADbContext dbc)
-        //{
-        //    // Get system settings
-        //    var settings = await dbc.SystemSettings
-        //                        .OrderBy(x => x.ID)
-        //                        .FirstOrDefaultAsync();
-        //    TimezoneAdjustment.TimezoneOffset = new TimeSpan(settings.UTCOffset, 0, 0);
-        //    return DateTime.UtcNow.AddHours(settings.UTCOffset);
-        //}
-
     }
 
 }
