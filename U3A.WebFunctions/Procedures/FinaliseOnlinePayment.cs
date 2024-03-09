@@ -29,7 +29,7 @@ namespace U3A.WebFunctions.Procedures
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError($"Error processing online payment for {person.FullName}. {ex.Message}");
+                        logger.LogInformation($"Error processing online payment for {person.FullName}. {ex.Message}");
                     }
                 }
             }

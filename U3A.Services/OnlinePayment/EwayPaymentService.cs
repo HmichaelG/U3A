@@ -153,7 +153,7 @@ namespace U3A.Services
                 {
                     throw new Exception("Payment details no longer exist at Eway.");
                 }
-                if (response.ResponseCode != null || response.ResponseCode == "06")
+                if (response.ResponseCode != null && response.ResponseCode == "06")
                 {
                     throw new Exception(@"The processing of your payment is incomplete.
                                           This may be due to a delay in processing by your bank.
