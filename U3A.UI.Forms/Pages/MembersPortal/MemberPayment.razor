@@ -77,6 +77,12 @@ else
                             <TermsAndConditions SystemSettings="@settings" OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                         </div>
                     </DxFormLayoutGroup>
+                    @if (!string.IsNullOrWhiteSpace(OnlineErrorMessage))
+                    {
+                        <div class="alert alert-warning text-dark text-center">
+                            @OnlineErrorMessage
+                        </div>
+                    }
                     <DxButton Text="@AmountDueText"
                               CssClass="col-12 my-2"
                               Click="@(e => DoShowFeesDue())"
@@ -186,6 +192,7 @@ else
     List<MemberFee> memberFees = new List<MemberFee>();
     string clickText = "Click here for details.";
     bool IsProcessing;
+    string OnlineErrorMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -413,17 +420,13 @@ else
                 await CalculateFees();
                 IsProcessing = false;
                 InvokeAsync(StateHasChanged);
-                await messageBox.ShowOkOnlyAsync("Thank you!", "Your payment has been completed, and your support is appreciated.");
+                //await messageBox.ShowOkOnlyAsync("Thank you!", "Your payment has been completed, and your support is appreciated.");
             }
             catch (Exception ex)
             {
+                OnlineErrorMessage = ex.Message;
                 IsProcessing = false;
                 InvokeAsync(StateHasChanged);
-                await messageBox.ShowOkOnlyAsync("Payment was not completed", ex.Message);
-            }
-            finally
-            {
-                ReturnToMenu(PortalMenuResult.MenuOptionCompleted);
             }
         }
     }

@@ -153,6 +153,13 @@ namespace U3A.Services
                 {
                     throw new Exception("Payment details no longer exist at Eway.");
                 }
+                if (response.ResponseCode != null || response.ResponseCode == "06")
+                {
+                    throw new Exception(@"The processing of your payment is incomplete.
+                                          This may be due to a delay in processing by your bank.
+                                          Don't worry as we'll keep trying. Please review later, and
+                                          if the problem persists, contact your U3A.");
+                }
                 result = new PaymentResult()
                 {
                     Date = paymentStatus.LocalCreatedOn.Value,
@@ -163,6 +170,10 @@ namespace U3A.Services
                     ResponseCode = response.ResponseCode ?? "",
                     ResponseMessage = response.ResponseMessage ?? ""
                 };
+            }
+            else
+            {
+                throw new Exception("Internet transmission errors are prventing successful completion of your transaction. Please try again later.");
             }
             if (result != null)
             {

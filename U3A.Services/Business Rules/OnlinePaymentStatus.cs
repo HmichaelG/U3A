@@ -1,4 +1,6 @@
-﻿using DevExpress.XtraRichEdit.Commands.Internal;
+﻿using DevExpress.XtraPrinting.Native;
+using DevExpress.XtraRichEdit.Commands.Internal;
+using Eway.Rapid.Abstractions.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
@@ -9,6 +11,11 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
+        // Result Code 06 
+        //The customer’s card issuer has declined the transaction as there is a problem with the card number.
+        //The customer should use an alternate credit card, or contact their bank.
+        //Note: This response code can also be returned via the Rapid API if you run a transaction query prior to the transaction being completed.
+
         public static bool HasUnprocessedOnlinePayment(U3ADbContext dbc, Person person)
         {
             if (person == null) { return false; }
