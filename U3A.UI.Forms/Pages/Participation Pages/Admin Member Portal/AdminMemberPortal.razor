@@ -227,14 +227,14 @@ else
             authEmail = authenticationState.User.Identity.Name;
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                bool hasUnprocessedPayments = BusinessRule.HasUnprocessedOnlinePayment(dbc, authEmail);
+                bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, authEmail);
                 if (hasUnprocessedPayments)
                 {
                     isProcessing = true;
                     InvokeAsync(StateHasChanged);
                     var term = BusinessRule.CurrentEnrolmentTerm(dbc);
                     if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
-                    foreach (var payment in BusinessRule.GetUnprocessedOnlinePayment(dbc, authEmail))
+                    foreach (var payment in (await BusinessRule.GetUnprocessedOnlinePayment(dbc, authEmail)))
                     {
                         try
                         {

@@ -146,30 +146,30 @@ namespace U3A.Services
                 throw new Exception("The participant for this payment no longer exists.");
             }
             PaymentResult? result = null;
-            var response = await ewayClient.QueryAccessCode(paymentStatus.AccessCode);
-            if (response.Errors == null)
+            var eWayResponse = await ewayClient.QueryAccessCode(paymentStatus.AccessCode);
+            if (eWayResponse.Errors == null)
             {
-                if (response.AccessCode == null || response.AccessCode != paymentStatus.AccessCode)
+                if (eWayResponse.AccessCode == null || eWayResponse.AccessCode != paymentStatus.AccessCode)
                 {
                     throw new Exception("Payment details no longer exist at Eway.");
                 }
-                if (response.ResponseCode != null && response.ResponseCode == "06")
+                result = new PaymentResult()
+                {
+                    Date = paymentStatus.LocalCreatedOn.Value,
+                    AccessCode = eWayResponse.AccessCode,
+                    AuthorizationCode = eWayResponse.AuthorisationCode,
+                    TransactionID = eWayResponse.TransactionID.GetValueOrDefault(),
+                    Amount = (decimal)(eWayResponse.TotalAmount.GetValueOrDefault() / 100.00),
+                    ResponseCode = eWayResponse.ResponseCode ?? "",
+                    ResponseMessage = eWayResponse.ResponseMessage ?? ""
+                };
+                if (!CanSetPaymentStatusProcessed(result.ResponseCode, result.Date))
                 {
                     throw new Exception(@"The processing of your payment is incomplete.
                                           This may be due to a delay in processing by your bank.
                                           Don't worry as we'll keep trying. Please review later, and
                                           if the problem persists, contact your U3A.");
                 }
-                result = new PaymentResult()
-                {
-                    Date = paymentStatus.LocalCreatedOn.Value,
-                    AccessCode = response.AccessCode,
-                    AuthorizationCode = response.AuthorisationCode,
-                    TransactionID = response.TransactionID.GetValueOrDefault(),
-                    Amount = (decimal)(response.TotalAmount.GetValueOrDefault() / 100.00),
-                    ResponseCode = response.ResponseCode ?? "",
-                    ResponseMessage = response.ResponseMessage ?? ""
-                };
             }
             else
             {
@@ -200,7 +200,7 @@ namespace U3A.Services
         {
             var feeService = new MemberFeeCalculationService();
 
-            if (result.AccessCode != null && result.ResponseCode == "00")
+            if (result.AccessCode != null && (result.ResponseCode == "00" || result.ResponseCode == "08"))
             {
                 var receipt = new Receipt()
                 {
@@ -215,7 +215,7 @@ namespace U3A.Services
                 var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(dbc, person);
 
                 // Special Rule: set Financial To if amount paid greater than minimum amount
-                var previouslyPaid = BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, processingYear, DateTime.Now);
+                var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, processingYear, DateTime.Now);
                 if (receipt.Amount + previouslyPaid >= minMembershipFee)
                 {
                     receipt.FinancialTo = (person.FinancialTo >= processingYear) ? person.FinancialTo : processingYear;
@@ -237,6 +237,10 @@ namespace U3A.Services
                 person.FinancialTo = receipt.FinancialTo;
                 person.DateJoined = receipt.DateJoined;
                 await dbc.AddAsync(receipt);
+                if (string.IsNullOrWhiteSpace(person.Email))
+                {
+                    await BusinessRule.CreateReceiptSendMailAsync(dbc);
+                }
                 dbc.Update(person);
             }
             await SetPaymentStatusProcessed(dbc, result, person);
@@ -245,7 +249,7 @@ namespace U3A.Services
         public async Task<PaymentResult?> ProcessPaymentResponse(U3ADbContext dbc, Person person)
         {
             PaymentResult? result = null;
-            var reqDetails = BusinessRule.GetUnprocessedOnlinePayment(dbc, person);
+            var reqDetails = await BusinessRule.GetUnprocessedOnlinePayment(dbc, person);
             if (reqDetails != null)
             {
                 var response = await ewayClient.QueryAccessCode(reqDetails.AccessCode);
@@ -269,15 +273,16 @@ namespace U3A.Services
             var details = await dbc.OnlinePaymentStatus.FirstOrDefaultAsync(x => x.AccessCode == result.AccessCode);
             if (details != null)
             {
-                details.Status = "Processed";
+                details.Status = (CanSetPaymentStatusProcessed(result.ResponseCode, details.CreatedOn)) ? "Processed" : string.Empty;
                 details.ResultCode = result.ResponseCode;
                 details.ResultMessage = result.ResponseMessage;
                 dbc.Update(details);
-                if (details.ResultCode == "00" && string.IsNullOrWhiteSpace(person.Email))
-                {
-                    await BusinessRule.CreateReceiptSendMailAsync(dbc);
-                }
             }
+        }
+
+        private bool CanSetPaymentStatusProcessed(string ResponseCode, DateTime? paymentDate)
+        {
+            return (ResponseCode == "06" && (DateTime.UtcNow - paymentDate.Value).TotalHours <= 24) ? false : true;
         }
         public async Task<Tuple<string, string>> FixResultCodesAsync(U3ADbContext dbc, OnlinePaymentStatus PayStatus)
         {

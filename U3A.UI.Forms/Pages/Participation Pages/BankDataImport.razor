@@ -493,7 +493,7 @@ else
                 }
 
                 // Special Rule: set Financial To
-                var previouslyPaid = BusinessRule.GetPreviouslyPaidAsync(dbc, importItem.PersonID, ProcessingYear, startTime);
+                var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, importItem.PersonID, ProcessingYear, startTime);
                 var minMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, importItem.Person);
                 if (receipt.Amount >= 0)
                 {

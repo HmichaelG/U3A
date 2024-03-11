@@ -7,7 +7,7 @@
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
    <meta name="generator" content="Help &amp; Manual" />
    <meta name="keywords" content="" />
-   <meta name="description" content="Version 2024.3.Current Review Online Payment Status A Resubmit button is now included on each payment status record. If clicked, the system will re-interrogate the EWAY system..." />
+   <meta name="description" content="Version 2024.3.Current Member Portal - Online Payment Online payment processing has been revised for payments with a result code of 06 - Error. This result can occur as the..." />
    <link type="text/css" href="default.css" rel="stylesheet" />
    <link type="text/css" href="custom.css" rel="stylesheet" />
 
@@ -128,8 +128,18 @@
 
 <!--ZOOMRESTART-->
 <h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Version 2024.3.Current</span></h2>
+<h3 class="p_Heading3"><span class="f_Heading3">Member Portal - Online Payment</span></h3>
+<p class="p_Normal">Online payment processing has been revised for payments with a result code of 06 - Error. This result can occur as the result of delayed processing by either the member's financial institution or the card provider. As such, the error is not recorded until 24 hours after the payment attempt. Attempting to view a member's financial status in the portal will cause the software to re-interrogate Eway for an updated payment result. If the result remains in error within the 24 hour period, the following message will be displayed...</p>
+<p style="text-align: center; margin: 0 0 0 0;"><span style="font-size: 12px; font-family: 'Cascadia Mono'; color: #800000;">The processing of your payment is incomplete.</span></p>
+<p style="text-align: center; margin: 0 0 0 0;"><span style="font-size: 12px; font-family: 'Cascadia Mono'; color: #800000;">This may be due to a delay in processing by your bank.</span></p>
+<p style="text-align: center; margin: 0 0 0 0;"><span style="font-size: 12px; font-family: 'Cascadia Mono'; color: #800000;">Don't worry as we'll keep trying. Please review later, and</span></p>
+<p style="text-align: center; margin: 0 0 0 0;"><span style="font-size: 12px; font-family: 'Cascadia Mono'; color: #800000;">if the problem persists, contact your U3A.</span></p>
+<p class="p_Normal">&nbsp;</p>
 <h3 class="p_Heading3"><span class="f_Heading3">Review Online Payment Status</span></h3>
-<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>A <span style="font-weight: bold;">Resubmit</span> button is now included on each payment status record. If clicked, the system will re-interrogate the EWAY system for the status of the payment. If the status is successful and a cash receipt transaction does not exist that cash receipt will be created. </p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>A <span style="font-weight: bold;">Re-Submit</span> button is now available on the toolbar. If clicked, the system will re-interrogate the EWAY system for the status of the <span style="text-decoration: underline;">selected</span> payment. If the status is successful and a cash receipt transaction does not exist that cash receipt will be created. Note that this button is only enabled when the <span style="font-style: italic;">Status</span> field is blank (Not Processed).</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>A <span style="font-weight: bold;">Full Msg</span> button has been added to the toolbar. When clicked, a full message explaining the payment result will be displayed.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span>The <span style="font-style: italic;">Result Code</span> is now displayed with a brief description as to its meaning.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">4.</span>This procedure has been moved up in the menu hierarchy to indicate its relative importance when researching a failed online payment issue.</p>
 <h3 class="p_Heading3"><span class="f_Heading3">Add/Edit Courses</span></h3>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Added the <span style="font-style: italic;">Off-Schedule Activity</span> check box. When ticked, this field will prevent the course &amp; its classes from being displayed on the Class Schedule report and will not allow enrolment via the Member Portal.</p>
 <h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Version 2024.3.7</span></h2>

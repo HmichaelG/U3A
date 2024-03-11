@@ -1,15 +1,25 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-03-08T16:39:23.628+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-03-11T13:56:50.381+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>2024 Version History</title>
   <body>
     <header>
       <para styleclass="Heading1">2024 Version History (Version 3)</para>
     </header>
     <para styleclass="Heading2">Version 2024.3.Current</para>
+    <para styleclass="Heading3">Member Portal - Online Payment</para>
+    <para styleclass="Normal">Online payment processing has been revised for payments with a result code of 06 - Error. This result can occur as the result of delayed processing by either the member&apos;s financial institution or the card provider. As such, the error is not recorded until 24 hours after the payment attempt. Attempting to view a member&apos;s financial status in the portal will cause the software to re-interrogate Eway for an updated payment result. If the result remains in error within the 24 hour period, the following message will be displayed...</para>
+    <para styleclass="" style="text-align:center; text-indent:0px; margin-top:0px; margin-right:0px; margin-bottom:0px; margin-left:0px; line-height:1.00; background-color:transparent; white-space:normal; page-break-inside:auto; page-break-after:auto; border:none; tabstops:none;"><text styleclass="" style="font-family:&apos;Cascadia Mono&apos;; font-size:9pt; color:#800000;">The processing of your payment is incomplete.</text></para>
+    <para styleclass="" style="text-align:center; text-indent:0px; margin-top:0px; margin-right:0px; margin-bottom:0px; margin-left:0px; line-height:1.00; background-color:transparent; white-space:normal; page-break-inside:auto; page-break-after:auto; border:none; tabstops:none;"><text styleclass="" style="font-family:&apos;Cascadia Mono&apos;; font-size:9pt; color:#800000;">This may be due to a delay in processing by your bank.</text></para>
+    <para styleclass="" style="text-align:center; text-indent:0px; margin-top:0px; margin-right:0px; margin-bottom:0px; margin-left:0px; line-height:1.00; background-color:transparent; white-space:normal; page-break-inside:auto; page-break-after:auto; border:none; tabstops:none;"><text styleclass="" style="font-family:&apos;Cascadia Mono&apos;; font-size:9pt; color:#800000;">Don&apos;t worry as we&apos;ll keep trying. Please review later, and</text></para>
+    <para styleclass="" style="text-align:center; text-indent:0px; margin-top:0px; margin-right:0px; margin-bottom:0px; margin-left:0px; line-height:1.00; background-color:transparent; white-space:normal; page-break-inside:auto; page-break-after:auto; border:none; tabstops:none;"><text styleclass="" style="font-family:&apos;Cascadia Mono&apos;; font-size:9pt; color:#800000;">if the problem persists, contact your U3A.</text></para>
+    <para styleclass="Normal"></para>
     <para styleclass="Heading3">Review Online Payment Status</para>
-    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; font-weight:bold; color:#000000;">
-      <li styleclass="Normal">A <text style="font-weight:bold;">Resubmit</text> button is now included on each payment status record. If clicked, the system will re-interrogate the EWAY system for the status of the payment. If the status is successful and a cash receipt transaction does not exist that cash receipt will be created. </li>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">A <text style="font-weight:bold;">Re-Submit</text> button is now available on the toolbar. If clicked, the system will re-interrogate the EWAY system for the status of the <text style="text-decoration:underline;">selected</text> payment. If the status is successful and a cash receipt transaction does not exist that cash receipt will be created. Note that this button is only enabled when the <text style="font-style:italic;">Status</text> field is blank (Not Processed).</li>
+      <li styleclass="Normal">A <text style="font-weight:bold;">Full Msg</text> button has been added to the toolbar. When clicked, a full message explaining the payment result will be displayed.</li>
+      <li styleclass="Normal">The <text style="font-style:italic;">Result Code</text> is now displayed with a brief description as to its meaning.</li>
+      <li styleclass="Normal">This procedure has been moved up in the menu hierarchy to indicate its relative importance when researching a failed online payment issue.</li>
     </list>
     <para styleclass="Heading3">Add/Edit Courses</para>
     <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">

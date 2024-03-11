@@ -18,7 +18,7 @@ namespace U3A.WebFunctions.Procedures
                 if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
                 if (term == null) { return; }
                 var paymentService = new EwayPaymentService(dbc);
-                foreach (var payment in BusinessRule.GetUnprocessedOnlinePayment(dbc))
+                foreach (var payment in await BusinessRule.GetUnprocessedOnlinePayment(dbc))
                 {
                     var person = await dbc.Person.FindAsync(payment.PersonID);
                     if (person == null) { continue; }

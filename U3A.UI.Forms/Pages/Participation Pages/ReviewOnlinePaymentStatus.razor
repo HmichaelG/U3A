@@ -32,34 +32,45 @@ else
 
     <FullScreen>
         <ContentTemplate>
-            <DxGrid Data="@PaymentStatus" @ref=@mainGrid CssClass="grid-height"
+            <DxGrid Data="@PaymentStatus" @ref=@mainGrid
                     AutoExpandAllGroupRows="true"
+                    SelectionMode="GridSelectionMode.Single"
+                    SelectedDataItem="selectedPaymentStatus"
+                    SelectedDataItemChanged="OnSelectionChanged"
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                     UnboundColumnData="Grid_UnboundColumnData"
                     ShowAllRows="true"
                     KeyFieldName="ID">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid />
+                    <GridToolbar LinkedGrid=@mainGrid>
+                        <CustomButtonContent>
+                            <DxToolbarItem Text="Re-Submit"
+                                           Tooltip="Re-submit the selected payment to Eway and process receipt, if successful."
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" 
+                                           Enabled=@(selectedPaymentStatus != null && string.IsNullOrWhiteSpace(selectedPaymentStatus.Status))
+                                           Click="OnResubmit" />
+                            <DxToolbarItem Text="Full Msg"
+                                           Tooltip="Display the full Eway result message."
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary"
+                                           Click="OnFullMsg" />
+                        </CustomButtonContent>
+                    </GridToolbar>
                 </ToolbarTemplate>
                 <Columns>
-                    <DxGridDataColumn Width="5rem">
-                        <CellDisplayTemplate>
-                            <DxButton Text="Re-Submit" CssClass="w-100"
-                                Click="() => OnResubmit((OnlinePaymentStatus)context.DataItem)" />
-                        </CellDisplayTemplate>
-                    </DxGridDataColumn>
-                    <DxGridDataColumn Width="10rem" Caption="Date"
+                    <DxGridSelectionColumn Width="4rem" />
+                    <DxGridDataColumn Width="5rem" Caption="Date"
                                       FieldName="Created"
                                       DisplayFormat="dd-MMM-yyyy"
                                       UnboundType="GridUnboundColumnType.DateTime"
                                       SortOrder="GridColumnSortOrder.Descending" />
-                    <DxGridDataColumn Width="10rem" Caption="Time"
+                    <DxGridDataColumn Width="5rem" Caption="Time"
                                       FieldName="CreatedTime"
                                       DisplayFormat="hh:mm tt"
                                       UnboundType="GridUnboundColumnType.DateTime" />
                     <DxGridDataColumn Width="6rem" Caption="Status" FieldName="Status" />
-                    <DxGridDataColumn Width="6rem" Caption="Result Code" FieldName="ResultCode" />
-                    <DxGridDataColumn Width="6rem" Caption="Result Msg" FieldName="ResultMessage" />
+                    <DxGridDataColumn Caption="Result Code" FieldName="ResultDescription"  />
                     <DxGridDataColumn Caption="Participant" FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="6rem" Caption="Mobile" FieldName="Mobile" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="6rem" Caption="Phone" FieldName="Phone" UnboundType="GridUnboundColumnType.String" />
@@ -67,26 +78,6 @@ else
                     <DxGridDataColumn Caption="Processed By" FieldName="ProcessedBy" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Caption="W/Station ID" FieldName="WorkstationID" Visible=false />
                 </Columns>
-
-                <EditFormTemplate Context="EditFormContext">
-                    @{
-                        var editItem = (CourseType)EditFormContext.EditModel;
-                    }
-                    <DxFormLayout>
-                        <DxFormLayoutItem ColSpanMd="12">
-                            <ValidationSummary />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@editItem.Name" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
-                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Discontinued">
-                            <DxCheckBox @bind-Checked="@editItem.Discontinued" />
-                        </DxFormLayoutItem>
-                    </DxFormLayout>
-                </EditFormTemplate>
             </DxGrid>
         </ContentTemplate>
     </FullScreen>
@@ -94,6 +85,7 @@ else
 
 @code {
     bool IsReady;
+    OnlinePaymentStatus? selectedPaymentStatus;
     private List<OnlinePaymentStatus> PaymentStatus { get; set; }
     private List<Person> People { get; set; }
     private DxGridCommandColumnEx? GridCommandColumn;
@@ -167,31 +159,46 @@ else
         }
     }
 
-    async Task OnResubmit(OnlinePaymentStatus payment)
+    void OnSelectionChanged(object payment)
     {
-        await progressBar.ShowSmallSpinnerAsync();
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        if (payment != null)
         {
-            var term = BusinessRule.CurrentEnrolmentTerm(dbc);
-            if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
-            if (term == null) { return; }
-            var paymentService = new EwayPaymentService(dbc);
-            try
-            {
-                await paymentService.FinaliseEwayPyamentAsync(dbc, payment, term);
-                await GetDataAsync();
-                await messageBox.ShowOkOnlyAsync("Payment Resubmitted", "The payment has been successfully resubmitted.");
-            }
-            catch (Exception ex)
-            {
-                var person = await dbc.Person.FindAsync(payment.PersonID);
-                await messageBox.ShowOkOnlyAsync("Resubmit error", 
-                            $"Error processing online payment for {person.FullName}.<br/>{ex.Message}");
-            }
-            finally
-            {
-                await progressBar.Close();
-            }
+            selectedPaymentStatus = (OnlinePaymentStatus)payment;
+            StateHasChanged();
+        }
+    }
+    async Task OnResubmit()
+    {
+        if (selectedPaymentStatus == null) { return; }
+        await progressBar.ShowSmallSpinnerAsync();
+        var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
+        if (term == null) { return; }
+        var paymentService = new EwayPaymentService(dbc);
+        try
+        {
+            await paymentService.FinaliseEwayPyamentAsync(dbc, selectedPaymentStatus, term);
+            await messageBox.ShowOkOnlyAsync("Payment Resubmitted", "The payment has been successfully resubmitted.");
+            await GetDataAsync();
+        }
+        catch (Exception ex)
+        {
+            var person = await dbc.Person.FindAsync(selectedPaymentStatus.PersonID);
+            await messageBox.ShowOkOnlyAsync("Resubmit error",
+                        $"Error processing online payment for {person.FullName}.<br/>{ex.Message}");
+        }
+        finally
+        {
+            selectedPaymentStatus = null;
+            await progressBar.Close();
+        }
+    }
+
+    async Task OnFullMsg()
+    {
+        if (selectedPaymentStatus != null)
+        {
+            await messageBox.ShowOkOnlyAsync("Result Message", selectedPaymentStatus.ResultLongDescription);
         }
     }
 

@@ -95,15 +95,15 @@ namespace U3A.BusinessRules
                                         x.Description == Description &&
                                         x.CreatedOn < StartTime).ToArrayAsync());
         }
-        public static decimal GetPreviouslyPaidAsync(U3ADbContext dbc,
+        public static async Task<decimal> GetPreviouslyPaidAsync(U3ADbContext dbc,
                                                     Guid? PersonID,
                                                     int ProcessingYear,
                                                     DateTime StartTime)
         {
-            return dbc.Receipt.Where(x => x.PersonID == PersonID &&
+            return await dbc.Receipt.Where(x => x.PersonID == PersonID &&
                                             x.ProcessingYear == ProcessingYear &&
                                             x.CreatedOn < StartTime)
-                                            .Sum(x => x.Amount);
+                                            .SumAsync(x => x.Amount);
         }
     }
 }

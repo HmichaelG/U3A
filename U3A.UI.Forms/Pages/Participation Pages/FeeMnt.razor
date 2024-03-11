@@ -257,7 +257,7 @@ else
         var person = fee.Person;
         var maxDate = DateTime.MaxValue;
         var minMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, person);
-        var paidToDate = BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, ProcessingYear, maxDate);
+        var paidToDate = await BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, ProcessingYear, maxDate);
         // Set FinancialTo if amount paid greater than minimum amount
         if (paidToDate >= minMembershipFee)
         {

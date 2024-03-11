@@ -217,7 +217,7 @@ else
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 // Process Eway response, if any
-                bool hasUnprocessedPayment = BusinessRule.HasUnprocessedOnlinePayment(dbc, loginState.SelectedPerson);
+                bool hasUnprocessedPayment = await BusinessRule.HasUnprocessedOnlinePayment(dbc, loginState.SelectedPerson);
                 if (hasUnprocessedPayment)
                 {
                     FinaliseEwayPayment();
@@ -413,14 +413,13 @@ else
         var service = new EwayPaymentService();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            var payment = BusinessRule.GetUnprocessedOnlinePayment(dbc, loginState.SelectedPerson);
+            var payment = await BusinessRule.GetUnprocessedOnlinePayment(dbc, loginState.SelectedPerson);
             try
             {
                 await service.FinaliseEwayPyamentAsync(dbc, payment, term);
                 await CalculateFees();
                 IsProcessing = false;
                 InvokeAsync(StateHasChanged);
-                //await messageBox.ShowOkOnlyAsync("Thank you!", "Your payment has been completed, and your support is appreciated.");
             }
             catch (Exception ex)
             {

@@ -12,13 +12,56 @@ namespace U3A.Model
     [Index(nameof(AdminEmail), nameof(CreatedOn))]
     public class OnlinePaymentStatus : BaseEntity
     {
+        [NotMapped]
+        private EwayResultCodes resultCodes;
+        public OnlinePaymentStatus()
+        {
+            resultCodes = new();
+        }
         public Guid ID { get; set; }
         public string? AdminEmail { get; set; }
         public Guid PersonID { get; set; }
         public string AccessCode { get; set; }
         public string Status { get; set; }
+
         public string ResultCode { get; set; } = string.Empty;
-        public string ResultMessage { get; set; }= string.Empty;
+        [NotMapped]
+        public string ResultDescription
+        {
+            get
+            {
+                var result = string.Empty;
+                if (!string.IsNullOrWhiteSpace(ResultCode))
+                {
+                    var resultCode = resultCodes.FirstOrDefault(x => x.Code == ResultCode);
+                    if (resultCode != null)
+                    {
+                        result = resultCode.CodeAndDescription;
+                    }
+                    else { result = ResultCode; }
+                }
+                return result;
+            }
+        }
+
+        [NotMapped]
+        public string ResultLongDescription
+        {
+            get
+            {
+                var result = string.Empty;
+                if (!string.IsNullOrWhiteSpace(ResultCode))
+                {
+                    var resultCode = resultCodes.FirstOrDefault(x => x.Code == ResultCode);
+                    if (resultCode != null)
+                    {
+                        result = resultCode.LongDescription;
+                    }
+                }
+                return result;
+            }
+        }
+        public string ResultMessage { get; set; } = string.Empty;
         public string WorkstationID { get; set; } = Workstation.ID;
     }
 
