@@ -137,7 +137,11 @@ namespace U3A.BusinessRules
             {
                 if (!courses.Contains(course)) { courses.Add(course); }
             }
-            return courses;
+            foreach (var course in courses)
+            {
+                AssignClassClerks(dbc, term, course.Classes);
+            }
+            return courses.OrderBy(x => x.Name).ToList();
         }
 
         public static async Task<List<Course>> GetClassDetailsForClerk(U3ADbContext dbc, Person Student, Term term)

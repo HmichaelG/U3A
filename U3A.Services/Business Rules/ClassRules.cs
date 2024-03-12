@@ -354,10 +354,19 @@ namespace U3A.BusinessRules
                                 .Where(x => x.TermID == term.ID && x.IsCourseClerk).ToList();
             Parallel.ForEach(classes, c =>
             {
-                var clerkDetails = string.Empty;
                 foreach (var e in enrolments.Where(x => x.CourseID == c.Course.ID))
                 {
-                    c.Clerks.Add(e.Person);
+                    if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                    {
+                        c.Clerks.Add(e.Person);
+                    }
+                    else
+                    {
+                        if (e.ClassID != null && e.ClassID == c.ID)
+                        {
+                            c.Clerks.Add(e.Person);
+                        }
+                    }
                 }
             });
         }

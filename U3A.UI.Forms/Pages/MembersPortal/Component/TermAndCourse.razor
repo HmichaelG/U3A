@@ -162,7 +162,19 @@ else {
 
     async Task SetupClasses() {
         if (selectedCourse == null) return;
-        classes = selectedCourse.Classes;
+        Guid personID = loginState.SelectedPerson.ID;
+        classes = selectedCourse.Classes
+                        .Where(x => x.LeaderID == personID 
+                                    || x.Leader2ID == personID 
+                                    || x.Leader3ID == personID)
+                        .ToList();
+        foreach (var c in selectedCourse.Classes)
+        {
+            foreach (var clerk in c.Clerks)
+            {
+                if (clerk.ID == personID) { classes.Add(c); }
+            }            
+        }
         if (selectedClass == null || !classes.Contains(selectedClass)) {
             selectedClass = classes?.FirstOrDefault();
         }

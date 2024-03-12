@@ -73,9 +73,6 @@ else
                                                     </Buttons>
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <div class="d-flex justify-content-end pt-2">
-                                                <DxWaitIndicator Visible=@showWaitIndicator />
-                                            </div>
                                         </Items>
                                     </DxFormLayoutGroup>
                                 </div>
@@ -184,7 +181,6 @@ else
     Person selectedPerson { get; set; }
     string authEmail;
     IEnumerable<Receipt> RecevivedToday;
-    bool showWaitIndicator;
     TimeSpan offset;
     CollapsableContent? collapsableContent;
     string formWidth = "col col-12 px-lg-0 col-lg-10 col-xl-8 mt-3 px-1 mx-auto";
@@ -225,30 +221,11 @@ else
             selectedPerson = null;
             var authenticationState = await authenticationStateTask;
             authEmail = authenticationState.User.Identity.Name;
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-            {
-                bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, authEmail);
-                if (hasUnprocessedPayments)
-                {
-                    isProcessing = true;
-                    InvokeAsync(StateHasChanged);
-                    var term = BusinessRule.CurrentEnrolmentTerm(dbc);
-                    if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
-                    foreach (var payment in (await BusinessRule.GetUnprocessedOnlinePayment(dbc, authEmail)))
-                    {
-                        try
-                        {
-                            var service = new EwayPaymentService();
-                            await service.FinaliseEwayPyamentAsync(U3Adbfactory, payment, term);
-                        }
-                        catch (Exception ex) { }
-                    }
-                }
-            }
+            await CheckEwayStatus();
             if (isProcessing)
             {
                 isProcessing = false;
-                await OnRefresh();
+                //await OnRefresh();
             }
             if (selectedPerson != null)
             {
@@ -262,14 +239,37 @@ else
         await base.OnAfterRenderAsync(firstRender);
     }
 
+    async Task CheckEwayStatus()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, authEmail);
+            if (hasUnprocessedPayments)
+            {
+                isProcessing = true;
+                InvokeAsync(StateHasChanged);
+                var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
+                foreach (var payment in (await BusinessRule.GetUnprocessedOnlinePayment(dbc, authEmail)))
+                {
+                    try
+                    {
+                        var service = new EwayPaymentService();
+                        await service.FinaliseEwayPyamentAsync(U3Adbfactory, payment, term);
+                    }
+                    catch (Exception ex) { }
+                }
+            }
+        }
+    }
+
     async Task OnRefresh()
     {
-        showWaitIndicator = true;
-        await InvokeAsync(StateHasChanged);
+        await CheckEwayStatus();
         await GetData();
         isSelected = false;
         selectedPerson = null;
-        showWaitIndicator = false;
+        isProcessing = false;
         await InvokeAsync(StateHasChanged);
     }
 
