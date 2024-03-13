@@ -12,12 +12,6 @@ namespace U3A.Model
     [Index(nameof(AdminEmail), nameof(CreatedOn))]
     public class OnlinePaymentStatus : BaseEntity
     {
-        [NotMapped]
-        private EwayResultCodes resultCodes;
-        public OnlinePaymentStatus()
-        {
-            resultCodes = new();
-        }
         public Guid ID { get; set; }
         public string? AdminEmail { get; set; }
         public Guid PersonID { get; set; }
@@ -33,7 +27,7 @@ namespace U3A.Model
                 var result = string.Empty;
                 if (!string.IsNullOrWhiteSpace(ResultCode))
                 {
-                    var resultCode = resultCodes.FirstOrDefault(x => x.Code == ResultCode);
+                    var resultCode = EwayResultCodes.Codes.FirstOrDefault(x => x.Code == ResultCode);
                     if (resultCode != null)
                     {
                         result = resultCode.CodeAndDescription;
@@ -52,7 +46,7 @@ namespace U3A.Model
                 var result = string.Empty;
                 if (!string.IsNullOrWhiteSpace(ResultCode))
                 {
-                    var resultCode = resultCodes.FirstOrDefault(x => x.Code == ResultCode);
+                    var resultCode = EwayResultCodes.Codes.FirstOrDefault(x => x.Code == ResultCode);
                     if (resultCode != null)
                     {
                         result = resultCode.LongDescription;

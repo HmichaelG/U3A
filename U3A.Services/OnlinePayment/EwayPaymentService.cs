@@ -185,11 +185,14 @@ namespace U3A.Services
                 {
                     await CreateReceipt(dbc, result, person, term);
                 }
+                await SetPaymentStatusProcessed(dbc, result, person);
+                await dbc.SaveChangesAsync();
             }
         }
 
         private async Task<bool> DoesReceiptExist(U3ADbContext dbc, Guid PersonID, PaymentResult paymentResult)
         {
+            if (string.IsNullOrWhiteSpace(paymentResult.AuthorizationCode)) { return false; }
             var receipts = await dbc.Receipt.Where(x => x.PersonID == PersonID).ToListAsync();
             return receipts.Where(x => x.PersonID == PersonID
                             && x.Description.EndsWith(paymentResult.AuthorizationCode)
@@ -199,7 +202,6 @@ namespace U3A.Services
         private async Task CreateReceipt(U3ADbContext dbc, PaymentResult result, Person person, Term term)
         {
             var feeService = new MemberFeeCalculationService();
-
             if (result.AccessCode != null && (result.ResponseCode == "00" || result.ResponseCode == "08"))
             {
                 var receipt = new Receipt()
@@ -243,8 +245,6 @@ namespace U3A.Services
                 }
                 dbc.Update(person);
             }
-            await SetPaymentStatusProcessed(dbc, result, person);
-            await dbc.SaveChangesAsync();
         }
         public async Task<PaymentResult?> ProcessPaymentResponse(U3ADbContext dbc, Person person)
         {

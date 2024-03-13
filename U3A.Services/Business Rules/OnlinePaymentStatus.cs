@@ -16,15 +16,15 @@ namespace U3A.BusinessRules
                                                                 x.AccessCode != string.Empty &&
                                                                 x.Status == String.Empty);
         }
-        public static async Task<bool> HasUnprocessedOnlinePayment(U3ADbContext dbc, string AdminEmail)
+        public static async Task<bool> HasUnprocessedOnlinePayment(U3ADbContext dbc)
         {
-            return await dbc.OnlinePaymentStatus.AnyAsync(x => x.AdminEmail == AdminEmail &&
-                                                                x.AccessCode != string.Empty &&
-                                                                x.Status == String.Empty);
+            return await dbc.OnlinePaymentStatus.AnyAsync(x => x.AccessCode != string.Empty
+                                                                && x.Status == String.Empty);
         }
         public static async Task<List<OnlinePaymentStatus>> GetUnprocessedOnlinePayment(U3ADbContext dbc)
         {
             return await dbc.OnlinePaymentStatus
+                .OrderBy(x => x.CreatedOn)
                 .Where(x => x.AccessCode != string.Empty &&
                                             x.Status == String.Empty)
                 .ToListAsync();
@@ -35,15 +35,6 @@ namespace U3A.BusinessRules
                 .FirstOrDefaultAsync(x => x.PersonID == person.ID &&
                                             x.AccessCode != string.Empty &&
                                             x.Status == String.Empty);
-        }
-        public static async Task<List<OnlinePaymentStatus>> GetUnprocessedOnlinePayment(U3ADbContext dbc, string AdminEmail)
-        {
-            return await dbc.OnlinePaymentStatus
-                                            .OrderBy(x => x.CreatedOn)
-                                            .Where(x => x.AdminEmail == AdminEmail &&
-                                                x.AccessCode != string.Empty &&
-                                                x.Status == String.Empty)
-                                            .ToListAsync();
         }
         public static async Task<List<OnlinePaymentStatus>> GetOnlinePaymentStatus(U3ADbContext dbc)
         {

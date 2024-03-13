@@ -34,7 +34,7 @@ else
                     <DxFormLayout CssClass="my-2">
                         <CollapsableContent AlertType="none" CssClass="w-100"
                                             ShowCollapseButton=false
-                                            OnContentExpanded="@(async() => await OnRefresh())"
+                                            OnContentExpanded="@(async() => await OnClearSelection())"
                                             @ref=@collapsableContent>
                             <ContentTemplate>
                                 <div class="@formWidth">
@@ -68,7 +68,7 @@ else
                                                         <DxEditorButton CssClass="text-info"
                                                                         IconCssClass="h5 bi bi-x-circle"
                                                                         Tooltip="Click to clear the selection editor"
-                                                                        Click="@OnRefresh">
+                                                                        Click="@OnClearSelection">
                                                         </DxEditorButton>
                                                     </Buttons>
                                                 </DxComboBox>
@@ -187,7 +187,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-
+        await GetData();
         IsReady = true;
     }
 
@@ -221,19 +221,9 @@ else
             selectedPerson = null;
             var authenticationState = await authenticationStateTask;
             authEmail = authenticationState.User.Identity.Name;
-            await CheckEwayStatus();
-            if (isProcessing)
-            {
-                isProcessing = false;
-                //await OnRefresh();
-            }
             if (selectedPerson != null)
             {
                 await OnProcess();
-            }
-            else
-            {
-                await OnRefresh();
             }
         }
         await base.OnAfterRenderAsync(firstRender);
@@ -243,14 +233,14 @@ else
     {
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, authEmail);
+            bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc);
             if (hasUnprocessedPayments)
             {
                 isProcessing = true;
-                InvokeAsync(StateHasChanged);
+                await InvokeAsync(StateHasChanged);
                 var term = BusinessRule.CurrentEnrolmentTerm(dbc);
                 if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
-                foreach (var payment in (await BusinessRule.GetUnprocessedOnlinePayment(dbc, authEmail)))
+                foreach (var payment in (await BusinessRule.GetUnprocessedOnlinePayment(dbc)))
                 {
                     try
                     {
@@ -266,6 +256,11 @@ else
     async Task OnRefresh()
     {
         await CheckEwayStatus();
+        await OnClearSelection();
+    }
+
+    async Task OnClearSelection()
+    {
         await GetData();
         isSelected = false;
         selectedPerson = null;
