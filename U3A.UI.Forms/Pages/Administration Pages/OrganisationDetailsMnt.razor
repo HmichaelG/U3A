@@ -203,13 +203,30 @@ else
                                             <DxFormLayoutItem Caption="Label Width" ColSpanMd="6">
                                                 <DxMaskedInput @bind-Value="@systemSettings.MailLabelWidth" />
                                             </DxFormLayoutItem>
-                                        </DxFormLayoutGroup><br />
+                                        </DxFormLayoutGroup>
                                         <DxFormLayoutGroup Caption="Other Settings">
                                             <DxFormLayoutItem Caption="Require Vax Certificate?" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@systemSettings.RequireVaxCertificate" Alignment="CheckBoxContentAlignment.Right" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Allow Person Post-Nominal Letters?" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@systemSettings.AllowPostNominalLetters" Alignment="CheckBoxContentAlignment.Right" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
+                                        <DxFormLayoutGroup Caption="Data Retebtion">
+                                            <DxFormLayoutItem Caption="Attendance data (years)" ColSpanMd="12">
+                                                <DxSpinEdit @bind-Value="@systemSettings.RetainAttendanceForYears" MinValue="1" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Enrolments data (years)" ColSpanMd="12">
+                                                <DxSpinEdit @bind-Value="@systemSettings.RetainEnrolmentForYears" MinValue="1" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Financials - receipt & fee data (years)" ColSpanMd="12">
+                                                <DxSpinEdit @bind-Value="@systemSettings.RetainFinancialsForYears" MinValue="1" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Persons not financial (years)" ColSpanMd="12">
+                                                <DxSpinEdit @bind-Value="@systemSettings.RetainUnfinancialPersonsForYears" MinValue="1" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Registrations never completed (days)" ColSpanMd="12">
+                                                <DxSpinEdit @bind-Value="@systemSettings.RetainRegistrationsNeverCompletedForDays" MinValue="30" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
                                     </Template>

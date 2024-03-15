@@ -154,8 +154,12 @@ namespace U3A.Model
         public SendLeaderReportsTo SendLeaderReportsTo { get; set; } = SendLeaderReportsTo.LeadersThenClerks;
         public CourseContactOrder CourseContactOrder { get; set; }
         public bool ShowLeaderOnPublicSchedule { get; set; }
-
         public DateTime? InMaintenanceTill { get; set; }
+        public int RetainAttendanceForYears { get; set; } = 5;
+        public int RetainFinancialsForYears { get; set; } = 5;
+        public int RetainEnrolmentForYears { get; set; } = 2;
+        public int RetainUnfinancialPersonsForYears { get; set; } = 2;
+        public int RetainRegistrationsNeverCompletedForDays { get; set; } = 60; 
     }
 
     public enum AutoEnrollOccurrence
