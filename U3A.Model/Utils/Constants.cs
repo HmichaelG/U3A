@@ -22,6 +22,7 @@ namespace U3A.Model
         public const int START_OF_TIME = 2020;
         public const string SYSTEM_DOMAIN = "u3admin.org.au";
         public const string NO_SMS = "(No SMS)";
+        public static readonly DateTime PERSON_DELETED_FLAG = new DateTime(1800,1,1);
 
         public static List<string> nameOfRoles = new List<string>() { "Security Administrator",
                                                 "System Administrator",

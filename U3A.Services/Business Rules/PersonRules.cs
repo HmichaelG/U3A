@@ -14,9 +14,22 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
+
+        public static async Task<bool> CanDelete(U3ADbContext dbc,Person person)
+        {
+            // return false if person has any transactions
+            bool result = true;
+            if (await dbc.Receipt.AnyAsync(x => x.PersonID == person.ID)) { result = false; }
+            if (await dbc.Fee.AnyAsync(x => x.PersonID == person.ID)) { result = false; }
+            if (await dbc.Enrolment.AnyAsync(x => x.PersonID == person.ID)) { result = false; }
+            if (await dbc.AttendClass.AnyAsync(x => x.PersonID == person.ID)) { result = false; }
+            if (await dbc.Committee.AnyAsync(x => x.PersonID == person.ID)) { result = false; }
+            if (await dbc.Volunteer.AnyAsync(x => x.PersonID == person.ID)) { result = false; }
+            return result;
+        }
         public static async Task<List<Person>> EditablePersonAsync(U3ADbContext dbc)
         {
-            var people = dbc.Person
+            var people = dbc.Person.Where(x => x.DateCeased != constants.PERSON_DELETED_FLAG)
                             .AsEnumerable()
                             .OrderBy(x => x.LastName)
                             .ThenBy(x => x.FirstName)

@@ -137,7 +137,7 @@
                             <DxFormLayoutItem ColSpanMd="12">
                                 <ValidationSummary />
                             </DxFormLayoutItem>
-                            <div class="w-100 m-2 text-danger" >
+                            <div class="w-100 m-2 text-danger">
                                 <strong>NB:</strong> Changing the Email address requires Member Portal re-registration.
                             </div>
                             <DxFormLayoutGroup Caption="Personal" ColSpanMd="6">
@@ -410,7 +410,14 @@
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
         Person person = (Person)e.DataItem;
-        dbc.Remove(person);
+        if (await BusinessRule.CanDelete(dbc, person))
+        {
+            dbc.Remove(person);
+        }
+        else
+        {
+            person.DateCeased = constants.PERSON_DELETED_FLAG;
+        }
         await SaveChangesAsync();
         await GetData();
     }
@@ -532,7 +539,7 @@
         switch (TabIndex)
         {
             case 0:             // All financial participants not Ceased
-                co = CriteriaOperator.FromLambda<Person>(x => x.DateCeased == null 
+                co = CriteriaOperator.FromLambda<Person>(x => x.DateCeased == null
                         && (x.FinancialTo >= currentTerm.Year));
                 break;
             case 1:             // Leaders

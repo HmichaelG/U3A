@@ -49,7 +49,7 @@ namespace U3A.BusinessRules
             if (string.IsNullOrWhiteSpace(person.LastName)) return null;
             List<Person> potentialDuplicates;
             potentialDuplicates = await dbc.Person
-                                    .Where(x => x.ID != person.ID &&
+                                    .Where(x => x.ID != person.ID && x.DateCeased != constants.PERSON_DELETED_FLAG &&
                                            x.Gender.ToUpper().Trim() == person.Gender.ToUpper().Trim() &&
                                            x.LastName.ToUpper().Trim() == person.LastName.ToUpper().Trim() &&
                                            x.FirstName.ToUpper().Trim() == person.FirstName.ToUpper().Trim())
@@ -60,7 +60,7 @@ namespace U3A.BusinessRules
                 if (matches > 0) { return p; }
             }
             potentialDuplicates = await dbc.Person
-                                    .Where(x => x.ID != person.ID &&
+                                    .Where(x => x.ID != person.ID && x.DateCeased != constants.PERSON_DELETED_FLAG &&
                                            x.Gender.ToUpper().Trim() == person.Gender.ToUpper().Trim() &&
                                            x.LastName.ToUpper().Trim() == person.LastName.ToUpper().Trim())
                                     .ToListAsync();
@@ -70,7 +70,7 @@ namespace U3A.BusinessRules
                 if (matches > 1) { return p; }
             }
             potentialDuplicates = await dbc.Person
-                                    .Where(x => x.ID != person.ID &&
+                                    .Where(x => x.ID != person.ID && x.DateCeased != constants.PERSON_DELETED_FLAG &&
                                            x.Gender.ToUpper().Trim() == person.Gender.ToUpper().Trim() &&
                                            x.FirstName.ToUpper().Trim() == person.FirstName.ToUpper().Trim())
                                     .ToListAsync();
