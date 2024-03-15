@@ -69,6 +69,10 @@ namespace U3A.Database
             {
                 CreateDropout(entity);
             }
+            if (entity is Person)
+            {
+                SetLeaderNull((entity as Person).ID);
+            }
             if (entity is Course)
             {
                 base.RemoveRange(Class.Where(x => x.CourseID == (entity as Course).ID));
@@ -79,6 +83,13 @@ namespace U3A.Database
 
         public override void RemoveRange(IEnumerable<object> entities)
         {
+            if (entities is IEnumerable<Person>)
+            {
+                foreach (var entity in entities)
+                {
+                    SetLeaderNull((entity as Person).ID);
+                }
+            }
             if (entities is IEnumerable<Enrolment>)
             {
                 foreach (var entity in entities)
@@ -87,6 +98,14 @@ namespace U3A.Database
                 }
             }
             base.RemoveRange(entities);
+        }
+
+        private void SetLeaderNull(Guid PersonID)
+        {
+            foreach (var c in Class.Where(x => x.LeaderID == PersonID)) { c.LeaderID = null; }
+            foreach (var c in Class.Where(x => x.Leader2ID == PersonID)) { c.Leader2ID = null; }
+            foreach (var c in Class.Where(x => x.Leader3ID == PersonID)) { c.Leader3ID = null; }
+            foreach (var c in Committee.Where(x => x.PersonID == PersonID)) { c.PersonID = null; }
         }
         private void CreateDropout<TEntity>(TEntity entity) where TEntity : class
         {
