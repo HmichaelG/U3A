@@ -491,15 +491,6 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        public static async Task DeleteLeadershipRole(U3ADbContext dbc, Guid PersonID)
-        {
-            foreach (var c in await dbc.Class.Where(x => x.LeaderID == PersonID).ToListAsync())
-            {
-                c.LeaderID = null;
-                c.Leader = null;
-            }
-        }
-
         public static async Task AssignTermForOnceOnlyClass(U3ADbContext dbc, Class c)
         {
             if (c.StartDate == null) { return; }

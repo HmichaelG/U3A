@@ -410,7 +410,6 @@
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
         Person person = (Person)e.DataItem;
-        await BusinessRule.DeleteLeadershipRole(dbc, person.ID);
         dbc.Remove(person);
         await SaveChangesAsync();
         await GetData();

@@ -163,7 +163,6 @@ else {
 
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e) {
         var Committee = (Committee)e.DataItem;
-        await BusinessRule.DeleteLeadershipRole(dbc, Committee.ID);
         dbc.Remove(Committee);
         await SaveChangesAsync();
         await RefreshData();

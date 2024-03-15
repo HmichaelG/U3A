@@ -226,7 +226,6 @@ else
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
         var Volunteer = (Volunteer)e.DataItem;
-        await BusinessRule.DeleteLeadershipRole(dbc, Volunteer.ID);
         dbc.Remove(Volunteer);
         await SaveChangesAsync();
         await RefreshData();
