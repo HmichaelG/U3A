@@ -282,7 +282,7 @@ namespace U3A.Services
 
         private bool CanSetPaymentStatusProcessed(string ResponseCode, DateTime? paymentDate)
         {
-            return (ResponseCode == "06" && (DateTime.UtcNow - paymentDate.Value).TotalHours <= 24) ? false : true;
+            return (ResponseCode == "06" && (DateTime.UtcNow - paymentDate.Value).TotalHours <= 6) ? false : true;
         }
         public async Task<Tuple<string, string>> FixResultCodesAsync(U3ADbContext dbc, OnlinePaymentStatus PayStatus)
         {
