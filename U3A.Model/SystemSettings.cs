@@ -36,7 +36,7 @@ namespace U3A.Model
         [Comment("Pro-forma reports are sent from here")]
         public string SendEmailAddesss { get; set; }
 
-        [EmailAddress]
+        [EmailAddressAlowNull]
         [Comment("Support requests are sent to here")]
         public string? SupportEmailAddesss { get; set; }
 

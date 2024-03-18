@@ -80,8 +80,9 @@ else
                                                 <DxTextBox @bind-Text="@systemSettings.SendEmailDisplayName" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Support Email Address" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@systemSettings.SupportEmailAddesss"
-                                                           NullText="The email address to which member support requuests are sent." />
+                                                <DxTextBox @bind-Text="@systemSettings.SupportEmailAddesss" 
+                                                            ClearButtonDisplayMode=DataEditorClearButtonDisplayMode.Auto
+                                                            NullText="The email address to which member support requuests are sent." />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="System Postman CC Email" ColSpanMd="12">
                                                 <DxMemo @bind-Text="@systemSettings.SystemPostmanCCAddresses"
