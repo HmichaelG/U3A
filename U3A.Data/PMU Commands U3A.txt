@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_IsOffScheduleActivity
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_sp_prcDbCleanup
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_DataRetention
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_sp_prcDbCleanup_18-Mar-24
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_DataRetention
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_sp_prcDbCleanup_18-Mar-24
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
