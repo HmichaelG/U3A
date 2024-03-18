@@ -252,7 +252,73 @@ namespace U3A.BusinessRules
                 .OrderBy(r => r.Year).ToListAsync();
             return result;
         }
+        public static async Task<List<MemberSummary>> GetMemberSummaryByDOB(U3ADbContext dbc, Term term)
+        {
+            var today = DateTime.Today;
+            var result = await dbc.Person
+                .Where(p => p.BirthDate != null && p.FinancialTo >= term.Year)
+                .GroupBy(p => today.Year - p.BirthDate.Value.Year)
+                .Select(g => new MemberSummary
+                {
+                    Year = g.Key,
+                    Group = GetBirthDateRange(g.Key),
+                    Count = g.Count()
+                })
+                .OrderBy(r => r.Year).ToListAsync();
+            return result;
+        }
 
+        private static string GetBirthDateRange(int years)
+        {
+            if (years < 50)
+            {
+                return "< 50 year";
+            }
+            else if (years >= 51 && years <= 55)
+            {
+                return "51-55 years";
+            }
+            else if (years >= 56 && years <= 60)
+            {
+                return "56-50 years";
+            }
+            else if (years >= 61 && years <= 65)
+            {
+                return "61-65 years";
+            }
+            else if (years >= 66 && years <= 70)
+            {
+                return "66-70 years";
+            }
+            else if (years >= 71 && years <= 75)
+            {
+                return "71-75 years";
+            }
+            else if (years >= 76 && years <= 80)
+            {
+                return "76-80 years";
+            }
+            else if (years >= 81 && years <= 85)
+            {
+                return "81-85 years";
+            }
+            else if (years >= 86 && years <= 90)
+            {
+                return "86-90 years";
+            }
+            else if (years >= 91 && years <= 95)
+            {
+                return "91-95 years";
+            }
+            else if (years >= 96 && years <= 100)
+            {
+                return "96-100 years";
+            }
+            else
+            {
+                return "> 100 years";
+            }
+        }
         private static string GetJoiningYearRange(int years)
         {
             if (years == 0)

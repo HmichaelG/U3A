@@ -95,8 +95,8 @@
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
     </div>
-    <div class="row">
-        <DxPieChart Data="@enrolmentData" CssClass="col-lg-6"
+    <div class="row mt-2">
+        <DxPieChart Data="@enrolmentData" CssClass="col-lg-4"
                     InnerDiameter="0.5"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     Palette="@enrolmentTheme"
@@ -129,7 +129,7 @@
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
 
-        <DxPieChart Data="@waitlistData" CssClass="col-lg-6"
+        <DxPieChart Data="@waitlistData" CssClass="col-lg-4"
                     InnerDiameter="0.5"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     Palette="@waitlistTheme"
@@ -161,12 +161,44 @@
                            Position="RelativePosition.Outside"
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
-
+    <DxPieChart Data="@membershipDOBData" CssClass="col-lg-4"
+                InnerDiameter="0.5"
+                Palette="@memberLengthTheme"
+                LabelOverlap="PieChartLabelOverlap.Hide"
+                T="MemberSummary">
+        <DxChartTitle Text="Age of Membership" />
+        <DxPieChartSeries T="MemberSummary"
+                          TArgument="string"
+                          TValue="int"
+                          ValueField="si => si.Count"
+                          ArgumentField="si => si.Group"
+                          SummaryMethod="Enumerable.Sum">
+            <DxChartSeriesLabel Visible="true"
+                                Position="RelativePosition.Inside"
+                                Format='ChartElementFormat.FromLdmlString("#0")' />
+        </DxPieChartSeries>
+        <DxChartTooltip Enabled="true"
+                        Position="RelativePosition.Outside">
+            <div style="margin: 0.75rem">
+                <div class="fw-bold">@context.Point.Argument</div>
+                <div>
+                    @(
+                        $"{context.Point.Value:#,0.}"
+                        )
+                </div>
+            </div>
+        </DxChartTooltip>
+        <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                       VerticalAlignment="VerticalEdge.Top"
+                       Position="RelativePosition.Outside"
+                       Orientation="Orientation.Vertical" />
+    </DxPieChart>
     </div>
 
 @code {
     IEnumerable<MemberSummary> memberData;
     IEnumerable<MemberSummary> membershipLengthData;
+    IEnumerable<MemberSummary> membershipDOBData;
     IEnumerable<MemberSummary> enrolmentData;
     IEnumerable<MemberSummary> waitlistData;
     IEnumerable<MemberSummary> attritionData;
@@ -181,6 +213,7 @@
             {
                 memberData = await BusinessRule.GetMemberSummaryByGender(dbc, term);
                 membershipLengthData = await BusinessRule.GetMemberSummaryByMshipLength(dbc, term);
+                membershipDOBData = await BusinessRule.GetMemberSummaryByDOB(dbc, term);
                 enrolmentData = await BusinessRule.GetEnrolmentSummary(dbc, term);
                 waitlistData = await BusinessRule.GetWaitlistSummary(dbc, term);
                 attritionData = await BusinessRule.GetAttritionSummary(dbc, term);
