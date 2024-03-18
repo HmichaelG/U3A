@@ -26,7 +26,7 @@ namespace U3A.WebFunctions
         [Function("DailyProcedures")]
         public async Task Run([TimerTrigger("0 0 17 * * *"      
 #if DEBUG
-            , RunOnStartup=true
+            , RunOnStartup=false
 #endif            
             )] TimerInfo myTimer)
         {
@@ -86,6 +86,12 @@ namespace U3A.WebFunctions
                     _logger.LogInformation($"Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
                 }
             }
+
+            foreach (var tenant in tenants)
+            {
+                await DatabaseCleanup.Process(tenant, _logger);
+            }
+            
             _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             _logger.LogInformation($"Next timer schedule at: {myTimer!.ScheduleStatus!.Next}");
         }
