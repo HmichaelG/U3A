@@ -217,6 +217,7 @@ else
             dbc.Remove(selectedLeave);
             await dbc.SaveChangesAsync();
             await RefreshData();
+            selectedLeave = null;
             InvokeAsync(StateHasChanged);
         }
     }
