@@ -212,12 +212,11 @@
             if (term != null)
             {
                 memberData = await BusinessRule.GetMemberSummaryByGender(dbc, term);
-                membershipLengthData = await BusinessRule.GetMemberSummaryByMshipLength(dbc, term);
-                membershipDOBData = await BusinessRule.GetMemberSummaryByDOB(dbc, term);
                 enrolmentData = await BusinessRule.GetEnrolmentSummary(dbc, term);
                 waitlistData = await BusinessRule.GetWaitlistSummary(dbc, term);
                 attritionData = await BusinessRule.GetAttritionSummary(dbc, term);
-                InvokeAsync(StateHasChanged);
+                membershipLengthData = BusinessRule.GetMemberSummaryByMshipLength(dbc, term);
+                membershipDOBData = BusinessRule.GetMemberSummaryByDOB(dbc, term);
             }
         }
         await base.OnInitializedAsync();

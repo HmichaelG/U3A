@@ -237,34 +237,46 @@ namespace U3A.BusinessRules
                 .ToListAsync();
             return result;
         }
-        public static async Task<List<MemberSummary>> GetMemberSummaryByMshipLength(U3ADbContext dbc, Term term)
+
+        private static int GetAge(DateTime birthDate)
+        {
+            var today = TimezoneAdjustment.GetLocalTime().Date;
+
+            // Calculate the age.
+            var age = today.Year - birthDate.Year;
+
+            // Go back to the year in which the person was born in case of a leap year
+            if (birthDate.Date > today.AddYears(-age)) age--;
+            return age;
+        }
+        public static List<MemberSummary> GetMemberSummaryByMshipLength(U3ADbContext dbc, Term term)
         {
             var today = DateTime.Today;
-            var result = await dbc.Person
-                .Where(p => p.DateJoined != null && p.FinancialTo >= term.Year)
-                .GroupBy(p => today.Year - p.DateJoined.Value.Year)
+            var result = dbc.Person
+                .Where(p => p.DateJoined != null && p.FinancialTo >= term.Year).AsEnumerable()
+                .GroupBy(p => GetAge(p.DateJoined.Value))
                 .Select(g => new MemberSummary
                 {
                     Year = g.Key,
                     Group = GetJoiningYearRange(g.Key),
                     Count = g.Count()
                 })
-                .OrderBy(r => r.Year).ToListAsync();
+                .OrderBy(r => r.Year).ToList();
             return result;
         }
-        public static async Task<List<MemberSummary>> GetMemberSummaryByDOB(U3ADbContext dbc, Term term)
+        public static List<MemberSummary> GetMemberSummaryByDOB(U3ADbContext dbc, Term term)
         {
             var today = DateTime.Today;
-            var result = await dbc.Person
-                .Where(p => p.BirthDate != null && p.FinancialTo >= term.Year)
-                .GroupBy(p => today.Year - p.BirthDate.Value.Year)
+            var result = dbc.Person
+                .Where(p => p.BirthDate != null && p.FinancialTo >= term.Year).AsEnumerable()
+                .GroupBy(p => GetAge(p.BirthDate.Value))
                 .Select(g => new MemberSummary
                 {
                     Year = g.Key,
                     Group = GetBirthDateRange(g.Key),
                     Count = g.Count()
                 })
-                .OrderBy(r => r.Year).ToListAsync();
+                .OrderBy(r => r.Year).ToList();
             return result;
         }
 
@@ -316,7 +328,7 @@ namespace U3A.BusinessRules
             }
             else
             {
-                return "> 100 years";
+                return "100+ years";
             }
         }
         private static string GetJoiningYearRange(int years)
@@ -343,7 +355,7 @@ namespace U3A.BusinessRules
             }
             else
             {
-                return "> 20 years";
+                return "20+ years";
             }
         }
 
