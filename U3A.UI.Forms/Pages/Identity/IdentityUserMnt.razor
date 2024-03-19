@@ -463,7 +463,7 @@ else
                             EmailConfirmed = true,
                             PasswordHash = hasher.HashPassword(null, p.PersonIdentity)
                         };
-                    await UserManager.CreateAsync(user);
+                    var result = await UserManager.CreateAsync(user);
                     AppUsers.Add(user);
                     processed++;
                 }
