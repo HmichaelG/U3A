@@ -4,22 +4,25 @@
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
+@using DevExpress.Blazor.Navigation.Internal
 
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
-    <div class="col col-12 col-md-10 p-2 m-auto">
+    <div class="col col-12 col-lg-10 p-2 m-auto">
         <div class="row align-content-start">
             <ContextHelpTitle Title="Review Class Dropouts" HelpTopic="Review-Class-Dropouts.html" />
         </div>
         <div class="row">
             <div class="d-none col-lg-8 d-lg-inline">
-                Review / Reinstate Class Dropouts. That is, deleted enrolments.
+                Review / Reinstate deleted class enrolments.
             </div>
         </div>
 
@@ -27,75 +30,73 @@ else {
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
         <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-                                 DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+                                     DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
         <Progress @ref="@ProgressBar" />
 
         <DxFormLayout CssClass="mt-2">
-            <DxFormLayoutGroup Caption="Dropout Details">
-                <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
-                    <DxComboBox Data="@terms" NullText="Select the Term required..."
-                            FilteringMode="DataGridFilteringMode.Contains"
-                            TextFieldName="@nameof(Term.TermSummary)"
-                            Value="@selectedTerm"
-                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="" ColSpanMd="6">
-                    <DxButton Text="Reinstate Selected"
-                          Click="@OnReinstateClick"
-                          Enabled="@(SelectedDataItems != null && SelectedDataItems.Count() > 0)"
-                          RenderStyle="ButtonRenderStyle.Primary" />
-                    <DxButton Text="Communicate" CssClass="mx-2"
-                          Click="@OnCommunicate"
-                          Enabled="@(SelectedDataItems != null && SelectedDataItems.Count() > 0)"
-                          RenderStyle="ButtonRenderStyle.Primary" />
-                </DxFormLayoutItem>
-            </DxFormLayoutGroup>
-
-                <FullScreen>
-                    <ContentTemplate>
-            <DxGrid Data="@Dropouts" @ref=@mainGrid CssClass="grid-height"
-                ShowAllRows="true"
-                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                KeyFieldName="ID"
-                ValidationEnabled="true"
-                SelectionMode="GridSelectionMode.Multiple"
-                AllowSelectRowByClick="true"
-                AutoExpandAllGroupRows="true"
-                UnboundColumnData="Grid_CustomUnboundColumnData"
-                @bind-SelectedDataItems="SelectedDataItems">
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid />
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridSelectionColumn Width="2rem" />
-                    <DxGridDataColumn Caption="Course" FieldName="Course.Name" GroupIndex="0" />
-                    <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
-                    <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem"/>
-                    <DxGridDataColumn Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
-                    <DxGridDataColumn Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
-                    <DxGridDataColumn Caption="Email" FieldName="Person.Email" Width="12rem" />
-                    <DxGridDataColumn Caption="Created" FieldName="Created"
-                                  DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible="false" />
-                    <DxGridDataColumn Caption="Enrolled" FieldName="DateEnrolled"
-                                  DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
-                    <DxGridDataColumn Caption="Dropped" FieldName="DropoutDate"
-                                  DisplayFormat="{0:dd-MMM-yy hh:mm tt}"
-                                  UnboundType="GridUnboundColumnType.DateTime" />                    <DxGridDataColumn Caption="Dropped By" FieldName="DeletedBy" />
-                </Columns>
-            </DxGrid>
+            <FullScreen>
+                <ContentTemplate>
+                    <DxGrid Data="@Dropouts" @ref=@mainGrid CssClass="grid-height"
+                            ShowAllRows="true"
+                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                            KeyFieldName="ID"
+                            ValidationEnabled="true"
+                            SelectionMode="GridSelectionMode.Multiple"
+                            AllowSelectRowByClick="true"
+                            AutoExpandAllGroupRows="true"
+                            UnboundColumnData="Grid_CustomUnboundColumnData"
+                            @bind-SelectedDataItems="SelectedDataItems">
+                        <ToolbarTemplate>
+                            <GridToolbar LinkedGrid=@mainGrid>
+                                <CustomButtonContent>
+                                    <DxToolbarComboBoxItem Data="@terms"
+                                                           Text="Term: "
+                                                           Alignment="ToolbarItemAlignment.Right"
+                                                           BeginGroup=true
+                                                           FilteringMode="DataGridFilteringMode.Contains"
+                                                           TextFieldName="@nameof(Term.Name)"
+                                                           Value="@selectedTerm"
+                                                           ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                                    <DxToolbarItem Text="Reinstate"
+                                                   BeginGroup=true
+                                                   Alignment="ToolbarItemAlignment.Right"
+                                                   Click="@OnReinstateClick"
+                                                   Enabled="@(SelectedDataItems != null && SelectedDataItems.Count() > 0)"
+                                                   RenderStyleMode=ToolbarItemRenderStyleMode.Contained
+                                                   RenderStyle="ButtonRenderStyle.Primary" />
+                                    <DxToolbarItem Text="Communicate" CssClass="mx-2"
+                                                   Alignment="ToolbarItemAlignment.Right"
+                                                   Click="@OnCommunicate"
+                                                   Enabled="@(SelectedDataItems != null && SelectedDataItems.Count() > 0)"
+                                                   RenderStyleMode=ToolbarItemRenderStyleMode.Contained
+                                                   RenderStyle="ButtonRenderStyle.Primary" />
+                                </CustomButtonContent>
+                            </GridToolbar>
+                        </ToolbarTemplate>
+                        <Columns>
+                            <DxGridSelectionColumn Width="2rem" />
+                            <DxGridDataColumn Caption="Course" FieldName="Course.Name" GroupIndex="0" />
+                            <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
+                            <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
+                            <DxGridDataColumn Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
+                            <DxGridDataColumn Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
+                            <DxGridDataColumn Caption="Email" FieldName="Person.Email" Width="12rem" />
+                            <DxGridDataColumn Caption="Created" FieldName="Created"
+                                              DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible="false" />
+                            <DxGridDataColumn Caption="Enrolled" FieldName="DateEnrolled"
+                                              DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
+                            <DxGridDataColumn Caption="Dropped" FieldName="DropoutDate"
+                                              DisplayFormat="{0:dd-MMM-yy hh:mm tt}"
+                                              UnboundType="GridUnboundColumnType.DateTime" />
+                            <DxGridDataColumn Caption="Dropped By" FieldName="DeletedBy" />
+                        </Columns>
+                    </DxGrid>
                 </ContentTemplate>
             </FullScreen>
         </DxFormLayout>
     </div>
 
 }
-<style>
-    .leader-height {
-        height: 11vh;
-    }
-
-</style>
-
 
 @code {
     bool IsReady;
@@ -135,7 +136,8 @@ else {
     internal Progress? ProgressBar;
     LocalTime? localTime;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
 
@@ -148,7 +150,8 @@ else {
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         currentTerm = selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         IsSetSelectionEnrolledEnabled = true;
-        if (selectedTerm != null) {
+        if (selectedTerm != null)
+        {
             Persons = await BusinessRule.SelectablePersonsAsync(dbc, selectedTerm);
             await SelectedTermChanged(selectedTerm);
         }
@@ -175,45 +178,57 @@ else {
     {
         // wire up the toolbar
         base.OnAfterRender(firstRender);
-        if (!firstRender) {
-            if (selectedTerm == null) {
+        if (!firstRender)
+        {
+            if (selectedTerm == null)
+            {
                 await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");
                 NavMan.NavigateTo("/");
             }
         }
-        else {
+        else
+        {
             localTime = new LocalTime(js);
         }
     }
 
-    async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e) {
-        if (e.FieldName == "Dropout") {
+    async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        if (e.FieldName == "Dropout")
+        {
             e.Value = await localTime?.GetLocalTimeAsync((e.DataItem as Dropout).DropoutDate);
         }
     }
 
-    async Task SelectedTermChanged(Term term) {
+    async Task SelectedTermChanged(Term term)
+    {
         selectedTerm = term;
         ClearSelection();
         await GetDropouts();
     }
 
-    void ClearSelection() {
+    void ClearSelection()
+    {
         SendTo = null;
         SelectedDataItems = null;
     }
 
-    async Task GetDropouts() {
+    async Task GetDropouts()
+    {
         Dropouts = await BusinessRule.EditableDropoutsAsync(dbc, selectedTerm);
     }
 
-    async Task OnReinstateClick() {
+    async Task OnReinstateClick()
+    {
         if (await messageBox.ShowAsync("Reinstate Students?",
                   $"<p>The {SelectedDataItems.Count} selected students will be reinstated. Their waitlist status will remain unchanged.</p>" +
-                  "<p>Do you wish to continue?</p>")) {
-            foreach (var obj in SelectedDataItems) {
+                  "<p>Do you wish to continue?</p>"))
+        {
+            foreach (var obj in SelectedDataItems)
+            {
                 var d = (Dropout)(obj);
-                var e = new Enrolment() {
+                var e = new Enrolment()
+                    {
                         Course = await dbc.Course.FindAsync(d.CourseID),
                         DateEnrolled = d.DateEnrolled,
                         IsWaitlisted = d.IsWaitlisted,
@@ -233,13 +248,16 @@ else {
     }
 
 
-    async Task<bool> SaveChangesAsync() {
+    async Task<bool> SaveChangesAsync()
+    {
         bool result = false;
-        try {
+        try
+        {
             await dbc.SaveChangesAsync();
             result = true;
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             ErrorHeader = "Save to database error";
             ErrorMessage = Helpers.GetErrorMessage(ex);
             await ErrorPopup.ShowPopupAsync();
@@ -248,8 +266,10 @@ else {
         return result;
     }
 
-    void ShowEnrolledTypeChanged(int Value) {
-        switch (Value) {
+    void ShowEnrolledTypeChanged(int Value)
+    {
+        switch (Value)
+        {
             case 1:
                 mainGrid?.FilterBy("IsWaitlisted", GridFilterRowOperatorType.Equal, false);
                 break;
@@ -263,19 +283,23 @@ else {
     }
 
 
-    async Task OnCommunicate() {
+    async Task OnCommunicate()
+    {
 
-        if (SelectedDataItems == null || SelectedDataItems.Count <= 0) {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
             await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
             return;
         }
         SendTo = new List<Person>
             ();
         foreach (var e in SelectedDataItems.Cast<Dropout>
-            ().ToList()) {
+            ().ToList())
+        {
             SendTo.Add(e.Person);
         };
-        if (await selectDocumentTemplatePopup.ShowAsync()) {
+        if (await selectDocumentTemplatePopup.ShowAsync())
+        {
             documentsSent = 0;
             await ProgressBar.ShowAsync("Sending ... Please Wait", SelectedDataItems.Count);
             List<ExportData>
@@ -287,12 +311,14 @@ else {
         }
     }
 
-    async void Server_DocumentSent(object sender, DocumentSentEventArgs e) {
+    async void Server_DocumentSent(object sender, DocumentSentEventArgs e)
+    {
         documentsSent += e.DocumentsSent;
         await ProgressBar.SetValueAsync(documentsSent);
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 }
