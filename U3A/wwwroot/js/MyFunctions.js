@@ -39,8 +39,7 @@ function getLocalStorage(key) {
 function setFocus(id) {
     let elem = document.getElementById(id);
     if (elem != null) {
-        elem.scrollIntoView();
-        setTimeout(() => elem.focus(), 0);
+        setTimeout(() => elem.focus(), 1000);
     }
 }
 

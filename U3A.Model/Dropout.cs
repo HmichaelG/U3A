@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +11,7 @@ namespace U3A.Model
 {
     public class Dropout
     {
-        public Dropout() { DropoutDate = DateTime.Now; }
+        public Dropout() { DropoutDate = DateTime.UtcNow; }
 
         [Key]
         public Guid ID { get; set; }
@@ -31,6 +33,15 @@ namespace U3A.Model
         public DateTime Created { get; set; }
 
         public DateTime DropoutDate { get; set; }
+
+        [NotMapped]
+        public DateTime? LocalDropoutDate
+        {
+            get
+            {
+                return (DropoutDate != null) ? TimezoneAdjustment.GetLocalTime(DropoutDate) : null;
+            }
+        }
 
         public bool IsWaitlisted { get; set; }
 

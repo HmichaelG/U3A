@@ -352,24 +352,27 @@
             welcomeText = new MarkupString($"Welcome <strong>{loginState.LoginEmail}</strong>");
         }
         //
-        if (TimezoneAdjustment.GetLocalTime().Date > CurrentTerm.EndDate)
+        if (CurrentTerm != null)
         {
-            if (nextTerm != null)
+            if (TimezoneAdjustment.GetLocalTime().Date > CurrentTerm.EndDate)
             {
-                var sOpeningTime = nextTerm?.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
-                welcomeText = new MarkupString($@"<h6><strong>{nextTerm.Year} Term-{nextTerm.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.</h6>");
+                if (nextTerm != null)
+                {
+                    var sOpeningTime = nextTerm?.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
+                    welcomeText = new MarkupString($@"<h6><strong>{nextTerm.Year} Term-{nextTerm.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.</h6>");
+                }
+                else
+                {
+                    welcomeText = new MarkupString(@"<h6>Membership renewal and course enrolments are currenlty closed.</h6>");
+                }
             }
-            else
-            {
-                welcomeText = new MarkupString(@"<h6>Membership renewal and course enrolments are currenlty closed.</h6>");
-            }
-        }
 
-        // The day before new year enrolment day
-        if (openingTime != null)
-        {
-            var sOpeningTime = openingTime?.ToString("ddd dd-MMM-yy hh:mm tt");
-            welcomeText = new MarkupString($@"<h6><strong>{CurrentTerm.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.</h6>");
+            // The day before new year enrolment day
+            if (openingTime != null)
+            {
+                var sOpeningTime = openingTime?.ToString("ddd dd-MMM-yy hh:mm tt");
+                welcomeText = new MarkupString($@"<h6><strong>{CurrentTerm.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.</h6>");
+            }
         }
     }
 

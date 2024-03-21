@@ -16,7 +16,7 @@
 else
 {
 
-    <div class="col col-12 col-lg-10 p-2 m-auto">
+    <div class="col col-12 p-2 m-auto">
         <div class="row align-content-start">
             <ContextHelpTitle Title="Review Class Dropouts" HelpTopic="Review-Class-Dropouts.html" />
         </div>
@@ -44,13 +44,12 @@ else
                             SelectionMode="GridSelectionMode.Multiple"
                             AllowSelectRowByClick="true"
                             AutoExpandAllGroupRows="true"
-                            UnboundColumnData="Grid_CustomUnboundColumnData"
                             @bind-SelectedDataItems="SelectedDataItems">
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid>
                                 <CustomButtonContent>
                                     <DxToolbarComboBoxItem Data="@terms"
-                                                           Text="Term: "
+                                                           Text="Select Term"
                                                            Alignment="ToolbarItemAlignment.Right"
                                                            BeginGroup=true
                                                            FilteringMode="DataGridFilteringMode.Contains"
@@ -85,7 +84,7 @@ else
                                               DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible="false" />
                             <DxGridDataColumn Caption="Enrolled" FieldName="DateEnrolled"
                                               DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
-                            <DxGridDataColumn Caption="Dropped" FieldName="DropoutDate"
+                            <DxGridDataColumn Caption="Dropped" FieldName="LocalDropoutDate"
                                               DisplayFormat="{0:dd-MMM-yy hh:mm tt}"
                                               UnboundType="GridUnboundColumnType.DateTime" />
                             <DxGridDataColumn Caption="Dropped By" FieldName="DeletedBy" />
@@ -134,7 +133,7 @@ else
     DocumentServer server;
     int documentsSent;
     internal Progress? ProgressBar;
-    LocalTime? localTime;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -168,36 +167,7 @@ else
                 NavMan.NavigateTo("/");
             }
         }
-        else
-        {
-            localTime = new LocalTime(js);
-        }
         await base.OnAfterRenderAsync(firstRender);
-    }
-    protected override async void OnAfterRender(bool firstRender)
-    {
-        // wire up the toolbar
-        base.OnAfterRender(firstRender);
-        if (!firstRender)
-        {
-            if (selectedTerm == null)
-            {
-                await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");
-                NavMan.NavigateTo("/");
-            }
-        }
-        else
-        {
-            localTime = new LocalTime(js);
-        }
-    }
-
-    async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
-    {
-        if (e.FieldName == "Dropout")
-        {
-            e.Value = await localTime?.GetLocalTimeAsync((e.DataItem as Dropout).DropoutDate);
-        }
     }
 
     async Task SelectedTermChanged(Term term)
