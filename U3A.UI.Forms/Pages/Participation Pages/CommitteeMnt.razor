@@ -110,7 +110,8 @@ else {
     async Task RefreshData() {
         Persons = await BusinessRule.EditablePersonAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        if (settings != null) {
+        if (settings != null && !string.IsNullOrWhiteSpace(settings.CommitteePositions))
+        {
             Positions = settings.CommitteePositions.Split(new string[] { "\n" },
                                 StringSplitOptions.None)
                                 .Where(x => !string.IsNullOrWhiteSpace(x)).ToList();

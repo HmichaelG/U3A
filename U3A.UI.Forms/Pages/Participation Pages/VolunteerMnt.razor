@@ -146,7 +146,7 @@ else
         Persons = await BusinessRule.EditablePersonAsync(dbc);
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        if (settings != null)
+        if (settings != null && !string.IsNullOrWhiteSpace(settings.VolunteerActivities))
         {
             Activities = settings.VolunteerActivities.Split(new string[] { "\n" },
                                 StringSplitOptions.None)
