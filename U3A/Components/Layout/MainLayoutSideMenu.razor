@@ -45,7 +45,7 @@
                         <ErrorContent>
                             <p class="u3admin-error-boundary mt-5">
                                 Oops! Something went wrong. An unexpected error has occurred.<br />
-                                When reporting this issue please include the date and time: @(DateTime.Now.ToUniversalTime()) UTC.
+                                When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(TimezoneAdjustment.GetLocalTime()) Local ).
                                 <button class="btn btn-warning" @onclick="ResetError">Reset</button>
                             </p>
                         </ErrorContent>

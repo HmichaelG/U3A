@@ -23,71 +23,71 @@
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
                     @bind-IsActive="@IsXtraLargeLayout" />
 
-    <DxGridLayout CssClass="">
-        <Rows>
-            <DxGridLayoutRow Areas="Left-Blank header Right-Blank" Height="auto" />
-            <DxGridLayoutRow Areas="Left-Blank content Right-Blank" />
-        </Rows>
-        <Columns>
-            @{
-                if (IsXtraLargeLayout)
+<DxGridLayout CssClass="">
+    <Rows>
+        <DxGridLayoutRow Areas="Left-Blank header Right-Blank" Height="auto" />
+        <DxGridLayoutRow Areas="Left-Blank content Right-Blank" />
+    </Rows>
+    <Columns>
+        @{
+            if (IsXtraLargeLayout)
+            {
+                <DxGridLayoutColumn Width="10%" />
+                <DxGridLayoutColumn Width="80%" />
+                <DxGridLayoutColumn Width="10%" />
+            }
+            else
+            {
+                <DxGridLayoutColumn Width="0%" />
+                <DxGridLayoutColumn Width="100%" />
+                <DxGridLayoutColumn Width="0%" />
+            }
+        }
+    </Columns>
+    <Items>
+        <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none vh-100">
+        </DxGridLayoutItem>
+        <DxGridLayoutItem Area="header" CssClass="py-1">
+            <Template>
+                @if (hasRole)
                 {
-                    <DxGridLayoutColumn Width="10%" />
-                    <DxGridLayoutColumn Width="80%" />
-                    <DxGridLayoutColumn Width="10%" />
+                    <div class="fixed-top">
+                        <MainMenu />
+                    </div>
                 }
                 else
                 {
-                    <DxGridLayoutColumn Width="0%" />
-                    <DxGridLayoutColumn Width="100%" />
-                    <DxGridLayoutColumn Width="0%" />
+                    <PortalHeader />
                 }
-            }
-        </Columns>
-        <Items>
-            <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none vh-100">
-            </DxGridLayoutItem>
-            <DxGridLayoutItem Area="header" CssClass="py-1">
-                <Template>
-                    @if (hasRole)
-                    {
-                        <div class="fixed-top">
-                            <MainMenu />
-                        </div>
-                    }
-                    else
-                    {
-                        <PortalHeader />
-                    }
-                </Template>
-            </DxGridLayoutItem>
-            <DxGridLayoutItem Area="content" CssClass="main">
-                <Template>
-                    <ErrorBoundary @ref="@errorBoundary">
-                        <ChildContent>
-                            <div class="@((hasRole) ? "content-padding" : "" )">
-                                @if (!string.IsNullOrWhiteSpace(messageText))
-                                {
+            </Template>
+        </DxGridLayoutItem>
+        <DxGridLayoutItem Area="content" CssClass="main">
+            <Template>
+                <ErrorBoundary @ref="@errorBoundary">
+                    <ChildContent>
+                        <div class="@((hasRole) ? "content-padding" : "" )">
+                            @if (!string.IsNullOrWhiteSpace(messageText))
+                            {
                                 <div class="alert alert-danger text-danger text-center mx-auto">
-                                        @(new MarkupString(messageText))
-                                    </div>
-                                }
-                                @Body
-                            </div>
-                        </ChildContent>
-                        <ErrorContent>
-                            <p class="u3admin-error-boundary mt-5">
-                                Oops! Something went wrong. An unexpected error has occurred.<br />
-                                When reporting this issue please include the date and time: @(DateTime.Now.ToUniversalTime()) UTC.
-                                <button class="btn btn-warning" @onclick="ResetError">Reset</button>
-                            </p>
-                        </ErrorContent>
-                    </ErrorBoundary>
-                </Template>
-            </DxGridLayoutItem>
-            <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none vh-100" />
-        </Items>
-    </DxGridLayout>
+                                    @(new MarkupString(messageText))
+                                </div>
+                            }
+                            @Body
+                        </div>
+                    </ChildContent>
+                    <ErrorContent>
+                        <p class="u3admin-error-boundary mt-5">
+                            Oops! Something went wrong. An unexpected error has occurred.<br />
+                            When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(TimezoneAdjustment.GetLocalTime()) Local ).
+                            <button class="btn btn-warning" @onclick="ResetError">Reset</button>
+                        </p>
+                    </ErrorContent>
+                </ErrorBoundary>
+            </Template>
+        </DxGridLayoutItem>
+        <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none vh-100" />
+    </Items>
+</DxGridLayout>
 
 
 <style>
@@ -121,13 +121,13 @@
             var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             foreach (var r in Roles)
             {
-                if (authenticationState.User.IsInRole(r.Name))
+                if (authenticationState.User.IsInRole(r.Name!))
                 {
                     hasRole = true;
                     break;
                 }
             }
-            var authEmail = authenticationState.User.Identity.Name;
+            var authEmail = authenticationState.User.Identity!.Name;
             if (authEmail == constants.superAdmin) hasRole = true;
         }
         NavigationManager.LocationChanged += OnLocationChanged;
