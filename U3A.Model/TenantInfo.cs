@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,29 +9,8 @@ namespace U3A.Model
 {
     public class TenantInfo
     {
-
-        private string? id;
-
-        public string? Id
-        {
-            get
-            {
-                return id;
-            }
-            set
-            {
-                if (value != null)
-                {
-                    if (value.Length > constants.TenantIdMaxLength)
-                    {
-                        throw new Exception($"The tenant id cannot exceed {constants.TenantIdMaxLength} characters.");
-                    }
-
-                    id = value;
-                }
-            }
-        }
-
+        [MaxLength(64)]
+        public string Id { get; set; }
         public string? Identifier { get; set; }
 
         public string? Name { get; set; }
