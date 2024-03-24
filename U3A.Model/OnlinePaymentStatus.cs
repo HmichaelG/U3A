@@ -20,41 +20,10 @@ namespace U3A.Model
 
         public string ResultCode { get; set; } = string.Empty;
         [NotMapped]
-        public string ResultDescription
-        {
-            get
-            {
-                var result = string.Empty;
-                if (!string.IsNullOrWhiteSpace(ResultCode))
-                {
-                    var resultCode = EwayResultCodes.Codes.FirstOrDefault(x => x.Code == ResultCode);
-                    if (resultCode != null)
-                    {
-                        result = resultCode.CodeAndDescription;
-                    }
-                    else { result = ResultCode; }
-                }
-                return result;
-            }
-        }
+        public string ResultDescription { get; set; }
 
         [NotMapped]
-        public string ResultLongDescription
-        {
-            get
-            {
-                var result = string.Empty;
-                if (!string.IsNullOrWhiteSpace(ResultCode))
-                {
-                    var resultCode = EwayResultCodes.Codes.FirstOrDefault(x => x.Code == ResultCode);
-                    if (resultCode != null)
-                    {
-                        result = resultCode.LongDescription;
-                    }
-                }
-                return result;
-            }
-        }
+        public string ResultLongDescription { get; set; }
         public string ResultMessage { get; set; } = string.Empty;
         public string WorkstationID { get; set; } = Workstation.ID;
     }

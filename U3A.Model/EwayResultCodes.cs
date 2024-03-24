@@ -26,17 +26,11 @@ namespace U3A.Model
             }
         }
     }
-    public static class EwayResultCodes
+    public class EwayResultCodes : List<EwayResultCode>
     {
-        static List<EwayResultCode> _codes;
-        public static List<EwayResultCode> Codes
+        public EwayResultCodes()
         {
-            get
-            {
-                if (_codes == null)
-                {
-                    _codes = new List<EwayResultCode>();
-                    _codes.AddRange(new List<EwayResultCode>(){
+            AddRange(new List<EwayResultCode>(){
                     new EwayResultCode("00", "Transaction Approved", "Transaction approved successfully."),
                     new EwayResultCode("08", "Honour With Identification", "Transaction processed successfully - identification is NOT actually required for online transactions.This code is returned by some banks in place of 00 response."),
                     new EwayResultCode("01", "Refer to Issuer", "The customer’s card issuer has indicated there is a problem with the card number.The customer should use an alternate credit card, or contact their bank."),
@@ -94,10 +88,7 @@ namespace U3A.Model
 
                     new EwayResultCode("W9", "Eway Status Error", @"There has been an error connecting to the banking connector to process the payment.This may occur due to an outage.
                     Check the Eway status page status.eway.com.au for outage and incident information.")
-                    });
-                }
-                return _codes;
-            }
+            });
         }
     }
 }

@@ -44,17 +44,39 @@ else
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid>
                         <CustomButtonContent>
-                            <DxToolbarItem Text="Re-Submit"
-                                           Tooltip="Re-submit the selected payment to Eway and process receipt, if successful."
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary" 
-                                           Enabled=@(selectedPaymentStatus != null && string.IsNullOrWhiteSpace(selectedPaymentStatus.Status))
-                                           Click="OnResubmit" />
-                            <DxToolbarItem Text="Full Msg"
+                            <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                                <Template>
+                                    <div class="input-group">
+                                        <div class="flex-grow-0 pt-1 pe-2">From:</div>
+                                        <DxDateEdit @bind-Date=@fromDate CssClass="flex-grow-1" />
+                                    </div>
+                                </Template>
+                            </DxToolbarItem>
+                            <DxToolbarItem Context="a" Alignment="ToolbarItemAlignment.Right">
+                                <Template>
+                                    <div class="input-group">
+                                        <div class="flex-grow-0 pt-1 px-2">To:</div>
+                                        <DxDateEdit @bind-Date=@toDate CssClass="flex-grow-1" />
+                                    </div>
+                                </Template>
+                            </DxToolbarItem>
+                            <DxToolbarItem Text="Process"
+                                           Alignment="ToolbarItemAlignment.Right"
+                                           RenderStyle="ButtonRenderStyle.Primary"
+                                           Tooltip="Retrieve records for the selected dates."
+                                           Click="OnProcess" />
+                            <DxToolbarItem Text="Full Msg" BeginGroup="true"
+                                           Alignment="ToolbarItemAlignment.Right"
                                            Tooltip="Display the full Eway result message."
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary"
                                            Click="OnFullMsg" />
+                            <DxToolbarItem Text="Re-Submit"
+                                           Alignment="ToolbarItemAlignment.Right"
+                                           Tooltip="Re-submit the selected payment to Eway and process receipt, if successful."
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary"
+                                           Enabled=@(selectedPaymentStatus != null && string.IsNullOrWhiteSpace(selectedPaymentStatus.Status))
+                                           Click="OnResubmit" />
                         </CustomButtonContent>
                     </GridToolbar>
                 </ToolbarTemplate>
@@ -70,7 +92,7 @@ else
                                       DisplayFormat="hh:mm tt"
                                       UnboundType="GridUnboundColumnType.DateTime" />
                     <DxGridDataColumn Width="6rem" Caption="Status" FieldName="Status" />
-                    <DxGridDataColumn Caption="Result Code" FieldName="ResultDescription"  />
+                    <DxGridDataColumn Caption="Result Code" FieldName="ResultDescription" />
                     <DxGridDataColumn Caption="Participant" FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="6rem" Caption="Mobile" FieldName="Mobile" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="6rem" Caption="Phone" FieldName="Phone" UnboundType="GridUnboundColumnType.String" />
@@ -98,6 +120,8 @@ else
     internal string ErrorMessage;
     U3ADbContext dbc { get; set; }
     TimeSpan? offset;
+    DateTime fromDate;
+    DateTime toDate;
 
     Progress? progressBar;
 
@@ -105,13 +129,21 @@ else
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        toDate = TimezoneAdjustment.GetLocalTime().Date;
+        fromDate = TimezoneAdjustment.GetLocalTime().Date.AddDays(-14);
         await GetDataAsync();
         IsReady = true;
     }
 
+    async Task OnProcess()
+    {
+        await progressBar.ShowSmallSpinnerAsync();
+        await GetDataAsync();
+        await progressBar.Close();
+    }
     async Task GetDataAsync()
     {
-        PaymentStatus = await BusinessRule.GetOnlinePaymentStatus(dbc);
+        PaymentStatus = await BusinessRule.GetOnlinePaymentStatus(dbc,fromDate,toDate);
         People = await BusinessRule.EditablePersonAsync(dbc);
     }
 

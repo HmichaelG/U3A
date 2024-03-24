@@ -36,9 +36,22 @@ namespace U3A.BusinessRules
                                             x.AccessCode != string.Empty &&
                                             x.Status == String.Empty);
         }
-        public static async Task<List<OnlinePaymentStatus>> GetOnlinePaymentStatus(U3ADbContext dbc)
+        public static async Task<List<OnlinePaymentStatus>> GetOnlinePaymentStatus(U3ADbContext dbc,
+            DateTime fromDate,DateTime toDate)
         {
-            return await dbc.OnlinePaymentStatus.OrderByDescending(x => x.CreatedOn).ToListAsync();
+            var codes = new EwayResultCodes();
+            var status = await dbc.OnlinePaymentStatus
+                .Where(x => x.CreatedOn >= fromDate
+                             && x.CreatedOn < toDate.AddDays(1))
+                .OrderByDescending(x => x.CreatedOn).ToListAsync();
+            foreach (var s in status) { 
+                var code = codes.FirstOrDefault(x => x.Code == s.ResultCode);
+                if (code != null) { 
+                    s.ResultDescription = code.CodeAndDescription;
+                    s.ResultLongDescription = code.LongDescription;
+                }
+            }
+            return status;
         }
     }
 
