@@ -1,22 +1,28 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2023-11-26T13:33:45.761+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-03-25T11:29:19.409+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Review Online Payment Status</title>
   <body>
     <header>
       <para styleclass="Heading1">Review Online Payment Status</para>
     </header>
-    <para styleclass="Normal"><text style="font-weight:bold; color:#ff0000;">Note:</text><text style="color:#ff0000;"> Be aware Message Result </text><text style="font-weight:bold; color:#ff0000;">D4406</text><text style="color:#ff0000;"> includes payment requests cancelled by the user.</text></para>
-    <para styleclass="Normal">Use this procedure to review the status of all<text style="font-style:italic;"> Eway request for payment</text> status attempts.</para>
-    <para styleclass="Normal">A payment request has the following life cycle...</para>
+    <para styleclass="Normal">Use this procedure to review the status of all<text style="font-style:italic;"> Eway request for payment</text> attempts. By default, the procedure displays all payment attempts for the last 14 days. The date range may be changed using the From and To date editors positioned on the toolbar.</para>
+    <para styleclass="Normal">Note the status code <text style="font-weight:bold;">06 Error</text> is a general catch-all error when further detail is not forthcoming from the issuing bank / card provider.</para>
+    <para styleclass="Normal">If a payment request remains unprocessed, you may re-request the status result by...</para>
     <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">Select the required payment request from the grid, and</li>
+      <li styleclass="Normal">Click the <text style="font-style:italic;">Re-Submit</text> button.</li>
+    </list>
+    <para styleclass="Heading3">The payment request life cycle</para>
+    <para styleclass="Normal">A payment request has the following life cycle...</para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">The u3admin website creates a unique access code.</li>
-      <li styleclass="Normal">The u3admin website persists the access code in a payment request record in the database.</li>
-      <li styleclass="Normal">The u3admin website activates the EWAY API and passes the access code in a payment request call.</li>
+      <li styleclass="Normal">The u3admin website persists the access code in a payment request record in the U3A&apos;s database.</li>
+      <li styleclass="Normal">The u3admin website activates the EWAY API and passes the access code along with card details and the payment amount in a payment request call.</li>
       <li styleclass="Normal">The EWAY website processes the payment and returns to the u3admin website.</li>
       <li styleclass="Normal">The u3admin website retrieves incomplete payment requests from the database and interrogates the EWAY API to ascertain the payment result.</li>
       <li styleclass="Normal">For those requests that the EWAY API has marked as complete, the u3admin will either...</li>
-      <list id="0" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <list id="1" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
         <li styleclass="Normal">Create a receipt if the request has been successful. The payment request will be updated as <text style="font-weight:bold;">Processed</text> and a success result code recorded.</li>
         <li styleclass="Normal">If the request has been unsuccessful, the payment request will be marked as <text style="font-weight:bold;">Processed</text> and the failure codes recorded. A receipt will not be created.</li>
       </list>

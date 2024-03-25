@@ -4,7 +4,6 @@
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
-@using DevExpress.Blazor.Navigation.Internal
 
 
 @attribute [Authorize]
@@ -48,14 +47,19 @@ else
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid>
                                 <CustomButtonContent>
-                                    <DxToolbarComboBoxItem Data="@terms"
+                                    <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                                        <Template>
+                                            <div class="d-flex">
+                                                <div class="flex-grow-0 pt-1 pe-2">Term:</div>
+                                                     <DxComboBox Data="@terms" CssClass="flex-grow-1"
                                                            Text="Select Term"
-                                                           Alignment="ToolbarItemAlignment.Right"
-                                                           BeginGroup=true
                                                            FilteringMode="DataGridFilteringMode.Contains"
                                                            TextFieldName="@nameof(Term.Name)"
                                                            Value="@selectedTerm"
                                                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                                            </div>
+                                        </Template>
+                                    </DxToolbarItem>
                                     <DxToolbarItem Text="Reinstate"
                                                    BeginGroup=true
                                                    Alignment="ToolbarItemAlignment.Right"

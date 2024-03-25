@@ -7,7 +7,7 @@
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
    <meta name="generator" content="Help &amp; Manual" />
    <meta name="keywords" content="" />
-   <meta name="description" content="Note: Be aware Message Result D4406 includes payment requests cancelled by the user." />
+   <meta name="description" content="Use this procedure to review the status of all Eway request for payment attempts. By default, the procedure displays all payment attempts for the last 14 days. The date range..." />
    <link type="text/css" href="default.css" rel="stylesheet" />
    <link type="text/css" href="custom.css" rel="stylesheet" />
 
@@ -112,9 +112,9 @@
     </td>
     <td class="topichead" id="idnav">
       
-      <a href="course-fess-due-report.html" title="Previous Topic"><span class="hmbtnprev"></span></a>
+      <a href="add_edit-fees.html" title="Previous Topic"><span class="hmbtnprev"></span></a>
       <a href="fees--receipting.html" title="Parent Chapter"><span class="hmbtntop"></span></a>
-      <a href="add_edit-participants.html" title="Next Topic"><span class="hmbtnnext"></span></a>
+      <a href="complimentary-membership.html" title="Next Topic"><span class="hmbtnnext"></span></a>
       
     </td>
   </tr>  
@@ -127,12 +127,16 @@
 <!--[if lt IE 7]><div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;'><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." /></a></div><![endif]-->
 
 <!--ZOOMRESTART-->
-<p class="p_Normal"><span style="font-weight: bold; color: #ff0000;">Note:</span><span style="color: #ff0000;"> Be aware Message Result </span><span style="font-weight: bold; color: #ff0000;">D4406</span><span style="color: #ff0000;"> includes payment requests cancelled by the user.</span></p>
-<p class="p_Normal">Use this procedure to review the status of all<span style="font-style: italic;"> Eway request for payment</span> status attempts.</p>
+<p class="p_Normal">Use this procedure to review the status of all<span style="font-style: italic;"> Eway request for payment</span> attempts. By default, the procedure displays all payment attempts for the last 14 days. The date range may be changed using the From and To date editors positioned on the toolbar.</p>
+<p class="p_Normal">Note the status code <span style="font-weight: bold;">06 Error</span> is a general catch-all error when further detail is not forthcoming from the issuing bank / card provider.</p>
+<p class="p_Normal">If a payment request remains unprocessed, you may re-request the status result by...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Select the required payment request from the grid, and</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>Click the <span style="font-style: italic;">Re-Submit</span> button.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">The payment request life cycle</span></h3>
 <p class="p_Normal">A payment request has the following life cycle...</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>The u3admin website creates a unique access code.</p>
-<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>The u3admin website persists the access code in a payment request record in the database.</p>
-<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span>The u3admin website activates the EWAY API and passes the access code in a payment request call.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>The u3admin website persists the access code in a payment request record in the U3A's database.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span>The u3admin website activates the EWAY API and passes the access code along with card details and the payment amount in a payment request call.</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">4.</span>The EWAY website processes the payment and returns to the u3admin website.</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">5.</span>The u3admin website retrieves incomplete payment requests from the database and interrogates the EWAY API to ascertain the payment result.</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">6.</span>For those requests that the EWAY API has marked as complete, the u3admin will either...</p>

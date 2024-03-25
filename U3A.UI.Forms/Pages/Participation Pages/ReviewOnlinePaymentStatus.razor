@@ -46,7 +46,7 @@ else
                         <CustomButtonContent>
                             <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
                                 <Template>
-                                    <div class="input-group">
+                                    <div class="d-flex">
                                         <div class="flex-grow-0 pt-1 pe-2">From:</div>
                                         <DxDateEdit @bind-Date=@fromDate CssClass="flex-grow-1" />
                                     </div>
@@ -54,7 +54,7 @@ else
                             </DxToolbarItem>
                             <DxToolbarItem Context="a" Alignment="ToolbarItemAlignment.Right">
                                 <Template>
-                                    <div class="input-group">
+                                    <div class="d-flex">
                                         <div class="flex-grow-0 pt-1 px-2">To:</div>
                                         <DxDateEdit @bind-Date=@toDate CssClass="flex-grow-1" />
                                     </div>
