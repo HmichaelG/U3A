@@ -113,7 +113,7 @@ namespace U3A.Services
             else
             {
                 var msg = $"Error processing CreateResponsiveSharedRequest; Error code(s): {response.Errors}";
-                EwayResponseException ex = new(msg);
+                EwayRequestException ex = new(msg);
                 throw ex;
             }
             return result;
@@ -140,6 +140,7 @@ namespace U3A.Services
         public async Task FinaliseEwayPyamentAsync(U3ADbContext dbc, OnlinePaymentStatus paymentStatus, Term term)
         {
             GetClient(dbc);
+            paymentStatus = await dbc.OnlinePaymentStatus.FindAsync(paymentStatus.ID);
             var person = await dbc.Person.FindAsync(paymentStatus.PersonID);
             if (person == null)
             {
@@ -165,10 +166,12 @@ namespace U3A.Services
                 };
                 if (!CanSetPaymentStatusProcessed(result.ResponseCode, result.Date))
                 {
-                    throw new Exception(@"The processing of your payment is incomplete.
-                                          This may be due to a delay in processing by your bank.
-                                          Don't worry as we'll keep trying. Please review later, and
-                                          if the problem persists, contact your U3A.");
+                    throw new EwayResponseException(@"The processing of your payment is incomplete.
+                            This may be due to a delay in processing by your bank, 
+                            or you cancelled a previous transaction. 
+                            If you did not cancel, please wait as we’ll keep checking. 
+                            Otherwise, simply make your payment now.
+                            If the problem persists, contact your U3A.", result);
                 }
             }
             else
@@ -239,34 +242,13 @@ namespace U3A.Services
                 person.FinancialTo = receipt.FinancialTo;
                 person.DateJoined = receipt.DateJoined;
                 await dbc.AddAsync(receipt);
+                // send email
                 if (string.IsNullOrWhiteSpace(person.Email))
                 {
                     await BusinessRule.CreateReceiptSendMailAsync(dbc);
                 }
                 dbc.Update(person);
             }
-        }
-        public async Task<PaymentResult?> ProcessPaymentResponse(U3ADbContext dbc, Person person)
-        {
-            PaymentResult? result = null;
-            var reqDetails = await BusinessRule.GetUnprocessedOnlinePayment(dbc, person);
-            if (reqDetails != null)
-            {
-                var response = await ewayClient.QueryAccessCode(reqDetails.AccessCode);
-                if (response.Errors == null)
-                {
-                    result = new PaymentResult()
-                    {
-                        AccessCode = response.AccessCode,
-                        AuthorizationCode = response.AuthorisationCode,
-                        TransactionID = response.TransactionID.GetValueOrDefault(),
-                        Amount = (decimal)(response.TotalAmount.GetValueOrDefault() / 100.00),
-                        ResponseCode = response.ResponseCode ?? "",
-                        ResponseMessage = response.ResponseMessage ?? ""
-                    };
-                }
-            }
-            return result;
         }
         public async Task SetPaymentStatusProcessed(U3ADbContext dbc, PaymentResult result, Person person)
         {
@@ -308,10 +290,19 @@ namespace U3A.Services
 
     }
 
+    public class EwayRequestException : Exception
+    {
+        public string Message { get; set; }
+        public EwayRequestException(string Message) { this.Message = Message; }
+    }
     public class EwayResponseException : Exception
     {
         public string Message { get; set; }
-        public EwayResponseException(string Message) { this.Message = Message; }
+        public PaymentResult PaymentResult { get; set; }
+        public EwayResponseException(string Message, PaymentResult PaymentResult) { 
+            this.Message = Message; 
+            this.PaymentResult = PaymentResult;
+        }
     }
 }
 

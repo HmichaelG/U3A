@@ -221,12 +221,8 @@ else
                 if (hasUnprocessedPayment)
                 {
                     FinaliseEwayPayment();
-                }
-                else
-                {
                     //Calculate fees
                     await CalculateFees();
-                    InvokeAsync(StateHasChanged);
                 }
             }
         }
@@ -331,7 +327,7 @@ else
                     );
                 if (paymentURL != null) { navMan.NavigateTo(paymentURL); }
             }
-            catch (EwayResponseException ex)
+            catch (EwayRequestException ex)
             {
                 IsProcessing = false;
                 await InvokeAsync(StateHasChanged);
@@ -421,9 +417,17 @@ else
                 IsProcessing = false;
                 InvokeAsync(StateHasChanged);
             }
+            catch (EwayResponseException ex)
+            {
+                decimal fee = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+                if (fee > 0) { OnlineErrorMessage = ex.Message; }
+            }
             catch (Exception ex)
             {
                 OnlineErrorMessage = ex.Message;
+            }
+            finally
+            {
                 IsProcessing = false;
                 InvokeAsync(StateHasChanged);
             }
