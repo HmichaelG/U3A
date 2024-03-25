@@ -255,9 +255,9 @@ else
 
 
 @code {
-        bool IsReady;
-        int ShowEnrolmentType;
-        SystemSettings? settings;
+    bool IsReady;
+    int ShowEnrolmentType;
+    SystemSettings? settings;
 
     private List<Enrolment>? Enrolments { get; set; }
     Enrolment? thisEnrolment;
@@ -455,7 +455,7 @@ else
     async Task SetupGrid()
     {
         if (selectedCourse.CourseFeePerTerm != 0 || selectedCourse.CourseFeePerYear != 0) {await ProgressBar.ShowSmallSpinnerAsync(); }
-    ClearSelection();
+        ClearSelection();
         mainGrid.BeginUpdate();
         GridCommandColumn.Visible = false;
         if (selectedCourse != null)
@@ -594,7 +594,8 @@ else
 
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
-        dbc.Remove<Enrolment>((Enrolment)e.DataItem);
+        var enrolment = ((Enrolment)e.DataItem);
+        BusinessRule.DeleteEnrolment(dbc, enrolment);
         await SaveChangesAsync();
         mainGrid.ClearSelection();
         await SetupGrid();

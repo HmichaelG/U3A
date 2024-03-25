@@ -547,10 +547,27 @@ namespace U3A.BusinessRules
 
         public static async Task DeleteEnrolmentByClassID(U3ADbContext dbc, Guid ClassID)
         {
-            var query = await dbc.Enrolment
+            var deletions = await dbc.Enrolment
                         .Include(x => x.Class)
                         .Where(x => x.ClassID == ClassID).ToArrayAsync();
+            foreach (var d in deletions) { DeleteEnrolment(dbc, d); }
+        }
+        public static void DeleteEnrolment(U3ADbContext dbc, Enrolment enrolment)
+        {
+            // delete the enrolment & any future enrolments
+            var query = dbc.Enrolment
+                        .Include(x => x.Term)
+                        .Where(x => x.CourseID == enrolment.CourseID
+                                    && (x.ClassID == null || x.ClassID == enrolment.ClassID)
+                                    && x.PersonID == enrolment.PersonID).AsEnumerable()
+                                    .Where(x => x.Term.Comparer >= enrolment.Term.Comparer);
             dbc.RemoveRange(query);
+            // delete future attendance records
+            var query2 = dbc.AttendClass
+                        .Where(x => x.ClassID == enrolment.ClassID
+                                    && x.PersonID == enrolment.PersonID).AsEnumerable()
+                                    .Where(x => x.Date >= TimezoneAdjustment.GetLocalTime());
+            dbc.RemoveRange(query2);
         }
 
         /// <summary>
@@ -579,26 +596,20 @@ namespace U3A.BusinessRules
                 var course = await dbc.Course.FindAsync(c.CourseID);
                 if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
                 {
-                    var e = dbc.Enrolment.Where(x =>
+                    var deletions = dbc.Enrolment.Where(x =>
                                         x.PersonID == person.ID &&
                                         x.Term.Year == thisTerm.Year && x.Term.TermNumber == thisTerm.TermNumber &&
                                         x.CourseID == c.CourseID).ToImmutableList();
-                    if (e.Count > 0)
-                    {
-                        dbc.RemoveRange(e);
-                    }
+                    foreach (var d in deletions) { DeleteEnrolment(dbc, d); }
                 }
                 else
                 {
-                    var e = dbc.Enrolment.Where(x =>
+                    var deletions = dbc.Enrolment.Where(x =>
                                         x.PersonID == person.ID &&
                                         x.Term.Year == term.Year && x.Term.TermNumber == thisTerm.TermNumber &&
                                         x.CourseID == c.CourseID &&
                                         x.ClassID == c.ID).ToImmutableList();
-                    if (e.Count > 0)
-                    {
-                        dbc.RemoveRange(e);
-                    }
+                    foreach (var d in deletions) { DeleteEnrolment(dbc, d); }
                 }
             }
         }
