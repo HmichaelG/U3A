@@ -2,6 +2,7 @@
 
 @inject IDbContextFactory<TenantStoreDbContext> tenantDbfactory
 @inject IJSRuntime js
+@inject NavigationManager navMan
 
 <PageTitle>Tenant Summary</PageTitle>
 
@@ -41,6 +42,13 @@
                     KeyFieldName="Id"
                     ValidationEnabled="true">
                 <Columns>
+                    <DxGridDataColumn Width="8rem" Caption="" AllowGroup="false">
+                        <CellDisplayTemplate>
+                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                      RenderStyle="ButtonRenderStyle.Primary" Text="Navigate"
+                                      Click="() => OnNavigate(context.DataItem)"></DxButton>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
                     <DxGridDataColumn Caption="Tenant ID" FieldName="Identifier" />
                     <DxGridDataColumn Caption="Display Name" FieldName="Name" />
                     <DxGridDataColumn Caption="Website" FieldName="Website" />
@@ -80,8 +88,8 @@
 </style>
 
 @code {
-
-    List<TenantInfo> tenantInfo { get; set; }
+    object? selectedDataItem;
+    List<TenantInfo>? tenantInfo { get; set; }
     Dictionary<string, int> financialMembers = new();
     Dictionary<string, PostmarkOutboundOverviewStats> EmailStats = new();
     bool showPostmark;
@@ -139,6 +147,14 @@
         PostmarkOutboundOverviewStats stats;
         stats = await client.GetOutboundOverviewStatsAsync(null, startDate, endDate);
         EmailStats.Add(tenant.Id, stats);
+    }
+
+    void OnNavigate(object tenant)
+    {
+        if (tenant != null)
+        {
+            navMan.NavigateTo($"https://{((TenantInfo)tenant).Identifier}.u3admin.org.au", true);
+        };
     }
 
 }
