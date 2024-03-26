@@ -148,24 +148,9 @@
             var lt = new LocalTime(js);
             TimezoneAdjustment.TimezoneOffset = await lt.GetTimezoneOffsetAsync();
             // Set the workstation ID
-            await Workstation.SetWorkstationID(js, localStorage);
-
-            var key = constants.USE_TOP_MENU_KEY;
-            if (await localStorage.ContainKeyAsync(key))
-            {
-                bool value = await localStorage.GetItemAsync<bool>(key);
-                if (value != useTopMenu)
-                {
-                    useTopMenu = value;
-                    DoStateChange = true;
-                }
-            }
-            else if (!useTopMenu.HasValue)
-            {
-                useTopMenu = false;
-                DoStateChange = true;
-            }
-            if (DoStateChange) await InvokeAsync(StateHasChanged);
+            await Workstation.SetWorkstationDetail(js, localStorage);
+            useTopMenu = Workstation.UseTopMenu;
+            await InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);
     }

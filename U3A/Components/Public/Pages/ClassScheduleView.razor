@@ -22,12 +22,12 @@ else
     <PortalHeader NavigateTo="/public" />
     <div class="h6" align="center">This report contains many pages. Scroll down to view.</div>
     <p>@message</p>
-    <DxReportViewer @ref="reportViewer" Id="reportViewer"
+    <DxReportViewer @ref="@reportViewer" Id="reportViewer"
                     Report="@rpt" SizeMode="SizeMode.Small"
                     SinglePagePreview="false"
                     RootCssClasses="w-100 view-normal"
                     TabPanelMinWidth="200"
-                    TabPanelMaxWidth="200"                    
+                    TabPanelMaxWidth="200"                                     
                     Zoom="1"
                     OnCustomizeToolbar="@OnCustomizeToolbar" />
 }
@@ -89,14 +89,11 @@ else
     {
         if (firstRender)
         {
-
             reportViewer!.TabPanelModel[TabContentKind.Parameters].Visible = false;
             reportViewer.TabPanelModel[TabContentKind.Search].Visible = true;
             reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
             reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
         }
-        // var newHeight = await Window.FitToRemainingHeight(js, "reportViewer", viewerHeight,0);
-        // if (newHeight != viewerHeight) { viewerHeight = newHeight; await InvokeAsync(StateHasChanged); }
         await base.OnAfterRenderAsync(firstRender);
     }
 

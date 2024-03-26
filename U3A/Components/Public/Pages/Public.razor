@@ -207,7 +207,7 @@
             if (js != null)
             {
                 // Set the workstation ID
-                await Workstation.SetWorkstationID(js, localStorage);
+                await Workstation.SetWorkstationDetail(js, localStorage);
                 // Apple version check
                 AppleOSversion = await js.InvokeAsync<int[]>("appleOSversion");
                 using (var dbc = await U3Adbfactory.CreateDbContextAsync())

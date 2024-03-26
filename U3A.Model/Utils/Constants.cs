@@ -13,9 +13,6 @@ namespace U3A.Model
         //  that random allocation is actually performed.
         public const int RANDOM_ALLOCATION_PREVIEW = 3;
 
-        public const string USE_TOP_MENU_KEY = "use-topmenu";
-
-
         public const string STD_DATE_FORMAT = "ddd dd-MMM-yyy";
         public const string STD_DATE_MONTH_ONLY_FORMAT = "ddd dd-MMM";
         public const string SHORT_DATE_FORMAT = "dd-MMM-yyy";
