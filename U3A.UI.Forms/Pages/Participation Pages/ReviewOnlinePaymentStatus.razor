@@ -213,6 +213,12 @@ else
             await messageBox.ShowOkOnlyAsync("Payment Resubmitted", "The payment has been successfully resubmitted.");
             await GetDataAsync();
         }
+        catch (EwayResponseException ex)
+        {
+            var person = await dbc.Person.FindAsync(selectedPaymentStatus.PersonID);
+            await messageBox.ShowOkOnlyAsync("Resubmit error",
+                        $"Error processing online payment for {person.FullName}.<br/>{ex.Message}");
+        }
         catch (Exception ex)
         {
             var person = await dbc.Person.FindAsync(selectedPaymentStatus.PersonID);
