@@ -208,7 +208,7 @@ SELECT
 			,0
 			,[categoryTitle]
 			,categoryDescription
-FROM mu3a.u3a.wp_u3a_category
+FROM mu3a.u3a.qsycsj_u3a_category
 
 SET @KEY = newid()
 INSERT INTO [dbo].[CourseType]
@@ -248,7 +248,7 @@ INSERT INTO [dbo].[Venue]
            ,other
            ,null
            ,ContactPhone
-FROM mu3a.u3a.wp_u3a_venues
+FROM mu3a.u3a.qsycsj_u3a_venues
 
 SET @VKEY = newid()
 INSERT INTO [dbo].[Venue]
@@ -319,9 +319,9 @@ INSERT INTO [dbo].[Person]
                 when 'F' then 'Female'
                 when 'O' then 'Other'
             end Gender
-            ,case yob
+            ,case dob
                 when 0 then null
-                else '31-dec-' + cast(yob as char(4))
+                else '31-dec-' + cast(dob as char(4))
             end BirthDate
            ,memberSince		DateJoined
            ,null				DateCeased
@@ -339,7 +339,7 @@ INSERT INTO [dbo].[Person]
            ,[CreatedOn] = getDate()
            ,[UpdatedOn] = getDate()
            ,DATEPART(year,feesDue) FinancialTo
-FROM	mu3a.u3a.wp_u3a_members
+FROM	mu3a.u3a.qsycsj_u3a_members where feesDue is not null
 
 
 --UPDATE Person 
@@ -381,7 +381,7 @@ INSERT INTO [dbo].[Receipt]
            ,memberSince
            ,datepart(year,feesDue)
            ,'System Conversion'
-     FROM mu3a.u3a.wp_u3a_members
+     FROM mu3a.u3a.qsycsj_u3a_members where feesDue is not null
 
 --IF (@OBFISCATE = 1)
 --    BEGIN
@@ -428,9 +428,9 @@ INSERT INTO [dbo].[Course]
            ,duration
            ,1
            ,maxNbrPlaces
-           ,isnull((Select Top 1 ID From CourseType where Name = (select top 1 categoryTitle From mu3a.u3a.wp_u3a_category C Where fkCategory = c.categoryID)),@KEY) CourseTypeID
+           ,isnull((Select Top 1 ID From CourseType where Name = (select top 1 categoryTitle From mu3a.u3a.qsycsj_u3a_category C Where Category = c.categoryID)),@KEY) CourseTypeID
            ,0   CourseParticipationTypeID
-FROM	mu3a.u3a.wp_u3a_event
+FROM	mu3a.u3a.qsycsj_u3a_event
 
 INSERT INTO [dbo].[Class]
            ([ID]
@@ -479,8 +479,8 @@ SELECT
            ,eventTime StartTime
            ,(Select top 1 ID from Course where ConversionID = eventCode) CourseID
            ,isnull((Select Top 1 ID From Venue where Name = 
-                            (select top 1 venueName from mu3a.u3a.wp_u3a_venues v where v.venueID = fkVenueID )),@VKEY)   VenueID
-FROM	mu3a.u3a.wp_u3a_event
+                            (select top 1 venueName from mu3a.u3a.qsycsj_u3a_venues v where v.venueID = fkVenueID )),@VKEY)   VenueID
+FROM	mu3a.u3a.qsycsj_u3a_event
 
 -- Normalise StartTime to 1st Jan 0001 so we have no sort issues
 
@@ -518,7 +518,7 @@ INSERT INTO [dbo].[Enrolment]
                               ,Cast(rand(checksum(newid()))*1000  as int)) -- !! Important
            ,0
            ,e.DateEntered
-FROM	mu3a.u3a.wp_u3a_enrolments e Inner Join
-			mu3a.u3a.wp_u3a_event p on e.fkEventCode = p.eventCode inner join
-			mu3a.u3a.wp_u3a_members m on e.fkBadgeNo = m.BadgeNo
+FROM	mu3a.u3a.qsycsj_u3a_enrolments e Inner Join
+			mu3a.u3a.qsycsj_u3a_event p on e.fkEventCode = p.eventCode inner join
+			mu3a.u3a.qsycsj_u3a_members m on e.fkBadgeNo = m.BadgeNo
 
