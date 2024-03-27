@@ -82,8 +82,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.Venue)
                             .Where(x => x.Course.Year == term.Year
                                             && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities && !x.Course.IsOffScheduleActivity))
-                                            && !x.Enrolments.Any())
-                            .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime);
+                                            && !x.Enrolments.Any());
         }
         private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc,
                                             Term term, bool ExludeOffScheduleActivities)
@@ -93,7 +92,6 @@ namespace U3A.BusinessRules
                                 .ThenInclude(e => e.Person)
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
-                            .Include(x => x.Course)
                             .Include(x => x.Leader)
                             .Include(x => x.Leader2)
                             .Include(x => x.Leader3)
