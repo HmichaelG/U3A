@@ -66,7 +66,7 @@ namespace U3A.BusinessRules
             return classes;
         }
 
-        private static IQueryable<Class> GetSameParticipantClasses(U3ADbContext dbc, 
+        private static IQueryable<Class> GetSameParticipantClasses(U3ADbContext dbc,
                                                 Term term, bool ExludeOffScheduleActivities)
         {
             return dbc.Class.AsNoTracking()
@@ -85,7 +85,7 @@ namespace U3A.BusinessRules
                                             && !x.Enrolments.Any())
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime);
         }
-        private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc, 
+        private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc,
                                             Term term, bool ExludeOffScheduleActivities)
         {
             return dbc.Class.AsNoTracking()
@@ -99,24 +99,21 @@ namespace U3A.BusinessRules
                             .Include(x => x.Leader3)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == term.Year 
+                            .Where(x => x.Course.Year == term.Year
                                         && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities && !x.Course.IsOffScheduleActivity))
                                         && x.Enrolments.Any());
         }
 
-        private static void AssignClassTerm(IEnumerable<Class> classes, IEnumerable<Term> terms, Term term)
+        private static void AssignClassTerm(Class c, IEnumerable<Term> terms, Term term)
         {
-            Parallel.ForEach(classes, c =>
+            c.TermNumber = GetRequiredTerm(term.TermNumber, c);
+            Parallel.ForEach(c.Course.Enrolments, e =>
             {
-                c.TermNumber = GetRequiredTerm(term.TermNumber, c);
-                Parallel.ForEach(c.Course.Enrolments, e =>
-                {
-                    e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-                });
-                Parallel.ForEach(c.Enrolments, e =>
-                {
-                    e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-                });
+                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
+            });
+            Parallel.ForEach(c.Enrolments, e =>
+            {
+                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
             });
         }
 
@@ -126,19 +123,22 @@ namespace U3A.BusinessRules
         /// <param name="dbc"></param>
         /// <param name="term"></param>
         /// <returns></returns>
-        public static async Task<List<Class>> GetClassDetailsAsync(U3ADbContext dbc, 
-            Term term, SystemSettings settings, bool ExludeOffScheduleActivities=false)
+        public static async Task<List<Class>> GetClassDetailsAsync(U3ADbContext dbc,
+            Term term, SystemSettings settings, bool ExludeOffScheduleActivities = false)
         {
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities)
-                            .ToListAsync()); 
+                            .ToListAsync());
             classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities)
                             .ToListAsync());
             classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            AssignClassTerm(classes, terms, term);
-            AssignClassContacts(classes, term, settings);
-            AssignClassCounts(dbc, term, classes);
+            Parallel.ForEach(classes, c =>
+            {
+                AssignClassTerm(c, terms, term);
+                AssignClassContacts(c, term, settings);
+                AssignClassCounts(term, c);
+            });
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
             if (prevTerm != null && prevTerm.Year == term.Year)
             {
@@ -150,17 +150,20 @@ namespace U3A.BusinessRules
                                             .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                                             && x.StartDate.GetValueOrDefault() < term.StartDate
                                                             && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                AssignClassTerm(prevTermShoulderClasses, terms, prevTerm);
-                AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
-                AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
+                Parallel.ForEach(prevTermShoulderClasses, c =>
+                {
+                    AssignClassTerm(c, terms, prevTerm);
+                    AssignClassContacts(c, prevTerm, settings);
+                    AssignClassCounts(prevTerm, c);
+                });
                 classes.AddRange(prevTermShoulderClasses);
             }
             return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)
                         .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name).ToList();
         }
 
-        public static List<Class> GetClassDetails(U3ADbContext dbc, 
-                                            Term term, 
+        public static List<Class> GetClassDetails(U3ADbContext dbc,
+                                            Term term,
                                             SystemSettings settings, bool ExludeOffScheduleActivities = false)
         {
             var terms = dbc.Term.AsNoTracking().Where(x => x.Year == term.Year &&
@@ -169,9 +172,9 @@ namespace U3A.BusinessRules
             var classes = GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities).ToList();
             classes.AddRange(GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities).ToList());
             classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            AssignClassTerm(classes, terms, term);
-            AssignClassContacts(classes, term, settings);
-            AssignClassCounts(dbc, term, classes);
+            //AssignClassTerm(classes, terms, term);
+            //AssignClassContacts(classes, term, settings);
+            //AssignClassCounts(term, classes);
             AssignClassClerks(dbc, term, classes);
             var prevTerm = GetPreviousTerm(dbc, term.Year, term.TermNumber);
             if (prevTerm != null && prevTerm.Year == term.Year)
@@ -184,9 +187,9 @@ namespace U3A.BusinessRules
                                             .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                                             && x.StartDate.GetValueOrDefault() < term.StartDate
                                                             && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                AssignClassTerm(prevTermShoulderClasses, terms, prevTerm);
-                AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
-                AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
+                //AssignClassTerm(prevTermShoulderClasses, terms, prevTerm);
+                //AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
+                //AssignClassCounts(prevTerm, prevTermShoulderClasses);
                 AssignClassClerks(dbc, prevTerm, prevTermShoulderClasses);
                 classes.AddRange(prevTermShoulderClasses);
             }
@@ -253,54 +256,51 @@ namespace U3A.BusinessRules
             return (d < endDate) && (d > startDate);
         }
 
-        public static void AssignClassContacts(List<Class> classes, Term term, SystemSettings settings)
+        public static void AssignClassContacts(Class c, Term term, SystemSettings settings)
         {
-            Parallel.ForEach(classes, c =>
+            c.CourseContacts = new();
+            List<Person> clerks;
+            var course = c.Course;
+            var contactOrder = (course.CourseContactOrder == null)
+                ? settings.CourseContactOrder
+                : course.CourseContactOrder;
+            if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
             {
-                c.CourseContacts = new();
-                List<Person> clerks;
-                var course = c.Course;
-                var contactOrder = (course.CourseContactOrder == null)
-                    ? settings.CourseContactOrder
-                    : course.CourseContactOrder;
-                if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+                clerks = course.Enrolments.Where(x => x.CourseID == course.ID &&
+                                                  x.TermID == term.ID &&
+                                                  x.IsCourseClerk && !x.IsWaitlisted)
+                                                  .Select(x => x.Person).OrderBy(x => x?.FullNameAlpha).ToList();
+            }
+            else
+            {
+                clerks = course.Enrolments.Where(x => x.CourseID == course.ID && x.ClassID == c.ID &&
+                                                x.TermID == term.ID &&
+                                                x.IsCourseClerk && !x.IsWaitlisted)
+                                                .Select(x => x.Person).OrderBy(x => x?.FullNameAlpha).ToList();
+            }
+            if (contactOrder == CourseContactOrder.LeadersThenClerks)
+            {
+                AddContact(c, CourseContactType.Leader, c.Leader);
+                AddContact(c, CourseContactType.Leader, c.Leader2);
+                AddContact(c, CourseContactType.Leader, c.Leader3);
+                foreach (var clerk in clerks.OrderBy(x => x.FullNameAlpha))
                 {
-                    clerks = course.Enrolments.Where(x => x.CourseID == course.ID &&
-                                                      x.TermID == term.ID &&
-                                                      x.IsCourseClerk && !x.IsWaitlisted)
-                                                      .Select(x => x.Person).OrderBy(x => x?.FullNameAlpha).ToList();
+                    AddContact(c, CourseContactType.Clerk, clerk);
                 }
-                else
+            }
+            else
+            {
+                foreach (var clerk in clerks)
                 {
-                    clerks = course.Enrolments.Where(x => x.CourseID == course.ID && x.ClassID == c.ID &&
-                                                    x.TermID == term.ID &&
-                                                    x.IsCourseClerk && !x.IsWaitlisted)
-                                                    .Select(x => x.Person).OrderBy(x => x?.FullNameAlpha).ToList();
+                    AddContact(c, CourseContactType.Clerk, clerk);
                 }
-                if (contactOrder == CourseContactOrder.LeadersThenClerks)
+                if (c.CourseContacts.Count <= 0)
                 {
-                    AddContact(c, CourseContactType.Leader, c.Leader);
-                    AddContact(c, CourseContactType.Leader, c.Leader2);
-                    AddContact(c, CourseContactType.Leader, c.Leader3);
-                    foreach (var clerk in clerks.OrderBy(x => x.FullNameAlpha))
-                    {
-                        AddContact(c, CourseContactType.Clerk, clerk);
-                    }
+                    if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader); }
+                    if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader2); }
+                    if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader3); }
                 }
-                else
-                {
-                    foreach (var clerk in clerks)
-                    {
-                        AddContact(c, CourseContactType.Clerk, clerk);
-                    }
-                    if (c.CourseContacts.Count <= 0)
-                    {
-                        if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader); }
-                        if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader2); }
-                        if (c.CourseContacts.Count <= 0) { AddContact(c, CourseContactType.Leader, c.Leader3); }
-                    }
-                }
-            });
+            }
         }
 
         private static void AddContact(Class c, CourseContactType contactType, Person? person)
@@ -314,10 +314,8 @@ namespace U3A.BusinessRules
                 c.CourseContacts.Add(new CourseContact() { ContactType = contactType, Person = person });
             }
         }
-        private static void AssignClassCounts(U3ADbContext dbc, Term term, List<Class> Classes)
+        private static void AssignClassCounts(Term term, Class c)
         {
-            Parallel.ForEach(Classes, c =>
-            {
                 var nextTerm = GetNextTermOffered(c, term.TermNumber);
                 double maxStudents = c.Course.MaximumStudents; ;
                 c.ParticipationRate = 0;
@@ -336,7 +334,6 @@ namespace U3A.BusinessRules
                                                 .Where(e => e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
                 }
                 if (maxStudents != 0) c.ParticipationRate = (double)((c.TotalActiveStudents + c.TotalWaitlistedStudents) / maxStudents);
-            });
         }
 
         public static void AssignClassClerks(U3ADbContext dbc, Term term, IEnumerable<Class> classes)

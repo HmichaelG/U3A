@@ -47,7 +47,10 @@ namespace U3A.BusinessRules
                                 .Include(x => x.Occurrence)
                                 .Where(x => x.CourseID == cr.ID).ToList());
             }
-            BusinessRule.AssignClassContacts(classes, t, settings);
+            foreach (Class c in classes)
+            {
+                BusinessRule.AssignClassContacts(c, t, settings);
+            }
             var termEnrolments = dbc.Enrolment.AsNoTracking().Where(x => x.TermID == t.ID);
             foreach (var c in classes)
             {
