@@ -132,27 +132,24 @@ namespace U3A.BusinessRules
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities)
-                            .ToListAsync()).Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            classes.AddRange((await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities)
-                        .ToListAsync()).Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList()
-                        );
+                            .ToListAsync()); 
+            classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities)
+                            .ToListAsync());
+            classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
             AssignClassTerm(classes, terms, term);
             AssignClassContacts(classes, term, settings);
             AssignClassCounts(dbc, term, classes);
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
             if (prevTerm != null && prevTerm.Year == term.Year)
             {
-                var prevTermShoulderClasses = (await GetSameParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities)
-                            .ToListAsync())
-                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
-                                            && x.StartDate.GetValueOrDefault() < term.StartDate
-                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                prevTermShoulderClasses.AddRange((await GetDifferentParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities)
-                        .ToListAsync())
-                        .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
-                                        && x.StartDate.GetValueOrDefault() < term.StartDate
-                                        && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList()
-                        );
+                var prevTermShoulderClasses = await GetSameParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities)
+                            .ToListAsync();
+                prevTermShoulderClasses.AddRange(await GetDifferentParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities)
+                            .ToListAsync());
+                prevTermShoulderClasses = prevTermShoulderClasses
+                                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
+                                                            && x.StartDate.GetValueOrDefault() < term.StartDate
+                                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
                 AssignClassTerm(prevTermShoulderClasses, terms, prevTerm);
                 AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
                 AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
@@ -169,11 +166,9 @@ namespace U3A.BusinessRules
             var terms = dbc.Term.AsNoTracking().Where(x => x.Year == term.Year &&
                             x.TermNumber >= term.TermNumber).ToList();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
-            var classes = GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities)
-                            .ToList().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            classes.AddRange(GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities)
-                            .ToList().Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList()
-                            );
+            var classes = GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities).ToList();
+            classes.AddRange(GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities).ToList());
+            classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
             AssignClassTerm(classes, terms, term);
             AssignClassContacts(classes, term, settings);
             AssignClassCounts(dbc, term, classes);
@@ -182,16 +177,13 @@ namespace U3A.BusinessRules
             if (prevTerm != null && prevTerm.Year == term.Year)
             {
                 var prevTermShoulderClasses = GetSameParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities)
-                            .ToList()
-                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
-                                            && x.StartDate.GetValueOrDefault() < term.StartDate
-                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
+                            .ToList();
                 prevTermShoulderClasses.AddRange(GetDifferentParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities)
-                            .ToList()
-                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
-                                            && x.StartDate.GetValueOrDefault() < term.StartDate
-                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList()
-                            );
+                            .ToList());
+                prevTermShoulderClasses = prevTermShoulderClasses
+                                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
+                                                            && x.StartDate.GetValueOrDefault() < term.StartDate
+                                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
                 AssignClassTerm(prevTermShoulderClasses, terms, prevTerm);
                 AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
                 AssignClassCounts(dbc, prevTerm, prevTermShoulderClasses);
