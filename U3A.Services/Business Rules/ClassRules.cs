@@ -172,9 +172,12 @@ namespace U3A.BusinessRules
             var classes = GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities).ToList();
             classes.AddRange(GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities).ToList());
             classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            //AssignClassTerm(classes, terms, term);
-            //AssignClassContacts(classes, term, settings);
-            //AssignClassCounts(term, classes);
+            foreach (var c in classes)
+            {
+                AssignClassTerm(c, terms, term);
+                AssignClassContacts(c, term, settings);
+                AssignClassCounts(term, c);
+            }
             AssignClassClerks(dbc, term, classes);
             var prevTerm = GetPreviousTerm(dbc, term.Year, term.TermNumber);
             if (prevTerm != null && prevTerm.Year == term.Year)
@@ -187,9 +190,12 @@ namespace U3A.BusinessRules
                                             .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                                             && x.StartDate.GetValueOrDefault() < term.StartDate
                                                             && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                //AssignClassTerm(prevTermShoulderClasses, terms, prevTerm);
-                //AssignClassContacts(prevTermShoulderClasses, prevTerm, settings);
-                //AssignClassCounts(prevTerm, prevTermShoulderClasses);
+                foreach (var c in prevTermShoulderClasses)
+                {
+                    AssignClassTerm(c, terms, prevTerm);
+                    AssignClassContacts(c, prevTerm, settings);
+                    AssignClassCounts(prevTerm, c);
+                }
                 AssignClassClerks(dbc, prevTerm, prevTermShoulderClasses);
                 classes.AddRange(prevTermShoulderClasses);
             }
