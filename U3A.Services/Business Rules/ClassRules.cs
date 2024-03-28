@@ -129,12 +129,18 @@ namespace U3A.BusinessRules
             classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities)
                             .ToListAsync());
             classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            Parallel.ForEach(classes, c =>
+            foreach(var c in classes)
             {
                 AssignClassTerm(c, terms, term);
                 AssignClassContacts(c, term, settings);
                 AssignClassCounts(term, c);
-            });
+            }
+            //Parallel.ForEach(classes, c =>
+            //{
+            //    AssignClassTerm(c, terms, term);
+            //    AssignClassContacts(c, term, settings);
+            //    AssignClassCounts(term, c);
+            //});
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
             if (prevTerm != null && prevTerm.Year == term.Year)
             {
@@ -146,12 +152,18 @@ namespace U3A.BusinessRules
                                             .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                                             && x.StartDate.GetValueOrDefault() < term.StartDate
                                                             && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                Parallel.ForEach(prevTermShoulderClasses, c =>
+                foreach (var c in prevTermShoulderClasses)
                 {
                     AssignClassTerm(c, terms, prevTerm);
                     AssignClassContacts(c, prevTerm, settings);
                     AssignClassCounts(prevTerm, c);
-                });
+                }
+                //Parallel.ForEach(prevTermShoulderClasses, c =>
+                //{
+                //    AssignClassTerm(c, terms, prevTerm);
+                //    AssignClassContacts(c, prevTerm, settings);
+                //    AssignClassCounts(prevTerm, c);
+                //});
                 classes.AddRange(prevTermShoulderClasses);
             }
             return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)
@@ -280,6 +292,7 @@ namespace U3A.BusinessRules
                                                 x.IsCourseClerk && !x.IsWaitlisted)
                                                 .Select(x => x.Person).OrderBy(x => x?.FullNameAlpha).ToList();
             }
+            c.Clerks.AddRange(clerks);
             if (contactOrder == CourseContactOrder.LeadersThenClerks)
             {
                 AddContact(c, CourseContactType.Leader, c.Leader);

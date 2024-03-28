@@ -32,6 +32,8 @@ namespace U3A.Model
 
         public static readonly int TenantIdMaxLength = 64;
 
+        public static bool IS_DEVELOPMENT;
+
 #if DEBUG
         public const bool IS_DEBUG = true;
 #else

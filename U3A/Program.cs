@@ -15,6 +15,7 @@ using System.Reflection;
 using Azure.Identity;
 using Microsoft.AspNetCore.Builder;
 using DevExpress.XtraCharts;
+using U3A.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,6 +99,8 @@ builder.Services.AddTransient<ReCaptchaV2API>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddRazorPages();
+
+constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
 
 //**** End local modifications ****
 
