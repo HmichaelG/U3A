@@ -78,6 +78,7 @@ namespace U3A.WebFunctions
                 using (var dbc = new U3ADbContext(tenant))
                 {
                     await BusinessRule.BuildScheduleAsync(dbc);
+                    _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
             }
             _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
