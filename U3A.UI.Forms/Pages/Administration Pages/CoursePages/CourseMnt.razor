@@ -33,6 +33,7 @@ else
 
 
     <br />
+    <Progress @ref=@progressBar />
     <MessageBox @ref="@messageBox" />
     <SelectCourseView @ref="selectCourseView" PopupWidth="40rem" />
 
@@ -57,11 +58,16 @@ else
                 <ToolbarTemplate>
                     <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid IsMasterDetail=true>
                         <CustomButtonContent>
-                            <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-check-circle"
-                                      Text="Preview Schedule"
-                                      RenderStyle="@ButtonRenderStyle.Info"
+                            <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-database"
+                                      Text="Rebuild Cache"
+                                      RenderStyle="@ButtonRenderStyle.Primary"
                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                      Click="@(() => OnPreview(1))" />
+                                      Click="@OnRebuild" />
+                            <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-check-circle"
+                                           Text="Preview Schedule"
+                                           RenderStyle="@ButtonRenderStyle.Info"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           Click="@(() => OnPreview(1))" />
                         </CustomButtonContent>
                     </GridToolbar>
                 </ToolbarTemplate>
@@ -148,6 +154,7 @@ else
 
 @code {
     bool IsReady;
+    Progress? progressBar;
     IEnumerable<CourseParticipationType> CourseParticipationTypes { get; set; }
     List<Occurrence>? Occurrences { get; set; }
     IEnumerable<Person> Persons { get; set; }
@@ -209,6 +216,14 @@ else
         }
         IsReady = true;
         await base.OnInitializedAsync();
+    }
+
+    async Task OnRebuild()
+    {
+        await progressBar.ShowSmallSpinnerAsync();
+        await BusinessRule.BuildScheduleAsync(dbc);
+        await progressBar.Close();
+        await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");
     }
 
     async Task OnPreview(int TermNumber)

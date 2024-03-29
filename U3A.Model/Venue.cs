@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace U3A.Model
@@ -38,6 +39,7 @@ namespace U3A.Model
         public string? AccessDetail { get; set; }
         public string? KeyCode { get; set; }
 
+        [JsonIgnore]
         public List<Class> Classes { get; set; } = new List<Class>();
 
         public string Comment { get; set; } = string.Empty;

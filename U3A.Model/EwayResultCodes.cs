@@ -31,6 +31,7 @@ namespace U3A.Model
         public EwayResultCodes()
         {
             AddRange(new List<EwayResultCode>(){
+                    new EwayResultCode("--", "Transaction Cancelled", "The Transaction was cancelled by the operator."),
                     new EwayResultCode("00", "Transaction Approved", "Transaction approved successfully."),
                     new EwayResultCode("08", "Honour With Identification", "Transaction processed successfully - identification is NOT actually required for online transactions.This code is returned by some banks in place of 00 response."),
                     new EwayResultCode("01", "Refer to Issuer", "The customer’s card issuer has indicated there is a problem with the card number.The customer should use an alternate credit card, or contact their bank."),

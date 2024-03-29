@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 {
     [DbContext(typeof(U3ADbContextSeed))]
-    partial class U3ADbContextSeedModelSnapshot : ModelSnapshot
+    [Migration("20240328232354_U3A_Schedule_NewFields_0")]
+    partial class U3A_Schedule_NewFields_0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1520,8 +1523,131 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ClassID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ClassOccurenceID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ClassOfferedT1")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ClassOfferedT2")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ClassOfferedT3")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ClassOfferedT4")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ClassRecurrence")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ClassStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ClassSummary")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ClassTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ClerkEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClerkMobile")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClerkName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClerkPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("CourseCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CourseCostDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CourseCostTermDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CourseDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CourseID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("CourseMaximum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CourseName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CourseNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CourseParticipationTypeID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CourseRequired")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CourseTermCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CourseType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("GuestLeader")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsOffScheduleActivity")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LeaderEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LeaderMobile")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LeaderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LeaderPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OnDayID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TermNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TermSummary")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
@@ -1529,17 +1655,19 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.Property<string>("User")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("jsonClass")
+                    b.Property<string>("VenueAddress")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("jsonClassEnrolments")
+                    b.Property<bool>("VenueCanMapAddress")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("VenueName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("jsonCourseEnrolments")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("ID");
 

@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace U3A.Model
@@ -95,10 +96,13 @@ namespace U3A.Model
         public CourseType CourseType { get; set; }
         public Guid? CourseTypeID { get; set; }
 
+        [JsonIgnore]
         public List<Class> Classes { get; set; } = new List<Class>();
 
+        [JsonIgnore]
         public List<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
 
+        [JsonIgnore]
         public List<Leave> Leave { get; set; } = new List<Leave>();
 
         [NotMapped]

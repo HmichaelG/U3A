@@ -167,11 +167,9 @@ namespace U3A.Services
                 if (!CanSetPaymentStatusProcessed(result.ResponseCode, result.Date))
                 {
                     throw new EwayResponseException(@"The processing of your payment is incomplete.
-                            This may be due to a delay in processing by your bank, 
-                            or you cancelled a previous transaction. 
-                            If you did not cancel, please wait as we’ll keep checking. 
-                            Otherwise, simply make your payment now.
-                            If the problem persists, contact your U3A.", result);
+                            This may be due to a delay in processing by your bank or other system issue. 
+                            Please wait as we’ll keep checking for 24 hours. Or, if you know the reason simply make your payment now.
+                            Otherwise, if the problem persists, contact your U3A.", result);
                 }
             }
             else
@@ -259,6 +257,18 @@ namespace U3A.Services
                 details.ResultCode = result.ResponseCode;
                 details.ResultMessage = result.ResponseMessage;
                 dbc.Update(details);
+            }
+        }
+
+        public async Task CancelPaymentAsync(U3ADbContext dbc, string AccessCode)
+        {
+            var request = await dbc.OnlinePaymentStatus.FirstOrDefaultAsync(x => x.AccessCode == AccessCode);
+            if (request != null)
+            {
+                request.Status = "Processed";
+                request.ResultCode = "--";
+                request.ResultMessage = "Payment Cancelled";
+                dbc.SaveChangesAsync();
             }
         }
 

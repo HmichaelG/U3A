@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace U3A.Model
 {
@@ -28,6 +30,7 @@ namespace U3A.Model
             }
         }
 
+        [JsonIgnore]
         public List<Course> Courses { get; set; } = new List<Course>();
 
     }

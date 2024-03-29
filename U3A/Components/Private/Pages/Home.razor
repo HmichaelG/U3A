@@ -34,14 +34,14 @@ else
                                   ButtonIconCssClass="bi bi-check2-circle"
                                   HelpTopic="2024-Version-History.html"
                                   ActivationStyle="@HelpActivationStyle.ButtonOnly" />
-                <ContextHelpTitle Title="help"                                  
+                <ContextHelpTitle Title="help"
                                   ButtonIconCssClass="bi bi-question"
                                   HelpTopic="Introduction.html"
                                   IncludeTableOfContents=true
                                   ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMaintenanceWarning" />
                 <DxButton Text="Support"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                  NavigateUrl="Public/Support"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          NavigateUrl="Public/Support"
                           CssClass="bi bi-person" />
             </div>
             <DxTabs CssClass="vw-100">
@@ -66,14 +66,14 @@ else
                     </div>
                 </DxTabPage>
                 <DxTabPage Text="u3admin.org.au">
-                        <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-height"></iframe>
+                    <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-height"></iframe>
                 </DxTabPage>
             </DxTabs>
-             <footer class="footer vw-100 text-muted mt-4">
+            <footer class="footer vw-100 text-muted mt-4">
                 <div align="center">
                     &copy; @(DateTime.Today.Year) - U3Admin.org.au
                 </div>
-            </footer> 
+            </footer>
         }
     </DxFormLayout>
 }
@@ -122,16 +122,29 @@ else
 
     async Task ParseQueryString()
     {
+        // Top prioriy: handle cancelled online payments
+        var colQueryString = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
+        if (colQueryString.Count > 1)
+        {
+            if (colQueryString.GetKey(0) == "Eway" && colQueryString[0] == "Fail")
+            {
+                string accessCode = colQueryString[1]!;
+                var service = new EwayPaymentService();
+                await service.CancelPaymentAsync(dbc!, accessCode);
+            }
+        }
+
         if (!hasRole) { return; }
-        var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
-        if (queryStringCollection.Count > 0) {
-            if (queryStringCollection.GetKey(0) == "Eway")
+
+        if (colQueryString.Count > 0)
+        {
+            if (colQueryString.GetKey(0) == "Eway")
             {
                 navMan.NavigateTo("/AdminMemberPortal");
             }
-            else 
+            else
             {
-                var page = queryStringCollection.GetValues("Page");
+                var page = colQueryString.GetValues("Page");
                 if (page != null && page.Count() > 0)
                 {
                     var path = page[0];
@@ -141,16 +154,16 @@ else
                     }
                     else
                     {
-                        if (path != "/~/" && path != "~/") 
-                        { 
-                            navMan.NavigateTo(path); 
+                        if (path != "/~/" && path != "~/")
+                        {
+                            navMan.NavigateTo(path);
                         }
                         else
                         {
                             navMan.NavigateTo("/");
                         }
                     }
-                }                
+                }
             }
         }
     }
@@ -162,8 +175,8 @@ else
         msg.AppendLine("<thead><tr><td>UpTime</td><td>Status</td><td>Login</td><td>Circuit</td></tr></thead><tbody>");
         foreach (var kvp in (circuitHandler as CircuitHandlerService)!.CircuitDetails)
         {
-                var cd = kvp.Value;
-                msg.AppendLine($"<tr><td>{cd.UpTime}</td><td>{cd.DownTime}</td><td>{cd.Name}</td><td>{cd.Id}</td></tr>");
+            var cd = kvp.Value;
+            msg.AppendLine($"<tr><td>{cd.UpTime}</td><td>{cd.DownTime}</td><td>{cd.Name}</td><td>{cd.Id}</td></tr>");
         }
         msg.AppendLine("</tbody></table");
         await messageBox!.SetPopupWidth("40rem");

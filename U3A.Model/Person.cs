@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using U3A.Model;
 
 namespace U3A.Model
@@ -362,23 +363,23 @@ namespace U3A.Model
         public Boolean IsVolunteer { get; set; }
 
         [InverseProperty("Leader")]
-        public List<Class> LeaderOf { get; set; } = new List<Class>();
+        [JsonIgnore] public List<Class> LeaderOf { get; set; } = new List<Class>();
         [InverseProperty("Leader2")]
-        public List<Class> Leader2Of { get; set; } = new List<Class>();
+        [JsonIgnore] public List<Class> Leader2Of { get; set; } = new List<Class>();
         [InverseProperty("Leader3")]
-        public List<Class> Leader3Of { get; set; } = new List<Class>();
+        [JsonIgnore] public List<Class> Leader3Of { get; set; } = new List<Class>();
 
         /// <summary>
         /// Populated in BusinessRule. Use when printing enrolled classes for a student.
         /// </summary>
         [NotMapped]
-        public List<Class> EnrolledClasses { get; set; } = new List<Class>();
+        [JsonIgnore] public List<Class> EnrolledClasses { get; set; } = new List<Class>();
 
-        public List<Leave> Leave { get; set; } = new List<Leave>();
-        public List<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
-        public List<Receipt> Receipts { get; set; } = new List<Receipt>();
-        public List<Fee> Fees { get; set; } = new List<Fee>();
-        public List<ReceiptDataImport> ReceiptDataImports { get; set; } = new List<ReceiptDataImport>();
+        [JsonIgnore] public List<Leave> Leave { get; set; } = new List<Leave>();
+        [JsonIgnore] public List<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
+        [JsonIgnore] public List<Receipt> Receipts { get; set; } = new List<Receipt>();
+        [JsonIgnore] public List<Fee> Fees { get; set; } = new List<Fee>();
+        [JsonIgnore] public List<ReceiptDataImport> ReceiptDataImports { get; set; } = new List<ReceiptDataImport>();
 
     }
     public class PersonList : BindingList<Person> { }

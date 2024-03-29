@@ -581,7 +581,15 @@ else
         {
             prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
             var exludeOffScheduleActivities = (IsReadOnly) ? false : true;
-            Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
+
+            if (PreviewTerm != null)
+            {
+                Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
+            }
+            else
+            {
+                Classes = await BusinessRule.RestoreClassesFromSchedule(dbc, term, exludeOffScheduleActivities);
+            }
             if (Classes != null)
             {
                 if (loginState?.SelectedPerson != null)
@@ -779,7 +787,6 @@ else
     {
         var c = context;
         var result = string.Empty;
-        c.DoNotAllowEdit = false;
         DateTime? classEndDate = null;
         string status;
         Enrolment? e = GetEnrolment(c, term);
@@ -793,12 +800,6 @@ else
         {
             e = GetEnrolment(c, prevTerm);
             status = BusinessRule.GetMemberPortalEnrolmentStatus(e, prevTerm, settings);
-            if (status != "Pending")
-            {
-                // Enrolled in previous term - not current. Term is complete, do not allow edits.
-                classEndDate = BusinessRule.GetClassEndDate(c, prevTerm);
-                if (classEndDate < today) { c.DoNotAllowEdit = true; } // cannot delete an expired class
-            }
         };
         if (e != null)
         {
@@ -965,14 +966,6 @@ else
         if (selectedClasses.Contains(selectedClass))
         {
 
-            // Edge case: enrolled in previous term but not in current.
-            if (selectedClass.DoNotAllowEdit)
-            {
-                await messageBox.ShowOkOnlyAsync("Class is complete",
-                                                        $@"<p>The class, <strong>{selectedClass.Course.Name}</strong> was held in term {prevTerm.TermNumber}
-                        and is now complete. Therefore, it cannot be deleted.</p><p>There are no enrolments in future terms to delete.");
-                listGrid.ClearSelection(); return;
-            }
             // Otherwise process withdrawal
             if (await messageBox.ShowAsync("Class will be withdrawn",
                        $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be <strong>withdrawn</strong>.</p>" +

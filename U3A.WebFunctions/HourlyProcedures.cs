@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 using U3A.WebFunctions.Procedures;
@@ -48,7 +49,6 @@ namespace U3A.WebFunctions
             foreach (var tenant in tenants)
             {
                 isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
-                _logger.LogInformation($"****** Processing Daily Procedures for {tenant.Identifier}: {tenant.Name}. ******");
                 using (var dbc = new U3ADbContext(tenant))
                 {
                     _logger.LogInformation("Local Time for {0} is: {1}", tenant.Identifier, await Common.GetNowAsync(dbc));
@@ -73,8 +73,14 @@ namespace U3A.WebFunctions
                     _logger.LogInformation($"Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
                 }
             }
+            foreach (var tenant in tenants)
+            {
+                using (var dbc = new U3ADbContext(tenant))
+                {
+                    await BusinessRule.BuildScheduleAsync(dbc);
+                }
+            }
             _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-            _logger.LogInformation($"Next timer schedule at: {myTimer!.ScheduleStatus!.Next}");
         }
 
     }

@@ -2,12 +2,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection.Metadata.Ecma335;
+using System.Text.Json.Serialization;
 
 namespace U3A.Model
 {
     public class Enrolment
     {
-        public Enrolment() { Created = DateTime.Now; }
+        public Enrolment() { Created = DateTime.UtcNow; }
 
         [Key]
         public Guid ID { get; set; }
@@ -16,14 +17,14 @@ namespace U3A.Model
         public Term Term { get; set; }
 
         public Guid CourseID { get; set; }
-        public Course Course { get; set; }
+        [JsonIgnore] public Course Course { get; set; }
 
         public Guid? ClassID { get; set; }
-        public Class? Class { get; set; }
+        [JsonIgnore] public Class? Class { get; set; }
 
         public Guid PersonID { get; set; }
         [Required]
-        public Person Person { get; set; }
+        [JsonIgnore] public Person Person { get; set; }
 
         [Required]
         public DateTime Created { get; set; }
@@ -32,7 +33,6 @@ namespace U3A.Model
 
         public DateTime? DateEnrolled { get; set; }
 
-        bool mIsCourseClerk;
         [Required]
         [DefaultValue(false)]
         public bool IsCourseClerk { get; set; } = false;

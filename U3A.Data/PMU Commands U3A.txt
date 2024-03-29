@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Schedule_TermDetails
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Schedule_NewFields_0
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Schedule_IsOffScheduleActivity
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Schedule_JsonFields
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Schedule_IsOffScheduleActivity
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Schedule_JsonFields
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

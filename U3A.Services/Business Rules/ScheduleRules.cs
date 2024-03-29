@@ -1,108 +1,99 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using U3A.Database;
 using U3A.Model;
+using System.Text.Json;
 
 namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
-        public static async Task BuildScheduleAsync(U3ADbContext dbc,
-                    Term term, SystemSettings settings)
+        public static async Task<List<Class>> RestoreClassesFromSchedule(U3ADbContext dbc, Term term, bool exludeOffScheduleActivities)
+        {
+            var classes = new ConcurrentBag<Class>();
+            // get the first recorded schedule
+            var firstSchedule = await dbc.Schedule.AsNoTracking()
+                                        .OrderBy(x => x.CreatedOn)
+                                        .FirstOrDefaultAsync();
+            // Get the new enrolments
+            var newEnrolments = await dbc.Enrolment.AsNoTracking()
+                                .Include(x => x.Term)
+                                .Where(x => x.Created > firstSchedule.CreatedOn).ToListAsync();
+            // get new dropouts
+            var newDropouts = await dbc.Dropout.AsNoTracking()
+                                .Include(x => x.Term)
+                                .Where(x => x.DropoutDate > firstSchedule.CreatedOn).ToListAsync();
+
+            var schedule = await dbc.Schedule.AsNoTracking().ToListAsync();
+            Parallel.ForEach(schedule, s =>
+            {
+                var c = JsonSerializer.Deserialize<Class>(s.jsonClass);
+                if (!exludeOffScheduleActivities || !c.Course.IsOffScheduleActivity)
+                {
+                    c.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonClassEnrolments);
+                    c.Course.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonCourseEnrolments);
+                    // add new enrolments
+                    c.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID != null && x.ClassID == c.ID));
+                    c.Course.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID == null && x.CourseID == c.Course.ID));
+                    classes.Add(c);
+                    // and remove new dropouts
+                    foreach (var d in newDropouts)
+                    {
+                        var deleted = c.Enrolments.FirstOrDefault(x => x.ClassID != null && x.ClassID == c.ID);
+                        if (deleted != null) { c.Enrolments.Remove(deleted); }
+                        deleted = c.Course.Enrolments.FirstOrDefault(x => x.ClassID == null && x.CourseID == c.Course.ID);
+                        if (deleted != null) { c.Enrolments.Remove(deleted); }
+                    }
+                }
+            });
+            return classes
+                .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
+                .ToList();
+        }
+        public static async Task BuildScheduleAsync(U3ADbContext dbc)
         {
             List<Schedule> schedules = new List<Schedule>();
-            var classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
-            foreach (var c in classes)
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+            var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            if (term != null)
             {
-                schedules.Add(processClasses(c, settings));
+                var classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
+                foreach (var c in classes)
+                {
+                    schedules.Add(processClasses(c, settings));
+                }
+                await dbc.Database.BeginTransactionAsync();
+                try
+                {
+                    await dbc.Schedule.ExecuteDeleteAsync();
+                    await dbc.Schedule.AddRangeAsync(schedules);
+                    await dbc.SaveChangesAsync();
+                    await dbc.Database.CommitTransactionAsync();
+                }
+                catch (Exception ex)
+                {
+                    await dbc.Database.RollbackTransactionAsync();
+                }
             }
-            await dbc.Database.BeginTransactionAsync();
-            await dbc.Database.ExecuteSqlAsync($"delete Schedule");
-            await dbc.Schedule.AddRangeAsync(schedules);
-            await dbc.SaveChangesAsync();
-            await dbc.Database.CommitTransactionAsync();
         }
 
         private static Schedule processClasses(Class c, SystemSettings settings)
         {
+            var cls = JsonSerializer.Serialize<Class>(c);
+            var classEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Enrolments);
+            var courseEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Course.Enrolments);
             var s = new Schedule()
             {
-                ClassID = c.ID,
-                ClassSummary = c.ClassSummary,
-                CourseCost = c.Course.CourseFeePerYear,
-                CourseTermCost = c.Course.CourseFeePerTerm,
-                CourseCostDescription = c.Course.CourseFeePerYearDescription ?? "",
-                CourseCostTermDescription = c.Course.CourseFeePerTermDescription ?? "",
-                CourseDescription = c.Course.Description,
-                CourseID = c.CourseID,
-                CourseMaximum = c.Course.MaximumStudents,
-                CourseMinimu = c.Course.MaximumStudents,
-                CourseName = c.Course.Name,
-                CourseNumber = c.Course.ConversionID,
-                CourseType = c.Course.CourseType.Name,
-                IsOffScheduleActivity = c.Course.IsOffScheduleActivity,
-                GuestLeader = c.GuestLeader ?? "",
-                OnDayID = c.OnDayID,
-                TermNumber = c.TermNumber,
-                TermSummary = c.OfferedSummary,
-                VenueAddress = c.Venue.Address,
-                VenueName = c.Venue.Name,
+                jsonClass = cls,
+                jsonClassEnrolments = classEnrolments,
+                jsonCourseEnrolments = courseEnrolments,
             };
-            var contactOrder = c.Course.CourseContactOrder ?? settings.CourseContactOrder;
-            if (contactOrder == CourseContactOrder.LeadersThenClerks)
-            {
-                doLeaders(c, s);
-                doClerks(c, s);
-            }
-            else
-            {
-                doClerks(c, s);
-                doLeaders(c, s);
-            }
             return s;
-        }
-        private static void doLeaders(Class c, Schedule s)
-        {
-            if (c.Leader != null)
-            {
-                s.LeaderName.Add(c.Leader.FullName);
-                s.LeaderEmail.Add(c.Leader.AdjustedEmail ?? "");
-                s.LeaderMobile.Add(c.Leader.AdjustedMobile ?? "");
-                s.LeaderPhone.Add(c.Leader.AdjustedHomePhone ?? "");
-                s.LeaderType.Add("Leader");
-            }
-            if (c.Leader2 != null)
-            {
-                s.LeaderName.Add(c.Leader2.FullName);
-                s.LeaderEmail.Add(c.Leader2.AdjustedEmail ?? "");
-                s.LeaderMobile.Add(c.Leader2.AdjustedMobile ?? "");
-                s.LeaderPhone.Add(c.Leader2.AdjustedHomePhone ?? "");
-                s.LeaderType.Add("Leader");
-            }
-            if (c.Leader3 != null)
-            {
-                s.LeaderName.Add(c.Leader3.FullName);
-                s.LeaderEmail.Add(c.Leader3.AdjustedEmail ?? "");
-                s.LeaderMobile.Add(c.Leader3.AdjustedMobile ?? "");
-                s.LeaderPhone.Add(c.Leader3.AdjustedHomePhone ?? "");
-                s.LeaderType.Add("Leader");
-            }
-        }
-
-        private static void doClerks(Class c, Schedule s)
-        {
-            foreach (var p in c.Clerks)
-            {
-                s.LeaderName.Add(p.FullName);
-                s.LeaderEmail.Add(p.AdjustedEmail ?? "");
-                s.LeaderMobile.Add(p.AdjustedMobile ?? "");
-                s.LeaderPhone.Add(p.AdjustedHomePhone ?? "");
-                s.LeaderType.Add("Clerk");
-            }
         }
     }
 }

@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace U3A.Model
@@ -321,8 +322,8 @@ namespace U3A.Model
         [ForeignKey("Leader3ID")]
         public Person? Leader3 { get; set; }
 
-        public List<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
-        public List<CancelClass> CancelledClasses { get; set; } = new List<CancelClass>();
+        [JsonIgnore] public List<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
+        [JsonIgnore] public List<CancelClass> CancelledClasses { get; set; } = new List<CancelClass>();
 
         [NotMapped]
         public string LeaderSummary
@@ -412,7 +413,9 @@ namespace U3A.Model
         public List<CourseContact> CourseContacts { get; set; } = new List<CourseContact>();
 
         public string CourseContactDetails
-        { get { 
+        {
+            get
+            {
                 var result = string.Empty;
                 var type = string.Empty;
                 foreach (var contact in CourseContacts)
@@ -421,7 +424,7 @@ namespace U3A.Model
                     result += $"({type}) {contact.Person.PersonSummary}{Environment.NewLine}";
                 }
                 return result.Trim();
-            } 
+            }
         }
 
         [NotMapped]
@@ -453,10 +456,6 @@ namespace U3A.Model
         [NotMapped]
         [Comment("Set By Business Rule")]
         public double ParticipationRate { get; set; }
-
-        [NotMapped]
-        [Comment("Only used in Member Portal - Member Enrolment")]
-        public bool DoNotAllowEdit { get; set; }
 
         [NotMapped]
         [Comment("Only used in Member Portal - Member Enrolment")]

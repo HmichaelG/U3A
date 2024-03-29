@@ -135,12 +135,6 @@ namespace U3A.BusinessRules
                 AssignClassContacts(c, term, settings);
                 AssignClassCounts(term, c);
             }
-            //Parallel.ForEach(classes, c =>
-            //{
-            //    AssignClassTerm(c, terms, term);
-            //    AssignClassContacts(c, term, settings);
-            //    AssignClassCounts(term, c);
-            //});
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
             if (prevTerm != null && prevTerm.Year == term.Year)
             {
@@ -158,12 +152,6 @@ namespace U3A.BusinessRules
                     AssignClassContacts(c, prevTerm, settings);
                     AssignClassCounts(prevTerm, c);
                 }
-                //Parallel.ForEach(prevTermShoulderClasses, c =>
-                //{
-                //    AssignClassTerm(c, terms, prevTerm);
-                //    AssignClassContacts(c, prevTerm, settings);
-                //    AssignClassCounts(prevTerm, c);
-                //});
                 classes.AddRange(prevTermShoulderClasses);
             }
             return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)

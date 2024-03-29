@@ -554,19 +554,19 @@ namespace U3A.BusinessRules
         }
         public static void DeleteEnrolment(U3ADbContext dbc, Enrolment enrolment)
         {
-            // delete the enrolment & any future enrolments
+            // delete the enrolments
             var query = dbc.Enrolment
                         .Include(x => x.Term)
                         .Where(x => x.CourseID == enrolment.CourseID
                                     && (x.ClassID == null || x.ClassID == enrolment.ClassID)
                                     && x.PersonID == enrolment.PersonID).AsEnumerable()
-                                    .Where(x => x.Term.Comparer >= enrolment.Term.Comparer);
+                                    .Where(x => x.Term.Year >= enrolment.Term.Year).ToList();
             dbc.RemoveRange(query);
             // delete future attendance records
             var query2 = dbc.AttendClass
                         .Where(x => x.ClassID == enrolment.ClassID
                                     && x.PersonID == enrolment.PersonID).AsEnumerable()
-                                    .Where(x => x.Date >= TimezoneAdjustment.GetLocalTime());
+                                    .Where(x => x.Date >= TimezoneAdjustment.GetLocalTime()).ToList();
             dbc.RemoveRange(query2);
         }
 
@@ -581,35 +581,28 @@ namespace U3A.BusinessRules
                                             Person person,
                                             Term term, Term prevTerm)
         {
-            Term thisTerm = term;
             foreach (var c in DeletedClasses)
             {
-                if (c.DoNotAllowEdit) continue;
-                var termNumber = c.TermNumber;
-                thisTerm = (term.TermNumber == termNumber) ? term : prevTerm;
-                if (thisTerm.TermNumber != termNumber)
-                {
-                    thisTerm = await dbc.Term
-                                .Where(x => x.Year == term.Year && x.TermNumber == termNumber)
-                                .FirstOrDefaultAsync();
-                }
-                var course = await dbc.Course.FindAsync(c.CourseID);
                 if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
                 {
-                    var deletions = dbc.Enrolment.Where(x =>
-                                        x.PersonID == person.ID &&
-                                        x.Term.Year == thisTerm.Year && x.Term.TermNumber == thisTerm.TermNumber &&
-                                        x.CourseID == c.CourseID).ToImmutableList();
-                    foreach (var d in deletions) { DeleteEnrolment(dbc, d); }
+                    var deletion = await dbc.Enrolment
+                                        .Include(x => x.Term)
+                                        .Where(x =>
+                                            x.PersonID == person.ID &&
+                                            x.Term.Year == term.Year &&
+                                            x.CourseID == c.CourseID).FirstOrDefaultAsync();
+                    if (deletion != null) { DeleteEnrolment(dbc, deletion); }
                 }
                 else
                 {
-                    var deletions = dbc.Enrolment.Where(x =>
+                    var deletion = await dbc.Enrolment
+                                    .Include(x => x.Term)
+                                    .Where(x =>
                                         x.PersonID == person.ID &&
-                                        x.Term.Year == term.Year && x.Term.TermNumber == thisTerm.TermNumber &&
+                                        x.Term.Year == term.Year &&
                                         x.CourseID == c.CourseID &&
-                                        x.ClassID == c.ID).ToImmutableList();
-                    foreach (var d in deletions) { DeleteEnrolment(dbc, d); }
+                                        x.ClassID == c.ID).FirstOrDefaultAsync();
+                    if (deletion != null) { DeleteEnrolment(dbc, deletion); }
                 }
             }
         }
@@ -630,7 +623,6 @@ namespace U3A.BusinessRules
             var result = new List<Enrolment>();
             foreach (var c in RequestedClasses)
             {
-                if (c.DoNotAllowEdit) continue;
                 bool isFutureTerm = false;
                 int thisYear;
                 int thisTermNo;
