@@ -39,16 +39,18 @@ namespace U3A.BusinessRules
                     c.Course.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonCourseEnrolments);
                     // add new enrolments
                     c.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID != null && x.ClassID == c.ID));
-                    c.Course.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID == null && x.CourseID == c.Course.ID));
-                    classes.Add(c);
+                    c.Course.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID == null && x.CourseID == c.CourseID));
                     // and remove new dropouts
                     foreach (var d in newDropouts)
                     {
-                        var deleted = c.Enrolments.FirstOrDefault(x => x.ClassID != null && x.ClassID == c.ID);
-                        if (deleted != null) { c.Enrolments.Remove(deleted); }
-                        deleted = c.Course.Enrolments.FirstOrDefault(x => x.ClassID == null && x.CourseID == c.Course.ID);
-                        if (deleted != null) { c.Enrolments.Remove(deleted); }
+                        c.Enrolments.RemoveAll(x => x.ClassID != null 
+                                                        && x.ClassID == d.ID
+                                                        && x.PersonID == d.PersonID);
+                        c.Course.Enrolments.RemoveAll(x => x.ClassID == null 
+                                                        && x.CourseID == d.CourseID
+                                                        && x.PersonID == d.PersonID);
                     }
+                    classes.Add(c);
                 }
             });
             return classes

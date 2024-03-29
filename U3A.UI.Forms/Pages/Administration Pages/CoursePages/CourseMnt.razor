@@ -223,6 +223,7 @@ else
         await progressBar.ShowSmallSpinnerAsync();
         await BusinessRule.BuildScheduleAsync(dbc);
         await progressBar.Close();
+        await InvokeAsync(StateHasChanged);
         await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");
     }
 

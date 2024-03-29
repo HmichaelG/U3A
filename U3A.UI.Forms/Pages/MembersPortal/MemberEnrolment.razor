@@ -584,10 +584,12 @@ else
 
             if (PreviewTerm != null)
             {
+                // slow database lookup, required because PreviewTerm is selectable.
                 Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
             }
             else
             {
+                // Fast lookup from Schedule cache
                 Classes = await BusinessRule.RestoreClassesFromSchedule(dbc, term, exludeOffScheduleActivities);
             }
             if (Classes != null)
