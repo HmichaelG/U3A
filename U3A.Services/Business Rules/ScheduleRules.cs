@@ -45,10 +45,12 @@ namespace U3A.BusinessRules
                     {
                         c.Enrolments.RemoveAll(x => x.ClassID != null 
                                                         && x.ClassID == d.ID
-                                                        && x.PersonID == d.PersonID);
+                                                        && x.PersonID == d.PersonID
+                                                        && x.Created == d.Created);
                         c.Course.Enrolments.RemoveAll(x => x.ClassID == null 
                                                         && x.CourseID == d.CourseID
-                                                        && x.PersonID == d.PersonID);
+                                                        && x.PersonID == d.PersonID
+                                                        && x.Created == d.Created);
                     }
                     classes.Add(c);
                 }
