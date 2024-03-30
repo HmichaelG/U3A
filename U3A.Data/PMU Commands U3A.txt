@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_ScheduleCache
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_ScheduleCache_RevertToString
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_ScheduleCache_RevertToString
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_ScheduleCache_Revert
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_ScheduleCache_RevertToString
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_ScheduleCache_Revert
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
