@@ -13,7 +13,7 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
-        public static async Task<List<Class>> RestoreClassesFromSchedule(U3ADbContext dbc, Term term, bool exludeOffScheduleActivities)
+        public static async Task<List<Class>> RestoreClassesFromSchedule(U3ADbContext dbc, bool exludeOffScheduleActivities)
         {
             var classes = new ConcurrentBag<Class>();
             // get the first recorded schedule
