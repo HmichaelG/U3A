@@ -1,5 +1,4 @@
 ﻿using DevExpress.XtraPrinting;
-using Newtonsoft.Json.Converters;
 
 namespace U3A.Model
 {
