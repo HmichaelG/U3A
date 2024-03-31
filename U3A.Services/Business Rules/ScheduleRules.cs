@@ -7,13 +7,24 @@ using System.Text;
 using System.Threading.Tasks;
 using U3A.Database;
 using U3A.Model;
+using U3A.Services;
+using DevExpress.Blazor;
 using System.Text.Json;
 
 namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
-        public static async Task<List<Class>> RestoreClassesFromSchedule(U3ADbContext dbc, bool exludeOffScheduleActivities)
+        public static List<Class> RestoreClassesFromSchedule(U3ADbContext dbc, bool exludeOffScheduleActivities)
+            {
+            Task<List<Class>> syncTask = Task.Run(async () =>
+            {
+                return await RestoreClassesFromScheduleAsync(dbc, exludeOffScheduleActivities);
+            });
+            syncTask.Wait();
+            return syncTask.Result;
+        }
+        public static async Task<List<Class>> RestoreClassesFromScheduleAsync(U3ADbContext dbc, bool exludeOffScheduleActivities)
         {
             var classes = new ConcurrentBag<Class>();
             // get the first recorded schedule

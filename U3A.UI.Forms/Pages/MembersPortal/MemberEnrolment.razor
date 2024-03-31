@@ -590,7 +590,7 @@ else
             else
             {
                 // Fast lookup from Schedule cache
-                Classes = await BusinessRule.RestoreClassesFromSchedule(dbc, exludeOffScheduleActivities);
+                Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, exludeOffScheduleActivities);
             }
             if (Classes != null)
             {
