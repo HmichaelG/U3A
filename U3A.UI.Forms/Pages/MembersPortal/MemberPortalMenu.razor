@@ -25,7 +25,7 @@
             </div>
             <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="col col-12"
                          ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
-                         
+
                 <Items>
                     @if (ShowEnrolmentSubMneu)
                     {
@@ -142,7 +142,17 @@
                                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                                     </DxButton>
                                 }
-                                @if (!loginState.IsAdminOnBehalfOfMember)
+                                @if (loginState.IsAdminOnBehalfOfMember)
+                                {
+                                        <DxButton Text="Return to Admin Portal"
+                                                  IconCssClass="bi-door-closed menu-icon me-3 h2"
+                                                  CssClass="col-12 my-1"
+                                                  Click="@OnReturnHome"
+                                                  RenderStyle="ButtonRenderStyle.Primary"
+                                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                        </DxButton>
+                                }
+                                else
                                 {
                                     <form action="Account/Logout" @formname="logout" method="post">
                                         <AntiforgeryToken />
@@ -419,6 +429,7 @@
         NavigationManager.NavigateTo("Account/Manage/" + page, true);
     }
 
+    void OnReturnHome() => NavigationManager.NavigateTo("/AdminMemberPortal", true);
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
     {
