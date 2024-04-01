@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public static class ObjectExtension
+    public static partial class Extensions
     {
         public static object CopyTo(this object objSource, object objTarget)
         {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public static class Extensions
+    public static partial class Extensions
     {
         /// <summary>
         ///     A generic extension method that aids in reflecting 

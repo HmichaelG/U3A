@@ -43,11 +43,11 @@ namespace U3A.BusinessRules
             var schedule = await dbc.Schedule.AsNoTracking().ToListAsync();
             Parallel.ForEach(schedule, s =>
             {
-                var c = JsonSerializer.Deserialize<Class>(s.jsonClass);
+                var c = JsonSerializer.Deserialize<Class>(s.jsonClass.Unzip());
                 if (!exludeOffScheduleActivities || !c.Course.IsOffScheduleActivity)
                 {
-                    c.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonClassEnrolments);
-                    c.Course.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonCourseEnrolments);
+                    c.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonClassEnrolments.Unzip());
+                    c.Course.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonCourseEnrolments.Unzip());
                     // add new enrolments
                     c.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID != null && x.ClassID == c.ID));
                     c.Course.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID == null && x.CourseID == c.CourseID));
@@ -99,9 +99,9 @@ namespace U3A.BusinessRules
 
         private static Schedule processClasses(Class c, SystemSettings settings)
         {
-            var cls = JsonSerializer.Serialize<Class>(c);
-            var classEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Enrolments);
-            var courseEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Course.Enrolments);
+            var cls = JsonSerializer.Serialize<Class>(c).Zip();
+            var classEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Enrolments).Zip();
+            var courseEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Course.Enrolments).Zip();
             var s = new Schedule()
             {
                 jsonClass = cls,
