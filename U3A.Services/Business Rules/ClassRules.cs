@@ -49,7 +49,7 @@ namespace U3A.BusinessRules
         }
 
         private static IQueryable<Class> GetSameParticipantClasses(U3ADbContext dbc,
-                                                Term term, bool ExludeOffScheduleActivities)
+                                                Term term, bool ExludeOffScheduleActivities, DateTime? LastScheduleUpdate)
         {
             return dbc.Class.AsNoTracking()
                             .Include(x => x.OnDay)
@@ -62,11 +62,14 @@ namespace U3A.BusinessRules
                             .Include(x => x.Leader3)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == term.Year && x.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses
-                                            && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities && !x.Course.IsOffScheduleActivity)));
+                            .Where(x => x.Course.Year == term.Year 
+                                            && (LastScheduleUpdate == null || x.UpdatedOn > LastScheduleUpdate.Value)
+                                            && x.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses
+                                            && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities 
+                                            && !x.Course.IsOffScheduleActivity)));
         }
         private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc,
-                                            Term term, bool ExludeOffScheduleActivities)
+                                            Term term, bool ExludeOffScheduleActivities, DateTime? LastScheduleUpdate)
         {
             return dbc.Class.AsNoTracking()
                                 .Include(x => x.Enrolments.Where(e => e.ClassID != null))
@@ -78,8 +81,11 @@ namespace U3A.BusinessRules
                             .Include(x => x.Leader3)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == term.Year && x.Course.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass
-                                        && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities && !x.Course.IsOffScheduleActivity)));
+                            .Where(x => x.Course.Year == term.Year
+                                        && (LastScheduleUpdate == null || x.UpdatedOn > LastScheduleUpdate.Value)
+                                        && x.Course.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass
+                                        && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities 
+                                        && !x.Course.IsOffScheduleActivity)));
         }
 
         private static void AssignClassTerm(Class c, IEnumerable<Term> terms, Term term)
@@ -102,13 +108,13 @@ namespace U3A.BusinessRules
         /// <param name="term"></param>
         /// <returns></returns>
         public static async Task<List<Class>> GetClassDetailsAsync(U3ADbContext dbc,
-            Term term, SystemSettings settings, bool ExludeOffScheduleActivities = false)
+            Term term, SystemSettings settings, bool ExludeOffScheduleActivities = false, DateTime? LastScheduleUpdate = null )
         {
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
-            var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities)
+            var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
-            classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities)
+            classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
             classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
             foreach(var c in classes)
@@ -120,9 +126,9 @@ namespace U3A.BusinessRules
             var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
             if (prevTerm != null && prevTerm.Year == term.Year)
             {
-                var prevTermShoulderClasses = await GetSameParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities)
+                var prevTermShoulderClasses = await GetSameParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync();
-                prevTermShoulderClasses.AddRange(await GetDifferentParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities)
+                prevTermShoulderClasses.AddRange(await GetDifferentParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
                 prevTermShoulderClasses = prevTermShoulderClasses
                                             .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate

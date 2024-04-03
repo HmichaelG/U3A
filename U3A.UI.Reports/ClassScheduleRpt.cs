@@ -55,7 +55,7 @@ namespace U3A.UI.Reports
             {
                 if ((int)prmIntendedUse.Value == 0)
                 {
-                    DataSource = BusinessRule.RestoreClassesFromSchedule(DbContext, exludeOffScheduleActivities: true);
+                    DataSource = BusinessRule.RestoreClassesFromSchedule(DbContext, term, settings, exludeOffScheduleActivities: true);
                 }
                 else
                 {

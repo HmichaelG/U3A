@@ -15,22 +15,31 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
-        public static List<Class> RestoreClassesFromSchedule(U3ADbContext dbc, bool exludeOffScheduleActivities)
-            {
+        public static List<Class> RestoreClassesFromSchedule(U3ADbContext dbc,
+                                    Term term, SystemSettings settings,
+                                    bool exludeOffScheduleActivities)
+        {
             Task<List<Class>> syncTask = Task.Run(async () =>
             {
-                return await RestoreClassesFromScheduleAsync(dbc, exludeOffScheduleActivities);
+                return await RestoreClassesFromScheduleAsync(dbc, term, settings, exludeOffScheduleActivities);
             });
             syncTask.Wait();
             return syncTask.Result;
         }
-        public static async Task<List<Class>> RestoreClassesFromScheduleAsync(U3ADbContext dbc, bool exludeOffScheduleActivities)
+        public static async Task<List<Class>> RestoreClassesFromScheduleAsync(U3ADbContext dbc,
+                                                    Term term, SystemSettings settings,
+                                                    bool exludeOffScheduleActivities)
         {
             var classes = new ConcurrentBag<Class>();
             // get the first recorded schedule
             var firstSchedule = await dbc.Schedule.AsNoTracking()
                                         .OrderBy(x => x.CreatedOn)
                                         .FirstOrDefaultAsync();
+            // Get Class updates since cache creation
+            foreach (var c in await GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities, firstSchedule.UpdatedOn))
+            {
+                classes.Add(c);
+            }
             // Get the new enrolments
             var newEnrolments = await dbc.Enrolment.AsNoTracking()
                                 .Include(x => x.Term)
@@ -54,11 +63,11 @@ namespace U3A.BusinessRules
                     // and remove new dropouts
                     foreach (var d in newDropouts)
                     {
-                        c.Enrolments.RemoveAll(x => x.ClassID != null 
+                        c.Enrolments.RemoveAll(x => x.ClassID != null
                                                         && x.ClassID == d.ID
                                                         && x.PersonID == d.PersonID
                                                         && x.Created == d.Created);
-                        c.Course.Enrolments.RemoveAll(x => x.ClassID == null 
+                        c.Course.Enrolments.RemoveAll(x => x.ClassID == null
                                                         && x.CourseID == d.CourseID
                                                         && x.PersonID == d.PersonID
                                                         && x.Created == d.Created);
@@ -66,7 +75,19 @@ namespace U3A.BusinessRules
                     classes.Add(c);
                 }
             });
-            return classes
+            // Remove deleted classes from cache
+            var liveKeys = await dbc.Class
+                            .AsNoTracking()
+                            .Include(x => x.Course)
+                            .Where(x => x.Course.Year == term.Year).Select(x => x.ID).ToListAsync();
+            var deletions = new List<Class>();
+            Parallel.ForEach(classes, c =>
+            {
+                if (!liveKeys.Contains(c.ID)) { deletions.Add(c); }
+            });
+            List<Class> result = classes.Except(deletions).ToList();
+            // sort & return the result
+            return result
                 .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
                 .ToList();
         }
