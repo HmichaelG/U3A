@@ -42,14 +42,13 @@
                     KeyFieldName="Id"
                     ValidationEnabled="true">
                 <Columns>
-                    <DxGridDataColumn Width="8rem" Caption="" AllowGroup="false">
+                    <DxGridDataColumn Width="8rem" Caption="Tenant ID" AllowGroup="false">
                         <CellDisplayTemplate>
                             <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
-                                      RenderStyle="ButtonRenderStyle.Primary" Text="Navigate"
+                                      RenderStyle="ButtonRenderStyle.Primary" Text="@(((TenantInfo)context.DataItem).Identifier)"
                                       Click="() => OnNavigate(context.DataItem)"></DxButton>
                         </CellDisplayTemplate>
-                    </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Tenant ID" FieldName="Identifier" />
+                    </DxGridDataColumn>                  
                     <DxGridDataColumn Caption="Display Name" FieldName="Name" />
                     <DxGridDataColumn Caption="Website" FieldName="Website" />
                     <DxGridDataColumn Caption="EWAY Enabled" FieldName="EwayEnabled"
