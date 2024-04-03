@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace U3A.Model
+namespace U3A.Services
 {
     public static partial class Extensions
     {

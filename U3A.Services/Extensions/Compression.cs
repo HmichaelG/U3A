@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Text;
 
-namespace U3A.Model
+namespace U3A.Services
 {
     public static partial class Extensions
     {
