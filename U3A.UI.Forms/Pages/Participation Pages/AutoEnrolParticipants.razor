@@ -56,7 +56,7 @@ else {
                                     Value="@processTerm"
                                     ValueChanged="@((Term term) => OnTermChanged(term))" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Is Term Auto-Enrolment Finalised?" ColSpanMd="8">
+                    <DxFormLayoutItem Caption="Is Term Random Enrolment Finalised?" ColSpanMd="8">
                         <DxCheckBox Alignment="CheckBoxContentAlignment.Right" @bind-Checked="@IsClassAllocationFinalised"
                                     Enabled=@(!IsClassAllocationFinalised) />
                     </DxFormLayoutItem>
