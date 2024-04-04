@@ -34,7 +34,7 @@ namespace U3A.WebFunctions.Procedures
                     DateTime allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
                     if (BusinessRule.IsPreRandomAllocationDay(currentTerm, settings, today))
                     {
-                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Auto-Allocation performed - Date prior to allocation date: {allocationDate.ToLongDateString()}");
+                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: No Auto-Allocation performed - Date prior to allocation date: {allocationDate.ToLongDateString()}");
                         return;
                     }
                     else
