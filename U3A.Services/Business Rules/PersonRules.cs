@@ -134,6 +134,7 @@ namespace U3A.BusinessRules
             {
                 person.LeaderOf = dbc.Class
                             .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
+                            .Include(x => x.Course).ThenInclude(x => x.Classes)
                             .Include(x => x.Venue)
                             .Include(x => x.OnDay)
                             .Include(x => x.Leader)
@@ -143,7 +144,8 @@ namespace U3A.BusinessRules
                             .Where(x => (x.LeaderID == person.ID || x.Leader2ID == person.ID || x.Leader3ID == person.ID) &&
                                             x.Course.Year == term.Year)
                                             .AsEnumerable()
-                                            .Where(x => IsClassInTerm(x, term.TermNumber)).ToList();
+                                            .Where(x => IsClassInTerm(x, term.TermNumber))
+                            .AsEnumerable().Where(x => IsCourseInTerm(x.Course,term)).ToList();
                 foreach (var c in person.LeaderOf)
                 {
                     c.Enrolments.AddRange(BusinessRule.SelectableEnrolmentsByClass(dbc, c, term, c.Course));
@@ -161,7 +163,8 @@ namespace U3A.BusinessRules
                             .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
                             .Include(x => x.Course).ThenInclude(c => c.Classes)
                             .Include(x => x.Person)
-                            .Where(x => x.TermID == TermID && x.IsCourseClerk).ToList();
+                            .Where(x => x.TermID == TermID && x.IsCourseClerk)
+                            .AsEnumerable().Where(x => IsCourseInTerm(x.Course, term)).ToList();
             foreach (var e in clerkEnrolments)
             {
                 var person = e.Person;
@@ -259,13 +262,17 @@ namespace U3A.BusinessRules
             }
             var people = dbc.Person.Where(x => x.DateCeased == null).AsNoTracking().ToList();
             var enrolments = dbc.Enrolment
+                .Include(x => x.Term)
                 .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
+                .Include(x => x.Course).ThenInclude(x => x.Classes)
                 .Include(x => x.Class).ThenInclude(x => x.Course)
                 .Include(x => x.Class).ThenInclude(x => x.Venue)
                 .Include(x => x.Class).ThenInclude(x => x.OnDay)
                 .Include(x => x.Class).ThenInclude(x => x.Leader)
                 .Include(x => x.Class).ThenInclude(x => x.Occurrence)
-                .Where(x => x.TermID == TermID && (WaitlistStatus == null || x.IsWaitlisted == WaitlistStatus)).ToList();
+                .Where(x => x.TermID == TermID                             
+                            && (WaitlistStatus == null || x.IsWaitlisted == WaitlistStatus))
+                            .AsEnumerable().Where(x => IsCourseInTerm(x.Course,x.Term)).ToList();
             foreach (var person in people) { 
                 person.Enrolments=enrolments.Where(e => e.PersonID == person.ID).ToList();
                 person.EnrolledClasses.Clear();

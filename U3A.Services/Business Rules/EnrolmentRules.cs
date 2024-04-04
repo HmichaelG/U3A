@@ -152,7 +152,7 @@ namespace U3A.BusinessRules
         {
             var enrolments = dbc.Enrolment
                                 .Include(x => x.Term)
-                                .Include(x => x.Course)
+                                .Include(x => x.Course).ThenInclude(x => x.Classes)
                                 .Include(x => x.Class).ThenInclude(x => x.OnDay)
                                 .Include(x => x.Person)
                                 .Where(x => x.TermID == SelectedTerm.ID
@@ -160,7 +160,7 @@ namespace U3A.BusinessRules
                                 .OrderBy(x => x.IsWaitlisted)
                                             .ThenBy(x => x.Person.LastName)
                                             .ThenBy(x => x.Person.FirstName)
-                                .ToList();
+                                .AsEnumerable().Where(x => IsCourseInTerm(x.Course,SelectedTerm)).ToList();
             Parallel.ForEach(enrolments, e =>
             {
                 if (e.Class != null)
