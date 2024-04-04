@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_ScheduleCache_Revert
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_sp_DbCleanup_02_APR_2024
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_sp_DbCleanup_02_APR_2024
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_model_indexFix
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_sp_DbCleanup_02_APR_2024
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_model_indexFix
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
