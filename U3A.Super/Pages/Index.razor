@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using System.Web
 
 @inject IDbContextFactory<TenantStoreDbContext> tenantDbfactory
 @inject IJSRuntime js
@@ -20,19 +21,25 @@
         <div class="input-group">
             <p class="h6 flex-grow-1">Current Tenants</p>
             <DxFormLayout>
-                <DxFormLayoutItem Caption="Email Start" ColSpanMd="4">
+                <DxFormLayoutItem Caption="Email Start" ColSpanMd="3">
                     <DxDateEdit @bind-Date=@startDate />
                 </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Email End" ColSpanMd="4">
+                <DxFormLayoutItem Caption="Email End" ColSpanMd="3">
                     <DxDateEdit @bind-Date=@endDate />
                 </DxFormLayoutItem>
-                <DxFormLayoutItem ColSpanMd="4">
+                <DxFormLayoutItem ColSpanMd="3">
                     <DxButton Text="Show Email" Click="ShowEmail" CssClass="button-width" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem ColSpanMd="3">
+                    <DxButton Text="Send Email" Click="@OnSendEmail" 
+                        RenderStyle="ButtonRenderStyle.Success"
+                        CssClass="button-width" />
                 </DxFormLayoutItem>
             </DxFormLayout>
         </div>
         <div class="pb-2">
             <DxGrid @ref="grid" Data="@tenantInfo" CssClass="grid-height" id="myGrid"
+                    @bind-SelectedDataItems="@selectedItems"
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                     UnboundColumnData="GetUnboundColumnData"
                     VirtualScrollingEnabled="true"
@@ -42,6 +49,7 @@
                     KeyFieldName="Id"
                     ValidationEnabled="true">
                 <Columns>
+                    <DxGridSelectionColumn AllowSelectAll="true" Width="4rem" />
                     <DxGridDataColumn Width="8rem" Caption="Tenant ID" AllowGroup="false">
                         <CellDisplayTemplate>
                             <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
@@ -88,6 +96,7 @@
 
 @code {
     object? selectedDataItem;
+    IReadOnlyList<object>? selectedItems;
     List<TenantInfo>? tenantInfo { get; set; }
     Dictionary<string, int> financialMembers = new();
     Dictionary<string, PostmarkOutboundOverviewStats> EmailStats = new();
@@ -102,8 +111,10 @@
         using (var dbc = await tenantDbfactory.CreateDbContextAsync()) {
             tenantInfo = await dbc.TenantInfo.OrderBy(x => x.Identifier).ToListAsync();
         }
-        foreach (var tenant in tenantInfo.Where(x => !x.UsePostmarkTestEnviroment)) {
-            using (var dbc = new U3ADbContext(tenant)) {
+        foreach (var tenant in tenantInfo.Where(x => !x.UsePostmarkTestEnviroment))
+        {
+            using (var dbc = new U3ADbContext(tenant))
+            {
                 var finMembers = dbc.Person.Count(x => x.FinancialTo >= DateTime.Today.Year);
                 financialMembers.Add(tenant.Id!, finMembers);
             }
@@ -146,6 +157,20 @@
         PostmarkOutboundOverviewStats stats;
         stats = await client.GetOutboundOverviewStatsAsync(null, startDate, endDate);
         EmailStats.Add(tenant.Id, stats);
+    }
+
+    public async Task OnSendEmail()
+    {
+        string mailto = $"mailto:?subject=U3Admin: Today's update&bcc=";
+        foreach (TenantInfo tenant in selectedItems!)
+        {
+            using (var dbc = new U3ADbContext(tenant))
+            {
+                var settings = await dbc.SystemSettings.OrderBy(s => s.ID).FirstOrDefaultAsync();
+                mailto += $"{settings!.U3AdminEmailRecipients.Replace("\n",";")} ";
+            }
+        }
+        navMan.NavigateTo(HttpUtility.UrlDecode(mailto.Remove(mailto.Length - 1)));
     }
 
     void OnNavigate(object tenant)
