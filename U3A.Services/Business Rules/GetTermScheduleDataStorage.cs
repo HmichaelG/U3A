@@ -67,7 +67,7 @@ namespace U3A.BusinessRules
             Term term = await BusinessRule.CurrentTermAsync(dbc);
             if (term != null)
             {
-                var terms = await dbc.Term.Where(x => x.Year >= term.Year).ToListAsync();
+                var terms = await dbc.Term.AsNoTracking().ToListAsync();
                 foreach (Term t in terms)
                 {
                     // Random allocation day

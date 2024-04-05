@@ -7,7 +7,7 @@
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
    <meta name="generator" content="Help &amp; Manual" />
    <meta name="keywords" content="" />
-   <meta name="description" content="Version 2024.3.Current Class Schedule cache A cache is a software component that stores data so that future requests for that data can be served faster. It is built once and..." />
+   <meta name="description" content="Version 2024.3.Current Enrolment Reports Previously, if a course in term had enrolments and the term was then unchecked on the class record, the enrolments would continue to be..." />
    <link type="text/css" href="default.css" rel="stylesheet" />
    <link type="text/css" href="custom.css" rel="stylesheet" />
 
@@ -128,10 +128,15 @@
 
 <!--ZOOMRESTART-->
 <h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Version 2024.3.Current</span></h2>
+<h3 class="p_Heading3"><span class="f_Heading3">Enrolment Reports</span></h3>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Previously, if a course in term had enrolments and the term was then unchecked on the class record, the enrolments would continue to be listed on the various enrolment reports. This has now been corrected. Only courses with the term number checked will be listed on enrolment reports for that term. </p>
+<h3 class="p_Heading3"><span class="f_Heading3">Add/Edit Terms</span></h3>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Performance improvement displaying the timeline.</p>
+<h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Version 2024.3.4</span></h2>
 <h3 class="p_Heading3"><span class="f_Heading3">Class Schedule cache</span></h3>
 <p class="p_Notes"><span class="f_Notes">A </span><span class="f_Notes" style="font-weight: bold;">cache</span><span class="f_Notes"> is a software component that stores data so that future requests for that data can be served faster. It is built once and then used multiple times without refreshing the data from the database. A cache can improve performance significantly but with the trade-off that the data may become &quot;stale&quot; or out-of-date.</span></p>
 <p class="p_Normal">The u3admin system now employs a cache to store the details reported on the Class Schedule Report and the Member Portal - Member Enrolment procedures. The cache is rebuilt every hour so at most, the data is one hour out of date. However, the Enrolled &amp; Waitlist numbers are always up-to-date.</p>
-<p class="p_Normal">The cache can also be rebuilt manually if needs be. In most cases however, this will be unnecessary.</p>
+<p class="p_Normal">The cache can also be rebuilt manually if needs be. In most cases however, this will not be unnecessary.</p>
 <h3 class="p_Heading3"><span class="f_Heading3">Member Portal - Member Enrolment</span></h3>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>This module now uses the new Class Schedule cache.</p>
 <h3 class="p_Heading3"><span class="f_Heading3">Class Schedule Report</span></h3>

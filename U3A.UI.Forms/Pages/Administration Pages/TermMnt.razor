@@ -42,19 +42,7 @@ else
             EditMode="GridEditMode.PopupEditForm"
             EditModelSaving="Grid_EditModelSaving">
         <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid>
-                <CustomButtonContent>
-                    <DxToolbarItem Text="@((showTimeline) ? "Hide Timeline" : "Show Timeline" )"
-                                   Click="OnShowTimelineChanged"
-                                   Tooltip="Click to show / hide the term timeline"
-                                   RenderStyle="ButtonRenderStyle.Primary"
-                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained" />
-                    <DxToolbarItem Text="Print Class Schedule" Click="OnPrint"
-                                   Tooltip="Click to print the current class schedule (public view)."
-                                   RenderStyle="ButtonRenderStyle.Primary"
-                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained" />
-                </CustomButtonContent>
-            </GridToolbar>
+            <GridToolbar LinkedGrid=@mainGrid />
         </ToolbarTemplate>
         <Columns>
             <DxGridCommandColumnEx @ref="GridCommandColumn" Width="6rem" EditButtonVisible="true" DeleteButtonVisible="false" />
@@ -119,47 +107,85 @@ else
             </DxFormLayout>
         </EditFormTemplate>
     </DxGrid>
-    if (showTimeline)
-    {
-        <DxScheduler StartDate="@(new DateTime(DateTime.Today.Year,1,1))"
-                     AllowCreateAppointment="false"
-                     AllowDeleteAppointment="false"
-                     AllowEditAppointment="false"
-                     ShowAppointmentTooltip="true"
-                     ActiveViewType=SchedulerViewType.Timeline
-                     DataStorage="@TermDataStorage">
-            <Views>
-                <DxSchedulerTimelineView SnapToCellsMode="SchedulerSnapToCellsMode.Never" Duration="@(TimeSpan.FromDays(365))">
-                    <Scales>
-                        <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" UnitCount="1" />
-                    </Scales>
-                    <DateHeaderCellTemplate>
-                        <div style="width: 100%; text-align:center;">
-                            <span>@context.Interval.Start.ToString("MMM yyyy")</span>
-                        </div>
-                    </DateHeaderCellTemplate>
-                </DxSchedulerTimelineView>
-            </Views>
-            <AppointmentTooltipHeaderTemplate>
-                <h4>@context.Label?.Caption</h4>
-            </AppointmentTooltipHeaderTemplate>
-            <AppointmentTooltipTemplate>
-                <div class="container">
-                    <span style="vertical-align: middle;">
-                        <strong>Period:</strong>  @context.Appointment.Subject<br />
-                        <strong>From:</strong>  @context.Appointment.Start.ToString("ddd, dd-MMM-yyyy") <strong>To:</strong>
-                        @context.Appointment.End.ToString("ddd, dd-MMM-yyyy")<br />
-                    </span>
-                </div>
-            </AppointmentTooltipTemplate>
-        </DxScheduler>
-    }
+
+    <DxToolbar>
+            <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                <Template>
+                    <div class="d-flex">
+                        <div class="flex-grow-0 pt-1 pe-2">Year:</div>
+                        <DxSpinEdit @bind-Value=@year CssClass="flex-grow-1" />
+                    </div>
+                </Template>
+            </DxToolbarItem>
+    </DxToolbar>
+        <DxScheduler StartDate="@(new DateTime(year,1,1))"
+        AllowCreateAppointment="false"
+                 AllowDeleteAppointment="false"
+                 AllowEditAppointment="false"
+                 ShowAppointmentTooltip="true"
+                 ActiveViewType=SchedulerViewType.Timeline
+                 GroupType="SchedulerGroupType.Date"
+                 DataStorage="@TermDataStorage">
+        <Views>
+            <DxSchedulerTimelineView SnapToCellsMode="SchedulerSnapToCellsMode.Never">
+                <Scales>
+                    <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" UnitCount="12" />
+                </Scales>
+                <DateHeaderCellTemplate>
+                    <div style="width: 100%; text-align:center;">
+                        <span>@context.Interval.Start.ToString("yyyy")</span>
+                    </div>
+                    <div class="d-flex">
+                        <div class="month-style">Jan</div>
+                        <div class="month-style">Feb</div>
+                        <div class="month-style">Mar</div>
+                        <div class="month-style">Apr</div>
+                        <div class="month-style">May</div>
+                        <div class="month-style">Jun</div>
+                        <div class="month-style">Jul</div>
+                        <div class="month-style">Aug</div>
+                        <div class="month-style">Sep</div>
+                        <div class="month-style">Oct</div>
+                        <div class="month-style">Nov</div>
+                        <div class="month-style-nb">Dec</div>
+                    </div>
+                </DateHeaderCellTemplate>
+            </DxSchedulerTimelineView>
+        </Views>
+        <AppointmentTooltipHeaderTemplate>
+            <h4>@context.Label?.Caption</h4>
+        </AppointmentTooltipHeaderTemplate>
+        <AppointmentTooltipTemplate>
+            <div class="container">
+                <span style="vertical-align: middle;">
+                    <strong>Period:</strong>  @context.Appointment.Subject<br />
+                    <strong>From:</strong>  @context.Appointment.Start.ToString("ddd, dd-MMM-yyyy") <strong>To:</strong>
+                    @context.Appointment.End.ToString("ddd, dd-MMM-yyyy")<br />
+                </span>
+            </div>
+        </AppointmentTooltipTemplate>
+    </DxScheduler>
 }
 
 <style>
     .grid-height {
         overflow: auto;
-        height: @gridHeight;
+        height: 40vh;
+    }
+
+    .dxbs-sc-tb-wrapper {
+        display: none !important;
+    }
+    .month-style {
+        width: 8.33333333%;
+        text-align:center;
+        border-right: thin solid;
+        border-right-color:gainsboro;
+    }
+
+    .month-style-nb {
+        width: 8.33333333%;
+        text-align: center;
     }
 
 </style>
@@ -185,9 +211,7 @@ else
     internal string? ErrorMessage;
     U3ADbContext? dbc { get; set; }
     SystemSettings settings;
-    bool showTimeline;
-    string gridHeight = "80vh";
-
+    int year = DateTime.Today.Year;
 
     protected override async Task OnInitializedAsync()
     {
@@ -209,16 +233,15 @@ else
         IsReady = true;
     }
 
-    async Task OnShowTimelineChanged()
-    {
-        showTimeline = !showTimeline;
-        gridHeight = (showTimeline) ? "40vh" : "80vh";
-        await InvokeAsync(StateHasChanged);
-    }
-
     async Task GetSchedule()
     {
-        if (Terms != null) TermDataStorage = await BusinessRule.GetTermScheduleDataStorageAsync(dbc);
+        if (Terms != null)
+        {
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                TermDataStorage = await BusinessRule.GetTermScheduleDataStorageAsync(dbc);
+            }
+        }
     }
 
 
