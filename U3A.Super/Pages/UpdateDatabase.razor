@@ -45,6 +45,8 @@
         using (var dbc = await Tenantdbfactory.CreateDbContextAsync())
         {
             tenantInfo = await dbc.TenantInfo.OrderBy(x => x.Identifier).ToListAsync();
+            await dbc.Database.MigrateAsync();
+            result += $"<li>Database schema for [Tenant] has been updated</li>";
         }
         foreach (var tenant in tenantInfo)
         {

@@ -1,8 +1,8 @@
-﻿update-database -cont TenantStoreDbContext -project U3A.Database ContactRequest_u3a
+﻿update-database -cont TenantStoreDbContext -project U3A.Database Schedule
 
-remove-migration -cont TenantStoreDbContext -project U3A.Database -args TenantInfo_Id
+remove-migration -cont TenantStoreDbContext -project U3A.Database -args Schedules_to_Schedule
 
-add-migration -cont TenantStoreDbContext -project U3A.Database TenantInfo_Id
+add-migration -cont TenantStoreDbContext -project U3A.Database Schedules_to_Schedule
 
 update-database -cont TenantStoreDbContext -project U3A.Database
 

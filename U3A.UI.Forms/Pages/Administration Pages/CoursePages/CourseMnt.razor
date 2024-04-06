@@ -3,8 +3,11 @@
 @inject NavigationManager NavMan
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantStoreDbContext> TenantDbfactory
+@inject IHttpContextAccessor HttpContextAccessor
 @implements IDisposable
 
+@using Microsoft.AspNetCore.Http
 @using U3A.UI.Forms.Pages.Shared
 @using U3A.UI.Forms.Pages.MembersPortal
 
@@ -154,6 +157,7 @@ else
 
 @code {
     bool IsReady;
+
     Progress? progressBar;
     IEnumerable<CourseParticipationType> CourseParticipationTypes { get; set; }
     List<Occurrence>? Occurrences { get; set; }
@@ -223,7 +227,7 @@ else
         await progressBar.ShowSmallSpinnerAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            await BusinessRule.BuildScheduleAsync(dbc);
+            await BusinessRule.BuildScheduleAsync(dbc,TenantDbfactory,HttpContextAccessor);
         }
         await progressBar.Close();
         await InvokeAsync(StateHasChanged);

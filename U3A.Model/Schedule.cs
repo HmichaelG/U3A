@@ -11,6 +11,8 @@ namespace U3A.Model
     public class Schedule : BaseEntity
     {
         public Guid ID { get; set; }
+
+        public string TenantIdentifier { get; set; }
         public string jsonClass { get; set; }
         public string jsonClassEnrolments { get; set; }
         public string jsonCourseEnrolments { get; set;}

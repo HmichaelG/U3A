@@ -1,3 +1,4 @@
+using DevExpress.DirectX.NativeInterop.Direct2D;
 using DevExpress.Drawing;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Data.SqlClient;
@@ -26,7 +27,7 @@ namespace U3A.WebFunctions
         [Function("HouryProcedures")]
         public async Task Run([TimerTrigger("0 0 0-13,18-23 * * *"      
 #if DEBUG
-            , RunOnStartup=false
+            , RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
@@ -77,7 +78,10 @@ namespace U3A.WebFunctions
             {
                 using (var dbc = new U3ADbContext(tenant))
                 {
-                    await BusinessRule.BuildScheduleAsync(dbc);
+                    using (var dbcT = new TenantStoreDbContext(cn!))
+                    {
+                        await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
+                    }
                     _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
             }

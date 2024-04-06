@@ -10,6 +10,7 @@ using U3A.Model;
 using U3A.Services;
 using DevExpress.Blazor;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace U3A.BusinessRules
 {
@@ -91,9 +92,22 @@ namespace U3A.BusinessRules
                 .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
                 .ToList();
         }
-        public static async Task BuildScheduleAsync(U3ADbContext dbc)
+        public static async Task BuildScheduleAsync(U3ADbContext dbc,
+                                        IDbContextFactory<TenantStoreDbContext> TenantDbFactory,
+                                        IHttpContextAccessor httpContextAccessor)
+        {
+            var tenantInfo = await BusinessRule.GetTenantInfoAsync(TenantDbFactory, httpContextAccessor);
+            using (var dbcT = await TenantDbFactory.CreateDbContextAsync())
+            {
+                await BuildScheduleAsync(dbc, dbcT, tenantInfo.Identifier);
+            }
+        }
+        public static async Task BuildScheduleAsync(U3ADbContext dbc, 
+                                                        TenantStoreDbContext dbcT,
+                                                        string TenantIdentifier)
         {
             List<Schedule> schedules = new List<Schedule>();
+            List<Schedule> multiCampusSchedules = new List<Schedule>();
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             var term = BusinessRule.CurrentEnrolmentTerm(dbc);
             if (term != null)
@@ -101,8 +115,15 @@ namespace U3A.BusinessRules
                 var classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
                 foreach (var c in classes)
                 {
-                    schedules.Add(processClasses(c, settings));
+                    schedules.Add(processClasses(c, settings, TenantIdentifier));
+                    if (c.Course.AllowMultiCampsuFrom != null 
+                            && c.Course.AllowMultiCampsuFrom >= TimezoneAdjustment.GetLocalTime().Date)
+                    {
+                        multiCampusSchedules.Add(processClasses(c, settings, TenantIdentifier));
+                    }
                 }
+
+                // local campus
                 await dbc.Database.BeginTransactionAsync();
                 try
                 {
@@ -115,16 +136,31 @@ namespace U3A.BusinessRules
                 {
                     await dbc.Database.RollbackTransactionAsync();
                 }
+
+                //multi-campus
+                await dbcT.Database.BeginTransactionAsync();
+                try
+                {
+                    await dbcT.Schedule.Where(x => x.TenantIdentifier == TenantIdentifier).ExecuteDeleteAsync();
+                    await dbcT.Schedule.AddRangeAsync(multiCampusSchedules);
+                    await dbcT.SaveChangesAsync();
+                    await dbcT.Database.CommitTransactionAsync();
+                }
+                catch (Exception ex)
+                {
+                    await dbcT.Database.RollbackTransactionAsync();
+                }
             }
         }
 
-        private static Schedule processClasses(Class c, SystemSettings settings)
+        private static Schedule processClasses(Class c, SystemSettings settings, string TenantIdentifier)
         {
             var cls = JsonSerializer.Serialize<Class>(c).Zip();
             var classEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Enrolments).Zip();
             var courseEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Course.Enrolments).Zip();
             var s = new Schedule()
             {
+                TenantIdentifier = TenantIdentifier,
                 jsonClass = cls,
                 jsonClassEnrolments = classEnrolments,
                 jsonCourseEnrolments = courseEnrolments,

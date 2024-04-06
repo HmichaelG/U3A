@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 {
     [DbContext(typeof(U3ADbContextSeed))]
-    partial class U3ADbContextSeedModelSnapshot : ModelSnapshot
+    [Migration("20240406021353_U3A_Schedule_TenantIdentifier")]
+    partial class U3A_Schedule_TenantIdentifier
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -446,9 +449,6 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.Property<bool>("AllowAutoEnrol")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime?>("AllowMultiCampsuFrom")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("ConversionID")
                         .HasColumnType("int");

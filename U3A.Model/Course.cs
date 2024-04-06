@@ -29,6 +29,8 @@ namespace U3A.Model
         [MaxLength(100)]
         public string Name { get; set; }
 
+        public DateTime? AllowMultiCampsuFrom { get; set; }
+
         [DefaultValue(" ")]
         public string? Description { get; set; }
 

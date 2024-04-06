@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_sp_DbCleanup_02_APR_2024
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Schedule_TenantIdentifier
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_model_indexFix
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Cousre_AllowMultiCampusFrom
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_model_indexFix
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Cousre_AllowMultiCampusFrom
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

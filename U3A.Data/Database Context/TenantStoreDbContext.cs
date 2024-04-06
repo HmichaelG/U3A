@@ -3,6 +3,8 @@
 
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using U3A.Model;
 
 namespace U3A.Database
@@ -11,18 +13,35 @@ namespace U3A.Database
     public class TenantStoreDbContext : DbContext
     {
         internal AuthenticationStateProvider authenticationStateProvider;
+        private readonly string cnnStr;
+
+        public TenantStoreDbContext(String ConnectionString) { 
+            cnnStr = ConnectionString;
+        }
+
+        [ActivatorUtilitiesConstructor] // force DI to use this constructor
         public TenantStoreDbContext(DbContextOptions<TenantStoreDbContext> options,
                           AuthenticationStateProvider? AuthStateProvider) : base(options)
         {
             authenticationStateProvider = AuthStateProvider;
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.EnableSensitiveDataLogging(true);
+                optionsBuilder.UseSqlServer(cnnStr);
+            }
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<ContactRequest> ContactRequest { get; set; }
+        public DbSet<Schedule> Schedule { get; set; }
         public DbSet<TenantInfo> TenantInfo { get; set; }
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
                             CancellationToken cancellationToken = default(CancellationToken))

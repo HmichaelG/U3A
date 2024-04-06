@@ -80,6 +80,11 @@
                     </DxFormLayoutItem>
                 </DxFormLayout>
             </DxFormLayoutGroup>
+            <DxFormLayoutGroup Caption="Multi-Campus Enrolment">
+                <DxFormLayoutItem Caption="Allow Multi-Campus Enrolment From" ColSpanMd="12" >
+                    <DxDateEdit @bind-Date="Course.AllowMultiCampsuFrom" />
+                </DxFormLayoutItem>
+            </DxFormLayoutGroup>
         </DxTabPage>
     </DxTabs>
 </DxFormLayout>
