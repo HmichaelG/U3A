@@ -9250,3 +9250,1275 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240327232848_U3A_Schedule'
+)
+BEGIN
+    CREATE TABLE [Schedule] (
+        [ID] uniqueidentifier NOT NULL,
+        [TermID] uniqueidentifier NOT NULL,
+        [CourseID] uniqueidentifier NOT NULL,
+        [ClassID] uniqueidentifier NOT NULL,
+        [OnDayID] int NOT NULL,
+        [CourseNumber] int NOT NULL,
+        [CourseName] nvarchar(max) NOT NULL,
+        [CourseDescription] nvarchar(max) NOT NULL,
+        [CourseType] nvarchar(max) NOT NULL,
+        [CourseMaximum] int NOT NULL,
+        [CourseMinimu] int NOT NULL,
+        [CourseCost] decimal(18,2) NOT NULL,
+        [CourseCostDescription] nvarchar(max) NOT NULL,
+        [CourseTermCost] decimal(18,2) NOT NULL,
+        [CourseCostTermDescription] nvarchar(max) NOT NULL,
+        [TermSummary] nvarchar(max) NOT NULL,
+        [ClassSummary] nvarchar(max) NOT NULL,
+        [VenueName] nvarchar(max) NOT NULL,
+        [VenueAddress] nvarchar(max) NOT NULL,
+        [GuestLeader] nvarchar(max) NOT NULL,
+        [LeaderName] nvarchar(max) NOT NULL,
+        [LeaderType] nvarchar(max) NOT NULL,
+        [LeaderEmail] nvarchar(max) NOT NULL,
+        [LeaderMobile] nvarchar(max) NOT NULL,
+        [LeaderPhone] nvarchar(max) NOT NULL,
+        [CreatedOn] datetime2 NULL,
+        [UpdatedOn] datetime2 NULL,
+        [User] nvarchar(max) NULL,
+        CONSTRAINT [PK_Schedule] PRIMARY KEY ([ID])
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240327232848_U3A_Schedule'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240327232848_U3A_Schedule', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328004414_U3A_Schedule_TermDetails'
+)
+BEGIN
+    DECLARE @var32 sysname;
+    SELECT @var32 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'TermID');
+    IF @var32 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var32 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [TermID];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328004414_U3A_Schedule_TermDetails'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [TermNumber] int NOT NULL DEFAULT 0;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328004414_U3A_Schedule_TermDetails'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [Year] int NOT NULL DEFAULT 0;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328004414_U3A_Schedule_TermDetails'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240328004414_U3A_Schedule_TermDetails', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328022838_U3A_Schedule_IsOffScheduleActivity'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [IsOffScheduleActivity] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328022838_U3A_Schedule_IsOffScheduleActivity'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240328022838_U3A_Schedule_IsOffScheduleActivity', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    EXEC sp_rename N'[Schedule].[LeaderType]', N'ClerkPhone', N'COLUMN';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    EXEC sp_rename N'[Schedule].[CourseMinimu]', N'CourseRequired', N'COLUMN';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClassOccurenceID] int NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClassOfferedT1] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClassOfferedT2] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClassOfferedT3] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClassOfferedT4] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClassRecurrence] int NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClassStartDate] datetime2 NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClassTime] datetime2 NOT NULL DEFAULT '0001-01-01T00:00:00.0000000';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClerkEmail] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClerkMobile] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [ClerkName] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [CourseParticipationTypeID] int NOT NULL DEFAULT 0;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [VenueCanMapAddress] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240328232354_U3A_Schedule_NewFields_0'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240328232354_U3A_Schedule_NewFields_0', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var33 sysname;
+    SELECT @var33 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassID');
+    IF @var33 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var33 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassID];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var34 sysname;
+    SELECT @var34 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassOccurenceID');
+    IF @var34 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var34 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassOccurenceID];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var35 sysname;
+    SELECT @var35 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassOfferedT1');
+    IF @var35 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var35 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassOfferedT1];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var36 sysname;
+    SELECT @var36 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassOfferedT2');
+    IF @var36 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var36 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassOfferedT2];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var37 sysname;
+    SELECT @var37 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassOfferedT3');
+    IF @var37 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var37 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassOfferedT3];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var38 sysname;
+    SELECT @var38 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassOfferedT4');
+    IF @var38 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var38 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassOfferedT4];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var39 sysname;
+    SELECT @var39 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassRecurrence');
+    IF @var39 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var39 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassRecurrence];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var40 sysname;
+    SELECT @var40 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassStartDate');
+    IF @var40 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var40 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassStartDate];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var41 sysname;
+    SELECT @var41 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassSummary');
+    IF @var41 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var41 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassSummary];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var42 sysname;
+    SELECT @var42 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClassTime');
+    IF @var42 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var42 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClassTime];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var43 sysname;
+    SELECT @var43 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClerkEmail');
+    IF @var43 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var43 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClerkEmail];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var44 sysname;
+    SELECT @var44 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClerkMobile');
+    IF @var44 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var44 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClerkMobile];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var45 sysname;
+    SELECT @var45 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClerkName');
+    IF @var45 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var45 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClerkName];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var46 sysname;
+    SELECT @var46 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'ClerkPhone');
+    IF @var46 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var46 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [ClerkPhone];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var47 sysname;
+    SELECT @var47 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseCost');
+    IF @var47 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var47 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseCost];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var48 sysname;
+    SELECT @var48 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseCostDescription');
+    IF @var48 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var48 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseCostDescription];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var49 sysname;
+    SELECT @var49 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseCostTermDescription');
+    IF @var49 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var49 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseCostTermDescription];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var50 sysname;
+    SELECT @var50 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseDescription');
+    IF @var50 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var50 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseDescription];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var51 sysname;
+    SELECT @var51 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseID');
+    IF @var51 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var51 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseID];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var52 sysname;
+    SELECT @var52 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseMaximum');
+    IF @var52 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var52 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseMaximum];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var53 sysname;
+    SELECT @var53 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseName');
+    IF @var53 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var53 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseName];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var54 sysname;
+    SELECT @var54 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseNumber');
+    IF @var54 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var54 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseNumber];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var55 sysname;
+    SELECT @var55 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseParticipationTypeID');
+    IF @var55 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var55 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseParticipationTypeID];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var56 sysname;
+    SELECT @var56 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseRequired');
+    IF @var56 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var56 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseRequired];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var57 sysname;
+    SELECT @var57 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseTermCost');
+    IF @var57 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var57 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseTermCost];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var58 sysname;
+    SELECT @var58 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'CourseType');
+    IF @var58 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var58 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [CourseType];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var59 sysname;
+    SELECT @var59 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'GuestLeader');
+    IF @var59 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var59 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [GuestLeader];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var60 sysname;
+    SELECT @var60 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'IsOffScheduleActivity');
+    IF @var60 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var60 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [IsOffScheduleActivity];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var61 sysname;
+    SELECT @var61 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'LeaderEmail');
+    IF @var61 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var61 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [LeaderEmail];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var62 sysname;
+    SELECT @var62 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'LeaderMobile');
+    IF @var62 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var62 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [LeaderMobile];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var63 sysname;
+    SELECT @var63 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'LeaderName');
+    IF @var63 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var63 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [LeaderName];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var64 sysname;
+    SELECT @var64 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'LeaderPhone');
+    IF @var64 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var64 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [LeaderPhone];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var65 sysname;
+    SELECT @var65 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'OnDayID');
+    IF @var65 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var65 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [OnDayID];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var66 sysname;
+    SELECT @var66 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'TermNumber');
+    IF @var66 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var66 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [TermNumber];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var67 sysname;
+    SELECT @var67 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'VenueCanMapAddress');
+    IF @var67 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var67 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [VenueCanMapAddress];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    DECLARE @var68 sysname;
+    SELECT @var68 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Schedule]') AND [c].[name] = N'Year');
+    IF @var68 IS NOT NULL EXEC(N'ALTER TABLE [Schedule] DROP CONSTRAINT [' + @var68 + '];');
+    ALTER TABLE [Schedule] DROP COLUMN [Year];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    EXEC sp_rename N'[Schedule].[VenueName]', N'jsonCourseEnrolments', N'COLUMN';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    EXEC sp_rename N'[Schedule].[VenueAddress]', N'jsonClassEnrolments', N'COLUMN';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    EXEC sp_rename N'[Schedule].[TermSummary]', N'jsonClass', N'COLUMN';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240329003232_U3A_Schedule_JsonFields'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240329003232_U3A_Schedule_JsonFields', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330201022_U3A_ScheduleCache'
+)
+BEGIN
+    CREATE TABLE [ScheduleCache] (
+        [ID] uniqueidentifier NOT NULL,
+        [gz_jsonClasses] varbinary(max) NOT NULL,
+        [gz_jsonEnrolments] varbinary(max) NOT NULL,
+        [CreatedOn] datetime2 NULL,
+        [UpdatedOn] datetime2 NULL,
+        [User] nvarchar(max) NULL,
+        CONSTRAINT [PK_ScheduleCache] PRIMARY KEY ([ID])
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330201022_U3A_ScheduleCache'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240330201022_U3A_ScheduleCache', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330223419_U3A_ScheduleCache_RevertToString'
+)
+BEGIN
+    DECLARE @var69 sysname;
+    SELECT @var69 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ScheduleCache]') AND [c].[name] = N'gz_jsonClasses');
+    IF @var69 IS NOT NULL EXEC(N'ALTER TABLE [ScheduleCache] DROP CONSTRAINT [' + @var69 + '];');
+    ALTER TABLE [ScheduleCache] DROP COLUMN [gz_jsonClasses];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330223419_U3A_ScheduleCache_RevertToString'
+)
+BEGIN
+    DECLARE @var70 sysname;
+    SELECT @var70 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ScheduleCache]') AND [c].[name] = N'gz_jsonEnrolments');
+    IF @var70 IS NOT NULL EXEC(N'ALTER TABLE [ScheduleCache] DROP CONSTRAINT [' + @var70 + '];');
+    ALTER TABLE [ScheduleCache] DROP COLUMN [gz_jsonEnrolments];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330223419_U3A_ScheduleCache_RevertToString'
+)
+BEGIN
+    ALTER TABLE [ScheduleCache] ADD [jsonClasses] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330223419_U3A_ScheduleCache_RevertToString'
+)
+BEGIN
+    ALTER TABLE [ScheduleCache] ADD [jsonEnrolments] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330223419_U3A_ScheduleCache_RevertToString'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240330223419_U3A_ScheduleCache_RevertToString', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330224648_U3A_ScheduleCache_Revert'
+)
+BEGIN
+    DROP TABLE [ScheduleCache];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240330224648_U3A_ScheduleCache_Revert'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240330224648_U3A_ScheduleCache_Revert', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
+)
+BEGIN
+
+
+    IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'prcDbCleanup')
+    DROP PROCEDURE prcDbCleanup
+
+    /****** Object:  StoredProcedure [dbo].[prcDbCleanup]    Script Date: 2/04/2024 7:32:44 PM ******/
+    SET ANSI_NULLS ON
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
+)
+BEGIN
+
+    SET QUOTED_IDENTIFIER ON
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
+)
+BEGIN
+
+
+
+
+    -- =============================================
+    -- Author:		M Hanlon
+    -- Create date: 16 March 2024
+    -- Description:	End of period - database cleanup
+    -- =============================================
+    CREATE PROCEDURE [dbo].[prcDbCleanup]
+    	-- Add the parameters for the stored procedure here
+    AS
+    BEGIN
+    	-- SET NOCOUNT ON added to prevent extra result sets from
+    	-- interfering with SELECT statements.
+    	SET NOCOUNT ON;
+
+    	declare @Year int
+    			,@termNumber int
+    			,@START_OF_EPOCH int
+    			,@PERSON_DELETE_FLAG datetime
+    			,@Today datetime
+    			,@RetainAttendanceForYears int
+    			,@RetainEnrolmentForYears int
+    			,@RetainFinancialsForYears int
+    			,@RetainRegistrationsNeverCompletedForDays int
+    			,@RetainUnfinancialPersonsForYears int
+
+    	set @START_OF_EPOCH = 2020
+    	set @PERSON_DELETE_FLAG = CAST('1-jan-1800' as datetime)
+    	set @Today = getdate() at time zone 'UTC'
+    	set @Year = DATEPART(year,@Today)
+
+    	select Top 1 @Year=[Year],@termNumber=[TermNumber] from Term where IsDefaultTerm=1
+    	if (@Year is null) goto endall
+
+    	select @RetainAttendanceForYears=[RetainAttendanceForYears]
+    		  ,@RetainEnrolmentForYears=[RetainEnrolmentForYears]
+    		  ,@RetainFinancialsForYears=[RetainFinancialsForYears]
+    		  ,@RetainRegistrationsNeverCompletedForDays=[RetainRegistrationsNeverCompletedForDays]
+    		  ,@RetainUnfinancialPersonsForYears=[RetainUnfinancialPersonsForYears]
+    	from [dbo].[SystemSettings]
+
+
+    	delete CourseType
+    		where CourseType.Discontinued = 1 and CourseType.ID not in (select CourseTypeID from Course)
+    	delete Venue
+    		where Venue.Discontinued = 1 and Venue.ID not in (select VenueID from Class)
+    	delete Enrolment
+    		where DATEDIFF(YEAR,Created, @Today) > @RetainEnrolmentForYears
+    	delete Dropout
+    		where DATEDIFF(YEAR,Created, @Today) > @RetainEnrolmentForYears
+    	delete Receipt
+    		where DATEDIFF(YEAR,[Date], @Today) > @RetainFinancialsForYears
+    	delete Fee
+    		where DATEDIFF(YEAR,[Date], @Today) > @RetainFinancialsForYears
+    	delete OnlinePaymentStatus
+    		where DATEDIFF(YEAR,[CreatedOn], @Today) > @RetainFinancialsForYears
+    	delete OnlinePaymentStatus
+    		where DATEDIFF(YEAR,[CreatedOn], @Today) > @RetainFinancialsForYears
+
+    	-- persons who have never completed registration
+    	delete Person
+    		where FinancialTo = @START_OF_EPOCH
+    		and DATEDIFF(day,CreatedOn,@Today) > @RetainRegistrationsNeverCompletedForDays
+
+    	-- unfinancial persons - set delete flag so we don't lose history
+        update Person
+    		set DateCeased = @PERSON_DELETE_FLAG
+            where FinancialTo != @START_OF_EPOCH
+    				and @year - FinancialTo > @RetainUnfinancialPersonsForYears
+
+    	-- delete Term will cascade deletes to Class, AttendClass, Enrolment, Dropout
+    	delete Term
+    			where @Year - [Year] > @RetainAttendanceForYears
+    	
+    	-- leave allows a null CourseID so delete manually
+    	delete Leave
+    		where CourseID in (
+    			select ID from Course 
+    			where @Year - [Year] > @RetainAttendanceForYears)
+    	delete Course
+    			where @Year - [Year] > @RetainAttendanceForYears
+    		
+    	-- delete leaders manually
+    	update Class
+    		set LeaderID = null where LeaderID in (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	update Class
+    		set Leader2ID = null where Leader2ID in (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	update Class
+    		set Leader3ID = null where Leader3ID in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	delete Committee
+    		where PersonID in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	delete Volunteer
+    		where PersonID in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)
+
+    	-- delete Person will cascade deletes to Receipt, Fee, Leave, AttendClass, Enrolment, Dropout
+    	delete Person  
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears												
+
+    endall:
+    	return 0
+    END
+
+                    
+
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
+)
+BEGIN
+
+
+
+
+        
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240402083049_U3A_sp_DbCleanup_02_APR_2024', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240403235406_U3A_model_indexFix'
+)
+BEGIN
+    ALTER TABLE [SystemSettings] ADD [U3AdminEmailRecipients] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240403235406_U3A_model_indexFix'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240403235406_U3A_model_indexFix', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240406021353_U3A_Schedule_TenantIdentifier'
+)
+BEGIN
+    ALTER TABLE [Schedule] ADD [TenantIdentifier] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240406021353_U3A_Schedule_TenantIdentifier'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240406021353_U3A_Schedule_TenantIdentifier', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240406031316_U3A_Cousre_AllowMultiCampusFrom'
+)
+BEGIN
+    ALTER TABLE [Course] ADD [AllowMultiCampsuFrom] datetime2 NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240406031316_U3A_Cousre_AllowMultiCampusFrom'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240406031316_U3A_Cousre_AllowMultiCampusFrom', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240408021909_U3A_Person_TenantIdentifier'
+)
+BEGIN
+    ALTER TABLE [Person] ADD [TenantIdentifier] nvarchar(450) NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240408021909_U3A_Person_TenantIdentifier'
+)
+BEGIN
+    CREATE INDEX [IX_Person_TenantIdentifier] ON [Person] ([TenantIdentifier]);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240408021909_U3A_Person_TenantIdentifier'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240408021909_U3A_Person_TenantIdentifier', N'8.0.3');
+END;
+GO
+
+COMMIT;
+GO
+

@@ -1,4 +1,5 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantStoreDbContext> TenantDbfactory
 @implements IAsyncDisposable
 @inject IJSRuntime js
 @inject NavigationManager NavMan
@@ -104,6 +105,11 @@ else
                                 <div class="mx-1 d-flex">
                                     <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
                                         @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
+                                        <span class="text-info"><strong>
+                                        @((!string.IsNullOrWhiteSpace(c.Course.SponsoredBy) 
+                                            ? $" | {c.Course.SponsoredBy}" : ""))
+                                            </strong>
+                                        </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
                                     {
@@ -131,6 +137,13 @@ else
                                             <div class="row px-2 px-md-3 col-12">
                                                 <div class="text-info col-12 text-center h6">@GetStatus(@c)</div>
                                             </div>
+
+                                            @if (!string.IsNullOrEmpty(c.Course.SponsoredBy))
+                                            {
+                                            <div class="row px-2 px-md-3 col-12">
+                                                <div class="text-info col-12 text-center h6">@($"Sponsored By: {c.Course.SponsoredBy}")</div>
+                                            </div>
+                                            }
 
                                             <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
                                                 <em style="white-space: pre-line">
@@ -422,7 +435,7 @@ else
     bool isProgressVisible { get; set; }
 
     U3ADbContext? dbc { get; set; }
-
+    TenantStoreDbContext? dbcT { get; set; }
 
     Term? term;
     Term? prevTerm;
@@ -454,6 +467,7 @@ else
     bool IsMobileLayout;
 
     Person perosn;
+    bool isFinancial;
     bool isNotInEnrolmentPeriod = false;
     bool IsReady = false;
     bool isDirty = false;
@@ -553,6 +567,7 @@ else
         deletedClasses = new List<Class>();
         activeTabIndex = 0;
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        dbcT = await TenantDbfactory.CreateDbContextAsync();
         // wire up the data
         settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
         if (IsPreview)
@@ -590,7 +605,9 @@ else
             else
             {
                 // Fast lookup from Schedule cache
-                Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, term, settings, exludeOffScheduleActivities);
+                isFinancial = false;
+                if (loginState.SelectedPerson.FinancialTo >= term.Year) { isFinancial = true; }
+                Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, term, settings, exludeOffScheduleActivities, isFinancial);
             }
             if (Classes != null)
             {

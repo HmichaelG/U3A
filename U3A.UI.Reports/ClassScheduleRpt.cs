@@ -15,7 +15,10 @@ using U3A.Model;
 
 namespace U3A.UI.Reports
 {
-    public partial class ClassScheduleRpt : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContext, IXtraReportWithNavManager
+    public partial class ClassScheduleRpt 
+        : DevExpress.XtraReports.UI.XtraReport, 
+            IXtraReportWithDbContextAndTenantDbContext, 
+            IXtraReportWithNavManager
     {
         public ClassScheduleRpt()
         {
@@ -23,6 +26,7 @@ namespace U3A.UI.Reports
         }
 
         public U3ADbContext DbContext { get; set; }
+        public TenantStoreDbContext TenantDbContext { get; set; }
         public NavigationManager NavManager { get; set; }
 
         private void ClassSchedule_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
@@ -55,7 +59,9 @@ namespace U3A.UI.Reports
             {
                 if ((int)prmIntendedUse.Value == 0)
                 {
-                    DataSource = BusinessRule.RestoreClassesFromSchedule(DbContext, term, settings, exludeOffScheduleActivities: true);
+                    DataSource = BusinessRule.RestoreClassesFromSchedule(DbContext,
+                                        TenantDbContext,
+                                        term, settings, exludeOffScheduleActivities: true);
                 }
                 else
                 {

@@ -11,4 +11,9 @@ namespace U3A.UI.Reports
     {
         public U3ADbContext DbContext { get; set; }
     }
+    public interface IXtraReportWithDbContextAndTenantDbContext
+    {
+        public U3ADbContext DbContext { get; set; }
+        public TenantStoreDbContext TenantDbContext { get; set; }
+    }
 }

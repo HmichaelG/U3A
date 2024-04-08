@@ -5,6 +5,7 @@
 @inject IJSRuntime js
 @inject NavigationManager NavManager
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantStoreDbContext> TenantDbfactory
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @implements IDisposable
 
@@ -46,10 +47,12 @@ else
     MarkupString message = new MarkupString("");
     DxReportViewer? reportViewer;
     U3ADbContext? dbc { get; set; }
+    TenantStoreDbContext? dbcT { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        dbcT = await TenantDbfactory.CreateDbContextAsync();
         var today = DateTime.Today;
         Term? term = BusinessRule.CurrentEnrolmentTerm(dbc);
         if (term != null)
@@ -61,6 +64,7 @@ else
                 prm.Visible = false;
             }
             rpt.DbContext = dbc;
+            rpt.TenantDbContext = dbcT;
             rpt.prmTerm.Value = term.ID;
             rpt.prmIntendedUse.Value = 0; // Public
             rpt.CreateReport();

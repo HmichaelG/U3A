@@ -1,8 +1,8 @@
-﻿update-database -cont TenantStoreDbContext -project U3A.Database Schedule
+﻿update-database -cont TenantStoreDbContext -project U3A.Database MultiCampusPerson_delBaseEntity
 
-remove-migration -cont TenantStoreDbContext -project U3A.Database -args Schedules_to_Schedule
+remove-migration -cont TenantStoreDbContext -project U3A.Database -args createMCPeopleAndScheduleCache
 
-add-migration -cont TenantStoreDbContext -project U3A.Database Schedules_to_Schedule
+add-migration -cont TenantStoreDbContext -project U3A.Database createMCPeopleAndScheduleCache
 
 update-database -cont TenantStoreDbContext -project U3A.Database
 

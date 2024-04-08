@@ -11,31 +11,38 @@ using U3A.Services;
 using DevExpress.Blazor;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using U3A.Database.Migrations.TenantStoreDb;
+using DevExpress.XtraRichEdit.Import.OpenXml;
 
 namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
         public static List<Class> RestoreClassesFromSchedule(U3ADbContext dbc,
+                                    TenantStoreDbContext dbcT,
                                     Term term, SystemSettings settings,
                                     bool exludeOffScheduleActivities)
         {
             Task<List<Class>> syncTask = Task.Run(async () =>
             {
-                return await RestoreClassesFromScheduleAsync(dbc, term, settings, exludeOffScheduleActivities);
+                return await RestoreClassesFromScheduleAsync(dbc, dbcT, term, settings, exludeOffScheduleActivities, true);
             });
             syncTask.Wait();
             return syncTask.Result;
         }
         public static async Task<List<Class>> RestoreClassesFromScheduleAsync(U3ADbContext dbc,
+                                                    TenantStoreDbContext dbcT,
                                                     Term term, SystemSettings settings,
-                                                    bool exludeOffScheduleActivities)
+                                                    bool exludeOffScheduleActivities,
+                                                    bool IsFinancial)
         {
             var classes = new ConcurrentBag<Class>();
             // get the first recorded schedule
             var firstSchedule = await dbc.Schedule.AsNoTracking()
                                         .OrderBy(x => x.CreatedOn)
                                         .FirstOrDefaultAsync();
+            TenantInfo tInfo = await dbcT.TenantInfo
+                                    .FirstOrDefaultAsync(x => x.Identifier == firstSchedule.TenantIdentifier);
             // Get Class updates since cache creation
             foreach (var c in await GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities, firstSchedule.UpdatedOn))
             {
@@ -87,9 +94,34 @@ namespace U3A.BusinessRules
                 if (!liveKeys.Contains(c.ID)) { deletions.Add(c); }
             });
             List<Class> result = classes.Except(deletions).ToList();
+
+
+            // Get the multi-campus classes, only for financial members
+            if (IsFinancial)
+            {
+                classes.Clear();
+                var tenantInfo = await dbcT.TenantInfo.ToListAsync();
+                var mcSchedule = await dbcT.ScheduleCache
+                                    .AsNoTracking()
+                                    .Where(x => x.TenantIdentifier != tInfo.Identifier)
+                                    .ToListAsync();
+                Parallel.ForEach(mcSchedule, async s =>
+                {
+                    var c = JsonSerializer.Deserialize<Class>(s.jsonClass.Unzip());
+                    var id = result.FirstOrDefault(x => x.ID == c.ID);
+                    if (id == null)
+                    {
+                        var mcTenant = tenantInfo.FirstOrDefault(x => x.Identifier == s.TenantIdentifier);
+                        if (mcTenant != null) { c.Course.SponsoredBy = mcTenant.Name; }
+                        classes.Add(c);
+                    }
+                });
+
+                result.AddRange(classes);
+            }
+
             // sort & return the result
-            return result
-                .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
+            return result.OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
                 .ToList();
         }
         public static async Task BuildScheduleAsync(U3ADbContext dbc,
@@ -102,12 +134,12 @@ namespace U3A.BusinessRules
                 await BuildScheduleAsync(dbc, dbcT, tenantInfo.Identifier);
             }
         }
-        public static async Task BuildScheduleAsync(U3ADbContext dbc, 
+        public static async Task BuildScheduleAsync(U3ADbContext dbc,
                                                         TenantStoreDbContext dbcT,
                                                         string TenantIdentifier)
         {
-            List<Schedule> schedules = new List<Schedule>();
-            List<Schedule> multiCampusSchedules = new List<Schedule>();
+            List<ScheduleCache> schedules = new List<ScheduleCache>();
+            List<ScheduleCache> multiCampusSchedules = new List<ScheduleCache>();
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             var term = BusinessRule.CurrentEnrolmentTerm(dbc);
             if (term != null)
@@ -116,8 +148,10 @@ namespace U3A.BusinessRules
                 foreach (var c in classes)
                 {
                     schedules.Add(processClasses(c, settings, TenantIdentifier));
-                    if (c.Course.AllowMultiCampsuFrom != null 
-                            && c.Course.AllowMultiCampsuFrom >= TimezoneAdjustment.GetLocalTime().Date)
+                    var now = TimezoneAdjustment.GetLocalTime().Date;
+                    if (c.Course.AllowMultiCampsuFrom != null
+                            && c.Course.AllowMultiCampsuFrom >= TimezoneAdjustment.GetLocalTime().Date
+                            && !c.Course.IsOffScheduleActivity)
                     {
                         multiCampusSchedules.Add(processClasses(c, settings, TenantIdentifier));
                     }
@@ -141,8 +175,11 @@ namespace U3A.BusinessRules
                 await dbcT.Database.BeginTransactionAsync();
                 try
                 {
-                    await dbcT.Schedule.Where(x => x.TenantIdentifier == TenantIdentifier).ExecuteDeleteAsync();
-                    await dbcT.Schedule.AddRangeAsync(multiCampusSchedules);
+                    // Schedule cache
+                    await dbcT.ScheduleCache.Where(x => x.TenantIdentifier == TenantIdentifier).ExecuteDeleteAsync();
+                    await dbcT.ScheduleCache.AddRangeAsync(multiCampusSchedules);
+                    // members
+                    await UpdatePersonCache(dbc, dbcT, TenantIdentifier);
                     await dbcT.SaveChangesAsync();
                     await dbcT.Database.CommitTransactionAsync();
                 }
@@ -153,12 +190,73 @@ namespace U3A.BusinessRules
             }
         }
 
-        private static Schedule processClasses(Class c, SystemSettings settings, string TenantIdentifier)
+        private static async Task UpdatePersonCache(U3ADbContext dbc,
+                                                        TenantStoreDbContext dbcT,
+                                                        string TenantIdentifier)
+        {
+            ConcurrentBag<MultiCampusPeople> deleted = new();
+            ConcurrentBag<MultiCampusPeople> additions = new();
+            ConcurrentBag<MultiCampusPeople> updates = new();
+            var people = await BusinessRule.SelectableFinancialPeopleAsync(dbc);
+            var mcPeople = await dbcT.MultiCampusPeople
+                                .Where(x => x.TenantIdentifier == TenantIdentifier)
+                                .ToListAsync();
+            if (mcPeople != null && mcPeople.Count > 0)
+            {
+                Parallel.ForEach(mcPeople, async mcp =>
+                {
+                    if (!people.Any(x => x.ID == mcp.ID)) { deleted.Add(mcp); }
+                    else
+                    {
+                        var p = people.FirstOrDefault(x => x.ID == mcp.ID);
+                        mcp = UpdateMultiCampusPerson(mcp, p, TenantIdentifier);
+                        updates.Add(mcp);
+                    }
+                });
+            }
+            if (people != null && people.Count > 0)
+            {
+                Parallel.ForEach(people, async p =>
+                {
+                    if (!mcPeople.Any(x => x.ID == p.ID))
+                    {
+                        var mcp = new MultiCampusPeople();
+                        mcp = UpdateMultiCampusPerson(mcp, p, TenantIdentifier);
+                        additions.Add(mcp);
+                    }
+                });
+            }
+            await dbcT.AddRangeAsync(additions);
+            dbcT.RemoveRange(deleted);
+            dbcT.UpdateRange(updates);
+        }
+
+        private static MultiCampusPeople UpdateMultiCampusPerson
+                           (MultiCampusPeople mcp, Person p, string TenantIdentifier)
+        {
+            mcp.ID = p.ID;
+            mcp.TenantIdentifier = TenantIdentifier;
+            mcp.Email = p.Email;
+            mcp.Communication = p.Communication;
+            mcp.FirstName = p.FirstName;
+            mcp.HomePhone = p.HomePhone;
+            mcp.ICEContact = p.ICEContact;
+            mcp.LastName = p.LastName;
+            mcp.ICEPhone = p.ICEPhone;
+            mcp.Mobile = p.Mobile;
+            mcp.PostNominals = p.PostNominals;
+            mcp.SMSOptOut = p.SMSOptOut;
+            mcp.Title = p.Title;
+            mcp.VaxCertificateViewed = p.VaxCertificateViewed;
+            return mcp;
+        }
+
+        private static ScheduleCache processClasses(Class c, SystemSettings settings, string TenantIdentifier)
         {
             var cls = JsonSerializer.Serialize<Class>(c).Zip();
             var classEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Enrolments).Zip();
             var courseEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Course.Enrolments).Zip();
-            var s = new Schedule()
+            var s = new ScheduleCache()
             {
                 TenantIdentifier = TenantIdentifier,
                 jsonClass = cls,

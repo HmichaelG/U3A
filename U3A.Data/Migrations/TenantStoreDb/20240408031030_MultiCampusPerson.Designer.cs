@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.TenantStoreDb
 {
     [DbContext(typeof(TenantStoreDbContext))]
-    partial class TenantStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240408031030_MultiCampusPerson")]
+    partial class MultiCampusPerson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,7 +65,7 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.ToTable("ContactRequest");
                 });
 
-            modelBuilder.Entity("U3A.Model.MultiCampusPeople", b =>
+            modelBuilder.Entity("U3A.Model.MultiCampusPerson", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -71,6 +74,9 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.Property<string>("Communication")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
@@ -110,6 +116,12 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("User")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("VaxCertificateViewed")
                         .HasColumnType("bit");
 
@@ -117,10 +129,10 @@ namespace U3A.Database.Migrations.TenantStoreDb
 
                     b.HasIndex("LastName", "FirstName", "Email");
 
-                    b.ToTable("MultiCampusPeople");
+                    b.ToTable("MultiCampusPerson");
                 });
 
-            modelBuilder.Entity("U3A.Model.ScheduleCache", b =>
+            modelBuilder.Entity("U3A.Model.Schedule", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -153,7 +165,7 @@ namespace U3A.Database.Migrations.TenantStoreDb
 
                     b.HasKey("ID");
 
-                    b.ToTable("ScheduleCache");
+                    b.ToTable("Schedule");
                 });
 
             modelBuilder.Entity("U3A.Model.TenantInfo", b =>

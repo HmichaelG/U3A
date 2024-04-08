@@ -118,6 +118,8 @@ namespace U3A.Model
             }
         }
 
+        [NotMapped]
+        public string? SponsoredBy { get; set; } // The U3A that owns the course
     }
 
     public class UrlAttribute : ValidationAttribute

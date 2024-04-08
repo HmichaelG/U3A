@@ -9,6 +9,7 @@
 
 @inject NavigationManager NavMan
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantStoreDbContext> TenantDbfactory
 @implements IDisposable
 
 @using DevExpress.XtraReports.Services
@@ -55,12 +56,14 @@
     string viewerHeight;
 
     U3ADbContext dbc { get; set; }
+    TenantStoreDbContext dbcT { get; set; }
     bool isReady;
 
     protected override async Task OnInitializedAsync()
     {
         viewerHeight = (Workstation.UseTopMenu) ? "calc(100vh - 4rem) !important;" : "calc(100vh - 1rem) !important;";
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        dbcT = await TenantDbfactory.CreateDbContextAsync();
         if (Report == null)
         {
             Type? thisType = Type.GetType($"U3A.UI.Reports.{ReportName}");
@@ -72,11 +75,18 @@
                 {
                     (Report as IXtraReportWithNavManager).NavManager = NavMan;
                 }
-                if (Report is IXtraReportWithDbContext || Report is IXtraReportWithDbContextFactory)
+                if (Report is IXtraReportWithDbContext
+                    || Report is IXtraReportWithDbContextAndTenantDbContext
+                    || Report is IXtraReportWithDbContextFactory)
                 {
                     if (Report is IXtraReportWithDbContext)
                     {
                         (Report as IXtraReportWithDbContext).DbContext = dbc;
+                    }
+                    if (Report is IXtraReportWithDbContextAndTenantDbContext)
+                    {
+                        (Report as IXtraReportWithDbContextAndTenantDbContext).DbContext = dbc;
+                        (Report as IXtraReportWithDbContextAndTenantDbContext).TenantDbContext = dbcT;
                     }
                     if (Report is IXtraReportWithDbContextFactory)
                     {
@@ -119,7 +129,7 @@
                 BeginGroup = true,
                 Text = "Close Report",
                 AdaptiveText = "Close Report",
-                AdaptivePriority = 1,                  
+                AdaptivePriority = 1,
                 Click = async (args) =>
                 {
                     if (OnCloseButtonClick.HasDelegate)

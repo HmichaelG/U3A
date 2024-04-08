@@ -41,7 +41,8 @@ namespace U3A.Database
         }
 
         public DbSet<ContactRequest> ContactRequest { get; set; }
-        public DbSet<Schedule> Schedule { get; set; }
+        public DbSet<ScheduleCache> ScheduleCache { get; set; }
+        public DbSet<MultiCampusPeople> MultiCampusPeople { get; set; }
         public DbSet<TenantInfo> TenantInfo { get; set; }
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
                             CancellationToken cancellationToken = default(CancellationToken))

@@ -62,10 +62,10 @@ else
                     <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid IsMasterDetail=true>
                         <CustomButtonContent>
                             <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-database"
-                                      Text="Rebuild Cache"
-                                      RenderStyle="@ButtonRenderStyle.Primary"
-                                      RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                      Click="@OnRebuild" />
+                                           Text="Rebuild Cache"
+                                           RenderStyle="@ButtonRenderStyle.Primary"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           Click="@OnRebuild" />
                             <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-check-circle"
                                            Text="Preview Schedule"
                                            RenderStyle="@ButtonRenderStyle.Info"
@@ -227,11 +227,11 @@ else
         await progressBar.ShowSmallSpinnerAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            await BusinessRule.BuildScheduleAsync(dbc,TenantDbfactory,HttpContextAccessor);
+            await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory, HttpContextAccessor);
+            await progressBar.Close();
+            await InvokeAsync(StateHasChanged);
+            await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");
         }
-        await progressBar.Close();
-        await InvokeAsync(StateHasChanged);
-        await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");
     }
 
     async Task OnPreview(int TermNumber)

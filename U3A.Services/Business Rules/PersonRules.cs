@@ -56,6 +56,19 @@ namespace U3A.BusinessRules
             await ApplyGroupsAsync(dbc, people);
             return people.Where(x => x.FinancialTo >= term.Year - 1).ToList();
         }
+        public static async Task<List<Person>> SelectableFinancialPeopleAsync(U3ADbContext dbc)
+        {
+            var currentTerm = await dbc.Term.AsNoTracking()
+                                .OrderByDescending(x => x.IsDefaultTerm)
+                                .FirstOrDefaultAsync();
+            if (currentTerm == null) { return null; }
+            return await dbc.Person.AsNoTracking()
+                            .Where(x => x.DateCeased == null 
+                                        && x.FinancialTo >= currentTerm.Year)
+                            .OrderBy(x => x.LastName)
+                            .ThenBy(x => x.FirstName)
+                            .ThenBy(x => x.Email).ToListAsync();
+        }
         public static async Task<List<Person>> SelectablePersonsNotEnrolledAsync(U3ADbContext dbc,
                                                 Term CurrentTerm,
                                                 DateTime FromDate,
