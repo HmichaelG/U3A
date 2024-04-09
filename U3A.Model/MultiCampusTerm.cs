@@ -15,6 +15,7 @@ namespace U3A.Model
     {
         [Key]
         public Guid ID { get; set; }
+        public string TenantIdentifier { get; set; }
         public int Year { get; set; }
         public int TermNumber { get; set; }
         public DateTime StartDate { get; set; }

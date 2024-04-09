@@ -138,6 +138,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
+builder.Services.AddScoped<TenantInfoService>();
 
 if (!builder.Environment.IsDevelopment())
 {

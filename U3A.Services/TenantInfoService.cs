@@ -5,13 +5,20 @@ using System.Text;
 using U3A.Database;
 using U3A.Model;
 
-namespace U3A.BusinessRules
+namespace U3A.Services
 {
-    public static partial class BusinessRule
+    public class TenantInfoService
     {
-        public static async Task<TenantInfo> GetTenantInfoAsync(
-                                IDbContextFactory<TenantDbContext> TenantDbFactory, 
+        private readonly IDbContextFactory<TenantDbContext> TenantDbFactory;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public TenantInfoService(
+                                IDbContextFactory<TenantDbContext> TenantDbFactory,
                                 IHttpContextAccessor httpContextAccessor)
+        { 
+            this.TenantDbFactory = TenantDbFactory;
+            this.httpContextAccessor = httpContextAccessor;
+        }
+        public async Task<TenantInfo> GetTenantInfoAsync()
         {
             HostStrategy hs = new HostStrategy();
 

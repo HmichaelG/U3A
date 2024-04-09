@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.TenantStoreDb
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240409204722_TdB_MCTerm_identifier")]
+    partial class TdB_MCTerm_identifier
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,45 +63,6 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.HasKey("Id");
 
                     b.ToTable("ContactRequest");
-                });
-
-            modelBuilder.Entity("U3A.Model.MultiCampusEnrolment", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ClassID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CourseID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateEnrolled")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCourseClerk")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsWaitlisted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("PersonID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("TenantIdentifier")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("TermID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("MultiCampusEnrolment");
                 });
 
             modelBuilder.Entity("U3A.Model.MultiCampusPerson", b =>
@@ -159,42 +123,6 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.ToTable("MultiCampusPerson");
                 });
 
-            modelBuilder.Entity("U3A.Model.MultiCampusSchedule", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TenantIdentifier")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("User")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("jsonClass")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("jsonClassEnrolments")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("jsonCourseEnrolments")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("MultiCampusSchedule");
-                });
-
             modelBuilder.Entity("U3A.Model.MultiCampusTerm", b =>
                 {
                     b.Property<Guid>("ID")
@@ -232,6 +160,42 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.HasKey("ID");
 
                     b.ToTable("MultiCampusTerm");
+                });
+
+            modelBuilder.Entity("U3A.Model.ScheduleCache", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenantIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("User")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("jsonClass")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("jsonClassEnrolments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("jsonCourseEnrolments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("ScheduleCache");
                 });
 
             modelBuilder.Entity("U3A.Model.TenantInfo", b =>

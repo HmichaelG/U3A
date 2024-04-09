@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class ScheduleCache : BaseEntity
+    public class MultiCampusSchedule : BaseEntity
     {
         public Guid ID { get; set; }
 

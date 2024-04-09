@@ -97,12 +97,22 @@ namespace U3A.BusinessRules
             return terms;
         }
 
+        public static async Task<List<Term>> SelectableTermsInCurrentYearAsync(U3ADbContext dbc)
+        {
+            var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+            return await SelectableTermsInCurrentYearAsync(dbc, currentTerm);
+        }
         public static async Task<List<Term>> SelectableTermsInCurrentYearAsync(U3ADbContext dbc, Term CurrentTerm)
         {
             return await dbc.Term.AsNoTracking()
                 .Where(x => x.Year == CurrentTerm.Year && x.TermNumber >= CurrentTerm.TermNumber)
                 .OrderBy(x => x.Year).ThenBy(x => x.TermNumber)
                 .ToListAsync();
+        }
+        public static async Task<List<Term>> GetAllTermsInCurrentYearAsync(U3ADbContext dbc)
+        {
+            var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+            return await GetAllTermsInCurrentYearAsync(dbc, currentTerm);
         }
         public static async Task<List<Term>> GetAllTermsInCurrentYearAsync(U3ADbContext dbc, Term CurrentTerm)
         {

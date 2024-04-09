@@ -5,6 +5,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject IHttpContextAccessor HttpContextAccessor
+@inject TenantInfoService tenantService
 @implements IDisposable
 
 @using Microsoft.AspNetCore.Http
@@ -227,7 +228,8 @@ else
         await progressBar.ShowSmallSpinnerAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory, HttpContextAccessor);
+            var tenant = await tenantService.GetTenantInfoAsync();
+            await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory,tenant.Identifier);
             await progressBar.Close();
             await InvokeAsync(StateHasChanged);
             await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");

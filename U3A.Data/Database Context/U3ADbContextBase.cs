@@ -48,7 +48,7 @@ namespace U3A.Database
         public DbSet<Report> Report { get; set; }
         public DbSet<DocumentQueue> DocumentQueue { get; set; }
         public DbSet<DocumentQueueAttachment> DocumentQueueAttachment { get; set; }
-        public DbSet<ScheduleCache> Schedule { get; set; }
+        public DbSet<MultiCampusSchedule> Schedule { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
