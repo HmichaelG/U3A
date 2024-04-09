@@ -11,7 +11,7 @@ using U3A.Database;
 
 namespace U3A.Database.Migrations.TenantStoreDb
 {
-    [DbContext(typeof(TenantStoreDbContext))]
+    [DbContext(typeof(TenantDbContext))]
     [Migration("20240406034104_Schedules_to_Schedule")]
     partial class Schedules_to_Schedule
     {

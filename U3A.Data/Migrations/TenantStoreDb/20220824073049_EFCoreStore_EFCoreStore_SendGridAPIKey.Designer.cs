@@ -10,7 +10,7 @@ using U3A.Database;
 
 namespace U3A.Database.Migrations.TenantStoreDb
 {
-    [DbContext(typeof(TenantStoreDbContext))]
+    [DbContext(typeof(TenantDbContext))]
     [Migration("20220824073049_EFCoreStore_EFCoreStore_SendGridAPIKey")]
     partial class EFCoreStore_EFCoreStore_SendGridAPIKey
     {

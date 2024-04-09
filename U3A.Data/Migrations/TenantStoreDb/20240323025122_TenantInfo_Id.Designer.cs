@@ -11,7 +11,7 @@ using U3A.Database;
 
 namespace U3A.Database.Migrations.TenantStoreDb
 {
-    [DbContext(typeof(TenantStoreDbContext))]
+    [DbContext(typeof(TenantDbContext))]
     [Migration("20240323025122_TenantInfo_Id")]
     partial class TenantInfo_Id
     {

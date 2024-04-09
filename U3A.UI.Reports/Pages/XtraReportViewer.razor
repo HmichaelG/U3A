@@ -9,7 +9,7 @@
 
 @inject NavigationManager NavMan
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@inject IDbContextFactory<TenantStoreDbContext> TenantDbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @implements IDisposable
 
 @using DevExpress.XtraReports.Services
@@ -56,7 +56,7 @@
     string viewerHeight;
 
     U3ADbContext dbc { get; set; }
-    TenantStoreDbContext dbcT { get; set; }
+    TenantDbContext dbcT { get; set; }
     bool isReady;
 
     protected override async Task OnInitializedAsync()

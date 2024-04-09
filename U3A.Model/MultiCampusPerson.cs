@@ -11,7 +11,7 @@ using U3A.Model;
 namespace U3A.Model
 {
     [Index(nameof(LastName), nameof(FirstName), nameof(Email))]
-    public class MultiCampusPeople
+    public class MultiCampusPerson
     {
         [Key]
         public Guid ID { get; set; }

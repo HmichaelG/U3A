@@ -19,7 +19,7 @@ namespace U3A.BusinessRules
     public static partial class BusinessRule
     {
         public static List<Class> RestoreClassesFromSchedule(U3ADbContext dbc,
-                                    TenantStoreDbContext dbcT,
+                                    TenantDbContext dbcT,
                                     Term term, SystemSettings settings,
                                     bool exludeOffScheduleActivities)
         {
@@ -31,7 +31,7 @@ namespace U3A.BusinessRules
             return syncTask.Result;
         }
         public static async Task<List<Class>> RestoreClassesFromScheduleAsync(U3ADbContext dbc,
-                                                    TenantStoreDbContext dbcT,
+                                                    TenantDbContext dbcT,
                                                     Term term, SystemSettings settings,
                                                     bool exludeOffScheduleActivities,
                                                     bool IsFinancial)
@@ -125,7 +125,7 @@ namespace U3A.BusinessRules
                 .ToList();
         }
         public static async Task BuildScheduleAsync(U3ADbContext dbc,
-                                        IDbContextFactory<TenantStoreDbContext> TenantDbFactory,
+                                        IDbContextFactory<TenantDbContext> TenantDbFactory,
                                         IHttpContextAccessor httpContextAccessor)
         {
             var tenantInfo = await BusinessRule.GetTenantInfoAsync(TenantDbFactory, httpContextAccessor);
@@ -135,7 +135,7 @@ namespace U3A.BusinessRules
             }
         }
         public static async Task BuildScheduleAsync(U3ADbContext dbc,
-                                                        TenantStoreDbContext dbcT,
+                                                        TenantDbContext dbcT,
                                                         string TenantIdentifier)
         {
             List<ScheduleCache> schedules = new List<ScheduleCache>();
@@ -191,14 +191,14 @@ namespace U3A.BusinessRules
         }
 
         private static async Task UpdatePersonCache(U3ADbContext dbc,
-                                                        TenantStoreDbContext dbcT,
+                                                        TenantDbContext dbcT,
                                                         string TenantIdentifier)
         {
-            ConcurrentBag<MultiCampusPeople> deleted = new();
-            ConcurrentBag<MultiCampusPeople> additions = new();
-            ConcurrentBag<MultiCampusPeople> updates = new();
+            ConcurrentBag<MultiCampusPerson> deleted = new();
+            ConcurrentBag<MultiCampusPerson> additions = new();
+            ConcurrentBag<MultiCampusPerson> updates = new();
             var people = await BusinessRule.SelectableFinancialPeopleAsync(dbc);
-            var mcPeople = await dbcT.MultiCampusPeople
+            var mcPeople = await dbcT.MultiCampusPerson
                                 .Where(x => x.TenantIdentifier == TenantIdentifier)
                                 .ToListAsync();
             if (mcPeople != null && mcPeople.Count > 0)
@@ -220,7 +220,7 @@ namespace U3A.BusinessRules
                 {
                     if (!mcPeople.Any(x => x.ID == p.ID))
                     {
-                        var mcp = new MultiCampusPeople();
+                        var mcp = new MultiCampusPerson();
                         mcp = UpdateMultiCampusPerson(mcp, p, TenantIdentifier);
                         additions.Add(mcp);
                     }
@@ -231,8 +231,8 @@ namespace U3A.BusinessRules
             dbcT.UpdateRange(updates);
         }
 
-        private static MultiCampusPeople UpdateMultiCampusPerson
-                           (MultiCampusPeople mcp, Person p, string TenantIdentifier)
+        private static MultiCampusPerson UpdateMultiCampusPerson
+                           (MultiCampusPerson mcp, Person p, string TenantIdentifier)
         {
             mcp.ID = p.ID;
             mcp.TenantIdentifier = TenantIdentifier;

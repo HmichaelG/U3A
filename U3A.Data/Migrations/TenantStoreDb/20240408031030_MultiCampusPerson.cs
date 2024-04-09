@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace U3A.Database.Migrations.TenantStoreDb
 {
     /// <inheritdoc />
-    public partial class MultiCampusPerson : Migration
+    public partial class createMultiCampusPerson : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

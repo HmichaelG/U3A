@@ -5,7 +5,7 @@
 @inject IJSRuntime js
 @inject NavigationManager NavManager
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@inject IDbContextFactory<TenantStoreDbContext> TenantDbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @implements IDisposable
 
@@ -47,7 +47,7 @@ else
     MarkupString message = new MarkupString("");
     DxReportViewer? reportViewer;
     U3ADbContext? dbc { get; set; }
-    TenantStoreDbContext? dbcT { get; set; }
+    TenantDbContext? dbcT { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

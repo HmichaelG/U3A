@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var MultiTenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
 var assemblyName = typeof(U3ADbContext).Namespace;
-builder.Services.AddDbContext<TenantStoreDbContext>(options =>
+builder.Services.AddDbContext<TenantDbContext>(options =>
     options.UseSqlServer(MultiTenantConnectionString,
      b =>
      {
@@ -18,7 +18,7 @@ builder.Services.AddDbContext<TenantStoreDbContext>(options =>
      )
 );
 
-builder.Services.AddDbContextFactory<TenantStoreDbContext>(options =>
+builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
     options.UseSqlServer();
 }, ServiceLifetime.Scoped);

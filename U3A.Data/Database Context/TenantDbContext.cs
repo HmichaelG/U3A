@@ -10,17 +10,17 @@ using U3A.Model;
 namespace U3A.Database
 {
 
-    public class TenantStoreDbContext : DbContext
+    public class TenantDbContext : DbContext
     {
         internal AuthenticationStateProvider authenticationStateProvider;
         private readonly string cnnStr;
 
-        public TenantStoreDbContext(String ConnectionString) { 
+        public TenantDbContext(String ConnectionString) { 
             cnnStr = ConnectionString;
         }
 
         [ActivatorUtilitiesConstructor] // force DI to use this constructor
-        public TenantStoreDbContext(DbContextOptions<TenantStoreDbContext> options,
+        public TenantDbContext(DbContextOptions<TenantDbContext> options,
                           AuthenticationStateProvider? AuthStateProvider) : base(options)
         {
             authenticationStateProvider = AuthStateProvider;
@@ -42,7 +42,8 @@ namespace U3A.Database
 
         public DbSet<ContactRequest> ContactRequest { get; set; }
         public DbSet<ScheduleCache> ScheduleCache { get; set; }
-        public DbSet<MultiCampusPeople> MultiCampusPeople { get; set; }
+        public DbSet<MultiCampusPerson> MultiCampusPerson { get; set; }
+        public DbSet<MultiCampusTerm> MultiCampusTerm { get; set; }
         public DbSet<TenantInfo> TenantInfo { get; set; }
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
                             CancellationToken cancellationToken = default(CancellationToken))

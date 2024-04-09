@@ -1,9 +1,9 @@
-﻿update-database -cont TenantStoreDbContext -project U3A.Database MultiCampusPerson_delBaseEntity
+﻿update-database -cont TenantDbContext -project U3A.Database createMCPeopleAndScheduleCache
 
-remove-migration -cont TenantStoreDbContext -project U3A.Database -args createMCPeopleAndScheduleCache
+remove-migration -cont TenantDbContext -project U3A.Database -args createMCTerm
 
-add-migration -cont TenantStoreDbContext -project U3A.Database createMCPeopleAndScheduleCache
+add-migration -cont TenantSDbContext -project U3A.Database createMCTerm
 
-update-database -cont TenantStoreDbContext -project U3A.Database
+update-database -cont TenantDbContext -project U3A.Database
 
-script-migration -cont TenantStoreDbContext -project U3A.Database -idempotent -Output TenantMigration.sql
+script-migration -cont TenantDbContext -project U3A.Database -idempotent -Output TenantMigration.sql

@@ -26,7 +26,7 @@ namespace U3A.UI.Reports
         }
 
         public U3ADbContext DbContext { get; set; }
-        public TenantStoreDbContext TenantDbContext { get; set; }
+        public TenantDbContext TenantDbContext { get; set; }
         public NavigationManager NavManager { get; set; }
 
         private void ClassSchedule_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)

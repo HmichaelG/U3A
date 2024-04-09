@@ -2,7 +2,7 @@
 
 @using Microsoft.Data.SqlClient
 @inject IJSRuntime js
-@inject IDbContextFactory<TenantStoreDbContext> Tenantdbfactory
+@inject IDbContextFactory<TenantDbContext> Tenantdbfactory
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
@@ -108,7 +108,7 @@ else
     bool IsEditEnabled = false;
     int ActiveTabIndex { get; set; } = 0;
     private SystemSettings? systemSettings { get; set; }
-    TenantStoreDbContext? dbc { get; set; }
+    TenantDbContext? dbc { get; set; }
     TenantInfo selectedTenant = new();
     string DatabaseCatalog;
 

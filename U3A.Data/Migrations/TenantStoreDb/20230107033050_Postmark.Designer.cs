@@ -10,7 +10,7 @@ using U3A.Database;
 
 namespace U3A.Database.Migrations.TenantStoreDb
 {
-    [DbContext(typeof(TenantStoreDbContext))]
+    [DbContext(typeof(TenantDbContext))]
     [Migration("20230107033050_Postmark")]
     partial class Postmark
     {

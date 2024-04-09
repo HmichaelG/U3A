@@ -1,5 +1,5 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@inject IDbContextFactory<TenantStoreDbContext> TenantDbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @implements IAsyncDisposable
 @inject IJSRuntime js
 @inject NavigationManager NavMan
@@ -435,7 +435,7 @@ else
     bool isProgressVisible { get; set; }
 
     U3ADbContext? dbc { get; set; }
-    TenantStoreDbContext? dbcT { get; set; }
+    TenantDbContext? dbcT { get; set; }
 
     Term? term;
     Term? prevTerm;

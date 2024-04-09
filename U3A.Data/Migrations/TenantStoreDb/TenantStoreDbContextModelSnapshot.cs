@@ -10,7 +10,7 @@ using U3A.Database;
 
 namespace U3A.Database.Migrations.TenantStoreDb
 {
-    [DbContext(typeof(TenantStoreDbContext))]
+    [DbContext(typeof(TenantDbContext))]
     partial class TenantStoreDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -62,7 +62,7 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.ToTable("ContactRequest");
                 });
 
-            modelBuilder.Entity("U3A.Model.MultiCampusPeople", b =>
+            modelBuilder.Entity("U3A.Model.MultiCampusPerson", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -117,7 +117,42 @@ namespace U3A.Database.Migrations.TenantStoreDb
 
                     b.HasIndex("LastName", "FirstName", "Email");
 
-                    b.ToTable("MultiCampusPeople");
+                    b.ToTable("MultiCampusPerson");
+                });
+
+            modelBuilder.Entity("U3A.Model.MultiCampusTerm", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EnrolmentEnds")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EnrolmentStarts")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsClassAllocationFinalised")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDefaultTerm")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TermNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("MultiCampusTerm");
                 });
 
             modelBuilder.Entity("U3A.Model.ScheduleCache", b =>

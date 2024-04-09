@@ -12,8 +12,8 @@ using U3A.Database;
 namespace U3A.Database.Migrations.TenantStoreDb
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20240408031351_MultiCampusPerson_delBaseEntity")]
-    partial class MultiCampusPerson_delBaseEntity
+    [Migration("20240409203006_createMCTerm")]
+    partial class createMCTerm
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -123,7 +123,42 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.ToTable("MultiCampusPerson");
                 });
 
-            modelBuilder.Entity("U3A.Model.Schedule", b =>
+            modelBuilder.Entity("U3A.Model.MultiCampusTerm", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EnrolmentEnds")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EnrolmentStarts")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsClassAllocationFinalised")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDefaultTerm")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TermNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("MultiCampusTerm");
+                });
+
+            modelBuilder.Entity("U3A.Model.ScheduleCache", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -156,7 +191,7 @@ namespace U3A.Database.Migrations.TenantStoreDb
 
                     b.HasKey("ID");
 
-                    b.ToTable("Schedule");
+                    b.ToTable("ScheduleCache");
                 });
 
             modelBuilder.Entity("U3A.Model.TenantInfo", b =>

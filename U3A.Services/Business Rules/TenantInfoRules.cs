@@ -10,7 +10,7 @@ namespace U3A.BusinessRules
     public static partial class BusinessRule
     {
         public static async Task<TenantInfo> GetTenantInfoAsync(
-                                IDbContextFactory<TenantStoreDbContext> TenantDbFactory, 
+                                IDbContextFactory<TenantDbContext> TenantDbFactory, 
                                 IHttpContextAccessor httpContextAccessor)
         {
             HostStrategy hs = new HostStrategy();

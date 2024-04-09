@@ -10,7 +10,7 @@ using U3A.Database;
 
 namespace U3A.Database.Migrations.TenantStoreDb
 {
-    [DbContext(typeof(TenantStoreDbContext))]
+    [DbContext(typeof(TenantDbContext))]
     [Migration("20220908050744_EFCoreStore_TwilioSMS")]
     partial class EFCoreStore_TwilioSMS
     {

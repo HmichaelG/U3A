@@ -15,7 +15,7 @@ namespace U3A.Database
     {
 
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IDbContextFactory<TenantStoreDbContext> _TenantDbFactory;
+        private readonly IDbContextFactory<TenantDbContext> _TenantDbFactory;
         private readonly bool useCachedTenentInfo = false;
 
         public U3ADbContext(TenantInfo tenantInfo)
@@ -26,7 +26,7 @@ namespace U3A.Database
 
         [ActivatorUtilitiesConstructor] // force DI to use this constructor
         public U3ADbContext(AuthenticationStateProvider? AuthStateProvider,
-                    IDbContextFactory<TenantStoreDbContext> TenantDbFactory = default,
+                    IDbContextFactory<TenantDbContext> TenantDbFactory = default,
                     IHttpContextAccessor HttpContextAccessor = default)
         {
             if (AuthStateProvider != null) authenticationStateProvider = AuthStateProvider;

@@ -47,7 +47,7 @@ if (MultiTenantConnectionString is null)
     MultiTenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString");
 }
 
-builder.Services.AddDbContextFactory<TenantStoreDbContext>(options =>
+builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
     options.UseSqlServer(MultiTenantConnectionString);
 }, ServiceLifetime.Scoped);

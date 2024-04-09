@@ -11,7 +11,7 @@ using U3A.Database;
 
 namespace U3A.Database.Migrations.TenantStoreDb
 {
-    [DbContext(typeof(TenantStoreDbContext))]
+    [DbContext(typeof(TenantDbContext))]
     [Migration("20230829220435_ContactRequest_u3a")]
     partial class ContactRequest_u3a
     {

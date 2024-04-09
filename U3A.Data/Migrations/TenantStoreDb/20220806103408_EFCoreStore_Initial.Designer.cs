@@ -10,7 +10,7 @@ using U3A.Database;
 
 namespace U3A.Database.Migrations.TenantStoreDb
 {
-    [DbContext(typeof(TenantStoreDbContext))]
+    [DbContext(typeof(TenantDbContext))]
     [Migration("20220806103408_EFCoreStore_Initial")]
     partial class EFCoreStore_Initial
     {

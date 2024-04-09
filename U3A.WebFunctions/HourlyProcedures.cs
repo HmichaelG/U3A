@@ -78,7 +78,7 @@ namespace U3A.WebFunctions
             {
                 using (var dbc = new U3ADbContext(tenant))
                 {
-                    using (var dbcT = new TenantStoreDbContext(cn!))
+                    using (var dbcT = new TenantDbContext(cn!))
                     {
                         await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
                     }
