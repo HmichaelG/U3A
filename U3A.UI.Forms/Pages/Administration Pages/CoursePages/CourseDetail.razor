@@ -80,9 +80,12 @@
                     </DxFormLayoutItem>
                 </DxFormLayout>
             </DxFormLayoutGroup>
-            <DxFormLayoutGroup Caption="Multi-Campus Enrolment">
-                <DxFormLayoutItem Caption="Allow Multi-Campus Enrolment From" ColSpanMd="12" >
-                    <DxDateEdit @bind-Date="Course.AllowMultiCampsuFrom" />
+            <DxFormLayoutGroup Caption="Multi-Campus Enrolment" >
+                <DxFormLayoutItem Caption="Allow Multi-Campus Enrolment From"
+                                  ColSpanMd="12" >
+                    <DxDateEdit @bind-Date="Course.AllowMultiCampsuFrom" 
+                        Enabled="@EnableMultiCampus" 
+                        NullText=@((EnableMultiCampus) ? "" : "Not available for this course") />
                 </DxFormLayoutItem>
             </DxFormLayoutGroup>
         </DxTabPage>
@@ -127,6 +130,7 @@
     string leaderReportsToNullText;
     string contactOrderNullText;
     DxTabs? TabPages;
+    bool EnableMultiCampus;
 
     List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
     List<CourseContactOrderWrapper> contactOrder = new CourseContactOrderList();
@@ -139,6 +143,7 @@
             contactOrderNullText = $"(Optional) {Settings.CourseContactOrder.GetAttribute<DisplayAttribute>().Name}";
         }
         CourseViewType = Course.EditType;
+        EnableMultiCampus = BusinessRule.AllowMultiCampusForCourse(Course, Settings);
         base.OnInitialized();
     }
 

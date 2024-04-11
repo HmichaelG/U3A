@@ -16,6 +16,31 @@ namespace U3A.BusinessRules
     public static partial class BusinessRule
     {
 
+        public static bool AllowMultiCampusForCourse(Course course,SystemSettings settings)
+        {
+            bool result = false;
+            if (settings.AllowMultiCampusExtensions)
+            {
+                if (course.CourseFeePerYear == 0 && course.CourseFeePerTerm == 0)
+                {
+                    if (course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                    {
+                        if (course.Classes.Count == 1)
+                        {
+                            var c = course.Classes.First();
+                            var terms = 0;
+                            if (c.OfferedTerm1) terms++;
+                            if (c.OfferedTerm2) terms++;
+                            if (c.OfferedTerm3) terms++;
+                            if (c.OfferedTerm4) terms++;
+                            if (terms == 1) result = true;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         /// <summary>
         /// Delete enrolments no longer required by a member.
         /// </summary>
