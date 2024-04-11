@@ -106,11 +106,9 @@ else
                                 <div class="mx-1 d-flex">
                                     <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
                                         @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
-                                        <span class="text-info">
-                                            <strong>
-                                                @((!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                                ? $" | {c.Course.OfferedBy}" : ""))
-                                            </strong>
+                                        <span>
+                                            @((!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                            ? $" | {c.Course.OfferedBy}" : ""))
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
@@ -618,7 +616,6 @@ else
                     selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
                     if (selectedClasses.Count() > 0) isListboxShowingSummary = false;
                     if (IsReadOnly && selectedClasses.Count() <= 0) Classes.Clear();
-                    foreach (var c in selectedClasses) { c.IsSelected = true; }
                     SetReviewButtonText();
                 }
                 else if (IsPreview)
@@ -810,19 +807,11 @@ else
         var result = string.Empty;
         DateTime? classEndDate = null;
         string status;
-        Enrolment? e = GetEnrolment(c, term);
-        if (e != null)
-        {
-            // Enrolled in class - display the status
-            status = BusinessRule.GetMemberPortalEnrolmentStatus(e, term, settings);
-            classEndDate = term.EndDate;
-        }
-        else
-        {
-            e = GetEnrolment(c, prevTerm);
-            status = BusinessRule.GetMemberPortalEnrolmentStatus(e, prevTerm, settings);
-        };
-        if (e != null)
+        Enrolment? e = c.IsSelectedByEnrolment;
+        // Enrolled in class - display the status
+        status = BusinessRule.GetMemberPortalEnrolmentStatus(e, term, settings);
+        classEndDate = term.EndDate;
+        if (c.TermNumber != term.TermNumber )
         {
             result = $"Term {c.TermNumber}: {status}";
         }
@@ -832,31 +821,6 @@ else
         };
 
         return (result, classEndDate);
-    }
-
-    Enrolment? GetEnrolment(Class thisClass, Term thisTerm)
-    {
-        Enrolment? e = null;
-        if (!IsPreview)
-        {
-            var c = thisClass;
-            e = c.Course.Enrolments
-                    .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
-                    .FirstOrDefault(x => x.CourseID == thisClass.Course.ID &&
-                            x.Term.Year == thisTerm.Year &&
-                            x.Term.TermNumber >= thisTerm.TermNumber &&
-                            x.PersonID == loginState.SelectedPerson.ID);
-            if (e == null)
-            {
-                e = c.Enrolments
-                        .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber)
-                        .FirstOrDefault(x => x.CourseID == thisClass.Course.ID &&
-                            x.Term.Year == thisTerm.Year &&
-                            x.Term.TermNumber >= thisTerm.TermNumber &&
-                            x.PersonID == loginState.SelectedPerson.ID);
-            }
-        }
-        return e;
     }
 
     async Task<List<Class>> GetAcceptableClasses()

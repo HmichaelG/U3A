@@ -53,13 +53,9 @@ namespace U3A.WebFunctions
             {
                 isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                 _logger.LogInformation($"****** Processing Daily Procedures for {tenant.Identifier}: {tenant.Name}. ******");
-                using (var dbc = new U3ADbContext(tenant))
-                {
-                    _logger.LogInformation("Local Time for {0} is: {1}", tenant.Identifier, await Common.GetNowAsync(dbc));
-                }
                 RandomAllocationExecuted.Add(tenant.Identifier!, false);
                 TaskList.Add(FinaliseOnlinePayment.Process(tenant, _logger));
-                TaskList.Add(AutoEnrolParticipants.Process(tenant, _logger));
+                TaskList.Add(AutoEnrolParticipants.Process(tenant, cn!, _logger));
                 await BringForwardEnrolments.Process(tenant, _logger);
                 if (isBackgroundProcessingEnabled) TaskList.Add(CreateAttendance.Process(tenant, _logger));
             }
@@ -91,9 +87,8 @@ namespace U3A.WebFunctions
             {
                 await DatabaseCleanup.Process(tenant, _logger);
             }
-            
-            _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-            _logger.LogInformation($"Next timer schedule at: {myTimer!.ScheduleStatus!.Next}");
+
+            _logger.LogInformation($"Daily Procedures completed at: {DateTime.Now}");
         }
     }
 

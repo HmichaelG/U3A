@@ -8,7 +8,9 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class AutoEnrolParticipants
     {
-        public static async Task Process(TenantInfo tenant, ILogger logger)
+        public static async Task Process(TenantInfo tenant, 
+                                            string tenantConnectionString,
+                                            ILogger logger)
         {
             using (var dbc = new U3ADbContext(tenant))
             {
@@ -18,6 +20,7 @@ namespace U3A.WebFunctions.Procedures
                 // Get system settings
                 var today = await Common.GetTodayAsync(dbc);
                 var now = await Common.GetNowAsync(dbc);
+                DateTime? allocationDate = null;
                 var settings = await dbc.SystemSettings
                                     .OrderBy(x => x.ID)
                                     .FirstOrDefaultAsync();
@@ -31,10 +34,10 @@ namespace U3A.WebFunctions.Procedures
                 {
                     //Allocation is random
 
-                    DateTime allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
+                    allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
                     if (BusinessRule.IsPreRandomAllocationDay(currentTerm, settings, today))
                     {
-                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: No Auto-Allocation performed - Date prior to allocation date: {allocationDate.ToLongDateString()}");
+                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: No Auto-Allocation performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
                         return;
                     }
                     else
@@ -63,6 +66,8 @@ namespace U3A.WebFunctions.Procedures
                     IsClassAllocationFinalised = true;
                     forceEmailQueue = false;
                 }
+
+                // process for participants
                 await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm,
                                                 IsClassAllocationFinalised,
                                                 forceEmailQueue, emailDate);
@@ -72,6 +77,13 @@ namespace U3A.WebFunctions.Procedures
                     logger.LogInformation(log);
                 }
                 BusinessRule.AutoEnrolments.Clear();
+
+                // process for multi-campus visitors
+                //  Make sure random allocation is complete
+                if (today >= allocationDate?.AddDays(constants.RANDOM_ALLOCATION_PREVIEW))
+                {
+                    await BusinessRule.AutoEnrolMultiCampus(tenant, tenantConnectionString, now);
+                }
             }
             return;
         }

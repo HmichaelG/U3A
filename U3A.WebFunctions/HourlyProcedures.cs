@@ -50,16 +50,10 @@ namespace U3A.WebFunctions
             foreach (var tenant in tenants)
             {
                 isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
-                using (var dbc = new U3ADbContext(tenant))
-                {
-                    _logger.LogInformation("Local Time for {0} is: {1}", tenant.Identifier, await Common.GetNowAsync(dbc));
-                }
-                TaskList.Add(AutoEnrolParticipants.Process(tenant, _logger));
+                TaskList.Add(AutoEnrolParticipants.Process(tenant, cn!, _logger));
             }
             // Make sure all processing is complete before email starts.
             Task.WaitAll(TaskList.ToArray());
-            // Make sure we are email at a later time then we process.
-            Thread.Sleep(3000);
 
             foreach (var tenant in tenants)
             {
@@ -85,7 +79,7 @@ namespace U3A.WebFunctions
                     _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
             }
-            _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            _logger.LogInformation($"Hourly Procedures at: {DateTime.Now}");
         }
 
     }
