@@ -10,6 +10,7 @@
 @inject NavigationManager NavMan
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService TenantService
 @implements IDisposable
 
 @using DevExpress.XtraReports.Services
@@ -19,6 +20,7 @@
 @using DevExpress.XtraReports.Web.Native.ClientControls;
 @using DevExpress.Blazor.Reporting
 @using DevExpress.Blazor.Reporting.Models
+@using U3A.Services
 
 @attribute [Authorize]
 
@@ -87,6 +89,7 @@
                     {
                         (Report as IXtraReportWithDbContextAndTenantDbContext).DbContext = dbc;
                         (Report as IXtraReportWithDbContextAndTenantDbContext).TenantDbContext = dbcT;
+                        (Report as IXtraReportWithDbContextAndTenantDbContext).TenantService = TenantService;
                     }
                     if (Report is IXtraReportWithDbContextFactory)
                     {

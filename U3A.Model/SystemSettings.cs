@@ -161,6 +161,7 @@ namespace U3A.Model
         public int RetainUnfinancialPersonsForYears { get; set; } = 2;
         public int RetainRegistrationsNeverCompletedForDays { get; set; } = 60; 
         public string U3AdminEmailRecipients { get; set; }
+        public bool AllowMultiCampusExtensions { get; set; }
     }
 
     public enum AutoEnrollOccurrence

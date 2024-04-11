@@ -160,7 +160,7 @@ namespace U3A.BusinessRules
                                 .OrderBy(x => x.IsWaitlisted)
                                             .ThenBy(x => x.Person.LastName)
                                             .ThenBy(x => x.Person.FirstName)
-                                .AsEnumerable().Where(x => IsCourseInTerm(x.Course,SelectedTerm)).ToList();
+                                .AsEnumerable().Where(x => IsCourseInTerm(x.Course, SelectedTerm)).ToList();
             Parallel.ForEach(enrolments, e =>
             {
                 if (e.Class != null)
@@ -570,13 +570,43 @@ namespace U3A.BusinessRules
             dbc.RemoveRange(query2);
         }
 
+        public static async Task DeleteEnrolmentsRescinded(U3ADbContext dbc,
+                                            TenantDbContext dbT,
+                                            IEnumerable<Class> DeletedClasses,
+                                            Person person,
+                                            Term term, Term prevTerm)
+        {
+            List<Enrolment> result = new();
+            List<Class> thisCampus = new();
+            List<Class> multiCampus = new();
+            foreach (var c in DeletedClasses)
+            {
+                if (await dbc.Class.AnyAsync(x => x.ID == c.ID))
+                {
+                    thisCampus.Add(c);
+                }
+                else
+                {
+                    multiCampus.Add(c);
+                }
+            }
+            if (thisCampus.Count > 0)
+            {
+                await DeleteEnrolmentsRescinded(dbc, thisCampus, person, term, prevTerm);
+            }
+            if (multiCampus.Count > 0)
+            {
+                await DeleteMultiCampusEnrolmentsRescinded(dbT, multiCampus, person, term, prevTerm);
+            }
+        }
+
         /// <summary>
         /// Delete enrolments no longer required by a member.
         /// </summary>
         /// <param name="dbc"></param>
         /// <param name="person"></param>
         /// <param name="term"></param>
-        public static async Task DeleteEnrolmentsRescinded(U3ADbContext dbc,
+        private static async Task DeleteEnrolmentsRescinded(U3ADbContext dbc,
                                             IEnumerable<Class> DeletedClasses,
                                             Person person,
                                             Term term, Term prevTerm)
@@ -616,6 +646,36 @@ namespace U3A.BusinessRules
         /// <param name="term"></param>
         /// <returns></returns>
         public static async Task<List<Enrolment>> AddEnrolmentRequests(U3ADbContext dbc,
+                                            TenantDbContext dbT,
+                                            IEnumerable<Class> RequestedClasses,
+                                            Person person,
+                                            Term term, Term prevTerm)
+        {
+            List<Enrolment> result = new();
+            List<Class> thisCampus = new();
+            List<Class> multiCampus = new();
+            foreach (var c in RequestedClasses)
+            {
+                if (await dbc.Class.AnyAsync(x => x.ID == c.ID))
+                {
+                    thisCampus.Add(c);
+                }
+                else
+                {
+                    multiCampus.Add(c);
+                }
+            }
+            if (thisCampus.Count > 0)
+            {
+                result = await AddEnrolmentRequests(dbc, thisCampus, person, term, prevTerm);
+            }
+            if (multiCampus.Count > 0)
+            {
+                result.AddRange(await AddMultiCampusEnrolmentRequests(dbT, multiCampus, person, term, prevTerm));
+            }
+            return result;
+        }
+        private static async Task<List<Enrolment>> AddEnrolmentRequests(U3ADbContext dbc,
                                             IEnumerable<Class> RequestedClasses,
                                             Person person,
                                             Term term, Term prevTerm)

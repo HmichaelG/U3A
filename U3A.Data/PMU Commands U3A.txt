@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_TenantIdentifierFrom
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_delTenantIdentifier
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Person_delTenantIdentifier
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_AllowMultiCampusExtensions
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Person_delTenantIdentifier
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_AllowMultiCampusExtensions
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

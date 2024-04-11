@@ -254,6 +254,11 @@ else
                         </DxFormLayoutItem>
 
                     </DxTabPage>
+                    <DxTabPage Text="Multi-Campus">
+                        <DxFormLayoutItem Caption="Allow Multi-Campus Extensions?" ColSpanMd="12">
+                            <DxCheckBox @bind-Checked="@systemSettings.AllowMultiCampusExtensions" />
+                        </DxFormLayoutItem>
+                    </DxTabPage>
                 </DxFormLayoutTabPages>
                 <DxFormLayoutItem ColSpanMd="12">
                     <Template>

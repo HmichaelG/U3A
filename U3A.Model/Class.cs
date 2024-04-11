@@ -36,6 +36,8 @@ namespace U3A.Model
 
         [NotMapped] public bool IsNotSelected { get { return !IsSelected; } }
 
+        [NotMapped] public string TenantIdentifier { get; set; }
+
         private DateTime mStartTime { get; set; }
 
         [NotMapped]

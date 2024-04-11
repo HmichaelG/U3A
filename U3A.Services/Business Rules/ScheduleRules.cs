@@ -20,18 +20,20 @@ namespace U3A.BusinessRules
     {
         public static List<Class> RestoreClassesFromSchedule(U3ADbContext dbc,
                                     TenantDbContext dbcT,
+                                    TenantInfoService tenantService,
                                     Term term, SystemSettings settings,
                                     bool exludeOffScheduleActivities)
         {
             Task<List<Class>> syncTask = Task.Run(async () =>
             {
-                return await RestoreClassesFromScheduleAsync(dbc, dbcT, term, settings, exludeOffScheduleActivities, true);
+                return await RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, true);
             });
             syncTask.Wait();
             return syncTask.Result;
         }
         public static async Task<List<Class>> RestoreClassesFromScheduleAsync(U3ADbContext dbc,
                                                     TenantDbContext dbcT,
+                                                    TenantInfoService tenantService,
                                                     Term term, SystemSettings settings,
                                                     bool exludeOffScheduleActivities,
                                                     bool IsFinancial)
@@ -97,9 +99,10 @@ namespace U3A.BusinessRules
 
 
             // Get the multi-campus classes, only for financial members
-            if (IsFinancial)
+            if (settings.AllowMultiCampusExtensions && IsFinancial)
             {
                 classes.Clear();
+                var myTenant = await tenantService.GetTenantInfoAsync();
                 var tenantInfo = await dbcT.TenantInfo.ToListAsync();
                 var mcSchedule = await dbcT.MultiCampusSchedule
                                     .AsNoTracking()
@@ -108,15 +111,50 @@ namespace U3A.BusinessRules
                 Parallel.ForEach(mcSchedule, async s =>
                 {
                     var c = JsonSerializer.Deserialize<Class>(s.jsonClass.Unzip());
+                    c.TenantIdentifier = s.TenantIdentifier;
                     var id = result.FirstOrDefault(x => x.ID == c.ID);
                     if (id == null)
                     {
                         var mcTenant = tenantInfo.FirstOrDefault(x => x.Identifier == s.TenantIdentifier);
-                        if (mcTenant != null) { c.Course.SponsoredBy = mcTenant.Name; }
+                        if (mcTenant != null) { c.Course.OfferedBy = mcTenant.Name; }
                         classes.Add(c);
                     }
                 });
 
+                var mcEnrolments = await dbcT.MultiCampusEnrolment
+                                        .Where(x => x.TenantIdentifier != myTenant.Identifier)
+                                        .ToListAsync();
+                foreach (var mcE in mcEnrolments)
+                {
+                    MultiCampusPerson mcP = await dbcT.MultiCampusPerson.FirstOrDefaultAsync(x => x.ID ==  mcE.PersonID);
+                    MultiCampusTerm mcT = await dbcT.MultiCampusTerm.FirstOrDefaultAsync(x => x.ID == mcE.TermID);
+                    Class c;
+                    if (mcP != null && mcT != null )
+                    {
+                        if (mcE.ClassID == null)
+                        {
+                            c = classes.Where(x => x.CourseID == mcE.CourseID).FirstOrDefault();
+                        }
+                        else
+                        {
+                            c = classes.Where(x => x.ID == mcE.ClassID).FirstOrDefault();
+                        }
+                        Enrolment e = GetEnrolmentFromMultiCampusEnrolment(mcE, mcP,c, mcT);
+                        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses )
+                        {
+                            foreach (var classToupdate in classes.Where(x => x.CourseID == c.Course.ID))
+                            {
+                                if (e.IsWaitlisted) { classToupdate.TotalWaitlistedStudents++; } else { classToupdate.TotalActiveStudents++; }
+                                classToupdate.Course.Enrolments.Add(e);
+                            }
+                        }
+                        else
+                        {
+                            if (e.IsWaitlisted) { c.TotalWaitlistedStudents++; } else { c.TotalActiveStudents++; }
+                            c.Enrolments.Add(e);
+                        }
+                    }
+                }
                 result.AddRange(classes);
             }
 
@@ -149,7 +187,7 @@ namespace U3A.BusinessRules
                     schedules.Add(processClasses(c, settings, TenantIdentifier));
                     var now = TimezoneAdjustment.GetLocalTime().Date;
                     if (c.Course.AllowMultiCampsuFrom != null
-                            && TimezoneAdjustment.GetLocalTime().Date >= c.Course.AllowMultiCampsuFrom  
+                            && TimezoneAdjustment.GetLocalTime().Date >= c.Course.AllowMultiCampsuFrom
                             && !c.Course.IsOffScheduleActivity)
                     {
                         multiCampusSchedules.Add(processClasses(c, settings, TenantIdentifier));

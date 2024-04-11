@@ -36,17 +36,13 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.3" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.3" />
+    <PackageReference Include="OFXParser" Version="1.0.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\U3A.Data\U3A.Database.csproj" />
     <ProjectReference Include="..\U3A.Model\U3A.Model.csproj" />
     <ProjectReference Include="..\U3A.Services\U3A.Services.csproj" />
     <ProjectReference Include="..\U3A.UI.Reports\U3A.UI.Reports.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="OFXParser">
-      <HintPath>..\..\ofxparser.net\OFXParser\bin\Release\netstandard2.0\OFXParser.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Update="Pages\Administration Pages\EnterExitMaintenance.razor">

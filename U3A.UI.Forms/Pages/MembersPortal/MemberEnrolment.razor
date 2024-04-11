@@ -1,5 +1,6 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
 @implements IAsyncDisposable
 @inject IJSRuntime js
 @inject NavigationManager NavMan
@@ -105,9 +106,10 @@ else
                                 <div class="mx-1 d-flex">
                                     <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
                                         @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
-                                        <span class="text-info"><strong>
-                                        @((!string.IsNullOrWhiteSpace(c.Course.SponsoredBy) 
-                                            ? $" | {c.Course.SponsoredBy}" : ""))
+                                        <span class="text-info">
+                                            <strong>
+                                                @((!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                ? $" | {c.Course.OfferedBy}" : ""))
                                             </strong>
                                         </span>
                                     </div>
@@ -138,11 +140,11 @@ else
                                                 <div class="text-info col-12 text-center h6">@GetStatus(@c)</div>
                                             </div>
 
-                                            @if (!string.IsNullOrEmpty(c.Course.SponsoredBy))
+                                            @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                             {
-                                            <div class="row px-2 px-md-3 col-12">
-                                                <div class="text-info col-12 text-center h6">@($"Sponsored By: {c.Course.SponsoredBy}")</div>
-                                            </div>
+                                                <div class="row px-2 px-md-3 col-12">
+                                                    <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
+                                                </div>
                                             }
 
                                             <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
@@ -607,7 +609,7 @@ else
                 // Fast lookup from Schedule cache
                 isFinancial = false;
                 if (loginState.SelectedPerson.FinancialTo >= term.Year) { isFinancial = true; }
-                Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, term, settings, exludeOffScheduleActivities, isFinancial);
+                Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
             }
             if (Classes != null)
             {
@@ -1025,16 +1027,20 @@ else
         if (isDirty) { await SaveChanges(); }
     }
 
+    bool isWorking;
     async Task SaveChanges()
     {
+        if (isWorking) return;
         try
         {
+            isWorking = true;
             // Post changes to the database.
             var acceptableClasses = await GetAcceptableClasses();
-            await BusinessRule.DeleteEnrolmentsRescinded(dbc, deletedClasses, loginState.SelectedPerson, term, prevTerm);
-            var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
+            await BusinessRule.DeleteEnrolmentsRescinded(dbc, dbcT, deletedClasses, loginState.SelectedPerson, term, prevTerm);
+            var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, dbcT, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
             await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
             await dbc.SaveChangesAsync();
+            await dbcT.SaveChangesAsync();
             if (addedEnrolments.Count() > 0)
             {
                 await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, term, settings));
@@ -1048,6 +1054,7 @@ else
             ErrorMessage = Helpers.GetErrorMessage(ex);
             await ErrorPopup.ShowPopupAsync();
         }
+        finally { isWorking = false; }
     }
 
     string WaitlistWarning()
@@ -1134,5 +1141,6 @@ else
     public async ValueTask DisposeAsync()
     {
         dbc?.Dispose();
+        dbcT?.Dispose();
     }
 }
