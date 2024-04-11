@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http.Json;
 using System.Text.Json.Serialization;
 using System.Runtime.InteropServices;
 using Twilio.Rest.Trunking.V1;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace U3A.BusinessRules
 {
@@ -325,13 +326,26 @@ namespace U3A.BusinessRules
 
         public static List<Class> GetClassDetailsForStudent(IEnumerable<Class> Classes, Person Student)
         {
-            List<Class> result;
-            result = Classes.Where(c => c.Course.Enrolments
-                                .Any(e => e.PersonID == Student.ID &&
-                                    (e.ClassID == null || e.ClassID == c.ID))).ToList();
-            result.AddRange(Classes.Where(c => c.Enrolments
-                                .Any(e => e.PersonID == Student.ID &&
-                                    (e.ClassID == null || e.ClassID == c.ID))).ToList());
+            List<Class> result = new();
+            foreach (var c in Classes)
+            {
+                c.IsSelected = false;
+                c.IsSelectedByEnrolment = null;
+                // same participants in each class
+                foreach (var e in c.Course.Enrolments.Where(x => x.PersonID == Student.ID))
+                {
+                    c.IsSelected = true;
+                    c.IsSelectedByEnrolment = e;
+                    result.Add(c);
+                }
+                // different participants in each class
+                foreach (var e in c.Enrolments.Where(x => x.PersonID == Student.ID))
+                {
+                    c.IsSelected = true;
+                    c.IsSelectedByEnrolment = e;
+                    result.Add(c);
+                }
+            }
             return result;
         }
         public static bool IsCourseInTerm(Course course, Term term)

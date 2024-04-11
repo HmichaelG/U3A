@@ -303,6 +303,7 @@ namespace U3A.BusinessRules
                             newClass.Occurrence = c.Occurrence;
                             newClass.Leader = c.Leader;
                             newClass.IsSelected = !e.IsWaitlisted;
+                            newClass.IsSelectedByEnrolment = (newClass.IsSelected) ? e : null;
                             person.EnrolledClasses.Add(newClass);
                         }
                     }
@@ -316,8 +317,9 @@ namespace U3A.BusinessRules
                         newClass.Occurrence = e.Class.Occurrence;
                         newClass.Leader = e.Class.Leader;
                         newClass.IsSelected = !e.IsWaitlisted;
+                        newClass.IsSelectedByEnrolment = (newClass.IsSelected) ? e : null;
                         person.EnrolledClasses.Add(newClass);
-                    }
+                    }                    
                 }
             }
             return people.Where(x => x.EnrolledClasses.Any()).ToList();

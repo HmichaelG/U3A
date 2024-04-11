@@ -34,6 +34,9 @@ namespace U3A.Model
             }
         }
 
+        // The enrolment that caused Iselected = true
+        [NotMapped]public Enrolment? IsSelectedByEnrolment { get; set; }
+
         [NotMapped] public bool IsNotSelected { get { return !IsSelected; } }
 
         [NotMapped] public string TenantIdentifier { get; set; }
