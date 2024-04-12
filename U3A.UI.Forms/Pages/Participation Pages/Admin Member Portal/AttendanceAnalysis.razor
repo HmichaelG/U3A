@@ -50,8 +50,8 @@
         </DxTabs>
 
         <DxPivotGrid @ref=pivotGrid Data="@pivotData"
-                     CssClass="w-100" PageSize=13 ShowPager=true
-                     ShowFieldHeaders="true">
+                     CssClass="pivot-height" 
+                     ShowFieldHeaders="false">
             @{
                 switch (selectedIndex) {
                     case 1:
@@ -89,6 +89,11 @@
         </DxPivotGrid>
     </DxFormLayout>
 }
+<style>
+    .pivot-height{
+        height: calc(100vh - 12rem);
+    }
+</style>
 
 @code {
 
