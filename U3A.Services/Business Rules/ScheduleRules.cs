@@ -97,9 +97,8 @@ namespace U3A.BusinessRules
             });
             List<Class> result = classes.Except(deletions).ToList();
 
-
             // Get the multi-campus classes, only for financial members
-            if (settings.AllowMultiCampusExtensions && IsFinancial)
+            if (tInfo.EnableMultiCampusExtension && settings.AllowMultiCampusExtensions && IsFinancial)
             {
                 classes.Clear();
                 var myTenant = await tenantService.GetTenantInfoAsync();
@@ -209,22 +208,30 @@ namespace U3A.BusinessRules
                 }
 
                 //multi-campus
-                await dbcT.Database.BeginTransactionAsync();
-                try
+                var tInfo = await dbcT.TenantInfo.FirstOrDefaultAsync(x => x.Identifier == TenantIdentifier);
+                if (tInfo != null)
                 {
-                    // Schedule cache
-                    await dbcT.MultiCampusSchedule.Where(x => x.TenantIdentifier == TenantIdentifier).ExecuteDeleteAsync();
-                    await dbcT.MultiCampusSchedule.AddRangeAsync(multiCampusSchedules);
-                    // Terms
-                    await UpdateTermCache(dbc, dbcT, TenantIdentifier);
-                    // members
-                    await UpdatePersonCache(dbc, dbcT, TenantIdentifier);
-                    await dbcT.SaveChangesAsync();
-                    await dbcT.Database.CommitTransactionAsync();
-                }
-                catch (Exception ex)
-                {
-                    await dbcT.Database.RollbackTransactionAsync();
+                    // Multi-campus extensions must be enavled at the tenant & the client level
+                    if (tInfo.EnableMultiCampusExtension && settings.AllowMultiCampusExtensions)
+                    {
+                        await dbcT.Database.BeginTransactionAsync();
+                        try
+                        {
+                            // Schedule cache
+                            await dbcT.MultiCampusSchedule.Where(x => x.TenantIdentifier == TenantIdentifier).ExecuteDeleteAsync();
+                            await dbcT.MultiCampusSchedule.AddRangeAsync(multiCampusSchedules);
+                            // Terms
+                            await UpdateTermCache(dbc, dbcT, TenantIdentifier);
+                            // members
+                            await UpdatePersonCache(dbc, dbcT, TenantIdentifier);
+                            await dbcT.SaveChangesAsync();
+                            await dbcT.Database.CommitTransactionAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            await dbcT.Database.RollbackTransactionAsync();
+                        }
+                    }
                 }
             }
         }

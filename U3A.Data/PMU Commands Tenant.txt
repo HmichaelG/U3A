@@ -1,8 +1,8 @@
 ﻿update-database -cont TenantDbContext -project U3A.Database TdB_MCTerm_identifier
 
-remove-migration -cont TenantDbContext -project U3A.Database -args TdB_MCEnrolment
+remove-migration -cont TenantDbContext -project U3A.Database -args TdB_EnableMCExtensions
 
-add-migration -cont TenantDbContext -project U3A.Database TdB_MCEnrolment
+add-migration -cont TenantDbContext -project U3A.Database TdB_EnableMCExtensions
 
 update-database -cont TenantDbContext -project U3A.Database
 

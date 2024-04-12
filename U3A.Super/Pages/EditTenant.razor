@@ -56,6 +56,9 @@ else
                         <DxFormLayoutItem Caption="Database Catalog" ColSpanMd="12">
                             <DxTextBox @bind-Text=@DatabaseCatalog Enabled=@IsEditEnabled />
                         </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Enable Multi-Campus?" ColSpanMd="12">
+                            <DxCheckBox @bind-Checked=@selectedTenant.EnableMultiCampusExtension Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
                     </DxFormLayoutGroup>
                     <DxFormLayoutGroup Caption="Eway Payments">
                         <DxFormLayoutItem Caption="Eway API Key" ColSpanMd="12">

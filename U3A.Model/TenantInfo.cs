@@ -30,5 +30,6 @@ namespace U3A.Model
         public string? EwayAPIKey { get; set; }
         public string? EwayPassword { get; set; }
         public bool UseEwayTestEnviroment { get; set; }
+        public bool EnableMultiCampusExtension { get; set; }
     }
 }
