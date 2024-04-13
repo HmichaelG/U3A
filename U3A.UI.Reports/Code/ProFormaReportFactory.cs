@@ -136,10 +136,11 @@ namespace U3A.UI.Reports
                 {
                     terms = await dbc.Term.Where(x => x.Year == currentTerm.Year).ToListAsync();
                 }
-                var person = await dbc.Person.FindAsync(kvp.Key);
                 var personsFiles = new List<string>();
+                Person person =  null;
                 foreach (var enrolment in kvp.Value.OrderBy(x => x.Course.Name))
                 {
+                    person = enrolment.Person;
                     (Guid, Guid?) onfileKey = (enrolment.CourseID, enrolment.ClassID);
                     if (!onFile.Contains(onfileKey)) // one report per enrolment / class
                     {

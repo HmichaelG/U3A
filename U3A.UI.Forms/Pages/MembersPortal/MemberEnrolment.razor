@@ -811,7 +811,7 @@ else
         // Enrolled in class - display the status
         status = BusinessRule.GetMemberPortalEnrolmentStatus(e, term, settings);
         classEndDate = term.EndDate;
-        if (c.TermNumber != term.TermNumber )
+        if (c.TermNumber != term.TermNumber)
         {
             result = $"Term {c.TermNumber}: {status}";
         }
@@ -1003,6 +1003,7 @@ else
             await BusinessRule.DeleteEnrolmentsRescinded(dbc, dbcT, deletedClasses, loginState.SelectedPerson, term, prevTerm);
             var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, dbcT, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
             await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
+            await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, Classes, settings);
             await dbc.SaveChangesAsync();
             await dbcT.SaveChangesAsync();
             if (addedEnrolments.Count() > 0)

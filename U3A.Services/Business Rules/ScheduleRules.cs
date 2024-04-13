@@ -138,7 +138,7 @@ namespace U3A.BusinessRules
                         {
                             c = classes.Where(x => x.ID == mcE.ClassID).FirstOrDefault();
                         }
-                        Enrolment e = GetEnrolmentFromMultiCampusEnrolment(mcE, mcP,c, mcT);
+                        Enrolment e = GetEnrolmentFromMCEnrolment(mcE, mcP,c, mcT);
                         if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses )
                         {
                             foreach (var classToupdate in classes.Where(x => x.CourseID == c.Course.ID))
@@ -349,6 +349,10 @@ namespace U3A.BusinessRules
             mcp.SMSOptOut = p.SMSOptOut;
             mcp.Title = p.Title;
             mcp.VaxCertificateViewed = p.VaxCertificateViewed;
+            mcp.Address = p.Address;
+            mcp.City = p.City;
+            mcp.State = p.State;
+            mcp.Postcode = p.Postcode;
             return mcp;
         }
 

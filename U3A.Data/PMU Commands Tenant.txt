@@ -1,8 +1,8 @@
-﻿update-database -cont TenantDbContext -project U3A.Database TdB_MCTerm_identifier
+﻿update-database -cont TenantDbContext -project U3A.Database TdB_MCSendMail
 
-remove-migration -cont TenantDbContext -project U3A.Database -args TdB_EnableMCExtensions
+remove-migration -cont TenantDbContext -project U3A.Database -args TdB_MCPerson_Address
 
-add-migration -cont TenantDbContext -project U3A.Database TdB_EnableMCExtensions
+add-migration -cont TenantDbContext -project U3A.Database TdB_MCPerson_Address
 
 update-database -cont TenantDbContext -project U3A.Database
 

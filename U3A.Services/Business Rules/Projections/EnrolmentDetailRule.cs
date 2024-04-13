@@ -19,8 +19,10 @@ namespace U3A.BusinessRules
             var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
             var result = new List<EnrolmentDetail>();
             EnrolmentDetail ed;
-            var p = BusinessRule.SelectPerson(dbc, enrolment.PersonID) ?? throw new ArgumentNullException(nameof(Person));
-            var t = dbc.Term.Find(enrolment.TermID) ?? throw new ArgumentNullException(nameof(Term));
+            var p = enrolment.Person
+                        ?? BusinessRule.SelectPerson(dbc, enrolment.PersonID) ?? throw new ArgumentNullException(nameof(Person));
+            var t = enrolment.Term
+                        ?? dbc.Term.Find(enrolment.TermID) ?? throw new ArgumentNullException(nameof(Term));
             var cr = dbc.Course.Where(x => x.ID == enrolment.CourseID).Include(x => x.Enrolments).FirstOrDefault();
             var pt = dbc.CourseParticpationType.Find(cr.CourseParticipationTypeID);
             var ct = dbc.CourseType.Find(cr.CourseTypeID);

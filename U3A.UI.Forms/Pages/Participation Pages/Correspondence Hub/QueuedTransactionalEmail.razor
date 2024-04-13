@@ -9,6 +9,8 @@
 
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantInfoService
 @inject ILogger<QueuedTransactionalEmail> Logger
 @inject IWebHostEnvironment Environment
 @inject NavigationManager NavigationManager
@@ -116,6 +118,8 @@ else
     string pdfPath;
 
     U3ADbContext dbc { get; set; }
+    TenantDbContext dbcT { get; set; }
+    string tenant;
     SystemSettings? settings;
     PDFReport? pdfReport;
 
@@ -123,8 +127,10 @@ else
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        dbcT = await TenantDbfactory.CreateDbContextAsync();
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        GetData();
+        tenant = await tenantInfoService.GetTenantIdentifierAsync();
+        await GetData();
         IsReady = true;
     }
 
@@ -146,10 +152,12 @@ else
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    void GetData()
+    async Task GetData()
     {
         mainGrid?.ClearSelection();
-        SendMail = dbc.SendMail.Include(x => x.Person).AsEnumerable().OrderByDescending(x => x.CreatedOn).ToList();
+        SendMail = await dbc.SendMail.Include(x => x.Person).ToListAsync();
+        SendMail.AddRange(await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant));
+        SendMail = SendMail.OrderByDescending(x => x.CreatedOn).ToList();
     }
 
     async Task OnPreview()
@@ -198,6 +206,10 @@ else
                                         .Include(x => x.Course)
                                         .Include(x => x.Person)
                                         .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
+                    if (enrolment == null)
+                    {
+                        enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT,sm.RecordKey, tenant);
+                    }
                     if (enrolment != null)
                     {
                         var key = enrolment.PersonID;
@@ -283,11 +295,14 @@ else
             foreach (var sm in dbc.SendMail.Where(x => x.PersonID == kvp.Key))
             {
                 if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
-                await ProgressBar.SetValueAsync(mailItems);
+            }
+            foreach (var sm in dbcT.MultiCampusSendMail.Where(x => x.PersonID == kvp.Key))
+            {
+                if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
             }
             await ProgressBar.SetValueAsync(mailItems);
         }
-        if (!IsPreview) await dbc.SaveChangesAsync();
+        if (!IsPreview) { await dbc.SaveChangesAsync(); await dbcT.SaveChangesAsync(); }
         // finish up
         s.Stop();
         await ProgressBar.Close();
@@ -303,7 +318,7 @@ else
                     $"Elapsed time is: {elapsedTime}";
             await messageBox.SetPopupWidth("33%");
             await messageBox.ShowOkOnlyAsync("Communication Complete", msg);
-            GetData();
+            await GetData();
             mainGrid.ClearSelection();
             StateHasChanged();
         }
@@ -322,12 +337,13 @@ else
     {
         dbc.RemoveRange(SelectedDataItems);
         await dbc.SaveChangesAsync();
-        GetData();
+        await GetData();
     }
 
     public void Dispose()
     {
         dbc?.Dispose();
+        dbcT?.Dispose();
     }
 
 }

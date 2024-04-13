@@ -20,6 +20,7 @@ namespace U3A.BusinessRules
             {
                 using (var dbcT = new TenantDbContext(tenantConnectionString))
                 {
+                    
                     var mcEnrolments = dbcT.MultiCampusEnrolment
                                             .Where(x => x.TenantIdentifier == tenant.Identifier)
                                             .OrderByDescending(x => x.Created)
@@ -51,9 +52,10 @@ namespace U3A.BusinessRules
                                     }
                                 }
                             }
+                            await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, classes, settings);
                         }
-                        dbcT.SaveChanges();
                     }
+                    await dbcT.SaveChangesAsync();
                 }
             }
         }

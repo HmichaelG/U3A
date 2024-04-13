@@ -267,7 +267,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("TermID", "ClassID", "Date");
 
-                    b.ToTable("AttendClass");
+                    b.ToTable("AttendClass", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.AttendClassStatus", b =>
@@ -281,7 +281,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("AttendClassStatus");
+                    b.ToTable("AttendClassStatus", (string)null);
 
                     b.HasData(
                         new
@@ -324,7 +324,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("ClassID");
 
-                    b.ToTable("CancelClass");
+                    b.ToTable("CancelClass", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Class", b =>
@@ -408,7 +408,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("VenueID");
 
-                    b.ToTable("Class");
+                    b.ToTable("Class", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Committee", b =>
@@ -432,7 +432,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                         .IsUnique()
                         .HasFilter("[PersonID] IS NOT NULL");
 
-                    b.ToTable("Committee");
+                    b.ToTable("Committee", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Course", b =>
@@ -549,7 +549,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("Year", "Name");
 
-                    b.ToTable("Course");
+                    b.ToTable("Course", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.CourseParticipationType", b =>
@@ -563,7 +563,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("CourseParticpationType");
+                    b.ToTable("CourseParticpationType", (string)null);
 
                     b.HasData(
                         new
@@ -601,7 +601,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("CourseType");
+                    b.ToTable("CourseType", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.DocumentQueue", b =>
@@ -644,7 +644,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("Status");
 
-                    b.ToTable("DocumentQueue");
+                    b.ToTable("DocumentQueue", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.DocumentQueueAttachment", b =>
@@ -664,7 +664,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("DocumentQueueID");
 
-                    b.ToTable("DocumentQueueAttachment");
+                    b.ToTable("DocumentQueueAttachment", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.DocumentTemplate", b =>
@@ -708,7 +708,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("DocumentTemplate");
+                    b.ToTable("DocumentTemplate", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.DocumentType", b =>
@@ -737,7 +737,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("DocumentType");
+                    b.ToTable("DocumentType", (string)null);
 
                     b.HasData(
                         new
@@ -835,7 +835,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("TermID");
 
-                    b.ToTable("Dropout");
+                    b.ToTable("Dropout", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Enrolment", b =>
@@ -878,7 +878,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("TermID");
 
-                    b.ToTable("Enrolment");
+                    b.ToTable("Enrolment", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Fee", b =>
@@ -925,7 +925,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("Date", "Description");
 
-                    b.ToTable("Fee");
+                    b.ToTable("Fee", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Leave", b =>
@@ -965,7 +965,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("PersonID");
 
-                    b.ToTable("Leave");
+                    b.ToTable("Leave", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.MultiCampusSchedule", b =>
@@ -1001,7 +1001,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Schedule");
+                    b.ToTable("Schedule", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Occurrence", b =>
@@ -1019,7 +1019,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Occurrence");
+                    b.ToTable("Occurrence", (string)null);
 
                     b.HasData(
                         new
@@ -1143,7 +1143,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("PersonID", "CreatedOn");
 
-                    b.ToTable("OnlinePaymentStatus");
+                    b.ToTable("OnlinePaymentStatus", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Person", b =>
@@ -1284,7 +1284,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("LastName", "FirstName", "Email");
 
-                    b.ToTable("Person");
+                    b.ToTable("Person", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.PersonImport", b =>
@@ -1392,7 +1392,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("LastName", "FirstName", "IsNewPerson");
 
-                    b.ToTable("PersonImport");
+                    b.ToTable("PersonImport", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.PersonImportError", b =>
@@ -1425,7 +1425,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("PersonImportError");
+                    b.ToTable("PersonImportError", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.PublicHoliday", b =>
@@ -1443,7 +1443,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("PublicHoliday");
+                    b.ToTable("PublicHoliday", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Receipt", b =>
@@ -1495,7 +1495,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("Date", "Description");
 
-                    b.ToTable("Receipt");
+                    b.ToTable("Receipt", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.ReceiptDataImport", b =>
@@ -1531,7 +1531,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("PersonID");
 
-                    b.ToTable("ReceiptDataImport");
+                    b.ToTable("ReceiptDataImport", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Report", b =>
@@ -1550,7 +1550,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Report");
+                    b.ToTable("Report", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.SendMail", b =>
@@ -1610,7 +1610,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasIndex("PersonID");
 
-                    b.ToTable("SendMail");
+                    b.ToTable("SendMail", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.SystemSettings", b =>
@@ -1837,7 +1837,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("SystemSettings");
+                    b.ToTable("SystemSettings", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Term", b =>
@@ -1877,7 +1877,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Term");
+                    b.ToTable("Term", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Venue", b =>
@@ -1927,7 +1927,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Venue");
+                    b.ToTable("Venue", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.Volunteer", b =>
@@ -1953,7 +1953,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.HasIndex("Activity", "PersonID")
                         .IsUnique();
 
-                    b.ToTable("Volunteer");
+                    b.ToTable("Volunteer", (string)null);
                 });
 
             modelBuilder.Entity("U3A.Model.WeekDay", b =>
@@ -1971,7 +1971,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("WeekDay");
+                    b.ToTable("WeekDay", (string)null);
 
                     b.HasData(
                         new

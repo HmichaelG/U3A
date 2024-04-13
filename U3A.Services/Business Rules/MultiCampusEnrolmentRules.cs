@@ -3,6 +3,7 @@ using DevExpress.Pdf.ContentGeneration.Interop;
 using DevExpress.XtraRichEdit.Import.Rtf;
 using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,56 @@ namespace U3A.BusinessRules
     public static partial class BusinessRule
     {
 
-        public static bool AllowMultiCampusForCourse(Course course,SystemSettings settings)
+        public static async Task<Enrolment> GetMultiCampusEnrolmentAsync(
+                                                            U3ADbContext dbc,
+                                                            TenantDbContext dbcT,
+                                                            Guid EnrolmentID,
+                                                            string Tenant)
+        {
+            Enrolment result = null;
+            var mcEnrolment = await dbcT.MultiCampusEnrolment.FirstOrDefaultAsync(x => x.ID == EnrolmentID);
+            if (mcEnrolment != null)
+            {
+                var mcTerm = await dbcT.MultiCampusTerm.FindAsync(mcEnrolment.TermID);
+                var mcPerson = await dbcT.MultiCampusPerson.FindAsync(mcEnrolment.PersonID);
+                result = BusinessRule.GetEnrolmentFromMCEnrolment(mcEnrolment, mcPerson, mcTerm);
+                result.Course = await dbc.Course.FindAsync(mcEnrolment.CourseID);
+            }
+            return result;
+        }
+        public static async Task<IEnumerable<Enrolment>> GetMultiCampusEnrolmentsAsync(
+                                                            U3ADbContext dbc,
+                                                            TenantDbContext dbcT,
+                                                            string Tenant)
+        {
+            ConcurrentBag<Enrolment> result = new();
+            var mcEnrolment = await dbcT.MultiCampusEnrolment.Where(x => x.TenantIdentifier == Tenant).ToListAsync();
+            foreach (var e in mcEnrolment)
+            {
+                var mcTerm = await dbcT.MultiCampusTerm.FindAsync(e.TermID);
+                var mcPerson = await dbcT.MultiCampusPerson.FindAsync(e.PersonID);
+                if (mcPerson != null)
+                {
+                    if (e.ClassID == null)
+                    {
+                        var classes = await dbc.Class.Where(x => x.CourseID == e.CourseID).ToListAsync();
+                        foreach (var c in classes)
+                        {
+                            result.Add(BusinessRule.GetEnrolmentFromMCEnrolment(e, mcPerson, c, mcTerm));
+                        }
+                    }
+                    else
+                    {
+                        var c = await dbc.Class.FindAsync(e.ClassID);
+                        result.Add(BusinessRule.GetEnrolmentFromMCEnrolment(e, mcPerson, c, mcTerm));
+                    }
+                }
+            }
+            return result;
+        }
+
+
+        public static bool AllowMultiCampusForCourse(Course course, SystemSettings settings)
         {
             bool result = false;
             if (settings.AllowMultiCampusExtensions)
@@ -133,7 +183,7 @@ namespace U3A.BusinessRules
                             TermID = thisTerm.ID,
                             CourseID = c.Course.ID
                         };
-                        var e = GetEnrolmentFromMultiCampusEnrolment(mcE, person, c, thisTerm);
+                        var e = GetEnrolmentFromMCEnrolment(mcE, person, thisTerm, c);
                         result.Add(e);
                         c.Course.Enrolments.Add(e);
                         await dbT.AddAsync<MultiCampusEnrolment>(mcE);
@@ -156,7 +206,7 @@ namespace U3A.BusinessRules
                             CourseID = c.Course.ID,
                             ClassID = c.ID
                         };
-                        var e = GetEnrolmentFromMultiCampusEnrolment(mcE, person, c, thisTerm);
+                        var e = GetEnrolmentFromMCEnrolment(mcE, person, thisTerm, c);
                         result.Add(e);
                         c.Course.Enrolments.Add(e);
                         await dbT.AddAsync<MultiCampusEnrolment>(mcE);
@@ -164,60 +214,6 @@ namespace U3A.BusinessRules
                 }
             }
             return result;
-        }
-
-        public static Enrolment GetEnrolmentFromMultiCampusEnrolment(MultiCampusEnrolment e,
-                                    MultiCampusPerson p,
-                                    Class c,
-                                    MultiCampusTerm t)
-        {
-            Person person = new()
-            {
-                ID = p.ID,
-                Title = p.Title,
-                PostNominals = p.PostNominals,
-                FirstName = p.FirstName,
-                LastName = p.LastName,
-                Email = p.Email,
-                HomePhone = p.HomePhone,
-                Mobile = p.Mobile,
-                SMSOptOut = p.SMSOptOut,
-                ICEContact = p.ICEContact,
-                ICEPhone = p.ICEPhone,
-                VaxCertificateViewed = p.VaxCertificateViewed,
-                Communication = p.Communication,
-            };
-            return GetEnrolmentFromMultiCampusEnrolment(e, person, c, t);
-        }
-        public static Enrolment GetEnrolmentFromMultiCampusEnrolment(MultiCampusEnrolment e,
-                                    Person p,
-                                    Class c,
-                                    MultiCampusTerm t)
-        {
-            var term = new Term()
-            {
-                Duration = t.Duration,
-                EnrolmentEnds = t.EnrolmentEnds,
-                EnrolmentStarts = t.EnrolmentStarts,
-                ID = t.ID,
-                StartDate = t.StartDate,
-                IsDefaultTerm = t.IsDefaultTerm,
-                IsClassAllocationFinalised = t.IsClassAllocationFinalised,
-            };
-            return new Enrolment()
-            {
-                ID = e.ID,
-                IsWaitlisted = e.IsWaitlisted,
-                PersonID = e.PersonID,
-                TermID = e.TermID,
-                Term = term,
-                CourseID = e.CourseID,
-                Course = c.Course,
-                ClassID = e.ClassID,
-                Created = e.Created,
-                DateEnrolled = e.DateEnrolled,
-                Person = p,
-            };
         }
 
     }

@@ -44,6 +44,7 @@ namespace U3A.Database
         public DbSet<MultiCampusSchedule> MultiCampusSchedule { get; set; }
         public DbSet<MultiCampusPerson> MultiCampusPerson { get; set; }
         public DbSet<MultiCampusEnrolment> MultiCampusEnrolment { get; set; }
+        public DbSet<MultiCampusSendMail> MultiCampusSendMail { get; set; }
         public DbSet<MultiCampusTerm> MultiCampusTerm { get; set; }
         public DbSet<TenantInfo> TenantInfo { get; set; }
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,

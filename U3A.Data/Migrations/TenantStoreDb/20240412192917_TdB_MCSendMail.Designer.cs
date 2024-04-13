@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.TenantStoreDb
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240412192917_TdB_MCSendMail")]
+    partial class TdB_MCSendMail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,14 +110,6 @@ namespace U3A.Database.Migrations.TenantStoreDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Communication")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -147,15 +142,8 @@ namespace U3A.Database.Migrations.TenantStoreDb
                     b.Property<string>("PostNominals")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Postcode")
-                        .HasColumnType("int");
-
                     b.Property<bool>("SMSOptOut")
                         .HasColumnType("bit");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TenantIdentifier")
                         .IsRequired()

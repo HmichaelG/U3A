@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using U3A.Database;
@@ -36,6 +37,12 @@ namespace U3A.Services
                 }
             }
             return tenantInfo;
+        }
+
+        public async Task<string> GetTenantIdentifierAsync()
+        {
+            var tInfo = await GetTenantInfoAsync();
+            return tInfo.Identifier;
         }
 
     }
