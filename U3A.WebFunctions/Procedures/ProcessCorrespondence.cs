@@ -30,7 +30,10 @@ namespace U3A.WebFunctions.Procedures
                                             .Include(x => x.Person)
                                             .Where(x => string.IsNullOrWhiteSpace(x.Status)
                                                     && utcTime >= x.CreatedOn).ToListAsync();
-                    foreach (var sm in await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant.Identifier!)) { mailItems.Add(sm); }
+                    foreach (var sm in await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant.Identifier!)) 
+                    {
+                        if (string.IsNullOrWhiteSpace(sm.Status)) { mailItems.Add(sm); }
+                    }
                     foreach (SendMail sm in mailItems)
                     {
                         var p = sm.Person;
@@ -178,12 +181,17 @@ namespace U3A.WebFunctions.Procedures
                     dbc.RemoveRange(dbc.SendMail.AsEnumerable()
                         .Where(x => !string.IsNullOrWhiteSpace(x.Status) &&
                                         (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
+                    dbcT.RemoveRange(dbcT.MultiCampusSendMail.AsEnumerable()
+                        .Where(x => !string.IsNullOrWhiteSpace(x.Status) &&
+                                        (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
                     var deleted = dbc.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
+                    deleted += dbcT.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
                     if (deleted > 0)
                     {
-                        await dbc.SaveChangesAsync();
                         logger.LogInformation($"Deleted {deleted} correspondence queue records because they are more than 30 days old.");
                     }
+                    await dbc.SaveChangesAsync();
+                    await dbcT.SaveChangesAsync();
                 }
             }
         }
