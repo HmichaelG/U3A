@@ -33,13 +33,15 @@ namespace U3A.BusinessRules
             }
             return result;
         }
-        public static async Task<IEnumerable<Enrolment>> GetMultiCampusEnrolmentsAsync(
+        public static async Task<List<Enrolment>> GetMultiCampusEnrolmentsAsync(
                                                             U3ADbContext dbc,
                                                             TenantDbContext dbcT,
-                                                            string Tenant)
+                                                            string Tenant,
+                                                            Guid? CourseID = null)
         {
             ConcurrentBag<Enrolment> result = new();
             var mcEnrolment = await dbcT.MultiCampusEnrolment.Where(x => x.TenantIdentifier == Tenant).ToListAsync();
+            if (CourseID != null) { mcEnrolment = mcEnrolment.Where(x => x.CourseID == CourseID).ToList(); }
             foreach (var e in mcEnrolment)
             {
                 var mcTerm = await dbcT.MultiCampusTerm.FindAsync(e.TermID);
@@ -61,7 +63,7 @@ namespace U3A.BusinessRules
                     }
                 }
             }
-            return result;
+            return result.ToList();
         }
 
 

@@ -185,10 +185,12 @@ else
         await InvokeAsync(StateHasChanged);
         reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
         var enrolments = new List<Enrolment>();
+        var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant);
         foreach (SendMail sm in SelectedDataItems)
         {
             mailItems++;
-            await ProgressBar.SetValueAsync(mailItems);
+            var scopedMCEnrolments = mcEnrolments;  //Don't know why - probably something to do with LINQ
+            await ProgressBar.SetValueAsync(mailItems);            
             switch (sm.DocumentName)
             {
                 case "Cash Receipt":
@@ -230,16 +232,22 @@ else
                                         .Where(x => x.ID == sm.PersonID).FirstOrDefaultAsync();
                     if (dbc.Class.Any(x => x.ID == sm.RecordKey))
                     {
-                        enrolments = dbc.Enrolment.Where(x => x.ClassID == sm.RecordKey
-                                                            && x.TermID == sm.TermID).ToList();
-                        var Class = dbc.Class.Find(sm.RecordKey);
-                        course = dbc.Course.Find(Class.CourseID);
+                        enrolments = await dbc.Enrolment.Where(x => x.ClassID == sm.RecordKey
+                                                            && x.TermID == sm.TermID).ToListAsync();
+                        enrolments.AddRange(scopedMCEnrolments.Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
+                        var Class = await dbc.Class.FindAsync(sm.RecordKey);
+                        course = await dbc.Course.FindAsync(Class.CourseID);
                     }
                     else
                     {
                         course = dbc.Course.Find(sm.RecordKey);
-                        if (course != null) enrolments = dbc.Enrolment.Where(x => x.CourseID == course.ID
-                                                                                && x.TermID == sm.TermID).ToList();
+                        if (course != null)
+                        {
+                            enrolments = dbc.Enrolment.Where(x => x.CourseID == course.ID
+                                                                  && x.TermID == sm.TermID).ToList();
+                            enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
+                                                                  && x.TermID == sm.TermID));
+                        }
                     };
                     if (leader != null && enrolments.Count > 0)
                     {
@@ -258,6 +266,7 @@ else
                     course = await dbc.Course.FindAsync(thisClass.CourseID);
                     var thisTerm = await dbc.Term.FindAsync(sm.TermID);
                     enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
+                    enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID));
                     bool isEnrolmentReqd = sm.PrintAttendanceRecord ||
                                                     sm.PrintClassList ||
                                                     sm.PrintCSVFile ||

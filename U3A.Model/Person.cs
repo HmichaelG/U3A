@@ -281,7 +281,8 @@ namespace U3A.Model
         {
             get
             {
-                return $"{ToTitleText(LastName.Trim())}, {ToTitleText(FirstName.Trim())}";
+                string vTag = (IsMultiCampusVisitor) ? "[V]" : "";
+                return ($"{ToTitleText(LastName.Trim())}, {ToTitleText(FirstName.Trim())} {vTag}").Trim();
             }
         }
         public string FullNameAlphaKey
@@ -380,6 +381,8 @@ namespace U3A.Model
         [JsonIgnore] public List<Receipt> Receipts { get; set; } = new List<Receipt>();
         [JsonIgnore] public List<Fee> Fees { get; set; } = new List<Fee>();
         [JsonIgnore] public List<ReceiptDataImport> ReceiptDataImports { get; set; } = new List<ReceiptDataImport>();
+
+        [NotMapped][JsonIgnore] public bool IsMultiCampusVisitor { get; set; } = false;
 
     }
     public class PersonList : BindingList<Person> { }

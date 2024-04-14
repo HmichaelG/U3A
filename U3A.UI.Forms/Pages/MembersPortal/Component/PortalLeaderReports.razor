@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Hosting;
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
 @inject IWebHostEnvironment Environment
 
 
@@ -38,55 +40,66 @@
     SelectLeaderReports? rptSelect;
     ProFormaReportFactory reportFactory;
 
-    async Task OnQueueReportsSelected() {
+    async Task OnQueueReportsSelected()
+    {
         var msg = await ProcessReportsAsync(false);
         if (msg == string.Empty) msg = $"<p>The selected documents have been queued and will be sent via email within the hour.</p>";
         await messageBox.ShowOkOnlyAsync("Leaders Reports", msg);
     }
 
-    async Task<string> ProcessReportsAsync(bool IsPreview) {
+    async Task<string> ProcessReportsAsync(bool IsPreview)
+    {
         var result = string.Empty;
         reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
         var leader = loginState.SelectedPerson;
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
-            var enrolments = new List<Enrolment>();
-            if (dbc.Enrolment.Any(x => x.ClassID == selectedClass.ID && x.TermID == selectedTerm.ID)) {
-                enrolments = dbc.Enrolment.Include(x => x.Person)
-                                          .Where(x => x.ClassID == selectedClass.ID
-                                                    && x.TermID == selectedTerm.ID).ToList();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
+            {
+                var enrolments = new List<Enrolment>();
+                if (dbc.Enrolment.Any(x => x.ClassID == selectedClass.ID && x.TermID == selectedTerm.ID))
+                {
+                    enrolments = dbc.Enrolment.Include(x => x.Person)
+                                              .Where(x => x.ClassID == selectedClass.ID
+                                                        && x.TermID == selectedTerm.ID).ToList();
+                }
+                else
+                {
+                    enrolments = dbc.Enrolment.Include(x => x.Person)
+                                                .Where(x => x.CourseID == selectedCourse.ID
+                                                                && x.TermID == selectedTerm.ID).ToList();
+                };
+                enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
+                                        await tenantService.GetTenantIdentifierAsync(), selectedCourse.ID));
+                if (enrolments.Count > 0 || !rptSelect.RequireEnrolements)
+                {
+                    var mail = new SendMail()
+                        {
+                            DocumentName = "U3A Leaders Reports",
+                            Person = await dbc.Person.FindAsync(leader.ID),
+                            PersonID = leader.ID,
+                            TermID = selectedTerm.ID,
+                            PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
+                            PrintClassList = rptSelect.PrintClassList,
+                            PrintCSVFile = rptSelect.PrintCSVFile,
+                            PrintICEList = rptSelect.PrintICEList,
+                            PrintLeaderReport = rptSelect.PrintLeaderReport,
+                            PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
+                            RecordKey = selectedClass.ID,
+                            IsUserRequested = true
+                        };
+                    dbc.Add(mail);
+                    await dbc.SaveChangesAsync();
+                }
+                else { result = "<p>The selected reports could not be created because this course has no enrolments.</p>"; }
+                rptSelect.PrintLeaderReport = false;
+                rptSelect.PrintClassList = false;
+                rptSelect.PrintICEList = false;
+                rptSelect.PrintAttendanceRecord = false;
+                rptSelect.PrintCSVFile = false;
+                rptSelect.PrintAttendanceAnalysis = false;
+                return result;
             }
-            else {
-                enrolments = dbc.Enrolment.Include(x => x.Person)
-                                            .Where(x => x.CourseID == selectedCourse.ID
-                                                            && x.TermID == selectedTerm.ID).ToList();
-            };
-            if (enrolments.Count > 0 || !rptSelect.RequireEnrolements) {
-                var mail = new SendMail()
-                    {
-                        DocumentName = "U3A Leaders Reports",
-                        Person = await dbc.Person.FindAsync(leader.ID),
-                        PersonID = leader.ID,
-                        TermID = selectedTerm.ID,
-                        PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
-                        PrintClassList = rptSelect.PrintClassList,
-                        PrintCSVFile = rptSelect.PrintCSVFile,
-                        PrintICEList = rptSelect.PrintICEList,
-                        PrintLeaderReport = rptSelect.PrintLeaderReport,
-                        PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
-                        RecordKey = selectedClass.ID,
-                        IsUserRequested = true
-                    };
-                dbc.Add(mail);
-                await dbc.SaveChangesAsync();
-            }
-            else { result = "<p>The selected reports could not be created because this course has no enrolments.</p>"; }
-            rptSelect.PrintLeaderReport = false;
-            rptSelect.PrintClassList = false;
-            rptSelect.PrintICEList = false;
-            rptSelect.PrintAttendanceRecord = false;
-            rptSelect.PrintCSVFile = false;
-            rptSelect.PrintAttendanceAnalysis = false;
-            return result;
         }
     }
 

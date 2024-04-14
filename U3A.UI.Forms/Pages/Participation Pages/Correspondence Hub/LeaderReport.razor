@@ -5,6 +5,8 @@
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Logging
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
 @inject ILogger<LeaderReport> Logger
 @inject IWebHostEnvironment Environment
 @implements IDisposable
@@ -114,11 +116,13 @@ else
     string ErrorHeader;
     string ErrorMessage;
     U3ADbContext dbc { get; set; }
+    TenantDbContext dbcT { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        dbcT = await TenantDbfactory.CreateDbContextAsync();
         settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
         currentTerm = await BusinessRule.CurrentTermAsync(dbc);
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
@@ -195,6 +199,8 @@ else
                                         .Where(x => x.CourseID == Course.ID
                                                         && x.TermID == selectedTerm.ID).ToList();
         };
+        enrolments.AddRange( await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, 
+                                await tenantService.GetTenantIdentifierAsync(),Course.ID));
         if (enrolments.Count > 0 || !rptSelect.RequireEnrolements)
         {
             var mail = new SendMail()

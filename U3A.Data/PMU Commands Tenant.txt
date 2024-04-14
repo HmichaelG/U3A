@@ -1,8 +1,8 @@
-﻿update-database -cont TenantDbContext -project U3A.Database TdB_MCSendMail
+﻿update-database -cont TenantDbContext -project U3A.Database TdB_Term_CompositeKey
 
-remove-migration -cont TenantDbContext -project U3A.Database -args TdB_MCPerson_Address
+remove-migration -cont TenantDbContext -project U3A.Database -args TdB_Term_delCompositeKey
 
-add-migration -cont TenantDbContext -project U3A.Database TdB_MCPerson_Address
+add-migration -cont TenantDbContext -project U3A.Database TdB_Term_delCompositeKey
 
 update-database -cont TenantDbContext -project U3A.Database
 

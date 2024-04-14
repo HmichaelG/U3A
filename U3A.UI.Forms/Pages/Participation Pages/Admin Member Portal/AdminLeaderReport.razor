@@ -4,6 +4,8 @@
 @using U3A.UI.Reports.Pages
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
 @inject ILogger<LeaderReport> Logger
 @inject IWebHostEnvironment Environment
 @inject NavigationManager navMan;
@@ -130,11 +132,13 @@ else
     bool showPDF;
     string pdfPath;
     PDFReport pdfReport;
+    TenantDbContext dbcT { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        dbcT = await TenantDbfactory.CreateDbContextAsync();
         settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
         currentTerm = await BusinessRule.CurrentTermAsync(dbc);
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
@@ -170,6 +174,8 @@ else
         await progressBar.ShowSmallSpinnerAsync();
         var recipients = await BusinessRule.GetLeaderReportRecipients(dbc, settings, currentTerm, Class);
         var enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, Course, Class, selectedTerm);
+        enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
+                                await tenantService.GetTenantIdentifierAsync(),Course.ID));
         await progressBar.Close();
         if (!await IsDataOk(recipients, enrolments)) return;
         var Leader = recipients[0];
