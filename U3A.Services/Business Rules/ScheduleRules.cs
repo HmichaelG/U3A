@@ -13,6 +13,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using U3A.Database.Migrations.TenantStoreDb;
 using DevExpress.XtraRichEdit.Import.OpenXml;
+using U3A.Database.Migrations.U3ADbContextSeedMigrations;
 
 namespace U3A.BusinessRules
 {
@@ -45,6 +46,14 @@ namespace U3A.BusinessRules
                                         .FirstOrDefaultAsync();
             TenantInfo tInfo = await dbcT.TenantInfo
                                     .FirstOrDefaultAsync(x => x.Identifier == firstSchedule.TenantIdentifier);
+            // Get all current Enrolment keys
+            var enrolmentKeys = await dbc.Enrolment
+                                                .AsNoTracking()
+                                                .Where(x => x.TermID == term.ID)
+                                                .Select(x => x.ID).ToListAsync();
+            enrolmentKeys.AddRange( await dbcT.MultiCampusEnrolment
+                                                .AsNoTracking()
+                                                .Select(x => x.ID).ToListAsync());
             // Get Class updates since cache creation
             foreach (var c in await GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities, firstSchedule.UpdatedOn))
             {
@@ -70,6 +79,10 @@ namespace U3A.BusinessRules
                     // add new enrolments
                     c.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID != null && x.ClassID == c.ID));
                     c.Course.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID == null && x.CourseID == c.CourseID));
+                    // remove any enrolments deleted by the offering U3A
+                    c.Course.Enrolments.RemoveAll(x => 
+                                        !enrolmentKeys.Contains(x.ID));
+                    c.Enrolments.RemoveAll(x => !enrolmentKeys.Contains(x.ID));
                     // and remove new dropouts
                     foreach (var d in newDropouts)
                     {
