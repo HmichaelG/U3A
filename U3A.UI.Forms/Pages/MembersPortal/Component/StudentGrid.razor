@@ -30,7 +30,7 @@ else
                               UnboundType="GridUnboundColumnType.Integer" />
             <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
                               Visible="@IsManageEnrolmentsView" />
-            <DxGridDataColumn Caption="Name" FieldName="Person.FullName">
+            <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag">
                 <CellDisplayTemplate>
                     @{
                         if (context.DataItem != null)

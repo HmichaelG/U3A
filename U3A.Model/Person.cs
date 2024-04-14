@@ -16,6 +16,7 @@ namespace U3A.Model
     [Index(nameof(LastName), nameof(FirstName), nameof(Email))]
     public class Person : BaseEntity
     {
+        
         [Key]
 
         [NotMapped]
@@ -283,6 +284,22 @@ namespace U3A.Model
             {
                 string vTag = (IsMultiCampusVisitor) ? "[V]" : "";
                 return ($"{ToTitleText(LastName.Trim())}, {ToTitleText(FirstName.Trim())} {vTag}").Trim();
+            }
+        }
+        public string LastNameWithVisitorTag
+        {
+            get
+            {
+                string vTag = (IsMultiCampusVisitor) ? "[V]" : "";
+                return ($"{ToTitleText(LastName.Trim())} {vTag}").Trim();
+            }
+        }
+        public string FullNameWithVisitorTag
+        {
+            get
+            {
+                string vTag = (IsMultiCampusVisitor) ? "[V]" : "";
+                return ($"{FullName} {vTag}").Trim();
             }
         }
         public string FullNameAlphaKey

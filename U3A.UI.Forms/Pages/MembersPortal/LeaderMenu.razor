@@ -2,6 +2,7 @@
 
 @layout BasicLayout
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject NavigationManager NavigationManager
 @inject SignInManager<ApplicationUser> SignInMgr
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
@@ -443,9 +444,9 @@ else
 
     List<Enrolment>? Enrolments { get; set; } // Active & Waitlisted
     List<Enrolment>? EnrolmentsToSelectFrom { get; set; }
-    Enrolment? selectedEnrolment = new ();
-    List<Person>? Students { get; set; } = new ();
-    List<StudentDetails>? StudentsAndLeaders { get; set; } = new ();
+    Enrolment? selectedEnrolment = new();
+    List<Person>? Students { get; set; } = new();
+    List<StudentDetails>? StudentsAndLeaders { get; set; } = new();
     Person? selectedStudent;
     StudentDetails? selectedLookupStudent;
     bool isApple;
@@ -462,13 +463,17 @@ else
     public class StudentDetails
     {
         public Guid ID { get; set; }
+        public bool IsVisitor { get; set; }
         public Person Person { get; set; }
         public Enrolment Enrolment { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string FullName { get; set; }
-        public string Status { get {
-                if (Enrolment.IsWaitlisted) { return "Waitlisted"; } 
+        public string Status
+        {
+            get
+            {
+                if (Enrolment.IsWaitlisted) { return "Waitlisted"; }
                 if (Enrolment.isLeader) { return "Leader"; }
                 if (Enrolment.IsCourseClerk) { return "Clerk"; }
                 return "Enrolled";
@@ -572,7 +577,7 @@ else
                     if (studentGrid.SelectedDataItems.Contains(e))
                     {
                         e.IsWaitlisted = !e.IsWaitlisted;
-                        if (e.Person.FinancialTo < selectedTerm.Year)
+                        if (e.Person.FinancialTo < selectedTerm.Year && !e.Person.IsMultiCampusVisitor)
                         {
                             msg = $"{e.Person.FullName} set Waitlisted because they are unfinancial.<br/>";
                             e.IsWaitlisted = true;
@@ -586,8 +591,29 @@ else
                 }
                 using (var dbc = await U3Adbfactory.CreateDbContextAsync())
                 {
-                    dbc.UpdateRange(Enrolments);
+                    foreach (var o in studentGrid.SelectedDataItems)
+                    {
+                        var e = o as Enrolment;
+                        if (!e.Person.IsMultiCampusVisitor)
+                        {
+                            dbc.Update(e);
+                        }
+                    }
                     await dbc.SaveChangesAsync();
+                }
+                using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
+                {
+                    foreach (var o in studentGrid.SelectedDataItems)
+                    {
+                        var e = o as Enrolment;
+                        if (e.Person.IsMultiCampusVisitor)
+                        {
+                            var mcE = await dbcT.MultiCampusEnrolment.FindAsync(e.ID);
+                            mcE.IsWaitlisted = e.IsWaitlisted;
+                            if (mcE != null) { dbcT.Update(mcE); }
+                        }
+                    }
+                    await dbcT.SaveChangesAsync();
                 }
             }
             studentGrid.ClearSelections();
@@ -634,12 +660,31 @@ else
             {
                 using (var dbc = await U3Adbfactory.CreateDbContextAsync())
                 {
-                    foreach (var e in studentGrid.SelectedDataItems)
+                    foreach (var o in studentGrid.SelectedDataItems)
                     {
-                        dbc.Remove(e);
-                        Enrolments.Remove((Enrolment)e);
+                        var e = o as Enrolment;
+                        if (!e.Person.IsMultiCampusVisitor)
+                        {
+                            e = await dbc.Enrolment.FindAsync(e.ID);
+                            dbc.Remove(e);
+                            Enrolments.Remove(e);
+                        }
                     }
                     await dbc.SaveChangesAsync();
+                }
+                using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
+                {
+                    foreach (var o in studentGrid.SelectedDataItems)
+                    {
+                        var e = o as Enrolment;
+                        if (e.Person.IsMultiCampusVisitor)
+                        {
+                            var mcE = await dbcT.MultiCampusEnrolment.FindAsync((e as Enrolment).ID);
+                            if (mcE != null) { dbcT.Remove(mcE); }
+                            Enrolments.Remove(e);
+                        }
+                    }
+                    await dbcT.SaveChangesAsync();
                 }
                 await messageBox.ShowOkOnlyAsync("Selection deleted", $"{studentGrid.SelectedDataItems.Count()} enrolments have been deleted.");
             }
@@ -680,17 +725,18 @@ else
         }
         Students.Clear();
         StudentsAndLeaders.Clear();
-        foreach (var e in termAndCourse.EnrolmentsWithLeaders) 
+        foreach (var e in termAndCourse.EnrolmentsWithLeaders)
         {
             StudentsAndLeaders.Add(new StudentDetails()
                 {
                     ID = e.PersonID,
+                    IsVisitor = e.Person.IsMultiCampusVisitor,
                     Person = e.Person,
                     Enrolment = e,
                     FirstName = e.Person.FirstName,
-                    LastName = e.Person.LastName,
-                    FullName = e.Person.FullName
-                }); 
+                    LastName = e.Person.LastNameWithVisitorTag,
+                    FullName = e.Person.FullNameWithVisitorTag
+                });
         }
         foreach (var e in Enrolments) { Students.Add(e.Person); }
         selectedStudent = null;

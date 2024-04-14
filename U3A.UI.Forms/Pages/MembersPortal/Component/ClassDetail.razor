@@ -6,7 +6,13 @@
 @if (Class != null)
 {
     <DxFormLayout CssClass="pt-2">
-            <div class="col-small"><strong>Offered:</strong></div>
+        @if (!string.IsNullOrEmpty(Class.Course.OfferedBy))
+        {
+            <div class="row px-2 px-md-3 col-12">
+                <div class="text-info col-12 text-center h6">@($"Offered By: {Class.Course.OfferedBy}")</div>
+            </div>
+        }
+        <div class="col-small"><strong>Offered:</strong></div>
             <div class="col-large">@Class.OfferedSummary</div>
             @if (Class.Course.CourseFeePerYear != 0)
             {

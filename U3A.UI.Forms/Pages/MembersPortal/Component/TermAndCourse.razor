@@ -5,6 +5,8 @@
 @inject IJSRuntime js
 @inject NavigationManager NavigationManager
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> tenantDbfactory
+@inject TenantInfoService tenantService
 
 @attribute [Authorize]
 
@@ -193,9 +195,25 @@ else {
         if (selectedTerm == null) return;
         if (selectedCourse == null) return;
         if (selectedClass == null) return;
-        using (var dbContext = await U3Adbfactory.CreateDbContextAsync()) {
-            EnrolmentsWithLeaders = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbContext, selectedCourse, selectedClass, selectedTerm);
-            Enrolments = await BusinessRule.EditableEnrolmentsAsync(dbContext, selectedTerm, selectedCourse, selectedClass);
+        var tenant = await tenantService.GetTenantIdentifierAsync();
+        List<Enrolment> mcE = new();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync()) {
+            using (var dbcT = await tenantDbfactory.CreateDbContextAsync())
+            {                
+                EnrolmentsWithLeaders = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, selectedCourse, selectedClass, selectedTerm);
+                Enrolments = await BusinessRule.EditableEnrolmentsAsync(dbc, selectedTerm, selectedCourse, selectedClass);
+                if (selectedCourse.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                {
+                    mcE = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant,selectedCourse.ID);
+                }
+                else {
+                    mcE = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant, selectedCourse.ID,selectedClass.ID);
+                }
+                EnrolmentsWithLeaders.AddRange(mcE);
+                EnrolmentsWithLeaders = EnrolmentsWithLeaders.OrderBy(x => x.Person.FullNameAlphaKey).ToList();
+                Enrolments.AddRange(mcE);
+                Enrolments = Enrolments.OrderBy(x => x.Person.FullNameAlphaKey).ToList();
+            }
         }
     }
 
