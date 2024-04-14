@@ -34,6 +34,7 @@ namespace U3A.WebFunctions.Procedures
                     {
                         if (string.IsNullOrWhiteSpace(sm.Status)) { mailItems.Add(sm); }
                     }
+                    var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant.Identifier!);
                     foreach (SendMail sm in mailItems)
                     {
                         var p = sm.Person;
@@ -87,8 +88,9 @@ namespace U3A.WebFunctions.Procedures
                                 {
                                     enrolments = dbc.Enrolment.Where(x => x.ClassID == sm.RecordKey
                                                                         && x.TermID == sm.TermID).ToList();
+                                    enrolments.AddRange(mcEnrolments.Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
                                     var Class = dbc.Class.Find(sm.RecordKey);
-                                    course = dbc.Course.Find(Class.CourseID);
+                                    course = dbc.Course.Find(Class!.CourseID);
                                     classOnDayID = Class.OnDayID;
                                 }
                                 else
@@ -98,6 +100,8 @@ namespace U3A.WebFunctions.Procedures
                                     {
                                         enrolments = dbc.Enrolment.Where(x => x.CourseID == course.ID
                                                                               && x.TermID == sm.TermID).ToList();
+                                        enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
+                                                                              && x.TermID == sm.TermID));
                                         foreach (var c in dbc.Class.Where(x => x.CourseID == course.ID).OrderBy(x => x.OnDayID))
                                         {
                                             if (c.OnDayID >= todayID) { classOnDayID = c.OnDayID; break; }
@@ -130,6 +134,14 @@ namespace U3A.WebFunctions.Procedures
                                 course = await dbc.Course.FindAsync(thisClass!.CourseID);
                                 var thisTerm = await dbc.Term.FindAsync(sm.TermID);
                                 enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
+                                if (course!.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                                {
+                                    enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null));
+                                }
+                                else
+                                {
+                                    enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == thisClass.ID));
+                                }
                                 if (enrolments?.Count > 0)
                                 {
                                     sm.Status = await reportFactory.CreateLeaderReports(

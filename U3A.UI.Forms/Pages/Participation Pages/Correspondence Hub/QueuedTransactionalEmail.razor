@@ -190,7 +190,7 @@ else
         {
             mailItems++;
             var scopedMCEnrolments = mcEnrolments;  //Don't know why - probably something to do with LINQ
-            await ProgressBar.SetValueAsync(mailItems);            
+            await ProgressBar.SetValueAsync(mailItems);
             switch (sm.DocumentName)
             {
                 case "Cash Receipt":
@@ -210,7 +210,7 @@ else
                                         .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
                     if (enrolment == null)
                     {
-                        enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT,sm.RecordKey, tenant);
+                        enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT, sm.RecordKey, tenant);
                     }
                     if (enrolment != null)
                     {
@@ -266,7 +266,14 @@ else
                     course = await dbc.Course.FindAsync(thisClass.CourseID);
                     var thisTerm = await dbc.Term.FindAsync(sm.TermID);
                     enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
-                    enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID));
+                    if (course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                    {
+                        enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null));
+                    }
+                    else
+                    {
+                        enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == thisClass.ID));
+                    }
                     bool isEnrolmentReqd = sm.PrintAttendanceRecord ||
                                                     sm.PrintClassList ||
                                                     sm.PrintCSVFile ||

@@ -37,11 +37,20 @@ namespace U3A.BusinessRules
                                                             U3ADbContext dbc,
                                                             TenantDbContext dbcT,
                                                             string Tenant,
-                                                            Guid? CourseID = null)
+                                                            Guid? CourseID = null,
+                                                            Guid? ClassID = null)
         {
             ConcurrentBag<Enrolment> result = new();
             var mcEnrolment = await dbcT.MultiCampusEnrolment.Where(x => x.TenantIdentifier == Tenant).ToListAsync();
-            if (CourseID != null) { mcEnrolment = mcEnrolment.Where(x => x.CourseID == CourseID).ToList(); }
+            if (CourseID != null && ClassID == null) 
+            { 
+                mcEnrolment = mcEnrolment.Where(x => x.CourseID == CourseID && x.ClassID == null).ToList(); 
+            }
+            if (CourseID != null && ClassID != null) { 
+                mcEnrolment = mcEnrolment
+                                .Where(x => x.CourseID == CourseID
+                                            && x.ClassID == ClassID).ToList(); 
+            }
             foreach (var e in mcEnrolment)
             {
                 var mcTerm = await dbcT.MultiCampusTerm.FindAsync(e.TermID);

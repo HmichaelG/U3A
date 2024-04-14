@@ -174,8 +174,16 @@ else
         await progressBar.ShowSmallSpinnerAsync();
         var recipients = await BusinessRule.GetLeaderReportRecipients(dbc, settings, currentTerm, Class);
         var enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, Course, Class, selectedTerm);
-        enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
-                                await tenantService.GetTenantIdentifierAsync(),Course.ID));
+        if (Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+        {
+            enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
+                        await tenantService.GetTenantIdentifierAsync(), Course.ID, Class.ID));
+        }
+        else
+        {
+            enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
+                                    await tenantService.GetTenantIdentifierAsync(), Course.ID));
+        }
         await progressBar.Close();
         if (!await IsDataOk(recipients, enrolments)) return;
         var Leader = recipients[0];

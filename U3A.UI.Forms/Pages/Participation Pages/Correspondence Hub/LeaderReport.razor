@@ -192,15 +192,17 @@ else
             enrolments = dbc.Enrolment.Include(x => x.Person)
                                       .Where(x => x.ClassID == Class.ID
                                                 && x.TermID == selectedTerm.ID).ToList();
+            enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
+                                    await tenantService.GetTenantIdentifierAsync(), Course.ID,Class.ID));
         }
         else
         {
             enrolments = dbc.Enrolment.Include(x => x.Person)
                                         .Where(x => x.CourseID == Course.ID
                                                         && x.TermID == selectedTerm.ID).ToList();
+            enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
+                                    await tenantService.GetTenantIdentifierAsync(), Course.ID));
         };
-        enrolments.AddRange( await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, 
-                                await tenantService.GetTenantIdentifierAsync(),Course.ID));
         if (enrolments.Count > 0 || !rptSelect.RequireEnrolements)
         {
             var mail = new SendMail()
