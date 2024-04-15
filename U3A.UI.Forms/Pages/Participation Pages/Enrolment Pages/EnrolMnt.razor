@@ -158,10 +158,10 @@ else
                                 <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
                                                   Width="5rem" Visible="@settings.RequireVaxCertificate" />
                                 <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
-                                <DxGridDataColumn ReadOnly=true 
+                                <DxGridDataColumn ReadOnly=true
                                                   Visible=@(selectedCourse?.AllowMultiCampsuFrom != null)
-                                                  Caption="Visitor?" 
-                                                  FieldName="Person.IsMultiCampusVisitor"/>
+                                                  Caption="Visitor?"
+                                                  FieldName="Person.IsMultiCampusVisitor" />
                                 <DxGridDataColumn ReadOnly=true Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
                                 <DxGridDataColumn ReadOnly=true Caption="Email" FieldName="Person.Email" />
                                 <DxGridDataColumn ReadOnly=true Caption="Enrolled" FieldName="DateEnrolled"
@@ -332,6 +332,7 @@ else
     int documentsSent;
     internal Progress? ProgressBar;
     MemberFeeCalculationService service;
+    bool hasMultiCampusVisitors = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -448,6 +449,8 @@ else
         selectedCourse = course;
         if (selectedCourse != null)
         {
+            hasMultiCampusVisitors = false;
+            if (selectedCourse.AllowMultiCampsuFrom <= TimezoneAdjustment.GetLocalTime().Date) { hasMultiCampusVisitors = true; }
             classes = selectedCourse.Classes;
             SetupClassToEnrol();
             await SetupGrid();
@@ -569,7 +572,6 @@ else
             if (mce != null)
             {
                 mce.IsWaitlisted = editModel.IsWaitlisted;
-                await dbcT.SaveChangesAsync();
             }
         }
         else
@@ -590,10 +592,9 @@ else
                 }
                 // Post changes to the database.
                 if (e.IsNew) await dbc.AddAsync(dataItem);
-                await SaveChangesAsync();
             }
         }
-        await SetupGrid();
+        await SaveChangesAsync();
     }
 
 
@@ -621,15 +622,12 @@ else
         {
             var mcE = await dbcT.MultiCampusEnrolment.FindAsync(enrolment.ID);
             dbcT.Remove(mcE);
-            await dbcT.SaveChangesAsync();
         }
         else
         {
             BusinessRule.DeleteEnrolment(dbc, enrolment);
-            await SaveChangesAsync();
         }
-        mainGrid.ClearSelection();
-        await SetupGrid();
+        await SaveChangesAsync();
     }
 
     async Task<bool> SaveChangesAsync()
@@ -640,6 +638,9 @@ else
             // Post changes to the database.
             await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
             await dbc.SaveChangesAsync();
+            await dbcT.SaveChangesAsync();
+            mainGrid.ClearSelection();
+            await SetupGrid();
             result = true;
         }
         catch (Exception ex)
@@ -714,6 +715,11 @@ else
             ShowWaitlistFlyout("#SetSelectionTransfer");
             IsFlyoutOpen = true;
         }
+        else if (hasMultiCampusVisitors)
+        {
+            ShowMultiCampusFlyout("#SetSelectionTransfer");
+            IsFlyoutOpen = true;
+        }
         else
         {
             if (await transferOrCopyEnrolment.ShowTransferAsync(dbc, selectedTerm, selectedCourse, selectedClass))
@@ -731,6 +737,11 @@ else
         if (SelectedDataItems == null || SelectedDataItems.Count < 1)
         {
             ShowWaitlistFlyout("#SetSelectionCopy");
+            IsFlyoutOpen = true;
+        }
+        else if (hasMultiCampusVisitors)
+        {
+            ShowMultiCampusFlyout("#SetSelectionCopy");
             IsFlyoutOpen = true;
         }
         else
@@ -782,11 +793,7 @@ else
         // If transfer, delete the selected items
         if (!IsCopy) dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
         // and save...
-        if (await SaveChangesAsync())
-        {
-            mainGrid.ClearSelection();
-            await SetupGrid();
-        }
+        await SaveChangesAsync();
         string msg = $"<p>{count} Enrolments processed successfully. &nbsp";
         if (failures > 0) { msg += $"{failures} failed because they were already enrolled."; }
         msg += "</p>";
@@ -825,23 +832,28 @@ else
                 if (mcE != null)
                 {
                     mcE.IsWaitlisted = SetTo;
-                    await dbcT.SaveChangesAsync();
                 }
             }
             else
             {
                 dbc.Enrolment.Find(enrol.ID).IsWaitlisted = SetTo;
-                await SaveChangesAsync();
             }
         }
-        mainGrid.ClearSelection();
+        await SaveChangesAsync();
     }
 
     void ShowWaitlistFlyout(string FlyoutTarget)
     {
         HeaderContent = "Select Items";
-        MessageContent = "<p>You must select items from the list to perform this Quick Action.</p>" +
-        "<p>Use the Selection column on the grid to select one or multiple items.</p>";
+        MessageContent = "<p>You must select items from the list to perform this Quick Action.<br/>" +
+        "Use the Selection column on the grid to select one or multiple items.</p>";
+        FlyoutTargetID = FlyoutTarget;
+        IsFlyoutOpen = true;
+    }
+    void ShowMultiCampusFlyout(string FlyoutTarget)
+    {
+        HeaderContent = "Not available";
+        MessageContent = "<p>Copy/Transfer functions are not permitted for Multi-Campus courses.</p>";
         FlyoutTargetID = FlyoutTarget;
         IsFlyoutOpen = true;
     }
@@ -878,12 +890,19 @@ else
 
     async Task BulkDelete()
     {
-        dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
-        if (await SaveChangesAsync())
+        foreach (var e in SelectedDataItems.Cast<Enrolment>())
         {
-            mainGrid.ClearSelection();
-            await SetupGrid();
+            if (e.Person.IsMultiCampusVisitor)
+            {
+                var mcE = await dbcT.MultiCampusEnrolment.FindAsync(e.ID);
+                dbcT.Remove(mcE);
+            }
+            else
+            {
+                dbc.Remove(e);
+            }
         }
+        await SaveChangesAsync();
     }
 
     async Task DoQuickEnrolmentAsync()
@@ -921,7 +940,7 @@ else
                     }
                     else { failures++; }
                 }
-                if (await SaveChangesAsync()) { await SetupGrid(); }
+                await SaveChangesAsync();
                 if (failures != 0)
                 {
                     int count = quickEnrolment.SelectedPersons.Count() - failures;
