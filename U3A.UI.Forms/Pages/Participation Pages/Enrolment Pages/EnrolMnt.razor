@@ -450,7 +450,6 @@ else
         if (selectedCourse != null)
         {
             hasMultiCampusVisitors = false;
-            if (selectedCourse.AllowMultiCampsuFrom <= TimezoneAdjustment.GetLocalTime().Date) { hasMultiCampusVisitors = true; }
             classes = selectedCourse.Classes;
             SetupClassToEnrol();
             await SetupGrid();
@@ -510,6 +509,7 @@ else
         {
             mcE = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant, selectedCourse.ID, selectedClass.ID);
         }
+        hasMultiCampusVisitors = (mcE.Count > 0) ? true : false;
         Enrolments.AddRange(mcE);
         Enrolments = Enrolments.OrderBy(x => x.Person.FullNameAlphaKey).ToList();
         mainGrid.AutoFitColumnWidths();
@@ -572,6 +572,16 @@ else
             if (mce != null)
             {
                 mce.IsWaitlisted = editModel.IsWaitlisted;
+                List<Class> classes = new();
+                if (selectedClass != null)
+                {
+                    classes.Add(selectedClass);
+                }
+                else
+                {
+                    classes.AddRange(selectedCourse.Classes);
+                }
+               await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, classes, settings);
             }
         }
         else
@@ -592,6 +602,8 @@ else
                 }
                 // Post changes to the database.
                 if (e.IsNew) await dbc.AddAsync(dataItem);
+                // Create a mail item
+                await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
             }
         }
         await SaveChangesAsync();
@@ -636,7 +648,6 @@ else
         try
         {
             // Post changes to the database.
-            await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
             await dbc.SaveChangesAsync();
             await dbcT.SaveChangesAsync();
             mainGrid.ClearSelection();
