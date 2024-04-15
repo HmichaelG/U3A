@@ -61,6 +61,18 @@ namespace U3A.Database
             var utcNow = DateTime.Now;
             foreach (var entry in entries)
             {
+                if (entry.Entity is MultiCampusEnrolment e)
+                {
+                    if (e.IsWaitlisted)
+                    {
+                        e.DateEnrolled = null;// Waitlisted, therefore not enrolled.
+                    }
+                    else
+                    {
+                        // Not Waitlisted, therefore set DateEnrolled if required.
+                        if (e.DateEnrolled == null) { e.DateEnrolled = utcNow; }
+                    }
+                }
                 // for entities that inherit from BaseEntity,
                 // set UpdatedOn / CreatedOn appropriately
                 if (entry.Entity is BaseEntity trackable)
