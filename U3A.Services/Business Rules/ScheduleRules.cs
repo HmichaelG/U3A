@@ -224,7 +224,7 @@ namespace U3A.BusinessRules
                 var tInfo = await dbcT.TenantInfo.FirstOrDefaultAsync(x => x.Identifier == TenantIdentifier);
                 if (tInfo != null)
                 {
-                    // Multi-campus extensions must be enavled at the tenant & the client level
+                    // Multi-campus extensions must be enabled at the tenant & the client level
                     if (tInfo.EnableMultiCampusExtension && settings.AllowMultiCampusExtensions)
                     {
                         await dbcT.Database.BeginTransactionAsync();

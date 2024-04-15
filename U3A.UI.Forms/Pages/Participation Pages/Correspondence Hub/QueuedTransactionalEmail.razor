@@ -351,8 +351,21 @@ else
 
     async Task OnDeleteSelection()
     {
-        dbc.RemoveRange(SelectedDataItems);
+        foreach (var o in SelectedDataItems)
+        {
+            var sm = o as SendMail;
+            if (sm.Person.IsMultiCampusVisitor)
+            {
+                var mcSM = await dbcT.MultiCampusSendMail.FindAsync(sm.ID);
+                if (mcSM != null) { dbcT.Remove(mcSM); }
+            }
+            else
+            {
+                dbc.Remove(sm);
+            }
+        }
         await dbc.SaveChangesAsync();
+        await dbcT.SaveChangesAsync();
         await GetData();
     }
 
