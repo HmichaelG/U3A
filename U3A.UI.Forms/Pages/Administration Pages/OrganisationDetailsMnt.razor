@@ -2,6 +2,8 @@
 
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> tenantDbfactory
+@inject TenantInfoService tenantService
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
@@ -80,9 +82,9 @@ else
                                                 <DxTextBox @bind-Text="@systemSettings.SendEmailDisplayName" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Support Email Address" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@systemSettings.SupportEmailAddesss" 
-                                                            ClearButtonDisplayMode=DataEditorClearButtonDisplayMode.Auto
-                                                            NullText="The email address to which member support requuests are sent." />
+                                                <DxTextBox @bind-Text="@systemSettings.SupportEmailAddesss"
+                                                           ClearButtonDisplayMode=DataEditorClearButtonDisplayMode.Auto
+                                                           NullText="The email address to which member support requuests are sent." />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="System Postman CC Email" ColSpanMd="12">
                                                 <DxMemo @bind-Text="@systemSettings.SystemPostmanCCAddresses"
@@ -258,6 +260,50 @@ else
                         <DxFormLayoutItem Caption="Allow Multi-Campus Extensions?" ColSpanMd="12">
                             <DxCheckBox @bind-Checked="@systemSettings.AllowMultiCampusExtensions" />
                         </DxFormLayoutItem>
+                        <DxFormLayoutGroup Caption="Multi Campus U3A" ColSpanMd="12" CssClass="u3a-box-height">
+                            <DxFormLayoutGroup Caption="U3A Not Allowed" ColSpanMd="5">
+                                <DxGrid @ref=@UnassignedGrid Data=@UnassignedU3A AllowColumnReorder=false CssClass="m-1"
+                                        @bind-SelectedDataItems="SelectedUnassignedItems"
+                                        SelectionMode="GridSelectionMode.Multiple"
+                                        VirtualScrollingEnabled=true
+                                        KeyFieldName="Id"
+                                        AllowGroup=false
+                                        AllowSelectRowByClick=true>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="2rem" />
+                                        <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
+                                        <DxGridDataColumn Caption="Name" FieldName="Name" />
+                                    </Columns>
+                                </DxGrid>
+                            </DxFormLayoutGroup>
+
+                            <DxFormLayoutGroup Caption="Action" ColSpanMd="2">
+                                <DxButton Text="Allow >>" 
+                                            Enabled='@(SelectedUnassignedItems?.Count > 0)'
+                                            Click="OnAllowSelected" 
+                                            CssClass="mx-2 mt-2 w-100" />
+                                <DxButton Text="<< Disallow"
+                                          Enabled='@(SelectedAssignedItems?.Count > 0)'
+                                          Click="OnDisallowSelected"
+                                          CssClass="mx-2 mt-2 w-100" />
+                            </DxFormLayoutGroup>
+
+                            <DxFormLayoutGroup Caption="U3A Allowed" ColSpanMd="5">
+                                <DxGrid @ref=@AssignedGrid Data=@AssignedU3A AllowColumnReorder=false CssClass="m-1"
+                                        @bind-SelectedDataItems="SelectedAssignedItems"
+                                        SelectionMode="GridSelectionMode.Multiple"
+                                        VirtualScrollingEnabled=true
+                                        KeyFieldName="Id"
+                                        AllowGroup=false
+                                        AllowSelectRowByClick=true>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="2rem" />
+                                        <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
+                                        <DxGridDataColumn Caption="Name" FieldName="Name" />
+                                    </Columns>
+                                </DxGrid>
+                            </DxFormLayoutGroup>
+                        </DxFormLayoutGroup>
                     </DxTabPage>
                 </DxFormLayoutTabPages>
                 <DxFormLayoutItem ColSpanMd="12">
@@ -270,6 +316,11 @@ else
         </EditForm>
     </div>
 }
+<style>
+    .u3a-box-height {
+        min-height: calc(100dvh - 15rem);
+    }
+</style>
 @code {
     bool IsReady = false;
     List<string> AutoEnrolAllocationMethods;
@@ -278,6 +329,7 @@ else
     int ActiveTabIndex { get; set; } = 0;
     private SystemSettings systemSettings { get; set; }
     U3ADbContext? dbc { get; set; }
+    TenantDbContext? dbcT { get; set; }
     DxRichEdit richEdit;
     internal ErrorPopup? ErrorPopup { get; set; }
     internal string? ErrorHeader;
@@ -287,6 +339,13 @@ else
     AutoEnrollOccurrences autoEnrollOccurrences = new AutoEnrollOccurrences();
     DocumentServer server;
 
+    List<TenantInfo> UnassignedU3A = new();
+    List<TenantInfo> AssignedU3A = new();
+    DxGrid? UnassignedGrid;
+    DxGrid? AssignedGrid;
+    IReadOnlyList<object> SelectedUnassignedItems { get; set; }
+    IReadOnlyList<object> SelectedAssignedItems { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -295,6 +354,7 @@ else
         AutoEnrolAllocationMethods.Add("Random");
         AutoEnrolAllocationMethods.Add("First In Wins");
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        dbcT = await tenantDbfactory.CreateDbContextAsync();
         WeekDays = await dbc.WeekDay.ToListAsync();
         systemSettings = await dbc.SystemSettings.FirstOrDefaultAsync();
         if (systemSettings == null)
@@ -312,6 +372,18 @@ else
                     MailLabelHeight = 25
                 };
         }
+        UnassignedU3A = await dbcT.TenantInfo
+                                    .AsNoTracking()
+                                    .Where(x => x.EnableMultiCampusExtension
+                                                && !systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
+                                    .OrderBy(x => x.State).ThenBy(x => x.Name)
+                                    .ToListAsync();
+        AssignedU3A = await dbcT.TenantInfo
+                                    .AsNoTracking()
+                                    .Where(x => x.EnableMultiCampusExtension
+                                                && systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
+                                    .OrderBy(x => x.State).ThenBy(x => x.Name)
+                                    .ToListAsync();
         if (systemSettings.AutoEnrolAllocationDay < 0 ||
                 systemSettings.AutoEnrolAllocationDay > 6) systemSettings.AutoEnrolAllocationDay = 2;
         server = new DocumentServer(dbc);
@@ -342,6 +414,8 @@ else
         {
             editModel.CopyTo(dataItem);
             dataItem.TermsAndConditionsHTML = server.GetHTMLText(systemSettings.TermsAndConditions);
+            dataItem.MultiCampusU3AAllowed.Clear();
+            dataItem.MultiCampusU3AAllowed.AddRange(AssignedU3A.Select(x => x.Identifier));
             try
             {
                 // Post changes to the database.
@@ -364,6 +438,25 @@ else
         systemSettings.TermsAndConditions = richEdit.DocumentContent;
     }
 
+    async Task OnAllowSelected()
+    {
+        foreach (var t in SelectedUnassignedItems.Cast<TenantInfo>())
+        {
+            AssignedU3A.Add(t);
+            UnassignedU3A.Remove(t);
+            UnassignedGrid.ClearSelection();
+        }
+    }
+
+    async Task OnDisallowSelected()
+    {
+        foreach (var t in SelectedAssignedItems.Cast<TenantInfo>())
+        {
+            UnassignedU3A.Add(t);
+            AssignedU3A.Remove(t);
+            AssignedGrid.ClearSelection();
+        }
+    }
 
     void Close()
     {
@@ -373,6 +466,7 @@ else
     public void Dispose()
     {
         dbc?.Dispose();
+        dbcT?.Dispose();
     }
 
 }
