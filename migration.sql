@@ -833,7 +833,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220813052441_U3A_Initial', N'8.0.3');
+    VALUES (N'20220813052441_U3A_Initial', N'8.0.4');
 END;
 GO
 
@@ -957,7 +957,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220818092843_U3A_CourseTypeChnage', N'8.0.3');
+    VALUES (N'20220818092843_U3A_CourseTypeChnage', N'8.0.4');
 END;
 GO
 
@@ -1107,7 +1107,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220819053920_U3A_AttendanceHistory', N'8.0.3');
+    VALUES (N'20220819053920_U3A_AttendanceHistory', N'8.0.4');
 END;
 GO
 
@@ -1236,7 +1236,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220821064729_U3A_DefaultTerm', N'8.0.3');
+    VALUES (N'20220821064729_U3A_DefaultTerm', N'8.0.4');
 END;
 GO
 
@@ -1360,7 +1360,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220823005347_U3A_PersonCommunication', N'8.0.3');
+    VALUES (N'20220823005347_U3A_PersonCommunication', N'8.0.4');
 END;
 GO
 
@@ -1502,7 +1502,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220823064735_U3A_AddnClassOccurence', N'8.0.3');
+    VALUES (N'20220823064735_U3A_AddnClassOccurence', N'8.0.4');
 END;
 GO
 
@@ -1650,7 +1650,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220823225311_U3A_RemovePersonDiscontinued', N'8.0.3');
+    VALUES (N'20220823225311_U3A_RemovePersonDiscontinued', N'8.0.4');
 END;
 GO
 
@@ -1798,7 +1798,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220824000648_U3A_RemoveCourseDiscontinued', N'8.0.3');
+    VALUES (N'20220824000648_U3A_RemoveCourseDiscontinued', N'8.0.4');
 END;
 GO
 
@@ -1939,7 +1939,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220826220449_U3A_EmailTemplate', N'8.0.3');
+    VALUES (N'20220826220449_U3A_EmailTemplate', N'8.0.4');
 END;
 GO
 
@@ -2063,7 +2063,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220828235252_U3A_EmailTemplateWithHTML', N'8.0.3');
+    VALUES (N'20220828235252_U3A_EmailTemplateWithHTML', N'8.0.4');
 END;
 GO
 
@@ -2196,7 +2196,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220831001431_U3A_EmailHistory', N'8.0.3');
+    VALUES (N'20220831001431_U3A_EmailHistory', N'8.0.4');
 END;
 GO
 
@@ -2329,7 +2329,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220831065109_U3A_AutoEnrolSettings', N'8.0.3');
+    VALUES (N'20220831065109_U3A_AutoEnrolSettings', N'8.0.4');
 END;
 GO
 
@@ -2453,7 +2453,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220901020153_U3A_AddedDateEnrolled', N'8.0.3');
+    VALUES (N'20220901020153_U3A_AddedDateEnrolled', N'8.0.4');
 END;
 GO
 
@@ -2649,7 +2649,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220903022302_U3A_Committee', N'8.0.3');
+    VALUES (N'20220903022302_U3A_Committee', N'8.0.4');
 END;
 GO
 
@@ -2798,7 +2798,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220903055005_U3A_Volunteer', N'8.0.3');
+    VALUES (N'20220903055005_U3A_Volunteer', N'8.0.4');
 END;
 GO
 
@@ -2997,7 +2997,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220905230015_U3A_DocumentType', N'8.0.3');
+    VALUES (N'20220905230015_U3A_DocumentType', N'8.0.4');
 END;
 GO
 
@@ -3127,7 +3127,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220906015610_U3A_DocumentTemplateNullSubject', N'8.0.3');
+    VALUES (N'20220906015610_U3A_DocumentTemplateNullSubject', N'8.0.4');
 END;
 GO
 
@@ -3257,7 +3257,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220907063013_U3A_DocumentTemplateDocumentTypeID', N'8.0.3');
+    VALUES (N'20220907063013_U3A_DocumentTemplateDocumentTypeID', N'8.0.4');
 END;
 GO
 
@@ -3435,7 +3435,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220908214823_U3A_DocumentTemplateRemoveNotNull', N'8.0.3');
+    VALUES (N'20220908214823_U3A_DocumentTemplateRemoveNotNull', N'8.0.4');
 END;
 GO
 
@@ -3595,7 +3595,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220913213917_U3A_PersonImport', N'8.0.3');
+    VALUES (N'20220913213917_U3A_PersonImport', N'8.0.4');
 END;
 GO
 
@@ -3728,7 +3728,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220914080048_U3A_PersonImportDateJoined', N'8.0.3');
+    VALUES (N'20220914080048_U3A_PersonImportDateJoined', N'8.0.4');
 END;
 GO
 
@@ -3882,7 +3882,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220914224221_U3A_PersonImportIndex', N'8.0.3');
+    VALUES (N'20220914224221_U3A_PersonImportIndex', N'8.0.4');
 END;
 GO
 
@@ -4006,7 +4006,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220915203410_U3A_PersonImportStudentID', N'8.0.3');
+    VALUES (N'20220915203410_U3A_PersonImportStudentID', N'8.0.4');
 END;
 GO
 
@@ -4139,7 +4139,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220916052700_U3A_PersonBaseEntity', N'8.0.3');
+    VALUES (N'20220916052700_U3A_PersonBaseEntity', N'8.0.4');
 END;
 GO
 
@@ -4263,7 +4263,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220918085306_U3A_CourseYear', N'8.0.3');
+    VALUES (N'20220918085306_U3A_CourseYear', N'8.0.4');
 END;
 GO
 
@@ -4415,7 +4415,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220921065755_U3A_PersonImportError', N'8.0.3');
+    VALUES (N'20220921065755_U3A_PersonImportError', N'8.0.4');
 END;
 GO
 
@@ -4574,7 +4574,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220922035413_U3A_RemoveStdUsers', N'8.0.3');
+    VALUES (N'20220922035413_U3A_RemoveStdUsers', N'8.0.4');
 END;
 GO
 
@@ -4729,7 +4729,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220923200353_U3A_DataImportTimestamp', N'8.0.3');
+    VALUES (N'20220923200353_U3A_DataImportTimestamp', N'8.0.4');
 END;
 GO
 
@@ -4818,7 +4818,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220923212556_U3A_DataImportFileDetails', N'8.0.3');
+    VALUES (N'20220923212556_U3A_DataImportFileDetails', N'8.0.4');
 END;
 GO
 
@@ -4898,7 +4898,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220924075231_U3A_PersonFinancialTo', N'8.0.3');
+    VALUES (N'20220924075231_U3A_PersonFinancialTo', N'8.0.4');
 END;
 GO
 
@@ -4978,7 +4978,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220925101028_U3A_PersonImportHasPaid', N'8.0.3');
+    VALUES (N'20220925101028_U3A_PersonImportHasPaid', N'8.0.4');
 END;
 GO
 
@@ -5064,7 +5064,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220925105903_U3A_PersonImportDateJoinedDeleted', N'8.0.3');
+    VALUES (N'20220925105903_U3A_PersonImportDateJoinedDeleted', N'8.0.4');
 END;
 GO
 
@@ -5150,7 +5150,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220927010121_U3A_PersonImportHasPaidDeleted', N'8.0.3');
+    VALUES (N'20220927010121_U3A_PersonImportHasPaidDeleted', N'8.0.4');
 END;
 GO
 
@@ -5279,7 +5279,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220927041713_U3A_Receipt', N'8.0.3');
+    VALUES (N'20220927041713_U3A_Receipt', N'8.0.4');
 END;
 GO
 
@@ -5394,7 +5394,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220928051816_U3A_ReceiptDateJoined', N'8.0.3');
+    VALUES (N'20220928051816_U3A_ReceiptDateJoined', N'8.0.4');
 END;
 GO
 
@@ -5465,7 +5465,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221009022810_U3A_ReceiptDataImportCascadeDelete', N'8.0.3');
+    VALUES (N'20221009022810_U3A_ReceiptDataImportCascadeDelete', N'8.0.4');
 END;
 GO
 
@@ -5564,7 +5564,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221012210535_U3A_SystemSettingsFinancialToPercent', N'8.0.3');
+    VALUES (N'20221012210535_U3A_SystemSettingsFinancialToPercent', N'8.0.4');
 END;
 GO
 
@@ -5653,7 +5653,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221012222333_U3A_ReceiptProcessingYear', N'8.0.3');
+    VALUES (N'20221012222333_U3A_ReceiptProcessingYear', N'8.0.4');
 END;
 GO
 
@@ -5752,7 +5752,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221013052730_U3A_SendMail', N'8.0.3');
+    VALUES (N'20221013052730_U3A_SendMail', N'8.0.4');
 END;
 GO
 
@@ -5860,7 +5860,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221020193948_U3A_SendEmailAddress', N'8.0.3');
+    VALUES (N'20221020193948_U3A_SendEmailAddress', N'8.0.4');
 END;
 GO
 
@@ -5964,7 +5964,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221021222945_U3A_ReceiptImport_IsPosted', N'8.0.3');
+    VALUES (N'20221021222945_U3A_ReceiptImport_IsPosted', N'8.0.4');
 END;
 GO
 
@@ -6083,7 +6083,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221024043827_U3A_U3A_ReceiptImport_MovedPrevFieldsToPerson', N'8.0.3');
+    VALUES (N'20221024043827_U3A_U3A_ReceiptImport_MovedPrevFieldsToPerson', N'8.0.4');
 END;
 GO
 
@@ -6198,7 +6198,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221027051426_U3A_RemoveASPNETSecurityFromDbContext', N'8.0.3');
+    VALUES (N'20221027051426_U3A_RemoveASPNETSecurityFromDbContext', N'8.0.4');
 END;
 GO
 
@@ -6223,7 +6223,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221102222245_U3A_SettingsLastReceiptDate', N'8.0.3');
+    VALUES (N'20221102222245_U3A_SettingsLastReceiptDate', N'8.0.4');
 END;
 GO
 
@@ -6273,7 +6273,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221110041029_U3A_PersonRequireICE', N'8.0.3');
+    VALUES (N'20221110041029_U3A_PersonRequireICE', N'8.0.4');
 END;
 GO
 
@@ -6289,7 +6289,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221110042556_U3A_PersonRequireICE1', N'8.0.3');
+    VALUES (N'20221110042556_U3A_PersonRequireICE1', N'8.0.4');
 END;
 GO
 
@@ -6314,7 +6314,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221111012843_U3A_SettingsTimezone', N'8.0.3');
+    VALUES (N'20221111012843_U3A_SettingsTimezone', N'8.0.4');
 END;
 GO
 
@@ -6399,7 +6399,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221111185359_U3A_SettingsMail', N'8.0.3');
+    VALUES (N'20221111185359_U3A_SettingsMail', N'8.0.4');
 END;
 GO
 
@@ -6433,7 +6433,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221114233010_U3A_SettingsBank', N'8.0.3');
+    VALUES (N'20221114233010_U3A_SettingsBank', N'8.0.4');
 END;
 GO
 
@@ -6473,7 +6473,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221118015841_U3A_OnlinePaymentStatus', N'8.0.3');
+    VALUES (N'20221118015841_U3A_OnlinePaymentStatus', N'8.0.4');
 END;
 GO
 
@@ -6498,7 +6498,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221121001317_U3A_SettingsUTCOffset', N'8.0.3');
+    VALUES (N'20221121001317_U3A_SettingsUTCOffset', N'8.0.4');
 END;
 GO
 
@@ -6565,7 +6565,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221125022428_U3A_OnlinePaymentStatusBaseEntity', N'8.0.3');
+    VALUES (N'20221125022428_U3A_OnlinePaymentStatusBaseEntity', N'8.0.4');
 END;
 GO
 
@@ -6635,7 +6635,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221127222455_U3A_VenueNewcastleDetail', N'8.0.3');
+    VALUES (N'20221127222455_U3A_VenueNewcastleDetail', N'8.0.4');
 END;
 GO
 
@@ -6681,7 +6681,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221127224003_U3A_VenueMaxLength', N'8.0.3');
+    VALUES (N'20221127224003_U3A_VenueMaxLength', N'8.0.4');
 END;
 GO
 
@@ -6712,7 +6712,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221127224348_U3A_VenueKeyCodeNull', N'8.0.3');
+    VALUES (N'20221127224348_U3A_VenueKeyCodeNull', N'8.0.4');
 END;
 GO
 
@@ -6745,7 +6745,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221128004831_U3A_CourseNameLength', N'8.0.3');
+    VALUES (N'20221128004831_U3A_CourseNameLength', N'8.0.4');
 END;
 GO
 
@@ -6832,7 +6832,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221203035427_U3A_MembershipFees', N'8.0.3');
+    VALUES (N'20221203035427_U3A_MembershipFees', N'8.0.4');
 END;
 GO
 
@@ -6866,7 +6866,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221205045943_U3A_OnlinePaymentAdminEmail', N'8.0.3');
+    VALUES (N'20221205045943_U3A_OnlinePaymentAdminEmail', N'8.0.4');
 END;
 GO
 
@@ -6918,7 +6918,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221206215029_U3A_BaseEntityUser', N'8.0.3');
+    VALUES (N'20221206215029_U3A_BaseEntityUser', N'8.0.4');
 END;
 GO
 
@@ -6979,7 +6979,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221207034113_U3A_SettingsComplimentaryParameters', N'8.0.3');
+    VALUES (N'20221207034113_U3A_SettingsComplimentaryParameters', N'8.0.4');
 END;
 GO
 
@@ -7071,7 +7071,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221207041315_U3A_CourseFees', N'8.0.3');
+    VALUES (N'20221207041315_U3A_CourseFees', N'8.0.4');
 END;
 GO
 
@@ -7141,7 +7141,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221207192428_U3A_AdditionalLeaders', N'8.0.3');
+    VALUES (N'20221207192428_U3A_AdditionalLeaders', N'8.0.4');
 END;
 GO
 
@@ -7205,7 +7205,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221211214017_U3A_Fee', N'8.0.3');
+    VALUES (N'20221211214017_U3A_Fee', N'8.0.4');
 END;
 GO
 
@@ -7249,7 +7249,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221212000414_U3A_CourseComplimentaryOverride', N'8.0.3');
+    VALUES (N'20221212000414_U3A_CourseComplimentaryOverride', N'8.0.4');
 END;
 GO
 
@@ -7279,7 +7279,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221212023735_U3A_FeeIsMemberFee', N'8.0.3');
+    VALUES (N'20221212023735_U3A_FeeIsMemberFee', N'8.0.4');
 END;
 GO
 
@@ -7304,7 +7304,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221213042626_U3A_CourseExcludeLeaderComplimentaryCount', N'8.0.3');
+    VALUES (N'20221213042626_U3A_CourseExcludeLeaderComplimentaryCount', N'8.0.4');
 END;
 GO
 
@@ -7329,7 +7329,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221222190932_U3A_SendMailTermID', N'8.0.3');
+    VALUES (N'20221222190932_U3A_SendMailTermID', N'8.0.4');
 END;
 GO
 
@@ -7359,7 +7359,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230109042807_U3A_TermClassAllocationFinalised', N'8.0.3');
+    VALUES (N'20230109042807_U3A_TermClassAllocationFinalised', N'8.0.4');
 END;
 GO
 
@@ -7444,7 +7444,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230127204532_U3A_Dropout', N'8.0.3');
+    VALUES (N'20230127204532_U3A_Dropout', N'8.0.4');
 END;
 GO
 
@@ -7469,7 +7469,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230127220550_U3A_DropoutDeletedBy', N'8.0.3');
+    VALUES (N'20230127220550_U3A_DropoutDeletedBy', N'8.0.4');
 END;
 GO
 
@@ -7494,7 +7494,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230222202836_U3A_CourseClerk', N'8.0.3');
+    VALUES (N'20230222202836_U3A_CourseClerk', N'8.0.4');
 END;
 GO
 
@@ -7549,7 +7549,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230224023108_U3A_AttendClassCascadeRule', N'8.0.3');
+    VALUES (N'20230224023108_U3A_AttendClassCascadeRule', N'8.0.4');
 END;
 GO
 
@@ -7574,7 +7574,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230226013334_U3A_AllowLeaderToChangeEnrolment', N'8.0.3');
+    VALUES (N'20230226013334_U3A_AllowLeaderToChangeEnrolment', N'8.0.4');
 END;
 GO
 
@@ -7599,7 +7599,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230307225122_U3A_Venue_CanMapAddress', N'8.0.3');
+    VALUES (N'20230307225122_U3A_Venue_CanMapAddress', N'8.0.4');
 END;
 GO
 
@@ -7644,7 +7644,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230316021356_U3A_Leave', N'8.0.3');
+    VALUES (N'20230316021356_U3A_Leave', N'8.0.4');
 END;
 GO
 
@@ -7687,7 +7687,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230319204930_U3A_Leave_Course', N'8.0.3');
+    VALUES (N'20230319204930_U3A_Leave_Course', N'8.0.4');
 END;
 GO
 
@@ -7717,7 +7717,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230402225355_U3A_Report', N'8.0.3');
+    VALUES (N'20230402225355_U3A_Report', N'8.0.4');
 END;
 GO
 
@@ -7751,7 +7751,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230417004301_U3A_Course_LeaderFees', N'8.0.3');
+    VALUES (N'20230417004301_U3A_Course_LeaderFees', N'8.0.4');
 END;
 GO
 
@@ -7785,7 +7785,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230421044320_U3A_AttendClass_SignIn', N'8.0.3');
+    VALUES (N'20230421044320_U3A_AttendClass_SignIn', N'8.0.4');
 END;
 GO
 
@@ -7855,7 +7855,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230506042043_U3A_CourseClass_BaseEntity', N'8.0.3');
+    VALUES (N'20230506042043_U3A_CourseClass_BaseEntity', N'8.0.4');
 END;
 GO
 
@@ -7880,7 +7880,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230508225723_U3A_Course_AllowAutoEnrol', N'8.0.3');
+    VALUES (N'20230508225723_U3A_Course_AllowAutoEnrol', N'8.0.4');
 END;
 GO
 
@@ -7905,7 +7905,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230601224511_U3A_Class_GuestLeader', N'8.0.3');
+    VALUES (N'20230601224511_U3A_Class_GuestLeader', N'8.0.4');
 END;
 GO
 
@@ -7935,7 +7935,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230602001203_U3A_Settings_AutoEnrolAllocationDay', N'8.0.3');
+    VALUES (N'20230602001203_U3A_Settings_AutoEnrolAllocationDay', N'8.0.4');
 END;
 GO
 
@@ -7960,7 +7960,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230610041539_U3A_DeleteAttendanceHistory', N'8.0.3');
+    VALUES (N'20230610041539_U3A_DeleteAttendanceHistory', N'8.0.4');
 END;
 GO
 
@@ -7985,7 +7985,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230619050814_U3A_Settings_AllowLeaderToAssignClerks', N'8.0.3');
+    VALUES (N'20230619050814_U3A_Settings_AllowLeaderToAssignClerks', N'8.0.4');
 END;
 GO
 
@@ -8043,7 +8043,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230619061621_U3A_Settings_AutoEnrol', N'8.0.3');
+    VALUES (N'20230619061621_U3A_Settings_AutoEnrol', N'8.0.4');
 END;
 GO
 
@@ -8093,7 +8093,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230626231922_U3A_DocumentQueue', N'8.0.3');
+    VALUES (N'20230626231922_U3A_DocumentQueue', N'8.0.4');
 END;
 GO
 
@@ -8169,7 +8169,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230627011914_U3A_DocumentQueueAttachment', N'8.0.3');
+    VALUES (N'20230627011914_U3A_DocumentQueueAttachment', N'8.0.4');
 END;
 GO
 
@@ -8194,7 +8194,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230627050603_U3A_DocumentQueue_OverrideCommunicationPreference', N'8.0.3');
+    VALUES (N'20230627050603_U3A_DocumentQueue_OverrideCommunicationPreference', N'8.0.4');
 END;
 GO
 
@@ -8219,7 +8219,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230715071125_U3A_SystemSettings_TandCs', N'8.0.3');
+    VALUES (N'20230715071125_U3A_SystemSettings_TandCs', N'8.0.4');
 END;
 GO
 
@@ -8244,7 +8244,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230718195605_U3A_SystemSettings_TandCsHTML', N'8.0.3');
+    VALUES (N'20230718195605_U3A_SystemSettings_TandCsHTML', N'8.0.4');
 END;
 GO
 
@@ -8269,7 +8269,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230719040922_U3A_SystemSettings_TandCsEnabled', N'8.0.3');
+    VALUES (N'20230719040922_U3A_SystemSettings_TandCsEnabled', N'8.0.4');
 END;
 GO
 
@@ -8294,7 +8294,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230721200349_U3A_Person_Title', N'8.0.3');
+    VALUES (N'20230721200349_U3A_Person_Title', N'8.0.4');
 END;
 GO
 
@@ -8328,7 +8328,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230722033453_U3A_Person_PostNominals', N'8.0.3');
+    VALUES (N'20230722033453_U3A_Person_PostNominals', N'8.0.4');
 END;
 GO
 
@@ -8389,7 +8389,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230722225652_U3A_SendMail_LeadersPack', N'8.0.3');
+    VALUES (N'20230722225652_U3A_SendMail_LeadersPack', N'8.0.4');
 END;
 GO
 
@@ -8414,7 +8414,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230725043102_U3A_Settings_DisableBackgroundProcessing', N'8.0.3');
+    VALUES (N'20230725043102_U3A_Settings_DisableBackgroundProcessing', N'8.0.4');
 END;
 GO
 
@@ -8439,7 +8439,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230725233035_U3A_Settings_SendLeaderReportsTo', N'8.0.3');
+    VALUES (N'20230725233035_U3A_Settings_SendLeaderReportsTo', N'8.0.4');
 END;
 GO
 
@@ -8473,7 +8473,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230731202122_U3A_Course_SendLeaderReportsTo_Person_SilentContact', N'8.0.3');
+    VALUES (N'20230731202122_U3A_Course_SendLeaderReportsTo_Person_SilentContact', N'8.0.4');
 END;
 GO
 
@@ -8507,7 +8507,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230731234004_U3A_Settings_Course_CourseContactOrder', N'8.0.3');
+    VALUES (N'20230731234004_U3A_Settings_Course_CourseContactOrder', N'8.0.4');
 END;
 GO
 
@@ -8532,7 +8532,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230801233418_U3A_Settings_ShowLeaderOnPublicSchedule', N'8.0.3');
+    VALUES (N'20230801233418_U3A_Settings_ShowLeaderOnPublicSchedule', N'8.0.4');
 END;
 GO
 
@@ -8571,7 +8571,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230811074101_U3A_U3A_SendMail_PrintAttendanceAnalysis', N'8.0.3');
+    VALUES (N'20230811074101_U3A_U3A_SendMail_PrintAttendanceAnalysis', N'8.0.4');
 END;
 GO
 
@@ -8596,7 +8596,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230823052453_U3A_Settings_InMaintenanceTill', N'8.0.3');
+    VALUES (N'20230823052453_U3A_Settings_InMaintenanceTill', N'8.0.4');
 END;
 GO
 
@@ -8626,7 +8626,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20231107003039_U3A_Settings_SystemPostmanCCAddresses', N'8.0.3');
+    VALUES (N'20231107003039_U3A_Settings_SystemPostmanCCAddresses', N'8.0.4');
 END;
 GO
 
@@ -8688,7 +8688,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20231113211909_U3A_Course_EditType', N'8.0.3');
+    VALUES (N'20231113211909_U3A_Course_EditType', N'8.0.4');
 END;
 GO
 
@@ -8722,7 +8722,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20231124010650_U3A_OnlinePaymentStatus_REsponseCode', N'8.0.3');
+    VALUES (N'20231124010650_U3A_OnlinePaymentStatus_REsponseCode', N'8.0.4');
 END;
 GO
 
@@ -8747,7 +8747,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20231129225104_U3A_OnlinePaymentStatus_WorkstationID', N'8.0.3');
+    VALUES (N'20231129225104_U3A_OnlinePaymentStatus_WorkstationID', N'8.0.4');
 END;
 GO
 
@@ -8772,7 +8772,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20231204192733_U3A_Course_AddnInfoURL', N'8.0.3');
+    VALUES (N'20231204192733_U3A_Course_AddnInfoURL', N'8.0.4');
 END;
 GO
 
@@ -8802,7 +8802,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20231206233805_U3A_Occurence_Varies', N'8.0.3');
+    VALUES (N'20231206233805_U3A_Occurence_Varies', N'8.0.4');
 END;
 GO
 
@@ -8832,7 +8832,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240116005656_U3A_SystemSettings_SupportEmail', N'8.0.3');
+    VALUES (N'20240116005656_U3A_SystemSettings_SupportEmail', N'8.0.4');
 END;
 GO
 
@@ -8857,7 +8857,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240227213250_U3A_SendMail_IsUserRequested', N'8.0.3');
+    VALUES (N'20240227213250_U3A_SendMail_IsUserRequested', N'8.0.4');
 END;
 GO
 
@@ -8882,7 +8882,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240306030422_U3A_Course_EnforceOneStudentPerClass', N'8.0.3');
+    VALUES (N'20240306030422_U3A_Course_EnforceOneStudentPerClass', N'8.0.4');
 END;
 GO
 
@@ -8907,7 +8907,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240307224253_U3A_Course_IsOffScheduleActivity', N'8.0.3');
+    VALUES (N'20240307224253_U3A_Course_IsOffScheduleActivity', N'8.0.4');
 END;
 GO
 
@@ -8968,7 +8968,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240315044212_U3A_Settings_DataRetention', N'8.0.3');
+    VALUES (N'20240315044212_U3A_Settings_DataRetention', N'8.0.4');
 END;
 GO
 
@@ -8983,8 +8983,119 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20240318001702_U3A_sp_prcDbCleanup'
 )
 BEGIN
+    EXECUTE('
 
-    select 0                    
+    -- =============================================
+    -- Author:		M Hanlon
+    -- Create date: 16 March 2024
+    -- Description:	End of period - database cleanup
+    -- =============================================
+    CREATE PROCEDURE [dbo].[prcDbCleanup]
+    	-- Add the parameters for the stored procedure here
+    AS
+    BEGIN
+    	-- SET NOCOUNT ON added to prevent extra result sets from
+    	-- interfering with SELECT statements.
+    	SET NOCOUNT ON;
+
+    	declare @Year int
+    			,@termNumber int
+    			,@START_OF_EPOCH int
+    			,@PERSON_DELETE_FLAG datetime
+    			,@Today datetime
+    			,@RetainAttendanceForYears int
+    			,@RetainEnrolmentForYears int
+    			,@RetainFinancialsForYears int
+    			,@RetainRegistrationsNeverCompletedForDays int
+    			,@RetainUnfinancialPersonsForYears int
+
+    	set @START_OF_EPOCH = 2020
+    	set @PERSON_DELETE_FLAG = CAST(''1-jan-1800'' as datetime)
+    	set @Today = getdate() at time zone ''UTC''
+    	set @Year = DATEPART(year,@Today)
+
+    	select Top 1 @Year=[Year],@termNumber=[TermNumber] from Term where IsDefaultTerm=1
+    	if (@Year is null) goto endall
+
+    	select @RetainAttendanceForYears=[RetainAttendanceForYears]
+    		  ,@RetainEnrolmentForYears=[RetainEnrolmentForYears]
+    		  ,@RetainFinancialsForYears=[RetainFinancialsForYears]
+    		  ,@RetainRegistrationsNeverCompletedForDays=[RetainRegistrationsNeverCompletedForDays]
+    		  ,@RetainUnfinancialPersonsForYears=[RetainUnfinancialPersonsForYears]
+    	from [dbo].[SystemSettings]
+
+
+    	delete CourseType
+    		where CourseType.Discontinued = 1 and CourseType.ID not in (select CourseTypeID from Course)
+    	delete Venue
+    		where Venue.Discontinued = 1 and Venue.ID not in (select VenueID from Class)
+    	delete Enrolment
+    		where DATEDIFF(YEAR,Created, @Today) > @RetainEnrolmentForYears
+    	delete Dropout
+    		where DATEDIFF(YEAR,Created, @Today) > @RetainEnrolmentForYears
+    	delete Receipt
+    		where DATEDIFF(YEAR,[Date], @Today) > @RetainFinancialsForYears
+    	delete Fee
+    		where DATEDIFF(YEAR,[Date], @Today) > @RetainFinancialsForYears
+    	delete OnlinePaymentStatus
+    		where DATEDIFF(YEAR,[CreatedOn], @Today) > @RetainFinancialsForYears
+    	delete OnlinePaymentStatus
+    		where DATEDIFF(YEAR,[CreatedOn], @Today) > @RetainFinancialsForYears
+
+    	-- persons who have never completed registration
+    	delete Person
+    		where FinancialTo = @START_OF_EPOCH
+    		and DATEDIFF(day,CreatedOn,@Today) > @RetainRegistrationsNeverCompletedForDays
+
+    	-- unfinancial persons - set delete flag so we dont lose history
+        update Person
+    		set DateCeased = @PERSON_DELETE_FLAG
+            where FinancialTo != @START_OF_EPOCH
+    				and @year - FinancialTo > @RetainUnfinancialPersonsForYears
+
+    	-- delete Term will cascade deletes to Class, AttendClass, Enrolment, Dropout
+    	delete Term
+    			where @Year - [Year] > @RetainAttendanceForYears
+    	
+    	-- leave allows a null CourseID so delete manually
+    	delete Leave
+    		where CourseID in (
+    			select ID from Course 
+    			where @Year - [Year] > @RetainAttendanceForYears)
+    	delete Course
+    			where @Year - [Year] > @RetainAttendanceForYears
+    		
+    	-- delete leaders manually
+    	update Class
+    		set LeaderID = null where LeaderID not in (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	update Class
+    		set Leader2ID = null where Leader2ID not in (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	update Class
+    		set Leader3ID = null where Leader3ID not in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	delete Committee
+    		where PersonID not in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	delete Volunteer
+    		where PersonID not in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)
+
+    	-- delete Person will cascade deletes to Receipt, Fee, Leave, AttendClass, Enrolment, Dropout
+    	delete Person  
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears												
+
+    endall:
+    	return 0
+    END
+
+                    ')
 END;
 GO
 
@@ -8994,7 +9105,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240318001702_U3A_sp_prcDbCleanup', N'8.0.3');
+    VALUES (N'20240318001702_U3A_sp_prcDbCleanup', N'8.0.4');
 END;
 GO
 
@@ -9009,7 +9120,119 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20240318021230_U3A_sp_prcDbCleanup_18-Mar-24'
 )
 BEGIN
-            select 0        
+    EXECUTE('
+
+    -- =============================================
+    -- Author:		M Hanlon
+    -- Create date: 16 March 2024
+    -- Description:	End of period - database cleanup
+    -- =============================================
+    ALTER PROCEDURE [dbo].[prcDbCleanup]
+    	-- Add the parameters for the stored procedure here
+    AS
+    BEGIN
+    	-- SET NOCOUNT ON added to prevent extra result sets from
+    	-- interfering with SELECT statements.
+    	SET NOCOUNT ON;
+
+    	declare @Year int
+    			,@termNumber int
+    			,@START_OF_EPOCH int
+    			,@PERSON_DELETE_FLAG datetime
+    			,@Today datetime
+    			,@RetainAttendanceForYears int
+    			,@RetainEnrolmentForYears int
+    			,@RetainFinancialsForYears int
+    			,@RetainRegistrationsNeverCompletedForDays int
+    			,@RetainUnfinancialPersonsForYears int
+
+    	set @START_OF_EPOCH = 2020
+    	set @PERSON_DELETE_FLAG = CAST(''1-jan-1800'' as datetime)
+    	set @Today = getdate() at time zone ''UTC''
+    	set @Year = DATEPART(year,@Today)
+
+    	select Top 1 @Year=[Year],@termNumber=[TermNumber] from Term where IsDefaultTerm=1
+    	if (@Year is null) goto endall
+
+    	select @RetainAttendanceForYears=[RetainAttendanceForYears]
+    		  ,@RetainEnrolmentForYears=[RetainEnrolmentForYears]
+    		  ,@RetainFinancialsForYears=[RetainFinancialsForYears]
+    		  ,@RetainRegistrationsNeverCompletedForDays=[RetainRegistrationsNeverCompletedForDays]
+    		  ,@RetainUnfinancialPersonsForYears=[RetainUnfinancialPersonsForYears]
+    	from [dbo].[SystemSettings]
+
+
+    	delete CourseType
+    		where CourseType.Discontinued = 1 and CourseType.ID not in (select CourseTypeID from Course)
+    	delete Venue
+    		where Venue.Discontinued = 1 and Venue.ID not in (select VenueID from Class)
+    	delete Enrolment
+    		where DATEDIFF(YEAR,Created, @Today) > @RetainEnrolmentForYears
+    	delete Dropout
+    		where DATEDIFF(YEAR,Created, @Today) > @RetainEnrolmentForYears
+    	delete Receipt
+    		where DATEDIFF(YEAR,[Date], @Today) > @RetainFinancialsForYears
+    	delete Fee
+    		where DATEDIFF(YEAR,[Date], @Today) > @RetainFinancialsForYears
+    	delete OnlinePaymentStatus
+    		where DATEDIFF(YEAR,[CreatedOn], @Today) > @RetainFinancialsForYears
+    	delete OnlinePaymentStatus
+    		where DATEDIFF(YEAR,[CreatedOn], @Today) > @RetainFinancialsForYears
+
+    	-- persons who have never completed registration
+    	delete Person
+    		where FinancialTo = @START_OF_EPOCH
+    		and DATEDIFF(day,CreatedOn,@Today) > @RetainRegistrationsNeverCompletedForDays
+
+    	-- unfinancial persons - set delete flag so we dont lose history
+        update Person
+    		set DateCeased = @PERSON_DELETE_FLAG
+            where FinancialTo != @START_OF_EPOCH
+    				and @year - FinancialTo > @RetainUnfinancialPersonsForYears
+
+    	-- delete Term will cascade deletes to Class, AttendClass, Enrolment, Dropout
+    	delete Term
+    			where @Year - [Year] > @RetainAttendanceForYears
+    	
+    	-- leave allows a null CourseID so delete manually
+    	delete Leave
+    		where CourseID in (
+    			select ID from Course 
+    			where @Year - [Year] > @RetainAttendanceForYears)
+    	delete Course
+    			where @Year - [Year] > @RetainAttendanceForYears
+    		
+    	-- delete leaders manually
+    	update Class
+    		set LeaderID = null where LeaderID not in (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	update Class
+    		set Leader2ID = null where Leader2ID not in (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	update Class
+    		set Leader3ID = null where Leader3ID not in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	delete Committee
+    		where PersonID not in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	delete Volunteer
+    		where PersonID not in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)
+
+    	-- delete Person will cascade deletes to Receipt, Fee, Leave, AttendClass, Enrolment, Dropout
+    	delete Person  
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears												
+
+    endall:
+    	return 0
+    END
+
+                    ')
 END;
 GO
 
@@ -9019,7 +9242,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240318021230_U3A_sp_prcDbCleanup_18-Mar-24', N'8.0.3');
+    VALUES (N'20240318021230_U3A_sp_prcDbCleanup_18-Mar-24', N'8.0.4');
 END;
 GO
 
@@ -9074,7 +9297,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240327232848_U3A_Schedule', N'8.0.3');
+    VALUES (N'20240327232848_U3A_Schedule', N'8.0.4');
 END;
 GO
 
@@ -9123,7 +9346,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240328004414_U3A_Schedule_TermDetails', N'8.0.3');
+    VALUES (N'20240328004414_U3A_Schedule_TermDetails', N'8.0.4');
 END;
 GO
 
@@ -9148,7 +9371,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240328022838_U3A_Schedule_IsOffScheduleActivity', N'8.0.3');
+    VALUES (N'20240328022838_U3A_Schedule_IsOffScheduleActivity', N'8.0.4');
 END;
 GO
 
@@ -9299,7 +9522,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240328232354_U3A_Schedule_NewFields_0', N'8.0.3');
+    VALUES (N'20240328232354_U3A_Schedule_NewFields_0', N'8.0.4');
 END;
 GO
 
@@ -9882,7 +10105,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240329003232_U3A_Schedule_JsonFields', N'8.0.3');
+    VALUES (N'20240329003232_U3A_Schedule_JsonFields', N'8.0.4');
 END;
 GO
 
@@ -9915,7 +10138,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240330201022_U3A_ScheduleCache', N'8.0.3');
+    VALUES (N'20240330201022_U3A_ScheduleCache', N'8.0.4');
 END;
 GO
 
@@ -9979,7 +10202,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240330223419_U3A_ScheduleCache_RevertToString', N'8.0.3');
+    VALUES (N'20240330223419_U3A_ScheduleCache_RevertToString', N'8.0.4');
 END;
 GO
 
@@ -10004,7 +10227,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240330224648_U3A_ScheduleCache_Revert', N'8.0.3');
+    VALUES (N'20240330224648_U3A_ScheduleCache_Revert', N'8.0.4');
 END;
 GO
 
@@ -10019,13 +10242,120 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
 )
 BEGIN
+    EXECUTE ('
+
+    -- =============================================
+    -- Author:		M Hanlon
+    -- Create date: 16 March 2024
+    -- Description:	End of period - database cleanup
+    -- =============================================
+    ALTER PROCEDURE [dbo].[prcDbCleanup]
+    	-- Add the parameters for the stored procedure here
+    AS
+    BEGIN
+    	-- SET NOCOUNT ON added to prevent extra result sets from
+    	-- interfering with SELECT statements.
+    	SET NOCOUNT ON;
+
+    	declare @Year int
+    			,@termNumber int
+    			,@START_OF_EPOCH int
+    			,@PERSON_DELETE_FLAG datetime
+    			,@Today datetime
+    			,@RetainAttendanceForYears int
+    			,@RetainEnrolmentForYears int
+    			,@RetainFinancialsForYears int
+    			,@RetainRegistrationsNeverCompletedForDays int
+    			,@RetainUnfinancialPersonsForYears int
+
+    	set @START_OF_EPOCH = 2020
+    	set @PERSON_DELETE_FLAG = CAST(''1-jan-1800'' as datetime)
+    	set @Today = getdate() at time zone ''UTC''
+    	set @Year = DATEPART(year,@Today)
+
+    	select Top 1 @Year=[Year],@termNumber=[TermNumber] from Term where IsDefaultTerm=1
+    	if (@Year is null) goto endall
+
+    	select @RetainAttendanceForYears=[RetainAttendanceForYears]
+    		  ,@RetainEnrolmentForYears=[RetainEnrolmentForYears]
+    		  ,@RetainFinancialsForYears=[RetainFinancialsForYears]
+    		  ,@RetainRegistrationsNeverCompletedForDays=[RetainRegistrationsNeverCompletedForDays]
+    		  ,@RetainUnfinancialPersonsForYears=[RetainUnfinancialPersonsForYears]
+    	from [dbo].[SystemSettings]
 
 
-    IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'prcDbCleanup')
-    DROP PROCEDURE prcDbCleanup
+    	delete CourseType
+    		where CourseType.Discontinued = 1 and CourseType.ID not in (select CourseTypeID from Course)
+    	delete Venue
+    		where Venue.Discontinued = 1 and Venue.ID not in (select VenueID from Class)
+    	delete Enrolment
+    		where DATEDIFF(YEAR,Created, @Today) > @RetainEnrolmentForYears
+    	delete Dropout
+    		where DATEDIFF(YEAR,Created, @Today) > @RetainEnrolmentForYears
+    	delete Receipt
+    		where DATEDIFF(YEAR,[Date], @Today) > @RetainFinancialsForYears
+    	delete Fee
+    		where DATEDIFF(YEAR,[Date], @Today) > @RetainFinancialsForYears
+    	delete OnlinePaymentStatus
+    		where DATEDIFF(YEAR,[CreatedOn], @Today) > @RetainFinancialsForYears
+    	delete OnlinePaymentStatus
+    		where DATEDIFF(YEAR,[CreatedOn], @Today) > @RetainFinancialsForYears
 
-    /****** Object:  StoredProcedure [dbo].[prcDbCleanup]    Script Date: 2/04/2024 7:32:44 PM ******/
-    SET ANSI_NULLS ON
+    	-- persons who have never completed registration
+    	delete Person
+    		where FinancialTo = @START_OF_EPOCH
+    		and DATEDIFF(day,CreatedOn,@Today) > @RetainRegistrationsNeverCompletedForDays
+
+    	-- unfinancial persons - set delete flag so we dont lose history
+        update Person
+    		set DateCeased = @PERSON_DELETE_FLAG
+            where FinancialTo != @START_OF_EPOCH
+    				and @year - FinancialTo > @RetainUnfinancialPersonsForYears
+
+    	-- delete Term will cascade deletes to Class, AttendClass, Enrolment, Dropout
+    	delete Term
+    			where @Year - [Year] > @RetainAttendanceForYears
+    	
+    	-- leave allows a null CourseID so delete manually
+    	delete Leave
+    		where CourseID in (
+    			select ID from Course 
+    			where @Year - [Year] > @RetainAttendanceForYears)
+    	delete Course
+    			where @Year - [Year] > @RetainAttendanceForYears
+    		
+    	-- delete leaders manually
+    	update Class
+    		set LeaderID = null where LeaderID in (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	update Class
+    		set Leader2ID = null where Leader2ID in (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	update Class
+    		set Leader3ID = null where Leader3ID in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	delete Committee
+    		where PersonID in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
+    	delete Volunteer
+    		where PersonID in  (
+    			select ID from Person
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears)
+
+    	-- delete Person will cascade deletes to Receipt, Fee, Leave, AttendClass, Enrolment, Dropout
+    	delete Person  
+    			where @Year - [FinancialTo] > @RetainAttendanceForYears												
+
+    endall:
+    	return 0
+    END
+
+                    
+
 END;
 GO
 
@@ -10035,31 +10365,10 @@ IF NOT EXISTS (
 )
 BEGIN
 
-    SET QUOTED_IDENTIFIER ON
-END;
-GO
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
-)
-BEGIN
-
-select 0
-
-END;
-GO
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
-)
-BEGIN
 
 
-select 0
 
-        
+        ')
 END;
 GO
 
@@ -10069,7 +10378,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240402083049_U3A_sp_DbCleanup_02_APR_2024', N'8.0.3');
+    VALUES (N'20240402083049_U3A_sp_DbCleanup_02_APR_2024', N'8.0.4');
 END;
 GO
 
@@ -10094,7 +10403,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240403235406_U3A_model_indexFix', N'8.0.3');
+    VALUES (N'20240403235406_U3A_model_indexFix', N'8.0.4');
 END;
 GO
 
@@ -10119,7 +10428,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240406021353_U3A_Schedule_TenantIdentifier', N'8.0.3');
+    VALUES (N'20240406021353_U3A_Schedule_TenantIdentifier', N'8.0.4');
 END;
 GO
 
@@ -10144,7 +10453,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240406031316_U3A_Cousre_AllowMultiCampusFrom', N'8.0.3');
+    VALUES (N'20240406031316_U3A_Cousre_AllowMultiCampusFrom', N'8.0.4');
 END;
 GO
 
@@ -10178,7 +10487,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240408021909_U3A_Person_TenantIdentifier', N'8.0.3');
+    VALUES (N'20240408021909_U3A_Person_TenantIdentifier', N'8.0.4');
 END;
 GO
 
@@ -10218,7 +10527,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240408025024_U3A_Person_delTenantIdentifier', N'8.0.3');
+    VALUES (N'20240408025024_U3A_Person_delTenantIdentifier', N'8.0.4');
 END;
 GO
 
@@ -10243,7 +10552,32 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240410031621_U3A_Settings_AllowMultiCampusExtensions', N'8.0.3');
+    VALUES (N'20240410031621_U3A_Settings_AllowMultiCampusExtensions', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240415050743_U3A_Settings_MultiCampusU3AAllowed'
+)
+BEGIN
+    ALTER TABLE [SystemSettings] ADD [MultiCampusU3AAllowed] nvarchar(max) NOT NULL DEFAULT N'[]';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240415050743_U3A_Settings_MultiCampusU3AAllowed'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240415050743_U3A_Settings_MultiCampusU3AAllowed', N'8.0.4');
 END;
 GO
 

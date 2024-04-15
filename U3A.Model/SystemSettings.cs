@@ -162,6 +162,7 @@ namespace U3A.Model
         public int RetainRegistrationsNeverCompletedForDays { get; set; } = 60; 
         public string U3AdminEmailRecipients { get; set; }
         public bool AllowMultiCampusExtensions { get; set; }
+        public List<string> MultiCampusU3AAllowed { get; set; } = new();
     }
 
     public enum AutoEnrollOccurrence

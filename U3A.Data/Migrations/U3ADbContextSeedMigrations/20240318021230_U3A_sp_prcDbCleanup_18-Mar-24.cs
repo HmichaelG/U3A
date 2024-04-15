@@ -11,8 +11,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(
-                @"
-
+                @"EXECUTE('
 
 -- =============================================
 -- Author:		M Hanlon
@@ -39,8 +38,8 @@ BEGIN
 			,@RetainUnfinancialPersonsForYears int
 
 	set @START_OF_EPOCH = 2020
-	set @PERSON_DELETE_FLAG = CAST('1-jan-1800' as datetime)
-	set @Today = getdate() at time zone 'UTC'
+	set @PERSON_DELETE_FLAG = CAST(''1-jan-1800'' as datetime)
+	set @Today = getdate() at time zone ''UTC''
 	set @Year = DATEPART(year,@Today)
 
 	select Top 1 @Year=[Year],@termNumber=[TermNumber] from Term where IsDefaultTerm=1
@@ -76,7 +75,7 @@ BEGIN
 		where FinancialTo = @START_OF_EPOCH
 		and DATEDIFF(day,CreatedOn,@Today) > @RetainRegistrationsNeverCompletedForDays
 
-	-- unfinancial persons - set delete flag so we don't lose history
+	-- unfinancial persons - set delete flag so we dont lose history
     update Person
 		set DateCeased = @PERSON_DELETE_FLAG
         where FinancialTo != @START_OF_EPOCH
@@ -96,23 +95,23 @@ BEGIN
 		
 	-- delete leaders manually
 	update Class
-		set LeaderID = null where LeaderID in (
+		set LeaderID = null where LeaderID not in (
 			select ID from Person
 			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
 	update Class
-		set Leader2ID = null where Leader2ID in (
+		set Leader2ID = null where Leader2ID not in (
 			select ID from Person
 			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
 	update Class
-		set Leader3ID = null where Leader3ID in  (
+		set Leader3ID = null where Leader3ID not in  (
 			select ID from Person
 			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
 	delete Committee
-		where PersonID in  (
+		where PersonID not in  (
 			select ID from Person
 			where @Year - [FinancialTo] > @RetainAttendanceForYears)									
 	delete Volunteer
-		where PersonID in  (
+		where PersonID not in  (
 			select ID from Person
 			where @Year - [FinancialTo] > @RetainAttendanceForYears)
 
@@ -124,7 +123,7 @@ endall:
 	return 0
 END
 
-                "
+                ')"
                 );
         }
 

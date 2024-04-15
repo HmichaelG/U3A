@@ -11,27 +11,14 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
 			migrationBuilder.Sql(
-    @"
-
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'prcDbCleanup')
-DROP PROCEDURE prcDbCleanup
-
-/****** Object:  StoredProcedure [dbo].[prcDbCleanup]    Script Date: 2/04/2024 7:32:44 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-
+    @"EXECUTE ('
 
 -- =============================================
 -- Author:		M Hanlon
 -- Create date: 16 March 2024
 -- Description:	End of period - database cleanup
 -- =============================================
-CREATE PROCEDURE [dbo].[prcDbCleanup]
+ALTER PROCEDURE [dbo].[prcDbCleanup]
 	-- Add the parameters for the stored procedure here
 AS
 BEGIN
@@ -51,8 +38,8 @@ BEGIN
 			,@RetainUnfinancialPersonsForYears int
 
 	set @START_OF_EPOCH = 2020
-	set @PERSON_DELETE_FLAG = CAST('1-jan-1800' as datetime)
-	set @Today = getdate() at time zone 'UTC'
+	set @PERSON_DELETE_FLAG = CAST(''1-jan-1800'' as datetime)
+	set @Today = getdate() at time zone ''UTC''
 	set @Year = DATEPART(year,@Today)
 
 	select Top 1 @Year=[Year],@termNumber=[TermNumber] from Term where IsDefaultTerm=1
@@ -88,7 +75,7 @@ BEGIN
 		where FinancialTo = @START_OF_EPOCH
 		and DATEDIFF(day,CreatedOn,@Today) > @RetainRegistrationsNeverCompletedForDays
 
-	-- unfinancial persons - set delete flag so we don't lose history
+	-- unfinancial persons - set delete flag so we dont lose history
     update Person
 		set DateCeased = @PERSON_DELETE_FLAG
         where FinancialTo != @START_OF_EPOCH
@@ -143,7 +130,7 @@ GO
 
 
 
-    "
+    ')"
     );
 
         }
