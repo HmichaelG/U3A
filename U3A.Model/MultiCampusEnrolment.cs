@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Drawing.Text;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 
@@ -19,7 +20,7 @@ namespace U3A.Model
         public Guid PersonID { get; set; }
         public DateTime Created { get; set; }
         public DateTime? DateEnrolled { get; set; }
-        public bool IsCourseClerk { get; set; } = false;
+        public bool IsCourseClerk { get { return false; } private set { } } // visitor cannot be clerk
         public bool IsWaitlisted { get; set; } = true;
     }
 }
