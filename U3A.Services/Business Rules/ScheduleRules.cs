@@ -44,8 +44,7 @@ namespace U3A.BusinessRules
             var firstSchedule = await dbc.Schedule.AsNoTracking()
                                         .OrderBy(x => x.CreatedOn)
                                         .FirstOrDefaultAsync();
-            TenantInfo tInfo = await dbcT.TenantInfo
-                                    .FirstOrDefaultAsync(x => x.Identifier == firstSchedule.TenantIdentifier);
+            TenantInfo tInfo = await tenantService.GetTenantInfoAsync();
             // Get all current Enrolment keys
             var enrolmentKeys = await dbc.Enrolment
                                                 .AsNoTracking()
