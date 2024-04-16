@@ -42,7 +42,7 @@ else
             <DxFormLayout>
                 <DxFormLayoutTabPages>
                     <DxTabPage Text="Your Group's Details">
-                        <DxStackLayout CssClass="w-100" Orientation="Orientation.Horizontal">
+                        <DxStackLayout CssClass="w-100 box-height" Orientation="Orientation.Horizontal">
                             <Items>
                                 <DxStackLayoutItem>
                                     <Template>
@@ -123,7 +123,7 @@ else
                     </DxTabPage>
 
                     <DxTabPage Text="Operations">
-                        <DxStackLayout CssClass="w-100" Orientation="Orientation.Horizontal">
+                        <DxStackLayout CssClass="w-100 box-height" Orientation="Orientation.Horizontal">
                             <Items>
                                 <DxStackLayoutItem>
                                     <Template>
@@ -241,69 +241,86 @@ else
                     </DxTabPage>
 
                     <DxTabPage Text="Terms and Conditions">
-                        <DxFormLayoutItem Caption="Enable Terms & Conditions display?" ColSpanMd="12">
-                            <DxCheckBox @bind-Checked="@systemSettings.TermsAndConditionsEnabled" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem ColSpanMd="12">
-                            <DxRichEdit @ref="@richEdit"
-                                        DocumentContent=@systemSettings.TermsAndConditions
-                                        DocumentContentChanged="OnDocumentContentChanged"
-                                        CheckSpelling=true
-                                        BarMode=BarMode.Ribbon
-                                        DocumentFormat="DocumentFormat.Rtf"
-                                        CssClass="w-100">
-                            </DxRichEdit>
-                        </DxFormLayoutItem>
-
+                        <DxStackLayout CssClass="w-100 box-height" Orientation="Orientation.Horizontal">
+                            <Items>
+                                <DxStackLayoutItem>
+                                    <Template>
+                                        <DxFormLayoutItem Caption="Enable Terms & Conditions display?" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@systemSettings.TermsAndConditionsEnabled" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem ColSpanMd="12">
+                                            <DxRichEdit @ref="@richEdit"
+                                                        DocumentContent=@systemSettings.TermsAndConditions
+                                                        DocumentContentChanged="OnDocumentContentChanged"
+                                                        CheckSpelling=true
+                                                        BarMode=BarMode.Ribbon
+                                                        DocumentFormat="DocumentFormat.Rtf"
+                                                        CssClass="w-100 rich-style">
+                                            </DxRichEdit>
+                                        </DxFormLayoutItem>
+                                    </Template>
+                                </DxStackLayoutItem>
+                            </Items>
+                        </DxStackLayout>
                     </DxTabPage>
                     <DxTabPage Text="Multi-Campus">
-                        <DxFormLayoutItem Caption="Allow Multi-Campus Extensions?" ColSpanMd="12">
-                            <DxCheckBox @bind-Checked="@systemSettings.AllowMultiCampusExtensions" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutGroup Caption="Multi Campus U3A" ColSpanMd="12" CssClass="u3a-box-height">
-                            <DxFormLayoutGroup Caption="U3A Not Allowed" ColSpanMd="5">
-                                <DxGrid @ref=@UnassignedGrid Data=@UnassignedU3A AllowColumnReorder=false CssClass="m-1"
-                                        @bind-SelectedDataItems="SelectedUnassignedItems"
-                                        SelectionMode="GridSelectionMode.Multiple"
-                                        VirtualScrollingEnabled=true
-                                        KeyFieldName="Id"
-                                        AllowGroup=false
-                                        AllowSelectRowByClick=true>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="2rem" />
-                                        <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
-                                        <DxGridDataColumn Caption="Name" FieldName="Name" />
-                                    </Columns>
-                                </DxGrid>
-                            </DxFormLayoutGroup>
+                        <DxStackLayout CssClass="w-100 box-height" Orientation="Orientation.Horizontal">
+                            <Items>
+                                <DxStackLayoutItem>
+                                    <Template>
+                                        <DxFormLayoutItem Caption="Allow Multi-Campus Extensions?" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@systemSettings.AllowMultiCampusExtensions" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutGroup Caption="Multi Campus U3A"
+                                                           ColSpanMd="12"
+                                                           Visible="@systemSettings.AllowMultiCampusExtensions">
+                                            <DxFormLayoutGroup Caption="U3A Not Allowed" ColSpanMd="5">
+                                                <DxGrid @ref=@UnassignedGrid Data=@UnassignedU3A AllowColumnReorder=false CssClass="m-1"
+                                                        @bind-SelectedDataItems="SelectedUnassignedItems"
+                                                        SelectionMode="GridSelectionMode.Multiple"
+                                                        VirtualScrollingEnabled=true
+                                                        KeyFieldName="Id"
+                                                        AllowGroup=false
+                                                        AllowSelectRowByClick=true>
+                                                    <Columns>
+                                                        <DxGridSelectionColumn Width="2rem" />
+                                                        <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
+                                                        <DxGridDataColumn Caption="Name" FieldName="Name" />
+                                                    </Columns>
+                                                </DxGrid>
+                                            </DxFormLayoutGroup>
 
-                            <DxFormLayoutGroup Caption="Action" ColSpanMd="2">
-                                <DxButton Text="Allow >>" 
-                                            Enabled='@(SelectedUnassignedItems?.Count > 0)'
-                                            Click="OnAllowSelected" 
-                                            CssClass="mx-2 mt-2 w-100" />
-                                <DxButton Text="<< Disallow"
-                                          Enabled='@(SelectedAssignedItems?.Count > 0)'
-                                          Click="OnDisallowSelected"
-                                          CssClass="mx-2 mt-2 w-100" />
-                            </DxFormLayoutGroup>
+                                            <DxFormLayoutGroup Caption="Action" ColSpanMd="2">
+                                                <DxButton Text="Allow >>"
+                                                          Enabled='@(SelectedUnassignedItems?.Count > 0)'
+                                                          Click="OnAllowSelected"
+                                                          CssClass="mx-2 mt-2 w-100" />
+                                                <DxButton Text="<< Disallow"
+                                                          Enabled='@(SelectedAssignedItems?.Count > 0)'
+                                                          Click="OnDisallowSelected"
+                                                          CssClass="mx-2 mt-2 w-100" />
+                                            </DxFormLayoutGroup>
 
-                            <DxFormLayoutGroup Caption="U3A Allowed" ColSpanMd="5">
-                                <DxGrid @ref=@AssignedGrid Data=@AssignedU3A AllowColumnReorder=false CssClass="m-1"
-                                        @bind-SelectedDataItems="SelectedAssignedItems"
-                                        SelectionMode="GridSelectionMode.Multiple"
-                                        VirtualScrollingEnabled=true
-                                        KeyFieldName="Id"
-                                        AllowGroup=false
-                                        AllowSelectRowByClick=true>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="2rem" />
-                                        <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
-                                        <DxGridDataColumn Caption="Name" FieldName="Name" />
-                                    </Columns>
-                                </DxGrid>
-                            </DxFormLayoutGroup>
-                        </DxFormLayoutGroup>
+                                            <DxFormLayoutGroup Caption="U3A Allowed" ColSpanMd="5">
+                                                <DxGrid @ref=@AssignedGrid Data=@AssignedU3A AllowColumnReorder=false CssClass="m-1"
+                                                        @bind-SelectedDataItems="SelectedAssignedItems"
+                                                        SelectionMode="GridSelectionMode.Multiple"
+                                                        VirtualScrollingEnabled=true
+                                                        KeyFieldName="Id"
+                                                        AllowGroup=false
+                                                        AllowSelectRowByClick=true>
+                                                    <Columns>
+                                                        <DxGridSelectionColumn Width="2rem" />
+                                                        <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
+                                                        <DxGridDataColumn Caption="Name" FieldName="Name" />
+                                                    </Columns>
+                                                </DxGrid>
+                                            </DxFormLayoutGroup>
+                                        </DxFormLayoutGroup>
+                                    </Template>
+                                </DxStackLayoutItem>
+                            </Items>
+                        </DxStackLayout>
                     </DxTabPage>
                 </DxFormLayoutTabPages>
                 <DxFormLayoutItem ColSpanMd="12">
@@ -317,8 +334,12 @@ else
     </div>
 }
 <style>
-    .u3a-box-height {
-        min-height: calc(100dvh - 15rem);
+    .box-height {
+        height: calc(100dvh - 12rem);
+    }
+
+    .rich-style {
+        height: 70dvh;
     }
 </style>
 @code {
@@ -372,15 +393,18 @@ else
                     MailLabelHeight = 25
                 };
         }
+        var thisTenant = await tenantService.GetTenantIdentifierAsync();
         UnassignedU3A = await dbcT.TenantInfo
                                     .AsNoTracking()
-                                    .Where(x => x.EnableMultiCampusExtension
+                                    .Where(x => x.Identifier != thisTenant
+                                                && x.EnableMultiCampusExtension
                                                 && !systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
                                     .OrderBy(x => x.State).ThenBy(x => x.Name)
                                     .ToListAsync();
         AssignedU3A = await dbcT.TenantInfo
                                     .AsNoTracking()
-                                    .Where(x => x.EnableMultiCampusExtension
+                                    .Where(x => x.Identifier != thisTenant
+                                                && x.EnableMultiCampusExtension
                                                 && systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
                                     .OrderBy(x => x.State).ThenBy(x => x.Name)
                                     .ToListAsync();
