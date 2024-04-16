@@ -407,6 +407,13 @@ else
     }
 </style>
 @code {
+    const string EXPERIMENTAL_TEXT = $@"<div class='alert alert-warning text-dark text-center'><h5>This class is Experimental</h5>
+                        You have requested enrolment in a class that is currently experimental.<br/>
+                        This means the class has features that are new and are still undergoing full implementation.
+                        While you are encouraged to participate in this class, you should be aware that implementation
+                        and the feature-set may change. Thank you for your participation!
+                        </div>";
+
     [CascadingParameter]
     LoginState loginState { get; set; }
 
@@ -966,8 +973,10 @@ else
         {
             // process enrolment request
             var caption = "Request enrolment";
+            var experimentalMsg = (string.IsNullOrWhiteSpace(selectedClass.Course.OfferedBy))
+                    ? "" : EXPERIMENTAL_TEXT;
             var message = $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be requested.</p>" +
-                        WaitlistWarning() +
+                        WaitlistWarning() + experimentalMsg +
                        "<p>Do you wish to continue?</p>";
             bool result = true;
             if (reportStyle == ReportStyle.Detail)
