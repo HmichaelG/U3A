@@ -40,6 +40,7 @@ namespace U3A.BusinessRules
                                                     bool IsFinancial)
         {
             var classes = new ConcurrentBag<Class>();
+            var localTenant = await tenantService.GetTenantInfoAsync();
             // get the first recorded schedule
             var firstSchedule = await dbc.Schedule.AsNoTracking()
                                         .OrderBy(x => x.CreatedOn)
@@ -109,7 +110,6 @@ namespace U3A.BusinessRules
             });
             List<Class> result = classes.Except(deletions).ToList();
 
-            var localTenant = await tenantService.GetTenantInfoAsync();
             
             // Enrolments by other U3A into local courses
             var localEnrolments = await dbcT.MultiCampusEnrolment
@@ -130,6 +130,7 @@ namespace U3A.BusinessRules
                     {
                         c = classes.Where(x => x.ID == mcE.ClassID).FirstOrDefault();
                     }
+                    if (c == null) { continue; }
                     Enrolment e = GetEnrolmentFromMCEnrolment(mcE, mcP, c, mcT);
                     if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
                     {
@@ -190,6 +191,7 @@ namespace U3A.BusinessRules
                         {
                             c = classes.Where(x => x.ID == mcE.ClassID).FirstOrDefault();
                         }
+                        if (c ==  null) { continue; }
                         Enrolment e = GetEnrolmentFromMCEnrolment(mcE, mcP, c, mcT);
                         if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
                         {

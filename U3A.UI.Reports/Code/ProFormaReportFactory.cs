@@ -137,7 +137,7 @@ namespace U3A.UI.Reports
                     terms = await dbc.Term.Where(x => x.Year == currentTerm.Year).ToListAsync();
                 }
                 var personsFiles = new List<string>();
-                Person person =  null;
+                Person person = null;
                 foreach (var enrolment in kvp.Value.OrderBy(x => x.Course.Name))
                 {
                     person = enrolment.Person;
@@ -152,9 +152,9 @@ namespace U3A.UI.Reports
                             var dataSources = DataSourceManager.GetDataSources(participantEnrolmentProForma, includeSubReports: false);
                             foreach (var dataSource in dataSources)
                             {
-                                if (dataSource  is ObjectDataSource)
+                                if (dataSource is ObjectDataSource)
                                 {
-                                   var ds = (dataSource as ObjectDataSource);
+                                    var ds = (dataSource as ObjectDataSource);
                                     if (ds.Name.ToLower() == "objectdatasource2") { ds.DataSource = terms; }
                                 }
                             }
@@ -354,9 +354,26 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             var term = dbc.Term.Find(Enrolments[0].TermID);
             var leaderDetail = BusinessRule.GetLeaderDetail(dbc, Leader, term);
             var enrolmentDetails = new List<EnrolmentDetail>();
+            var totalEnrolled = 0.00;
+            var totalWaitListed = 0.00;
+            bool isMultiCampus = false;
             foreach (var enrolment in Enrolments)
             {
+                if (enrolment.Person != null && enrolment.Person.IsMultiCampusVisitor) { isMultiCampus = true; };
+                if (enrolment.IsWaitlisted) { totalWaitListed++; } else { totalEnrolled++; }
                 enrolmentDetails.AddRange(BusinessRule.GetEnrolmentDetail(dbc, enrolment));
+            }
+            if (isMultiCampus)
+            {   // we need to recalculate totals
+                foreach (var ed in enrolmentDetails)
+                {
+                    ed.CourseTotalActiveStudents = (int)totalEnrolled;
+                    ed.CourseTotalWaitlistedStudents = (int)totalWaitListed;
+                    if (ed.CourseMaximumStudents > 0)
+                    {
+                        ed.CourseParticipationRate = (totalEnrolled+totalWaitListed)/(double)ed.CourseMaximumStudents;
+                    }
+                }
             }
             var dataSources = DataSourceManager.GetDataSources<ObjectDataSource>(
                 report: report,
