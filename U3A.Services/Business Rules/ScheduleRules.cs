@@ -50,7 +50,7 @@ namespace U3A.BusinessRules
                                                 .AsNoTracking()
                                                 .Where(x => x.TermID == term.ID)
                                                 .Select(x => x.ID).ToListAsync();
-            enrolmentKeys.AddRange( await dbcT.MultiCampusEnrolment
+            enrolmentKeys.AddRange(await dbcT.MultiCampusEnrolment
                                                 .AsNoTracking()
                                                 .Select(x => x.ID).ToListAsync());
             // Get Class updates since cache creation
@@ -79,7 +79,7 @@ namespace U3A.BusinessRules
                     c.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID != null && x.ClassID == c.ID));
                     c.Course.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID == null && x.CourseID == c.CourseID));
                     // remove any enrolments deleted by the offering U3A
-                    c.Course.Enrolments.RemoveAll(x => 
+                    c.Course.Enrolments.RemoveAll(x =>
                                         !enrolmentKeys.Contains(x.ID));
                     c.Enrolments.RemoveAll(x => !enrolmentKeys.Contains(x.ID));
                     // and remove new dropouts
@@ -117,8 +117,9 @@ namespace U3A.BusinessRules
                 var tenantInfo = await dbcT.TenantInfo.ToListAsync();
                 var mcSchedule = await dbcT.MultiCampusSchedule
                                     .AsNoTracking()
-                                    .Where(x => x.TenantIdentifier != tInfo.Identifier)
-                                    .ToListAsync();
+                                    .Where(x => x.TenantIdentifier != tInfo.Identifier
+                                                && settings.MultiCampusU3AAllowed.Contains(x.TenantIdentifier))
+                                                .ToListAsync();
                 Parallel.ForEach(mcSchedule, async s =>
                 {
                     var c = JsonSerializer.Deserialize<Class>(s.jsonClass.Unzip());
@@ -133,14 +134,15 @@ namespace U3A.BusinessRules
                 });
 
                 var mcEnrolments = await dbcT.MultiCampusEnrolment
-                                        .Where(x => x.TenantIdentifier != myTenant.Identifier)
+                                        .Where(x => x.TenantIdentifier != myTenant.Identifier
+                                                    && settings.MultiCampusU3AAllowed.Contains(x.TenantIdentifier))
                                         .ToListAsync();
                 foreach (var mcE in mcEnrolments)
                 {
-                    MultiCampusPerson mcP = await dbcT.MultiCampusPerson.FirstOrDefaultAsync(x => x.ID ==  mcE.PersonID);
+                    MultiCampusPerson mcP = await dbcT.MultiCampusPerson.FirstOrDefaultAsync(x => x.ID == mcE.PersonID);
                     MultiCampusTerm mcT = await dbcT.MultiCampusTerm.FirstOrDefaultAsync(x => x.ID == mcE.TermID);
                     Class c;
-                    if (mcP != null && mcT != null )
+                    if (mcP != null && mcT != null)
                     {
                         if (mcE.ClassID == null)
                         {
@@ -150,8 +152,8 @@ namespace U3A.BusinessRules
                         {
                             c = classes.Where(x => x.ID == mcE.ClassID).FirstOrDefault();
                         }
-                        Enrolment e = GetEnrolmentFromMCEnrolment(mcE, mcP,c, mcT);
-                        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses )
+                        Enrolment e = GetEnrolmentFromMCEnrolment(mcE, mcP, c, mcT);
+                        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
                         {
                             foreach (var classToupdate in classes.Where(x => x.CourseID == c.Course.ID))
                             {
