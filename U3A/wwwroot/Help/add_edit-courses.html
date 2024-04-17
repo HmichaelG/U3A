@@ -134,6 +134,8 @@
 <p class="p_Normal">A course and its associated class(es) can be deleted. However, this should be avoided once there are enrolments and/or attendance details. Deleting a course will delete all enrolment and attendance detail associated with it.</p>
 <p class="p_Normal" style="text-align: center; margin: 0 0 0 0;"><span style="font-weight: bold;">Hint: </span>Check the Current Year</p>
 <p class="p_Normal" style="text-align: center;">Before you create/edit courses please ensure you are working in the correct year. The year is displayed on the top right hand corner above the grid. Click the button titled, <span style="font-style: italic;">Change Year</span> to change. Note that terms for the new year must be created via <a href="add_edit-enrolment-terms.html" class="topiclink">Add/Edit Enrolment Terms</a> before you can do this.</p>
+<h3 class="p_Heading3"><span class="f_Heading3">Rebuild Cache button</span></h3>
+<p class="p_Normal">The system employs a cache to display the <span style="font-style: italic;">Class Schedule</span>. Using a cache of pre-calculated data to display the schedule saves time and improves performance on the most used and calculation intensive process in the system. The cache is rebuilt automatically every hour. If you make changes to course/class details you may optionally click the <span style="font-weight: bold;">Rebuild Cache</span> button to rebuild the cache immediately.</p>
 <h3 class="p_Heading3"><span class="f_Heading3">Preview Enrolment List button</span></h3>
 <p class="p_Normal">Click this button to preview all classes as seen by members making enrolments via the <span style="font-style: italic;">Member Portal</span>. It is anticipated that this preview will be useful when the current enrolment period is undefined.</p>
 <h3 class="p_Heading3"><span class="f_Heading3">Course Edit Views</span></h3>
@@ -141,6 +143,7 @@
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span><span style="font-weight: bold;">Simple View</span>. This view presents the course and class data as one form. When creating a new course the <span style="font-style: italic;">Occurrence</span> will be set to <span style="font-weight: bold;">Weekly</span>. It is anticipated that this view will be suitable for most U3A courses.</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span><span style="font-weight: bold;">Activity View</span>. This is a slight variation on the <span style="font-style: italic;">Simple View</span> specifically intended for activities and events that occur once only. Therefore, when creating a new course the <span style="font-style: italic;">Occurrence</span> will be set to <span style="font-weight: bold;">Once Only</span> and the <span style="font-style: italic;">Start Date </span>displayed.</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span><span style="font-weight: bold;">Detail View</span>. A detail view in which all fields are displayed and provides the ability to create multiple classes per course. While being the most complex of all views, it is also the most flexible and comprehensive. </p>
+<p class="p_Normal">In addition, all views contain a <span style="font-weight: bold;">Settings</span> tab. This allows you to override default system settings as defined in <a href="organistaion-details.html" class="topiclink">Organistaion Details</a>. It also allows you to offer your selected courses to other U3A using the system's <span style="font-weight: bold;">Multi Campus Extensions</span>.</p>
 <p class="p_Normal"><span style="font-weight: bold;">Some Notes</span></p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin-left: 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>A view is persisted with course data. That means the view that was active at the time a course record is written to the database will be used when that data is subsequently retrieved from the database.</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 13px; margin-left: 0;"><span class="f_Normal" style="font-family: Arial,'Lucida Sans Unicode','Lucida Grande','Lucida Sans';display:inline-block;width:13px;margin-left:-13px">&#8226;</span>Views are organised via a tabset at the top of the edit form. A view can be changed at any time by clicking the tab desired. The exception to this is a course with multiple classes which is always displayed as a <span style="font-style: italic;">Detail</span> view.</p>
@@ -302,6 +305,19 @@
 </td>
 <td colspan="2"  style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">The system allows for membership fees to be waived if a leader is enrolled as a student in less than a defined count of classes. Tick this field if the course is not to be included in that count.</p>
 <p class="p_Normal">For example, special excursions and paid activities would normally be excluded from the count.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Allow Multi-Campus Enrolment From</p>
+</td>
+<td colspan="2"  style="vertical-align:top; width:1066px; padding:0; border:solid thin #c0c0c0;"><p class="p_Normal">Enter the date from which you wish to offer this course/activity to other U3A groups. Note that this field will only be enabled if...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>the <span style="font-weight: bold;">Allow Multi-Campus Extensions</span> checkbox in <a href="organistaion-details.html" class="topiclink">Organistaion Details</a> is ticked,</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>The course has no fees,</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span>The course participation type is <span style="font-style: italic;">Same participants in all classes</span>,</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">4.</span>There is only one class in the course, and</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">5.</span>The course is offered in one term only.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">As such, it is anticipated that most multi-campus courses will be once-only activities such as Guest Speakers.</p>
 </td>
 </tr>
 </table>

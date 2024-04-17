@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-03-15T16:06:37.213+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-04-17T10:45:01.245+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Organistaion Details</title>
   <body>
     <header>
@@ -13,6 +13,7 @@
       <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Your Group&apos;s Details</text>, contains the organisation&apos;s name and address details, committee and volunteer group names.</li>
       <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Operations</text>, contains parameters used in the automatic allocation of enrolments and waitlists as well as other parameters that control the behaviour of the system,</li>
       <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Terms and Conditions</text>, allows the entry of text in Rich Text Format (RTF). Members are required to accept these T&amp;C&apos;s on a regular basis.</li>
+      <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Multi Campus.</text> Allows your U3A to accept courses offered by other U3A groups (campuses) using the U3Admin system, and allows your U3A the ability to offer courses to other campuses.</li>
     </list>
     <para styleclass="Normal"></para>
     <para styleclass="Heading2">Your Group&apos;s Details tab</para>
@@ -470,5 +471,16 @@
     <para styleclass="Heading2">The Terms &amp; Conditions tab</para>
     <para styleclass="Normal">Use the Rich Text Format (RTF) editor to enter your U3A group&apos;s &apos;Terms and Conditions. <text style="font-weight:bold;">Hint</text>: it might be easier to use a Word processor such a <text style="font-style:italic;">Microsoft Word</text> to do this and copy and paste the result.</para>
     <para styleclass="Normal">If entered, your members will be required to agree to these terms on a regular basis. The Terms &amp; Conditions will be displayed in the <text style="font-style:italic;">Member Portal</text> and the member will be required to accept them using an <text style="font-style:italic;">Accept</text> button. If the member does not accept the T&amp;C&apos;s they will be logged out until they do.</para>
+    <para styleclass="Heading2">The Multi Campus tab</para>
+    <para styleclass="Normal">This tab provides the options to allow your U3A to accept courses offered by other U3A groups (campuses) using the U3Admin system, and allows your U3A the ability to offer courses to other campuses. This facility is known as the <text style="font-weight:bold;">Multi Campus Extension</text> to the U3Admin system.</para>
+    <para styleclass="Normal">To opt-in to multi-campus extensions, tick the <text style="font-weight:bold;">Allow Multi-Campus Extensions</text> checkbox. The system will display two lists...</para>
+    <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal"><text style="font-weight:bold;">U3A Not Allowed</text>. Those U3A you do not wish to accept courses from, and</li>
+      <li styleclass="Normal"><text style="font-weight:bold;">U3A Allowed</text>. Those U3A you do not wish to accept courses from.</li>
+    </list>
+    <para styleclass="Normal">There could be any reason why you do not wish to allow a particular U3A. However, it is anticipated the most common reason will be that distance prohibits a reciprocal arrangement.</para>
+    <para styleclass="Normal">That&apos;s it! Courses offered by other U3A will now appear in your <text style="font-style:italic;">Class Schedule</text>. Your members may request enrolment and will or will not be accepted by the offering U3A.</para>
+    <para styleclass="Normal">To offer a course to other U3A, go to <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Courses">Add/Edit Courses</link> and identify those courses you wish to offer. Once the schedule cache is updated, your courses will appear in their <text style="font-style:italic;">Class Schedule</text>.</para>
+    <para styleclass="Normal"></para>
   </body>
 </topic>
