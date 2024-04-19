@@ -1,0 +1,94 @@
+﻿@page "/ViewMultiCampusOffers"
+@using Microsoft.Extensions.Configuration
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
+@inject IConfiguration config
+
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+<ContextHelpTitle Title="View Multi-Campus Offers" HelpTopic="View-Multi-Campus-Offers.html"></ContextHelpTitle>
+<p>Courses offered by other U3A to your members.</p>
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@classes" @ref=@mainGrid CssClass="w-100 grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    AutoExpandAllGroupRows="true"
+                    SelectionMode="GridSelectionMode.Single">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridDataColumn Caption="Offerd By" FieldName="Course.OfferedBy" GroupIndex="0" />
+                    <DxGridDataColumn Caption="Available" FieldName="Course.AllowMultiCampsuFrom" DisplayFormat="@constants.STD_DATE_FORMAT" />
+                    <DxGridDataColumn Caption="Name" FieldName="Course.Name" />
+                    <DxGridDataColumn Caption="Type" FieldName="Course.CourseType.Name" />
+                    <DxGridDataColumn Caption="Class" FieldName="ClassDetailWithoutVenue" />
+                    <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
+                    <DxGridDataColumn Caption="Address" FieldName="Venue.Address" />
+                    <DxGridDataColumn Caption="Maximum" FieldName="Course.MaximumStudents" Width="4rem" />
+                    <DxGridDataColumn Caption="Required" FieldName="Course.RequiredStudents" Width="4rem" />
+                    <DxGridDataColumn Caption="Enrolled" FieldName="TotalActiveStudents" Width="4rem" />
+                    <DxGridDataColumn Caption="Waitlist" FieldName="TotalWaitlistedStudents" Width="4rem" />
+                </Columns>
+
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
+}
+
+@code {
+    bool isReady;
+    U3ADbContext? dbc;
+    TenantDbContext? dbcT;
+    DxGrid? mainGrid;
+    SystemSettings settings;
+    Term? term;
+    List<Class>? classes;
+    string googleMapAPIKey;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        dbcT = await TenantDbfactory.CreateDbContextAsync();
+        // wire up the data
+        settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+        term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        if (term != null)
+        {
+            classes = await BusinessRule.RestoreClassesFromMultiCampusScheduleAsync(dbc, dbcT, tenantService, term, settings);
+        }
+        googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
+        if (string.IsNullOrWhiteSpace(googleMapAPIKey)) googleMapAPIKey = config.GetConnectionString("GoogleMapAPIKey");
+        isReady = true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        mainGrid?.AutoFitColumnWidths();
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+}
