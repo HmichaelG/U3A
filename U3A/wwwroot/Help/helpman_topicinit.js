@@ -1,4 +1,4 @@
-﻿/* --------------- Script (c) 2022 EC Software ---------------
+﻿/* --------------- Script (c) 2024 EC Software ---------------
 This script was created by Help+Manual. It is designed for use 
 in combination with the output of Help+Manual and must not
 be used outside this context.     https://www.helpandmanual.com
@@ -224,6 +224,17 @@ var HMShowLightbox = function(htmlCode, startL, startT, startW, startH, endW, en
   	$(lightbox).append('<p id="hmlightboxcaption">' +newCaption+ '</p>');
   	lightboxCaption = parentScope ? parent.$('#hmlightboxcaption') : $('#hmlightboxcaption');
   }  	
+  
+  if (endW == 0) {
+	if ((startW/startH) > ($(lightboxWindow).width()/$(lightboxWindow).height())) {
+		endW = $(lightboxWindow).width();
+		endH = endW / startW * startH;
+	}
+	else {
+		endH = $(lightboxWindow).height();
+		endW = endH / startH * startW;
+	}
+  }
 
   var lightboxSpeed = 300;
   var sizeStart; /* keep initial size for hide animation */
