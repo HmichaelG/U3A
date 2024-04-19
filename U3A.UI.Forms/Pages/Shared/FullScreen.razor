@@ -22,7 +22,7 @@
     .fullscreen {
         z-index: 1049;                  /* dxPopup z-index = 1050 */
         width: calc(100% + 1.5rem);
-        height: 100vh;
+        height: 100dvh;
         top: 0px;
         left: 0px;
         position: absolute;
@@ -40,7 +40,7 @@
     [Parameter]
     public RenderFragment ContentTemplate { get; set; } = default;
 
-    string height = "100px";
+    string height = "100dvh";
     bool isFullscreen = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -58,7 +58,7 @@
         isFullscreen = !isFullscreen;
         if (isFullscreen)
         {
-            height = "100vh";
+            height = "100dvh";
         }
         else {
             await RefreshLayout(); 

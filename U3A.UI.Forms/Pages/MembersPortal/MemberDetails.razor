@@ -247,6 +247,18 @@ else
         dbc = await U3Adbfactory.CreateDbContextAsync();
         systemSettings = await dbc.SystemSettings.FirstOrDefaultAsync();
         surcharge = systemSettings.MailSurcharge.ToString("c2");
+        person = await dbc.Person.FindAsync(loginState.SelectedPerson?.ID);
+        if (person == null || person.DateCeased == constants.PERSON_DELETED_FLAG || IsNewLinkedMember)
+        {
+            person = new Person()
+                {
+                    Email = loginState.LoginEmail,
+                    FinancialTo = constants.START_OF_TIME,
+                    DateJoined = DateTime.Today
+                };
+            isNew = true;
+        }
+        else isNew = false;
         IsReady = true;
         await base.OnInitializedAsync();
     }
@@ -265,18 +277,6 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        person = await dbc.Person.FindAsync(loginState.SelectedPerson?.ID);
-        if (person == null || IsNewLinkedMember)
-        {
-            person = new Person()
-                {
-                    Email = loginState.LoginEmail,
-                    FinancialTo = constants.START_OF_TIME,
-                    DateJoined = DateTime.Today
-                };
-            isNew = true;
-        }
-        else isNew = false;
         await base.OnParametersSetAsync();
     }
 
@@ -292,7 +292,7 @@ else
             if (!await IsDataOK(editModel)) return;
             // Re-query a data item from the store.
             var dataItem = dbc.Person.Find(editModel.ID);
-            if (dataItem == null)
+            if (dataItem == null || dataItem.DateCeased == constants.PERSON_DELETED_FLAG)
             {
                 dataItem = new Person();
                 isNew = true;
@@ -389,7 +389,8 @@ else
         var city = City.ToLower().Trim();
         if (dbc.Person.Any(x => x.LastName.ToLower().Trim() == lastName &&
                                     x.FirstName.ToLower().Trim() == firstName &&
-                                    x.City.ToLower().Trim() == city))
+                                    x.City.ToLower().Trim() == city &&
+                                    !x.DateCeased.HasValue))
         {
             await messageBox.ShowOkOnlyAsync("Already on file", "A person with First Name, Last Name and City already exists in our database.");
         }

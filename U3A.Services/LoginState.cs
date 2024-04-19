@@ -52,7 +52,7 @@ namespace U3A.Services
             this.LoginEmail = LoginEmail;
             using (var dbc = dbFactory.CreateDbContext())
             {
-                LinkedPeople = dbc.Person.Where(x => x.Email == LoginEmail).ToList();
+                LinkedPeople = dbc.Person.Where(x => x.Email == LoginEmail && !x.DateCeased.HasValue).ToList();
                 IsNewMember = (LinkedPeople.Count <= 0) ? true : false;
                 if (!IsNewMember)
                 {

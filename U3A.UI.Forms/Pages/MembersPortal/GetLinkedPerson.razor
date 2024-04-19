@@ -31,10 +31,6 @@
 
     List<Person> SelectedPeople = new List<Person>();
 
-    protected override void OnParametersSet() {
-        base.OnParametersSet();
-    }
-
     async Task SelectedItemsChanged(IEnumerable<Person> values) {
         SelectedLinkedMember = values.First();
         await OnSelectedOptionCompleted.InvokeAsync(PortalMenuResult.LinkedMemberChanged);
