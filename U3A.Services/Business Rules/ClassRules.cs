@@ -63,10 +63,10 @@ namespace U3A.BusinessRules
                             .Include(x => x.Leader3)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == term.Year 
+                            .Where(x => x.Course.Year == term.Year
                                             && (LastScheduleUpdate == null || x.UpdatedOn > LastScheduleUpdate.Value)
                                             && x.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses
-                                            && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities 
+                                            && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities
                                             && !x.Course.IsOffScheduleActivity)));
         }
         private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc,
@@ -85,7 +85,7 @@ namespace U3A.BusinessRules
                             .Where(x => x.Course.Year == term.Year
                                         && (LastScheduleUpdate == null || x.UpdatedOn > LastScheduleUpdate.Value)
                                         && x.Course.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass
-                                        && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities 
+                                        && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities
                                         && !x.Course.IsOffScheduleActivity)));
         }
 
@@ -109,7 +109,7 @@ namespace U3A.BusinessRules
         /// <param name="term"></param>
         /// <returns></returns>
         public static async Task<List<Class>> GetClassDetailsAsync(U3ADbContext dbc,
-            Term term, SystemSettings settings, bool ExludeOffScheduleActivities = false, DateTime? LastScheduleUpdate = null )
+            Term term, SystemSettings settings, bool ExludeOffScheduleActivities = false, DateTime? LastScheduleUpdate = null)
         {
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
@@ -118,7 +118,8 @@ namespace U3A.BusinessRules
             classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
             classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
-            foreach(var c in classes)
+            classes = classes.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term)).ToList();
+            foreach (var c in classes)
             {
                 AssignClassTerm(c, terms, term);
                 AssignClassContacts(c, term, settings);
@@ -135,6 +136,7 @@ namespace U3A.BusinessRules
                                             .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
                                                             && x.StartDate.GetValueOrDefault() < term.StartDate
                                                             && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
+                prevTermShoulderClasses = prevTermShoulderClasses.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term)).ToList();
                 foreach (var c in prevTermShoulderClasses)
                 {
                     AssignClassTerm(c, terms, prevTerm);
@@ -153,7 +155,7 @@ namespace U3A.BusinessRules
         {
             Task<List<Class>> syncTask = Task.Run(async () =>
             {
-                return await GetClassDetailsAsync(dbc,term,settings, ExludeOffScheduleActivities);
+                return await GetClassDetailsAsync(dbc, term, settings, ExludeOffScheduleActivities);
             });
             syncTask.Wait();
             return syncTask.Result;
@@ -418,6 +420,34 @@ namespace U3A.BusinessRules
         public static bool IsClassInYear(U3ADbContext dbc, Class Class)
         {
             return (Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4);
+        }
+        public static bool IsClassInReportingPeriod(ClassScheduleDisplayPeriod reportPeriod,
+                            Class Class, Term term)
+        {
+            List<bool> termsOffered = new();
+            termsOffered.Add(Class.OfferedTerm1);
+            termsOffered.Add(Class.OfferedTerm2);
+            termsOffered.Add(Class.OfferedTerm3);
+            termsOffered.Add(Class.OfferedTerm4);
+            bool result = true;
+            switch (reportPeriod)
+            {
+                case ClassScheduleDisplayPeriod.CurrentSemester:
+                    if (term.TermNumber <= 2)
+                    {
+                        // zero based array
+                        if (!termsOffered[0] && !termsOffered[1]) { result = false; }
+                    }
+                    else
+                    {
+                        if (!termsOffered[2] && !termsOffered[3]) { result = false; }
+                    }
+                    break;
+                case ClassScheduleDisplayPeriod.CurrentTerm:
+                    if (!termsOffered[term.TermNumber-1]) { result = false; }
+                    break;
+            }
+            return result;
         }
         public static bool IsClassInRemainingYear(U3ADbContext dbc,
                                 Class Class, Term term, Term defaultTerm, IEnumerable<Term> allTerms = null)

@@ -127,6 +127,18 @@ else
                             <Items>
                                 <DxStackLayoutItem>
                                     <Template>
+                                        <DxFormLayoutGroup Caption="Class Schedule">
+                                            <DxFormLayoutItem Caption="Report for the eriod" ColSpanMd="12">
+                                                <DxComboBox Data="classSchedulePeriod"
+                                                            @bind-Value="@systemSettings.ClassScheduleDisplayPeriod"
+                                                            ValueFieldName="@nameof(ClassScheduleDisplayPeriodWrapper.Type)"
+                                                            TextFieldName="@nameof(ClassScheduleDisplayPeriodWrapper.DisplayText)">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Print leader on public report?" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@systemSettings.ShowLeaderOnPublicSchedule" Alignment="CheckBoxContentAlignment.Right" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
                                         <DxFormLayoutGroup Caption="Auto Enrolment" ColSpanLg="12">
                                             <DxFormLayoutItem Caption="Rule 1: New Participant Percent (%)" ColSpanMd="12">
                                                 <DxMaskedInput @bind-Value="@systemSettings.AutoEnrolNewParticipantPercent" />
@@ -171,9 +183,6 @@ else
                                                             ValueFieldName="@nameof(CourseContactOrderWrapper.Type)"
                                                             TextFieldName="@nameof(CourseContactOrderWrapper.DisplayText)">
                                                 </DxComboBox>
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Print leader on public Class Schedule?" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@systemSettings.ShowLeaderOnPublicSchedule" Alignment="CheckBoxContentAlignment.Right" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Allow leader to assign clerk?" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@systemSettings.AllowLeaderToChangeAssignClerk" Alignment="CheckBoxContentAlignment.Right" />
@@ -347,6 +356,7 @@ else
     List<string> AutoEnrolAllocationMethods;
     List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
     List<CourseContactOrderWrapper> contactOrder = new CourseContactOrderList();
+    List<ClassScheduleDisplayPeriodWrapper> classSchedulePeriod = new ClassScheduleDisplayPeriodList();
     int ActiveTabIndex { get; set; } = 0;
     private SystemSettings systemSettings { get; set; }
     U3ADbContext? dbc { get; set; }

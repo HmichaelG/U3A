@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-04-18T13:46:53.048+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-04-20T16:30:41.379+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Organisation Details</title>
   <body>
     <header>
@@ -18,7 +18,7 @@
     <para styleclass="Normal"></para>
     <para styleclass="Heading2">Your Group&apos;s Details tab</para>
     <para styleclass="Heading3">The Organisation Details group</para>
-    <para styleclass="Normal"><table styleclass="Default" rowcount="13" colcount="2">
+    <para styleclass="Normal"><table styleclass="Default" rowcount="14" colcount="2">
       <thead style="vertical-align:top">
         <td style="width:330px;">
           <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
@@ -119,6 +119,14 @@
       </tr>
       <tr style="vertical-align:top">
         <td style="width:330px;">
+          <para styleclass="Normal">Support Email Address</para>
+        </td>
+        <td style="width:923px;">
+          <para styleclass="Normal">The email address to which member support requests will be directed. If left blank, support email will be directed to the <text style="font-style:italic;">Send Email Address. </text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:330px;">
           <para styleclass="Normal">System Postman CC Address</para>
         </td>
         <td style="width:923px;">
@@ -159,6 +167,55 @@
     <para styleclass="Normal">A volunteer activity is normally an activity that occurs regularly within the group that is not considered a Course. Examples might be grounds maintenance, office administration or other assistance to the U3A group. Once defined, volunteer groups can be contacted by email/SMS as a group.</para>
     <para styleclass="Normal">Optionally enter volunteer activities, one per line. You can then assign participants to the activity using <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Volunteers">Add/Edit Volunteers</link>.</para>
     <para styleclass="Heading2">The Operations tab</para>
+    <para styleclass="Heading3">The Class Schedule group</para>
+    <para styleclass="Normal">Options that affect the <text style="font-style:italic;">Class Schedule</text> report.</para>
+    <para styleclass="Normal" style="margin-left:18px;"><table styleclass="Default" rowcount="4" colcount="2" style="width:100%;">
+      <thead style="vertical-align:top">
+        <td style="width:414px;">
+          <para styleclass="Normal" style="margin-left:18px;"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:1155px;">
+          <para styleclass="Normal" style="margin-left:18px;"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:414px;">
+          <para styleclass="Normal" style="margin-left:18px;">Report for the period</para>
+        </td>
+        <td style="width:1155px;">
+          <para styleclass="Normal" style="margin-left:18px;">The <text style="font-style:italic;">Class Schedule&apos;s</text> reporting period. It may be one of the following values...</para>
+          <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-top:1px; margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <list id="1" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-top:1px; margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+              <li styleclass="Normal" style="margin-top:1px; margin-bottom:0px;"><text style="font-weight:bold;">For the full year</text>. The report is printed for the current term through to the end of the year.</li>
+              <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">For the current semester only</text>. The report is printed for the current term through to the end of the current semester.</li>
+              <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">For the current term</text>. The report is printed for the current term only.</li>
+            </list>
+          </list>
+          <para styleclass="Normal" style="margin-bottom:0px;"></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:414px;">
+          <para styleclass="Normal" style="margin-left:18px;">Print leader on public report?</para>
+        </td>
+        <td style="width:1155px;">
+          <para styleclass="Normal" style="margin-left:18px;">Tick if you wish to print the leader&apos;s name on the public version of the <text style="font-style:italic;">Class Schedule</text> report. Please remember that the public <text style="font-style:italic;">Class Schedule</text> is available to <text style="font-weight:bold;">everyone</text>, irrespective of whether or not they are logged in. As such, printing a person&apos;s name on this report might be considered a privacy issue.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:414px;">
+          <para styleclass="Normal" style="margin-left:18px;">Occurrence</para>
+        </td>
+        <td style="width:1155px;">
+          <para styleclass="Normal" style="margin-left:18px;">The number of times automatic randomised allocation will occur throughout the year. Select from...</para>
+          <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; margin-left:18px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+            <li styleclass="Normal" style="margin-bottom:0px; margin-left:18px;"><text style="font-weight:bold;">Per Year.</text> Once a year prior to term 1.</li>
+            <li styleclass="Normal" style="margin-bottom:0px; margin-left:18px;"><text style="font-weight:bold;">Per Semester.</text> Twice per year. Once prior to term 1 and once prior to term 3.</li>
+            <li styleclass="Normal" style="margin-left:18px;"><text style="font-weight:bold;">Per Term</text>. Prior to each and every term.</li>
+          </list>
+        </td>
+      </tr>
+    </table></para>
     <para styleclass="Normal"><text styleclass="Heading3">The Auto Enrolment group</text></para>
     <para styleclass="Normal">The allocation rules discussed in these sections only apply to the <text style="font-style:italic;">Enrolment Allocation Day when allocation is </text>random (see below). Allocation at all other times of the year occur on a <text style="font-style:italic;">First In Wins</text> basis.</para>
     <para styleclass="Normal"><table styleclass="Default" rowcount="4" colcount="2">
@@ -185,7 +242,7 @@
         </td>
         <td style="width:922px;">
           <para styleclass="Normal">The allocation method may be <text style="font-weight:bold;">random</text> or <text style="font-weight:bold;">first in wins</text>.</para>
-          <list id="1" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:Symbol; font-size:11pt; color:#000000;">
+          <list id="3" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:Symbol; font-size:11pt; color:#000000;">
             <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Random</text>. Students are enrolled into their selected courses on a random basis. Random allocation is considered a fair and equitable means of allocating students to an oversubscribed course. Refer to Enrolment Allocation Day below for further details.</li>
             <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">First in wins</text>. Students are allocated on a first come, first served basis. Use this method if you wish to encourage students to enrol early.</li>
           </list>
@@ -228,7 +285,7 @@
               </td>
               <td style="width:1155px;">
                 <para styleclass="Normal" style="margin-left:18px;">The number of times automatic randomised allocation will occur throughout the year. Select from...</para>
-                <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; margin-left:18px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                <list id="4" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; margin-left:18px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
                   <li styleclass="Normal" style="margin-bottom:0px; margin-left:18px;"><text style="font-weight:bold;">Per Year.</text> Once a year prior to term 1.</li>
                   <li styleclass="Normal" style="margin-bottom:0px; margin-left:18px;"><text style="font-weight:bold;">Per Semester.</text> Twice per year. Once prior to term 1 and once prior to term 3.</li>
                   <li styleclass="Normal" style="margin-left:18px;"><text style="font-weight:bold;">Per Term</text>. Prior to each and every term.</li>
@@ -255,7 +312,7 @@
         </td>
         <td style="width:923px;">
           <para styleclass="Normal">Determines the recipients of leader reports sent automatically overnight...</para>
-          <list id="3" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+          <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
             <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Leaders, if none then clerks.</text> Leader reports will be sent to leaders. if there are no leaders with email addresses then the reports will be sent to clerks.</li>
             <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Clerks, if none then leaders.</text> Leader reports will be sent to clerks. if there are no clerks with email addresses then the reports will be sent to leaders.</li>
             <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Both</text>. Leader reports will be sent to both leaders and clerks with email addresses.</li>
@@ -269,7 +326,7 @@
         </td>
         <td style="width:923px;">
           <para styleclass="Normal">Defines the order in which a course contact is determined. The options are...</para>
-          <list id="4" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+          <list id="6" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
             <li styleclass="Normal" style="margin-bottom:0px;">Leaders then clerks, or</li>
             <li styleclass="Normal">Clerks then leaders</li>
           </list>
@@ -474,7 +531,7 @@
     <para styleclass="Heading2">The Multi Campus tab</para>
     <para styleclass="Normal">This tab provides the options to allow your U3A to accept courses offered by other U3A groups (campuses) using the U3Admin system, and allows your U3A the ability to offer courses to other campuses. This facility is known as the <text style="font-weight:bold;">Multi Campus Extension</text> to the U3Admin system.</para>
     <para styleclass="Normal">To opt-in to multi-campus extensions, tick the <text style="font-weight:bold;">Allow Multi-Campus Extensions</text> checkbox. The system will display two lists...</para>
-    <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="7" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal"><text style="font-weight:bold;">U3A Not Allowed</text>. Those U3A you do not wish to accept courses from, and</li>
       <li styleclass="Normal"><text style="font-weight:bold;">U3A Allowed</text>. Those U3A you do not wish to accept courses from.</li>
     </list>

@@ -10361,7 +10361,7 @@ GO
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
+    WHERE [MigrationId] = N''20240402083049_U3A_sp_DbCleanup_02_APR_2024''
 )
 BEGIN
 
@@ -10578,6 +10578,31 @@ IF NOT EXISTS (
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
     VALUES (N'20240415050743_U3A_Settings_MultiCampusU3AAllowed', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240420040734_U3A_Settings_ClassScheduleDisplayPeriod'
+)
+BEGIN
+    ALTER TABLE [SystemSettings] ADD [ClassScheduleDisplayPeriod] int NOT NULL DEFAULT 0;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240420040734_U3A_Settings_ClassScheduleDisplayPeriod'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240420040734_U3A_Settings_ClassScheduleDisplayPeriod', N'8.0.4');
 END;
 GO
 

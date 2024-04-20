@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_AllowMultiCampusExtensions
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_MultiCampusU3AAllowed
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_MultiCampusU3AAllowed
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_ClassScheduleDisplayPeriod
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_MultiCampusU3AAllowed
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_ClassScheduleDisplayPeriod
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
