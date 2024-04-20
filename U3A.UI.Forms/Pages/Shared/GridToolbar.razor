@@ -6,81 +6,83 @@
 @using DevExpress.Blazor
 
 
-    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" 
-            CssClass="me-4"            
-            ItemClick="OnItemClick">
-        <Items>
-            <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
-                           Alignment="ToolbarItemAlignment.Left">
-                <Items>
-                    <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
-                                   Name="CollapseGroups" Text="Collapse Group Rows"
-                                   Tooltip="Collapse grouped rows">
-                    </DxToolbarItem>
-                    <DxToolbarItem IconCssClass="bi bi-arrows-expand"
-                                   Name="ExpandGroups" Text="Expand Group Rows"
-                                   Tooltip="Expand grouped rows">
-                    </DxToolbarItem>
-                    <DxToolbarItem BeginGroup IconCssClass="bi bi-calendar3" Text="Group Dates By">
-                         <Items>
-                             <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Day" Text="Day"
-                                            Tooltip="Group dates by day">
-                             </DxToolbarItem>
-                             <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Month" Text="Month"
-                                            Tooltip="Group dates by month">
-                             </DxToolbarItem>
-                             <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Year" Text="Year"
-                                            Tooltip="Group dates by year">
-                             </DxToolbarItem>
-                         </Items>
-                     </DxToolbarItem>
-                 </Items>
-             </DxToolbarItem>
-             <DxToolbarItem IconCssClass="bi bi-collection" Text="Master/Detail" Visible=@IsMasterDetail
-                            BeginGroup=true>
-                 <Items>
-                     <DxToolbarItem IconCssClass="bi bi-arrows-expand"
-                                    Name="ShowDetails" Text="Show Detail Rows"
-                                    Tooltip="Show Detail rows">
-                     </DxToolbarItem>
-                     <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
-                                    Name="HideDetails" Text="Hide Detail Rows"
-                                    Tooltip="Hide Detail rows">
-                     </DxToolbarItem>
-                 </Items>
-             </DxToolbarItem>
-         <DxToolbarItem IconCssClass="bi bi-arrows" Name="AutoFit" Text="Auto Fit"
-                            BeginGroup=true
-                            Alignment="ToolbarItemAlignment.Right"
-                            CssClass="column-chooser-button"
-                            Tooltip="Adjust column size to fit cell content">
-             </DxToolbarItem>
-             <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Choose" Text="Choose"
-                            BeginGroup=true
-                            Alignment="ToolbarItemAlignment.Right"
-                            CssClass="column-chooser-button"
-                            Tooltip="Customise column display">
-             </DxToolbarItem>
-             <DxToolbarItem IconCssClass="bi bi-funnel" Name="Filter" Text="Filter"
-                            BeginGroup=true
-                            Alignment="ToolbarItemAlignment.Right"
-                            Tooltip="Filter / search for records">
-             </DxToolbarItem>
-             <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel Export"
-                            BeginGroup=true
-                            Alignment="ToolbarItemAlignment.Right">
-                 <Items>
-                     <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportAll" Text="Export All"
-                                    Tooltip="Export the entire grid to Excel">
-                     </DxToolbarItem>
-                     <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportSelected" Text="Export Selected"
-                                    Tooltip="Export selected rows to Excel">
-                     </DxToolbarItem>
-                 </Items>
-             </DxToolbarItem>
-             @CustomButtonContent
-         </Items>
-     </DxToolbar>
+<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain"
+           CssClass="me-4"
+           ItemClick="OnItemClick">
+    <Items>
+        <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
+                       Visible = "@(LinkedGrid?.GetGroupCount() > 0)"
+                       Alignment="ToolbarItemAlignment.Left">
+            <Items>
+                <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
+                               Name="CollapseGroups" Text="Collapse Group Rows"
+                               Tooltip="Collapse grouped rows">
+                </DxToolbarItem>
+                <DxToolbarItem IconCssClass="bi bi-arrows-expand"
+                               Name="ExpandGroups" Text="Expand Group Rows"
+                               Tooltip="Expand grouped rows">
+                </DxToolbarItem>
+                <DxToolbarItem BeginGroup IconCssClass="bi bi-calendar3" Text="Group Dates By">
+                    <Items>
+                        <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Day" Text="Day"
+                                       Tooltip="Group dates by day">
+                        </DxToolbarItem>
+                        <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Month" Text="Month"
+                                       Tooltip="Group dates by month">
+                        </DxToolbarItem>
+                        <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Year" Text="Year"
+                                       Tooltip="Group dates by year">
+                        </DxToolbarItem>
+                    </Items>
+                </DxToolbarItem>
+            </Items>
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-collection" Text="Master/Detail" Visible=@IsMasterDetail
+                       Alignment="ToolbarItemAlignment.Right"
+                       BeginGroup=true>
+            <Items>
+                <DxToolbarItem IconCssClass="bi bi-arrows-expand"
+                               Name="ShowDetails" Text="Show Detail Rows"
+                               Tooltip="Show Detail rows">
+                </DxToolbarItem>
+                <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
+                               Name="HideDetails" Text="Hide Detail Rows"
+                               Tooltip="Hide Detail rows">
+                </DxToolbarItem>
+            </Items>
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-arrows" Name="AutoFit" Text="Auto Fit"
+                       BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                       CssClass="column-chooser-button"
+                       Tooltip="Adjust column size to fit cell content">
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Choose" Text="Choose"
+                       BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                       CssClass="column-chooser-button"
+                       Tooltip="Customise column display">
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-funnel" Name="Filter" Text="Filter"
+                       BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                       Tooltip="Filter / search for records">
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel Export"
+                       BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right">
+            <Items>
+                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportAll" Text="Export All"
+                               Tooltip="Export the entire grid to Excel">
+                </DxToolbarItem>
+                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportSelected" Text="Export Selected"
+                               Tooltip="Export selected rows to Excel">
+                </DxToolbarItem>
+            </Items>
+        </DxToolbarItem>
+        @CustomButtonContent
+    </Items>
+</DxToolbar>
 
 @code {
 
@@ -90,7 +92,7 @@
     [Parameter] public bool HideSearchBox { get; set; }
     [Parameter] public bool IsMasterDetail { get; set; }
     [Parameter] public bool DisableVirtualScroll { get; set; }
-    [Parameter] public RenderFragment CustomButtonContent {get; set;}
+    [Parameter] public RenderFragment CustomButtonContent { get; set; }
     [Parameter] public EventCallback ToolbarFilterClosed { get; set; }
 
     internal bool IsToggleExpanded { get; set; } = false;
