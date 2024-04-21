@@ -3,6 +3,8 @@
 @using DevExpress.Drawing.Printing
 @using U3A.UI.Reports.Pages
 
+@inject TenantInfoService tenantService
+
 <AttachFile @ref=@attachFile Attachments="@attachments" />
 <MessageBox @ref="messageBox" />
 
@@ -29,6 +31,11 @@
             <div class="row vw-100 m-1">
                 <div class="col col-5 show-hide">
                     <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
+                    <div class="alert alert-warning text-dark text-center warning-style" >
+                        The mail system is currently disabled or in sandbox mode.<br/>
+                        Your email will be routed through Postmark but your members wil not receive it.<br/>
+                        Please use sparingly, all email delivered or not incurs usage cost.
+                    </div>
                     <DxFormLayoutGroup Caption="Parameters">
                         <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
                             <DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
@@ -120,7 +127,7 @@
                                         CustomizeRibbon="OnCustomizeRichEditToolbar"
                                         DocumentLoaded="OnDocumentLoaded"
                                         DocumentContentChanged="OnDocumentContentChanged"
-                                        CssClass="w-100">
+                                        CssClass="w-100 rtf-style">
                                 <MailMergeSettings>
                                     <DxMailMergeSettings Data="@ExportData" />
                                 </MailMergeSettings>
@@ -139,12 +146,12 @@
     }
 
     .preview {
-        height: calc(100vh - 3.5rem) !important;
+        height: calc(100dvh - 3.5rem) !important;
         overflow: hidden;
     }
 
-    .rtf-content {
-        height: calc(100vh - 5rem) !important;
+    .rtf-style {
+        height: calc(100dvh - 5rem) !important;
         overflow: hidden;
     }
 
@@ -155,6 +162,10 @@
 
     .show-hide {
         display: @showHideText;
+    }
+
+    .warning-style {
+        display: @((isEmailEnabled) ? "block" : "none");
     }
 
 </style>
@@ -196,8 +207,16 @@
     string showHideText = "inline";
     string editorDiv = "col col-7";
     Progress? progressBar;
+    bool isEmailEnabled;
 
     TaskCompletionSource<bool>? tcs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var tInfo = await tenantService.GetTenantInfoAsync();
+        isEmailEnabled = tInfo.UsePostmarkTestEnviroment;
+        base.OnInitializedAsync();
+    }
 
     public Task<bool> ShowAsync()
     {
