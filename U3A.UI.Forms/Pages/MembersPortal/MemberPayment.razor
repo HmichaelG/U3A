@@ -3,6 +3,7 @@
 @inject ILogger<MemberPayment> Logger
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject TenantInfoService tenantService
 @inject NavigationManager navMan
 
 
@@ -89,7 +90,8 @@ else
                               RenderStyle="ButtonRenderStyle.Light"
                               RenderStyleMode="ButtonRenderStyleMode.Contained">
                     </DxButton>
-                    <DxButton Text="Pay by Secure Online Payment"
+                    <DxButton Text="@((isOnlinePaymentEnabled) ? "Pay by Secure Online Payment" : "Online Payment is not currently available" )"
+                              Enabled = "@isOnlinePaymentEnabled"
                               IconCssClass="bi-credit-card menu-icon me-3 h2"
                               CssClass="col-12 my-1"
                               Click="@(e => OnPayOnline(e))"
@@ -175,6 +177,7 @@ else
     public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
 
     public bool IsOnlinePaymentFinalised;
+    bool isOnlinePaymentEnabled;
 
     U3ADbContext? dbc { get; set; }
 
@@ -206,6 +209,8 @@ else
         }
         Title = settings?.U3AGroup;
         menuSelection = PortalMenuSelection.DoMemberPaymentPreamble;
+        var tInfo = await tenantService.GetTenantInfoAsync();
+        isOnlinePaymentEnabled = (!string.IsNullOrWhiteSpace(tInfo.EwayAPIKey));
         IsReady = true;
         await base.OnInitializedAsync();
     }
