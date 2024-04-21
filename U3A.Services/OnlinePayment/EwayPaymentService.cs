@@ -139,6 +139,7 @@ namespace U3A.Services
 
         public async Task FinaliseEwayPyamentAsync(U3ADbContext dbc, OnlinePaymentStatus paymentStatus, Term term)
         {
+            if (paymentStatus == null) { return; } // cancelled by user
             GetClient(dbc);
             paymentStatus = await dbc.OnlinePaymentStatus.FindAsync(paymentStatus.ID);
             var person = await dbc.Person.FindAsync(paymentStatus.PersonID);

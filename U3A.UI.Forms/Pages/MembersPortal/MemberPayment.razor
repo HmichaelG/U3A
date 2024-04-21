@@ -259,7 +259,7 @@ else
             if (!AmountDueText.EndsWith(clickText)) AmountDueText += clickText;
             showFeesDueToggle = false;
         }
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
@@ -411,12 +411,13 @@ else
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             var payment = await BusinessRule.GetUnprocessedOnlinePayment(dbc, loginState.SelectedPerson);
+            if (payment == null) { return; } // payment cancelled by user
             try
             {
+                IsProcessing = true;
+                InvokeAsync(StateHasChanged);
                 await service.FinaliseEwayPyamentAsync(dbc, payment, term);
                 await CalculateFees();
-                IsProcessing = false;
-                InvokeAsync(StateHasChanged);
             }
             catch (EwayResponseException ex)
             {
