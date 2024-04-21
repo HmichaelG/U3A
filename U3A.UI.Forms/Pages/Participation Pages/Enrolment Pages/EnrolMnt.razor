@@ -157,7 +157,7 @@ else
                                 <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
                                 <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
                                                   Width="5rem" Visible="@settings.RequireVaxCertificate" />
-                                <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialTo" Width="4rem" DisplayFormat="{0:F0}" />
+                                <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialToBriefText" Width="4rem" />
                                 <DxGridDataColumn ReadOnly=true
                                                   Visible=@(selectedCourse?.AllowMultiCampsuFrom != null)
                                                   Caption="Visitor?"

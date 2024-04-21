@@ -80,6 +80,26 @@ namespace U3A.Model
         [Range(constants.START_OF_TIME, 9999)]
         [DefaultValue(constants.START_OF_TIME)]
         public int FinancialTo { get; set; } = constants.START_OF_TIME;
+        public int? FinancialToTerm { get; set; }
+        [NotMapped]
+        public string FinancialToText
+        {
+            get
+            {
+                string result = FinancialTo.ToString("F0");
+                if (FinancialToTerm != null) { result = $"{result} Term {FinancialToTerm}"; }
+                return result;
+            }
+        }
+        public string FinancialToBriefText
+        {
+            get
+            {
+                string result = FinancialTo.ToString();
+                if (FinancialToTerm != null) { result = $"{result}-T{FinancialToTerm}"; }
+                return result;
+            }
+        }
 
         public int? PreviousFinancialTo { get; set; }
 

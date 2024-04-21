@@ -39,6 +39,9 @@ namespace U3A.Model
         public int? PersonMembershipYears { get; set; }
         public DateTime? PersonDateCeased { get; set; }
         public int PersonFinancialTo { get; set; }
+        public int? PersonFinancialToTerm { get; set; }
+        public string PersonFinancialToText { get; set; }
+        public string PersonFinancialToBriefText { get; set; }
         public string? PersonEmail { get; set; }
         public string? PersonHomePhone { get; set; }
         public string? PersonMobile { get; set; }

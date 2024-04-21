@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_MultiCampusU3AAllowed
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_ClassScheduleDisplayPeriod
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_ClassScheduleDisplayPeriod
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_FinancialToTerm
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_ClassScheduleDisplayPeriod
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_FinancialToTerm
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

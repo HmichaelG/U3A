@@ -113,7 +113,7 @@
                         <DxGridDataColumn Caption="Occupation" FieldName="Occupation" Visible=false />
                         <DxGridDataColumn Caption="DOB" FieldName="BirthDate" Visible=false />
                         <DxGridDataColumn Caption="Joined" FieldName="DateJoined" Width="6rem" />
-                        <DxGridDataColumn Caption="Fin-To" FieldName="FinancialTo" DisplayFormat="{0:D}" Width="6rem" />
+                        <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToBriefText" Width="6rem" />
                         <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
                         <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
                                           DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
@@ -217,7 +217,9 @@
                             <DxFormLayoutGroup Caption="Membership" ColSpanMd="6">
                                 <Items>
                                     <DxFormLayoutItem Caption="Financial To" ColSpanMd="6">
-                                        <DxSpinEdit @bind-Value="@editItem.FinancialTo" ReadOnly="true" />
+                                        <DxTextBox Text="@editItem.FinancialToText"
+                                                   TextExpression="@(() => editItem.FinancialToText)"
+                                                   ReadOnly="true" />
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem Caption="Date Joined" ColSpanMd="6">
                                         <DxDateEdit @bind-Date="@editItem.DateJoined" />

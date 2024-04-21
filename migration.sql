@@ -10361,7 +10361,7 @@ GO
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N''20240402083049_U3A_sp_DbCleanup_02_APR_2024''
+    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
 )
 BEGIN
 
@@ -10603,6 +10603,31 @@ IF NOT EXISTS (
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
     VALUES (N'20240420040734_U3A_Settings_ClassScheduleDisplayPeriod', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240421191332_U3A_Settings_FinancialToTerm'
+)
+BEGIN
+    ALTER TABLE [Person] ADD [FinancialToTerm] int NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240421191332_U3A_Settings_FinancialToTerm'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240421191332_U3A_Settings_FinancialToTerm', N'8.0.4');
 END;
 GO
 
