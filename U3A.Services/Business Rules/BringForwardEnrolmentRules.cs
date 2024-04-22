@@ -63,15 +63,32 @@ namespace U3A.BusinessRules
                 var trm = await dbc.Term.FindAsync(targetTerm.ID);
                 trm.IsDefaultTerm = true;
             }
-
+            await WaitListPartPaidMembers(dbc, targetTerm);
             await dbc.SaveChangesAsync();
         }
 
+        static async Task WaitListPartPaidMembers(U3ADbContext dbc,Term targetTerm)
+        {
+            if (targetTerm.TermNumber < 3) { return; }
+            foreach (var e in dbc.Enrolment
+                            .Include(x => x.Term)
+                            .Include(x => x.Class)
+                            .Include(x => x.Course)
+                            .Include(x => x.Person)
+                            .Where(x => x.Term.Year == targetTerm.Year && x.Term.TermNumber >= targetTerm.TermNumber
+                                                    && x.Person.DateCeased == null
+                                                    && (x.Person.FinancialToTerm != null
+                                                        && x.Person.FinancialToTerm < targetTerm.TermNumber)))
+            {
+                e.IsWaitlisted = true;
+            }
+        }
         static async Task BringForwardEnrolmentsAsync(U3ADbContext dbc,
                                     Term sourceTerm, Term targetTerm)
         {
 
             var enrolments = await dbc.Enrolment
+                            .Include(x => x.Term)
                             .Include(x => x.Class)
                             .Include(x => x.Course)
                             .Include(x => x.Person)

@@ -212,7 +212,7 @@ else
     {
         IsProcessing = true;
         feeService = new MemberFeeCalculationService();
-        CalculateFee();
+        CalculateFeeAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             availablePayments = await feeService.GetAvailableMemberPaymentsAsync(dbc, loginState?.SelectedPerson);
@@ -250,7 +250,7 @@ else
 
     async Task CalculateFees()
     {
-        decimal fee = CalculateFee();
+        decimal fee = await CalculateFeeAsync();
         int billingYear = feeService.BillingYear;
         var payType = "fees payable";
         if (fee < 0)
@@ -268,7 +268,7 @@ else
     {
         if (!showFeesDueToggle)
         {
-            decimal fee = CalculateFee();
+            decimal fee = await CalculateFeeAsync();
             memberFees = feeService.GetMemberFees();
             if (AmountDueText.EndsWith(clickText)) AmountDueText = AmountDueText.Replace(clickText, "");
             showFeesDueToggle = true;
@@ -305,20 +305,15 @@ else
         }
     }
 
-    string GetFeeAsString()
+    async Task<string> GetFeeAsString()
     {
-        decimal result = (selectedPaymentType == null) ? CalculateFee() : selectedPaymentType.Amount;
+        decimal result = (selectedPaymentType == null) ? await CalculateFeeAsync() : selectedPaymentType.Amount;
         return result.ToString("c2");
     }
 
-    decimal CalculateFee()
+    async Task<decimal> CalculateFeeAsync()
     {
-        var result = Task.Run(() =>
-                {
-                    var service = new MemberFeeCalculationService();
-                    return feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
-                }).Result;
-        return result;
+        return await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
     }
 
     async Task OnPayOnline(MouseEventArgs e)
@@ -337,7 +332,7 @@ else
                                 ? loginState.LoginEmail
                                 : loginState.SelectedPerson.Email;
                 decimal fee = (selectedPaymentType == null)
-                            ? CalculateFee()
+                            ? await CalculateFeeAsync()
                             : selectedPaymentType.Amount;
                 int? termsPaid = (selectedPaymentType == null)
                                     ? null
@@ -466,7 +461,7 @@ else
     async Task<bool> AreThereFeesToBePaid()
     {
         bool result = true;
-        var fee = CalculateFee();
+        var fee = await CalculateFeeAsync();
         if (fee == 0)
         {
             await messageBox.ShowOkOnlyAsync("There's nothing to pay", "Your membership fees are fully paid.");

@@ -31,7 +31,7 @@ namespace U3A.Services
 
         public PersonFinancialStatus? PersonWithFinancialStatus { get; set; }
 
-        public List<MemberFee> GetMemberFees() => MemberFees.ToList();
+        public List<MemberFee> GetMemberFees() => MemberFees.Reverse().ToList();
         public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(U3ADbContext dbc, Person person)
         {
             var result = new List<MemberPaymentAvailable>();
