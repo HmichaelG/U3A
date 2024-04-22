@@ -62,6 +62,7 @@ namespace U3A.Services
             return result;
         }
 
+        static SemaphoreSlim? semaphore = new(1);
         public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc, Person person, Term term)
         {
             BillingTerm = term;
