@@ -160,13 +160,13 @@ else {
     }
 
     async Task Process() {
-        await progress.ShowSpinnerAsync("Processing ... Please wait");
         var localTime = new LocalTime(js);
         DateTime now = await localTime.GetLocalTimeAsync();
         if (AdHocPersonsToAssign != null && string.IsNullOrWhiteSpace(Reason)) {
             await messageBox.ShowOkOnlyAsync("Enter Reason", "You must assign a resaon to ad hoc complimentary memberships.");
             return;
         }
+        await progress.ShowSpinnerAsync("Processing ... Please wait");
         errorMessage = null;
         IsProcessing = true;
         //StateHasChanged();
