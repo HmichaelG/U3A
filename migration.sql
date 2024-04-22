@@ -10634,3 +10634,28 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240421210611_U3A_Settings_AllowedMemberFeePaymentTypes'
+)
+BEGIN
+    ALTER TABLE [SystemSettings] ADD [AllowedMemberFeePaymentTypes] int NOT NULL DEFAULT 0;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240421210611_U3A_Settings_AllowedMemberFeePaymentTypes'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240421210611_U3A_Settings_AllowedMemberFeePaymentTypes', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+

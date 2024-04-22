@@ -416,7 +416,7 @@ else
         if (fees == receipt) { result = true; }
         else if (fees > 0)
         {
-            foreach (var fee in service.MemberFees) { if (fee.Amount == receipt) result = true; break; }
+            foreach (var fee in service.GetMemberFees()) { if (fee.Amount == receipt) result = true; break; }
         }
         return result;
     }

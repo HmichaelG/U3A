@@ -387,7 +387,7 @@ else
         {
             selectedPerson = enrolment.Person;
             totalFees = await service.CalculateFeeAsync(U3Adbfactory, selectedPerson);
-            memberFees = service.MemberFees;
+            memberFees = service.GetMemberFees();
             InvokeAsync(StateHasChanged);
         }
     }

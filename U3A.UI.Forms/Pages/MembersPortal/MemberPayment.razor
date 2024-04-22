@@ -90,8 +90,17 @@ else
                               RenderStyle="ButtonRenderStyle.Light"
                               RenderStyleMode="ButtonRenderStyleMode.Contained">
                     </DxButton>
+
+                    <DxFormLayoutGroup Visible=@(availablePayments.Count() > 0)
+                                       Caption="Select your payment"
+                                       ColSpanMd="12" CssClass="py-2">
+                        <DxRadioGroup Items="@availablePayments" CssClass="pt-2 px-4"
+                                      TextFieldName="Description"
+                                      @bind-Value=@selectedPaymentType />
+                    </DxFormLayoutGroup>
+
                     <DxButton Text="@((isOnlinePaymentEnabled) ? "Pay by Secure Online Payment" : "Online Payment is not currently available" )"
-                              Enabled = "@isOnlinePaymentEnabled"
+                              Enabled="@isOnlinePaymentEnabled"
                               IconCssClass="bi-credit-card menu-icon me-3 h2"
                               CssClass="col-12 my-1"
                               Click="@(e => OnPayOnline(e))"
@@ -193,6 +202,8 @@ else
     Progress progressBar;
     MemberFeeCalculationService feeService;
     List<MemberFee> memberFees = new List<MemberFee>();
+    List<MemberPaymentAvailable> availablePayments = new();
+    MemberPaymentAvailable selectedPaymentType;
     string clickText = "Click here for details.";
     bool IsProcessing;
     string OnlineErrorMessage;
@@ -201,8 +212,11 @@ else
     {
         IsProcessing = true;
         feeService = new MemberFeeCalculationService();
+        CalculateFee();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
+            availablePayments = await feeService.GetAvailableMemberPaymentsAsync(dbc, loginState?.SelectedPerson);
+            if (availablePayments.Count() > 0) selectedPaymentType = availablePayments.First();
             term = BusinessRule.CurrentEnrolmentTerm(dbc);
             if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
             settings = await dbc.SystemSettings.FirstOrDefaultAsync();
@@ -236,7 +250,7 @@ else
 
     async Task CalculateFees()
     {
-        decimal fee = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+        decimal fee = CalculateFee();
         int billingYear = feeService.BillingYear;
         var payType = "fees payable";
         if (fee < 0)
@@ -254,8 +268,8 @@ else
     {
         if (!showFeesDueToggle)
         {
-            decimal fee = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
-            memberFees = feeService.MemberFees;
+            decimal fee = CalculateFee();
+            memberFees = feeService.GetMemberFees();
             if (AmountDueText.EndsWith(clickText)) AmountDueText = AmountDueText.Replace(clickText, "");
             showFeesDueToggle = true;
         }
@@ -264,7 +278,7 @@ else
             if (!AmountDueText.EndsWith(clickText)) AmountDueText += clickText;
             showFeesDueToggle = false;
         }
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
     }
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
@@ -293,17 +307,18 @@ else
 
     string GetFeeAsString()
     {
-        var result = Task.Run(() =>
-        {
-            return CalculateFee();
-
-        }).Result;
+        decimal result = (selectedPaymentType == null) ? CalculateFee() : selectedPaymentType.Amount;
         return result.ToString("c2");
     }
 
-    async Task<decimal> CalculateFee()
+    decimal CalculateFee()
     {
-        return await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+        var result = Task.Run(() =>
+                {
+                    var service = new MemberFeeCalculationService();
+                    return feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+                }).Result;
+        return result;
     }
 
     async Task OnPayOnline(MouseEventArgs e)
@@ -321,6 +336,12 @@ else
                 email = (!string.IsNullOrWhiteSpace(loginState.LoginEmail))
                                 ? loginState.LoginEmail
                                 : loginState.SelectedPerson.Email;
+                decimal fee = (selectedPaymentType == null)
+                            ? CalculateFee()
+                            : selectedPaymentType.Amount;
+                int? termsPaid = (selectedPaymentType == null)
+                                    ? null
+                                    : selectedPaymentType.TermsPaid;
                 var paymentURL = await paymentService.CreatePayment(dbc,
                                                 loginState.AdminEmail,
                                                 navMan.BaseUri,
@@ -329,8 +350,7 @@ else
                                                 loginState.SelectedPerson.PersonIdentity,
                                                 $"{settings.U3AGroup} {term.Year} membership fees",
                                                 term.Name,
-                                                await CalculateFee()
-                    );
+                                                fee, termsPaid);
                 if (paymentURL != null) { navMan.NavigateTo(paymentURL); }
             }
             catch (EwayRequestException ex)
@@ -408,8 +428,6 @@ else
         }
     }
 
-    static SemaphoreSlim? semaphore = new(1);
-
     async Task FinaliseEwayPayment()
     {
         var service = new EwayPaymentService();
@@ -421,7 +439,11 @@ else
             {
                 IsProcessing = true;
                 InvokeAsync(StateHasChanged);
+                term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
                 await service.FinaliseEwayPyamentAsync(dbc, payment, term);
+                selectedPaymentType = null;
+                availablePayments.Clear();
                 await CalculateFees();
             }
             catch (EwayResponseException ex)
@@ -444,7 +466,7 @@ else
     async Task<bool> AreThereFeesToBePaid()
     {
         bool result = true;
-        var fee = await CalculateFee();
+        var fee = CalculateFee();
         if (fee == 0)
         {
             await messageBox.ShowOkOnlyAsync("There's nothing to pay", "Your membership fees are fully paid.");

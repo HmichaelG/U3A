@@ -26,6 +26,8 @@ namespace U3A.Model
         public string ResultLongDescription { get; set; }
         public string ResultMessage { get; set; } = string.Empty;
         public string WorkstationID { get; set; } = Workstation.ID;
+
+        public int? TermsPaid { get; set; }
     }
 
 }

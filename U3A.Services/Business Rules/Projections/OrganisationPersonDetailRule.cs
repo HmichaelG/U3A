@@ -92,6 +92,9 @@ namespace U3A.BusinessRules
             opd.PersonMembershipYears = person.MembershipYears;
             opd.PersonDateCeased = person.DateCeased;
             opd.PersonFinancialTo = person.FinancialTo;
+            opd.PersonFinancialToBriefText = person.FinancialToBriefText;
+            opd.PersonFinancialToTerm = person.FinancialToTerm;
+            opd.PersonFinancialToText = person.FinancialToText;
             opd.PersonEmail = person.Email;
             opd.PersonHomePhone = person.HomePhoneOrSilent;
             opd.PersonMobile = person.MobileOrSilent;

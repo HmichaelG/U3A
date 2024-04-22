@@ -31,16 +31,23 @@ else {
             <ValidationSummary />
             <DxFormLayout>
                 <DxFormLayoutGroup Caption="Membership Fees" ColSpanLg="12">
+                    <DxFormLayoutItem Caption="Allowed Fee Payment Types" ColSpanMd="12">
+                        <DxComboBox Data="@memberFeePaymentTypeList"
+                                    @bind-Value="@systemSettings.AllowedMemberFeePaymentTypes"
+                                    ValueFieldName="@nameof(MemberFeePaymentTypeWrapper.Type)"
+                                    TextFieldName="@nameof(MemberFeePaymentTypeWrapper.DisplayText)">
+                        </DxComboBox>
+                    </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Full Year Membership Fee" ColSpanMd="12">
                         <DxMaskedInput @bind-Value="@systemSettings.MembershipFee" Mask="@NumericMask.Currency" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Term 2 Membership Fee" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Term 2 Joining Fee" ColSpanMd="12">
                         <DxMaskedInput @bind-Value="@systemSettings.MembershipFeeTerm2" Mask="@NumericMask.Currency" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Term 3 Membership Fee" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Term 3 Joining Fee" ColSpanMd="12">
                         <DxMaskedInput @bind-Value="@systemSettings.MembershipFeeTerm3" Mask="@NumericMask.Currency" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Term 4 Membership Fee" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Term 4 Joining Fee" ColSpanMd="12">
                         <DxMaskedInput @bind-Value="@systemSettings.MembershipFeeTerm4" Mask="@NumericMask.Currency" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Mail Correspondence Surcharge" ColSpanMd="12">
@@ -76,6 +83,7 @@ else {
 }
 @code {
     bool IsReady = false;
+    List<MemberFeePaymentTypeWrapper> memberFeePaymentTypeList = new MemberFeePaymentTypeList();
     List<string> AutoEnrolAllocationMethods;
     int ActiveTabIndex { get; set; } = 0;
     private SystemSettings systemSettings { get; set; }

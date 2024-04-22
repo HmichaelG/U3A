@@ -59,7 +59,8 @@ namespace U3A.Services
                             string InvoiceNumber,
                             string InvoiceDescription,
                             string InvoiceReference,
-                            decimal TotalFee)
+                            decimal TotalFee,
+                            int? TermsPaid)
         {
 
             string? result = null;
@@ -104,7 +105,8 @@ namespace U3A.Services
                     AdminEmail = AdminEmail,
                     AccessCode = response.AccessCode,
                     PersonID = person.ID,
-                    Status = String.Empty
+                    Status = String.Empty,
+                    TermsPaid = TermsPaid,
                 };
                 await dbc.AddAsync(pay);
                 await dbc.SaveChangesAsync();
@@ -158,6 +160,7 @@ namespace U3A.Services
                 result = new PaymentResult()
                 {
                     Date = paymentStatus.LocalCreatedOn.Value,
+                    TermsPaid = paymentStatus.TermsPaid,
                     AccessCode = eWayResponse.AccessCode,
                     AuthorizationCode = eWayResponse.AuthorisationCode,
                     TransactionID = eWayResponse.TransactionID.GetValueOrDefault(),
@@ -239,6 +242,7 @@ namespace U3A.Services
                 person.PreviousFinancialTo = person.FinancialTo;
                 person.PreviousDateJoined = person.DateJoined;
                 person.FinancialTo = receipt.FinancialTo;
+                person.FinancialToTerm = result.TermsPaid;
                 person.DateJoined = receipt.DateJoined;
                 await dbc.AddAsync(receipt);
                 // send email
@@ -296,6 +300,7 @@ namespace U3A.Services
         public string AuthorizationCode { get; set; }
         public int TransactionID { get; set; }
         public decimal Amount { get; set; }
+        public int? TermsPaid { get; set; }
         public string ResponseCode { get; set; }
         public string ResponseMessage { get; set; }
 

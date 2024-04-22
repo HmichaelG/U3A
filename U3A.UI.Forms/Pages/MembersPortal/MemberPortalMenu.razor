@@ -349,7 +349,7 @@
                 welcome += $"<br/>Financial to: <strong>{person.FinancialToText}</strong>";
                 var services = new MemberFeeCalculationService();
                 decimal fee = await services.CalculateFeeAsync(U3Adbfactory, person);
-                if (fee > 0) welcome += $" Fees due: <strong>{fee.ToString("c2")}</strong>";
+                if (fee > 0) welcome += $" Remaining: <strong>{fee.ToString("c2")}</strong>";
             }
             else
             {

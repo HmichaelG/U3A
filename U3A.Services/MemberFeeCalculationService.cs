@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,11 +20,65 @@ namespace U3A.Services
 {
     public class MemberFeeCalculationService
     {
-        public List<MemberFee> MemberFees { get; set; } = new();
+        ConcurrentBag<MemberFee> MemberFees { get; set; } = new();
         public int BillingYear { get; set; }
         public Term BillingTerm { get; set; }
 
+        public MemberFeeCalculationService()
+        {
+            MemberFees = new ConcurrentBag<MemberFee>();
+        }
+
         public PersonFinancialStatus? PersonWithFinancialStatus { get; set; }
+
+        public List<MemberFee> GetMemberFees() => MemberFees.ToList();
+        public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(U3ADbContext dbc, Person person)
+        {
+            var result = new List<MemberPaymentAvailable>();
+            var settings = dbc.SystemSettings.FirstOrDefault();
+            if (settings.AllowedMemberFeePaymentTypes == MemberFeePaymentType.PerYearAndPerSemester)
+            {
+                var term = await GetBillingTermAsync(dbc);
+                if (await IsComplimentaryMembership(dbc, person, term.Year)) { return result; }
+                decimal yearlyFee = GetTermFee(settings,term.TermNumber)
+                                        + await GetTotalOtherMembershipFees(dbc, person, term);
+                decimal semesterFee = decimal.Round(yearlyFee / 2, 2);
+                var totalFee = await CalculateFeeAsync(dbc, person, term);
+                if (totalFee < yearlyFee) { return result; }
+                if (term.TermNumber <= 2)
+                {
+                    result.Add(new MemberPaymentAvailable()
+                    {
+                        Amount = totalFee,
+                        Description = $"{totalFee.ToString("c2")} {term.Year} Full Year Fee",
+                        TermsPaid = null
+                    });
+                    result.Add(new MemberPaymentAvailable()
+                    {
+                        Amount = totalFee - semesterFee,
+                        Description = $"{(totalFee - semesterFee).ToString("c2")} {term.Year} Semester (Term 1 & 2) Fee",
+                        TermsPaid = 2
+                    }); ;
+                }
+            }
+            return result;
+        }
+        async Task<decimal> GetTotalOtherMembershipFees(U3ADbContext dbc, Person person, Term term)
+        {
+            return await dbc.Fee.AsNoTracking()
+                                    .Where(x => x.PersonID == person.ID
+                                            && x.IsMembershipFee
+                                            && x.ProcessingYear == term.Year)
+                                    .Select(x => x.Amount).SumAsync();
+        }
+
+        async Task<decimal> GetTotalReceipts(U3ADbContext dbc, Person person, Term term)
+        {
+            return await dbc.Receipt.AsNoTracking()
+                                .Where(x => x.PersonID == person.ID
+                                    && x.ProcessingYear == term.Year)
+                                .Select(x => x.Amount).SumAsync();
+        }
 
         /// <summary>
         /// Synchronous method for reporting financial status
@@ -44,6 +99,7 @@ namespace U3A.Services
             return result;
         }
 
+        bool isWorking;
 
         /// <summary>
         /// Calculate fees for an individual. Used for Member Portal calculations
@@ -65,10 +121,11 @@ namespace U3A.Services
         static SemaphoreSlim? semaphore = new(1);
         public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc, Person person, Term term)
         {
+            var result = decimal.Zero;
             BillingTerm = term;
             BillingYear = term.Year;
-            var result = decimal.Zero;
-            MemberFees = new List<MemberFee>();
+            var fees = new ConcurrentBag<MemberFee>();
+            fees.Clear();
             PersonWithFinancialStatus = new PersonFinancialStatus()
             {
                 PersonBase = person,
@@ -169,7 +226,7 @@ namespace U3A.Services
             if (result == null)
             {
                 result = await BusinessRule.CurrentTermAsync(dbc);
-                if (result.TermNumber == 4 && TimezoneAdjustment.GetLocalTime(DateTime.Now) > result.EndDate )
+                if (result.TermNumber == 4 && TimezoneAdjustment.GetLocalTime(DateTime.Now) > result.EndDate)
                 {
                     result = null; // End of year, no enrolment period - no man's land.
                 }
@@ -437,11 +494,16 @@ namespace U3A.Services
 
         private void AddFee(string description, decimal amount)
         {
-            MemberFees.Add(new MemberFee
+            var value = decimal.Round(amount,2);
+            if (!MemberFees.Any(fe => fe.Description == description
+                                        && fe.Amount == value))
             {
-                Description = description,
-                Amount = decimal.Round(amount, 2)
-            });
+                MemberFees.Add(new MemberFee
+                {
+                    Description = description,
+                    Amount = value
+                });
+            }
         }
 
         private static int ActiveCourseCount(U3ADbContext dbc, Person person, Term SelectedTerm)
