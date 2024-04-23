@@ -101,6 +101,12 @@ namespace U3A.BusinessRules
                               bool ForceEmailQueue,
                               DateTime? EmailDate = null)
         {
+            // Do part paid first
+            await WaitListPartPaidMembers(dbc, SelectedTerm);
+            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
+            await dbc.SaveChangesAsync();
+            
+            // and everybody else
             await FixEnrolmentTerm(dbc, SelectedTerm);
             AutoEnrolments = new List<string>();
             List<Enrolment> enrolmentsToProcess;
@@ -124,13 +130,18 @@ namespace U3A.BusinessRules
                 if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                 {
                     enrolmentsToProcess = dbc.Enrolment
+                                                .Include(x => x.Course)
+                                                .Include(x => x.Term)
                                                 .Include(x => x.Person)
                                                 .Where(x => x.TermID == SelectedTerm.ID
                                                                 && x.CourseID == course.ID
                                                                 && x.Person.DateCeased == null
                                                                 && !CourseLeaders.Contains(x.Person)
-                                                                && x.Person.FinancialTo >= SelectedTerm.Year)
-                                            .ToList();
+                                                                && x.Person.FinancialTo > SelectedTerm.Year
+                                                                || (x.Person.FinancialTo == SelectedTerm.Year
+                                                                    && (x.Person.FinancialToTerm == null
+                                                                        || SelectedTerm.TermNumber <= x.Person.FinancialToTerm)))
+                                                .ToList();
                     if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                     {
                         await ProcessEnrolments(dbc, 
@@ -146,12 +157,17 @@ namespace U3A.BusinessRules
                     foreach (var courseClass in course.Classes)
                     {
                         enrolmentsToProcess = dbc.Enrolment
+                                                    .Include(x => x.Course)     
+                                                    .Include(x => x.Term)
                                                     .Include(x => x.Person)
                                                     .Where(x => x.TermID == SelectedTerm.ID
                                                                     && x.ClassID == courseClass.ID
                                                                     && x.Person.DateCeased == null
                                                                     && !CourseLeaders.Contains(x.Person)
-                                                                    && x.Person.FinancialTo >= SelectedTerm.Year)
+                                                                    && x.Person.FinancialTo > SelectedTerm.Year
+                                                                    || (x.Person.FinancialTo == SelectedTerm.Year
+                                                                        && (x.Person.FinancialToTerm == null
+                                                                        || SelectedTerm.TermNumber <= x.Person.FinancialToTerm)))
                                                 .ToList();
                         if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                         {

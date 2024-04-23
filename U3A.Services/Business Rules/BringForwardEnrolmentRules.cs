@@ -63,7 +63,9 @@ namespace U3A.BusinessRules
                 var trm = await dbc.Term.FindAsync(targetTerm.ID);
                 trm.IsDefaultTerm = true;
             }
+            await dbc.SaveChangesAsync();
             await WaitListPartPaidMembers(dbc, targetTerm);
+            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, DateTime.UtcNow);
             await dbc.SaveChangesAsync();
         }
 
