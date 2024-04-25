@@ -443,7 +443,7 @@ else
             }
             catch (EwayResponseException ex)
             {
-                decimal fee = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+                decimal fee = await CalculateFeeAsync();
                 if (fee > 0) { OnlineErrorMessage = ex.Message; }
             }
             catch (Exception ex)

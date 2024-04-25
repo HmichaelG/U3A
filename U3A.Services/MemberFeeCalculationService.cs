@@ -110,7 +110,6 @@ namespace U3A.Services
             BillingTerm = term;
             BillingYear = term.Year;
             var fees = new ConcurrentBag<MemberFee>();
-            fees.Clear();
             PersonWithFinancialStatus = new PersonFinancialStatus()
             {
                 PersonBase = person,
@@ -126,8 +125,8 @@ namespace U3A.Services
                 Mobile = person.AdjustedMobile,
                 HomePhone = person.AdjustedHomePhone,
                 Email = person.Email,
-                Enrolments = ActiveCourseCount(dbc, person, term),
-                Waitlisted = WaitlistedCourseCount(dbc, person, term)
+                Enrolments = await ActiveCourseCountAsync(dbc, person, term),
+                Waitlisted = await WaitlistedCourseCountAsync(dbc, person, term)
             };
             if (term != null)
             {
@@ -156,7 +155,7 @@ namespace U3A.Services
                         var fee = PersonWithFinancialStatus.MembershipFees;
                         if (CalclateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalclateForTerm, 2); }
                         AddFee(person.ID,
-                            MemberFeeSortOrder.MemberFee, null, $"{term.Year} membership fee", PersonWithFinancialStatus.MembershipFees);
+                            MemberFeeSortOrder.MemberFee, null, $"{term.Year} membership fee", fee);
                     }
                     if (person.Communication != "Email")
                     {
@@ -502,9 +501,9 @@ namespace U3A.Services
         private void AddFee(Guid personID, MemberFeeSortOrder sortOrder, DateTime? date, string description, decimal amount)
         {
             var value = decimal.Round(amount, 2);
-            if (!MemberFees.Any(fe => fe.PersonID == personID
-                                        && fe.Description == description
-                                        && fe.Amount == value))
+            if (!MemberFees.Any(x => x.PersonID == personID
+                                        && x.Description == description
+                                        && x.Amount == value))
             {
                 MemberFees.Add(new MemberFee
                 {
@@ -517,21 +516,21 @@ namespace U3A.Services
             }
         }
 
-        private static int ActiveCourseCount(U3ADbContext dbc, Person person, Term SelectedTerm)
+        private static async Task<int> ActiveCourseCountAsync(U3ADbContext dbc, Person person, Term SelectedTerm)
         {
-            return dbc.Enrolment.Include(x => x.Course)
+            return (await dbc.Enrolment.Include(x => x.Course)
                             .Where(x => x.PersonID == person.ID &&
                                 x.TermID == SelectedTerm.ID &&
                                 !x.Course.ExcludeFromLeaderComplimentaryCount &&
-                                !x.IsWaitlisted).AsEnumerable().DistinctBy(x => x.CourseID).Count();
+                                !x.IsWaitlisted).ToListAsync()).DistinctBy(x => x.CourseID).Count();
         }
-        private static int WaitlistedCourseCount(U3ADbContext dbc, Person person, Term SelectedTerm)
+        private static async Task<int> WaitlistedCourseCountAsync(U3ADbContext dbc, Person person, Term SelectedTerm)
         {
-            return dbc.Enrolment.Include(x => x.Course)
+            return (await dbc.Enrolment.Include(x => x.Course)
                             .Where(x => x.PersonID == person.ID &&
                                 x.TermID == SelectedTerm.ID &&
                                 !x.Course.ExcludeFromLeaderComplimentaryCount &&
-                                x.IsWaitlisted).AsEnumerable().DistinctBy(x => x.CourseID).Count();
+                                x.IsWaitlisted).ToListAsync()).DistinctBy(x => x.CourseID).Count();
         }
 
     }
