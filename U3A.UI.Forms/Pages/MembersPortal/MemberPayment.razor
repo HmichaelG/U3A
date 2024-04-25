@@ -269,7 +269,7 @@ else
         if (!showFeesDueToggle)
         {
             decimal fee = await CalculateFeeAsync();
-            memberFees = feeService.GetMemberFees();
+            memberFees = feeService.GetMemberFees(loginState.SelectedPerson.ID);
             if (AmountDueText.EndsWith(clickText)) AmountDueText = AmountDueText.Replace(clickText, "");
             showFeesDueToggle = true;
         }

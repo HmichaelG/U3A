@@ -31,7 +31,12 @@ namespace U3A.Services
 
         public PersonFinancialStatus? PersonWithFinancialStatus { get; set; }
 
-        public List<MemberFee> GetMemberFees() => MemberFees.Reverse().ToList();
+        public List<MemberFee> GetMemberFees(Guid PersonID) => MemberFees
+                                                    .Where(x => x.PersonID == PersonID)
+                                                    .OrderBy(x => x.SortOrder)
+                                                    .ThenBy(x => x.Date)
+                                                    .ThenBy(x => x.Description)
+                                                    .ToList();
         public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(U3ADbContext dbc, Person person)
         {
             var result = new List<MemberPaymentAvailable>();
@@ -40,7 +45,7 @@ namespace U3A.Services
             {
                 var term = await GetBillingTermAsync(dbc);
                 if (await IsComplimentaryMembership(dbc, person, term.Year)) { return result; }
-                decimal yearlyFee = GetTermFee(settings,term.TermNumber)
+                decimal yearlyFee = GetTermFee(settings, term.TermNumber)
                                         + await GetTotalOtherMembershipFees(dbc, person, term);
                 decimal semesterFee = decimal.Round(yearlyFee / 2, 2);
                 var totalFee = await CalculateFeeAsync(dbc, person, term);
@@ -81,45 +86,25 @@ namespace U3A.Services
         }
 
         /// <summary>
-        /// Synchronous method for reporting financial status
-        /// </summary>
-        /// <param name="dbc"></param>
-        /// <param name="person"></param>
-        /// <param name="term"></param>
-        public decimal CalculateFees(IDbContextFactory<U3ADbContext> U3Adbfactory, Person person, Term term)
-        {
-            decimal result = 0;
-            using (var dbc = U3Adbfactory.CreateDbContext())
-            {
-                result = Task.Run(() =>
-                {
-                    return CalculateFeeAsync(dbc, person, term);
-                }).Result;
-            }
-            return result;
-        }
-
-        bool isWorking;
-
-        /// <summary>
         /// Calculate fees for an individual. Used for Member Portal calculations
         /// </summary>
         /// <param name="U3Adbfactory"></param>
         /// <param name="person"></param>
         /// <returns></returns>
-        public async Task<decimal> CalculateFeeAsync(IDbContextFactory<U3ADbContext> U3Adbfactory, Person person)
+        public async Task<decimal> CalculateFeeAsync(IDbContextFactory<U3ADbContext> U3Adbfactory,
+                                        Person person, int? CalclateForTerm = null)
         {
             var result = decimal.Zero;
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 var term = await GetBillingTermAsync(dbc);
-                if (term != null) { result = await CalculateFeeAsync(dbc, person, term); }
+                if (term != null) { result = await CalculateFeeAsync(dbc, person, term, CalclateForTerm); }
             }
             return result;
         }
 
-        static SemaphoreSlim? semaphore = new(1);
-        public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc, Person person, Term term)
+        public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc, 
+                                        Person person, Term term, int? CalclateForTerm = null)
         {
             var result = decimal.Zero;
             BillingTerm = term;
@@ -156,28 +141,35 @@ namespace U3A.Services
                         var complimentaryCalcDate = await GetComplimentaryCalculationDate(dbc, person, term.Year);
                         if (complimentaryCalcDate != null)
                         {
-                            AddFee($"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {term.Year} complimentary membership", 0.00M);
+                            AddFee(person.ID,
+                                MemberFeeSortOrder.MemberFee, null, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {term.Year} complimentary membership", 0.00M);
                         }
                         else
                         {
-                            AddFee($"{term.Year} complimentary membership", 0.00M);
+                            AddFee(person.ID,
+                                MemberFeeSortOrder.MemberFee, null, $"{term.Year} complimentary membership", 0.00M);
                         }
                     }
                     else
                     {
                         PersonWithFinancialStatus.MembershipFees = await CalculateMembershipFeeAsync(dbc, person.DateJoined.GetValueOrDefault(), term, person);
-                        AddFee($"{term.Year} membership fee", PersonWithFinancialStatus.MembershipFees);
+                        var fee = PersonWithFinancialStatus.MembershipFees;
+                        if (CalclateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalclateForTerm, 2); }
+                        AddFee(person.ID,
+                            MemberFeeSortOrder.MemberFee, null, $"{term.Year} membership fee", PersonWithFinancialStatus.MembershipFees);
                     }
                     if (person.Communication != "Email")
                     {
                         if (isComplimentary && settings.IncludeMailSurchargeInComplimentary)
                         {
-                            AddFee($"{term.Year} complimentary mail surcharge", 0.00M);
+                            AddFee(person.ID,
+                                MemberFeeSortOrder.MailSurcharge, null, $"{term.Year} complimentary mail surcharge", 0.00M);
                         }
                         else
                         {
                             PersonWithFinancialStatus.MailSurcharge = settings.MailSurcharge;
-                            AddFee($"{term.Year} mail surcharge", settings.MailSurcharge);
+                            AddFee(person.ID,
+                                MemberFeeSortOrder.MailSurcharge, null, $"{term.Year} mail surcharge", settings.MailSurcharge);
                         }
                     }
                     // course fees
@@ -188,7 +180,9 @@ namespace U3A.Services
                     // less payments
                     await SubtractReceiptsAsync(dbc, person, term);
                     // total due
-                    result = MemberFees.Sum(x => x.Amount);
+                    result = MemberFees
+                                .Where(x => x.PersonID == person.ID)
+                                .Sum(x => x.Amount);
                 }
             }
             return result;
@@ -235,16 +229,18 @@ namespace U3A.Services
             return result;
         }
 
-        public async Task<decimal> CalculateMinimumFeePayableAsync(IDbContextFactory<U3ADbContext> U3Adbfactory, Person person)
+        public async Task<decimal> CalculateMinimumFeePayableAsync(IDbContextFactory<U3ADbContext> U3Adbfactory, 
+                                        Person person, int? CalclateForTerm = null)
         {
             var result = decimal.Zero;
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                result = await CalculateMinimumFeePayableAsync(dbc, person);
+                result = await CalculateMinimumFeePayableAsync(dbc, person, CalclateForTerm);
             }
             return result;
         }
-        public async Task<decimal> CalculateMinimumFeePayableAsync(U3ADbContext dbc, Person person)
+        public async Task<decimal> CalculateMinimumFeePayableAsync(U3ADbContext dbc, 
+                                        Person person, int? CalclateForTerm = null)
         {
             var result = decimal.Zero;
             var term = await GetBillingTermAsync(dbc);
@@ -255,6 +251,7 @@ namespace U3A.Services
                                              && x.Amount != 0
                                              && x.IsMembershipFee
                                              && x.ProcessingYear == term.Year).Select(x => x.Amount).Sum();
+                if (CalclateForTerm.HasValue) { result = decimal.Round(result / 4m * (decimal)CalclateForTerm, 2); }
             }
             return result;
         }
@@ -331,7 +328,9 @@ namespace U3A.Services
                                                     && x.Amount != 0
                                                     && x.ProcessingYear == term.Year).ToArrayAsync())
             {
-                AddFee($"{r.Date.ToString("dd-MMM-yyyy")} {r.Description}", r.Amount);
+                AddFee(person.ID,
+                        MemberFeeSortOrder.AdditionalFee, r.Date,
+                        $"{r.Date.ToString("dd-MMM-yyyy")} {r.Description}", r.Amount);
                 PersonWithFinancialStatus.OtherFees += r.Amount;
             }
         }
@@ -343,7 +342,9 @@ namespace U3A.Services
                                                 && x.Amount != 0
                                                 && x.ProcessingYear == term.Year).ToArrayAsync())
             {
-                AddFee($"{r.Date.ToString("dd-MMM-yyyy")} payment received - thank you", -r.Amount);
+                AddFee(person.ID,
+                        MemberFeeSortOrder.Receipt, r.Date,
+                        $"{r.Date.ToString("dd-MMM-yyyy")} payment received - thank you", -r.Amount);
                 if (PersonWithFinancialStatus != null)
                 {
                     PersonWithFinancialStatus.AmountReceived += r.Amount;
@@ -385,7 +386,9 @@ namespace U3A.Services
                         {
                             description += $": {e.Course.CourseFeePerYearDescription}";
                         }
-                        AddFee($"{t.Year}: {description}", amount);
+                        AddFee(person.ID,
+                            MemberFeeSortOrder.CourseFee, null,
+                            $"{t.Year}: {description}", amount);
                         if (PersonWithFinancialStatus != null)
                             PersonWithFinancialStatus.CourseFeesPerYear += amount;
                         courseFeeAdded.Add(e.CourseID);
@@ -419,7 +422,9 @@ namespace U3A.Services
                             {
                                 description += $": {e.Course.CourseFeePerTermDescription}";
                             }
-                            AddFee($"{t.Name}: {description}", amount);
+                            AddFee(person.ID,
+                                MemberFeeSortOrder.TermFee, null,
+                                $"{t.Name}: {description}", amount);
                             if (PersonWithFinancialStatus != null)
                                 PersonWithFinancialStatus.CourseFeesPerTerm += amount;
                         }
@@ -455,7 +460,8 @@ namespace U3A.Services
                     {
                         description += $": {c.Course.CourseFeePerYearDescription}";
                     }
-                    AddFee($"{term.Year}: {description}", amount);
+                    AddFee(person.ID, MemberFeeSortOrder.TermFee, null,
+                                $"{term.Year}: {description}", amount);
                     if (PersonWithFinancialStatus != null)
                         PersonWithFinancialStatus.CourseFeesPerYear += amount;
                     courseFeeAdded.Add(c.CourseID);
@@ -473,7 +479,8 @@ namespace U3A.Services
                             {
                                 description += $": {c.Course.CourseFeePerTermDescription}";
                             }
-                            AddFee($"{t.Name}: {description}", amount);
+                            AddFee(person.ID, MemberFeeSortOrder.TermFee, null,
+                                $"{t.Name}: {description}", amount);
                             if (PersonWithFinancialStatus != null)
                                 PersonWithFinancialStatus.CourseFeesPerTerm += amount;
                         }
@@ -492,14 +499,18 @@ namespace U3A.Services
             return result;
         }
 
-        private void AddFee(string description, decimal amount)
+        private void AddFee(Guid personID, MemberFeeSortOrder sortOrder, DateTime? date, string description, decimal amount)
         {
-            var value = decimal.Round(amount,2);
-            if (!MemberFees.Any(fe => fe.Description == description
+            var value = decimal.Round(amount, 2);
+            if (!MemberFees.Any(fe => fe.PersonID == personID
+                                        && fe.Description == description
                                         && fe.Amount == value))
             {
                 MemberFees.Add(new MemberFee
                 {
+                    PersonID = personID,
+                    SortOrder = sortOrder,
+                    Date = date,
                     Description = description,
                     Amount = value
                 });

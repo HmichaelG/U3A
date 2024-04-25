@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2023-09-22T11:13:09.454+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-04-25T16:24:08.557+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Bank Data Import</title>
   <body>
     <header>
@@ -27,60 +27,104 @@
       <li styleclass="Normal" style="margin-top:1px; line-height:1.15;"><text style="font-weight:bold;">Clear bank OFX file</text>. This option will delete the OFX file from the system. It is intended to be used if a mistake was made when importing the file. An incorrect date range, for example. The original OFX file will remain intact on your client PC. &#160;</li>
     </list>
     <para styleclass="Normal" style="margin-top:1px; line-height:1.15;">The <text style="font-weight:bold;">display grid </text>has the following columns...</para>
-    <para styleclass="Normal" style="margin-top:1px; line-height:1.15;"><table styleclass="Default" rowcount="7" colcount="2">
+    <para styleclass="Normal" style="margin-top:1px; line-height:1.15;"><table styleclass="Default" rowcount="9" colcount="3">
       <thead style="vertical-align:top">
-        <td style="width:269px;">
+        <td style="width:161px;">
           <para styleclass="Normal">Column</para>
         </td>
-        <td style="width:682px;">
+        <td style="width:185px;">
+          <para styleclass="Normal">Editable</para>
+        </td>
+        <td style="width:726px;">
           <para styleclass="Normal">Description</para>
         </td>
       </thead>
       <tr style="vertical-align:top">
-        <td style="width:269px;">
-          <para styleclass="Normal">Name</para>
-        </td>
-        <td style="width:682px;">
-          <para styleclass="Normal">The participant (member) to whom the receipt has or will be assigned.</para>
-        </td>
-      </tr>
-      <tr style="vertical-align:top">
-        <td style="width:269px;">
+        <td style="width:161px;">
           <para styleclass="Normal">On File?</para>
         </td>
-        <td style="width:682px;">
+        <td style="width:185px;">
+          <para styleclass="Normal">No</para>
+        </td>
+        <td style="width:726px;">
           <para styleclass="Normal">A checkbox to indicate the receipt has already been processed by the system in a previous import. This will occur if your OFX file&apos;s date range overlaps with a previous import.</para>
         </td>
       </tr>
       <tr style="vertical-align:top">
-        <td style="width:269px;">
-          <para styleclass="Normal">Amount</para>
-        </td>
-        <td style="width:682px;">
-          <para styleclass="Normal">The amount received.</para>
-        </td>
-      </tr>
-      <tr style="vertical-align:top">
-        <td style="width:269px;">
+        <td style="width:161px;">
           <para styleclass="Normal">Date</para>
         </td>
-        <td style="width:682px;">
+        <td style="width:185px;">
+          <para styleclass="Normal">No</para>
+        </td>
+        <td style="width:726px;">
           <para styleclass="Normal">The date received/processed by the U3A&apos;s financial institution.</para>
         </td>
       </tr>
       <tr style="vertical-align:top">
-        <td style="width:269px;">
+        <td style="width:161px;">
+          <para styleclass="Normal">Name</para>
+        </td>
+        <td style="width:185px;">
+          <para styleclass="Normal">Yes</para>
+        </td>
+        <td style="width:726px;">
+          <para styleclass="Normal">The participant (member) to whom the receipt has or will be assigned.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:161px;">
+          <para styleclass="Normal">Amount</para>
+        </td>
+        <td style="width:185px;">
+          <para styleclass="Normal">Yes</para>
+        </td>
+        <td style="width:726px;">
+          <para styleclass="Normal">The amount received.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:161px;">
+          <para styleclass="Normal">Financial To</para>
+        </td>
+        <td style="width:185px;">
+          <para styleclass="Normal">Yes</para>
+        </td>
+        <td style="width:726px;">
+          <para styleclass="Normal">The member&apos;s new Financial To year. This field can be set to the previous financial year, meaning the member is not financial or the current financial year, meaning the member is financial.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:161px;">
+          <para styleclass="Normal">Terms Paid</para>
+        </td>
+        <td style="width:185px;">
+          <para styleclass="Normal">Yes</para>
+        </td>
+        <td style="width:726px;">
+          <para styleclass="Normal">The term to which the member is financial. If left blank, the member is financial for the full year. If set to a value, the member is financial to that term. Thus, if set to 2 the member is financial in terms 1 and 2 of the financial year but not terms 3 and 4.</para>
+          <para styleclass="Normal">Note that this column is only displayed when <text style="font-style:italic;">Member Fee Payment Type</text> is not set to <text style="font-weight:bold;">Full Year Only</text> in <link displaytype="text" defaultstyle="true" type="topiclink" href="Membership-Fees">Membership Fees</link>.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:161px;">
           <para styleclass="Normal">Description</para>
         </td>
-        <td style="width:682px;">
+        <td style="width:185px;">
+          <para styleclass="Normal">Yes</para>
+        </td>
+        <td style="width:726px;">
           <para styleclass="Normal">The description of the transaction. Most often this is text entered by the participant when the payment was made.</para>
         </td>
       </tr>
       <tr style="vertical-align:top">
-        <td style="width:269px;">
+        <td style="width:161px;">
           <para styleclass="Normal">Identifier</para>
         </td>
-        <td style="width:682px;">
+        <td style="width:185px;">
+          <para styleclass="Normal">Yes</para>
+        </td>
+        <td style="width:726px;">
           <para styleclass="Normal">Most often not used.</para>
         </td>
       </tr>

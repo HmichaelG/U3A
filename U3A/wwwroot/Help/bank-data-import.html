@@ -149,47 +149,78 @@
 <div style="text-align: left; text-indent: 0; line-height: 1.38; padding: 0 0 0 0; margin: 1px 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
 <thead>
 <tr>
-<th style="vertical-align:top; width:269px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;" scope="col"><p class="p_Normal">Column</p>
+<th style="vertical-align:top; width:161px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;" scope="col"><p class="p_Normal">Column</p>
 </th>
-<th style="vertical-align:top; width:682px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;" scope="col"><p class="p_Normal">Description</p>
+<th style="vertical-align:top; width:185px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;" scope="col"><p class="p_Normal">Editable</p>
+</th>
+<th style="vertical-align:top; width:726px; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;" scope="col"><p class="p_Normal">Description</p>
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="vertical-align:top; width:269px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Name</p>
+<td style="vertical-align:top; width:161px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">On File?</p>
 </td>
-<td style="vertical-align:top; width:682px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The participant (member) to whom the receipt has or will be assigned.</p>
+<td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">No</p>
 </td>
-</tr>
-<tr>
-<td style="vertical-align:top; width:269px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">On File?</p>
-</td>
-<td style="vertical-align:top; width:682px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">A checkbox to indicate the receipt has already been processed by the system in a previous import. This will occur if your OFX file's date range overlaps with a previous import.</p>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">A checkbox to indicate the receipt has already been processed by the system in a previous import. This will occur if your OFX file's date range overlaps with a previous import.</p>
 </td>
 </tr>
 <tr>
-<td style="vertical-align:top; width:269px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Amount</p>
+<td style="vertical-align:top; width:161px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Date</p>
 </td>
-<td style="vertical-align:top; width:682px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The amount received.</p>
+<td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">No</p>
 </td>
-</tr>
-<tr>
-<td style="vertical-align:top; width:269px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Date</p>
-</td>
-<td style="vertical-align:top; width:682px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The date received/processed by the U3A's financial institution.</p>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The date received/processed by the U3A's financial institution.</p>
 </td>
 </tr>
 <tr>
-<td style="vertical-align:top; width:269px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Description</p>
+<td style="vertical-align:top; width:161px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Name</p>
 </td>
-<td style="vertical-align:top; width:682px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The description of the transaction. Most often this is text entered by the participant when the payment was made.</p>
+<td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Yes</p>
+</td>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The participant (member) to whom the receipt has or will be assigned.</p>
 </td>
 </tr>
 <tr>
-<td style="vertical-align:top; width:269px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Identifier</p>
+<td style="vertical-align:top; width:161px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Amount</p>
 </td>
-<td style="vertical-align:top; width:682px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Most often not used.</p>
+<td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Yes</p>
+</td>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The amount received.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:161px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Financial To</p>
+</td>
+<td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Yes</p>
+</td>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The member's new Financial To year. This field can be set to the previous financial year, meaning the member is not financial or the current financial year, meaning the member is financial.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:161px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Terms Paid</p>
+</td>
+<td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Yes</p>
+</td>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The term to which the member is financial. If left blank, the member is financial for the full year. If set to a value, the member is financial to that term. Thus, if set to 2 the member is financial in terms 1 and 2 of the financial year but not terms 3 and 4.</p>
+<p class="p_Normal">Note that this column is only displayed when <span style="font-style: italic;">Member Fee Payment Type</span> is not set to <span style="font-weight: bold;">Full Year Only</span> in <a href="membership-fees.html" class="topiclink">Membership Fees</a>.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:161px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Description</p>
+</td>
+<td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Yes</p>
+</td>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">The description of the transaction. Most often this is text entered by the participant when the payment was made.</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top; width:161px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Identifier</p>
+</td>
+<td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Yes</p>
+</td>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Most often not used.</p>
 </td>
 </tr>
 </tbody>

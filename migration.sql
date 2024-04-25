@@ -10659,3 +10659,78 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240422043728_U3A_OnlinePayment_TermsPaid'
+)
+BEGIN
+    ALTER TABLE [OnlinePaymentStatus] ADD [TermsPaid] int NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240422043728_U3A_OnlinePayment_TermsPaid'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240422043728_U3A_OnlinePayment_TermsPaid', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240425013743_U3A_ReceiptDataImport_TermsPaid'
+)
+BEGIN
+    ALTER TABLE [ReceiptDataImport] ADD [TermsPaid] int NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240425013743_U3A_ReceiptDataImport_TermsPaid'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240425013743_U3A_ReceiptDataImport_TermsPaid', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240425021536_U3A_Receipt_TermsPaid'
+)
+BEGIN
+    ALTER TABLE [Receipt] ADD [TermPaid] int NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240425021536_U3A_Receipt_TermsPaid'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240425021536_U3A_Receipt_TermsPaid', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+

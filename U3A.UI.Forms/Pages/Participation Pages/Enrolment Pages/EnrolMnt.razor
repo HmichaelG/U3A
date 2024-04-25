@@ -173,7 +173,7 @@ else
                                 <DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
                                 <DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
                                                   Visible=@(selectedCourse?.CourseFeePerTerm > 0 || selectedCourse?.CourseFeePerYear > 0 )
-                                                  UnboundType="GridUnboundColumnType.Decimal" />
+                                                  UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
                             </Columns>
                             <GroupSummary>
                                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
@@ -296,6 +296,7 @@ else
     MessageBox? messageBox { get; set; }
     bool MessageBoxShowCancelButton;
     bool IsSetSelectionEnrolledEnabled;
+    Dictionary<Guid, Decimal> feesDue = new();
 
     QuickEnrolment? quickEnrolment;
     TransferOrCopyEnrolment? transferOrCopyEnrolment;
@@ -344,7 +345,6 @@ else
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         server = new DocumentServer(dbc);
         server.DocumentSentEvent += Server_DocumentSent;
-
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         currentTerm = selectedTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
@@ -388,7 +388,8 @@ else
         if (e.FieldName == "FeesDue" && FeesDueColumn.Visible)
         {
             Person p = (Person)e.GetRowValue("Person");
-            e.Value = service.CalculateFees(U3Adbfactory, p, currentTerm);
+            decimal fee = 0;
+            if (feesDue.TryGetValue(p.ID, out fee)) { e.Value = fee; }
         }
     }
 
@@ -485,6 +486,7 @@ else
             }
         }
         mainGrid.EndUpdate();
+        mainGrid.AutoFitColumnWidths();
         UpdateStatistics();
         await ProgressBar.Close();
         await InvokeAsync(StateHasChanged);
@@ -512,7 +514,13 @@ else
         hasMultiCampusVisitors = (mcE.Count > 0) ? true : false;
         Enrolments.AddRange(mcE);
         Enrolments = Enrolments.OrderBy(x => x.Person.FullNameAlphaKey).ToList();
+        feesDue = new();
+        foreach (var e in Enrolments)
+        {
+            feesDue.Add(e.PersonID,await service.CalculateFeeAsync(dbc, e.Person, currentTerm));
+        }
         mainGrid.AutoFitColumnWidths();
+        await InvokeAsync(StateHasChanged);
     }
 
     void SetupClassToEnrol()

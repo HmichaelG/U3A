@@ -28,6 +28,7 @@ namespace U3A.Model
         [ForeignKey("PersonID")]
         public Person Person { get; set; }
         public int FinancialTo { get; set; }
+        public int? TermPaid { get; set; }
         public DateTime DateJoined { get; set; }
 
         [NotMapped]
