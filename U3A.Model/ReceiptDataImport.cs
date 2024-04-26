@@ -14,7 +14,7 @@ namespace U3A.Model
         public Guid? PersonID { get; set; }
         public Person? Person { get; set; }
         public int? FinancialTo { get; set; }
-        public int? TermsPaid { get; set; }
+        public int? FinancialToTerm { get; set; }
         public bool IsOnFile { get; set; }
 
         [NotMapped] public string ImportIssues { get; set; }
