@@ -129,19 +129,16 @@ namespace U3A.BusinessRules
                 }
                 if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                 {
-                    enrolmentsToProcess = dbc.Enrolment
+                    enrolmentsToProcess = await dbc.Enrolment
                                                 .Include(x => x.Course)
                                                 .Include(x => x.Term)
                                                 .Include(x => x.Person)
                                                 .Where(x => x.TermID == SelectedTerm.ID
                                                                 && x.CourseID == course.ID
                                                                 && x.Person.DateCeased == null
-                                                                && !CourseLeaders.Contains(x.Person)
-                                                                && x.Person.FinancialTo > SelectedTerm.Year
-                                                                || (x.Person.FinancialTo == SelectedTerm.Year
-                                                                    && (x.Person.FinancialToTerm == null
-                                                                        || SelectedTerm.TermNumber <= x.Person.FinancialToTerm)))
-                                                .ToList();
+                                                                && !CourseLeaders.Contains(x.Person))
+                                                .ToListAsync();
+                    enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                     if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                     {
                         await ProcessEnrolments(dbc, 
@@ -156,19 +153,16 @@ namespace U3A.BusinessRules
                 {
                     foreach (var courseClass in course.Classes)
                     {
-                        enrolmentsToProcess = dbc.Enrolment
+                        enrolmentsToProcess = await dbc.Enrolment
                                                     .Include(x => x.Course)     
                                                     .Include(x => x.Term)
                                                     .Include(x => x.Person)
                                                     .Where(x => x.TermID == SelectedTerm.ID
                                                                     && x.ClassID == courseClass.ID
                                                                     && x.Person.DateCeased == null
-                                                                    && !CourseLeaders.Contains(x.Person)
-                                                                    && x.Person.FinancialTo > SelectedTerm.Year
-                                                                    || (x.Person.FinancialTo == SelectedTerm.Year
-                                                                        && (x.Person.FinancialToTerm == null
-                                                                        || SelectedTerm.TermNumber <= x.Person.FinancialToTerm)))
-                                                .ToList();
+                                                                    && !CourseLeaders.Contains(x.Person))
+                                                .ToListAsync();
+                        enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                         if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                         {
                             await ProcessEnrolments(dbc, 
@@ -188,6 +182,14 @@ namespace U3A.BusinessRules
             var term = await dbc.Term.FindAsync(SelectedTerm.ID);
             await SetClassAllocationDone(dbc, term, IsClassAllocationDone);
             await dbc.SaveChangesAsync();
+        }
+
+        public static bool IsPersonFinancial(Person person, Term term)
+        {
+            return person.FinancialTo >= term.Year
+                    || (person.FinancialTo == term.Year
+                        && (person.FinancialToTerm == null
+                            || person.FinancialToTerm >= term.TermNumber));
         }
 
         public static async Task FixEnrolmentTerm(U3ADbContext dbc, Term term)
