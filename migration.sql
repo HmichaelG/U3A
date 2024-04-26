@@ -10352,23 +10352,7 @@ BEGIN
 
     endall:
     	return 0
-    END
-
-                    
-
-END;
-GO
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20240402083049_U3A_sp_DbCleanup_02_APR_2024'
-)
-BEGIN
-
-
-
-
-        ')
+    END')
 END;
 GO
 
@@ -10728,6 +10712,31 @@ IF NOT EXISTS (
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
     VALUES (N'20240425021536_U3A_Receipt_TermsPaid', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240425195550_U3A_Receipt_FinancialToTerm'
+)
+BEGIN
+    EXEC sp_rename N'[ReceiptDataImport].[TermsPaid]', N'FinancialToTerm', N'COLUMN';
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240425195550_U3A_Receipt_FinancialToTerm'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240425195550_U3A_Receipt_FinancialToTerm', N'8.0.4');
 END;
 GO
 

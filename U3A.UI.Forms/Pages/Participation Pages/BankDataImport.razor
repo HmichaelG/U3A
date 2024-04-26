@@ -152,13 +152,13 @@ else
                     <DxGridDataColumn Caption="Financial-To" DisplayFormat="{0:f0}"
                                       FieldName="FinancialTo" Width="5rem">
                         <EditSettings>
-                            <DxSpinEditSettings MaxValue="@(yearComponent?.Year)"
+                            <DxSpinEditSettings MaxValue="@(yearComponent?.Year+1)"
                                                 MinValue="@(yearComponent?.Year-1)" />
                         </EditSettings>
                     </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Term Paid"
+                    <DxGridDataColumn Caption="FinTo-Term"
                                       Visible=@(settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly)
-                                      FieldName="TermsPaid" Width="6rem">
+                                      FieldName="FinancialToTerm" Width="6rem">
                         <CellEditTemplate>
                             @{
                                 var importData = (ReceiptDataImport)context.EditModel;
@@ -166,12 +166,14 @@ else
                             <DxComboBox Data="@memberFeePaidToTerms"
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                         NullText="Year"
-                                        @bind-Value=@importData.TermsPaid
+                                        @bind-Value=@importData.FinancialToTerm
                                         AllowUserInput="false" />
                         </CellEditTemplate>
                     </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Description" FieldName="Description" />
-                    <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
+                    <DxGridDataColumn Caption="Description" 
+                                        FieldName="Description" DataRowEditorVisible=false />
+                    <DxGridDataColumn Caption="Identifier" 
+                                        FieldName="Identifier" DataRowEditorVisible=false />
                 </Columns>
                 <DetailRowTemplate>
                     @{
@@ -359,7 +361,7 @@ else
         {
             model.Person = null;
             model.FinancialTo = null;
-            model.TermsPaid = null;
+            model.FinancialToTerm = null;
             currentFinancialTo = null;
         }
         StateHasChanged();
@@ -414,7 +416,10 @@ else
                 if (receiptImport.IsOnFile)
                 {
                     var r = await BusinessRule.GetReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
-                    receiptImport.Person = await dbc.Person.FindAsync(r.PersonID);
+                    var person = await dbc.Person.FindAsync(r.PersonID);
+                    receiptImport.Person = person;
+                    receiptImport.FinancialTo = person.FinancialTo;
+                    receiptImport.FinancialToTerm = person.FinancialToTerm;
                 }
                 // Otherwise, parse the person from the imported description
                 else
@@ -461,7 +466,7 @@ else
         var minPartMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, importItem.Person, calculationMonths);
         // assume tests fail
         importItem.FinancialTo = importItem.Person.FinancialTo;
-        importItem.TermsPaid = null;
+        importItem.FinancialToTerm = null;
         // Calculate financials
         if (importItem.Amount >= 0)
         {
@@ -473,12 +478,12 @@ else
                     && totalPaid < totalDue)
             {
                 importItem.FinancialTo = ProcessingYear;
-                importItem.TermsPaid = calculationMonths;
+                importItem.FinancialToTerm = calculationMonths;
             }
             else if (totalPaid >= minFullMembershipFee)
             {
                 importItem.FinancialTo = (importItem.Person.FinancialTo >= ProcessingYear) ? importItem.Person.FinancialTo : ProcessingYear;
-                importItem.TermsPaid = null;
+                importItem.FinancialToTerm = null;
             }
         }
         else
@@ -576,7 +581,7 @@ else
                 }
 
                 receipt.FinancialTo = importItem.FinancialTo.Value;
-                receipt.TermPaid = importItem.TermsPaid;
+                receipt.TermPaid = importItem.FinancialToTerm;
 
                 dbc.Add(receipt);
                 people.Add(receipt.Person);
