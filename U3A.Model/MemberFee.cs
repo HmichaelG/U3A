@@ -20,6 +20,7 @@ namespace U3A.Model
     public enum MemberFeeSortOrder
     {
         MemberFee,
+        Complimentary,
         MailSurcharge,
         AdditionalFee,
         CourseFee,

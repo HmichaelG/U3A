@@ -141,21 +141,24 @@ namespace U3A.Services
                         if (complimentaryCalcDate != null)
                         {
                             AddFee(person.ID,
-                                MemberFeeSortOrder.MemberFee, null, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {term.Year} complimentary membership", 0.00M);
+                                MemberFeeSortOrder.Complimentary, null, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {term.Year} complimentary membership", 0.00M);
                         }
                         else
                         {
                             AddFee(person.ID,
-                                MemberFeeSortOrder.MemberFee, null, $"{term.Year} complimentary membership", 0.00M);
+                                MemberFeeSortOrder.Complimentary, null, $"{term.Year} complimentary membership", 0.00M);
                         }
                     }
                     else
                     {
                         PersonWithFinancialStatus.MembershipFees = await CalculateMembershipFeeAsync(dbc, person.DateJoined.GetValueOrDefault(), term, person);
                         var fee = PersonWithFinancialStatus.MembershipFees;
-                        if (CalclateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalclateForTerm, 2); }
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.MemberFee, null, $"{term.Year} membership fee", fee);
+                        if (fee != 0)
+                                {
+                            if (CalclateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalclateForTerm, 2); }
+                            AddFee(person.ID,
+                                MemberFeeSortOrder.MemberFee, null, $"{term.Year} membership fee", fee);
+                        }
                     }
                     if (person.Communication != "Email")
                     {
