@@ -1,29 +1,29 @@
-/*
-CREATE FUNCTION [dbo].[StripHTML]
-(@HTMLText VARCHAR(MAX))
-RETURNS VARCHAR(MAX)
-AS
-BEGIN
-    DECLARE @Start INT
-    DECLARE @End INT
-    DECLARE @Length INT
-    SET @Start = CHARINDEX('<', @HTMLText)
+
+--CREATE FUNCTION [dbo].[StripHTML]
+--(@HTMLText VARCHAR(MAX))
+--RETURNS VARCHAR(MAX)
+--AS
+--BEGIN
+--    DECLARE @Start INT
+--    DECLARE @End INT
+--    DECLARE @Length INT
+--    SET @Start = CHARINDEX('<', @HTMLText)
     
-    WHILE @Start > 0
-        AND @Start < LEN(@HTMLText)
-        AND CHARINDEX('>', @HTMLText, @Start) > 0
-    BEGIN
-        SET @End = CHARINDEX('>', @HTMLText, @Start)
-        SET @Length = (@End - @Start) + 1
-        IF @Length > 0
-            SET @HTMLText = STUFF(@HTMLText, @Start, @Length, '')
+--    WHILE @Start > 0
+--        AND @Start < LEN(@HTMLText)
+--        AND CHARINDEX('>', @HTMLText, @Start) > 0
+--    BEGIN
+--        SET @End = CHARINDEX('>', @HTMLText, @Start)
+--        SET @Length = (@End - @Start) + 1
+--        IF @Length > 0
+--            SET @HTMLText = STUFF(@HTMLText, @Start, @Length, '')
         
-        SET @Start = CHARINDEX('<', @HTMLText)
-    END
-	SET @HTMLText = REPLACE(@HTMLText,'&amp;','and')
-    RETURN @HTMLText
-END;
-*/
+--        SET @Start = CHARINDEX('<', @HTMLText)
+--    END
+--	SET @HTMLText = REPLACE(@HTMLText,'&amp;','and')
+--    RETURN @HTMLText
+--END;
+
 
 
 
@@ -51,8 +51,6 @@ DECLARE @KEY uniqueidentifier
 
 SET @CRLF = char(13) + char(10)
 
-UPDATE AspNetUsers SET EmailConfirmed = 1
-
 INSERT INTO [dbo].[SystemSettings]
            ([ID]
            ,[U3AGroup]
@@ -63,7 +61,11 @@ INSERT INTO [dbo].[SystemSettings]
            ,[Email]
            ,[Website]
            ,[Phone]
+           ,[AllowedMemberFeePaymentTypes]
            ,[MembershipFee]
+           ,[MembershipFeeTerm2]
+           ,[MembershipFeeTerm3]
+           ,[MembershipFeeTerm4]
            ,[MailSurcharge]
            ,[RequireVaxCertificate]
            ,[CurrentTermID]
@@ -90,11 +92,15 @@ INSERT INTO [dbo].[SystemSettings]
            ,''
            ,'P.O. Box 502 Maitland. NSW 2320'
            ,'-'
-           ,'' -- ABN Unknown
+           ,'65 498 713 596' -- ABN Unknown
            ,'enrolments@u3amaitland.org.au'
            ,'https://u3amaitland.org.au/'
            ,'0412 207 890'
+           ,1
            ,50.00
+           ,50.00
+           ,25.00
+           ,25.00
            ,0.00
            ,0
            ,null
@@ -104,14 +110,11 @@ INSERT INTO [dbo].[SystemSettings]
              + @CRLF + 'Vice-President'
              + @CRLF + 'Secretary'
              + @CRLF + 'Treasurer'
-             + @CRLF + 'Assistant Treasurer'
              + @CRLF + 'Course Coordinator'
              + @CRLF + 'Enrolment Officer'
              + @CRLF + 'Venues Officer'
              + @CRLF + 'Leaders Liaison'
              + @CRLF + 'Publicity Officer'
-             + @CRLF + 'Assistant Secretary'
-             + @CRLF + 'BSCC Convenor'
             ,null
             ,'enrolments@u3amaitland.org.au'
             ,'Membership Office'
@@ -304,6 +307,7 @@ INSERT INTO [dbo].[Person]
            ,[CreatedOn]
            ,[UpdatedOn]
            ,[FinancialTo]
+           ,[FinancialToTerm]
            )
      SELECT
            newid()				ID
@@ -330,7 +334,10 @@ INSERT INTO [dbo].[Person]
            ,isnull(mobile,'')
            ,emergencyContactName ICEContact
            ,emergencyContactMobile + ' ' + emergencyContactPhone              ICEPhone
-           ,0 IsLifeMember
+           ,case DATEPART(year,feesDue)
+                when 2100 then 1
+                else 0
+            end as IsLifeMember
            ,0 Covid19
            ,case preferredMail
                 when 'p' then 'Post'
@@ -339,6 +346,10 @@ INSERT INTO [dbo].[Person]
            ,[CreatedOn] = getDate()
            ,[UpdatedOn] = getDate()
            ,DATEPART(year,feesDue) FinancialTo
+           ,case DATEPART(month,feesDue)
+                when 6 then 2
+                else null
+            end as FinancialToTerm
 FROM	mu3a.u3a.qsycsj_u3a_members where feesDue is not null
 
 
@@ -355,49 +366,59 @@ FROM	mu3a.u3a.qsycsj_u3a_members where feesDue is not null
 --Set Gender = 'Male'
 --WHERE Gender = 'Unknown'
 
-INSERT INTO [dbo].[Receipt]
+INSERT INTO [dbo].[Fee]
            ([ID]
-		   ,[Date]
+           ,[Date]
+           ,[ProcessingYear]
            ,[Amount]
            ,[Description]
-           ,[Identifier]
            ,[PersonID]
-           ,[FinancialTo]
            ,[CreatedOn]
            ,[UpdatedOn]
-           ,[DateJoined]
-           ,[ProcessingYear]
-           ,[User])
+           ,[User]
+           ,[IsMembershipFee])
      SELECT
-			newid()
+           newid()
            ,GetDate()
-           ,amtPaid
-           ,receiptNo
-           ,'System Conversion: Fees Due ' + cast(feesDue as varchar(max))
+           ,2024
+           ,case (datepart(month, feesDue))
+                when 12 then -50.00
+                else -25.00
+            end as amount
+           ,'2024 membership fee credit @ syetem conversion'
            ,(select top 1 ID from Person where ConversionID = BadgeNo)
-           ,datepart(year,feesDue)
            ,GetDate()
            ,GetDate()
-           ,memberSince
-           ,datepart(year,feesDue)
            ,'System Conversion'
-     FROM mu3a.u3a.qsycsj_u3a_members where feesDue is not null
+           ,1
+     FROM mu3a.u3a.qsycsj_u3a_members Where datepart(year,feesdue) IN (2024,2025)
 
---IF (@OBFISCATE = 1)
---    BEGIN
---    UPDATE Person
---        SET Mobile = replace(replace(replace(Mobile,'9','8'),'6','3'),'2','5')
---            ,HomePhone = replace(replace(replace(HomePhone,'9','8'),'6','3'),'2','5')
---            ,ICEPhone = replace(replace(replace(ICEPhone,'9','8'),'6','3'),'2','5')
---            ,Postcode = replace(replace(replace(Postcode,'9','8'),'6','3'),'2','5')
---            ,Email = lower(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(Email,'o','e'),'a','o'),'i','a'),'u','i'),'t','p'),'c','k'),'d','th'),'ee','e'),'oo','or'),'ll','ski'))
---            ,LastName = lower(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LastName,'o','e'),'a','o'),'i','a'),'u','i'),'t','p'),'c','k'),'d','th'),'ee','e'),'oo','or'),'ll','ski'))
---            ,Address = replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(Address,'o','e'),'a','o'),'i','a'),'u','i'),'t','p'),'c','k'),'d','th'),'ee','e'),'oo','or'),'ll','ski')
---            ,ICEContact = lower(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(ICEContact,'o','e'),'a','o'),'i','a'),'u','i'),'t','p'),'c','k'),'d','th'),'ee','e'),'oo','or'),'ll','ski'))
---            ,City = Upper(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(City,'o','e'),'a','o'),'i','a'),'u','i'),'t','p'),'c','k'),'d','th'),'ee','e'),'oo','or'),'ll','ski'))
---    UPDATE Person
---        SET LastName = UPPER(substring(LastName,1,1)) + RIGHT(LastName,LEN(LastName)-1)
---    END
+INSERT INTO [dbo].[Fee]
+           ([ID]
+           ,[Date]
+           ,[ProcessingYear]
+           ,[Amount]
+           ,[Description]
+           ,[PersonID]
+           ,[CreatedOn]
+           ,[UpdatedOn]
+           ,[User]
+           ,[IsMembershipFee])
+     SELECT
+           newid()
+           ,GetDate()
+           ,2025
+           ,case (datepart(month, feesDue))
+                when 12 then -50.00
+                else -25.00
+            end as amount
+           ,'2025 membership fee credit @ syetem conversion'
+           ,(select top 1 ID from Person where ConversionID = BadgeNo)
+           ,GetDate()
+           ,GetDate()
+           ,'System Conversion'
+           ,1
+     FROM mu3a.u3a.qsycsj_u3a_members Where datepart(year,feesdue) = 2025
 
 
 INSERT INTO [dbo].[Course]
