@@ -390,7 +390,7 @@ INSERT INTO [dbo].[Fee]
            ,GetDate()
            ,GetDate()
            ,'System Conversion'
-           ,1
+           ,0
      FROM mu3a.u3a.qsycsj_u3a_members Where datepart(year,feesdue) IN (2024,2025)
 
 INSERT INTO [dbo].[Fee]
@@ -417,7 +417,7 @@ INSERT INTO [dbo].[Fee]
            ,GetDate()
            ,GetDate()
            ,'System Conversion'
-           ,1
+           ,0
      FROM mu3a.u3a.qsycsj_u3a_members Where datepart(year,feesdue) = 2025
 
 
