@@ -162,7 +162,7 @@ namespace U3A.BusinessRules
                 var nextTerm = await dbc.Term.Where(x => x.Year == year && x.TermNumber == nextTermNo).FirstOrDefaultAsync();
                 result = (nextTerm != null) ? nextTerm.StartDate.AddDays(-1) : CurrentTerm.EndDate;
             }
-            return result;
+            return result.AddDays(1);
         }
         public static async Task<Term?> GetSameTermLastYearAsync(U3ADbContext dbc, int Year, int TermNumber)
         {

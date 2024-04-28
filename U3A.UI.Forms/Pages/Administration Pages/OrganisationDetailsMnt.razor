@@ -280,7 +280,7 @@ else
                                         <DxFormLayoutItem Caption="Allow Multi-Campus Extensions?" ColSpanMd="12">
                                             <DxCheckBox @bind-Checked="@systemSettings.AllowMultiCampusExtensions" />
                                         </DxFormLayoutItem>
-                                        <DxFormLayoutGroup Caption="Multi Campus U3A"
+                                        <DxFormLayoutGroup Caption="Multi-Campus U3A"
                                                            ColSpanMd="12"
                                                            Visible="@systemSettings.AllowMultiCampusExtensions">
                                             <DxFormLayoutGroup Caption="U3A Not Allowed" ColSpanMd="5">
@@ -480,6 +480,7 @@ else
             UnassignedU3A.Remove(t);
             UnassignedGrid.ClearSelection();
         }
+        await InvokeAsync(StateHasChanged);
     }
 
     async Task OnDisallowSelected()
@@ -490,6 +491,7 @@ else
             AssignedU3A.Remove(t);
             AssignedGrid.ClearSelection();
         }
+        await InvokeAsync(StateHasChanged);
     }
 
     void Close()
