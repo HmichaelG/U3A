@@ -123,7 +123,7 @@ else
                             <p>Please create a payment using your banking software with the following detail... </p>
                             <div class="row">
                                 <div class="col col-5"><strong>Amount Due:</strong></div>
-                                <div class="col col-7">@GetFeeAsString()</div>
+                                <div class="col col-7">@feeAsString</div>
                             </div>
                             <div class="row">
                                 <div class="col col-5"><strong>A/cc Name:</strong></div>
@@ -207,6 +207,7 @@ else
     string clickText = "Click here for details.";
     bool IsProcessing;
     string OnlineErrorMessage;
+    string feeAsString;
 
     protected override async Task OnInitializedAsync()
     {
@@ -305,15 +306,17 @@ else
         }
     }
 
-    async Task<string> GetFeeAsString()
+    string GetFeeAsString(decimal fullFee)
     {
-        decimal result = (selectedPaymentType == null) ? await CalculateFeeAsync() : selectedPaymentType.Amount;
+        decimal result = (selectedPaymentType == null)  ? fullFee : selectedPaymentType.Amount;
         return result.ToString("c2");
     }
 
     async Task<decimal> CalculateFeeAsync()
     {
-        return await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+        decimal result = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+        feeAsString = GetFeeAsString(result);
+        return result;
     }
 
     async Task OnPayOnline(MouseEventArgs e)
