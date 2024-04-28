@@ -101,6 +101,17 @@ else
                     <FrmClassDetailPopup Course="(Course)context.DataItem" AllowEdit="false" />
                 </DetailRowTemplate>
 
+                <GroupSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                       FieldName="ID" DisplayText="{0:n0}  Courses"
+                                       FooterColumnName="Name" />
+                </GroupSummary>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                       FieldName="ID" DisplayText="{0:n0}  Courses"
+                                       FooterColumnName="Name" />
+                </TotalSummary>
+
                 <EditFormTemplate Context="EditFormContext">
                     <CourseDetail @ref="@courseDetail" AnyEnrolmentsInYear="@anyEnrolmentsInYear"
                                   Settings=@settings
