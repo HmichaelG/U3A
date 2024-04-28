@@ -482,8 +482,7 @@ else
         base.OnAfterRender(firstRender);
         if (!firstRender)
         {
-            var service = new LocalTime(js);
-            now = await service.GetLocalDateAsync();
+            now = TimezoneAdjustment.GetLocalTime();
             if (SelectedTerm == null)
             {
                 await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");
