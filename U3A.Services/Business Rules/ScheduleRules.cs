@@ -49,7 +49,9 @@ namespace U3A.BusinessRules
             // Get all current Enrolment keys
             var enrolmentKeys = await dbc.Enrolment
                                                 .AsNoTracking()
-                                                .Where(x => x.TermID == term.ID)
+                                                .Include(x => x.Term)
+                                                .Where(x => x.Term.Year == term.Year 
+                                                            && x.Term.TermNumber >= term.TermNumber)
                                                 .Select(x => x.ID).ToListAsync();
             enrolmentKeys.AddRange(await dbcT.MultiCampusEnrolment
                                                 .AsNoTracking()

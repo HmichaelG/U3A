@@ -615,6 +615,7 @@ else
                 isFinancial = false;
                 if (loginState.SelectedPerson.FinancialTo >= term.Year) { isFinancial = true; }
                 Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
+                var cx = Classes.FirstOrDefault(x => x.ID == new Guid("2F7202DC-6C78-4D74-8C52-08DC108733B9"));
             }
             if (Classes != null)
             {

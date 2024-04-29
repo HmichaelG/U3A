@@ -10743,3 +10743,91 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    ALTER TABLE [Enrolment] ADD [DeletedAt] datetimeoffset NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    ALTER TABLE [Enrolment] ADD [IsDeleted] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    ALTER TABLE [Course] ADD [DeletedAt] datetimeoffset NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    ALTER TABLE [Course] ADD [IsDeleted] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    ALTER TABLE [Class] ADD [DeletedAt] datetimeoffset NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    ALTER TABLE [Class] ADD [IsDeleted] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    ALTER TABLE [AttendClass] ADD [DeletedAt] datetimeoffset NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    ALTER TABLE [AttendClass] ADD [IsDeleted] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240429001255_U3A_ISoftDelete'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240429001255_U3A_ISoftDelete', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
