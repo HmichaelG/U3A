@@ -152,6 +152,14 @@ namespace U3A.Database
                         if (e.DateEnrolled == null) { e.DateEnrolled = utcNow; }
                     }                    
                 }
+                // Soft delete entities implementing ISoftDelete.
+                // We do this first so we also pick up the BaseEntity stuff.
+                if (entry is { State: EntityState.Deleted, Entity: ISoftDelete delete })
+                {
+                    entry.State = EntityState.Modified;
+                    delete.IsDeleted = true;
+                    delete.DeletedAt = utcNow;
+                }
                 // for entities that inherit from BaseEntity,
                 // set UpdatedOn / CreatedOn appropriately
                 if (entry.Entity is BaseEntity trackable)
@@ -203,6 +211,17 @@ namespace U3A.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Automatically adding IsDeleted filter to 
+            // all LINQ queries that use ISoftDelete
+            modelBuilder.Entity<Course>()
+                .HasQueryFilter(x => x.IsDeleted == false);
+            modelBuilder.Entity<Class>()
+                .HasQueryFilter(x => x.IsDeleted == false);
+            modelBuilder.Entity<Enrolment>()
+                .HasQueryFilter(x => x.IsDeleted == false);
+            modelBuilder.Entity<AttendClass>()
+                .HasQueryFilter(x => x.IsDeleted == false);
 
             modelBuilder.Entity<DocumentType>()
                         .Property(x => x.ID).ValueGeneratedNever();

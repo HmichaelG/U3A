@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace U3A.Model
 {
     public class Class
-        : BaseEntity, INotifyPropertyChanged
+        : BaseEntity, INotifyPropertyChanged, ISoftDelete
     {
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -468,5 +468,7 @@ namespace U3A.Model
         [NotMapped]
         [Comment("Only used in Member Portal - Member Enrolment")]
         public bool ShowMap { get; set; } = false;
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

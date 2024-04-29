@@ -427,7 +427,11 @@ else
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
         Course course = (Course)e.DataItem;
-        dbc.Remove(course);
+        // This is a soft delete, so make sure we cascade all classes & enrolments
+        var courseToDelete = await dbc.Course.Include(x => x.Classes)
+                                        .Include(x => x.Enrolments)
+                                        .FirstOrDefaultAsync(x => x.ID == course.ID);
+        dbc.Remove(courseToDelete);
         await SaveChangesAsync();
         await GetData();
     }

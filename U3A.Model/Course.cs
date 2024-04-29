@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace U3A.Model
 {
     [Index(nameof(Year), nameof(Name))]
-    public class Course : BaseEntity
+    public class Course : BaseEntity, ISoftDelete
     {
         [Key]
         public Guid ID { get; set; }
@@ -120,6 +120,8 @@ namespace U3A.Model
 
         [NotMapped]
         public string? OfferedBy { get; set; } // The U3A that owns the course
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 
     public class UrlAttribute : ValidationAttribute

@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace U3A.Model
 {
-    public class Enrolment
+    public class Enrolment : ISoftDelete
     {
         public Enrolment() { Created = DateTime.UtcNow; }
 
@@ -48,5 +48,7 @@ namespace U3A.Model
 
         [NotMapped]
         public bool isLeader {  get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

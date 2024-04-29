@@ -403,6 +403,15 @@ else
                     MailLabelHeight = 25
                 };
         }
+        await GetTenantData();
+        if (systemSettings.AutoEnrolAllocationDay < 0 ||
+                systemSettings.AutoEnrolAllocationDay > 6) systemSettings.AutoEnrolAllocationDay = 2;
+        server = new DocumentServer(dbc);
+        IsReady = true;
+    }
+
+    async Task GetTenantData()
+    {
         var thisTenant = await tenantService.GetTenantIdentifierAsync();
         UnassignedU3A = await dbcT.TenantInfo
                                     .AsNoTracking()
@@ -418,10 +427,6 @@ else
                                                 && systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
                                     .OrderBy(x => x.State).ThenBy(x => x.Name)
                                     .ToListAsync();
-        if (systemSettings.AutoEnrolAllocationDay < 0 ||
-                systemSettings.AutoEnrolAllocationDay > 6) systemSettings.AutoEnrolAllocationDay = 2;
-        server = new DocumentServer(dbc);
-        IsReady = true;
     }
 
     async void ValidFormSubmitted(EditContext editContext)
@@ -472,25 +477,25 @@ else
         systemSettings.TermsAndConditions = richEdit.DocumentContent;
     }
 
-    void OnAllowSelected()
+    async void OnAllowSelected()
     {
         foreach (var t in SelectedUnassignedItems.Cast<TenantInfo>())
         {
-            AssignedU3A.Add(t);
-            UnassignedU3A.Remove(t);
+            systemSettings.MultiCampusU3AAllowed.Add(t.Identifier);
         }
         UnassignedGrid?.ClearSelection();
+        await GetTenantData();
         StateHasChanged();
     }
 
-    void OnDisallowSelected()
+    async void OnDisallowSelected()
     {
         foreach (var t in SelectedAssignedItems.Cast<TenantInfo>())
         {
-            UnassignedU3A.Add(t);
-            AssignedU3A.Remove(t);
+            systemSettings.MultiCampusU3AAllowed.Remove(t.Identifier);
         }
         AssignedGrid?.ClearSelection();
+        await GetTenantData();
         StateHasChanged();
     }
 

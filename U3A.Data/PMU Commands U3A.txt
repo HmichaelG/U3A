@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Receipt_TermsPaid
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Receipt_FinancialToTerm
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Receipt_FinancialToTerm
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_ISoftDelete
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Receipt_FinancialToTerm
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_ISoftDelete
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

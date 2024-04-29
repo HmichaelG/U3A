@@ -16,6 +16,7 @@ using Azure.Identity;
 using Microsoft.AspNetCore.Builder;
 using DevExpress.XtraCharts;
 using U3A.Model;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
