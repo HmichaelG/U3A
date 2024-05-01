@@ -116,8 +116,12 @@
         {
             using (var dbc = new U3ADbContext(tenant))
             {
-                var finMembers = dbc.Person.Count(x => x.FinancialTo >= DateTime.Today.Year);
-                financialMembers.Add(tenant.Id!, finMembers);
+                try
+                {
+                    var finMembers = dbc.Person.Count(x => x.FinancialTo >= DateTime.Today.Year);
+                    financialMembers.Add(tenant.Id!, finMembers);
+                }
+                catch (Exception e) { }
             }
         }
     }
