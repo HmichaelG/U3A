@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2024-05-01T18:56:27.474+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Restore Deleted Participants</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Restore Deleted Participants</para>
+    </header>
+    <para styleclass="Normal">A <text style="font-weight:bold;">Participant</text> consists not only the participant record itself, but also its enrolment, receipt and fee records. Accidental deletion can therefore result in a significant loss of work.</para>
+    <para styleclass="Normal">Rather than physically deleting a participant record from the database, a technique known as a soft delete is used. We simply identify or flag the record as no longer required and then ignore it when reading records from the database. In other systems, you might recognise this as moving the item to trash. The advantage of this technique is that it is a simple matter of removing the deletion flag to reinstate or restore the records.</para>
+    <para styleclass="Normal">This procedure restores participant records previously deleted in the system.</para>
+    <para styleclass="Normal">To restore, select the required records from the grid. Then click the <text style="font-weight:bold;">Restore Participants</text> from the grid&apos;s toolbar.</para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>
