@@ -39,12 +39,12 @@ namespace U3A.BusinessRules
             return people;
         }
 
-        public static async Task<List<Person>> EditableDeletedPersonsAsync(U3ADbContext dbc)
+        public static async Task<List<Person>> EditableDeletedPersonsAsync(U3ADbContext dbc,int CurrentYear)
         {
             var people = dbc.Person.IgnoreQueryFilters()
                             .Include(x => x.Enrolments)
                             .Include(x => x.Receipts)
-                            .Where(x => x.IsDeleted)
+                            .Where(x => x.IsDeleted && (x.FinancialTo >= CurrentYear-1 || x.FinancialTo == constants.START_OF_TIME))
                             .OrderBy(x => x.LastName)
                             .ThenBy(x => x.FirstName)
                             .ThenBy(x => x.Email).ToList();
