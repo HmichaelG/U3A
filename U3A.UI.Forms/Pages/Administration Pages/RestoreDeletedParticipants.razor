@@ -57,11 +57,12 @@ else
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridSelectionColumn Caption="Select" />
-                    <DxGridDataColumn Caption="Name" FieldName="FullName" />
+                    <DxGridDataColumn Caption="Name" FieldName="FullNameAlpha" />
+                    <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToText" />
                     <DxGridDataColumn FieldName="Email" />
                     <DxGridDataColumn FieldName="Address" />
                     <DxGridDataColumn FieldName="City" />
-                    <DxGridDataColumn FieldName="Postcode" />
+                    <DxGridDataColumn FieldName="Postcode" DisplayFormat="f0" />
                     <DxGridDataColumn FieldName="Mobile" />
                     <DxGridDataColumn FieldName="HomePhone" />
                     <DxGridDataColumn Caption="Deleted At"
