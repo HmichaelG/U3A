@@ -216,7 +216,6 @@ else
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             var person = await dbc.Person.FindAsync(loginState.SelectedPerson.ID);
-            if (person.DateCeased == constants.PERSON_DELETED_FLAG) { person = null; }
             return person;
         }
     }

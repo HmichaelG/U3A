@@ -44,6 +44,8 @@
             this.xrTableCell2 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell4 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell8 = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrTableCell6 = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrCheckBox1 = new DevExpress.XtraReports.UI.XRCheckBox();
             this.xrTableCell9 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell10 = new DevExpress.XtraReports.UI.XRTableCell();
             this.table1 = new DevExpress.XtraReports.UI.XRTable();
@@ -179,6 +181,7 @@
             this.xrTableCell2,
             this.xrTableCell4,
             this.xrTableCell8,
+            this.xrTableCell6,
             this.xrTableCell9,
             this.xrTableCell10});
             this.xrTableRow3.Name = "xrTableRow3";
@@ -211,29 +214,50 @@
             this.xrTableCell4.Multiline = true;
             this.xrTableCell4.Name = "xrTableCell4";
             this.xrTableCell4.Text = "xrTableCell4";
-            this.xrTableCell4.Weight = 0.96799649598314641D;
+            this.xrTableCell4.Weight = 1.1966695756587062D;
             // 
             // xrTableCell8
             // 
             this.xrTableCell8.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Person].[FinancialToBriefText]")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[EnrolmentStatusText]")});
             this.xrTableCell8.Multiline = true;
             this.xrTableCell8.Name = "xrTableCell8";
             this.xrTableCell8.StylePriority.UseTextAlignment = false;
             this.xrTableCell8.Text = "xrTableCell8";
             this.xrTableCell8.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell8.Weight = 0.35396252659760086D;
+            this.xrTableCell8.Weight = 0.38992289085140913D;
+            // 
+            // xrTableCell6
+            // 
+            this.xrTableCell6.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.xrCheckBox1});
+            this.xrTableCell6.Multiline = true;
+            this.xrTableCell6.Name = "xrTableCell6";
+            this.xrTableCell6.StylePriority.UseTextAlignment = false;
+            this.xrTableCell6.Text = "xrTableCell6";
+            this.xrTableCell6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+            this.xrTableCell6.Weight = 0.10418625499899335D;
+            // 
+            // xrCheckBox1
+            // 
+            this.xrCheckBox1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "CheckBoxState", "Iif([IsWaitlisted],\'Unchecked\' , \'Checked\')")});
+            this.xrCheckBox1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
+            this.xrCheckBox1.Name = "xrCheckBox1";
+            this.xrCheckBox1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
+            this.xrCheckBox1.SizeF = new System.Drawing.SizeF(23F, 23F);
+            this.xrCheckBox1.Text = " ";
             // 
             // xrTableCell9
             // 
             this.xrTableCell9.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif([IsWaitlisted],\'Waitlisted\' ,\'Active\' )")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Person].[FinancialToBriefText]")});
             this.xrTableCell9.Multiline = true;
             this.xrTableCell9.Name = "xrTableCell9";
             this.xrTableCell9.StylePriority.UseTextAlignment = false;
             this.xrTableCell9.Text = "xrTableCell9";
             this.xrTableCell9.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell9.Weight = 0.35396263082425866D;
+            this.xrTableCell9.Weight = 0.3391055627201558D;
             // 
             // xrTableCell10
             // 
@@ -355,7 +379,7 @@
             this.xrActiveStudents.StylePriority.UseTextAlignment = false;
             this.xrActiveStudents.Text = "xrActiveStudents";
             this.xrActiveStudents.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrActiveStudents.Weight = 0.11798746224463866D;
+            this.xrActiveStudents.Weight = 0.14675458313623085D;
             this.xrActiveStudents.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrActiveStudents_BeforePrint);
             // 
             // xrWaitlistStudents
@@ -374,7 +398,7 @@
             this.xrWaitlistStudents.StylePriority.UseTextAlignment = false;
             this.xrWaitlistStudents.Text = "xrWaitlistStudents";
             this.xrWaitlistStudents.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrWaitlistStudents.Weight = 0.11798746224463866D;
+            this.xrWaitlistStudents.Weight = 0.10138305397558424D;
             this.xrWaitlistStudents.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrWaitlistStudents_BeforePrint);
             // 
             // xrTotalStudents
@@ -394,7 +418,7 @@
             this.xrTotalStudents.Text = "xrTotalStudents";
             this.xrTotalStudents.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.xrTotalStudents.TextFormatString = "{0:N0}";
-            this.xrTotalStudents.Weight = 0.11798746224463866D;
+            this.xrTotalStudents.Weight = 0.10582474962210087D;
             this.xrTotalStudents.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrTotalStudents_BeforePrint);
             // 
             // Title
@@ -515,9 +539,9 @@
             this.xrTableCell15.StyleName = "DetailCaption1";
             this.xrTableCell15.StylePriority.UseBorders = false;
             this.xrTableCell15.StylePriority.UseTextAlignment = false;
-            this.xrTableCell15.Text = "Active ";
+            this.xrTableCell15.Text = "Enrolled";
             this.xrTableCell15.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell15.Weight = 0.2359749244892774D;
+            this.xrTableCell15.Weight = 0.29464192951023632D;
             // 
             // xrTableCell16
             // 
@@ -527,9 +551,9 @@
             this.xrTableCell16.StyleName = "DetailCaption1";
             this.xrTableCell16.StylePriority.UseBorders = false;
             this.xrTableCell16.StylePriority.UseTextAlignment = false;
-            this.xrTableCell16.Text = "Waitlisted";
+            this.xrTableCell16.Text = "Waitlist";
             this.xrTableCell16.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell16.Weight = 0.2359749244892774D;
+            this.xrTableCell16.Weight = 0.20221175714231929D;
             // 
             // xrTableCell35
             // 
@@ -541,7 +565,7 @@
             this.xrTableCell35.StylePriority.UseTextAlignment = false;
             this.xrTableCell35.Text = "Total Enrolled";
             this.xrTableCell35.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell35.Weight = 0.2359749244892774D;
+            this.xrTableCell35.Weight = 0.21107108681527659D;
             // 
             // xrTableRow4
             // 
@@ -593,9 +617,9 @@
             this.xrTableCell19.StyleName = "DetailCaption1";
             this.xrTableCell19.StylePriority.UseBorders = false;
             this.xrTableCell19.StylePriority.UseTextAlignment = false;
-            this.xrTableCell19.Text = "Fin-To";
-            this.xrTableCell19.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell19.Weight = 0.2359749244892774D;
+            this.xrTableCell19.Text = "Date";
+            this.xrTableCell19.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            this.xrTableCell19.Weight = 0.29464192951023632D;
             // 
             // xrTableCell20
             // 
@@ -605,9 +629,9 @@
             this.xrTableCell20.StyleName = "DetailCaption1";
             this.xrTableCell20.StylePriority.UseBorders = false;
             this.xrTableCell20.StylePriority.UseTextAlignment = false;
-            this.xrTableCell20.Text = "Status";
+            this.xrTableCell20.Text = "Fin-To";
             this.xrTableCell20.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell20.Weight = 0.2359749244892774D;
+            this.xrTableCell20.Weight = 0.20221175714231931D;
             // 
             // xrTableCell21
             // 
@@ -619,7 +643,7 @@
             this.xrTableCell21.StylePriority.UseTextAlignment = false;
             this.xrTableCell21.Text = "Requested";
             this.xrTableCell21.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell21.Weight = 0.2359749244892774D;
+            this.xrTableCell21.Weight = 0.21107108681527659D;
             // 
             // PageHeader
             // 
@@ -1244,5 +1268,7 @@
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell24;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell18;
         private DevExpress.XtraReports.Parameters.Parameter prmFinancialStatus;
+        private DevExpress.XtraReports.UI.XRTableCell xrTableCell6;
+        private DevExpress.XtraReports.UI.XRCheckBox xrCheckBox1;
     }
 }

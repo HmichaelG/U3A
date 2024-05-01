@@ -14,7 +14,7 @@ namespace U3A.Model
     [Index(nameof(ConversionID))]
     [Index(nameof(PersonID))]
     [Index(nameof(LastName), nameof(FirstName), nameof(Email))]
-    public class Person : BaseEntity
+    public class Person : BaseEntity, ISoftDelete
     {
         
         [Key]
@@ -420,7 +420,8 @@ namespace U3A.Model
         [JsonIgnore] public List<ReceiptDataImport> ReceiptDataImports { get; set; } = new List<ReceiptDataImport>();
 
         [NotMapped][JsonIgnore] public bool IsMultiCampusVisitor { get; set; } = false;
-
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
     public class PersonList : BindingList<Person> { }
 

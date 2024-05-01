@@ -30,7 +30,7 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<Person>> EditablePersonAsync(U3ADbContext dbc)
         {
-            var people = dbc.Person.Where(x => x.DateCeased != constants.PERSON_DELETED_FLAG)
+            var people = dbc.Person
                             .AsEnumerable()
                             .OrderBy(x => x.LastName)
                             .ThenBy(x => x.FirstName)
@@ -38,6 +38,19 @@ namespace U3A.BusinessRules
             await ApplyGroupsAsync(dbc, people);
             return people;
         }
+
+        public static async Task<List<Person>> EditableDeletedPersonsAsync(U3ADbContext dbc)
+        {
+            var people = dbc.Person.IgnoreQueryFilters()
+                            .Include(x => x.Enrolments)
+                            .Include(x => x.Receipts)
+                            .Where(x => x.IsDeleted)
+                            .OrderBy(x => x.LastName)
+                            .ThenBy(x => x.FirstName)
+                            .ThenBy(x => x.Email).ToList();
+            return people;
+        }
+
         public static Person SelectPerson(U3ADbContext dbc, Guid ID)
         {
             var person = dbc.Person.Find(ID) ?? throw new ArgumentNullException(nameof(Person));

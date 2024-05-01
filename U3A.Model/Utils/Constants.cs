@@ -14,12 +14,12 @@ namespace U3A.Model
         public const int RANDOM_ALLOCATION_PREVIEW = 3;
 
         public const string STD_DATE_FORMAT = "ddd dd-MMM-yyy";
+        public const string STD_DATETIME_FORMAT = "ddd dd-MMM-yyy hh:mm tt";
         public const string STD_DATE_MONTH_ONLY_FORMAT = "ddd dd-MMM";
         public const string SHORT_DATE_FORMAT = "dd-MMM-yyy";
         public const int START_OF_TIME = 2020;
         public const string SYSTEM_DOMAIN = "u3admin.org.au";
         public const string NO_SMS = "(No SMS)";
-        public static readonly DateTime PERSON_DELETED_FLAG = new DateTime(1800,1,1);
 
         public static List<string> nameOfRoles = new List<string>() { "Security Administrator",
                                                 "System Administrator",

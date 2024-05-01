@@ -1,0 +1,148 @@
+﻿@page "/RestoreDeletedCourses"
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <div class="row">
+        <ContextHelpTitle Title="Restore Deleted Courses" HelpTopic="Restore-Deleted-Courses.html"></ContextHelpTitle>
+    </div>
+    <div class="row">
+        <div class="col-11 d-none d-md-inline">
+            Restore courses previously deleted.
+        </div>
+
+    </div>
+    <br />
+
+    <MessageBox @ref="@messageBox" />
+
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@Courses" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    @bind-SelectedDataItems=@SelectedDataItems
+                    SelectionMode="GridSelectionMode.Multiple"
+                    UnboundColumnData="Grid_CustomUnboundColumnData">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid >
+                        <CustomButtonContent>
+                            <DxToolbarItem IconCssClass="bi bi-recycle" Text="Restore Courses"
+                                           BeginGroup=true
+                                           Click=@OnRestore
+                                           Enabled="@(SelectedDataItems?.Count > 0)"
+                                           RenderStyle="ButtonRenderStyle.Primary"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           Alignment="ToolbarItemAlignment.Right"
+                                           Tooltip="Restore the selected courses">
+                            </DxToolbarItem>
+                        </CustomButtonContent>
+                    </GridToolbar>
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridSelectionColumn Caption="Select" />
+                    <DxGridDataColumn Caption="Name" FieldName="Name" />
+                    <DxGridDataColumn Caption="Deleted At"
+                                      UnboundType="GridUnboundColumnType.String" FieldName="DeletedAsAt"/>
+                    <DxGridDataColumn Caption="Deleted By" FieldName="User" />
+                    <DxGridDataColumn Caption="@($"Term {currentTerm?.TermNumber}: Enrolled")" 
+                                      UnboundType="GridUnboundColumnType.Integer" FieldName="EnrolmentCount" />
+                    <DxGridDataColumn Caption="@($"Term {currentTerm?.TermNumber}: Waitlisted")"
+                                      UnboundType="GridUnboundColumnType.Integer" FieldName="WaitlistCount" />
+                </Columns>
+
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
+}
+
+@code {
+    bool IsReady;
+    private List<Course> Courses { get; set; }
+    IReadOnlyList<object> SelectedDataItems { get; set; }
+    MessageBox? messageBox;
+
+    internal IGrid? mainGrid { get; set; }
+    internal ErrorPopup? ErrorPopup { get; set; }
+    internal GridToolbar? Toolbar;
+    internal string ErrorHeader;
+    internal string ErrorMessage;
+    Term currentTerm;
+    U3ADbContext dbc { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        await GetDataAsync();
+        IsReady = true;
+    }
+
+    async Task GetDataAsync()
+    {
+        currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
+        Courses = await BusinessRule.EditableDeletedCoursesAsync(dbc, currentTerm.Year);
+    }
+
+    async Task OnRestore()
+    {
+        foreach (var course in SelectedDataItems.Cast<Course>())
+        {
+            var courseToRestore = await dbc.Course.FindAsync(course.ID);
+            (courseToRestore as ISoftDelete).Undo();
+            foreach (var c in courseToRestore.Classes)
+            {
+                (c as ISoftDelete).Undo();
+            }
+            foreach (var e in courseToRestore.Enrolments)
+            {
+                (e as ISoftDelete).Undo();
+            }
+        }
+        var result= await dbc.SaveChangesAsync();
+        await messageBox.ShowOkOnlyAsync("Restore Courses", "The selected courses have been restored.");
+        await GetDataAsync();
+    }
+
+    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        if (e.FieldName == "EnrolmentCount")
+        {
+            e.Value = (e.DataItem as Course).Enrolments.Count(x => !x.IsWaitlisted && x.TermID == currentTerm.ID);
+        }
+        if (e.FieldName == "WaitlistCount")
+        {
+            e.Value = (e.DataItem as Course).Enrolments.Count(x => x.IsWaitlisted && x.TermID == currentTerm.ID);
+        }
+        if (e.FieldName == "DeletedAsAt")
+        {
+            var deletedAt = (e.DataItem as Course).DeletedAt;
+            if (deletedAt != null)
+            {
+                e.Value = TimezoneAdjustment.GetLocalTime(deletedAt.Value).ToString(constants.STD_DATETIME_FORMAT);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

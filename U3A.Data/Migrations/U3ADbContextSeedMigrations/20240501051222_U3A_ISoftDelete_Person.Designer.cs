@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 {
     [DbContext(typeof(U3ADbContextSeed))]
-    partial class U3ADbContextSeedModelSnapshot : ModelSnapshot
+    [Migration("20240501051222_U3A_ISoftDelete_Person")]
+    partial class U3A_ISoftDelete_Person
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1495,9 +1498,6 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.Property<DateTime>("DateJoined")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -1507,9 +1507,6 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.Property<string>("Identifier")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<Guid>("PersonID")
                         .HasColumnType("uniqueidentifier");

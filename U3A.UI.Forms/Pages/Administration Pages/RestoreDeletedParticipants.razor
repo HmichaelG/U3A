@@ -1,0 +1,143 @@
+﻿@page "/RestoreDeletedParticipants"
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <div class="row">
+        <ContextHelpTitle Title="Restore Deleted Participants" HelpTopic="Restore-Deleted-Participants.html"></ContextHelpTitle>
+    </div>
+    <div class="row">
+        <div class="col-11 d-none d-md-inline">
+            Restore Participants previously deleted.
+        </div>
+
+    </div>
+    <br />
+
+    <MessageBox @ref="@messageBox" />
+
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@Participants" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    @bind-SelectedDataItems=@SelectedDataItems
+                    SelectionMode="GridSelectionMode.Multiple"
+                    UnboundColumnData="Grid_CustomUnboundColumnData">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid>
+                        <CustomButtonContent>
+                            <DxToolbarItem IconCssClass="bi bi-recycle" Text="Restore Participants"
+                                           BeginGroup=true
+                                           Click=@OnRestore
+                                           Enabled="@(SelectedDataItems?.Count > 0)"
+                                           RenderStyle="ButtonRenderStyle.Primary"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           Alignment="ToolbarItemAlignment.Right"
+                                           Tooltip="Restore the selected Participants">
+                            </DxToolbarItem>
+                        </CustomButtonContent>
+                    </GridToolbar>
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridSelectionColumn Caption="Select" />
+                    <DxGridDataColumn Caption="Name" FieldName="FullName" />
+                    <DxGridDataColumn Caption="Deleted At"
+                                      UnboundType="GridUnboundColumnType.String" FieldName="DeletedAsAt" />
+                    <DxGridDataColumn Caption="Deleted By" FieldName="User" />
+                </Columns>
+
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
+}
+
+@code {
+    bool IsReady;
+    private List<Person> Participants { get; set; }
+    IReadOnlyList<object> SelectedDataItems { get; set; }
+    MessageBox? messageBox;
+
+    internal IGrid? mainGrid { get; set; }
+    internal ErrorPopup? ErrorPopup { get; set; }
+    internal GridToolbar? Toolbar;
+    internal string ErrorHeader;
+    internal string ErrorMessage;
+    Term currentTerm;
+    U3ADbContext dbc { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        await GetDataAsync();
+        IsReady = true;
+    }
+
+    async Task GetDataAsync()
+    {
+        Participants = await BusinessRule.EditableDeletedPersonsAsync(dbc);
+    }
+
+    async Task OnRestore()
+    {
+        foreach (var Person in SelectedDataItems.Cast<Person>())
+        {
+            var PersonToRestore = await dbc.Person.FindAsync(Person.ID);
+            (PersonToRestore as ISoftDelete).Undo();
+            foreach (var r in PersonToRestore.Receipts)
+            {
+                (r as ISoftDelete).Undo();
+            }
+            foreach (var e in PersonToRestore.Enrolments)
+            {
+                (e as ISoftDelete).Undo();
+            }
+        }
+        var result = await dbc.SaveChangesAsync();
+        await messageBox.ShowOkOnlyAsync("Restore Participants", "The selected participant records have been restored.");
+        await GetDataAsync();
+    }
+
+    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        if (e.FieldName == "EnrolmentCount")
+        {
+            e.Value = (e.DataItem as Person).Enrolments.Count(x => !x.IsWaitlisted && x.TermID == currentTerm.ID);
+        }
+        if (e.FieldName == "WaitlistCount")
+        {
+            e.Value = (e.DataItem as Person).Enrolments.Count(x => x.IsWaitlisted && x.TermID == currentTerm.ID);
+        }
+        if (e.FieldName == "DeletedAsAt")
+        {
+            var deletedAt = (e.DataItem as Person).DeletedAt;
+            if (deletedAt != null)
+            {
+                e.Value = TimezoneAdjustment.GetLocalTime(deletedAt.Value).ToString(constants.STD_DATETIME_FORMAT);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

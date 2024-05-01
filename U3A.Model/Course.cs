@@ -121,7 +121,7 @@ namespace U3A.Model
         [NotMapped]
         public string? OfferedBy { get; set; } // The U3A that owns the course
         public bool IsDeleted { get; set; }
-        public DateTimeOffset? DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 
     public class UrlAttribute : ValidationAttribute

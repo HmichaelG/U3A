@@ -248,7 +248,7 @@ else
         systemSettings = await dbc.SystemSettings.FirstOrDefaultAsync();
         surcharge = systemSettings.MailSurcharge.ToString("c2");
         person = await dbc.Person.FindAsync(loginState.SelectedPerson?.ID);
-        if (person == null || person.DateCeased == constants.PERSON_DELETED_FLAG || IsNewLinkedMember)
+        if (person == null || IsNewLinkedMember)
         {
             person = new Person()
                 {
@@ -292,7 +292,7 @@ else
             if (!await IsDataOK(editModel)) return;
             // Re-query a data item from the store.
             var dataItem = dbc.Person.Find(editModel.ID);
-            if (dataItem == null || dataItem.DateCeased == constants.PERSON_DELETED_FLAG)
+            if (dataItem == null)
             {
                 dataItem = new Person();
                 isNew = true;

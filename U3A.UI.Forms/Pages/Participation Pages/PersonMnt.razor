@@ -412,14 +412,7 @@
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
         Person person = (Person)e.DataItem;
-        if (await BusinessRule.CanDelete(dbc, person))
-        {
-            dbc.Remove(person);
-        }
-        else
-        {
-            person.DateCeased = constants.PERSON_DELETED_FLAG;
-        }
+        dbc.Remove(person);
         await SaveChangesAsync();
         await GetData();
     }

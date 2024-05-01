@@ -31,6 +31,27 @@ namespace U3A.BusinessRules
             }
             return Courses;
         }
+        public static async Task<List<Course>> EditableDeletedCoursesAsync(U3ADbContext dbc, int Year)
+        {
+            var Courses = await dbc.Course.IgnoreQueryFilters()
+                        .Include(x => x.CourseType)
+                        .Include(x => x.CourseParticipationType)
+                        .Include(x => x.Classes).ThenInclude(x => x.Venue)
+                        .Include(x => x.Classes).ThenInclude(x => x.OnDay)
+                        .Include(x => x.Classes).ThenInclude(x => x.Leader)
+                        .Include(x => x.Classes).ThenInclude(x => x.Leader2)
+                        .Include(x => x.Classes).ThenInclude(x => x.Leader3)
+                        .Include(x => x.Classes).ThenInclude(x => x.Occurrence)
+                        .Include(x => x.Enrolments)
+                        .Where(x => x.Year == Year && x.IsDeleted)
+                        .OrderBy(x => x.Name).ThenByDescending(x => x.DeletedAt)
+                        .ToListAsync();
+            foreach (var course in Courses)
+            {
+                course.Classes = course.Classes.OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
+            }
+            return Courses;
+        }
 
         public static async Task<List<Course>> SelectableCoursesAsync(U3ADbContext dbc, int Year)
         {

@@ -8,7 +8,7 @@ namespace U3A.Model
 {
     [Index(nameof(ProcessingYear))]
     [Index(nameof(Date), nameof(Description))]
-    public class Receipt : BaseEntity
+    public class Receipt : BaseEntity, ISoftDelete
     {
         public Guid ID { get; set; }
         [Required]
@@ -51,5 +51,8 @@ namespace U3A.Model
         {
             get { return (!IsOnlinePayment) ? Amount : null; }
         }
+
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

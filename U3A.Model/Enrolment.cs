@@ -46,9 +46,14 @@ namespace U3A.Model
             get { return (IsWaitlisted) ? Created : null; }
         }
 
+        [NotMapped] public string EnrolmentStatusText
+        {
+            get { return (IsWaitlisted) ? "Waitlisted" : DateEnrolled.Value.ToString("dd-MMM-yyyy"); }
+        }
+
         [NotMapped]
         public bool isLeader {  get; set; }
         public bool IsDeleted { get; set; }
-        public DateTimeOffset? DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

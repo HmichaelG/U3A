@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace U3A.Model
 {
     [Index(new string[] { nameof(TermID), nameof(ClassID), nameof(Date) }, IsUnique = false)]
-    public class AttendClass : ISoftDelete
+    public class AttendClass
     {
 
         [Key]
@@ -104,8 +104,6 @@ namespace U3A.Model
             }
         }
 
-        public bool IsDeleted { get; set; }
-        public DateTimeOffset? DeletedAt { get; set; }
     }
 
     [NotMapped]

@@ -159,6 +159,19 @@ namespace U3A.Database
                     entry.State = EntityState.Modified;
                     delete.IsDeleted = true;
                     delete.DeletedAt = utcNow;
+                    if (entry is { Entity: Person deletePerson })
+                    {
+                        foreach (var enrol in Enrolment.Where(x => x.PersonID == deletePerson.ID))
+                        {
+                            enrol.IsDeleted = true;
+                            enrol.DeletedAt = utcNow;
+                        }
+                        foreach (var receipt in Receipt.Where(x => x.PersonID == deletePerson.ID))
+                        {
+                            receipt.IsDeleted = true;
+                            receipt.DeletedAt = utcNow;
+                        }
+                    }
                 }
                 // for entities that inherit from BaseEntity,
                 // set UpdatedOn / CreatedOn appropriately
@@ -220,7 +233,9 @@ namespace U3A.Database
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Enrolment>()
                 .HasQueryFilter(x => x.IsDeleted == false);
-            modelBuilder.Entity<AttendClass>()
+            modelBuilder.Entity<Person>()
+                .HasQueryFilter(x => x.IsDeleted == false);
+            modelBuilder.Entity<Receipt>()
                 .HasQueryFilter(x => x.IsDeleted == false);
 
             modelBuilder.Entity<DocumentType>()
