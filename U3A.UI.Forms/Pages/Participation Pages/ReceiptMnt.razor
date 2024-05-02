@@ -136,15 +136,77 @@ else
                                                 (originalReceipt != null && ProcessingYear >= originalReceipt.Person.FinancialTo))">
                             @if (editItem.Person != null && editItem.Person.FinancialTo < ProcessingYear)
                             {
-                                <DxFormLayoutItem Caption=@($"Set {editItem.Person.FullName} Financial To year to {ProcessingYear}?") ColSpanMd="12">
-                                    <DxCheckBox @bind-Checked=@setFinancialTo Alignment="CheckBoxContentAlignment.Right" />
-                                </DxFormLayoutItem>
+                                if (allowPartPayments)
+                                {
+                                    allowedFinancialTo.Clear();
+                                    allowedFinancialTo.Add(new FinToValue()
+                                    {
+                                        Name = $"Set {editItem.Person.FullName} Financial To {ProcessingYear}?",
+                                        finTo = ProcessingYear,
+                                        finToTerm = null
+                                    });
+                                    allowedFinancialTo.Add(new FinToValue()
+                                    {
+                                        Name = $"Set {editItem.Person.FullName} Financial To {ProcessingYear} Term 2?",
+                                        finTo = ProcessingYear,
+                                        finToTerm = 2
+                                    });
+                                    allowedFinancialTo.Add(new FinToValue()
+                                    {
+                                        Name = $"Keep {editItem.Person.FullName} Financial To {editItem.Person.FinancialToText}?",
+                                        finTo = editItem.Person.FinancialTo,
+                                        finToTerm = editItem.Person.FinancialToTerm
+                                    });
+                                    if (selectedFinancialTo == null) { selectedFinancialTo = allowedFinancialTo.First(); }
+                                    <DxFormLayoutItem Caption=@("Financial Status") ColSpanMd="12">
+                                        <DxRadioGroup Items="@allowedFinancialTo" CssClass="w-100 px-2"
+                                                      TextFieldName="@nameof(FinToValue.Name)"
+                                                      @bind-Value=@selectedFinancialTo>
+                                        </DxRadioGroup>
+                                    </DxFormLayoutItem>
+                                }
+                                else
+                                {
+                                    <DxFormLayoutItem Caption=@($"Set {editItem.Person.FullName} Financial To {ProcessingYear}?") ColSpanMd="12">
+                                        <DxCheckBox @bind-Checked=@setFinancialTo Alignment="CheckBoxContentAlignment.Right" />
+                                    </DxFormLayoutItem>
+                                }
                             }
                             @if (originalReceipt != null && ProcessingYear == originalReceipt.Person.FinancialTo)
                             {
-                                <DxFormLayoutItem Caption=@($"Reset {originalReceipt.Person.FullName} Financial To year to {ProcessingYear-1}?") ColSpanMd="12">
-                                    <DxCheckBox @bind-Checked=@resetOriginalFinancialTo Alignment="CheckBoxContentAlignment.Right" />
-                                </DxFormLayoutItem>
+                                if (allowPartPayments)
+                                {
+                                    allowedFinancialTo.Clear();
+                                    allowedFinancialTo.Add(new FinToValue()
+                                    {
+                                        Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear - 1}?",
+                                        finTo = ProcessingYear - 1,
+                                        finToTerm = null
+                                    });
+                                    allowedFinancialTo.Add(new FinToValue()
+                                    {
+                                        Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear} Term 2?",
+                                        finTo = ProcessingYear - 1,
+                                        finToTerm = 2
+                                    });
+                                    allowedFinancialTo.Add(new FinToValue()
+                                    {
+                                        Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear}?",
+                                        finTo = ProcessingYear - 1,
+                                        finToTerm = 2
+                                    });
+                                    <DxFormLayoutItem Caption=@("Financial Status") ColSpanMd="12">
+                                        <DxRadioGroup Items="@allowedFinancialTo" CssClass="w-100 px-2"
+                                                      TextFieldName="@nameof(FinToValue.Name)"
+                                                      @bind-Value=@selectedFinancialTo />
+                                    </DxFormLayoutItem>
+                                }
+                                else
+                                {
+                                    <DxFormLayoutItem Caption=@($"Reset {originalReceipt.Person.FullName} Financial To {ProcessingYear-1}?") ColSpanMd="12">
+                                        <DxCheckBox @bind-Checked=@resetOriginalFinancialTo Alignment="CheckBoxContentAlignment.Right" />
+                                    </DxFormLayoutItem>
+                                }
                             }
                         </DxFormLayoutGroup>
                     </DxFormLayout>
@@ -182,12 +244,23 @@ else
     string? ErrorHeader;
     string? ErrorMessage;
     U3ADbContext? dbc { get; set; }
+    bool allowPartPayments;
+    List<FinToValue> allowedFinancialTo = new();
+    FinToValue selectedFinancialTo;
+
+    public class FinToValue
+    {
+        public string Name { get; set; }
+        public int finTo { get; set; }
+        public int? finToTerm { get; set; }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         settings = dbc.SystemSettings.FirstOrDefault();
+        allowPartPayments = settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly;
         await RefreshData();
         IsReady = true;
     }
@@ -245,23 +318,58 @@ else
                 // Post changes to the database.
                 if (e.IsNew)
                 {
-                    if (setFinancialTo)
-                    {
-                        await BusinessRule.SetPersonDetailsForNewReceipt(dbc, dataItem);
-                    }
-                    else
-                    {
-                        dataItem.FinancialTo = 0;
-                    }
+                    await SetFinancialToDetails(dataItem);
                     await dbc.AddAsync(dataItem);
                 }
                 else
                 {
-                    if (resetOriginalFinancialTo) await BusinessRule.ResetPersonDetailsForDeletedReceipt(dbc, originalReceipt, ProcessingYear);
-                    if (setFinancialTo) await BusinessRule.SetPersonDetailsForEditedReceipt(dbc, originalReceipt, dataItem);
+                    await ResetFinancialToDetails(dataItem);
                 }
                 if (await SaveChangesAsync()) await RefreshData();
             }
+        }
+    }
+
+    async Task SetFinancialToDetails(Receipt receipt)
+    {
+        receipt.FinancialTo = 0;
+        receipt.TermPaid = null;
+        if (allowPartPayments)
+        {
+            if (selectedFinancialTo != null)
+            {
+                receipt.Person.FinancialTo = selectedFinancialTo.finTo;
+                receipt.Person.FinancialToTerm = selectedFinancialTo.finToTerm;
+                receipt.FinancialTo = selectedFinancialTo.finTo;
+                receipt.TermPaid = selectedFinancialTo.finToTerm;
+            }
+        }
+        else
+        {
+            if (setFinancialTo)
+            {
+                await BusinessRule.SetPersonDetailsForNewReceipt(dbc, receipt);
+            }
+        }
+    }
+
+    async Task ResetFinancialToDetails(Receipt receipt)
+    {
+        receipt.FinancialTo = 0;
+        receipt.TermPaid = null;
+        if (allowPartPayments)
+        {
+            if (selectedFinancialTo != null)
+            {
+                receipt.Person.FinancialTo = selectedFinancialTo.finTo;
+                receipt.Person.FinancialToTerm = selectedFinancialTo.finToTerm;
+                receipt.FinancialTo = selectedFinancialTo.finTo;
+                receipt.TermPaid = selectedFinancialTo.finToTerm;
+            }
+        }
+        else
+        {
+            if (resetOriginalFinancialTo) await BusinessRule.ResetPersonDetailsForDeletedReceipt(dbc, originalReceipt, ProcessingYear);
         }
     }
 
@@ -335,7 +443,8 @@ else
             if (currentTerm != null)
             {
                 ProcessingYear = currentTerm.Year;
-            } else { ProcessingYear = DateTime.UtcNow.Year; }
+            }
+            else { ProcessingYear = DateTime.UtcNow.Year; }
         }
         Persons = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
         Receipts = await BusinessRule.EditableReceiptsForYearAsync(dbc, ProcessingYear);
