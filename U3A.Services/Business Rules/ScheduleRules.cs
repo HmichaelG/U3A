@@ -45,12 +45,14 @@ namespace U3A.BusinessRules
             var firstSchedule = await dbc.Schedule.AsNoTracking()
                                         .OrderBy(x => x.CreatedOn)
                                         .FirstOrDefaultAsync();
+            if (firstSchedule == null) { return new List<Class>(); }
+
             TenantInfo tInfo = await tenantService.GetTenantInfoAsync();
             // Get all current Enrolment keys
             var enrolmentKeys = await dbc.Enrolment
                                                 .AsNoTracking()
                                                 .Include(x => x.Term)
-                                                .Where(x => x.Term.Year == term.Year 
+                                                .Where(x => x.Term.Year == term.Year
                                                             && x.Term.TermNumber >= term.TermNumber)
                                                 .Select(x => x.ID).ToListAsync();
             enrolmentKeys.AddRange(await dbcT.MultiCampusEnrolment
@@ -69,7 +71,6 @@ namespace U3A.BusinessRules
             var newDropouts = await dbc.Dropout.AsNoTracking()
                                 .Include(x => x.Term)
                                 .Where(x => x.DropoutDate > firstSchedule.CreatedOn).ToListAsync();
-
             var schedule = await dbc.Schedule.AsNoTracking().ToListAsync();
             Parallel.ForEach(schedule, s =>
             {
