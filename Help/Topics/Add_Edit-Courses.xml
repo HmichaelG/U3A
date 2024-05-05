@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-04-17T11:08:37.229+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-05-05T12:41:02.583+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Add/Edit Courses</title>
   <body>
     <header>
@@ -98,7 +98,12 @@
                   <li styleclass="Normal" style="margin-bottom:0px; line-height:1.15; border:none;">A walking group meets three times per week. The same students attend each walk. Select option 1.</li>
                   <li styleclass="Normal" style="border:none;">An art class is very popular. It is decided to hold the same class three times per week but each class will have a different group of students. In this case, select option 2.</li>
                 </list>
-                <para styleclass="Normal" style="border:none;">Please exercise care when changing the participation type once enrolment has commenced as changing the participation type will cause current enrolments to be lost.</para>
+                <para styleclass="Normal" style="border:none;"><text style="font-weight:bold;">Rules: </text>The followings rules apply when changing the <text style="font-style:italic;">Participation Type...</text></para>
+                <list id="6" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-top:1px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                  <li styleclass="Normal" style="margin-top:1px;">If the course has only one class, no warning is generated. The system performs the change without further ado.</li>
+                  <li styleclass="Normal" style="margin-top:1px;">If you change from <text style="font-weight:bold;">Different participants in each class </text>to <text style="font-weight:bold;">Same participants in each class </text>no warning message is generated. The system will move the class enrolments to course enrolments <text style="text-decoration:underline;">deleting any duplicate students</text>.</li>
+                  <li styleclass="Normal" style="margin-top:1px;">If you change from <text style="font-weight:bold;">Same participants in each class </text>to<text style="font-weight:bold;"> Different participants in each class </text>a message will be generated warning you that the system will move the course enrolments to the first class in the course. It is up to you to then transfer students from that class to other classes, if required. This can be done via <link displaytype="text" defaultstyle="true" type="topiclink" href="Enrol-Participants">Enrol Participants</link>.</li>
+                </list>
               </td>
             </tr>
             <tr style="vertical-align:top">
@@ -218,7 +223,7 @@
               </td>
               <td colspan="2" style="width:1066px;">
                 <para styleclass="Normal">Determines the recipients of leader reports sent automatically overnight...</para>
-                <list id="6" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                <list id="7" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
                   <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Leaders, if none then clerks.</text> Leader reports will be sent to leaders. if there are no leaders with visible email addresses then the reports will be sent to clerks.</li>
                   <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Clerks, if none then leaders.</text> Leader reports will be sent to clerks. if there are no clerks with email visible addresses then the reports will be sent to leaders.</li>
                   <li styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Both</text>. Leader reports will be sent to both leaders and clerks with email addresses.</li>
@@ -233,7 +238,7 @@
               </td>
               <td colspan="2" style="width:1066px;">
                 <para styleclass="Normal">Defines the order in which a course contact is determined. This field overrides the value entered in <link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details">Organistaion Details</link>. The options are...</para>
-                <list id="7" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                <list id="8" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
                   <li styleclass="Normal" style="margin-bottom:0px;">Leaders then clerks, or</li>
                   <li styleclass="Normal">Clerks then leaders</li>
                 </list>
@@ -255,7 +260,7 @@
               </td>
               <td colspan="2" style="width:1066px;">
                 <para styleclass="Normal" style="border:none;">Enter the date from which you wish to offer this course/activity to other U3A groups. Note that this field will only be enabled if...</para>
-                <list id="8" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; border:none; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+                <list id="9" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; border:none; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
                   <li styleclass="Normal" style="margin-bottom:0px; border:none;">the <text style="font-weight:bold;">Allow Multi-Campus Extensions</text> checkbox in <link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details">Organistaion Details</link> is ticked,</li>
                   <li styleclass="Normal" style="margin-bottom:0px; border:none;">The course has no fees,</li>
                   <li styleclass="Normal" style="margin-bottom:0px; border:none;">The course participation type is <text style="font-style:italic;">Same participants in all classes</text>,</li>
@@ -368,7 +373,7 @@
           <para styleclass="Normal">The class link is an internet address that allows a member to quickly enrol in a class. The link is intended to be used in email and other documentation to be sent to members or otherwise available in report form. By clicking on the link or scanning a QR Code created from the link the member will be enrolled in the class.</para>
           <para styleclass="Heading3" style="margin-bottom:0px;">Create a link</para>
           <para styleclass="Normal">To obtain a Class link...</para>
-          <list id="9" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+          <list id="10" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
             <li styleclass="Normal" style="margin-bottom:0px;">On the grid in <link displaytype="text" defaultstyle="true" type="topiclink" href="">Add/Edit Courses</link>, find the required Course.</li>
             <li styleclass="Normal" style="margin-bottom:0px;">Click the arrow button to the left hand side of the Course record. This will display the Class record(s).</li>
             <li styleclass="Normal" style="margin-bottom:0px;">Again, click the arrow to the left hand side of the Class record. This will display the Class link.</li>
@@ -376,7 +381,7 @@
           </list>
           <para styleclass="Heading3" style="margin-bottom:0px;">Using the link</para>
           <para styleclass="Normal">Using the copied link depends on the document you are creating. To add the link to an email created within the administrative portal...</para>
-          <list id="10" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+          <list id="11" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
             <li styleclass="Normal" style="margin-bottom:0px;">Create your email document as usual via the <link displaytype="text" defaultstyle="true" type="topiclink" href="Communicate">Communicate</link> button.</li>
             <li styleclass="Normal" style="margin-bottom:0px;">Position the mouse pointer where you require the link to be inserted.</li>
             <li styleclass="Normal" style="margin-bottom:0px;">On the document menu, select <text style="font-weight:bold;">Insert | Hyperlink</text>. A popup dialog will appear.</li>
@@ -386,14 +391,14 @@
           <para styleclass="Normal" style="margin-bottom:0px;"></para>
           <para styleclass="Normal" style="margin-bottom:1px;">To create a QR Code in a Word document...</para>
           <para styleclass="Normal" style="margin-bottom:0px;"></para>
-          <list id="11" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+          <list id="12" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
             <li styleclass="Normal" style="margin-bottom:0px;">Position the cursor in the document where you wish to insert the QR Code. Press <text style="font-weight:bold;">Ctrl + F9</text>. A pair of curly braces {} will appear in the document.</li>
             <li styleclass="Normal" style="margin-bottom:0px;">Within the braces, type </li>
           </list>
           <para styleclass="Normal" style="margin-bottom:0px;"></para>
           <para styleclass="Normal" style="margin-bottom:0px; margin-left:39px;"><text style="font-family:&apos;Cascadia Code&apos;;">DisplayBarcode &lt;paste link&gt; QR \s 100</text></para>
           <para styleclass="Normal" style="margin-bottom:0px; margin-left:39px;"></para>
-          <list id="12" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="3" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+          <list id="13" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="3" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
             <li styleclass="Normal">When complete, right-click the field and select <text style="font-style:italic;">Toggle Field Codes</text>. This will display the QR Code.</li>
           </list>
           <para styleclass="Normal">Note: The \s value is a percentage value from 10 through 10000. It determines the size of the QR Code.</para>

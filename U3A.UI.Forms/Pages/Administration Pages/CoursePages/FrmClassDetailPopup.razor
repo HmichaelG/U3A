@@ -271,8 +271,8 @@
                     .Where(x => x.ClassID == EditModel.ID)
                     .ForEachAsync(x =>
                     {
-                        x.Date = x.Date.Date + EditModel.StartTime.TimeOfDay;
                         x.Date = x.Date.AddDays(EditModel.OnDay.ID - (int)x.Date.DayOfWeek);
+                        x.Date = x.Date.Date + EditModel.StartTime.TimeOfDay;
                     });
             await progressBar.Close();
         }
