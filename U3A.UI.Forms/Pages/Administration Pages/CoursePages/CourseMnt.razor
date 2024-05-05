@@ -310,6 +310,10 @@ else
             anyEnrolmentsInYear = await BusinessRule.AnyEnrolmentsInYear(dbc, editModel, Year);
         }
         courseEditView = editModel.EditType;
+        if (editModel.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+        {
+            editModel.EnforceOneStudentPerClass = true;
+        }
     }
 
     async Task Grid_EditCanceling(GridEditCancelingEventArgs e)
