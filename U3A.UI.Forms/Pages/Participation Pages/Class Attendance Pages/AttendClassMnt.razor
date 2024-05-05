@@ -272,6 +272,10 @@ else
                 <DxButton Text="Apply Student Leave" CssClass="col-12 mt-1"
                           RenderStyleMode="ButtonRenderStyleMode.Outline"
                           RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
+                <DxButton Text="Reset Selection" CssClass="col-12 mt-1"
+                          Id="ResetSelection"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@OnResetSelection" />
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Caption="Ad Hoc Attendees">
                 <DxButton Text="Add Ad Hoc Attendee(s)" CssClass="col-12 mt-1"
@@ -344,6 +348,7 @@ else
     .bg-muted {
         --bs-bg-opacity: 0.1;
     }
+
     .grid-height {
         height: @gridHeight;
     }
@@ -563,7 +568,7 @@ else
         if (ClassDate.Date.Date > now.Date)
         {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                    @"The class date you have selected is in the future.<br/>
+                                        @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
@@ -715,6 +720,31 @@ else
         countAdHoc = ClassAttendance.Where(x => x.IsAdHoc).Count();
     }
 
+    async Task OnResetSelection()
+    {
+        int count = 0;
+        int errorCount = 0;
+        if (SelectedDataItems == null || SelectedDataItems.Count < 1)
+        {
+            ShowInvalidSelectionFlyout("#ResetSelection");
+            IsFlyoutOpen = true;
+        }
+        else
+        {
+            count = SelectedDataItems.Count;
+            foreach (var c in SelectedDataItems.Cast<AttendClass>())
+            {
+                dbc.Remove(c);
+            }
+            if (await SaveChangesAsync())
+            {
+                await messageBox.ShowOkOnlyAsync("Reset selecteion", "The selected attendance records have been reset.");
+                await GetClassAttendance();
+            }
+        }
+        UpdateStatistics();
+    }
+
     async Task DeleteAdHocAttendee()
     {
         int count = 0;
@@ -858,8 +888,8 @@ else
         isLeaveBusy = true;
         try
         {
-            var attendance = (ForceAcceptLeave) 
-                                ? ClassAttendance 
+            var attendance = (ForceAcceptLeave)
+                                ? ClassAttendance
                                 : ClassAttendance.Where(x => x.DateProcessed == null);
             foreach (var ac in attendance)
             {
