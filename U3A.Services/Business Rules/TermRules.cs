@@ -99,7 +99,7 @@ namespace U3A.BusinessRules
 
         public static async Task<List<Term>> SelectableTermsInCurrentYearAsync(U3ADbContext dbc)
         {
-            var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+            var currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
             return await SelectableTermsInCurrentYearAsync(dbc, currentTerm);
         }
         public static async Task<List<Term>> SelectableTermsInCurrentYearAsync(U3ADbContext dbc, Term CurrentTerm)

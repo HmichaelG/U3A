@@ -140,8 +140,8 @@ else
         dbc = await U3Adbfactory.CreateDbContextAsync();
         dbcT = await TenantDbfactory.CreateDbContextAsync();
         settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
-        currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+        currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
+        terms = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc);
         selectedTerm = currentTerm;
         await SelectedTermChanged(selectedTerm);
         IsReady = true;
