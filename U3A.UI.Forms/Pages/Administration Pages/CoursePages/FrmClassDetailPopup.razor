@@ -266,15 +266,6 @@
                         all attendance records for this class to be recalculated. </p>
                         <p>Do you wish to continue?</p>";
             if (!await messageBox.ShowAsync("Change to Start Time / On Day", msg)) return false;
-            await progressBar.ShowSmallSpinnerAsync();
-            await DbContext?.AttendClass
-                    .Where(x => x.ClassID == EditModel.ID)
-                    .ForEachAsync(x =>
-                    {
-                        x.Date = x.Date.AddDays(EditModel.OnDay.ID - (int)x.Date.DayOfWeek);
-                        x.Date = x.Date.Date + EditModel.StartTime.TimeOfDay;
-                    });
-            await progressBar.Close();
         }
         return true;
     }

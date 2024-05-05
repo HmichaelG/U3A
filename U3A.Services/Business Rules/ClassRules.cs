@@ -580,5 +580,29 @@ namespace U3A.BusinessRules
             }
             return result;
         }
+
+        public static async Task ReassignClassDatetime(U3ADbContext dbc, Class c)
+        {
+            var onDayModified = c.EntityPropertyChanges(dbc, nameof(Class.OnDayID));
+            var startTimeModified = c.EntityPropertyChanges(dbc, nameof(Class.StartTime));
+            if (onDayModified == null && startTimeModified == null) { return; }
+            {
+                await dbc.AttendClass
+                        .Where(x => x.ClassID == c.ID)
+                        .ForEachAsync(x =>
+                        {
+                            if (onDayModified != null) 
+                            { 
+                                x.Date = x.Date.AddDays((int)onDayModified.Value.newValue - (int)onDayModified.Value.originalValue); 
+                            }
+                            if (startTimeModified != null)
+                            {
+                                x.Date = x.Date.Date + ((DateTime)startTimeModified.Value.newValue).TimeOfDay;
+                            }
+                        });
+
+            }
+
+        }
     }
 }

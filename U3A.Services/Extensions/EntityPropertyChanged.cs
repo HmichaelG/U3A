@@ -20,7 +20,7 @@ namespace U3A.Services
             {
                 var entry = dbc.Entry(objSource);
                 var modified = entry.Properties
-                        .Where(prop => prop.Metadata.Name.ToLower() == PropertyName.ToLower())
+                        .Where(prop => prop.IsModified && prop.Metadata.Name.ToLower() == PropertyName.ToLower())
                         .FirstOrDefault();
                 if (modified != null)
                 {

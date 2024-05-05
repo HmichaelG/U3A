@@ -408,6 +408,10 @@ else
             {
                 dataItem.Classes.Add(c);
             }
+            else
+            {
+                await BusinessRule.ReassignClassDatetime(dbc, c);
+            }
         }
     }
 
