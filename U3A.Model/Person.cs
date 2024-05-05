@@ -287,6 +287,14 @@ namespace U3A.Model
                 return result;
             }
         }
+        [NotMapped]
+        public string FirstAndLastName
+        {
+            get
+            {
+                return $"{ToTitleText(FirstName.Trim())} {ToTitleText(LastName.Trim())}"; 
+            }
+        }
         public string FullNameWithPostNominals
         {
             get
