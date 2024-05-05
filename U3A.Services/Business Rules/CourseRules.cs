@@ -6,6 +6,7 @@ using System.Text;
 using U3A.Database;
 using U3A.Database.Migrations.U3ADbContextSeedMigrations;
 using U3A.Model;
+using U3A.Services;
 
 namespace U3A.BusinessRules
 {
@@ -285,6 +286,51 @@ namespace U3A.BusinessRules
                             .Where(x => x.ID != course.ID &&
                                         (x.Year == course.Year &&
                                             x.Name.Trim().ToUpper() == course.Name.Trim().ToUpper())).FirstOrDefaultAsync();
+        }
+
+        public static async Task ReassignCourseParticipationEnrolments(U3ADbContext dbc, Course course)
+        {
+            var propName = nameof(Course.CourseParticipationTypeID);
+            var modified = course.EntityPropertyChanges(dbc, propName);
+            if (modified == null) { return; }
+            ParticipationType original = (ParticipationType)((int)modified.Value.originalValue);
+            ParticipationType newValue = (ParticipationType)((int)modified.Value.newValue);
+            var enrolments = await dbc.Enrolment.Where(x => x.CourseID == course.ID).ToListAsync();
+            if (original == ParticipationType.SameParticipantsInAllClasses)
+            {
+                // change to Dfferent participants in each class
+                var c = course.Classes.First();
+                if (c != null)
+                {
+                    foreach (var e in enrolments)
+                    {
+                        e.ClassID = c.ID;
+                        e.Class = c;
+                    }
+                }
+            }
+            else
+            {
+                // Change to Same participants in each class
+                foreach (var e in enrolments)
+                {
+                    e.ClassID = null;
+                    e.Class = null;
+                }
+                // remove duplicates
+                List<Guid> peopleID = new();
+                List<Enrolment> toDelete = new();
+                foreach (var e in enrolments)
+                {
+                    if (peopleID.Find(x => x == e.PersonID) == Guid.Empty)
+                    { peopleID.Add(e.PersonID); }
+                    else
+                    {
+                        toDelete.Add(e);
+                    }
+                }
+                dbc.RemoveRange(toDelete);
+            }
         }
     }
 }

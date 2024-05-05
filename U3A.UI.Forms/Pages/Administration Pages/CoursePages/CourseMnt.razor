@@ -382,7 +382,11 @@ else
             }
             await ProcessClasses(dataItem, editModel);
             // Post changes to the database.
-            if (e.IsNew) dbc.Add(dataItem);
+            if (e.IsNew) { dbc.Add(dataItem); } 
+            else
+            {
+                await BusinessRule.ReassignCourseParticipationEnrolments(dbc, dataItem);
+            };
             if (await SaveChangesAsync())
             {
                 await GetData();

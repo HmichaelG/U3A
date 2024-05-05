@@ -10,7 +10,7 @@
     </DxFormLayoutItem>
     <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
         <DxComboBox Data="CourseTypes"
-        @bind-Value="Course.CourseType"
+                    @bind-Value="Course.CourseType"
                     TextFieldName="@nameof(CourseType.NameWithStatus)">
         </DxComboBox>
     </DxFormLayoutItem>
@@ -22,7 +22,7 @@
                     TextFieldName="@nameof(CourseParticipationType.Name)">
         </DxComboBox>
     </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Enforce One Class Per Student?" ColSpanMd="4" Context="context" >
+    <DxFormLayoutItem Caption="Enforce One Class Per Student?" ColSpanMd="4" Context="context">
         <DxCheckBox @bind-Checked="Course.EnforceOneStudentPerClass"
                     Alignment=CheckBoxContentAlignment.Right Enabled=@isDifferentParticipantsInEachClass />
     </DxFormLayoutItem>
@@ -33,8 +33,8 @@
         <DxMemo @bind-Text="Course.Description" Rows="5" />
     </DxFormLayoutItem>
     <DxFormLayoutItem Caption="Additional Info URL" ColSpanMd="12">
-        <DxTextBox @bind-Text="Course.AdditionalInformationURL" 
-            NullText="A fully qualified URL: https://example.com.au. Keep it short, use TinyURL." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"  />
+        <DxTextBox @bind-Text="Course.AdditionalInformationURL"
+                   NullText="A fully qualified URL: https://example.com.au. Keep it short, use TinyURL." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
     </DxFormLayoutItem>
     <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="3">
         <DxMaskedInput @bind-Value="Course.Duration"
@@ -116,17 +116,27 @@
 
     async Task OnCourseParticipationTypeChange(CourseParticipationType participationType)
     {
+        // This is a safe change
+        if (participationType.ID == (int)ParticipationType.SameParticipantsInAllClasses ||
+                                            Course.Classes.Count <= 1)
+        {
+            Course.CourseParticipationType = participationType;
+            isDifferentParticipantsInEachClass = (participationType.ID == 1) ? true : false;
+            return;
+        }
         if (AnyEnrolmentsInYear)
         {
-            await messageBox.ShowOkOnlyAsync("Participation Type cannot be changed",
-                                               @"<p>The course participation type cannot be changed because enrolments
+            if (await messageBox.ShowAsync("Participation Type is changing",
+                    @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
                    have already been assigned to it in the current year.</p>
-                   <p>The safest way to to implement this change is...</p>
-                   <ol><li>Create a completely new course, and then</li>
-                   <li>Transfer enrolments from the old to the new via <em>Enrol Participants</em>.</li></ol>");
+                   <p>If you continue, all enrolments will be assigned to the first class in the course.
+                    You will be responsible for transfering enrolemnts between classes, if necessary.</p>
+                   <p>Do you wish to continue?<p>"))
+            {
+                Course.CourseParticipationType = participationType;
+                isDifferentParticipantsInEachClass = (participationType.ID == 1) ? true : false;
+            }
         }
-        else { Course.CourseParticipationType = participationType; }
-        isDifferentParticipantsInEachClass = (participationType.ID == 1) ? true : false;
     }
 
 }
