@@ -3,6 +3,7 @@
 
 <MessageBox @ref="@messageBox" />
 <Progress @ref=@progressBar />
+<ClassDataCheck @ref=@classDataCheck />
 
 @if (editItem != null)
 {
@@ -145,6 +146,7 @@
     MessageBox? messageBox;
     Progress? progressBar;
     ValidationSummary validator;
+    ClassDataCheck? classDataCheck;
 
     bool IsOnDayReadOnly;
     bool showFullDetail = false;
@@ -181,62 +183,10 @@
         {
             using (var DbContext = await U3Adbfactory.CreateDbContextAsync())
             {
-                result = await IsDataOk(DbContext);
+                result = await classDataCheck.IsDataOk(DbContext, editItem, isNewRecord);
             }
         }
         return result;
-    }
-
-    async Task<bool> IsDataOk(U3ADbContext DbContext)
-    {
-        var msg = string.Empty;
-        if (await BusinessRule.IsOutOfTermClass(DbContext, editItem))
-        {
-            if (!await BusinessRule.IsOutOfTermClassOK(DbContext, editItem))
-            {
-                msg = @"<p>An Out of Term class must have an Occurrence of <strong>Once Only</strong> and Recurrence of <strong>nothing</strong>.</p>";
-                // set correct values
-                editItem.OccurrenceID = (int)OccurrenceType.OnceOnly;
-                editItem.Occurrence = DbContext?.Occurrence.First(x => x.ID == (int)OccurrenceType.OnceOnly);
-                editItem.Recurrence = null;
-            }
-            if (!await BusinessRule.IsOutOfTermClassTermOK(DbContext, editItem))
-            {
-                msg += @"<p>An Out of Term class must be offered in <strong>one</strong>
-                            term only being the term immediately preceding the Start Date.</p>";
-            }
-            if (msg != string.Empty)
-            {
-                await messageBox.ShowOkOnlyAsync("Incorrect Out of Term configuration", msg);
-                return false;
-            }
-        }
-        else
-        {
-            await BusinessRule.AssignTermForOnceOnlyClass(DbContext, editItem);
-        }
-
-
-        if (isNewRecord) return true;
-
-        var original = DbContext?.Class.Include(x => x.OnDay).AsNoTracking().First(x => x.ID == editItem.ID);
-        if (editItem.StartTime != original.StartTime || editItem.OnDay.ID != original.OnDay.ID)
-        {
-            msg = @"<p>Changing the <strong>Start Time</strong> or <strong>On Day</strong> fields will cause the date on
-                        all attendance records for this class to be recalculated. </p>
-                        <p>Do you wish to continue?</p>";
-            if (!await messageBox.ShowAsync("Change to Start Time / On Day", msg)) return false;
-            await progressBar.ShowSmallSpinnerAsync();
-            await DbContext?.AttendClass
-                    .Where(x => x.ClassID == editItem.ID)
-                    .ForEachAsync(x =>
-                    {
-                        x.Date = x.Date.Date + editItem.StartTime.TimeOfDay;
-                        x.Date = x.Date.AddDays(editItem.OnDay.ID - (int)x.Date.DayOfWeek);
-                    });
-            await progressBar.Close();
-        }
-        return true;
     }
 
     async Task OnStartDateChanged(DateTime? newStartDate, Class editItem)

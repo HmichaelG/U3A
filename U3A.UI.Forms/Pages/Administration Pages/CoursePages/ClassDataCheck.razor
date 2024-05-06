@@ -1,0 +1,71 @@
+﻿
+<MessageBox @ref="@messageBox" />
+
+@code {
+    MessageBox? messageBox;
+
+    public async Task<bool> IsDataOk(U3ADbContext DbContext, Class EditModel, bool IsNew)
+    {
+        var msg = string.Empty;
+        if (await BusinessRule.IsOutOfTermClass(DbContext, EditModel))
+        {
+            if (!await BusinessRule.IsOutOfTermClassOK(DbContext, EditModel))
+            {
+                msg = @"<p>An Out of Term class must have an Occurrence of <strong>Once Only</strong> and Recurrence of <strong>nothing</strong>.</p>";
+                // set correct values
+                EditModel.OccurrenceID = (int)OccurrenceType.OnceOnly;
+                EditModel.Occurrence = DbContext?.Occurrence.First(x => x.ID == (int)OccurrenceType.OnceOnly);
+                EditModel.Recurrence = null;
+            }
+            if (!await BusinessRule.IsOutOfTermClassTermOK(DbContext, EditModel))
+            {
+                msg += @"<p>An Out of Term class must be offered in <strong>one</strong>
+                            term only being the term immediately preceding the Start Date.</p>";
+            }
+            if (msg != string.Empty)
+            {
+                await messageBox.ShowOkOnlyAsync("Incorrect Out of Term configuration", msg);
+                return false;
+            }
+        }
+        else
+        {
+            await BusinessRule.AssignTermForOnceOnlyClass(DbContext, EditModel);
+        }
+
+        if (IsNew) return true;
+
+        var original = DbContext?.Class.AsNoTracking()
+                        .Include(x => x.OnDay)
+                        .Include(x => x.Occurrence)
+                        .FirstOrDefault(x => x.ID == EditModel.ID);
+        if (original != null &&
+            (
+                EditModel.StartTime != original.StartTime
+                    || EditModel.OnDay.ID != original.OnDay.ID
+                    || EditModel.Occurrence.ID != original.Occurrence.ID
+                    || EditModel.StartDate != original.StartDate
+                    || EditModel.Recurrence != original.Recurrence
+                    || EditModel.OfferedTerm1 != original.OfferedTerm1
+                    || EditModel.OfferedTerm2 != original.OfferedTerm2
+                    || EditModel.OfferedTerm3 != original.OfferedTerm3
+                    || EditModel.OfferedTerm4 != original.OfferedTerm4
+            ))
+        {
+            var today = TimezoneAdjustment.GetLocalTime().Date.ToString(constants.STD_DATETIME_FORMAT);
+            msg = $@"<p>Changing the class schedule will cause
+                        any <strong>future</strong> attendance records for this class to be deleted
+                        and re-created with the new schedule details. Records previous to today ({today}) will remain as is.</p>
+                        <p><strong>Hint:</strong> It will be less confusing if this change is made during term break.</p>
+                        <p>Click Ok to continue?</p>";
+            if (!await messageBox.ShowAsync("Change to Class Schedule", msg))
+            {
+                EditModel.StartTime = original.StartTime;
+                EditModel.OnDay = original.OnDay;
+                return false;
+            }
+        }
+        return true;
+    }
+
+}

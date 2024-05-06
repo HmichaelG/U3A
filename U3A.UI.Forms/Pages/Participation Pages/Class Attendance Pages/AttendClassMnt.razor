@@ -78,7 +78,7 @@ else
                                 AllowUserInput=false
                                 Enabled="@dateComboEnabled"
                                 NullText="@dateComboNullText"
-                                TextFieldName="@nameof(ClassDate.WeekDateName)"
+                                TextFieldName="@nameof(ClassDate.ClassDateName)"
                                 Value="@selectedDate"
                                 ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))" />
                 </div>
@@ -121,7 +121,7 @@ else
                         <DxComboBox @ref="@DateComboBox" Data="@ClassDates"
                                     Enabled="@dateComboEnabled"
                                     NullText="@dateComboNullText"
-                                    TextFieldName="@nameof(ClassDate.WeekDateName)"
+                                    TextFieldName="@nameof(ClassDate.ClassDateName)"
                                     Value="@selectedDate"
                                     ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))" />
                     </DxFormLayoutItem>

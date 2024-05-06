@@ -14,7 +14,7 @@ namespace U3A.Model
                 return Date.ToString("ddd, dd MMM yyyy hh:mm tt");
             }
         }
-        public string WeekDateName
+        public string ClassDateName
         {
             get
             {
@@ -22,7 +22,7 @@ namespace U3A.Model
                 if (TermStart != null)
                 {
                     var wk = ((Date - TermStart).Days / 7) + 1;
-                    result = $"Wk {wk}: {DateName}";
+                    result = $"Cls {wk}: {DateName}";
                 }
                 return result;
             }
