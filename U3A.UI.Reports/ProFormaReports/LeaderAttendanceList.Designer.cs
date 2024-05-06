@@ -514,7 +514,7 @@
             this.xrLabel3.Name = "xrLabel3";
             this.xrLabel3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.xrLabel3.SizeF = new System.Drawing.SizeF(672.9999F, 29.25001F);
-            this.xrLabel3.Text = "Tick = Present, A = Absent with apology, X = Absent wothout apology";
+            this.xrLabel3.Text = "Tick = Present, A = Absent with apology, X = Absent without apology";
             // 
             // xrLine1
             // 
