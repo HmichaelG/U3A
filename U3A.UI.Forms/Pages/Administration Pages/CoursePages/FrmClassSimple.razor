@@ -3,7 +3,7 @@
 
 <MessageBox @ref="@messageBox" />
 <Progress @ref=@progressBar />
-<ClassDataCheck @ref=@classDataCheck />
+<CommonClassProcedures @ref=@commonClassProcedures />
 
 @if (editItem != null)
 {
@@ -146,7 +146,7 @@
     MessageBox? messageBox;
     Progress? progressBar;
     ValidationSummary validator;
-    ClassDataCheck? classDataCheck;
+    CommonClassProcedures? commonClassProcedures;
 
     bool IsOnDayReadOnly;
     bool showFullDetail = false;
@@ -183,7 +183,7 @@
         {
             using (var DbContext = await U3Adbfactory.CreateDbContextAsync())
             {
-                result = await classDataCheck.IsDataOk(DbContext, editItem, isNewRecord);
+                result = await commonClassProcedures.IsDataOk(DbContext, editItem, isNewRecord);
             }
         }
         return result;
@@ -191,30 +191,7 @@
 
     async Task OnStartDateChanged(DateTime? newStartDate, Class editItem)
     {
-        editItem.StartDate = newStartDate;
-        if (newStartDate.HasValue)
-        {
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-            {
-                editItem.OnDay = dbc.WeekDay.Find((int)newStartDate.Value.DayOfWeek);
-                Term term = await BusinessRule.FindTermAsync(dbc, newStartDate.Value);
-                if (term != null)
-                {
-                    editItem.OfferedTerm1 = (term.TermNumber == 1);
-                    editItem.OfferedTerm2 = (term.TermNumber == 2);
-                    editItem.OfferedTerm3 = (term.TermNumber == 3);
-                    editItem.OfferedTerm4 = (term.TermNumber == 4);
-                }
-            }
-        }
-        else
-        {
-            editItem.OfferedTerm1 = true;
-            editItem.OfferedTerm2 = true;
-            editItem.OfferedTerm3 = true;
-            editItem.OfferedTerm4 = true;
-        }
-        IsOnDayReadOnly = newStartDate.HasValue;
+        IsOnDayReadOnly = await commonClassProcedures.OnStartDateChanged(newStartDate, editItem);
     }
 }
 

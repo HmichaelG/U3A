@@ -22,7 +22,7 @@ namespace U3A.Model
                 if (TermStart != null)
                 {
                     var wk = ((Date - TermStart).Days / 7) + 1;
-                    result = $"Cls {wk}: {DateName}";
+                    result = $"Wk {wk}: {DateName}";
                 }
                 return result;
             }

@@ -1,8 +1,37 @@
-﻿
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
 <MessageBox @ref="@messageBox" />
 
 @code {
     MessageBox? messageBox;
+
+    internal async Task<bool> OnStartDateChanged(DateTime? newStartDate, Class editItem)
+    {
+        editItem.StartDate = newStartDate;
+        if (newStartDate.HasValue)
+        {
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                editItem.OnDay = dbc.WeekDay.Find((int)newStartDate.Value.DayOfWeek);
+                Term term = await BusinessRule.FindTermAsync(dbc, newStartDate.Value);
+                if (term != null)
+                {
+                    editItem.OfferedTerm1 = (term.TermNumber == 1);
+                    editItem.OfferedTerm2 = (term.TermNumber == 2);
+                    editItem.OfferedTerm3 = (term.TermNumber == 3);
+                    editItem.OfferedTerm4 = (term.TermNumber == 4);
+                }
+            }
+        }
+        else
+        {
+            editItem.OfferedTerm1 = true;
+            editItem.OfferedTerm2 = true;
+            editItem.OfferedTerm3 = true;
+            editItem.OfferedTerm4 = true;
+        }
+        return newStartDate.HasValue;
+    }
 
     public async Task<bool> IsDataOk(U3ADbContext DbContext, Class EditModel, bool IsNew)
     {
