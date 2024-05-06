@@ -7,7 +7,7 @@
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
    <meta name="generator" content="Help &amp; Manual" />
    <meta name="keywords" content="" />
-   <meta name="description" content="Version 2024.Current Add/Edit Courses Previously, you could not change the Course Participation Type if a course had enrolments. This restriction is now relaxed... If the course" />
+   <meta name="description" content="Version 2024.Current Add/Edit Courses Previously, when a class start time or day was changed, the system would change all attendance records to match the new date &amp; time. This..." />
    <link type="text/css" href="default.css" rel="stylesheet" />
    <link type="text/css" href="custom.css" rel="stylesheet" />
 
@@ -128,6 +128,19 @@
 
 <!--ZOOMRESTART-->
 <h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Version 2024.Current</span></h2>
+<h3 class="p_Heading3"><span class="f_Heading3">Add/Edit Courses</span></h3>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Previously, when a class start time or day was changed, the system would change all attendance records to match the new date &amp; time. This has been changed such that any change to a schedule parameter value will cause <span style="font-weight: bold;">future</span> attendance records to be deleted and recreated with the new schedule values. Existing records prior to the current system date will remain intact and without change. The schedule parameter values that will trigger this behaviour are...</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">a.</span>Term offered</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">b.</span>Start Date</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">c.</span>Recurrence</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">d.</span>Occurrence</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">e.</span> On Day</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin: 0 0 0 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">f.</span>Start Time</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 0 13px;">This change will preserve existing attendance records while allowing change to future records. The only time that this may cause issue is where leaders/clerks record attendance into future classes. This is not recommended.</p>
+<p class="p_Normal" style="margin: 0 0 0 13px;">&nbsp;</p>
+<p class="p_Normal" style="margin: 0 0 0 13px;">Student leave records will not be changed.</p>
+<h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Version 2024.5.5</span></h2>
 <h3 class="p_Heading3"><span class="f_Heading3">Add/Edit Courses</span></h3>
 <p class="p_Normal">Previously, you could not change the <span style="font-style: italic;">Course Participation Type</span> if a course had enrolments. This restriction is now relaxed...</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>If the course has only one class, no warning is generated. The system performs the change without further ado.</p>

@@ -444,7 +444,7 @@ namespace U3A.BusinessRules
                     }
                     break;
                 case ClassScheduleDisplayPeriod.CurrentTerm:
-                    if (!termsOffered[term.TermNumber-1]) { result = false; }
+                    if (!termsOffered[term.TermNumber - 1]) { result = false; }
                     break;
             }
             return result;
@@ -581,26 +581,31 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        public static async Task ReassignClassDatetime(U3ADbContext dbc, Class c)
+        public static async Task ReassignClassScheduleValues(U3ADbContext dbc, Class c)
         {
             var onDayModified = c.EntityPropertyChanges(dbc, nameof(Class.OnDayID));
+            var onOccurenceModified = c.EntityPropertyChanges(dbc, nameof(Class.OccurrenceID));
             var startTimeModified = c.EntityPropertyChanges(dbc, nameof(Class.StartTime));
-            if (onDayModified == null && startTimeModified == null) { return; }
+            var startDateModified = c.EntityPropertyChanges(dbc, nameof(Class.StartDate));
+            var recurrenceModified = c.EntityPropertyChanges(dbc, nameof(Class.Recurrence));
+            var offeredT1Modified = c.EntityPropertyChanges(dbc, nameof(Class.OfferedTerm1));
+            var offeredT2Modified = c.EntityPropertyChanges(dbc, nameof(Class.OfferedTerm2));
+            var offeredT3Modified = c.EntityPropertyChanges(dbc, nameof(Class.OfferedTerm3));
+            var offeredT4Modified = c.EntityPropertyChanges(dbc, nameof(Class.OfferedTerm4));
+            if (onDayModified == null 
+                && startTimeModified == null 
+                && onOccurenceModified == null
+                && startDateModified == null
+                && recurrenceModified == null
+                && offeredT1Modified == null
+                && offeredT2Modified == null
+                && offeredT3Modified == null
+                && offeredT4Modified == null) { return; }
             {
-                await dbc.AttendClass
-                        .Where(x => x.ClassID == c.ID)
-                        .ForEachAsync(x =>
-                        {
-                            if (onDayModified != null) 
-                            { 
-                                x.Date = x.Date.AddDays((int)onDayModified.Value.newValue - (int)onDayModified.Value.originalValue); 
-                            }
-                            if (startTimeModified != null)
-                            {
-                                x.Date = x.Date.Date + ((DateTime)startTimeModified.Value.newValue).TimeOfDay;
-                            }
-                        });
-
+                var itesmToRenove = dbc.AttendClass
+                          .Where(x => x.ClassID == c.ID
+                                  && x.Date > TimezoneAdjustment.GetLocalTime().Date).ToList();
+                dbc.RemoveRange(itesmToRenove);
             }
 
         }
