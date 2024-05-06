@@ -29,9 +29,17 @@
 
     <HeadOutlet @rendermode="@RenderModeForPage" />
 
+    <style type="text/css">
+        .disableSelect {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+    </style>
 </head>
 
-<body oncontextmenu="return false;">
+<body oncontextmenu="return false;" class="disableSelect">
     
     <script type="text/javascript" src="/js/MyFunctions.js"></script>
     <script type="text/javascript" src="/js/reCaptchaV2.js"></script>
