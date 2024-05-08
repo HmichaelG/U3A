@@ -10831,3 +10831,177 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501034152_U3A_ISoftDelete_DateTime'
+)
+BEGIN
+    DECLARE @var72 sysname;
+    SELECT @var72 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Enrolment]') AND [c].[name] = N'DeletedAt');
+    IF @var72 IS NOT NULL EXEC(N'ALTER TABLE [Enrolment] DROP CONSTRAINT [' + @var72 + '];');
+    ALTER TABLE [Enrolment] ALTER COLUMN [DeletedAt] datetime2 NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501034152_U3A_ISoftDelete_DateTime'
+)
+BEGIN
+    DECLARE @var73 sysname;
+    SELECT @var73 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Course]') AND [c].[name] = N'DeletedAt');
+    IF @var73 IS NOT NULL EXEC(N'ALTER TABLE [Course] DROP CONSTRAINT [' + @var73 + '];');
+    ALTER TABLE [Course] ALTER COLUMN [DeletedAt] datetime2 NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501034152_U3A_ISoftDelete_DateTime'
+)
+BEGIN
+    DECLARE @var74 sysname;
+    SELECT @var74 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Class]') AND [c].[name] = N'DeletedAt');
+    IF @var74 IS NOT NULL EXEC(N'ALTER TABLE [Class] DROP CONSTRAINT [' + @var74 + '];');
+    ALTER TABLE [Class] ALTER COLUMN [DeletedAt] datetime2 NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501034152_U3A_ISoftDelete_DateTime'
+)
+BEGIN
+    DECLARE @var75 sysname;
+    SELECT @var75 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[AttendClass]') AND [c].[name] = N'DeletedAt');
+    IF @var75 IS NOT NULL EXEC(N'ALTER TABLE [AttendClass] DROP CONSTRAINT [' + @var75 + '];');
+    ALTER TABLE [AttendClass] ALTER COLUMN [DeletedAt] datetime2 NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501034152_U3A_ISoftDelete_DateTime'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240501034152_U3A_ISoftDelete_DateTime', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501051222_U3A_ISoftDelete_Person'
+)
+BEGIN
+    DECLARE @var76 sysname;
+    SELECT @var76 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[AttendClass]') AND [c].[name] = N'DeletedAt');
+    IF @var76 IS NOT NULL EXEC(N'ALTER TABLE [AttendClass] DROP CONSTRAINT [' + @var76 + '];');
+    ALTER TABLE [AttendClass] DROP COLUMN [DeletedAt];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501051222_U3A_ISoftDelete_Person'
+)
+BEGIN
+    DECLARE @var77 sysname;
+    SELECT @var77 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[AttendClass]') AND [c].[name] = N'IsDeleted');
+    IF @var77 IS NOT NULL EXEC(N'ALTER TABLE [AttendClass] DROP CONSTRAINT [' + @var77 + '];');
+    ALTER TABLE [AttendClass] DROP COLUMN [IsDeleted];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501051222_U3A_ISoftDelete_Person'
+)
+BEGIN
+    ALTER TABLE [Person] ADD [DeletedAt] datetime2 NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501051222_U3A_ISoftDelete_Person'
+)
+BEGIN
+    ALTER TABLE [Person] ADD [IsDeleted] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501051222_U3A_ISoftDelete_Person'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240501051222_U3A_ISoftDelete_Person', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501052636_U3A_ISoftDelete_Receipt'
+)
+BEGIN
+    ALTER TABLE [Receipt] ADD [DeletedAt] datetime2 NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501052636_U3A_ISoftDelete_Receipt'
+)
+BEGIN
+    ALTER TABLE [Receipt] ADD [IsDeleted] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240501052636_U3A_ISoftDelete_Receipt'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240501052636_U3A_ISoftDelete_Receipt', N'8.0.4');
+END;
+GO
+
+COMMIT;
+GO
+
