@@ -25,6 +25,7 @@ else
                   OnValidSubmit=@ValidFormSubmitted
                   Context="editContext">
             <DataAnnotationsValidator />
+            <ValidationSummary />
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
                 @if (loginState.SelectedPerson == null)
                 {
@@ -86,7 +87,9 @@ else
                             <ValidationMessage For="@(() => person.Gender)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
-                            <DxDateEdit @bind-Date="@person.BirthDate" NullText="Optional It helps to know you." />
+                            <DxDateEdit @bind-Date="@person.BirthDate" 
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                NullText="Optional It helps to know you." />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                             <DxMemo @bind-Text="@person.Occupation" Rows="3"

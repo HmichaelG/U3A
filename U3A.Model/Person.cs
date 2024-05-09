@@ -64,6 +64,7 @@ namespace U3A.Model
         [DefaultValue("Male")]
         public string Gender { get; set; }
 
+        [DateOfBirth]
         public DateTime? BirthDate { get; set; }
         public DateTime? DateJoined { get; set; }
         public DateTime? PreviousDateJoined { get; set; }
@@ -482,6 +483,24 @@ public class EmailAddressAlowNullAttribute : ValidationAttribute
 
         var a = new EmailAddressAttribute();
         return a.GetValidationResult(value, validationContext);
+    }
+}
+public class DateOfBirthAttribute : ValidationAttribute
+{
+
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    {
+        if (value == null) { return ValidationResult.Success; }
+
+        var year = DateTime.UtcNow.Year - 110;
+        var startDate = new DateOnly(year, 1, 1);
+        var endDate = new DateOnly(year+60,1,1);
+        ErrorMessage = $"Invalid birth date: not in range {startDate.ToString()} to {endDate.ToString()}";
+        
+        var birthDate = DateOnly.FromDateTime( ((DateTime)value));
+
+        if (birthDate >= startDate && birthDate <= endDate) return ValidationResult.Success;
+        return new ValidationResult(ErrorMessage) ;
     }
 }
 

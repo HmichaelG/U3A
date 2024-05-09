@@ -162,7 +162,8 @@
                                     <DxComboBox Data="@gender" @bind-Value="@editItem.Gender" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
-                                    <DxDateEdit @bind-Date="@editItem.BirthDate" />
+                                    <DxDateEdit @bind-Date="@editItem.BirthDate"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                                     <DxMemo @bind-Text="@editItem.Occupation" Rows="3" />
