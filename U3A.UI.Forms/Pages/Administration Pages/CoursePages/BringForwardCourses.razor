@@ -68,8 +68,7 @@ else
                     <DxGridDataColumn Caption="Maximum Allowed" FieldName="MaximumStudents" DisplayFormat="{0:n0}" />
                 </Columns>
                 <DetailRowTemplate>
-                    <ClassDetail Course="(Course)context.DataItem"
-                                 AllowEdit="false" />
+                    <FrmClassDetailPopup Course="(Course)context.DataItem" AllowEdit="false" />
                 </DetailRowTemplate>
             </DxGrid>
         </ContentTemplate>
