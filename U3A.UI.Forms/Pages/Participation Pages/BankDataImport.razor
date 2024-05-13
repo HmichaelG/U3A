@@ -607,7 +607,9 @@ else
                 if (receipt.Amount >= 0)
                 {
                     // process a receipt
-                    if (thisPerson.FinancialTo < receipt.FinancialTo)
+                    var currentFT = thisPerson.FinancialTo * 10 + (thisPerson.FinancialToTerm ?? 9);
+                    var receiptFT = receipt.FinancialTo * 10 + (receipt.TermPaid ?? 9);
+                    if (currentFT < receiptFT)
                     {
                         thisPerson.PreviousDateJoined = thisPerson.DateJoined;
                         thisPerson.PreviousFinancialTo = thisPerson.FinancialTo;
