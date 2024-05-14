@@ -231,12 +231,26 @@ namespace U3A.Database
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Class>()
                 .HasQueryFilter(x => x.IsDeleted == false);
+            modelBuilder.Entity<AttendClass>()
+                .HasQueryFilter(x => x.Class.IsDeleted == false);
+            modelBuilder.Entity<CancelClass>()
+                .HasQueryFilter(x => x.Class.IsDeleted == false);
+            modelBuilder.Entity<Dropout>()
+                .HasQueryFilter(x => x.Class.IsDeleted == false);
             modelBuilder.Entity<Enrolment>()
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Person>()
                 .HasQueryFilter(x => x.IsDeleted == false);
+            modelBuilder.Entity<Fee>()
+                .HasQueryFilter(x => x.Person.IsDeleted == false);
+            modelBuilder.Entity<Leave>()
+                .HasQueryFilter(x => x.Person.IsDeleted == false);
+            modelBuilder.Entity<SendMail>()
+                .HasQueryFilter(x => x.Person.IsDeleted == false);
+            modelBuilder.Entity<Volunteer>()
+                .HasQueryFilter(x => x.Person.IsDeleted == false);
             modelBuilder.Entity<Receipt>()
-                .HasQueryFilter(x => x.IsDeleted == false);
+                .HasQueryFilter(x => x.IsDeleted == false && x.Person.IsDeleted == false);
 
             modelBuilder.Entity<DocumentType>()
                         .Property(x => x.ID).ValueGeneratedNever();

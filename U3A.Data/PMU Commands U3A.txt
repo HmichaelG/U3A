@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_ISoftDelete_Person
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_prcDbCleanup_20240514
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_ISoftDelete_Receipt
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_ClassSummaries
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_ISoftDelete_Receipt
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_ClassSummaries
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

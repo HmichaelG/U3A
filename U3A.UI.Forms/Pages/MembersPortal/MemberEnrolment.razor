@@ -765,12 +765,12 @@ else
     MarkupString GetClassDetails(Class c)
     {
         var result = new MarkupString(c.ClassDetailWithoutVenue);
-        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses && c.Course.Classes.Count > 1)
+        if (c.Course.ClassSummaries.Count > 1)
         {
             string text = string.Empty;
-            foreach (var thisClass in c.Course.Classes.OrderBy(x => x.StartDate))
+            foreach (var thisClass in c.Course.ClassSummaries)
             {
-                text = $"{text}{thisClass.ClassDetail}<br/>";
+                text = $"{text}{thisClass}<br/>";
             }
             if (text != string.Empty) result = new MarkupString(text);
         }

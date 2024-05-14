@@ -54,7 +54,7 @@ namespace U3A.BusinessRules
         public static Term? CurrentEnrolmentTerm(U3ADbContext dbc)
         {
             var today = DateTime.UtcNow.Date;
-            return dbc.Term
+            return dbc.Term.AsNoTracking()
                         .OrderByDescending(x => x.Year).ThenByDescending(x => x.TermNumber).AsEnumerable()
                         .Where(x => today >= x.EnrolmentStartDate && today <= x.EnrolmentEndDate)
                         .FirstOrDefault();

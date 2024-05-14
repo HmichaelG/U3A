@@ -125,11 +125,11 @@ namespace U3A.UI.Reports
             var Class = GetCurrentRow() as Class;
             if (Class == null) { return; }
             var course = Class.Course;
-            if (course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses && course.Classes.Count > 1 ) {
+            if (course.ClassSummaries.Count > 1 ) {
                 string text = string.Empty;
-                foreach (var thisClass in course.Classes.OrderBy(x => x.StartDate))
+                foreach (var thisClass in course.ClassSummaries)
                 {
-                    text = $"{text}{thisClass.ClassDetail}{Environment.NewLine}";
+                    text = $"{text}{thisClass}{Environment.NewLine}";
                 }
                 if (text != string.Empty) tableCellClassDetail.Text  = text;
             }

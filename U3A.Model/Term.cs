@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace U3A.Model
@@ -245,6 +246,7 @@ namespace U3A.Model
             }
         }
 
+        [JsonIgnore]
         public List<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
     }
 }

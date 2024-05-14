@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using System.Runtime.InteropServices;
 using Twilio.Rest.Trunking.V1;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.AspNetCore.Components;
 
 namespace U3A.BusinessRules
 {
@@ -52,7 +53,7 @@ namespace U3A.BusinessRules
         private static IQueryable<Class> GetSameParticipantClasses(U3ADbContext dbc,
                                                 Term term, bool ExludeOffScheduleActivities, DateTime? LastScheduleUpdate)
         {
-            return dbc.Class.AsNoTracking()
+            return dbc.Class
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Course)
@@ -145,9 +146,32 @@ namespace U3A.BusinessRules
                 }
                 classes.AddRange(prevTermShoulderClasses);
             }
+            classes = GetClassSummaries(classes).ToList();
             return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)
                         .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name).ToList();
         }
+
+        static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes)
+        {
+            foreach (var c in classes)
+            {
+                c.Course.Classes.Add(c);
+            }
+            foreach (var c in classes.Where(x => x.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses))
+            {
+                var course = c.Course;
+                course.ClassSummaries.Clear();
+                foreach (var thisClass in course.Classes
+                    .Where(x => x.StartDate >= TimezoneAdjustment.GetLocalTime().Date)
+                    .OrderBy(x => x.StartDate).ThenBy(x => x.StartTime))
+                {
+                    if (!course.ClassSummaries.Contains(thisClass.ClassDetail))
+                        { course.ClassSummaries.Add(thisClass.ClassDetail); }
+                }
+            }
+            return classes;
+        }
+
 
         public static List<Class> GetClassDetails(U3ADbContext dbc,
                                             Term term,
@@ -592,8 +616,8 @@ namespace U3A.BusinessRules
             var offeredT2Modified = c.EntityPropertyChanges(dbc, nameof(Class.OfferedTerm2));
             var offeredT3Modified = c.EntityPropertyChanges(dbc, nameof(Class.OfferedTerm3));
             var offeredT4Modified = c.EntityPropertyChanges(dbc, nameof(Class.OfferedTerm4));
-            if (onDayModified == null 
-                && startTimeModified == null 
+            if (onDayModified == null
+                && startTimeModified == null
                 && onOccurenceModified == null
                 && startDateModified == null
                 && recurrenceModified == null
