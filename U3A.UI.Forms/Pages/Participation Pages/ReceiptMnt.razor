@@ -102,8 +102,7 @@ else
                                             ListRenderMode="ListRenderMode.Virtual"
                                             FilteringMode="DataGridFilteringMode.Contains"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            Value="@selectedPerson"
-                                            ValueChanged="@((Person? person) => OnPersonChanged(person))"
+                                            @bind-Value="editItem.Person"
                                             TextFieldName="@nameof(Person.PersonSummary)">
                                     <DxListEditorColumn FieldName="@nameof(Person.LastName)"
                                                         Caption="Last Name" />
@@ -139,25 +138,27 @@ else
                             {
                                 if (allowPartPayments)
                                 {
-                                    allowedFinancialTo = new();
-                                    allowedFinancialTo.Add(new FinToValue()
+                                    if (allowedFinancialTo.Count <= 0)
                                     {
-                                        Name = $"Set {editItem.Person.FullName} Financial To {ProcessingYear}?",
-                                        finTo = ProcessingYear,
-                                        finToTerm = null
-                                    });
-                                    allowedFinancialTo.Add(new FinToValue()
-                                    {
-                                        Name = $"Set {editItem.Person.FullName} Financial To {ProcessingYear} Term 2?",
-                                        finTo = ProcessingYear,
-                                        finToTerm = 2
-                                    });
-                                    allowedFinancialTo.Add(new FinToValue()
-                                    {
-                                        Name = $"Keep {editItem.Person.FullName} Financial To {editItem.Person.FinancialToText}?",
-                                        finTo = editItem.Person.FinancialTo,
-                                        finToTerm = editItem.Person.FinancialToTerm
-                                    });
+                                        allowedFinancialTo.Add(new FinToValue()
+                                        {
+                                            Name = $"Set {editItem.Person.FullName} Financial To {ProcessingYear}?",
+                                            finTo = ProcessingYear,
+                                            finToTerm = null
+                                        });
+                                        allowedFinancialTo.Add(new FinToValue()
+                                        {
+                                            Name = $"Set {editItem.Person.FullName} Financial To {ProcessingYear} Term 2?",
+                                            finTo = ProcessingYear,
+                                            finToTerm = 2
+                                        });
+                                        allowedFinancialTo.Add(new FinToValue()
+                                        {
+                                            Name = $"Keep {editItem.Person.FullName} Financial To {editItem.Person.FinancialToText}?",
+                                            finTo = editItem.Person.FinancialTo,
+                                            finToTerm = editItem.Person.FinancialToTerm
+                                        });
+                                    }
                                     if (selectedFinancialTo == null) { selectedFinancialTo = allowedFinancialTo.First(); }
                                     <DxFormLayoutItem Caption=@("Financial Status") ColSpanMd="12">
                                         <DxRadioGroup Items="@allowedFinancialTo" CssClass="w-100 px-2"
@@ -177,25 +178,27 @@ else
                             {
                                 if (allowPartPayments)
                                 {
-                                    allowedFinancialTo = new();
-                                    allowedFinancialTo.Add(new FinToValue()
+                                    if (allowedFinancialTo.Count <= 0)
                                     {
-                                        Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear - 1}?",
-                                        finTo = ProcessingYear - 1,
-                                        finToTerm = null
-                                    });
-                                    allowedFinancialTo.Add(new FinToValue()
-                                    {
-                                        Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear} Term 2?",
-                                        finTo = ProcessingYear - 1,
-                                        finToTerm = 2
-                                    });
+                                        allowedFinancialTo.Add(new FinToValue()
+                                        {
+                                            Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear - 1}?",
+                                            finTo = ProcessingYear - 1,
+                                            finToTerm = null
+                                        });
+                                        allowedFinancialTo.Add(new FinToValue()
+                                        {
+                                            Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear} Term 2?",
+                                            finTo = ProcessingYear,
+                                            finToTerm = 2
+                                        });
                                     allowedFinancialTo.Add(new FinToValue()
                                     {
                                         Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear}?",
-                                        finTo = ProcessingYear - 1,
-                                        finToTerm = 2
-                                    });
+                                        finTo = ProcessingYear,
+                                        finToTerm = null
+                                });
+                                    }
                                     <DxFormLayoutItem Caption=@("Financial Status") ColSpanMd="12">
                                         <DxRadioGroup Items="@allowedFinancialTo" CssClass="w-100 px-2"
                                                       TextFieldName="@nameof(FinToValue.Name)"
@@ -218,7 +221,7 @@ else
 
 }<style>
      .popup-width {
-         min-width: 40rem;
+         min-width: 45rem;
      }
 </style>
 
@@ -232,7 +235,6 @@ else
     YearComponent? yearComponent;
     Receipt originalReceipt;
     int ProcessingYear;
-    Person? selectedPerson = new();
 
     DxGridCommandColumnEx? GridCommandColumn;
     MessageBox? messageBox;
@@ -272,6 +274,7 @@ else
         setFinancialTo = false;
         resetOriginalFinancialTo = false;
         var editModel = (Receipt)e.EditModel;
+        allowedFinancialTo = new();
         if (e.IsNew)
         {
             originalReceipt = default;
@@ -284,9 +287,7 @@ else
         {
             originalReceipt = new Receipt();
             editModel.CopyTo(originalReceipt);
-            selectedPerson = dbc.Person.Find(editModel.Person.ID);
-            originalReceipt.Person = selectedPerson;
-
+            originalReceipt.Person = dbc.Person.Find(editModel.Person.ID);
         }
     }
 
@@ -303,10 +304,6 @@ else
         {
             isBusy = false;
         }
-    }
-
-    void OnPersonChanged(Person person)
-    {
     }
 
     async Task SaveRecord(GridEditModelSavingEventArgs e)
