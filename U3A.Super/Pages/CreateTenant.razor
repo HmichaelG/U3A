@@ -51,20 +51,20 @@ else
             <ValidationSummary />
             <DxFormLayout>
                 <DxFormLayoutItem Caption="Tenant ID" ColSpanMd="7">
-                    <DxTextBox @bind-Text=@details.TenantKey NullText="The unique tenant subdomain & database name. Must conform to DNS naming standards." />
+                    <DxTextBox @bind-Text=@details!.TenantKey NullText="The unique tenant subdomain & database name. Must conform to DNS naming standards." />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="U3A Display Name" ColSpanMd="7">
-                    <DxTextBox @bind-Text=@details.TenantName 
+                    <DxTextBox @bind-Text=@details!.TenantName 
                         NullText="Use the form: U3A <myU3Aname> <State>. For example, U3A Newcastle NSW" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Website" ColSpanMd="7">
-                    <DxTextBox @bind-Text=@details.website NullText="The U3A public website. Must be FQDN eg. https://myU3Asite.org.au" />
+                    <DxTextBox @bind-Text=@details!.website NullText="The U3A public website. Must be FQDN eg. https://myU3Asite.org.au" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Email Domain" ColSpanMd="7">
-                    <DxTextBox @bind-Text=@details.EmailDomain NullText="The U3A Postmark email domain, eg. myU3AEmailDomain.org.au" />
+                    <DxTextBox @bind-Text=@details!.EmailDomain NullText="The U3A Postmark email domain, eg. myU3AEmailDomain.org.au" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="State" ColSpanMd="7">
-                    <DxComboBox Data="@states" @bind-Value="@details.State" />
+                    <DxComboBox Data="@states" @bind-Value="@details!.State" />
                     <ValidationMessage For="@(() => details.State)" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem ColSpanMd="12" Context="myContext">
@@ -81,7 +81,7 @@ else
             </DxFormLayout>
         </EditForm>
         <ul class="my-2 col-12">
-            @(new MarkupString(status))
+            @(new MarkupString(status!))
         </ul>
     </div>
 }
@@ -94,19 +94,19 @@ else
     U3ASecrets? mySecrets;
     bool IsReady = false;
     int ActiveTabIndex { get; set; } = 0;
-    Details details { get; set; }
+    Details? details { get; set; }
     AUState states = new AUState();
     string? ErrorMessage;
     bool SuccessMessageVisible = false;
     bool isProcessing;
-    string status;
-    PostmarkAdminService service;
-    PostmarkBaseDomain newEmailDomain;
+    string? status;
+    PostmarkAdminService? service;
+    PostmarkBaseDomain? newEmailDomain;
     PostmarkCompleteDomain? domain;
 
     protected override async Task OnInitializedAsync()
     {
-        var authenticationState = await authenticationStateTask;
+        var authenticationState = await authenticationStateTask!;
         mySecrets = new U3ASecrets(config);
         details = new Details();
         service = new PostmarkAdminService(config);
@@ -125,8 +125,8 @@ else
         {
             try
             {
-                var tenant = details.TenantKey.ToLower();
-                if (mySecrets.ILLEGAL_SUBDOMAINS.Contains(tenant))
+                var tenant = details!.TenantKey!.ToLower();
+                if (mySecrets!.ILLEGAL_SUBDOMAINS.Contains(tenant))
                 {
                     SuccessMessageVisible = false;
                     ErrorMessage = $"The DNS subdomain [{tenant}] ia not allowed.";
@@ -144,7 +144,7 @@ else
                     await CreateTenantAsync(subscription);
                     await DeleteTXTAsync(subscription);
                     ErrorMessage = null;
-                    domain = await service.GetDomainDetailsAsync(newEmailDomain.ID);
+                    domain = await service!.GetDomainDetailsAsync(newEmailDomain!.ID);
                     SuccessMessageVisible = true;
                 }
             }
@@ -159,7 +159,7 @@ else
         else
         {
             SuccessMessageVisible = false;
-            ErrorMessage = $"The DNS/Database name [{details.TenantKey}] is already in use!";
+            ErrorMessage = $"The DNS/Database name [{details!.TenantKey}] is already in use!";
         }
 
         isProcessing = false;
@@ -169,7 +169,7 @@ else
     async Task<bool> TenantExistsAsync()
     {
         var result = false;
-        var key = details.TenantKey.ToLower();
+        var key = details!.TenantKey!.ToLower();
         using (var dbc = await Tenantdbfactory.CreateDbContextAsync())
         {
             result = await dbc.TenantInfo.AnyAsync(x => x.Identifier == key);
@@ -180,19 +180,19 @@ else
 
     async Task CreateTenantAsync(SubscriptionResource subscription)
     {
-        string rgName = mySecrets.SQL_RESOURCE_GROUP;
+        string rgName = mySecrets!.SQL_RESOURCE_GROUP;
         ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
         var csTemplate = config.GetConnectionString("TenantConnectionString");
-        var key = details.TenantKey.ToLower();
+        var key = details!.TenantKey!.ToLower();
         var builder = new SqlConnectionStringBuilder(csTemplate);
         builder.InitialCatalog = key;
         var cnnString = builder.ConnectionString;
 
         // postmark
         var poostmarkSandboxAPIKey = config.GetValue<string>("PostmarkSandboxAPIKey");
-        var newServer = await service.CreateServer($"{details.TenantKey} {details.State} U3A Server");
+        var newServer = await service!.CreateServer($"{details.TenantKey} {details.State} U3A Server");
         SetMessage($"Postmark server [{newServer.Name}] created.");
-        newEmailDomain = await service.CreateDomain(details.EmailDomain);
+        newEmailDomain = await service.CreateDomain(details.EmailDomain!);
         SetMessage($"Postmark Email Domain [{newEmailDomain.Name}] created.");
 
         TenantInfo tenant = new TenantInfo()
@@ -207,11 +207,11 @@ else
                 UseEmailTestEnviroment = true,
                 UsePostmarkTestEnviroment = true,
                 UseSMSTestEnviroment = true,
-                State = details.State,
-                Website = details.website,
+                State = details.State!,
+                Website = details.website!,
             };
 
-        var sqlServer = (await resourceGroup.GetSqlServerAsync("u3admin-server")).Value;
+        var sqlServer = (await resourceGroup.GetSqlServerAsync("u3admin")).Value;
         var databases = sqlServer.GetSqlDatabases();
         SqlDatabaseData newDb = new(await GetAuEastLocationAsync(resourceGroup))
             {
@@ -278,11 +278,11 @@ else
     async Task DeleteTXTAsync(SubscriptionResource subscription)
     {
         // Get the resource group
-        string rgName = mySecrets.DNS_RESOURCE_GROUP;
+        string rgName = mySecrets!.DNS_RESOURCE_GROUP;
         ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
         // Get the DnsZone from the resource group
         DnsZoneResource dnsZone = await resourceGroup.GetDnsZoneAsync(mySecrets.DNS_NAME);
-        var tenant = details.TenantKey.ToLower();
+        var tenant = details!.TenantKey!.ToLower();
         try
         {
             DnsTxtRecordResource txtRecord = dnsZone.GetDnsTxtRecord($"asuid.{tenant}");
@@ -296,11 +296,11 @@ else
     async Task CreateUpdateDNSAsync(SubscriptionResource subscription)
     {
         // Get the resource group
-        string rgName = mySecrets.DNS_RESOURCE_GROUP;
+        string rgName = mySecrets!.DNS_RESOURCE_GROUP;
         ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
         // Get the DnsZone from the resource group
         DnsZoneResource dnsZone = await resourceGroup.GetDnsZoneAsync(mySecrets.DNS_NAME);
-        var tenant = details.TenantKey.ToLower();
+        var tenant = details!.TenantKey!.ToLower();
         // Create or update CName pointing to A record
         string cnameName = tenant;
         DnsCnameRecordData dnsCnameRecordData = new() { Cname = mySecrets.DNS_CNAME, TtlInSeconds = (long)TimeSpan.FromMinutes(60).TotalSeconds, };
@@ -325,7 +325,7 @@ else
                 CustomHostNameDnsRecordType = CustomHostNameDnsRecordType.CName,
                 HostNameType = AppServiceHostNameType.Managed,
             };
-        var hostName = $"{details.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
+        var hostName = $"{details!.TenantKey!.ToLower()}.{mySecrets.DNS_NAME}";
         var binding = (await hostNameBindings.CreateOrUpdateAsync(Azure.WaitUntil.Completed, hostName, data).ConfigureAwait(false)).Value;
         SetMessage($"Create/Update custom domain [{hostName}] in web application [{mySecrets.WEBAPP_NAME}]");
 
@@ -338,9 +338,9 @@ else
 
     async Task<AppCertificateData> CreateOrUpdateAppCertificate(ResourceGroupResource resourceGroup)
     {
-        var website = (await resourceGroup.GetWebSiteAsync(mySecrets.WEBAPP_NAME)).Value;
+        var website = (await resourceGroup.GetWebSiteAsync(mySecrets!.WEBAPP_NAME)).Value;
         AppServicePlanResource plan = await resourceGroup.GetAppServicePlanAsync(mySecrets.WEBAPP_SERVICE_PLAN);
-        var canonicalName = $"{details.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
+        var canonicalName = $"{details!.TenantKey!.ToLower()}.{mySecrets.DNS_NAME}";
         var certificateName = $"{canonicalName}-{mySecrets.WEBAPP_NAME}";
         var newCert = new AppCertificateData(await GetAuEastLocationAsync(resourceGroup))
             {
@@ -378,7 +378,7 @@ else
 
     async Task<AzureLocation> GetAuEastLocationAsync(ResourceGroupResource rg)
     {
-        return (await rg.GetAvailableLocationsAsync()).Value.First(x => x.Name == mySecrets.LOCATION);
+        return (await rg.GetAvailableLocationsAsync()).Value.First(x => x.Name == mySecrets!.LOCATION);
     }
 
     void SetMessage(string msg)
@@ -400,11 +400,11 @@ else
 
     class Details
     {
-        [Required] public string TenantKey { get; set; }
-        [Required] public string TenantName { get; set; }
-        [Required] public string website { get; set; }
-        [Required] public string State { get; set; }
-        [Required] public string EmailDomain { get; set; }
+        [Required] public string? TenantKey { get; set; }
+        [Required] public string? TenantName { get; set; }
+        [Required] public string? website { get; set; }
+        [Required] public string? State { get; set; }
+        [Required] public string? EmailDomain { get; set; }
     }
 
 }
