@@ -102,7 +102,8 @@ else
                                             ListRenderMode="ListRenderMode.Virtual"
                                             FilteringMode="DataGridFilteringMode.Contains"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            @bind-Value="editItem.Person"
+                                            Value="@selectedPerson"
+                                            ValueChanged="@((Person? person) => OnPersonChanged(person))"
                                             TextFieldName="@nameof(Person.PersonSummary)">
                                     <DxListEditorColumn FieldName="@nameof(Person.LastName)"
                                                         Caption="Last Name" />
@@ -138,7 +139,7 @@ else
                             {
                                 if (allowPartPayments)
                                 {
-                                    allowedFinancialTo.Clear();
+                                    allowedFinancialTo = new();
                                     allowedFinancialTo.Add(new FinToValue()
                                     {
                                         Name = $"Set {editItem.Person.FullName} Financial To {ProcessingYear}?",
@@ -176,7 +177,7 @@ else
                             {
                                 if (allowPartPayments)
                                 {
-                                    allowedFinancialTo.Clear();
+                                    allowedFinancialTo = new();
                                     allowedFinancialTo.Add(new FinToValue()
                                     {
                                         Name = $"Reset {editItem.Person.FullName} Financial To {ProcessingYear - 1}?",
@@ -231,6 +232,7 @@ else
     YearComponent? yearComponent;
     Receipt originalReceipt;
     int ProcessingYear;
+    Person? selectedPerson = new();
 
     DxGridCommandColumnEx? GridCommandColumn;
     MessageBox? messageBox;
@@ -282,7 +284,9 @@ else
         {
             originalReceipt = new Receipt();
             editModel.CopyTo(originalReceipt);
-            originalReceipt.Person = dbc.Person.Find(editModel.Person.ID);
+            selectedPerson = dbc.Person.Find(editModel.Person.ID);
+            originalReceipt.Person = selectedPerson;
+
         }
     }
 
@@ -299,6 +303,10 @@ else
         {
             isBusy = false;
         }
+    }
+
+    void OnPersonChanged(Person person)
+    {
     }
 
     async Task SaveRecord(GridEditModelSavingEventArgs e)

@@ -130,7 +130,7 @@ else
                                 <DxGridSelectionColumn Width="2rem" />
                                 <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem"
                                                        EditButtonVisible="true" DeleteButtonVisible="true" />
-                                <DxGridDataColumn Caption="Name" FieldName="Person.FullName" Width="10rem">
+                                <DxGridDataColumn Caption="Name" FieldName="Person.FullName" Width="15rem">
                                     <CellEditTemplate>
                                         @{
                                             var enrolment = (Enrolment)context.EditModel;
@@ -519,7 +519,6 @@ else
         {
             feesDue.Add(e.PersonID,await service.CalculateFeeAsync(dbc, e.Person, currentTerm));
         }
-        mainGrid.AutoFitColumnWidths();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -599,7 +598,7 @@ else
             if (dataItem != null)
             {
                 editModel.CopyTo(dataItem);
-                dataItem.Person = editModel.Person ?? dbc.Person.Find(editModel.Person.ID);
+                dataItem.Person = dbc.Person.Find(editModel.Person.ID);
                 dataItem.Term = dbc.Term.Find(selectedTerm.ID);
                 dataItem.Course = dbc.Course.Find(selectedCourse.ID);
                 if (selectedClass != null) { dataItem.Class = dbc.Class.Find(selectedClass.ID); }
