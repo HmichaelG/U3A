@@ -768,7 +768,7 @@ else
                 ClassDates = (await BusinessRule.SelectableAttendanceDatesAsync(dbc,
                                     selectedTerm,
                                     selectedClass,
-                                    selectedTerm.EndDate)).Where(x => x.Date >= now).ToList();
+                                    now)).Where(x => x.Date >= now).ToList();
                 if (ClassDates.Count > 0) { SelectedClassDate = ClassDates[0]; }
                 else
                 {

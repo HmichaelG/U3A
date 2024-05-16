@@ -1,17 +1,11 @@
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using U3A.Database;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddAuthentication(
-    CertificateAuthenticationDefaults.AuthenticationScheme)
-    .AddCertificate();
-
 
 var MultiTenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
 var assemblyName = typeof(U3ADbContext).Namespace;

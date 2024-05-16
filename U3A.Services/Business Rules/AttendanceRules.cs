@@ -248,9 +248,9 @@ namespace U3A.BusinessRules
             return bag.OrderBy(x => x.CourseDetail).ThenBy(x => x.ClassDate).ToList();
         }
         public static async Task<List<ClassDate>> SelectableAttendanceDatesAsync(U3ADbContext dbc,
-                    Term selectedTerm, Class selectedClass, DateTime Now)
+                    Term selectedTerm, Class selectedClass, DateTime Today)
         {
-            var cutoffDate = Now.Date;
+            var cutoffDate = Today.Date;
             List<ClassDate> result = new();
             
             // a list of attendance records already created up till today's date
@@ -264,7 +264,7 @@ namespace U3A.BusinessRules
                                                         TermStart = selectedTerm.StartDate
                                                     } ).Distinct().ToListAsync();
             
-            // Calculate the date range for clas schedule calculation ( tart & end)
+            // Calculate the date range for class schedule calculation ( tart & end)
 
             // the last class date for term
             var lastAllowedClassDate = await BusinessRule.GetLastAllowedClassDateForTermAsync(dbc, selectedTerm);
