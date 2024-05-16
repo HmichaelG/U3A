@@ -54,8 +54,8 @@ else
                     <DxTextBox @bind-Text=@details!.TenantKey NullText="The unique tenant subdomain & database name. Must conform to DNS naming standards." />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="U3A Display Name" ColSpanMd="7">
-                    <DxTextBox @bind-Text=@details!.TenantName 
-                        NullText="Use the form: U3A <myU3Aname> <State>. For example, U3A Newcastle NSW" />
+                    <DxTextBox @bind-Text=@details!.TenantName
+                               NullText="Use the form: U3A <myU3Aname> <State>. For example, U3A Newcastle NSW" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Website" ColSpanMd="7">
                     <DxTextBox @bind-Text=@details!.website NullText="The U3A public website. Must be FQDN eg. https://myU3Asite.org.au" />
@@ -180,8 +180,8 @@ else
 
     async Task CreateTenantAsync(SubscriptionResource subscription)
     {
-        string rgName = mySecrets!.SQL_RESOURCE_GROUP;
-        ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
+        // string rgName = mySecrets!.SQL_RESOURCE_GROUP;
+        // ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
         var csTemplate = config.GetConnectionString("TenantConnectionString");
         var key = details!.TenantKey!.ToLower();
         var builder = new SqlConnectionStringBuilder(csTemplate);
@@ -211,68 +211,72 @@ else
                 Website = details.website!,
             };
 
-        var sqlServer = (await resourceGroup.GetSqlServerAsync("u3admin")).Value;
-        var databases = sqlServer.GetSqlDatabases();
-        SqlDatabaseData newDb = new(await GetAuEastLocationAsync(resourceGroup))
-            {
-                Sku = new SqlSku("Basic") { Tier = "Basic" },
-                RequestedBackupStorageRedundancy = SqlBackupStorageRedundancy.Local
-            };
-        await databases.CreateOrUpdateAsync(WaitUntil.Completed, key, newDb);
-        // Create Roles
-        string SecurityAdminID = string.Empty;
-        using (var dbc = new U3ADbContextSeed())
-        {
-            dbc.TenantInfo = tenant;
-            await dbc.Database.MigrateAsync();
-            SetMessage($"[{key}] Database schema created.");
-            foreach (var name in constants.nameOfRoles)
-            {
-                if (!await dbc.Roles.AnyAsync(x => x.Name == name))
-                {
-                    IdentityRole role = new()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Name = name,
-                            NormalizedName = name.ToUpper(),
-                            ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        };
-                    await dbc.Roles.AddAsync(role);
-                    if (name == constants.nameOfRoles[0]) SecurityAdminID = role.Id;
-                }
-            }
-            SetMessage("Application roles created.");
-            if (!await dbc.Users.AnyAsync(x => x.Email == constants.superAdmin))
-            {
-                ApplicationUser user = new()
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Email = constants.superAdmin,
-                        EmailConfirmed = true,
-                        NormalizedEmail = constants.superAdmin.ToUpper(),
-                        NormalizedUserName = constants.superAdmin.ToUpper(),
-                        PasswordHash = "AQAAAAEAACcQAAAAEGO9hnvP8x8fJPlDhs2gGYMhl9koCigXL2PPHidC9luB5nbMxW8fCFahxG/ZCA1OSw==",
-                        UserName = constants.superAdmin,
-                    };
-                await dbc.Users.AddAsync(user);
-                IdentityUserRole<string> userRole = new()
-                    {
-
-                        RoleId = SecurityAdminID,
-                        UserId = user.Id
-                    };
-                await dbc.UserRoles.AddAsync(userRole);
-            }
-            SetMessage($"Application user [{constants.superAdmin}] created.");
-            await dbc.SaveChangesAsync();
-        }
         using (var dbc = await Tenantdbfactory.CreateDbContextAsync())
         {
             await dbc.AddAsync(tenant);
             await dbc.SaveChangesAsync();
         }
         SetMessage($"TenantInfo [{key}] record in Tenant database created.");
+
+        // var sqlServer = (await resourceGroup.GetSqlServerAsync("u3admin")).Value;
+        // var databases = sqlServer.GetSqlDatabases();
+        // SqlDatabaseData newDb = new(await GetAuEastLocationAsync(resourceGroup))
+        //     {
+        //         Sku = new SqlSku("Basic") { Tier = "Basic" },
+        //         RequestedBackupStorageRedundancy = SqlBackupStorageRedundancy.Local
+        //     };
+        // await databases.CreateOrUpdateAsync(WaitUntil.Completed, key, newDb);
+
+        // // Create Roles
+        // string SecurityAdminID = string.Empty;
+        // using (var dbc = new U3ADbContextSeed())
+        // {
+        //     SetMessage($"Createing [{key}] Database. This will take a while...");
+        //     dbc.TenantInfo = tenant;
+        //     dbc.Database.SetCommandTimeout(600);
+        //     await dbc.Database.EnsureCreatedAsync();
+        //     SetMessage($"[{key}] Database schema created.");
+        //     foreach (var name in constants.nameOfRoles)
+        //     {
+        //         if (!await dbc.Roles.AnyAsync(x => x.Name == name))
+        //         {
+        //             IdentityRole role = new()
+        //                 {
+        //                     Id = Guid.NewGuid().ToString(),
+        //                     Name = name,
+        //                     NormalizedName = name.ToUpper(),
+        //                     ConcurrencyStamp = Guid.NewGuid().ToString(),
+        //                 };
+        //             await dbc.Roles.AddAsync(role);
+        //             if (name == constants.nameOfRoles[0]) SecurityAdminID = role.Id;
+        //         }
+        //     }
+        //     SetMessage("Application roles created.");
+        //     if (!await dbc.Users.AnyAsync(x => x.Email == constants.superAdmin))
+        //     {
+        //         ApplicationUser user = new()
+        //             {
+        //                 Id = Guid.NewGuid().ToString(),
+        //                 ConcurrencyStamp = Guid.NewGuid().ToString(),
+        //                 Email = constants.superAdmin,
+        //                 EmailConfirmed = true,
+        //                 NormalizedEmail = constants.superAdmin.ToUpper(),
+        //                 NormalizedUserName = constants.superAdmin.ToUpper(),
+        //                 PasswordHash = "AQAAAAEAACcQAAAAEGO9hnvP8x8fJPlDhs2gGYMhl9koCigXL2PPHidC9luB5nbMxW8fCFahxG/ZCA1OSw==",
+        //                 UserName = constants.superAdmin,
+        //             };
+        //         await dbc.Users.AddAsync(user);
+        //         IdentityUserRole<string> userRole = new()
+        //             {
+
+        //                 RoleId = SecurityAdminID,
+        //                 UserId = user.Id
+        //             };
+        //         await dbc.UserRoles.AddAsync(userRole);
+        //     }
+        //     SetMessage($"Application user [{constants.superAdmin}] created.");
+        //     await dbc.SaveChangesAsync();
+        // }
     }
 
     async Task DeleteTXTAsync(SubscriptionResource subscription)

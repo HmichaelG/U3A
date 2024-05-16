@@ -14,26 +14,34 @@
 
 @attribute [Authorize]
 
-@if (IsReady)
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
 {
     <AntiforgeryToken />
     <Progress @ref=@progress />
     <div class="vw-100">
         <div class="px-2 col-12 px-sm-0 col-md-10 col-lg-6 mx-auto">
-            <div class="text-center alert alert-success text-dark col-12">
-                @welcomeText @classText
+            <div class="text-center alert alert-success text-dark w-100">
+                <div class="w-100">@welcomeText</div>
+                <DxButton Text="Today's Schedule" Click="@SetupClassesToday"
+                   RenderStyle="ButtonRenderStyle.Success" IconCssClass="bi bi-alarm"
+                    Visible=@(classText == null)  />
+                <div class="w-100">@classText</div>
             </div>
-            <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="col col-12"
+            <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
                          ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
 
                 <Items>
                     @if (ShowEnrolmentSubMneu)
                     {
+                        <div class="pb-2">
+                            <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                        </div>
                         <DxAccordionItem Text="Manage your course enrolments">
                             <ContentTemplate>
-                                <div class="py-1">
-                                    <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
-                                </div>
                                 <DxButton Text="Request course enrolments" Context="ThisContext"
                                           IconCssClass="bi-mortarboard menu-icon me-3 h2"
                                           CssClass="col-12 mt-1"
@@ -60,12 +68,12 @@
                     }
                     else
                     {
-                        <DxAccordionItem Text="What's New" Expanded=false CssClass="text-info" IconCssClass="bi bi-emoji-smile">
-                            <ContentTemplate>
-                                <WhatsNew />
-                            </ContentTemplate>
-                        </DxAccordionItem>
-                        <DxAccordionItem Text="Main Menu" Expanded=true>
+                        @*                         <DxAccordionItem Text="What's New" Expanded=false CssClass="text-info" IconCssClass="bi bi-emoji-smile">
+                <ContentTemplate>
+                <WhatsNew />
+                </ContentTemplate>
+                </DxAccordionItem>
+                *@                        <DxAccordionItem Text="Main Menu" Expanded=true>
                             <ContentTemplate>
                                 @if (settings?.InMaintenanceTill != null)
                                 {
@@ -144,13 +152,13 @@
                                 }
                                 @if (loginState.IsAdminOnBehalfOfMember)
                                 {
-                                        <DxButton Text="Return to Admin Portal"
-                                                  IconCssClass="bi-door-closed menu-icon me-3 h2"
-                                                  CssClass="col-12 my-1"
-                                                  Click="@OnReturnHome"
-                                                  RenderStyle="ButtonRenderStyle.Primary"
-                                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                                        </DxButton>
+                                    <DxButton Text="Return to Admin Portal"
+                                              IconCssClass="bi-door-closed menu-icon me-3 h2"
+                                              CssClass="col-12 my-1"
+                                              Click="@OnReturnHome"
+                                              RenderStyle="ButtonRenderStyle.Primary"
+                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                    </DxButton>
                                 }
                                 else
                                 {
@@ -297,6 +305,7 @@
         {
             settings = await dbc.SystemSettings.AsNoTracking().OrderBy(x => x.ID).FirstOrDefaultAsync();
         }
+        await SetupTitle();
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
         IsReady = true;
@@ -306,22 +315,6 @@
     {
         currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
         StateHasChanged();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await SetupClassesToday();
-            await InvokeAsync(StateHasChanged);
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-        await SetupTitle();
     }
 
     async Task SetupTitle()
@@ -413,9 +406,9 @@
                 txt.AppendLine("</tbody>");
                 txt.AppendLine("</table>");
                 classText = new MarkupString(txt.ToString());
-                await SetupTitle();
                 await InvokeAsync(StateHasChanged);
             }
+            else classText = new MarkupString("You have no classes today.");
         }
     }
 
