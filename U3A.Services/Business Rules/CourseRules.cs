@@ -332,5 +332,21 @@ namespace U3A.BusinessRules
                 dbc.RemoveRange(toDelete);
             }
         }
+
+        public static List<Course> CoursesInRemainingYear(IEnumerable<Course> courses, int TermNumber)
+        {
+            return courses.Where(x => x.Classes.Where(c => IsClassInRemainingYear(c, TermNumber)).Any()).ToList();
+        }
+        public static List<Course> ActivityOrEventCourses(IEnumerable<Course> courses, int TermNumber)
+        {
+            return courses
+                .Where(x => x.Classes.Where(c => IsClassInRemainingYear(c, TermNumber)
+                        && c.OccurrenceID == (int)OccurrenceType.OnceOnly).Any()).ToList();
+        }
+        public static List<Course> CoursesNotInRemainingYear(IEnumerable<Course> courses, int TermNumber)
+        {
+            return courses.Where(x => x.Classes.Where(c => !IsClassInRemainingYear(c, TermNumber)).Any()).ToList();
+        }
+
     }
 }

@@ -43,6 +43,12 @@ else
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
+    <DxTabs @ref=@tabs ActiveTabIndexChanged="GetData">
+        <DxTab Text="All Courses" />
+        <DxTab Text="Current" />
+        <DxTab Text="Complete" />
+        <DxTab Text="Activity/Events" />
+    </DxTabs>
     <FullScreen>
         <ContentTemplate>
             <DxGrid Data="@Courses" @ref=@mainGrid CssClass="grid-height" id="myGrid"
@@ -170,6 +176,7 @@ else
 @code {
     bool IsReady;
 
+    DxTabs? tabs;
     Progress? progressBar;
     IEnumerable<CourseParticipationType> CourseParticipationTypes { get; set; }
     List<Occurrence>? Occurrences { get; set; }
@@ -240,7 +247,7 @@ else
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             var tenant = await tenantService.GetTenantInfoAsync();
-            await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory,tenant.Identifier);
+            await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory, tenant.Identifier);
             await progressBar.Close();
             await InvokeAsync(StateHasChanged);
             await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");
@@ -252,6 +259,31 @@ else
         previewTerm = dbc.Term.FirstOrDefault(x => x.Year == Year && x.TermNumber == TermNumber);
         await previewWindow.CloseAsync();
         await previewWindow?.ShowAsync();
+    }
+
+    async Task OnTabChanged()
+    {
+        if (tabs == null) { return; }
+        await GetData();
+    }
+
+    void FilterByTab()
+    {
+        if (tabs == null) { return; }
+        switch (tabs.ActiveTabIndex)
+        {
+            case 1:
+                Courses = BusinessRule.CoursesInRemainingYear(Courses, currentTerm.TermNumber);
+                break;
+            case 2:
+                Courses = BusinessRule.CoursesNotInRemainingYear(Courses, currentTerm.TermNumber);
+                break;
+            case 3:
+                Courses = BusinessRule.ActivityOrEventCourses(Courses, currentTerm.TermNumber);
+                break;
+            default:
+                break;
+        }
     }
 
     protected override async void OnAfterRender(bool firstRender)
@@ -278,6 +310,7 @@ else
     {
         dbc.ChangeTracker.Clear();
         Courses = await BusinessRule.EditableCoursesAsync(dbc, Year);
+        FilterByTab();
     }
 
     async Task Grid_EditStart(GridEditStartEventArgs e)
@@ -386,7 +419,7 @@ else
             }
             await ProcessClasses(dataItem, editModel);
             // Post changes to the database.
-            if (e.IsNew) { dbc.Add(dataItem); } 
+            if (e.IsNew) { dbc.Add(dataItem); }
             else
             {
                 await BusinessRule.ReassignCourseParticipationEnrolments(dbc, dataItem);

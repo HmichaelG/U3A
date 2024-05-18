@@ -166,7 +166,7 @@ namespace U3A.BusinessRules
                     .OrderBy(x => x.StartDate).ThenBy(x => x.StartTime))
                 {
                     if (!course.ClassSummaries.Contains(thisClass.ClassDetail))
-                        { course.ClassSummaries.Add(thisClass.ClassDetail); }
+                    { course.ClassSummaries.Add(thisClass.ClassDetail); }
                 }
             }
             return classes;
@@ -473,8 +473,28 @@ namespace U3A.BusinessRules
             }
             return result;
         }
+        public static bool IsClassInRemainingYear(Class Class, int termNumber)
+        {
+            bool result = false;
+            switch (termNumber)
+            {
+                case 1:
+                    result = (Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4);
+                    break;
+                case 2:
+                    result = Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4;
+                    break;
+                case 3:
+                    result = Class.OfferedTerm3 || Class.OfferedTerm4;
+                    break;
+                case 4:
+                    result = Class.OfferedTerm4;
+                    break;
+            }
+            return result;
+        }
         public static bool IsClassInRemainingYear(U3ADbContext dbc,
-                                Class Class, Term term, Term defaultTerm, IEnumerable<Term> allTerms = null)
+                            Class Class, Term term, Term defaultTerm, IEnumerable<Term> allTerms = null)
         {
             bool result = false;
             switch (term.TermNumber)
