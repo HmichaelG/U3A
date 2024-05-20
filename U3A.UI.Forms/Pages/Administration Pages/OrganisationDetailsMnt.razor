@@ -46,7 +46,7 @@ else
                             <Items>
                                 <DxStackLayoutItem>
                                     <Template>
-                                        <DxFormLayoutGroup Caption="Organisation Details" ColSpanMd="12">
+                                        <DxFormLayoutGroup Caption="Organisation Details" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                                             <DxFormLayoutItem Caption="UTC Local Time Offset" ColSpanMd="12">
                                                 <DxSpinEdit @bind-Value="@systemSettings.UTCOffset" />
                                             </DxFormLayoutItem>
@@ -95,7 +95,7 @@ else
                                 </DxStackLayoutItem>
                                 <DxStackLayoutItem>
                                     <Template>
-                                        <DxFormLayoutGroup Caption="Bank Account Details">
+                                        <DxFormLayoutGroup Caption="Bank Account Details" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                                             <DxFormLayoutItem Caption="Bank BSB" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@systemSettings.BankBSB" />
                                             </DxFormLayoutItem>
@@ -127,7 +127,7 @@ else
                             <Items>
                                 <DxStackLayoutItem>
                                     <Template>
-                                        <DxFormLayoutGroup Caption="Class Schedule">
+                                        <DxFormLayoutGroup Caption="Class Schedule" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                                             <DxFormLayoutItem Caption="Report for the period" ColSpanMd="12">
                                                 <DxComboBox Data="classSchedulePeriod"
                                                             @bind-Value="@systemSettings.ClassScheduleDisplayPeriod"
@@ -139,7 +139,7 @@ else
                                                 <DxCheckBox @bind-Checked="@systemSettings.ShowLeaderOnPublicSchedule" Alignment="CheckBoxContentAlignment.Right" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
-                                        <DxFormLayoutGroup Caption="Auto Enrolment" ColSpanLg="12">
+                                        <DxFormLayoutGroup Caption="Auto Enrolment" ColSpanLg="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                                             <DxFormLayoutItem Caption="Rule 1: New Participant Percent (%)" ColSpanMd="12">
                                                 <DxMaskedInput @bind-Value="@systemSettings.AutoEnrolNewParticipantPercent" />
                                             </DxFormLayoutItem>
@@ -169,7 +169,7 @@ else
                                                 </DxFormLayoutItem>
                                             </DxFormLayoutGroup>
                                         </DxFormLayoutGroup>
-                                        <DxFormLayoutGroup Caption="Leader / Clerk Options" ColSpanLg="12">
+                                        <DxFormLayoutGroup Caption="Leader / Clerk Options" ColSpanLg="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                                             <DxFormLayoutItem Caption="Send Leader Reports To" ColSpanMd="12">
                                                 <DxComboBox Data="sendLeaderReportsToList"
                                                             @bind-Value="@systemSettings.SendLeaderReportsTo"
@@ -196,7 +196,7 @@ else
 
                                 <DxStackLayoutItem>
                                     <Template>
-                                        <DxFormLayoutGroup Caption="Mail Labels (cm)" ColSpanMd="12">
+                                        <DxFormLayoutGroup Caption="Mail Labels (cm)" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                                             <DxFormLayoutItem Caption="Top Matgin" ColSpanMd="6">
                                                 <DxMaskedInput @bind-Value="@systemSettings.MailLabelTopMargin" />
                                             </DxFormLayoutItem>
@@ -216,7 +216,7 @@ else
                                                 <DxMaskedInput @bind-Value="@systemSettings.MailLabelWidth" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
-                                        <DxFormLayoutGroup Caption="Other Settings">
+                                        <DxFormLayoutGroup Caption="Other Settings" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                                             <DxFormLayoutItem Caption="Require Vax Certificate?" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@systemSettings.RequireVaxCertificate" Alignment="CheckBoxContentAlignment.Right" />
                                             </DxFormLayoutItem>
@@ -224,7 +224,7 @@ else
                                                 <DxCheckBox @bind-Checked="@systemSettings.AllowPostNominalLetters" Alignment="CheckBoxContentAlignment.Right" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
-                                        <DxFormLayoutGroup Caption="Data Retention">
+                                        <DxFormLayoutGroup Caption="Data Retention" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                                             <DxFormLayoutItem Caption="Attendance data (years)" ColSpanMd="12">
                                                 <DxSpinEdit @bind-Value="@systemSettings.RetainAttendanceForYears" MinValue="1" />
                                             </DxFormLayoutItem>
