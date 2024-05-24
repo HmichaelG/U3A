@@ -1,0 +1,20 @@
+﻿@namespace U3A.UI.Common
+
+@inject IJSRuntime js
+
+<div class="mb-2" id="qrCode"></div>
+<div id="qrCodeData" data-url="@Uri"></div>
+
+@code {
+    [Parameter][EditorRequired]
+    public string? Uri { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await js.InvokeVoidAsync("setQRCode");
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}
