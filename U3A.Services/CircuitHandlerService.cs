@@ -1,12 +1,14 @@
-﻿using DevExpress.XtraRichEdit.Model;
+﻿using DevExpress.XtraPrinting.Native;
+using DevExpress.XtraRichEdit.Model;
 using Microsoft.AspNetCore.Components.Server.Circuits;
-using Microsoft.AspNetCore.Http;
+using ASP_CORE = Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using U3A.Database;
+using Microsoft.AspNetCore.Http;
 
 namespace U3A.Services
 {
@@ -30,12 +32,15 @@ namespace U3A.Services
         public override Task OnCircuitOpenedAsync(Circuit circuit,
                              CancellationToken cancellationToken)
         {
-            IHttpContextAccessor accessor = new HttpContextAccessor();
+            IHttpContextAccessor accessor = new ASP_CORE.HttpContextAccessor();
             var id = accessor.HttpContext.User.Identity; // store in dictionary somewhere
+            HostStrategy hs = new HostStrategy();
+            var tenant = hs.GetIdentifier(accessor.HttpContext.Request.Host.Host);
             var cd = new CircuitDetail()
             {
                 Id = circuit.Id,
                 Name = (!string.IsNullOrWhiteSpace(id?.Name)) ? id.Name : "Anonymous (Public)",
+                Tenant = tenant,
             };
             CircuitDetails.TryAdd(circuit.Id, cd);
             OnCircuitsChanged();
@@ -75,6 +80,7 @@ namespace U3A.Services
     {
         public string Id { get; set; }
         public string? Name { get; set; }
+        public string? Tenant { get; set; }
         public DateTime? Created { get; set; } = DateTime.Now;
         public DateTime? Down { get; set; }
 
