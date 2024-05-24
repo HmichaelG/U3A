@@ -6,6 +6,7 @@
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.Identity
 @using U3A.Data
+@using U3A.UI.Common
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IdentityUserAccessor UserAccessor
@@ -37,9 +38,9 @@ else
                 </p>
             </li>
             <li>
-                <p><a class="btn-link" onclick="setQRCode()">Display &amp; Scan the QR Code</a> or enter this key</p><div class="alert alert-info h5">@sharedKey</div><p>into your two-factor authenticator app. Spaces and casing do not matter.</p>
-                <div class="mb-2" id="qrCode"></div>
-                <div id="qrCodeData" data-url="@authenticatorUri"></div>
+                <p>Scan the QR Code</p>
+                <QRCode Uri="@authenticatorUri" @rendermode=RenderMode.InteractiveServer />
+                <p>Or, enter this key</p><div class="alert alert-info h5">@sharedKey</div><p>into your two-factor authenticator app. Spaces and casing do not matter.</p>
             </li>
             <li>
                 <p>
@@ -153,10 +154,15 @@ else
 
     private string GenerateQrCodeUri(string email, string unformattedKey)
     {
+        IHttpContextAccessor accessor = new HttpContextAccessor();
+        HostStrategy hs = new HostStrategy();
+        var tenant = hs.GetIdentifier(accessor!.HttpContext!.Request.Host.Host);
+        TextInfo info = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo;
+        tenant = info.ToTitleCase(tenant);
         return string.Format(
             CultureInfo.InvariantCulture,
             AuthenticatorUriFormat,
-            UrlEncoder.Encode("Microsoft.AspNetCore.Identity.UI"),
+            UrlEncoder.Encode($"U3Admin for {tenant}"),
             UrlEncoder.Encode(email),
             unformattedKey);
     }
