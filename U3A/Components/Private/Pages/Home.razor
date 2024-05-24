@@ -62,11 +62,11 @@ else
                 </DxTabPage>
                 <DxTabPage Text="Website">
                     <div class="">
-                        <iframe src="@homePage" class="shadow card p-1 iframe-height"></iframe>
+                        <iframe src="@homePage" class="shadow card p-1 iframe-style"></iframe>
                     </div>
                 </DxTabPage>
                 <DxTabPage Text="u3admin.org.au">
-                    <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-height"></iframe>
+                    <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-style"></iframe>
                 </DxTabPage>
             </DxTabs>
             <footer class="footer vw-100 text-muted mt-4">
@@ -80,10 +80,10 @@ else
 
 <style>
 
-    .iframe-height {
+    .iframe-style {
         width: 85vw;
-        min-height: 40vh;
-        height: 95vh;
+        min-height: 40dvh;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "10rem" : "7.5rem"));
         border-style: none;
         padding-bottom: 5px;
     }
