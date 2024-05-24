@@ -15,9 +15,9 @@
                    IconCssClass="bi bi-database menu-icon" />
 </DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutGroup Caption="New Member Summary" ColSpanLg="9" CssClass="newMemberControlHeight">
+    <DxFormLayoutGroup Caption="New Member Summary" ColSpanLg="9" CssClass="controlHeight">
         <DxChart Data="memberData" Id="newMemberChart"
-                 Width="100%" Height="@controlHeight"
+                 Width="100%" CssClass="controlHeight"
                  LabelOverlap="ChartLabelOverlap.Hide">
             <DxChartStackedBarSeries Name="Male"
                                      Stack="true"
@@ -67,7 +67,7 @@
         </DxChart>
     </DxFormLayoutGroup>
     <DxFormLayoutGroup Caption="New Members by Month" ColSpanLg="3">
-        <DxGrid Data="@(memberData?.Where(x => x.Count != 0))" CssClass="newMemberControlHeight"
+        <DxGrid Data="@(memberData?.Where(x => x.Count != 0))" CssClass="controlHeight"
                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                 AutoExpandAllGroupRows="true"
                 ShowFilterRow="false"
@@ -90,8 +90,8 @@
 </DxFormLayout>
 
 <style>
-    .newMemberControlHeight {
-        height: @controlHeight;
+    .controlHeight {
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14rem"));
     }
 </style>
 
@@ -99,20 +99,7 @@
 @code {
     IEnumerable<MemberSummary> memberData;
     Progress? progress;
-    string controlHeight = "350px";
     int chartBreaks = 0;
-
-    protected override async void OnAfterRender(bool firstRender)
-    {
-        // wire up the toolbar
-        base.OnAfterRender(firstRender);
-        var newHeight = await Window.FitToRemainingHeight(js, "newMemberChart", controlHeight);
-        if (newHeight != controlHeight)
-        {
-            controlHeight = newHeight;
-            InvokeAsync(StateHasChanged);
-        }
-    }
 
     async Task OnProcess()
     {

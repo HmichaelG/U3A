@@ -18,9 +18,9 @@
                    IconCssClass="bi bi-database menu-icon" />
 </DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutGroup Caption="Enrolment Request Summary" ColSpanLg="9" CssClass="enrolControlHeight">
+    <DxFormLayoutGroup Caption="Enrolment Request Summary" ColSpanLg="9" CssClass="controlHeight">
         <DxChart Data="enrolmentData" Id="enrolChart"
-                 Width="100%" Height=@controlHeight
+                 Width="100%" CssClass="controlHeight"
                  LabelOverlap="ChartLabelOverlap.Hide">
             @if (enrolmentData != null)
             {
@@ -54,7 +54,7 @@
         </DxChart>
     </DxFormLayoutGroup>
     <DxFormLayoutGroup Caption="Enrolment Request Summary" ColSpanLg="3">
-        <DxGrid Data="@(enrolmentData?.Where(x => x.Count != 0))" CssClass="enrolControlHeight" id="enrolGrid"
+        <DxGrid Data="@(enrolmentData?.Where(x => x.Count != 0))" CssClass="controlHeight" id="enrolGrid"
                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                 AutoExpandAllGroupRows="true"
                 ShowFilterRow="false"
@@ -77,8 +77,8 @@
 </DxFormLayout>
 
 <style>
-    .enrolControlHeight {
-        height: @controlHeight;
+    .controlHeight {
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14rem"));
     }
 </style>
 
@@ -86,21 +86,7 @@
 @code {
     IEnumerable<EnrolmentSummary>? enrolmentData;
     Progress? progress;
-
-    string controlHeight = "350px";
     int chartBreaks = 0;
-
-    protected override async void OnAfterRender(bool firstRender)
-    {
-        // wire up the toolbar
-        base.OnAfterRender(firstRender);
-        var newHeight = await Window.FitToRemainingHeight(js, "enrolChart", controlHeight);
-        if (newHeight != controlHeight)
-        {
-            controlHeight = newHeight;
-            StateHasChanged();
-        }
-    }
 
     async Task OnProcess()
     {

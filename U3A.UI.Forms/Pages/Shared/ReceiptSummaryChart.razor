@@ -15,9 +15,9 @@
                    IconCssClass="bi bi-database menu-icon" />
 </DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutGroup Caption="Cash Receipts Summary" ColSpanLg="9" CssClass="receiptControlHeight">
+    <DxFormLayoutGroup Caption="Cash Receipts Summary" ColSpanLg="9" CssClass="controlHeight">
         <DxChart Data="receiptData" Id="receiptChart"
-                 Width="100%" Height="@controlHeight"
+                 Width="100%" CssClass="controlHeight"
                  LabelOverlap="ChartLabelOverlap.Hide">
             <DxChartStackedBarSeries Name="Online"
                                      Color="System.Drawing.Color.LimeGreen"
@@ -59,7 +59,7 @@
         </DxChart>
     </DxFormLayoutGroup>
     <DxFormLayoutGroup Caption="Cash Receipts by Month" ColSpanLg="3">
-        <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="receiptControlHeight"
+        <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="controlHeight"
                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                 AutoExpandAllGroupRows=true
                 ShowFilterRow="false"
@@ -80,9 +80,10 @@
         </DxGrid>
     </DxFormLayoutGroup>
 </DxFormLayout>
+
 <style>
-    .receiptControlHeight {
-        height: @controlHeight;
+    .controlHeight {
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14rem"));
     }
 </style>
 
@@ -91,20 +92,7 @@
     [Parameter] public bool ShowSeriesPointMarkers { get; set; }
     [Parameter] public bool ShowSeriesLabels { get; set; }
     Progress? progress;
-    string controlHeight = "350px";
     int chartBreaks = 0;
-
-    protected override async void OnAfterRender(bool firstRender)
-    {
-        // wire up the toolbar
-        base.OnAfterRender(firstRender);
-        var newHeight = await Window.FitToRemainingHeight(js, "receiptChart", controlHeight);
-        if (newHeight != controlHeight)
-        {
-            controlHeight = newHeight;
-            InvokeAsync(StateHasChanged);
-        }
-    }
 
     async Task OnProcess()
     {

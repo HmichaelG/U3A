@@ -2,15 +2,14 @@
 @inject IJSRuntime js
 
 <Progress @ref=@progress />
-<DxFormLayout>
-    <DxFormLayoutItem ColSpanMd="12">
-        <div class="float-end">
-            <DxButton Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
-                      IconCssClass="bi bi-database menu-icon" CssClass="col m-2" />
-        </div>
-    </DxFormLayoutItem>
-    <DxFormLayoutGroup Caption="Attendance Summary" ColSpanMd="9" CssClass="attendCcontrolHeight">
-        <DxChart T="AttendClassSummaryByWeek" Height=@controlHeight
+<DxToolbar CssClass="my-1">
+    <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
+                   Alignment="ToolbarItemAlignment.Right"
+                   IconCssClass="bi bi-database menu-icon" />
+</DxToolbar>
+<DxFormLayout CssClass="control-height">
+    <DxFormLayoutGroup Caption="Attendance Summary" ColSpanMd="9" CssClass="control-height">
+        <DxChart T="AttendClassSummaryByWeek" CssClass="control-height"
                  Data="@ChartsData" id="myChart"
                  Width="100%">
             <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
@@ -50,13 +49,13 @@
     </DxFormLayoutGroup>
 
     <DxFormLayoutGroup Caption="Attendance Summary" ColSpanMd="3">
-        <DxGrid Data="@(ChartsData?.Where(x => x.Total != 0))" CssClass="attendCcontrolHeight" id="attendGrid"
+        <DxGrid Data="@(ChartsData?.Where(x => x.Total != 0))" CssClass="control-height" id="attendGrid"
                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                 AutoExpandAllGroupRows="true"
                 ShowAllRows="true">
             <Columns>
-                <DxGridDataColumn Caption="Week" FieldName="WeekEnd" 
-                    GroupIndex=0 DisplayFormat="{0:dddd, dd MMMM yyyy}" />
+                <DxGridDataColumn Caption="Week" FieldName="WeekEnd"
+                                  GroupIndex=0 DisplayFormat="{0:dddd, dd MMMM yyyy}" />
                 <DxGridDataColumn Caption="Present" FieldName="Present" DisplayFormat="{0:n0}" />
                 <DxGridDataColumn Caption="Apology" FieldName="AbsentWithApology" DisplayFormat="{0:n0}" />
                 <DxGridDataColumn Caption="No Apology" FieldName="AbsentWithoutApology" DisplayFormat="{0:n0}" />
@@ -74,8 +73,8 @@
 </DxFormLayout>
 
 <style>
-    .attendCcontrolHeight {
-        height: @controlHeight;
+    .control-height {
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14em"));
     }
 </style>
 
@@ -83,14 +82,6 @@
 @code {
     List<AttendClassSummaryByWeek> ChartsData;
     Progress? progress;
-    string controlHeight = "350px";
-
-    protected override async void OnAfterRender(bool firstRender) {
-        // wire up the toolbar
-        base.OnAfterRender(firstRender);
-        var newHeight = await Window.FitToRemainingHeight(js, "myChart", controlHeight);
-        if (newHeight != controlHeight) { controlHeight = newHeight; InvokeAsync(StateHasChanged); }
-    }
 
     async Task OnProcess()
     {
