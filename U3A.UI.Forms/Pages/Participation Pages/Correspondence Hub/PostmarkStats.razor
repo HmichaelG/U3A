@@ -17,212 +17,209 @@
 {
     <LoadingIndicator />
 }
-
-<h4>Outbound Email Statistics</h4>
-<DxGrid Data=@statistics @ref=@bounceGrid ColumnResizeMode=GridColumnResizeMode.ColumnsContainer
-        ShowGroupPanel=false ShowSearchBox=false>
-    <Columns>
-        <DxGridDataColumn Width="8rem" Caption="Period" FieldName="Period" />
-        <DxGridDataColumn Caption="From" FieldName="StartDate" DisplayFormat="dd-MMM-yyyy" Visible=true />
-        <DxGridDataColumn Caption="To" FieldName="EndDate" DisplayFormat="dd-MMM-yyyy" Visible=true />
-        <DxGridDataColumn Caption="Sent" FieldName="Sent" />
-        <DxGridDataColumn Caption="Opens" FieldName="Opens" />
-        <DxGridDataColumn Caption="Unique Opens" FieldName="UniqueOpens" />
-        <DxGridDataColumn Caption="Spam Complaints" FieldName="SpamComplaints" />
-        <DxGridDataColumn Caption="Spam Complaints Rate" TextAlignment="GridTextAlignment.Center" FieldName="SpamComplaintsRate">
-            <CellDisplayTemplate>
-                @{
-                    var rate = (double)context.Value;
-                    string cssClass;
-                    switch (rate)
-                    {
-                        case > 0.1:
-                            cssClass = "bg-danger";
-                            break;
-                        case > 0:
-                            cssClass = "bg-warning";
-                            break;
-                        default:
-                            cssClass = "bg-success";
-                            break;
-                    }
-                    <div class="d-flex">
-                        <div class="badge badge-size py-1 px-2 mx-auto text-white @cssClass">@rate.ToString("n2")%</div>
-                    </div>
-                }
-            </CellDisplayTemplate>
-        </DxGridDataColumn>
-        <DxGridDataColumn FieldName="Bounced" Caption="Bounced" />
-        <DxGridDataColumn Caption="Bounce Rate" FieldName="BounceRate">
-            <CellDisplayTemplate>
-                @{
-                    var rate = (double)context.Value;
-                    string cssClass;
-                    switch (rate)
-                    {
-                        case > 0:
-                            cssClass = "bg-warning";
-                            break;
-                        default:
-                            cssClass = "bg-success";
-                            break;
-                    }
-                    <div class="d-flex">
-                        <div class="badge badge-size py-1 px-2 mx-auto text-white @cssClass">@rate.ToString("n2")%</div>
-                    </div>
-                }
-            </CellDisplayTemplate>
-        </DxGridDataColumn>
-        <DxGridDataColumn Width="8rem" Caption="Issues" AllowGroup="false">
-            <CellDisplayTemplate>
-                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
-                          RenderStyle="ButtonRenderStyle.Primary" Text=@($"{GetEmailIssues(context.DataItem as EmailOutboundOverviewStats)} Issues")
-                          Click="() => OnBouncedClick((EmailOutboundOverviewStats)context.DataItem)"></DxButton>
-            </CellDisplayTemplate>
-        </DxGridDataColumn>
-    </Columns>
-    <TotalSummary>
-        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Sent" FooterColumnName="Sent" />
-        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Opens" FooterColumnName="Opens" />
-        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="UniqueOpens" FooterColumnName="UniqueOpens" />
-        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="SpamComplaints" FooterColumnName="SpamComplaints" />
-    </TotalSummary>
-
-</DxGrid>
-
-@if (showBounceGrid)
-{
-    <div class="mt-2">
-        <h4>Bounce Email &amp; Spam Complaints</h4>
-        <DxGrid Data=@bounces @ref=@bounceGrid
-                CssClass="grid-height" id="bounceGrid">
-            <ToolbarTemplate>
-                <GridToolbar LinkedGrid=@bounceGrid />
-            </ToolbarTemplate>
-            <Columns>
-                <DxGridDataColumn Width="8rem" Caption="Date" FieldName="BouncedAt"
-                                  DisplayFormat="dd-MMM-yy hh:mm tt" />
-                <DxGridDataColumn Caption="Subject" FieldName="Subject" />
-                <DxGridDataColumn Caption="From" FieldName="From" />
-                <DxGridDataColumn Caption="To Email" FieldName="Email" />
-                <DxGridDataColumn Caption="To Person" FieldName="Person.FullName" />
-                <DxGridDataColumn Caption="Reason" FieldName="Details" />
-                <DxGridDataColumn Width="8rem" FieldName="ID" Caption="Bounce Type" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
-                    <CellDisplayTemplate>
-                        <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
-                                  RenderStyle="ButtonRenderStyle.Primary" Text=@($"{(context.DataItem as EmailBounce).Name}")
-                                  Click="() => OnSelectedBounceClick((EmailBounce)context.DataItem)"></DxButton>
-                    </CellDisplayTemplate>
-                </DxGridDataColumn>
-            </Columns>
-        </DxGrid>
-    </div>
-
-    <DxWindow @ref=@bounceDetailsForm Width="max(35vw, 400px)"
-              AllowResize="true"
-              Context="windowContext"
-              CloseOnEscape=true
-              ShowCloseButton=true
-              ShowFooter=true
-              Scrollable=true
-              CssClass="vh-75"
-              HeaderText="Bounced Email Details">
-        <BodyTextTemplate>
-            <div class="px-2 w-100">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td class="h6 text-left" colspan="2">Email Details</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><th scope="row" class="col-3">Type</th> <td>@selectedBounce.Name</td></tr>
-                        <tr><th scope="row" class="col-3">Subject</th> <td>@selectedBounce.Subject</td></tr>
-                        <tr><th scope="row" class="col-3">From</th> <td>@selectedBounce.From</td></tr>
-                        <tr><th scope="row" class="col-3">To</th> <td>@selectedBounce.Email</td></tr>
-                        <tr><th scope="row" class="col-3">Date</th> <td>@selectedBounce.BouncedAt.ToString("dd-MMM-yy hh:mm tt")</td></tr>
-                    </tbody>
-                </table>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td class="h6 text-left" colspan="3">Bounce Details</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><th scope="row" class="col-3">Reason</th> <td>@selectedBounce.Details</td></tr>
-                        <tr>
-                            <th scope="row" class="col-3">Status</th>
-                            <td>
-                                @((selectedBounce.Inactive)
-                                    ? "The email address has been deactiveted."
-                                    : "The email address remains active.")
-                            </td>
-                        </tr>
-                        @if (selectedBounce.Inactive)
+<div class="px-2">
+    <h4>Outbound Email Statistics</h4>
+    <DxGrid Data=@statistics @ref=@bounceGrid ColumnResizeMode=GridColumnResizeMode.ColumnsContainer
+            ShowGroupPanel=false ShowSearchBox=false>
+        <Columns>
+            <DxGridDataColumn Width="8rem" Caption="Period" FieldName="Period" />
+            <DxGridDataColumn Caption="From" FieldName="StartDate" DisplayFormat="dd-MMM-yyyy" Visible=true />
+            <DxGridDataColumn Caption="To" FieldName="EndDate" DisplayFormat="dd-MMM-yyyy" Visible=true />
+            <DxGridDataColumn Caption="Sent" FieldName="Sent" />
+            <DxGridDataColumn Caption="Opens" FieldName="Opens" />
+            <DxGridDataColumn Caption="Unique Opens" FieldName="UniqueOpens" />
+            <DxGridDataColumn Caption="Spam Complaints" FieldName="SpamComplaints" />
+            <DxGridDataColumn Caption="Spam Complaints Rate" TextAlignment="GridTextAlignment.Center" FieldName="SpamComplaintsRate">
+                <CellDisplayTemplate>
+                    @{
+                        var rate = (double)context.Value;
+                        string cssClass;
+                        switch (rate)
                         {
+                            case > 0.1:
+                                cssClass = "bg-danger";
+                                break;
+                            case > 0:
+                                cssClass = "bg-warning";
+                                break;
+                            default:
+                                cssClass = "bg-success";
+                                break;
+                        }
+                        <div class="d-flex">
+                            <div class="badge badge-size py-1 px-2 mx-auto text-white @cssClass">@rate.ToString("n2")%</div>
+                        </div>
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="Bounced" Caption="Bounced" />
+            <DxGridDataColumn Caption="Bounce Rate" FieldName="BounceRate">
+                <CellDisplayTemplate>
+                    @{
+                        var rate = (double)context.Value;
+                        string cssClass;
+                        switch (rate)
+                        {
+                            case > 0:
+                                cssClass = "bg-warning";
+                                break;
+                            default:
+                                cssClass = "bg-success";
+                                break;
+                        }
+                        <div class="d-flex">
+                            <div class="badge badge-size py-1 px-2 mx-auto text-white @cssClass">@rate.ToString("n2")%</div>
+                        </div>
+                    }
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn Width="8rem" Caption="Issues" AllowGroup="false">
+                <CellDisplayTemplate>
+                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                              RenderStyle="ButtonRenderStyle.Primary" Text=@($"{GetEmailIssues(context.DataItem as EmailOutboundOverviewStats)} Issues")
+                              Click="() => OnBouncedClick((EmailOutboundOverviewStats)context.DataItem)"></DxButton>
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+        </Columns>
+        <TotalSummary>
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Sent" FooterColumnName="Sent" />
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Opens" FooterColumnName="Opens" />
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="UniqueOpens" FooterColumnName="UniqueOpens" />
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="SpamComplaints" FooterColumnName="SpamComplaints" />
+        </TotalSummary>
+
+    </DxGrid>
+
+    @if (showBounceGrid)
+    {
+        <div class="mt-2">
+            <h4>Bounce Email &amp; Spam Complaints</h4>
+            <DxGrid Data=@bounces @ref=@bounceGrid
+                    CssClass="grid-height" id="bounceGrid">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@bounceGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridDataColumn Width="8rem" Caption="Date" FieldName="BouncedAt"
+                                      DisplayFormat="dd-MMM-yy hh:mm tt" />
+                    <DxGridDataColumn Caption="Subject" FieldName="Subject" />
+                    <DxGridDataColumn Caption="From" FieldName="From" />
+                    <DxGridDataColumn Caption="To Email" FieldName="Email" />
+                    <DxGridDataColumn Caption="To Person" FieldName="Person.FullName" />
+                    <DxGridDataColumn Caption="Reason" FieldName="Details" />
+                    <DxGridDataColumn Width="8rem" FieldName="ID" Caption="Bounce Type" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
+                        <CellDisplayTemplate>
+                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                      RenderStyle="ButtonRenderStyle.Primary" Text=@($"{(context.DataItem as EmailBounce).Name}")
+                                      Click="() => OnSelectedBounceClick((EmailBounce)context.DataItem)"></DxButton>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </DxGrid>
+        </div>
+        <DxWindow @ref=@bounceDetailsForm Width="max(35vw, 400px)"
+                  AllowResize="true"
+                  Context="windowContext"
+                  CloseOnEscape=true
+                  ShowCloseButton=true
+                  ShowFooter=true
+                  Scrollable=true
+                  CssClass="vh-75"
+                  HeaderText="Bounced Email Details">
+            <BodyTextTemplate>
+                <div class="px-2 w-100">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <th scope="row" class="col-3">Can Reactivate?</th>
+                                <td class="h6 text-left" colspan="2">Email Details</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><th scope="row" class="col-3">Type</th> <td>@selectedBounce.Name</td></tr>
+                            <tr><th scope="row" class="col-3">Subject</th> <td>@selectedBounce.Subject</td></tr>
+                            <tr><th scope="row" class="col-3">From</th> <td>@selectedBounce.From</td></tr>
+                            <tr><th scope="row" class="col-3">To</th> <td>@selectedBounce.Email</td></tr>
+                            <tr><th scope="row" class="col-3">Date</th> <td>@selectedBounce.BouncedAt.ToString("dd-MMM-yy hh:mm tt")</td></tr>
+                        </tbody>
+                    </table>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td class="h6 text-left" colspan="3">Bounce Details</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><th scope="row" class="col-3">Reason</th> <td>@selectedBounce.Details</td></tr>
+                            <tr>
+                                <th scope="row" class="col-3">Status</th>
                                 <td>
-                                    
-                                    @if (selectedBounce.CanActivate)
-                                    {
-                                    <span>Yes.</span> <DxButton Text="Reactivate Now!" Click="OnReactivate"  />
-                                    }
-                                    else
-                                    {
-                                        <div class='alert alert-danger text-dark pb-2'>
-                                        <p>No. A spam complaint is recorded when a subscriber clicks “This is Spam” or “Mark as Spam” in email clients like Outlook, Gmail, and other similar services.
-                                        In the email industry, spam complaints are a clear metric to determine abuse and poor sending practices.
-                                        If you feel a spam complaint has a reason for being reactivated, please <a href='https://postmarkapp.com/contact'>contact Postmark support</a> directly.</p>
-                                        <p>Reduce your spam rate to less than 0.1% of email. if your spam complaint rate remains higher than normal Postmark may pause sending on your account while they work with you to fix the issue.</p>                                        </div>
-                                    }
+                                    @((selectedBounce.Inactive)
+                                        ? "The email address has been deactiveted."
+                                        : "The email address remains active.")
                                 </td>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td class="h6 text-left" colspan="2">Praticipant Details</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (selectedBounce.Person != null)
-                        {
-                            <tr><th scope="row" class="col-3">Name</th> <td>@selectedBounce.Person.FullName</td></tr>
-                            <tr><th scope="row" class="col-3">Joined</th> <td>@selectedBounce.Person.DateJoined?.ToString("dd-MMM-yyyy")</td></tr>
-                            <tr><th scope="row" class="col-3">Mobile</th> <td>@selectedBounce.Person.Mobile</td></tr>
-                            <tr><th scope="row" class="col-3">Home Phone</th> <td>@selectedBounce.Person.HomePhone</td></tr>
-                        }
-                        else
-                        {
+                            @if (selectedBounce.Inactive)
+                            {
+                                <tr>
+                                    <th scope="row" class="col-3">Can Reactivate?</th>
+                                    <td>
+
+                                        @if (selectedBounce.CanActivate)
+                                        {
+                                            <span>Yes.</span> <DxButton Text="Reactivate Now!" Click="OnReactivate" />
+                                        }
+                                        else
+                                        {
+                                            <div class='alert alert-danger text-dark pb-2'>
+                                                <p>
+                                                    No. A spam complaint is recorded when a subscriber clicks “This is Spam” or “Mark as Spam” in email clients like Outlook, Gmail, and other similar services.
+                                                    In the email industry, spam complaints are a clear metric to determine abuse and poor sending practices.
+                                                    If you feel a spam complaint has a reason for being reactivated, please <a href='https://postmarkapp.com/contact'>contact Postmark support</a> directly.
+                                                </p>
+                                                <p>Reduce your spam rate to less than 0.1% of email. if your spam complaint rate remains higher than normal Postmark may pause sending on your account while they work with you to fix the issue.</p>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td class="h6 text-center text-info" colspan="2">
-                                    This email address is no longer associated with a participant.<br />
-                                    Normally, this indicates the issue has been resolved.
-                                </td>
+                                <td class="h6 text-left" colspan="2">Praticipant Details</td>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </BodyTextTemplate>
-    </DxWindow>
+                        </thead>
+                        <tbody>
+                            @if (selectedBounce.Person != null)
+                            {
+                                <tr><th scope="row" class="col-3">Name</th> <td>@selectedBounce.Person.FullName</td></tr>
+                                <tr><th scope="row" class="col-3">Joined</th> <td>@selectedBounce.Person.DateJoined?.ToString("dd-MMM-yyyy")</td></tr>
+                                <tr><th scope="row" class="col-3">Mobile</th> <td>@selectedBounce.Person.Mobile</td></tr>
+                                <tr><th scope="row" class="col-3">Home Phone</th> <td>@selectedBounce.Person.HomePhone</td></tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td class="h6 text-center text-info" colspan="2">
+                                        This email address is no longer associated with a participant.<br />
+                                        Normally, this indicates the issue has been resolved.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </BodyTextTemplate>
+        </DxWindow>
 
-
+    }
+</div>
 }
-
 <style>
     .grid-height {
-        height: @gridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "30rem" : "26rem"));
     }
-
-    .vh-85 {
-        height: 75vh;
-    }
-
     .badge-size {
         font-size: 0.7rem !important;
     }
@@ -242,8 +239,6 @@
     string ErrorHeader;
     string ErrorMessage;
     Progress? ProgressBar;
-    string gridHeight = "600px";
-
 
     U3ADbContext dbc { get; set; }
     DocumentServer server;
@@ -270,8 +265,6 @@
             IsReady = true;
             StateHasChanged();
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "bounceGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
     }
 
     int GetEmailIssues(EmailOutboundOverviewStats dataItem)

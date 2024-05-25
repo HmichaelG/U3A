@@ -93,7 +93,7 @@ else
 }
 <style>
     .grid-height {
-        height: @gridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "19rem" : "15rem"));
     }
 
     .viewer-height {
@@ -145,13 +145,6 @@ else
         selectedTerm = currentTerm;
         await SelectedTermChanged(selectedTerm);
         IsReady = true;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task SelectedTermChanged(Term term)

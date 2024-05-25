@@ -183,11 +183,11 @@ else
 <style>
 
     .main-grid-height {
-        height: @mainGridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14rem"));
     }
 
     .display-grid-height {
-        height: @displayGridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14rem"));
     }
 
 </style>
@@ -211,8 +211,6 @@ else
     string? MessageContent;
     MessageBox? messageBox { get; set; }
     bool MessageBoxShowCancelButton;
-    string displayGridHeight;
-    string mainGridHeight;
 
     private bool classComboEnabled;
     private bool courseComboEnabled;
@@ -260,19 +258,6 @@ else
         courseComboEnabled = false;
         if (selectedTerm != null) { await SelectedTermChanged(selectedTerm); }
         IsReady = true;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "displayGrid", displayGridHeight);
-        if (newHeight != displayGridHeight)
-        {
-            displayGridHeight = newHeight;
-            newHeight = await Window.FitToRemainingHeight(js, "mainGrid", mainGridHeight);
-            if (newHeight != mainGridHeight) mainGridHeight = newHeight;
-            InvokeAsync(StateHasChanged);
-        }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task SelectedTermChanged(Term term)

@@ -109,7 +109,7 @@ else
 <style>
     .schedule-height {
         overflow: auto;
-        height: @scheduleHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "13rem" : "9rem"));
     }
 
 </style>
@@ -134,8 +134,6 @@ else
 
     string SpinnerVisibility = "hidden";
     string ProcessButtonText = "Process";
-    string scheduleHeight;
-
 
     DxSchedulerTimeSpanRange VisibleTime = new DxSchedulerTimeSpanRange(TimeSpan.FromHours(6), TimeSpan.FromHours(22));
 
@@ -158,18 +156,6 @@ else
             }
         }
         IsReady = true;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            localTime = new LocalTime(js);
-            StartDate = (await localTime.GetLocalTimeAsync()).Date.AddHours(6);
-        }
-        var newHeight = await Window.FitToRemainingHeight(js, "mySchedule", scheduleHeight, 0.05);
-        if (newHeight != scheduleHeight) { scheduleHeight = newHeight; InvokeAsync(StateHasChanged); }
     }
 
     async void OnStartDateChanged(DateTime newStartDate) => StartDate = (await localTime.GetLocalTimeAsync(newStartDate)).Date;

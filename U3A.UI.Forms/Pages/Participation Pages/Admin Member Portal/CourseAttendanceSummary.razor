@@ -144,7 +144,7 @@
 
 <style>
     .grid-height {
-        height: @gridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "16rem" : "12rem"));
     }
 </style>
 
@@ -161,7 +161,6 @@
     DxGrid? mainGrid;
     DxGrid? classGrid;
     DxGrid? attendanceGrid;
-    string gridHeight { get; set; }
     U3ADbContext dbc { get; set; }
     GridToolbar? Toolbar;
     GridToolbar? ClassToolbar;
@@ -183,12 +182,6 @@
     {
         if (ClassToolbar != null && classGrid != null) { ClassToolbar.LinkedGrid = classGrid; }
         if (attendanceToolbar != null && attendanceGrid != null) { attendanceToolbar.LinkedGrid = attendanceGrid; }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight);
-        if (newHeight != gridHeight)
-        {
-            gridHeight = newHeight;
-            InvokeAsync(StateHasChanged);
-        }
         await base.OnAfterRenderAsync(firstRender);
     }
 
