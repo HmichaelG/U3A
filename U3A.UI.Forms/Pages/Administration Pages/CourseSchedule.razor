@@ -109,7 +109,7 @@ else
 <style>
     .schedule-height {
         overflow: auto;
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "13rem" : "9rem"));
+        height: calc(100dvh - @(Workstation.UseTopMenu ? (IsPortal) ? "9rem" : "13rem" : (IsPortal) ? "5rem" : "9rem"));
     }
 
 </style>

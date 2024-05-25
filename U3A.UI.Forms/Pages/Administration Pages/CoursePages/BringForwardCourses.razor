@@ -36,7 +36,7 @@ else
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <FullScreen>
+    <FullScreen DisplayOffset="10">
         <ContentTemplate>
             <DxGrid Data="@Courses" @ref=@mainGrid CssClass="grid-height" id="myGrid"
                     AutoCollapseDetailRow="true"

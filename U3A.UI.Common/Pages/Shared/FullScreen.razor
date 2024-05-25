@@ -30,7 +30,7 @@
     }
 
     .normalscreen {
-        height: @height;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? $"{DisplayOffset + 4}rem" : $"{DisplayOffset}rem"));
         width: calc(100% + 1.5rem);
     }
 
@@ -39,6 +39,8 @@
 @code {
     [Parameter]
     public RenderFragment ContentTemplate { get; set; } = default;
+    [Parameter]
+    public double DisplayOffset { get; set; } = 8;
 
     string height = "100dvh";
     bool isFullscreen = false;
