@@ -11,7 +11,8 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            var sql = @"
+            migrationBuilder.Sql(
+    @"EXECUTE ('
 
 -- =============================================
 -- Author:		M Hanlon
@@ -38,8 +39,8 @@ BEGIN
 			,@RetainUnfinancialPersonsForYears int
 
 	set @START_OF_EPOCH = 2020
-	set @PERSON_DELETE_FLAG = CAST('1-jan-1800' as datetime)
-	set @Today = getdate() at time zone 'UTC'
+	set @PERSON_DELETE_FLAG = CAST(''1-jan-1800'' as datetime)
+	set @Today = getdate() at time zone ''UTC''
 	set @Year = DATEPART(year,@Today)
 
 	select Top 1 @Year=[Year],@termNumber=[TermNumber] from Term where IsDefaultTerm=1
@@ -75,7 +76,7 @@ BEGIN
 		where FinancialTo = @START_OF_EPOCH
 		and DATEDIFF(day,CreatedOn,@Today) > @RetainRegistrationsNeverCompletedForDays
 
-	-- unfinancial persons - set delete flag so we don't lose history
+	-- unfinancial persons - set delete flag so we dont lose history
     update Person
 		set IsDeleted = 1
         where FinancialTo != @START_OF_EPOCH
@@ -121,10 +122,9 @@ BEGIN
 
 endall:
 	return 0
-END
-
-            ";
-		migrationBuilder.Sql(sql);
+END')"
+    ); 
+			
         }
 
         /// <inheritdoc />
