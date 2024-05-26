@@ -17,50 +17,52 @@
 {
     <LoadingIndicator />
 }
+else
+{
+    <div class="px-2">
+        <h4>Suppressions</h4>
+        <CollapsableContent AlertText=@($@"A <strong>suppression</strong> is created when a participant unsubscribes, or an address hard bounces.<br/>
+                        They are an essential part of maintaining good email reputation.<br/>
+                        You may delete a suppression once you are sure...<br/>
+                        the email address is valid, or the unsubscribe was accidental, the address is no longer associated with a participant, or the participant is unfinancial.")
+                            OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
-<h4>Suppressions</h4>
-<CollapsableContent AlertText=@($@"A <strong>suppression</strong> is created when a participant unsubscribes, or an address hard bounces.<br/>
-                  They are an essential part of maintaining good email reputation.<br/>
-                  You may delete a suppression once you are sure...<br/>
-                  the email address is valid, or the unsubscribe was accidental, the address is no longer associated with a participant, or the participant is unfinancial.")
-                  OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+        <FullScreen @ref=@fullScreen>
+            <ContentTemplate>
+                <DxGrid Data=@suppressions @ref=@mainGrid CssClass="grid-height"
+                        @bind-SelectedDataItems="@SelectedDataItems">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid>
+                            <CustomButtonContent>
+                                <DxToolbarItem Text="Reactivate Selected"
+                                               Click="@OnReset"
+                                               RenderStyle="ButtonRenderStyle.Primary"
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               Tooltip="Reactivate selected participant email addresses."
+                                               Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())" />
+                            </CustomButtonContent>
+                        </GridToolbar>
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left" Width="2rem" />
+                        <DxGridDataColumn Caption="Date" FieldName="CreatedAt" DisplayFormat="dd-MMM-yyyy hh:mm tt" Visible=true />
+                        <DxGridDataColumn Width="8rem" Caption="Stream" FieldName="Stream" />
+                        <DxGridDataColumn Caption="Reason" FieldName="Reason" />
+                        <DxGridDataColumn Caption="Email" FieldName="Email" />
+                        <DxGridDataColumn Caption="Participant" FieldName="Person.FullName" />
+                        <DxGridDataColumn Caption="Mobile" FieldName="Person.Mobile" />
+                        <DxGridDataColumn Caption="Home" FieldName="Person.HomePhone" />
+                        <DxGridDataColumn Caption="Financial To" FieldName="Person.FinancialToBriefText" />
+                    </Columns>
 
-<FullScreen @ref=@fullScreen>
-    <ContentTemplate>
-        <DxGrid Data=@suppressions @ref=@mainGrid CssClass="grid-height"
-                @bind-SelectedDataItems="@SelectedDataItems">
-            <ToolbarTemplate>
-                <GridToolbar LinkedGrid=@mainGrid>
-                    <CustomButtonContent>
-                        <DxToolbarItem Text="Reactivate Selected"
-                                       Click="@OnReset"
-                                       RenderStyle="ButtonRenderStyle.Primary"
-                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                       Tooltip="Reactivate selected participant email addresses."
-                                       Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())" />
-                    </CustomButtonContent>
-                </GridToolbar>
-            </ToolbarTemplate>
-            <Columns>
-                <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left" Width="2rem" />
-                <DxGridDataColumn Caption="Date" FieldName="CreatedAt" DisplayFormat="dd-MMM-yyyy hh:mm tt" Visible=true />
-                <DxGridDataColumn Width="8rem" Caption="Stream" FieldName="Stream" />
-                <DxGridDataColumn Caption="Reason" FieldName="Reason" />
-                <DxGridDataColumn Caption="Email" FieldName="Email" />
-                <DxGridDataColumn Caption="Participant" FieldName="Person.FullName" />
-                <DxGridDataColumn Caption="Mobile" FieldName="Person.Mobile" />
-                <DxGridDataColumn Caption="Home" FieldName="Person.HomePhone" />
-                <DxGridDataColumn Caption="Financial To" FieldName="Person.FinancialToBriefText" />
-            </Columns>
-
-        </DxGrid>
-    </ContentTemplate>
-</FullScreen>
-
-
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
+    </div>
+}
 <style>
-    .vh-85 {
-        height: 75vh;
+    .grid-height {
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "24rem" : "20rem"));
     }
 </style>
 
@@ -125,9 +127,9 @@
         if (count > 0)
         {
             result = (await messageBox.ShowAsync("Spam complaints can’t be reactivated",
-                           @"<div class='alert alert-danger text-dark pb-2'>
-                            <p>A spam complaint is recorded when a subscriber clicks “This is Spam” or “Mark as Spam” in email clients like Outlook, Gmail, and other similar services. 
-                                In the email industry, spam complaints are a clear metric to determine abuse and poor sending practices. 
+                                   @"<div class='alert alert-danger text-dark pb-2'>
+                            <p>A spam complaint is recorded when a subscriber clicks “This is Spam” or “Mark as Spam” in email clients like Outlook, Gmail, and other similar services.
+                                In the email industry, spam complaints are a clear metric to determine abuse and poor sending practices.
                                 If you feel a spam complaint has a reason for being reactivated, please <a href='https://postmarkapp.com/contact'>contact Postmark support</a> directly.</p>
                              <p>Reduce your spam rate to less than 0.1% of email. if your spam complaint rate remains higher than normal Postmark may pause sending on your account while they work with you to fix the issue."
                        ));

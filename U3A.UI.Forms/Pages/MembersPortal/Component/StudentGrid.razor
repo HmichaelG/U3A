@@ -90,7 +90,7 @@ else
 }
 <style>
     .grid-height {
-        height: @gridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "26rem" : "22rem"));
     }
 
     .badge-size {
@@ -143,14 +143,6 @@ else
         }
         IsReady = true;
         await base.OnInitializedAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, FooterHeight);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        sequence = 1;
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     int SelectedDataItemsCount()

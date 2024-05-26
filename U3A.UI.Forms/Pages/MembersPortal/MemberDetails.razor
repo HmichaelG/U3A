@@ -192,7 +192,7 @@ else
         display: block;
         width: 100%;
         min-width: 1px;
-        height: @formHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "12rem" : "8rem"));
         overflow-y: auto;
         border-bottom: thin;
     }
@@ -264,23 +264,6 @@ else
         else isNew = false;
         IsReady = true;
         await base.OnInitializedAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var formBounds = await Window.GetElementBounds(js, "myForm");
-        var newHeight = await Window.FitToRemainingHeight(js, "myForm", formHeight, 0.05);
-        if (newHeight != formHeight)
-        {
-            formHeight = newHeight;
-            InvokeAsync(StateHasChanged);
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
     }
 
     bool isBusy;

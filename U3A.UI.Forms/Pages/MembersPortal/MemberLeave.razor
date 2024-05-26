@@ -16,7 +16,7 @@ else
     <DxFormLayout>
         <div class=@((isOnBehalfOf)
          ? "my-2"
-         : "col-12 col-md-8 mx-auto mb-2")>
+         : "col-12 col-md-8 mx-auto pb-2")>
             <div class="p-2 w-100 text-center text-info">
                 To add leave, click the <span class="text-success h6 bi bi-plus-lg"></span> button below.
                 Enter a start date, return date and reason then click Save.
@@ -25,7 +25,7 @@ else
                 click the <span class="text-danger h6 bi bi-trash"></span> to delete.
             </div>
             <DxGrid @ref="Grid" CustomizeElement="OnCustomizeElement"
-                    CssClass="grid-height mx-2" id="myGrid"
+                    CssClass="grid-height px-2" id="myGrid"
                     Data="DataSource"
                     PageSize="12"
                     KeyFieldName="ID"
@@ -68,7 +68,7 @@ else
                     </DxFormLayout>
                 </EditFormTemplate>
             </DxGrid>
-            <footer class="input-group mx-4 mt-2">
+            <footer class="input-group px-4 pt-2">
                 <DxButton Text="Add" CssClass="flex-grow-1"
                           IconCssClass="bi bi-plus-lg"
                           RenderStyle="@ButtonRenderStyle.Success"
@@ -97,7 +97,7 @@ else
     }
 
     .grid-height {
-        height: @gridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? (LeaderCourse != null) ? "30rem" : "14rem" : (LeaderCourse != null) ? "28rem" : "12rem"));
     }
 </style>
 
@@ -153,12 +153,6 @@ else
             }
             await RefreshData();
             InvokeAsync(StateHasChanged);
-        }
-        else
-        {
-            double footerHeight = isOnBehalfOf ? 0.3 : 0.15;
-            var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, footerHeight);
-            if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
         }
     }
 

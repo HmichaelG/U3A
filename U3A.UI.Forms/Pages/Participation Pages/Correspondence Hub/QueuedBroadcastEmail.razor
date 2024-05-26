@@ -21,55 +21,55 @@
 }
 else
 {
+    <div class="px-2">
+        <CollapsableContent AlertText=@($@"<strong>Broadcast email</strong> queued and processed overnight.<br />
+                        That is, those email with attachments or merge codes that could not be sent immediately.<br/>
+                        Processed correspondence is deleted after 7 days.")
+                            OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
-    <CollapsableContent AlertText=@($@"<strong>Broadcast email</strong> queued and processed overnight.<br />
-                  That is, those email with attachments or merge codes that could not be sent immediately.<br/>
-                  Processed correspondence is deleted after 7 days.")
-                      OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+        <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
+        <Progress @ref="@ProgressBar" />
+        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
-    <Progress @ref="@ProgressBar" />
-    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+        <FullScreen @ref=@fullScreen DisplayOffset="13">
+            <ContentTemplate>
 
-    <FullScreen @ref=@fullScreen DisplayOffset="13">
-        <ContentTemplate>
+                <DxGrid Data=@Queue @ref=@bounceGrid
+                        UnboundColumnData="Grid_CustomUnboundColumnData"
+                        CssClass="grid-height"
+                        DataItemDeleting="Grid_DataItemDeleting">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@bounceGrid />
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridCommandColumnEx Caption="Delete" EditButtonVisible=false NewButtonVisible=false
+                                               FixedPosition="GridColumnFixedPosition.Right" />
+                        <DxGridDataColumn Width="8rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Queued"
+                                          UnboundType="GridUnboundColumnType.DateTime"
+                                          FieldName="Created" DisplayFormat="{0:dd-MMM-yy hh:mm tt}" />
+                        <DxGridDataColumn Caption="Subject" FieldName="Subject" FixedPosition="GridColumnFixedPosition.Left"
+                                          UnboundType="GridUnboundColumnType.String" />
+                        <DxGridDataColumn Caption="From" FieldName="From"
+                                          UnboundType="GridUnboundColumnType.String" />
+                        <DxGridDataColumn Width="6rem" Caption="MergeCode #" FieldName="MergeCodeCount"
+                                          UnboundType="GridUnboundColumnType.Integer" />
+                        <DxGridDataColumn Width="6rem" Caption="Attachment #" FieldName="AttachmnetCount"
+                                          UnboundType="GridUnboundColumnType.Integer" />
+                        <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
+                                          UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
+                        <DxGridDataColumn Width="6rem" Caption="Recipients" FieldName="Recipients"
+                                          UnboundType="GridUnboundColumnType.Integer" />
+                        <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
+                        <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
+                                          UnboundType="GridUnboundColumnType.DateTime"
+                                          DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                        <DxGridDataColumn Caption="Result" FieldName="Result" />
+                    </Columns>
 
-            <DxGrid Data=@Queue @ref=@bounceGrid
-                    UnboundColumnData="Grid_CustomUnboundColumnData"
-                    CssClass="grid-height"
-                    DataItemDeleting="Grid_DataItemDeleting">
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@bounceGrid />
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridCommandColumnEx Caption="Delete" EditButtonVisible=false NewButtonVisible=false
-                                           FixedPosition="GridColumnFixedPosition.Right" />
-                    <DxGridDataColumn Width="8rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Queued"
-                                      UnboundType="GridUnboundColumnType.DateTime"
-                                      FieldName="Created" DisplayFormat="{0:dd-MMM-yy hh:mm tt}" />
-                    <DxGridDataColumn Caption="Subject" FieldName="Subject" FixedPosition="GridColumnFixedPosition.Left"
-                                      UnboundType="GridUnboundColumnType.String" />
-                    <DxGridDataColumn Caption="From" FieldName="From"
-                                      UnboundType="GridUnboundColumnType.String" />
-                    <DxGridDataColumn Width="6rem" Caption="MergeCode #" FieldName="MergeCodeCount"
-                                      UnboundType="GridUnboundColumnType.Integer" />
-                    <DxGridDataColumn Width="6rem" Caption="Attachment #" FieldName="AttachmnetCount"
-                                      UnboundType="GridUnboundColumnType.Integer" />
-                    <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
-                                      UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
-                    <DxGridDataColumn Width="6rem" Caption="Recipients" FieldName="Recipients"
-                                      UnboundType="GridUnboundColumnType.Integer" />
-                    <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
-                    <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
-                                      UnboundType="GridUnboundColumnType.DateTime"
-                                      DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-                    <DxGridDataColumn Caption="Result" FieldName="Result" />
-                </Columns>
-
-            </DxGrid>
-        </ContentTemplate>
-    </FullScreen>
-
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
+    </div>
 }
 
 @code {

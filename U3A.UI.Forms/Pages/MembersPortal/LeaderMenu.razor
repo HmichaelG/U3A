@@ -59,8 +59,10 @@ else
                         </DxFormLayoutItem>
                         @if (selectedStudent != null)
                         {
-                            <MemberLeave ProcessOnBehalfOf="@selectedStudent"
-                                         LeaderCourse="@selectedCourse" />
+                            <div class="w-100">
+                                <MemberLeave ProcessOnBehalfOf="@selectedStudent"
+                                             LeaderCourse="@selectedCourse" />
+                            </div>
                         }
                     </DxFormLayoutGroup>
                 </div>

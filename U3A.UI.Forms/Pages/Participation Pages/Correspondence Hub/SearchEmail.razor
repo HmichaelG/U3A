@@ -9,14 +9,14 @@
 <Progress @ref=progressBar />
 <MessageBox @ref=messageBox />
 
-<h4>Search Email</h4>
 @if (!IsReady)
 {
     <LoadingIndicator />
 }
 else
 {
-    <DxFormLayout CssClass="w-100 mx-auto">
+    <div class="w-100 px-2">
+        <h4>Search Email</h4>
         <DxFormLayoutGroup Caption="Participant Details" ColSpanMd="8">
             <DxFormLayoutItem Caption="Search for participant" ColSpanLg="12">
                 <DxComboBox Data="@people"
@@ -57,7 +57,7 @@ else
                 <DxDateEdit @bind-Date="@fromDate" MinDate="@minDate" MaxDate="@maxDate" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="To" ColSpanLg="6">
-                <DxDateEdit @bind-Date="@toDate" MinDate="@minDate" MaxDate="@maxDate" >
+                <DxDateEdit @bind-Date="@toDate" MinDate="@minDate" MaxDate="@maxDate">
                     <Buttons>
                         <DxEditorButton Text="Search" CssClass="text-primary"
                                         IconCssClass="h5 bi bi-search"
@@ -68,7 +68,6 @@ else
             </DxFormLayoutItem>
 
         </DxFormLayoutGroup>
-    </DxFormLayout>
 
     <FullScreen>
         <ContentTemplate>
@@ -100,6 +99,7 @@ else
             </DxGrid>
         </ContentTemplate>
     </FullScreen>
+    </div>
 
     <DxWindow @ref=@emailDetailsForm Width="60vw" Height="90vh"
               AllowResize="true"
@@ -138,16 +138,20 @@ else
         </BodyTextTemplate>
     </DxWindow>
 
-}
-<style>
-    .window-height {
-        height: 40vh;
-    }
+    <style>
+        .grid-height {
+            height: calc(100dvh - @(Workstation.UseTopMenu ? "24rem" : "20rem"));
+        }
 
-    .event-grid-height {
-        height: 40vh;
-    }
-</style>
+        .window-height {
+            height: 40vh;
+        }
+
+        .event-grid-height {
+            height: 40vh;
+        }
+    </style>
+}
 
 
 @code {

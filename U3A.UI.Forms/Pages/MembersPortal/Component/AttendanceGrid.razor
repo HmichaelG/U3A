@@ -62,7 +62,7 @@ else {
 }
 <style>
     .grid-height {
-        height: @gridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "24rem" : "20rem"));
     }
 
 </style>
@@ -95,12 +95,6 @@ else {
             ClassAttendanceSummary = await BusinessRule.GetClassAttendanceSummary(dbc, summaryDate, SelectedTerm, SelectedClass);
         }
         IsReady = true;
-    }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight,0.15);
-        if (newHeight != gridHeight) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
 }

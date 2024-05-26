@@ -350,7 +350,7 @@ else
     }
 
     .grid-height {
-        height: @gridHeight;
+        height: calc(100dvh - @(Workstation.UseTopMenu ? (IsLargerLayout()) ? "26rem" : "30rem" : (IsLargerLayout()) ? "22rem" : "26rem"));
     }
 
     .removeWrapping {
@@ -494,9 +494,6 @@ else
                 NavMan.NavigateTo("/");
             }
         }
-        var offset = (IsLargerLayout()) ? 0.075 : 0.4;
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
-        if (Convert(newHeight) > Convert(gridHeight)) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
     }
 
     private int Convert(string Height)
