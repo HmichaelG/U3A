@@ -1009,6 +1009,7 @@ else
         {
             isWorking = true;
             // Post changes to the database.
+            dbc.ChangeTracker.Clear();
             var acceptableClasses = await GetAcceptableClasses();
             await BusinessRule.DeleteEnrolmentsRescinded(dbc, dbcT, deletedClasses, loginState.SelectedPerson, term, prevTerm);
             var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, dbcT, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
