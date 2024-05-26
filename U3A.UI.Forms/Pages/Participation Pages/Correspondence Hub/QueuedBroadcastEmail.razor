@@ -31,7 +31,7 @@ else
     <Progress @ref="@ProgressBar" />
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <FullScreen @ref=@fullScreen>
+    <FullScreen @ref=@fullScreen DisplayOffset="13">
         <ContentTemplate>
 
             <DxGrid Data=@Queue @ref=@bounceGrid

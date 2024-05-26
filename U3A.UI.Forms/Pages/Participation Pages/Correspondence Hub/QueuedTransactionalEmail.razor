@@ -42,9 +42,9 @@ else
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
         <div class="pb-1" />
-        <FullScreen @ref=@fullScreen>
+        <FullScreen @ref=@fullScreen DisplayOffset="14">
             <ContentTemplate>
-                <DxGrid Data="@SendMail" @ref=@mainGrid CssClass="grid-height"
+                <DxGrid Data="@SendMail" @ref=@mainGrid
                         @bind-SelectedDataItems="@SelectedDataItems"
                         UnboundColumnData="Grid_CustomUnboundColumnData"
                         ShowFilterRow="false"

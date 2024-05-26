@@ -204,11 +204,11 @@ INSERT INTO [dbo].[Person]
            newid()				ID
 		   ,[Mbr#]			ConversionID
            ,[first Name]
-           ,surname
-           ,address
-           ,isnull(city,'')
+           ,[last name]
+           ,isnull(address,'N/A')
+           ,isnull(city,'N/A')
            ,'NSW'
-           ,postCode
+           ,isnull(postCode,0)
            ,'Female'
            ,null
            ,'1-jan-2024'
@@ -220,8 +220,8 @@ INSERT INTO [dbo].[Person]
            ,'N/A'
            ,0
            ,0
-           ,case email
-                when null then 'Post'
+           ,case trim(isnull(email,''))
+                when '' then 'Post'
                 else 'Email'
             end as Communication
            ,[CreatedOn] = getDate()

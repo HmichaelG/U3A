@@ -1,10 +1,10 @@
 ﻿<section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
-    <button class="btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
+    <button class="btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
     @ContentTemplate
     <div class="@($"strong {AlertTextRender}")">@(new MarkupString(AlertText))</div>
 </section>
 <div class="w-100 bg-primary muted" hidden="@(!isHidden)">
-    <button class="btn-close" onclick="@onOpenButtonClick" />
+    <button class="btn btn-close" onclick="@onOpenButtonClick" />
 </div>
 
 <style>

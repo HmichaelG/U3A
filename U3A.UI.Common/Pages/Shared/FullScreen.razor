@@ -45,32 +45,15 @@
     string height = "100dvh";
     bool isFullscreen = false;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            await RefreshLayout();
-        }
-    }
-
     async Task OnClick()
     {
         await js.InvokeVoidAsync("toggleFullscreen");
         isFullscreen = !isFullscreen;
-        if (isFullscreen)
-        {
-            height = "100dvh";
-        }
-        else {
-            await RefreshLayout(); 
-        }
-        StateHasChanged();
+        await RefreshLayout(); 
     }
 
     public async Task RefreshLayout()
     {
-        var newHeight = await Window.FitToRemainingHeight(js, "fullscreen-element", height);
-        if (newHeight != height) { height = newHeight; await InvokeAsync(StateHasChanged); }
+        await InvokeAsync(StateHasChanged);
     }
 }
