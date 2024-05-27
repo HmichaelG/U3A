@@ -52,35 +52,39 @@ else
             <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
             <DxFormLayout>
-                <div class="col-10 p-2">
-                    <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                            ShowFilterRow="false"
-                            ShowAllRows="true"
-                            KeyFieldName="ID"
-                            SelectionMode="GridSelectionMode.Single"
-                            UnboundColumnData="Grid_CustomUnboundColumnData"
-                            SelectedDataItemChanged="OnSelectedDataItemChanged"
-                            @bind-SelectedDataItems="SelectedDataItems"
-                            ValidationEnabled="true">
-                        <ToolbarTemplate>
-                            <GridToolbar LinkedGrid=@mainGrid />
-                        </ToolbarTemplate>
-                        <Columns>
-                            <DxGridSelectionColumn Width="2rem" />
-                            <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
-                            <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
-                            <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
-                            <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
-                            <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
-                            <DxGridDataColumn Caption="Send To" FieldName="Recipient"
-                                              UnboundType="GridUnboundColumnType.String" Width="10rem" />
-                        </Columns>
-                        <TotalSummary>
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
-                        </TotalSummary>
+                <div class="col-10 px-4">
+                    <FullScreen DisplayOffset="18">
+                        <ContentTemplate>
+                            <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                    ShowFilterRow="false"
+                                    ShowAllRows="true"
+                                    KeyFieldName="ID"
+                                    SelectionMode="GridSelectionMode.Single"
+                                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                                    SelectedDataItemChanged="OnSelectedDataItemChanged"
+                                    @bind-SelectedDataItems="SelectedDataItems"
+                                    ValidationEnabled="true">
+                                <ToolbarTemplate>
+                                    <GridToolbar LinkedGrid=@mainGrid />
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn Width="2rem" />
+                                    <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
+                                    <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
+                                    <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
+                                    <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
+                                    <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
+                                    <DxGridDataColumn Caption="Send To" FieldName="Recipient"
+                                                      UnboundType="GridUnboundColumnType.String" Width="10rem" />
+                                </Columns>
+                                <TotalSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
+                                </TotalSummary>
 
-                    </DxGrid>
+                            </DxGrid>
+                        </ContentTemplate>
+                    </FullScreen>
                 </div>
                 <div class="col col-2">
                     <SelectLeaderReports @ref=@rptSelect SingleReportOnly=true
@@ -175,7 +179,7 @@ else
         else
         {
             enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
-                                    await tenantService.GetTenantIdentifierAsync(), Course.ID,Class.ID));
+                                    await tenantService.GetTenantIdentifierAsync(), Course.ID, Class.ID));
         }
         await progressBar.Close();
         if (!await IsDataOk(recipients, enrolments)) return;

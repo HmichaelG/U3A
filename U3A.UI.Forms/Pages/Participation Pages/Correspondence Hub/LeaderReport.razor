@@ -43,41 +43,45 @@ else
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
         <DxFormLayout>
-            <div class="col-10 p-2">
-                <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                        ShowFilterRow="false"
-                        ShowAllRows="true"
-                        KeyFieldName="ID"
-                        SelectionMode="GridSelectionMode.Multiple"
-                        UnboundColumnData="Grid_CustomUnboundColumnData"
-                        SelectedDataItemChanged="OnSelectedDataItemChanged"
-                        @bind-SelectedDataItems="SelectedDataItems"
-                        ValidationEnabled="true">
-                    <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid />
-                    </ToolbarTemplate>
-                    <Columns>
-                        <DxGridSelectionColumn Width="2rem" />
-                        <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
-                        <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
-                        <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
-                        <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
-                        <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
-                        <DxGridDataColumn Caption="Send To 1" FieldName="Recipient0"
-                                          UnboundType="GridUnboundColumnType.String" Width="10rem" />
-                        <DxGridDataColumn Caption="Send To 2" FieldName="Recipient1"
-                                          UnboundType="GridUnboundColumnType.String" />
-                        <DxGridDataColumn Caption="Send To 3" FieldName="Recipient2"
-                                          UnboundType="GridUnboundColumnType.String" />
-                    </Columns>
-                    <TotalSummary>
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
-                    </TotalSummary>
+            <div class="col-10 px-4">
+                <FullScreen DisplayOffset="18">
+                    <ContentTemplate>
+                        <DxGrid Data="@Classes" @ref=@mainGrid
+                                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                ShowFilterRow="false"
+                                ShowAllRows="true"
+                                KeyFieldName="ID"
+                                SelectionMode="GridSelectionMode.Multiple"
+                                UnboundColumnData="Grid_CustomUnboundColumnData"
+                                SelectedDataItemChanged="OnSelectedDataItemChanged"
+                                @bind-SelectedDataItems="SelectedDataItems"
+                                ValidationEnabled="true">
+                            <ToolbarTemplate>
+                                <GridToolbar LinkedGrid=@mainGrid />
+                            </ToolbarTemplate>
+                            <Columns>
+                                <DxGridSelectionColumn Width="2rem" />
+                                <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
+                                <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
+                                <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
+                                <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
+                                <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
+                                <DxGridDataColumn Caption="Send To 1" FieldName="Recipient0"
+                                                  UnboundType="GridUnboundColumnType.String" Width="10rem" />
+                                <DxGridDataColumn Caption="Send To 2" FieldName="Recipient1"
+                                                  UnboundType="GridUnboundColumnType.String" />
+                                <DxGridDataColumn Caption="Send To 3" FieldName="Recipient2"
+                                                  UnboundType="GridUnboundColumnType.String" />
+                            </Columns>
+                            <TotalSummary>
+                                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
+                            </TotalSummary>
 
-                </DxGrid>
+                        </DxGrid>
+                    </ContentTemplate>
+                </FullScreen>
             </div>
-            <div class="col col-2">
+            <div class="col col-2 mt-3">
                 <SelectLeaderReports @ref=@rptSelect SingleReportOnly=false
                                      AreSelectionsMade="@AreSelectionsMade"
                                      OnQueueReportsSelected="OnQueueReportsSelected" />
@@ -85,12 +89,6 @@ else
         </DxFormLayout>
     </div>
 }
-<style>
-    .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "24rem" : "20rem"));
-    }
-
-</style>
 
 
 @code {
