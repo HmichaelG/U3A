@@ -27,9 +27,9 @@ else
                         the email address is valid, or the unsubscribe was accidental, the address is no longer associated with a participant, or the participant is unfinancial.")
                             OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
-        <FullScreen @ref=@fullScreen>
+        <FullScreen @ref=@fullScreen DisplayOffset="16">
             <ContentTemplate>
-                <DxGrid Data=@suppressions @ref=@mainGrid CssClass="grid-height"
+                <DxGrid Data=@suppressions @ref=@mainGrid
                         @bind-SelectedDataItems="@SelectedDataItems">
                     <ToolbarTemplate>
                         <GridToolbar LinkedGrid=@mainGrid>
@@ -60,11 +60,6 @@ else
         </FullScreen>
     </div>
 }
-<style>
-    .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "24rem" : "20rem"));
-    }
-</style>
 
 @code {
     bool IsReady;

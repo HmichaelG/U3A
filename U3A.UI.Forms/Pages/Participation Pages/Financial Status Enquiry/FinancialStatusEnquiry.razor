@@ -30,26 +30,26 @@
             <DxFormLayoutGroup Caption="Enquiry Parameters">
                 <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="8">
                     <DxComboBox Data="@terms" NullText="Select the Term required..."
-                            FilteringMode="DataGridFilteringMode.Contains"
-                            TextFieldName="@nameof(Term.TermSummary)"
-                            @bind-Value="@selectedTerm" />
+                                FilteringMode="DataGridFilteringMode.Contains"
+                                TextFieldName="@nameof(Term.TermSummary)"
+                                @bind-Value="@selectedTerm" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Balance Type" ColSpanMd="8">
                     <DxComboBox Data="@BalanceTypes" NullText="All Account Balances"
-                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                            @bind-Value="@balanceType" />
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                @bind-Value="@balanceType" />
                 </DxFormLayoutItem>
                 <DxButton Text="Process" RenderStyle=ButtonRenderStyle.Primary CssClass="col-12 col-md-3 mt-2" Click="@OnProcess" />
                 <DxFormLayoutItem Caption="Financial To" ColSpanMd="8">
                     <DxTagBox Data="@FinancialYears" NullText="Ignore Financial To"
-                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                          @bind-Values="@selectedFinancialYears" />
+                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                              @bind-Values="@selectedFinancialYears" />
                 </DxFormLayoutItem>
                 <DxButton Text="Adjust Selected Fees"
-                      RenderStyle=ButtonRenderStyle.Primary
-                      CssClass="col-12 col-md-3 mt-2"
-                      Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
-                      Click="@OnFeeReversal" />
+                          RenderStyle=ButtonRenderStyle.Primary
+                          CssClass="col-12 col-md-3 mt-2"
+                          Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
+                          Click="@OnFeeReversal" />
             </DxFormLayoutGroup>
 
         </DxFormLayout>
@@ -59,112 +59,112 @@
         <Progress @ref="@ProgressBar" />
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-                <FullScreen>
-                    <ContentTemplate>
-        <DxGrid Data="@Persons" @ref=@mainGrid CssClass="grid-height"
-            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-            CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
-            CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
-            CustomSummary="Grid_CustomSummary"
-            GroupFooterDisplayMode="GridGroupFooterDisplayMode.Always"
-            AllowSelectRowByClick="false"
-            ShowFilterRow="false"
-            ShowAllRows="false"
-            ValidationEnabled="true"
-            @bind-SelectedDataItems="SelectedDataItems"
-            PageSize="30"
-            PageSizeSelectorVisible="true"
-            PageSizeSelectorItems="@(new int[] {10,15, 20,30, 40,60,80, 100, 200,400 })"
-            PageSizeSelectorAllRowsItemVisible="true"
-            PagerSwitchToInputBoxButtonCount="10"
-            PagerVisibleNumericButtonCount="10"
-            PagerVisible="true">
-            <ToolbarTemplate>
-                <GridToolbar LinkedGrid=@mainGrid />
-            </ToolbarTemplate>
-            <Columns>
-                <DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" />
-                <DxGridDataColumn Caption="Member" FieldName="FullName" Width="10rem" FixedPosition="GridColumnFixedPosition.Left" />
-                <DxGridDataColumn Caption="Joined" FieldName="DateJoined" DisplayFormat="dd-MMM-yy" Width="5rem" />
-                <DxGridDataColumn Caption="Email" FieldName="Email" Width="12rem" Visible="false" />
-                <DxGridDataColumn Caption="Mobile" FieldName="Mobile" Width="5rem" Visible="false" />
-                <DxGridDataColumn Caption="Home" FieldName="HomePhone" Width="5rem" Visible="false" />
-                <DxGridDataColumn Caption="Is Leader?" FieldName="IsCourseLeader" Visible="@true" Width="7rem">
-                    <CellDisplayTemplate>
-                        <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
-                    </CellDisplayTemplate>
-                    <FilterRowCellTemplate>
-                        <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                AllowIndeterminateStateByClick="true"
-                                Alignment="CheckBoxContentAlignment.Center" />
-                    </FilterRowCellTemplate>
-                </DxGridDataColumn>
-                <DxGridDataColumn Caption="Is Life Member?" FieldName="IsLifeMember" Visible="@true" Width="7rem">
-                    <CellDisplayTemplate>
-                        <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
-                    </CellDisplayTemplate>
-                    <FilterRowCellTemplate>
-                        <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                AllowIndeterminateStateByClick="true"
-                                Alignment="CheckBoxContentAlignment.Center" />
-                    </FilterRowCellTemplate>
-                </DxGridDataColumn>
-                <DxGridDataColumn Caption="Is Complimentary?" FieldName="IsComplimentary" Visible="@true" Width="7rem">
-                    <CellDisplayTemplate>
-                        <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
-                    </CellDisplayTemplate>
-                    <FilterRowCellTemplate>
-                        <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                AllowIndeterminateStateByClick="true"
-                                Alignment="CheckBoxContentAlignment.Center" />
-                    </FilterRowCellTemplate>
-                </DxGridDataColumn>
-                <DxGridDataColumn Caption="Active Enrolments" FieldName="Enrolments" DisplayFormat="N0" Width="5rem" />
-                <DxGridDataColumn Caption="W/Listed Enrolments" FieldName="Waitlisted" DisplayFormat="N0" Width="5rem" />
-                <DxGridDataColumn Caption="Last Receipt" FieldName="LastReceipt" DisplayFormat="dd-MMM-yy" Width="5rem" />
-                <DxGridDataColumn Caption="Membership" FieldName="MembershipFees" DisplayFormat="c2" Width="5rem" />
-                <DxGridDataColumn Caption="Postal" FieldName="MailSurcharge" DisplayFormat="c2" Width="5rem" />
-                <DxGridDataColumn Caption="Course/Year" FieldName="CourseFeesPerYear" DisplayFormat="c2" Width="5rem" />
-                <DxGridDataColumn Caption="Course/Term" FieldName="CourseFeesPerTerm" DisplayFormat="c2" Width="5rem" />
-                <DxGridDataColumn Caption="Other" FieldName="OtherFees" DisplayFormat="c2" Width="5rem" />
-                <DxGridDataColumn Caption="Received" FieldName="AmountReceived" DisplayFormat="c2" Width="5rem" />
-                <DxGridDataColumn Caption="Total" FieldName="TotalFees" DisplayFormat="c2" Width="5rem" />
-                <DxGridDataColumn Caption="Fin-To" FieldName=FinancialToBriefText />
-            </Columns>
-            <GroupSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsComplimentary" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsLifeMember" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsCourseLeader" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0}" FieldName="FullName" FooterColumnName="FullName" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Waitlisted" FooterColumnName="Waitlisted" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Enrolments" FooterColumnName="Enrolments" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MembershipFees" FooterColumnName="MembershipFees" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MailSurcharge" FooterColumnName="MailSurcharge" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="CourseFeesPerYear" FooterColumnName="CourseFeesPerYear" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="CourseFeesPerTerm" FooterColumnName="CourseFeesPerTerm" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="OtherFees" FooterColumnName="OtherFees" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="AmountReceived" FooterColumnName="AmountReceived" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="TotalFees" FooterColumnName="TotalFees" />
-            </GroupSummary>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsComplimentary" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsLifeMember" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsCourseLeader" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0}" FieldName="FullName" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Waitlisted" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Enrolments" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MembershipFees" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MailSurcharge" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="CourseFeesPerYear" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="CourseFeesPerTerm" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="OtherFees" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="AmountReceived" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="TotalFees" />
-            </TotalSummary>
-        </DxGrid>
+        <FullScreen>
+            <ContentTemplate>
+                <DxGrid Data="@Persons" @ref=@mainGrid
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
+                        CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
+                        CustomSummary="Grid_CustomSummary"
+                        GroupFooterDisplayMode="GridGroupFooterDisplayMode.Always"
+                        AllowSelectRowByClick="false"
+                        ShowFilterRow="false"
+                        ShowAllRows="false"
+                        ValidationEnabled="true"
+                        @bind-SelectedDataItems="SelectedDataItems"
+                        PageSize="30"
+                        PageSizeSelectorVisible="true"
+                        PageSizeSelectorItems="@(new int[] {10,15, 20,30, 40,60,80, 100, 200,400 })"
+                        PageSizeSelectorAllRowsItemVisible="true"
+                        PagerSwitchToInputBoxButtonCount="10"
+                        PagerVisibleNumericButtonCount="10"
+                        PagerVisible="true">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid />
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" />
+                        <DxGridDataColumn Caption="Member" FieldName="FullName" Width="10rem" FixedPosition="GridColumnFixedPosition.Left" />
+                        <DxGridDataColumn Caption="Joined" FieldName="DateJoined" DisplayFormat="dd-MMM-yy" Width="5rem" />
+                        <DxGridDataColumn Caption="Email" FieldName="Email" Width="12rem" Visible="false" />
+                        <DxGridDataColumn Caption="Mobile" FieldName="Mobile" Width="5rem" Visible="false" />
+                        <DxGridDataColumn Caption="Home" FieldName="HomePhone" Width="5rem" Visible="false" />
+                        <DxGridDataColumn Caption="Is Leader?" FieldName="IsCourseLeader" Visible="@true" Width="7rem">
+                            <CellDisplayTemplate>
+                                <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
+                            </CellDisplayTemplate>
+                            <FilterRowCellTemplate>
+                                <DxCheckBox Checked="(bool?)context.FilterRowValue"
+                                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                                            AllowIndeterminateStateByClick="true"
+                                            Alignment="CheckBoxContentAlignment.Center" />
+                            </FilterRowCellTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn Caption="Is Life Member?" FieldName="IsLifeMember" Visible="@true" Width="7rem">
+                            <CellDisplayTemplate>
+                                <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
+                            </CellDisplayTemplate>
+                            <FilterRowCellTemplate>
+                                <DxCheckBox Checked="(bool?)context.FilterRowValue"
+                                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                                            AllowIndeterminateStateByClick="true"
+                                            Alignment="CheckBoxContentAlignment.Center" />
+                            </FilterRowCellTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn Caption="Is Complimentary?" FieldName="IsComplimentary" Visible="@true" Width="7rem">
+                            <CellDisplayTemplate>
+                                <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
+                            </CellDisplayTemplate>
+                            <FilterRowCellTemplate>
+                                <DxCheckBox Checked="(bool?)context.FilterRowValue"
+                                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
+                                            AllowIndeterminateStateByClick="true"
+                                            Alignment="CheckBoxContentAlignment.Center" />
+                            </FilterRowCellTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn Caption="Active Enrolments" FieldName="Enrolments" DisplayFormat="N0" Width="5rem" />
+                        <DxGridDataColumn Caption="W/Listed Enrolments" FieldName="Waitlisted" DisplayFormat="N0" Width="5rem" />
+                        <DxGridDataColumn Caption="Last Receipt" FieldName="LastReceipt" DisplayFormat="dd-MMM-yy" Width="5rem" />
+                        <DxGridDataColumn Caption="Membership" FieldName="MembershipFees" DisplayFormat="c2" Width="5rem" />
+                        <DxGridDataColumn Caption="Postal" FieldName="MailSurcharge" DisplayFormat="c2" Width="5rem" />
+                        <DxGridDataColumn Caption="Course/Year" FieldName="CourseFeesPerYear" DisplayFormat="c2" Width="5rem" />
+                        <DxGridDataColumn Caption="Course/Term" FieldName="CourseFeesPerTerm" DisplayFormat="c2" Width="5rem" />
+                        <DxGridDataColumn Caption="Other" FieldName="OtherFees" DisplayFormat="c2" Width="5rem" />
+                        <DxGridDataColumn Caption="Received" FieldName="AmountReceived" DisplayFormat="c2" Width="5rem" />
+                        <DxGridDataColumn Caption="Total" FieldName="TotalFees" DisplayFormat="c2" Width="5rem" />
+                        <DxGridDataColumn Caption="Fin-To" FieldName=FinancialToBriefText />
+                    </Columns>
+                    <GroupSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsComplimentary" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsLifeMember" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsCourseLeader" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0}" FieldName="FullName" FooterColumnName="FullName" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Waitlisted" FooterColumnName="Waitlisted" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Enrolments" FooterColumnName="Enrolments" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MembershipFees" FooterColumnName="MembershipFees" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MailSurcharge" FooterColumnName="MailSurcharge" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="CourseFeesPerYear" FooterColumnName="CourseFeesPerYear" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="CourseFeesPerTerm" FooterColumnName="CourseFeesPerTerm" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="OtherFees" FooterColumnName="OtherFees" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="AmountReceived" FooterColumnName="AmountReceived" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="TotalFees" FooterColumnName="TotalFees" />
+                    </GroupSummary>
+                    <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsComplimentary" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsLifeMember" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsCourseLeader" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0}" FieldName="FullName" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Waitlisted" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Enrolments" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MembershipFees" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MailSurcharge" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="CourseFeesPerYear" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="CourseFeesPerTerm" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="OtherFees" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="AmountReceived" />
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="TotalFees" />
+                    </TotalSummary>
+                </DxGrid>
             </ContentTemplate>
         </FullScreen>
     }
@@ -202,7 +202,7 @@
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
-        terms = await BusinessRule.GetAllTermsInCurrentYearAsync(dbc,selectedTerm);
+        terms = await BusinessRule.GetAllTermsInCurrentYearAsync(dbc, selectedTerm);
         people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
         FinancialYears = new List<int>();
         FinancialYears.AddRange(people
@@ -271,7 +271,7 @@
     string[] customBools = { "IsComplimentary",
                                 "IsLifeMember",
                                 "IsCourseLeader"
-                            };
+                        };
 
     void Grid_CustomSummary(GridCustomSummaryEventArgs e)
     {

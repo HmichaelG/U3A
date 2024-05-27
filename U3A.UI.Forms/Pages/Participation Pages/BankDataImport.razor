@@ -75,9 +75,9 @@ else
     </div> @*row*@
 
     <div>@BankAccountDetails</div>
-    <FullScreen>
+    <FullScreen DisplayOffset="22">
         <ContentTemplate>
-            <DxGrid Data="@importData" @ref=@mainGrid CssClass="grid-height"
+            <DxGrid Data="@importData" @ref=@mainGrid
                     SelectionMode="GridSelectionMode.Single"
                     SelectedDataItem=@selectedDataItem
                     SelectedDataItemChanged="OnSelectedDataItemChanged"

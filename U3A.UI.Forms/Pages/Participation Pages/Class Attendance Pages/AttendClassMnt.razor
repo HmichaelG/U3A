@@ -67,7 +67,7 @@ else
 
     <DxFormLayout>
         <div class="col col-12 col-lg-9 p-2">
-            @if (!IsLargerLayout())
+            @if (isLeaderEnrty)
             {
                 <div class="text-center col-12">
                     @(new MarkupString($"{SelectedTerm?.Name} {SelectedCourse?.Name}<br/>{SelectedClass?.ClassSummary}"))
@@ -130,7 +130,7 @@ else
 
             @quickMessage
 
-            @if (!IsLargeLayout)
+            @if (IsLargerLayout())
             {
                 <GridToolbar LinkedGrid=@mainGrid />
             }
@@ -350,7 +350,7 @@ else
     }
 
     .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? (IsLargerLayout()) ? "26rem" : "30rem" : (IsLargerLayout()) ? "22rem" : "26rem"));
+        height: calc(100dvh - @(Workstation.UseTopMenu ? (IsLargerLayout()) ? "26rem" : "42rem" : (IsLargerLayout()) ? "22rem" : "40rem"));
     }
 
     .removeWrapping {
@@ -375,6 +375,7 @@ else
 
     bool IsLargeLayout { get; set; }
     bool IsXtraLargeLayout { get; set; }
+    bool isLeaderEnrty;
 
     bool IsReady;
     int attendanceStatus;
@@ -481,6 +482,11 @@ else
         IsReady = true;
     }
 
+    protected override void OnParametersSet()
+    {
+        if (SelectedCourse != null) { isLeaderEnrty = true; }
+        base.OnParametersSet();
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // wire up the toolbar

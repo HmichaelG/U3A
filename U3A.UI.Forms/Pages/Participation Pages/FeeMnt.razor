@@ -35,89 +35,89 @@ else
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 
-                    <FullScreen>
-                        <ContentTemplate>
-    <DxGrid Data="@Fees" @ref=@mainGrid CssClass="grid-height"
-            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-            GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
-            ShowFilterRow="false"
-            ShowAllRows="true"
-            KeyFieldName="ID"
-            PopupEditFormCssClass="popup-width"
-            PopupEditFormHeaderText="Add/Edit Fee"
-            ValidationEnabled="true"
-            CustomizeEditModel="OnCustomizeEditModel"
-            EditMode="GridEditMode.PopupEditForm"
-            DataItemDeleting="Grid_DataItemDeleting"
-            EditModelSaving="Grid_EditModelSaving">
-        <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridCommandColumnEx @ref="GridCommandColumn" Width="10rem"
-                                   EditButtonVisible="true" DeleteButtonVisible="true" />
-            <DxGridDataColumn Caption="First Name" FieldName="Person.FirstName" Width="10rem" />
-            <DxGridDataColumn Caption="Last Name" FieldName="Person.LastName" Width="10rem" />
-            <DxGridDataColumn Caption="Date" FieldName="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" />
-            <DxGridDataColumn Caption="Description" FieldName="Description" />
-            <DxGridDataColumn Caption="Membership Fee?" FieldName="IsMembershipFee" Width="10rem" />
-            <DxGridDataColumn Caption="Amount" FieldName="Amount" DisplayFormat="{0:c2}" />
-        </Columns>
-        <GroupSummary>
-            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                               FieldName="Description" DisplayText="{0:n0} Fees"
-                               FooterColumnName="IsMembershipFee" />
-            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
-                               DisplayText="{0:c2}"
-                               FieldName="Amount"
-                               FooterColumnName="Amount" />
-        </GroupSummary>
-        <TotalSummary>
-            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0} Fees" FieldName="Description" FooterColumnName="IsMembershipFee" />
-            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
-        </TotalSummary>
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@Fees" @ref=@mainGrid
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    PopupEditFormCssClass="popup-width"
+                    PopupEditFormHeaderText="Add/Edit Fee"
+                    ValidationEnabled="true"
+                    CustomizeEditModel="OnCustomizeEditModel"
+                    EditMode="GridEditMode.PopupEditForm"
+                    DataItemDeleting="Grid_DataItemDeleting"
+                    EditModelSaving="Grid_EditModelSaving">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridCommandColumnEx @ref="GridCommandColumn" Width="10rem"
+                                           EditButtonVisible="true" DeleteButtonVisible="true" />
+                    <DxGridDataColumn Caption="First Name" FieldName="Person.FirstName" Width="10rem" />
+                    <DxGridDataColumn Caption="Last Name" FieldName="Person.LastName" Width="10rem" />
+                    <DxGridDataColumn Caption="Date" FieldName="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" />
+                    <DxGridDataColumn Caption="Description" FieldName="Description" />
+                    <DxGridDataColumn Caption="Membership Fee?" FieldName="IsMembershipFee" Width="10rem" />
+                    <DxGridDataColumn Caption="Amount" FieldName="Amount" DisplayFormat="{0:c2}" />
+                </Columns>
+                <GroupSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                       FieldName="Description" DisplayText="{0:n0} Fees"
+                                       FooterColumnName="IsMembershipFee" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
+                                       DisplayText="{0:c2}"
+                                       FieldName="Amount"
+                                       FooterColumnName="Amount" />
+                </GroupSummary>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0} Fees" FieldName="Description" FooterColumnName="IsMembershipFee" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
+                </TotalSummary>
 
-        <EditFormTemplate Context="EditFormContext">
-            @{
-                var editItem = (Fee)EditFormContext.EditModel;
-            }
-            <DxFormLayout>
-                <DxFormLayoutItem ColSpanMd="12">
-                    <ValidationSummary />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Apply To" ColSpanMd="12">
-                    <DxComboBox Data="Persons"
-                                ListRenderMode="ListRenderMode.Virtual"
-                                FilteringMode="DataGridFilteringMode.Contains"
-                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                @bind-Value="editItem.Person"
-                                TextFieldName="@nameof(Person.PersonSummary)">
-                        <DxListEditorColumn FieldName="@nameof(Person.LastName)"
-                                            Caption="Last Name" />
-                        <DxListEditorColumn FieldName="@nameof(Person.FirstName)"
-                                            Caption="First Name" />
-                        <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
-                                            Caption="Mobile" />
-                        <DxListEditorColumn FieldName="@nameof(Person.Email)"
-                                            Caption="Email" />
-                    </DxComboBox>
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Date" ColSpanMd="12">
-                    <DxDateEdit @bind-Date="@editItem.Date" Mask=@constants.STD_DATE_FORMAT>
-                    </DxDateEdit>
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Description" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@editItem.Description" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Amount" ColSpanMd="12">
-                    <DxMaskedInput @bind-Value="@editItem.Amount" Mask="@NumericMask.Currency" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Include as Membershyp Fee?" ColSpanMd="12">
-                    <DxCheckBox @bind-Checked="@editItem.IsMembershipFee" />
-                </DxFormLayoutItem>
-            </DxFormLayout>
-        </EditFormTemplate>
-    </DxGrid>
+                <EditFormTemplate Context="EditFormContext">
+                    @{
+                        var editItem = (Fee)EditFormContext.EditModel;
+                    }
+                    <DxFormLayout>
+                        <DxFormLayoutItem ColSpanMd="12">
+                            <ValidationSummary />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Apply To" ColSpanMd="12">
+                            <DxComboBox Data="Persons"
+                                        ListRenderMode="ListRenderMode.Virtual"
+                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        @bind-Value="editItem.Person"
+                                        TextFieldName="@nameof(Person.PersonSummary)">
+                                <DxListEditorColumn FieldName="@nameof(Person.LastName)"
+                                                    Caption="Last Name" />
+                                <DxListEditorColumn FieldName="@nameof(Person.FirstName)"
+                                                    Caption="First Name" />
+                                <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
+                                                    Caption="Mobile" />
+                                <DxListEditorColumn FieldName="@nameof(Person.Email)"
+                                                    Caption="Email" />
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Date" ColSpanMd="12">
+                            <DxDateEdit @bind-Date="@editItem.Date" Mask=@constants.STD_DATE_FORMAT>
+                            </DxDateEdit>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Description" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@editItem.Description" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Amount" ColSpanMd="12">
+                            <DxMaskedInput @bind-Value="@editItem.Amount" Mask="@NumericMask.Currency" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Include as Membershyp Fee?" ColSpanMd="12">
+                            <DxCheckBox @bind-Checked="@editItem.IsMembershipFee" />
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                </EditFormTemplate>
+            </DxGrid>
         </ContentTemplate>
     </FullScreen>
 

@@ -69,11 +69,10 @@ else
 
         </DxFormLayoutGroup>
 
-    <FullScreen>
+    <FullScreen DisplayOffset="18">
         <ContentTemplate>
             <DxGrid Data=@messages @ref=@mainGrid
-                    AutoExpandAllGroupRows=false
-                    CssClass="grid-height">
+                    AutoExpandAllGroupRows=false>
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid />
                 </ToolbarTemplate>
@@ -139,10 +138,6 @@ else
     </DxWindow>
 
     <style>
-        .grid-height {
-            height: calc(100dvh - @(Workstation.UseTopMenu ? "24rem" : "20rem"));
-        }
-
         .window-height {
             height: 40vh;
         }
