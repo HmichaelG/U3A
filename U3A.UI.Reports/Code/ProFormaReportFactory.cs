@@ -332,7 +332,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
         public async Task<string> CreateLeaderReportProForma(Person Leader,
                                     string CourseName,
                                     Enrolment[] Enrolments,
-                                    bool RandomAllocationExecuted = true)
+                                    bool RandomAllocationExecuted = false)
         {
             using (var leaderReportProForma = new LeaderReport())
             {
