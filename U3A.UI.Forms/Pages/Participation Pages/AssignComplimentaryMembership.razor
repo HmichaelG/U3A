@@ -44,11 +44,14 @@ else {
                     <DxFormLayoutItem Caption="Assign to Course Leaders?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@DoCourseLeaders" />
                     </DxFormLayoutItem>
-                    @for (var i = 0; i < Activities.Count(); i++) {
-                        var iCopy = i;
-                        <DxFormLayoutItem Caption=@($"Assign to {Activities[i]} volunteers?") ColSpanMd="12">
-                            <DxCheckBox @bind-Checked="@ActivityIndex[iCopy]" />
-                        </DxFormLayoutItem>
+                    @if (Activities != null) {
+                        for (var i = 0; i < Activities!.Count(); i++)
+                        {
+                            var iCopy = i;
+                            <DxFormLayoutItem Caption=@($"Assign to {Activities[i]} volunteers?") ColSpanMd="12">
+                                <DxCheckBox @bind-Checked="@ActivityIndex[iCopy]" />
+                            </DxFormLayoutItem>
+                        }
                     }
                     <DxFormLayoutGroup Caption="Assign Ad Hoc Complimentary Members">
                         <DxFormLayoutItem Caption="Assign To Member(s)" ColSpanMd="12">
@@ -145,7 +148,7 @@ else {
             for (var i = processTerm.Year; i < processTerm.Year + 11; i++) { years.Add(i); }
         }
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        if (settings != null && settings.VolunteerActivities != null) {
+        if (settings != null && !string.IsNullOrWhiteSpace( settings.VolunteerActivities)) {
             Activities = settings.VolunteerActivities.Split(new string[] { "\n" },
                                 StringSplitOptions.None)
                                 .Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
