@@ -56,6 +56,7 @@ namespace U3A.WebFunctions.Procedures
                 var PrintClassList = true;
                 var PrintICEList = true;
                 var PrintCSVFile = true;
+                var PrintMemberBadges = true;
                 var PrintAttendanceAnalysis = false;
                 await reportFactory.CreateLeaderReports(
                     PrintLeaderReport,
@@ -64,6 +65,7 @@ namespace U3A.WebFunctions.Procedures
                     PrintICEList,
                     PrintCSVFile,
                     PrintAttendanceAnalysis,
+                    PrintMemberBadges,
                     Course.ID,
                     $"U3A {selectedTerm.Year} Term {selectedTerm.TermNumber} Report Package",
                     Course.Name,

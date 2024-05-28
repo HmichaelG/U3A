@@ -130,27 +130,26 @@
 </style>
 
 @code {
-    System.Threading.Timer timer;
+    System.Threading.Timer? timer;
     double hr, min, sec;
-    LocalTime localTime;
+    LocalTime? localTime;
 
 
     // NOTE: this math can be simplified!!!
     private async void SetClock(object stateInfo) {
-        var time = await localTime.GetLocalTimeAsync();
+        var time = await localTime!.GetLocalTimeAsync();
         hr = 360.0 * time.Hour / 12 + 30.0 * time.Minute / 60.0;
         min = 360.0 * time.Minute / 60 + 6.0 * time.Second / 60.0;
         sec = 360.0 * time.Second / 60 + 6.0 * time.Millisecond / 1000.0;
-        InvokeAsync(() => StateHasChanged()); // MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
+        await InvokeAsync(StateHasChanged); // MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
     }
 
-    protected override async void OnAfterRender(bool firstRender) {
+    protected override void OnAfterRender(bool firstRender) {
         base.OnAfterRender(firstRender);
         if (firstRender) {
             localTime = new LocalTime(js);
-            SetClock(null);
-
-            timer = new System.Threading.Timer(SetClock, new System.Threading.AutoResetEvent(false), 1000, 1000);
+            SetClock(new());
+            timer = new System.Threading.Timer(SetClock!, new System.Threading.AutoResetEvent(false), 1000, 1000);
         }
 
 

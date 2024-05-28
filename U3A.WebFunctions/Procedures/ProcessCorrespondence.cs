@@ -151,6 +151,7 @@ namespace U3A.WebFunctions.Procedures
                                               sm.PrintICEList,
                                               sm.PrintCSVFile,
                                               sm.PrintAttendanceAnalysis,
+                                              sm.PrintMemberBadges,
                                               course!.ID,
                                               "U3A Report Package",
                                               course.Name,

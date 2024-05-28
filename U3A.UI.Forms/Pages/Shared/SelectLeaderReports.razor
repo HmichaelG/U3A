@@ -22,6 +22,9 @@
         <DxFormLayoutItem Caption="Attendance Analysis" ColSpanMd="12">
             <DxCheckBox @bind-Checked="@PrintAttendanceAnalysis" />
         </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Member Badges" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintMemberBadges" />
+        </DxFormLayoutItem>
         <DxFormLayoutItem Caption="Class CSV file" ColSpanMd="12">
             <DxCheckBox @bind-Checked="@PrintCSVFile" />
         </DxFormLayoutItem>
@@ -53,9 +56,10 @@ else {
     public bool PrintICEList { get; set; }
     public bool PrintAttendanceRecord { get; set; }
     public bool PrintAttendanceAnalysis { get; set; }
+    public bool PrintMemberBadges { get; set; }
     public bool PrintCSVFile { get; set; }
     public bool RequireEnrolements {get {
-            return PrintAttendanceRecord || PrintICEList || PrintClassList || PrintLeaderReport || PrintCSVFile;
+            return PrintAttendanceRecord || PrintICEList || PrintClassList || PrintLeaderReport || PrintMemberBadges || PrintCSVFile;
         }
     }
     MessageBox? messageBox;
@@ -64,7 +68,8 @@ else {
                                             "Class Contact List",
                                             "In Case of Emergency List",
                                             "Attendance Record",
-                                            "Attendance Analysis"};
+                                            "Attendance Analysis",
+                                            "Member Badges"};
     string selectedReport = reports[0];
 
     [Parameter]
@@ -84,10 +89,12 @@ else {
         if (selectedReport == reports[2]) PrintICEList = true;
         if (selectedReport == reports[3]) PrintAttendanceRecord = true;
         if (selectedReport == reports[4]) PrintAttendanceAnalysis = true;
+        if (selectedReport == reports[5]) PrintMemberBadges = true;
         if (!PrintLeaderReport &&
              !PrintClassList &&
              !PrintICEList &&
-             !PrintAttendanceRecord && !PrintAttendanceAnalysis) {
+             !PrintAttendanceRecord && 
+             !PrintAttendanceAnalysis && !PrintMemberBadges) {
             await messageBox.ShowOkOnlyAsync("Select Report", "A report must be selected.");
         }
         else { InvokeAsync(StateHasChanged); await OnQueueReportsSelected.InvokeAsync(); }

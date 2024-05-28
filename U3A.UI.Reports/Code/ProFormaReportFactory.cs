@@ -8,6 +8,7 @@ using DevExpress.XtraPrinting;
 using DevExpress.XtraReports;
 using DevExpress.XtraReports.UI;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
@@ -236,6 +237,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                         bool DoLeaderICEList,
                                         bool DoLeaderCSVFile,
                                         bool DoAttendanceAnalysis,
+                                        bool DoMemberBadges,
                                         Guid CourseID,
                                         string ReportName,
                                         string CourseName,
@@ -282,6 +284,12 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                                 Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
                         reportNames.Add("Class ICE Listing.pdf");
                     }
+                }
+                if (DoMemberBadges)
+                {
+                        createdFilenames.Add(CreateMemberBadgesReport(Leader, 
+                                Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
+                        reportNames.Add("Member Badges.pdf");
                 }
                 if (DoAttendanceAnalysis)
                 {
@@ -336,6 +344,20 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                 new string[] { "Leader Report.pdf" },
                                 RandomAllocationExecuted);
             }
+        }
+        string CreateMemberBadgesReport(Person Leader,
+                Enrolment[] Enrolments)
+        {
+            var report = new MemberBadge() { DbContext = dbc };
+            var list = new List<Guid>();
+            foreach (var enrollment in Enrolments)
+            {
+                list.Add(enrollment.PersonID);
+            }
+            report.Parameters["prmPersonID"].Value = list;
+            string pdfFilename = GetTempPdfFile();
+            report.ExportToPdf(pdfFilename, options);
+            return pdfFilename;
         }
         string CreateAttendanceAnalysisReport(AttendanceAnalysis report,
                 Person Leader,

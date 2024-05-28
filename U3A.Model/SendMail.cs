@@ -25,6 +25,7 @@ namespace U3A.Model
         public bool PrintICEList { get; set; }
         public bool PrintCSVFile { get; set; }
         public bool PrintAttendanceAnalysis { get; set; }
+        public bool PrintMemberBadges { get; set; }
 
     }
 }

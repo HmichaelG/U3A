@@ -145,7 +145,7 @@ else {
             for (var i = processTerm.Year; i < processTerm.Year + 11; i++) { years.Add(i); }
         }
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        if (settings != null) {
+        if (settings != null && settings.VolunteerActivities != null) {
             Activities = settings.VolunteerActivities.Split(new string[] { "\n" },
                                 StringSplitOptions.None)
                                 .Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();

@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_prcDbCleanup_20240514
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_ClassSummaries
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_ClassSummaries
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_SendMail_MemberBadges
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_ClassSummaries
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_SendMail_MemberBadges
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

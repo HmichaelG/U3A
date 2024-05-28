@@ -75,12 +75,14 @@ namespace U3A.BusinessRules
                                 .OrderByDescending(x => x.IsDefaultTerm)
                                 .FirstOrDefaultAsync();
             if (currentTerm == null) { return null; }
-            return await dbc.Person.AsNoTracking()
+            var people = await dbc.Person.AsNoTracking()
                             .Where(x => x.DateCeased == null 
                                         && x.FinancialTo >= currentTerm.Year)
                             .OrderBy(x => x.LastName)
                             .ThenBy(x => x.FirstName)
                             .ThenBy(x => x.Email).ToListAsync();
+            await ApplyGroupsAsync(dbc, people);
+            return people;
         }
         public static async Task<List<Person>> SelectablePersonsNotEnrolledAsync(U3ADbContext dbc,
                                                 Term CurrentTerm,
