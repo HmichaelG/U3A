@@ -141,10 +141,12 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-        AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
-        selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+            AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
+            selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+        }
         if (IsPublic) IsPortal = true;
         viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
         if (selectedTerm != null)
@@ -184,7 +186,10 @@ else
         if (selectedTerm != null)
         {
             if (VenuesToFilter == null) { VenuesToFilter = new List<Venue>(); }
-            DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter);
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter);
+            }
         }
         if (!IsPortal)
         {
