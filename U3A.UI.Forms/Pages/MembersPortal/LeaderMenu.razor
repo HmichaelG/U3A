@@ -669,7 +669,7 @@ else
                         {
                             e = await dbc.Enrolment.FindAsync(e.ID);
                             dbc.Remove(e);
-                            Enrolments.Remove(e);
+                            Enrolments.Remove(o as Enrolment);
                         }
                     }
                     await dbc.SaveChangesAsync();
@@ -683,7 +683,7 @@ else
                         {
                             var mcE = await dbcT.MultiCampusEnrolment.FindAsync((e as Enrolment).ID);
                             if (mcE != null) { dbcT.Remove(mcE); }
-                            Enrolments.Remove(e);
+                            Enrolments.Remove(o as Enrolment);
                         }
                     }
                     await dbcT.SaveChangesAsync();
@@ -691,6 +691,7 @@ else
                 await messageBox.ShowOkOnlyAsync("Selection deleted", $"{studentGrid.SelectedDataItems.Count()} enrolments have been deleted.");
             }
             studentGrid.ClearSelections();
+            await OnMenuSelected(MenuOptions.ManageEnrolments);
         }
     }
 
