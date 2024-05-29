@@ -172,7 +172,6 @@ else {
         await progress.ShowSpinnerAsync("Processing ... Please wait");
         errorMessage = null;
         IsProcessing = true;
-        //StateHasChanged();
         int count = 0;
         int removedCount = 0;
         if (DoLifeMembers) count += await BusinessRule.AssignLifeComplimentaryMembership(dbc, processYear,now);
@@ -183,8 +182,12 @@ else {
             count += t.Item1;
             removedCount += t.Item2;
         }
-        for (var i = 0; i < ActivityIndex.Length; i++) {
-            if (ActivityIndex[i]) count += await BusinessRule.AssignVolunteerComplimentaryMembership(dbc, processYear, Activities[i],now);
+        if (ActivityIndex != null)
+        {
+            for (var i = 0; i < ActivityIndex.Length; i++)
+            {
+                if (ActivityIndex[i]) count += await BusinessRule.AssignVolunteerComplimentaryMembership(dbc, processYear, Activities[i], now);
+            }
         }
         if (AdHocPersonsToAssign != null) {
             count += await BusinessRule.AssignOtherComplimentaryMembership(dbc, processYear, AdHocPersonsToAssign, Reason,now);
