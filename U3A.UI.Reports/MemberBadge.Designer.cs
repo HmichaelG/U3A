@@ -176,8 +176,7 @@
             // xrPanel1
             // 
             this.xrPanel1.BorderColor = System.Drawing.Color.Gray;
-            this.xrPanel1.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
-            | DevExpress.XtraPrinting.BorderSide.Right) 
+            this.xrPanel1.Borders = ((DevExpress.XtraPrinting.BorderSide)(((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Right) 
             | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.xrPanel1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrLabel3,
@@ -315,7 +314,7 @@
             this.prmPersonID.Type = typeof(global::System.Guid);
             dynamicListLookUpSettings1.DataMember = null;
             dynamicListLookUpSettings1.DataSource = this.objectDataSource1;
-            dynamicListLookUpSettings1.DisplayMember = "FirstAndLastName";
+            dynamicListLookUpSettings1.DisplayMember = "FullNameAlpha";
             dynamicListLookUpSettings1.FilterString = null;
             dynamicListLookUpSettings1.SortMember = "FullNameAlphaKey";
             dynamicListLookUpSettings1.ValueMember = "ID";
