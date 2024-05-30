@@ -2,7 +2,7 @@
 
 <div id="fullscreen-element" class="d-flex normalscreen">
     @ContentTemplate
-    <DxButton Click="@OnClick"
+    <DxButton Click="@OnClick" Visible="@(!HideToggle)"
               tooltip="Clcik to display full screen"
               CssClass="toggle-button"
               IconCssClass="bi bi-arrows-fullscreen"             
@@ -39,6 +39,8 @@
 @code {
     [Parameter]
     public RenderFragment ContentTemplate { get; set; } = default;
+    [Parameter]
+    public bool HideToggle { get; set; } = false;
     [Parameter]
     public double DisplayOffset { get; set; } = 8;
 
