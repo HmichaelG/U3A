@@ -67,7 +67,7 @@ else
 
     <DxFormLayout>
         <div class="col col-12 col-lg-9 p-2">
-            @if (isLeaderEnrty)
+            @if (!IsLargerLayout())
             {
                 <div class="text-center col-12">
                     @(new MarkupString($"{SelectedTerm?.Name} {SelectedCourse?.Name}<br/>{SelectedClass?.ClassSummary}"))
@@ -130,7 +130,7 @@ else
 
             @quickMessage
 
-            @if (IsLargerLayout())
+            @if (!IsLargeLayout)
             {
                 <GridToolbar LinkedGrid=@mainGrid />
             }
@@ -350,7 +350,7 @@ else
     }
 
     .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? (IsLargerLayout()) ? "26rem" : "42rem" : (IsLargerLayout()) ? "22rem" : "40rem"));
+        height: @gridHeight;
     }
 
     .removeWrapping {
@@ -375,7 +375,6 @@ else
 
     bool IsLargeLayout { get; set; }
     bool IsXtraLargeLayout { get; set; }
-    bool isLeaderEnrty;
 
     bool IsReady;
     int attendanceStatus;
@@ -482,11 +481,6 @@ else
         IsReady = true;
     }
 
-    protected override void OnParametersSet()
-    {
-        if (SelectedCourse != null) { isLeaderEnrty = true; }
-        base.OnParametersSet();
-    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // wire up the toolbar
@@ -500,6 +494,9 @@ else
                 NavMan.NavigateTo("/");
             }
         }
+        var offset = (IsLargerLayout()) ? 0.075 : 0.4;
+        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
+        if (Convert(newHeight) > Convert(gridHeight)) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
     }
 
     private int Convert(string Height)
@@ -571,7 +568,7 @@ else
         if (ClassDate.Date.Date > now.Date)
         {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                        @"The class date you have selected is in the future.<br/>
+                                            @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
