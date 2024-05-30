@@ -1,15 +1,45 @@
-﻿window.getWindowDimensions = function () {
-    return {
-        width: window.innerWidth,
-        height: window.innerHeight
-    };
+﻿// system logout
+function logout() {
+    var f = document.getElementById('logoutForm');
+    if (f != null) {
+        f.submit();
+    }
+}
+
+// Full screen / normal screen functions
+function toggleFullscreen() {
+    var e = document.getElementById('fullscreen-element');
+    if (e != null) {
+        e.classList.toggle('normalscreen');
+        e.classList.toggle('fullscreen');
+    }
+}
+
+function refreshNormalscreen() {
+    var e = document.getElementById('fullscreen-element');
+    if (e != null) {
+        e.classList.remove('normalscreen');
+        e.classList.remove('fullscreen');
+        e.classList.add('normalscreen');
+    }
+}
+
+window.getWindowDimensions = function () {
+        return {
+            width: window.innerWidth,
+            height: window.innerHeight
+        };
 };
+
+function getLocalStorage(key) {
+    var result = localStorage.getItem(key);
+    return result == 'true';
+}
 
 function setFocus(id) {
     let elem = document.getElementById(id);
     if (elem != null) {
-        elem.scrollIntoView();
-        setTimeout(() => elem.focus(), 0);
+        setTimeout(() => elem.focus(), 1000);
     }
 }
 
@@ -43,6 +73,9 @@ function ScrollToTop(id) {
 function GetSessionState(key) {
     return window.sessionStorage.getItem(key);
 }
+function GetLocalStorage(key) {
+    return window.localStorage.getItem(key);
+}
 
 function IsApple() {
     return (/iP(hone|od|ad)/.test(navigator.platform));
@@ -74,7 +107,7 @@ function setTheme() {
         localStorage.setItem("theme", theme);
     }
     // set the default
-    var href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css';
+    var href = '_content/DevExpress.Blazor.Themes/office-white.bs5.css';
     // load from localStorage & replace the default
     var theme = localStorage.getItem('theme');
     if (theme) {
