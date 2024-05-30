@@ -15,90 +15,94 @@
                 IndicatorAreaVisible="false"
                 Text="Fetching Data...">
 
-    <div class="w-100">
+    <div class="w-100 px-4">
         <h2 class="pb-2">Tenant Summary</h2>
         <p class="pb-2">
             Note: U3A Tenants without <em>Postmark Enabled</em> are considered demonstration tenants only.
         </p>
         <div class="pb-2">
-            <DxGrid @ref="grid" Data="@tenantInfo" CssClass="grid-height" id="myGrid"
-                    @bind-SelectedDataItems="@selectedItems"
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    UnboundColumnData="GetUnboundColumnData"
-                    VirtualScrollingEnabled="true"
-                    ShowSearchBox="true"
-                    ShowFilterRow="false"
-                    ShowAllRows="true"
-                    KeyFieldName="Id"
-                    ValidationEnabled="true">
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@grid>
-                        <CustomButtonContent>
-                            <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
-                                <Template>
-                                    <div class="d-flex">
-                                        <div class="flex-grow-0 pt-1 pe-2">From:</div>
-                                        <DxDateEdit @bind-Date=@startDate CssClass="flex-grow-1" />
-                                    </div>
-                                </Template>
-                            </DxToolbarItem>
-                            <DxToolbarItem Context="a" Alignment="ToolbarItemAlignment.Right">
-                                <Template>
-                                    <div class="d-flex">
-                                        <div class="flex-grow-0 pt-1 px-2">To:</div>
-                                        <DxDateEdit @bind-Date=@endDate CssClass="flex-grow-1" />
-                                    </div>
-                                </Template>
-                            </DxToolbarItem>
-                            <DxToolbarItem Text="Show Email"
-                                           Click=@ShowEmail
-                                           RenderStyle="ButtonRenderStyle.Primary"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           Alignment="ToolbarItemAlignment.Right"
-                                           Tooltip="Show email statistics for the period">
-                            </DxToolbarItem>
-                            <DxToolbarItem Text="Send Email"
-                                           BeginGroup=true
-                                           Click=@OnSendEmail
-                                           RenderStyle="ButtonRenderStyle.Success"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           Alignment="ToolbarItemAlignment.Right"
-                                           Enabled="@(selectedItems != null)"
-                                           Tooltip="Send email and/or SMS to participants">
-                            </DxToolbarItem>
-                        </CustomButtonContent>
-                    </GridToolbar>
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridSelectionColumn AllowSelectAll="true" Width="4rem" />
-                    <DxGridDataColumn Width="8rem" Caption="Tenant ID" AllowGroup="false">
-                        <CellDisplayTemplate>
-                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
-                                      RenderStyle="ButtonRenderStyle.Primary" Text="@(((TenantInfo)context.DataItem).Identifier)"
-                                      Click="() => OnNavigate(context.DataItem)"></DxButton>
-                        </CellDisplayTemplate>
-                    </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Display Name" FieldName="Name" />
-                    <DxGridDataColumn Caption="Website" FieldName="Website" />
-                    <DxGridDataColumn Caption="Multi-Campus?" FieldName="EnableMultiCampusExtension" />
-                    <DxGridDataColumn Caption="EWAY Enabled" FieldName="EwayEnabled"
-                                      UnboundType=GridUnboundColumnType.Boolean
-                                      UnboundExpression="[UseEwayTestEnviroment] = 0" />
-                    <DxGridDataColumn Caption="Postmark Enabled" FieldName="PostmarkEnabled"
-                                      UnboundType=GridUnboundColumnType.Boolean
-                                      UnboundExpression="[UsePostmarkTestEnviroment] = 0" />
-                    <DxGridDataColumn Caption=@($"Financial To {DateTime.Today.Year}") FieldName="FinancialMembers"
-                                      UnboundType=GridUnboundColumnType.Integer Width="8rem" />
-                    <DxGridDataColumn Caption="Email Sent" FieldName="EmailStatistics" Visible="@showPostmark"
-                                      UnboundType=GridUnboundColumnType.Integer Width="8rem" />
-                </Columns>
+            <FullScreen DisplayOffset="12" HideToggle="true">
+                <ContentTemplate>
+                    <DxGrid @ref="grid" Data="@tenantInfo"
+                            @bind-SelectedDataItems="@selectedItems"
+                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                            UnboundColumnData="GetUnboundColumnData"
+                            VirtualScrollingEnabled="true"
+                            ShowSearchBox="true"
+                            ShowFilterRow="false"
+                            ShowAllRows="true"
+                            KeyFieldName="Id"
+                            ValidationEnabled="true">
+                        <ToolbarTemplate>
+                            <GridToolbar LinkedGrid=@grid>
+                                <CustomButtonContent>
+                                    <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                                        <Template>
+                                            <div class="d-flex">
+                                                <div class="flex-grow-0 pt-1 pe-2">From:</div>
+                                                <DxDateEdit @bind-Date=@startDate CssClass="flex-grow-1" />
+                                            </div>
+                                        </Template>
+                                    </DxToolbarItem>
+                                    <DxToolbarItem Context="a" Alignment="ToolbarItemAlignment.Right">
+                                        <Template>
+                                            <div class="d-flex">
+                                                <div class="flex-grow-0 pt-1 px-2">To:</div>
+                                                <DxDateEdit @bind-Date=@endDate CssClass="flex-grow-1" />
+                                            </div>
+                                        </Template>
+                                    </DxToolbarItem>
+                                    <DxToolbarItem Text="Show Email"
+                                                   Click=@ShowEmail
+                                                   RenderStyle="ButtonRenderStyle.Primary"
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   Alignment="ToolbarItemAlignment.Right"
+                                                   Tooltip="Show email statistics for the period">
+                                    </DxToolbarItem>
+                                    <DxToolbarItem Text="Send Email"
+                                                   BeginGroup=true
+                                                   Click=@OnSendEmail
+                                                   RenderStyle="ButtonRenderStyle.Success"
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   Alignment="ToolbarItemAlignment.Right"
+                                                   Enabled="@(selectedItems != null)"
+                                                   Tooltip="Send email and/or SMS to participants">
+                                    </DxToolbarItem>
+                                </CustomButtonContent>
+                            </GridToolbar>
+                        </ToolbarTemplate>
+                        <Columns>
+                            <DxGridSelectionColumn AllowSelectAll="true" Width="4rem" />
+                            <DxGridDataColumn Width="8rem" Caption="Tenant ID" AllowGroup="false">
+                                <CellDisplayTemplate>
+                                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                              RenderStyle="ButtonRenderStyle.Primary" Text="@(((TenantInfo)context.DataItem).Identifier)"
+                                              Click="() => OnNavigate(context.DataItem)"></DxButton>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                            <DxGridDataColumn Caption="Display Name" FieldName="Name" />
+                            <DxGridDataColumn Caption="Website" FieldName="Website" />
+                            <DxGridDataColumn Caption="Multi-Campus?" FieldName="EnableMultiCampusExtension" />
+                            <DxGridDataColumn Caption="EWAY Enabled" FieldName="EwayEnabled"
+                                              UnboundType=GridUnboundColumnType.Boolean
+                                              UnboundExpression="[UseEwayTestEnviroment] = 0" />
+                            <DxGridDataColumn Caption="Postmark Enabled" FieldName="PostmarkEnabled"
+                                              UnboundType=GridUnboundColumnType.Boolean
+                                              UnboundExpression="[UsePostmarkTestEnviroment] = 0" />
+                            <DxGridDataColumn Caption=@($"Financial To {DateTime.Today.Year}") FieldName="FinancialMembers"
+                                              UnboundType=GridUnboundColumnType.Integer Width="8rem" />
+                            <DxGridDataColumn Caption="Email Sent" FieldName="EmailStatistics" Visible="@showPostmark"
+                                              UnboundType=GridUnboundColumnType.Integer Width="8rem" />
+                        </Columns>
 
-                <TotalSummary>
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FinancialMembers" FooterColumnName="FinancialMembers" />
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="EmailStatistics" FooterColumnName="EmailStatistics" />
-                </TotalSummary>
+                        <TotalSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FinancialMembers" FooterColumnName="FinancialMembers" />
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="EmailStatistics" FooterColumnName="EmailStatistics" />
+                        </TotalSummary>
 
-            </DxGrid>
+                    </DxGrid>
+                </ContentTemplate>
+            </FullScreen>
         </div>
     </div>
 </DxLoadingPanel>
@@ -111,9 +115,6 @@
         width: 100%;
     }
 
-    .grid-height {
-        height: 50vh;
-    }
 </style>
 
 @code {
@@ -203,7 +204,9 @@
             using (var dbc = new U3ADbContext(tenant))
             {
                 var settings = await dbc.SystemSettings.OrderBy(s => s.ID).FirstOrDefaultAsync();
-                mailto += $"{settings!.U3AdminEmailRecipients.Replace("\n", ";")} ";
+                var addresses = settings!.U3AdminEmailRecipients.Split("\n");
+                var max = addresses.Take(5);
+                mailto += $"{string.Join("; ",max)};".Trim();
             }
         }
         navMan.NavigateTo(HttpUtility.UrlDecode(mailto.Remove(mailto.Length - 1)));
