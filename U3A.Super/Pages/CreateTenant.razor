@@ -189,7 +189,6 @@ else
         var cnnString = builder.ConnectionString;
 
         // postmark
-        var poostmarkSandboxAPIKey = config.GetValue<string>("PostmarkSandboxAPIKey");
         var newServer = await service!.CreateServer($"{details.TenantKey} {details.State} U3A Server");
         SetMessage($"Postmark server [{newServer.Name}] created.");
         newEmailDomain = await service.CreateDomain(details.EmailDomain!);
@@ -202,7 +201,7 @@ else
                 Identifier = key,
                 ConnectionString = cnnString,
                 PostmarkAPIKey = newServer.ApiTokens[0],
-                PostmarkSandboxAPIKey = poostmarkSandboxAPIKey,
+                PostmarkSandboxAPIKey = null,
                 UseEwayTestEnviroment = true,
                 UseEmailTestEnviroment = true,
                 UsePostmarkTestEnviroment = true,
