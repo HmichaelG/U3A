@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using U3A.Database;
 using Microsoft.AspNetCore.Http;
+using U3A.Model;
 
 namespace U3A.Services
 {
@@ -43,6 +44,7 @@ namespace U3A.Services
             var id = accessor.HttpContext.User.Identity;
             HostStrategy hs = new HostStrategy();
             var tenant = hs.GetIdentifier(accessor.HttpContext.Request.Host.Host);
+            constants.TENANT = tenant;
             var cd = new CircuitDetail()
             {
                 Id = circuit.Id,

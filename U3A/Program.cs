@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Builder;
 using DevExpress.XtraCharts;
 using U3A.Model;
 using System;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +50,7 @@ if (MultiTenantConnectionString is null)
     MultiTenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString");
 }
 
+constants.TENANT_CONNECTION_STRING = MultiTenantConnectionString!;
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
     options.UseSqlServer(MultiTenantConnectionString);
@@ -64,6 +67,7 @@ builder.Services.AddDbContextFactory<U3ADbContext>(options =>
 builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddSingleton<CircuitHandler>(new CircuitHandlerService());
+builder.Services.AddSingleton<IErrorBoundaryLogger>(new ErrorBoundaryLoggingService());
 
 builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
 {

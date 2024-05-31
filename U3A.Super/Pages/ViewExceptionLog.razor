@@ -1,0 +1,77 @@
+﻿@page "/ViewExceptionLog"
+
+@using System.Web
+@using U3A.UI.Common.Pages.Shared
+
+@inject IDbContextFactory<TenantDbContext> tenantDbfactory
+@inject IJSRuntime js
+@inject NavigationManager navMan
+
+<PageTitle>Tenant Summary</PageTitle>
+
+<DxLoadingPanel @bind-Visible="PanelVisible"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Fetching Data...">
+
+    <div class="w-100 px-4">
+        <h2>Exceptions</h2>
+        <div class="pb-2">
+            <FullScreen DisplayOffset="12" HideToggle="true">
+                <ContentTemplate>
+                    <DxGrid @ref="grid" Data="@exceptions"
+                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                            VirtualScrollingEnabled="true"
+                            ShowSearchBox="true"
+                            ShowFilterRow="false"
+                            ShowAllRows="true"
+                            KeyFieldName="Id"
+                            ValidationEnabled="true">
+                        <ToolbarTemplate>
+                            <GridToolbar LinkedGrid=@grid />
+                        </ToolbarTemplate>
+                        <Columns>
+                            <DxGridDataColumn Width="10rem" Caption="Date" FieldName="LocalDate" />
+                            <DxGridDataColumn Width="10rem" Caption="Tenant" FieldName="Tenant" />
+                            <DxGridDataColumn Caption="Exception" FieldName="Log" >
+                                <CellDisplayTemplate>
+                                    <DxMemo CssClass="text-size"
+                                            Rows=5 
+                                            Text="@(((ExceptionLog)context.DataItem).Log)" />
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                        </Columns>
+
+                        <TotalSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Date" FooterColumnName="Date" />
+                        </TotalSummary>
+
+                    </DxGrid>
+                </ContentTemplate>
+            </FullScreen>
+        </div>
+    </div>
+</DxLoadingPanel>
+<style>
+    .text-size {
+        font-size: 1rem;
+    }
+</style>
+
+@code {
+    List<ExceptionLog>? exceptions { get; set; }
+    bool PanelVisible;
+    DxGrid? grid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        using (var dbc = await tenantDbfactory.CreateDbContextAsync())
+        {
+            exceptions = await dbc.ExceptionLog.OrderByDescending(x => x.Date).ToListAsync();
+        }
+    }
+
+
+}

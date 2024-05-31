@@ -105,7 +105,7 @@ namespace U3A.Services
             resultServer = new RichEditDocumentServer();
             resultServer.Document.CalculateDocumentVariable += Document_CalculateDocumentVariable;
             IEmailSender = EmailFactory.GetEmailSender(dbc);
-            IEmailSender.BatchEmailSentEvent += IEmailSender_BatchEmailSentEvent;
+            if (IEmailSender != null) { IEmailSender.BatchEmailSentEvent += IEmailSender_BatchEmailSentEvent; }
         }
 
         public async Task ConvertDocx2Html(DocumentTemplate DocumentTemplate)

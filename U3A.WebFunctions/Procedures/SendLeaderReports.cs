@@ -10,7 +10,7 @@ namespace U3A.WebFunctions.Procedures
     public static class SendLeaderReports
     {
 
-        static ProFormaReportFactory reportFactory;
+        static ProFormaReportFactory? reportFactory;
         public static async Task Process(TenantInfo tenant, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
@@ -58,7 +58,7 @@ namespace U3A.WebFunctions.Procedures
                 var PrintCSVFile = true;
                 var PrintMemberBadges = true;
                 var PrintAttendanceAnalysis = false;
-                await reportFactory.CreateLeaderReports(
+                await reportFactory!.CreateLeaderReports(
                     PrintLeaderReport,
                     PrintAttendanceRecord,
                     PrintClassList,
