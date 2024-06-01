@@ -558,7 +558,10 @@ else
     async Task SetupClassDates()
     {
         ClearSelection();
-        ClassDates = await BusinessRule.SelectableAttendanceDatesAsync(dbc, SelectedTerm, SelectedClass, now);
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            ClassDates = await BusinessRule.SelectableAttendanceDatesAsync(dbc, SelectedTerm, SelectedClass, now);
+        }
         dateComboEnabled = true;
         await InvokeAsync(StateHasChanged);
     }
