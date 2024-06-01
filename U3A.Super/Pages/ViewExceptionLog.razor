@@ -21,6 +21,7 @@
             <FullScreen DisplayOffset="12" HideToggle="true">
                 <ContentTemplate>
                     <DxGrid @ref="grid" Data="@exceptions"
+                            DataItemDeleting="Grid_DataItemDeleting"
                             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                             VirtualScrollingEnabled="true"
                             ShowSearchBox="true"
@@ -32,12 +33,13 @@
                             <GridToolbar LinkedGrid=@grid />
                         </ToolbarTemplate>
                         <Columns>
+                            <DxGridCommandColumnEx Width="10rem" EditButtonVisible="false" DeleteButtonVisible="true" />
                             <DxGridDataColumn Width="10rem" Caption="Date" FieldName="LocalDate" />
                             <DxGridDataColumn Width="10rem" Caption="Tenant" FieldName="Tenant" />
-                            <DxGridDataColumn Caption="Exception" FieldName="Log" >
+                            <DxGridDataColumn Caption="Exception" FieldName="Log">
                                 <CellDisplayTemplate>
                                     <DxMemo CssClass="text-size"
-                                            Rows=5 
+                                            Rows=5
                                             Text="@(((ExceptionLog)context.DataItem).Log)" />
                                 </CellDisplayTemplate>
                             </DxGridDataColumn>
@@ -67,11 +69,26 @@
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
+        await GetData();
+    }
+
+    async Task GetData()
+    {
         using (var dbc = await tenantDbfactory.CreateDbContextAsync())
         {
             exceptions = await dbc.ExceptionLog.OrderByDescending(x => x.Date).ToListAsync();
         }
     }
 
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        using (var dbc = await tenantDbfactory.CreateDbContextAsync())
+        {
+            dbc.Remove((ExceptionLog)e.DataItem);
+            await dbc.SaveChangesAsync();
+            grid!.ClearSelection();
+            await GetData();
+        }
+    }
 
 }
