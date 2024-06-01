@@ -34,7 +34,7 @@
                         </ToolbarTemplate>
                         <Columns>
                             <DxGridCommandColumnEx Width="10rem" EditButtonVisible="false" DeleteButtonVisible="true" />
-                            <DxGridDataColumn Width="10rem" Caption="Date" FieldName="LocalDate" />
+                            <DxGridDataColumn Width="10rem" Caption="Date" FieldName="LocalDate" DisplayFormat=@constants.STD_DATETIME_FORMAT />
                             <DxGridDataColumn Width="10rem" Caption="Tenant" FieldName="Tenant" />
                             <DxGridDataColumn Caption="Exception" FieldName="Log">
                                 <CellDisplayTemplate>
