@@ -50,7 +50,6 @@ if (MultiTenantConnectionString is null)
     MultiTenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString");
 }
 
-constants.TENANT_CONNECTION_STRING = MultiTenantConnectionString!;
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
     options.UseSqlServer(MultiTenantConnectionString);
@@ -66,8 +65,8 @@ builder.Services.AddDbContextFactory<U3ADbContext>(options =>
 // Get / Set local storage data
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddSingleton<CircuitHandler>(new CircuitHandlerService());
-builder.Services.AddSingleton<IErrorBoundaryLogger>(new ErrorBoundaryLoggingService());
+builder.Services.AddSingleton<CircuitHandler, CircuitHandlerService>();
+builder.Services.AddScoped<IErrorBoundaryLogger, ErrorBoundaryLoggingService>();
 
 builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
 {
