@@ -12,14 +12,22 @@ namespace U3A.Services
 {
     public class ErrorBoundaryLoggingService : IErrorBoundaryLogger
     {
+        readonly IDbContextFactory<TenantDbContext> _tenantDbFactory;
+        readonly TenantInfoService _tenantInfoSvc;
+        public ErrorBoundaryLoggingService(IDbContextFactory<TenantDbContext> TenantDbFactory,
+                                            TenantInfoService TenantInfoService)
+        {
+            _tenantInfoSvc = TenantInfoService;
+            _tenantDbFactory = TenantDbFactory;
+        }
         public async ValueTask LogErrorAsync(Exception exception)
         {
-            var cnn = constants.TENANT_CONNECTION_STRING;
-            using (var dbc = new TenantDbContext(cnn))
+            using (var dbc = await _tenantDbFactory.CreateDbContextAsync())
             {
-                var ex = new ExceptionLog() { Tenant = constants.TENANT, Log = exception.ToString() };
+                var ex = new ExceptionLog() { Tenant = await _tenantInfoSvc.GetTenantIdentifierAsync(), 
+                                                Log = exception.ToString() };
                 await dbc.AddAsync(ex);
-                var expiredLogs = dbc.ExceptionLog.Where(x => x.Date > DateTime.UtcNow.AddDays(7)).ToList();
+                var expiredLogs = dbc.ExceptionLog.Where(x => x.Date > DateTime.UtcNow.AddDays(30)).ToList();
                 dbc.RemoveRange(expiredLogs);
                 await dbc.SaveChangesAsync();
             }

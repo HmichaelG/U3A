@@ -19,6 +19,16 @@ namespace U3A.Services
             this.TenantDbFactory = TenantDbFactory;
             this.httpContextAccessor = httpContextAccessor;
         }
+
+        public string GetUserIdentity ()
+        {
+            var result = "Anonymous(Public)";
+            if (httpContextAccessor.HttpContext == null) { return result; }
+            if (httpContextAccessor.HttpContext.User == null) { return result; }
+            if (httpContextAccessor.HttpContext.User.Identity == null) { return result; }
+            result = httpContextAccessor.HttpContext.User.Identity.Name;
+            return result;
+        }
         public async Task<TenantInfo> GetTenantInfoAsync()
         {
             HostStrategy hs = new HostStrategy();
