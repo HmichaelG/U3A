@@ -49,6 +49,8 @@
     [Parameter]
     public string ReportName { get; set; }
     [Parameter]
+    public bool HideTabPanels { get; set; }
+    [Parameter]
     public XtraReport? Report { get; set; }
     [Parameter]
     public string RootCssClass { get; set; } = "view-normal";
@@ -111,6 +113,12 @@
     {
         if (firstRender)
         {
+            if (HideTabPanels)
+            {
+                reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
+                reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
+                reportViewer.TabPanelModel[TabContentKind.Search].Visible = false;
+            }
             EditingFieldModelFactory.RegisterMaskEditor("Name", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z -.]+" });
             EditingFieldModelFactory.RegisterMaskEditor("UppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z]+" });
             EditingFieldModelFactory.RegisterMaskEditor("NumbersAndUppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9]+" });
