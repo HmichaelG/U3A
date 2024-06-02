@@ -60,7 +60,7 @@
             this.xrPanel2,
             this.xrPanel1});
             this.Detail.Dpi = 254F;
-            this.Detail.HeightF = 913.7709F;
+            this.Detail.HeightF = 940F;
             this.Detail.HierarchyPrintOptions.Indent = 50.8F;
             this.Detail.KeepTogether = true;
             this.Detail.MultiColumn.ColumnCount = 2;
@@ -87,7 +87,7 @@
             this.xrPanel2.Dpi = 254F;
             this.xrPanel2.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrPanel2.Name = "xrPanel2";
-            this.xrPanel2.SizeF = new System.Drawing.SizeF(901.9999F, 450F);
+            this.xrPanel2.SizeF = new System.Drawing.SizeF(902F, 465F);
             this.xrPanel2.StylePriority.UseBorderColor = false;
             this.xrPanel2.StylePriority.UseBorders = false;
             // 
@@ -181,9 +181,9 @@
             this.xrLabel2,
             this.xrLabel1});
             this.xrPanel1.Dpi = 254F;
-            this.xrPanel1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 450F);
+            this.xrPanel1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 465F);
             this.xrPanel1.Name = "xrPanel1";
-            this.xrPanel1.SizeF = new System.Drawing.SizeF(901.9999F, 450F);
+            this.xrPanel1.SizeF = new System.Drawing.SizeF(902F, 465F);
             this.xrPanel1.StylePriority.UseBorderColor = false;
             this.xrPanel1.StylePriority.UseBorders = false;
             // 
@@ -255,7 +255,7 @@
             // TopMargin
             // 
             this.TopMargin.Dpi = 254F;
-            this.TopMargin.HeightF = 96.81248F;
+            this.TopMargin.HeightF = 56F;
             this.TopMargin.Name = "TopMargin";
             // 
             // BottomMargin
@@ -322,7 +322,7 @@
             this.DataSource = this.objectDataSource1;
             this.Dpi = 254F;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
-            this.Margins = new DevExpress.Drawing.DXMargins(130F, 141F, 96.81248F, 103.5625F);
+            this.Margins = new DevExpress.Drawing.DXMargins(130F, 141F, 56F, 103.5625F);
             this.PageHeight = 2970;
             this.PageWidth = 2100;
             this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
