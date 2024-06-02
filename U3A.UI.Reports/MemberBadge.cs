@@ -136,5 +136,6 @@ namespace U3A.UI.Reports
         {
             xrU3AName.Text = _settings.U3AGroup;
         }
+
     }
 }
