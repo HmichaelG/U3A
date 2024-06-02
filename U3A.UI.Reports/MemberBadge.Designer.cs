@@ -33,7 +33,7 @@
             this.xrPanel2 = new DevExpress.XtraReports.UI.XRPanel();
             this.xrTitle = new DevExpress.XtraReports.UI.XRLabel();
             this.xrPictureBox2 = new DevExpress.XtraReports.UI.XRPictureBox();
-            this.xrLabel4 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrU3AName = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel6 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrPictureBox1 = new DevExpress.XtraReports.UI.XRPictureBox();
             this.xrPanel1 = new DevExpress.XtraReports.UI.XRPanel();
@@ -44,7 +44,6 @@
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
             this.xrLabel5 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrPageInfo1 = new DevExpress.XtraReports.UI.XRPageInfo();
-            this.prmU3AName = new DevExpress.XtraReports.Parameters.Parameter();
             this.prmStartDate = new DevExpress.XtraReports.Parameters.Parameter();
             this.prmPersonID = new DevExpress.XtraReports.Parameters.Parameter();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).BeginInit();
@@ -82,7 +81,7 @@
             this.xrPanel2.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrTitle,
             this.xrPictureBox2,
-            this.xrLabel4,
+            this.xrU3AName,
             this.xrLabel6,
             this.xrPictureBox1});
             this.xrPanel2.Dpi = 254F;
@@ -122,25 +121,24 @@
             this.xrPictureBox2.SizeF = new System.Drawing.SizeF(420.6873F, 84.66669F);
             this.xrPictureBox2.StylePriority.UseBorders = false;
             // 
-            // xrLabel4
+            // xrU3AName
             // 
-            this.xrLabel4.Borders = DevExpress.XtraPrinting.BorderSide.None;
-            this.xrLabel4.CanGrow = false;
-            this.xrLabel4.Dpi = 254F;
-            this.xrLabel4.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "?prmU3AName")});
-            this.xrLabel4.Font = new DevExpress.Drawing.DXFont("Arial", 12F, DevExpress.Drawing.DXFontStyle.Italic);
-            this.xrLabel4.LocationFloat = new DevExpress.Utils.PointFloat(24.99999F, 366.58F);
-            this.xrLabel4.Multiline = true;
-            this.xrLabel4.Name = "xrLabel4";
-            this.xrLabel4.Padding = new DevExpress.XtraPrinting.PaddingInfo(5, 5, 0, 0, 254F);
-            this.xrLabel4.SizeF = new System.Drawing.SizeF(851.9999F, 58.42001F);
-            this.xrLabel4.StylePriority.UseBorders = false;
-            this.xrLabel4.StylePriority.UseFont = false;
-            this.xrLabel4.StylePriority.UseTextAlignment = false;
-            this.xrLabel4.Text = "xrLabel4";
-            this.xrLabel4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.BottomCenter;
-            this.xrLabel4.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
+            this.xrU3AName.Borders = DevExpress.XtraPrinting.BorderSide.None;
+            this.xrU3AName.CanGrow = false;
+            this.xrU3AName.Dpi = 254F;
+            this.xrU3AName.Font = new DevExpress.Drawing.DXFont("Arial", 12F, DevExpress.Drawing.DXFontStyle.Italic);
+            this.xrU3AName.LocationFloat = new DevExpress.Utils.PointFloat(24.99999F, 366.58F);
+            this.xrU3AName.Multiline = true;
+            this.xrU3AName.Name = "xrU3AName";
+            this.xrU3AName.Padding = new DevExpress.XtraPrinting.PaddingInfo(5, 5, 0, 0, 254F);
+            this.xrU3AName.SizeF = new System.Drawing.SizeF(851.9999F, 58.42001F);
+            this.xrU3AName.StylePriority.UseBorders = false;
+            this.xrU3AName.StylePriority.UseFont = false;
+            this.xrU3AName.StylePriority.UseTextAlignment = false;
+            this.xrU3AName.Text = "xrU3AName";
+            this.xrU3AName.TextAlignment = DevExpress.XtraPrinting.TextAlignment.BottomCenter;
+            this.xrU3AName.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
+            this.xrU3AName.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrU3AName_BeforePrint);
             // 
             // xrLabel6
             // 
@@ -291,13 +289,6 @@
             this.xrPageInfo1.StylePriority.UseTextAlignment = false;
             this.xrPageInfo1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             // 
-            // prmU3AName
-            // 
-            this.prmU3AName.Description = "Parameter1";
-            this.prmU3AName.Enabled = false;
-            this.prmU3AName.Name = "prmU3AName";
-            this.prmU3AName.Visible = false;
-            // 
             // prmStartDate
             // 
             this.prmStartDate.AllowNull = true;
@@ -336,11 +327,9 @@
             this.PageWidth = 2100;
             this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
-            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmU3AName, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmPersonID, DevExpress.XtraReports.Parameters.Orientation.Vertical),
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmStartDate, DevExpress.XtraReports.Parameters.Orientation.Vertical)});
             this.Parameters.AddRange(new DevExpress.XtraReports.Parameters.Parameter[] {
-            this.prmU3AName,
             this.prmPersonID,
             this.prmStartDate});
             this.ReportPrintOptions.DetailCountOnEmptyDataSource = 12;
@@ -368,8 +357,7 @@
         private DevExpress.XtraReports.UI.XRLabel xrLabel1;
         private DevExpress.XtraReports.UI.XRLabel xrLabel3;
         private DevExpress.XtraReports.UI.XRLabel xrLabel2;
-        private DevExpress.XtraReports.Parameters.Parameter prmU3AName;
-        private DevExpress.XtraReports.UI.XRLabel xrLabel4;
+        private DevExpress.XtraReports.UI.XRLabel xrU3AName;
         private DevExpress.XtraReports.UI.XRPageInfo xrPageInfo1;
         private DevExpress.XtraReports.UI.XRLabel xrLabel5;
         private DevExpress.XtraReports.UI.XRPictureBox xrPictureBox2;

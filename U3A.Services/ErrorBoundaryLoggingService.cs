@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,9 @@ namespace U3A.Services
     {
         readonly IDbContextFactory<TenantDbContext> _tenantDbFactory;
         readonly TenantInfoService _tenantInfoSvc;
+        readonly ILogger<ErrorBoundaryLoggingService> _logger;
         public ErrorBoundaryLoggingService(IDbContextFactory<TenantDbContext> TenantDbFactory,
+                                            ILogger<ErrorBoundaryLoggingService> logger,
                                             TenantInfoService TenantInfoService)
         {
             _tenantInfoSvc = TenantInfoService;
@@ -24,6 +27,7 @@ namespace U3A.Services
         {
             using (var dbc = await _tenantDbFactory.CreateDbContextAsync())
             {
+                _logger.LogError(exception.ToString());
                 var ex = new ExceptionLog() { Tenant = await _tenantInfoSvc.GetTenantIdentifierAsync(), 
                                                 Log = exception.ToString() };
                 await dbc.AddAsync(ex);

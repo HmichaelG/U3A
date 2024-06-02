@@ -10,6 +10,8 @@
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Logging
 @using DevExpress.DataAccess.Excel
+@using FILE_IO=Microsoft.VisualBasic.FileIO;
+
 @inject ILogger<ParticipantDataImport> Logger
 @inject IWebHostEnvironment Environment
 @inject NavigationManager NavigationManager
@@ -366,8 +368,8 @@ else {
             var file = Path.Combine("uploads", fi.Name);
             var records = CountLines(new FileInfo(file));
             await ProgressBar.ShowAsync("Processing ... Please Wait", records);
-            using (var parser = new TextFieldParser(file)) {
-                parser.TextFieldType = FieldType.Delimited;
+            using (var parser = new FILE_IO.TextFieldParser(file)) {
+                parser.TextFieldType = FILE_IO.FieldType.Delimited;
                 parser.SetDelimiters(new string[] { "," });
                 while (!parser.EndOfData) {
                     string[]? row = parser.ReadFields();

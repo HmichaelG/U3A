@@ -38,6 +38,12 @@ else
 
     @switch (menuSelection)
     {
+        case MenuOptions.MemberBadges:
+                    <XtraReportViewer RootCssClass="vh-75"
+                              HideTabPanels=true
+                              OnCloseButtonClick="@OnReportComplete"
+            Report="GetMemberBadgeReport()" />
+            break;
         case MenuOptions.AddEditStudentLeave:
             <DxFormLayout class="mx-4 w-100 d-block">
                 <div class="col-12 col-md-8 mx-auto mt-2">
@@ -254,6 +260,13 @@ else
                                   RenderStyle="ButtonRenderStyle.Primary"
                                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                         </DxButton>
+                        <DxButton Text="Print member badges"
+                                  IconCssClass="bi-printer menu-icon me-3 h2"
+                                  CssClass="flex-grow-1"
+                                  Click="@(e => GetMemberBadges())"
+                                  RenderStyle="ButtonRenderStyle.Primary"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                        </DxButton>
                     </div>
                 </div>
             </DxFormLayout>
@@ -360,7 +373,7 @@ else
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
-                    <DxButton Text="Email / SMS Students"
+                    <DxButton Text="Email or SMS Students | Member Babdges"
                               IconCssClass="bi bi-broadcast-pin menu-icon me-3 h2"
                               CssClass="col-12 mb-1"
                               Click="@(e => OnMenuSelected(MenuOptions.Communicate))"
@@ -496,6 +509,7 @@ else
         AttendanceHistory,
         LeaderReports,
         CancelClass,
+        MemberBadges,
         ConfigureEmail
     }
     MenuOptions menuSelection = MenuOptions.Nothing;
@@ -845,6 +859,27 @@ else
         }
     }
 
+    async Task GetMemberBadges()
+    {
+        if (!await AreEnrolmentsSelected()) return;
+        if (studentGrid == null) return;
+        if (studentGrid.SelectedDataItems == null) return;
+        await OnMenuSelected(MenuOptions.MemberBadges);
+    }
+
+    XtraReport GetMemberBadgeReport()
+    {
+        MemberBadge report = new() {U3Adbfactory = U3Adbfactory};
+            List<Guid> PrintID = new();
+            foreach (var e in studentGrid.SelectedDataItems)
+                { 
+                    PrintID.Add(((Enrolment)e).PersonID); 
+                }
+            report.SetParameters(PrintID);
+        return report;
+
+    }
+
     async Task OnSelectedStudentChanged(Person student)
     {
         selectedEnrolment = null;
@@ -900,6 +935,8 @@ else
     {
         await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
     }
+
+    void OnReportComplete() => menuSelection = MenuOptions.Nothing;
 
     async Task ReturnToMenu(PortalMenuResult result)
     {

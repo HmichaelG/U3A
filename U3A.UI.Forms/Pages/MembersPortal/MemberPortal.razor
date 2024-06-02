@@ -92,9 +92,28 @@ else
         case PortalMenuSelection.DoWhatsOn:
             <CourseSchedule IsPortal=true />
             break;
+
+        case PortalMenuSelection.PrintMemberBadge:
+            <XtraReportViewer RootCssClass="report-viewer"
+                              HideTabPanels=true
+                              OnCloseButtonClick="@OnReportComplete"
+                              Report="GetMemberBadgeReport()" />
+            <DxButton Text="Return to menu"
+                      IconCssClass="bi-door-closed menu-icon me-3 h2"
+                      CssClass="mx-auto col-6 my-1"
+                      Click="@OnReportComplete"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline">
+            </DxButton>
+            menuSelection = PortalMenuSelection.ShowMenu;
+            break;
     }
 }
-
+<style>
+    .report-viewer{
+        height: calc(100dvh - 12rem);
+    }
+</style>
 
 
 @code {
@@ -167,6 +186,16 @@ else
             }
             if (person == null) menuSelection = PortalMenuSelection.DoMemberMaintenance;
         }
+    }
+
+    XtraReport GetMemberBadgeReport()
+    {
+        MemberBadge report = new() {U3Adbfactory = U3Adbfactory};
+        if (loginState.SelectedPerson is not null)
+        {
+            report.SetParameters(loginState.SelectedPerson.ID);
+        }
+        return report;
     }
 
 
@@ -315,6 +344,11 @@ else
             }
         }
         return result;
+    }
+
+    async Task OnReportComplete()
+    {
+        await OnSelectedOptionCompleted(PortalMenuResult.MemberDetailsCompleted);
     }
 
     async Task OnSelectedOptionCompleted(PortalMenuResult result)

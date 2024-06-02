@@ -107,6 +107,13 @@ else
                                               RenderStyle="ButtonRenderStyle.Primary"
                                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                                     </DxButton>
+                                    <DxButton Text="Print your member badge"
+                                              IconCssClass="bi-printer menu-icon me-3 h2"
+                                              CssClass="col-12 mt-1"
+                                              Click="@(e => OnMenuSelected(e,PortalMenuSelection.PrintMemberBadge))"
+                                              RenderStyle="ButtonRenderStyle.Primary"
+                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                    </DxButton>
                                     <DxButton Text="View your course enrolments"
                                               IconCssClass="bi-award menu-icon me-3 h2"
                                               CssClass="col-12 mt-1"

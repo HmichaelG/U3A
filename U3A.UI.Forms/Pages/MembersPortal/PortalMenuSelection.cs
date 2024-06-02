@@ -26,6 +26,7 @@ namespace U3A.UI.Forms
         DoUnlinkMember,
         DoWhatsOn,
         DoSignInSignOut,
+        PrintMemberBadge,
         NotImplemented
     }
 

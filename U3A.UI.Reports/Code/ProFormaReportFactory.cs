@@ -348,7 +348,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
         string CreateMemberBadgesReport(Person Leader,
                 Enrolment[] Enrolments)
         {
-            var report = new MemberBadge() { DbContext = dbc };
+            var report = new MemberBadge() { U3Adbfactory = U3AdbFactory };
             var list = new List<Guid>();
             foreach (var enrollment in Enrolments)
             {

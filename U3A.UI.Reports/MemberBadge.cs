@@ -8,13 +8,20 @@ using U3A.BusinessRules;
 using U3A.Database;
 using DevExpress.Drawing;
 using U3A.Model;
+using DevExpress.Data.Browsing.Design;
+using Microsoft.EntityFrameworkCore;
 
 namespace U3A.UI.Reports
 {
-    public partial class MemberBadge : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContext
+    public partial class MemberBadge : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContextFactory
     {
+       
         Term term { get; set; }
-        public U3ADbContext DbContext { get; set; }
+        public IDbContextFactory<U3ADbContext> U3Adbfactory { get; set; }
+
+        Guid? _personID;
+        List<Guid> _personsID;
+        SystemSettings _settings;
 
         public MemberBadge()
         {
@@ -23,27 +30,62 @@ namespace U3A.UI.Reports
 
         private void MemberBadge_BeforePrint(object sender, CancelEventArgs e)
         {
-            if (term == null) { term = BusinessRule.CurrentEnrolmentTerm(DbContext); }
+            if (term == null) {
+                using (var dbc = U3Adbfactory.CreateDbContext())
+                {
+                    term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                }
+            }
         }
         private void MemberBadge_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
-            term = BusinessRule.CurrentEnrolmentTerm(DbContext);
+            GetData();
             objectDataSource1.DataSource = GetPeople();
+        }
+
+        public void SetParameters(Guid PersonID)
+        {
+            this.Parameters.Clear();
+            _personID = PersonID;
+            GetData();
+        }
+        public void SetParameters(List<Guid> PersonsID)
+        {
+            this.Parameters.Clear();
+            _personsID = PersonsID;
+            GetData();
+        }
+        private void GetData()
+        {
+            using (var dbc = U3Adbfactory.CreateDbContext())
+            {
+                term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            }
         }
 
         private void MaillingLabels_DataSourceDemanded(object sender, EventArgs e)
         {
-            var settings = DbContext.SystemSettings.FirstOrDefault();
-            prmU3AName.Value = settings.U3AGroup;
-            var persons = GetPeople();
-            if (prmPersonID.Value != null)
+            using (var dbc = U3Adbfactory.CreateDbContext())
             {
-                persons = persons
-                            .Where(x => (prmPersonID.Value as IEnumerable<Guid>).Contains(x.ID)).ToList();
+                _settings = dbc.SystemSettings.FirstOrDefault();
             }
-            if (prmStartDate.Value != null)
+            List<Person> persons;
+            if (_personID.HasValue)
             {
-                persons = persons.Where(x => x.DateJoined >= (DateTime)prmStartDate.Value).ToList();
+                persons = GetPerson();
+            }
+            else
+            {
+                persons = GetPeople(); ;
+                if (prmPersonID.Value != null)
+                {
+                    persons = persons
+                                .Where(x => (prmPersonID.Value as IEnumerable<Guid>).Contains(x.ID)).ToList();
+                }
+                if (prmStartDate.Value != null)
+                {
+                    persons = persons.Where(x => x.DateJoined >= (DateTime)prmStartDate.Value).ToList();
+                }
             }
             DataSource = persons;
         }
@@ -52,7 +94,27 @@ namespace U3A.UI.Reports
         {
             Task<List<Person>> syncTask = Task.Run(async () =>
             {
-                return await BusinessRule.SelectableFinancialPeopleAsync(DbContext);
+                using (var dbc = U3Adbfactory.CreateDbContext())
+                {
+                    var people = await BusinessRule.SelectableFinancialPeopleAsync(dbc);
+                    if (_personsID is not null)
+                    {
+                        people = people.Where(x => _personsID.Contains(x.ID)).ToList();
+                    }
+                    return people;
+                }
+            });
+            syncTask.Wait();
+            return syncTask.Result;
+        }
+        List<Person> GetPerson()
+        {
+            Task<List<Person>> syncTask = Task.Run(async () =>
+            {
+                using (var dbc = U3Adbfactory.CreateDbContext())
+                {
+                    return await BusinessRule.SelectableFinancialPersonAsync(dbc, _personID.Value);
+                }
             });
             syncTask.Wait();
             return syncTask.Result;
@@ -70,5 +132,9 @@ namespace U3A.UI.Reports
             if (person.IsLifeMember) { xrTitle.Text = "Life Member"; }
         }
 
+        private void xrU3AName_BeforePrint(object sender, CancelEventArgs e)
+        {
+            xrU3AName.Text = _settings.U3AGroup;
+        }
     }
 }
