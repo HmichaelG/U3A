@@ -128,7 +128,7 @@ namespace U3A.UI.Reports
             if (person.FinancialTo == term.Year) { xrTitle.Text = $"Member {term.Year}"; }
             if (person.IsCourseClerk) { xrTitle.Text = $"Course Clerk {term.Year}"; }
             if (person.IsCourseLeader) { xrTitle.Text = $"Course Leader {term.Year}"; }
-            if (person.IsCommitteeMember) { xrTitle.Text = $"Committeee Member {term.Year}"; }
+            if (person.IsCommitteeMember) { xrTitle.Text = $"Committee Member {term.Year}"; }
             if (person.IsLifeMember) { xrTitle.Text = "Life Member"; }
         }
 
