@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,5 +32,11 @@ namespace U3A.Model
         public string? EwayPassword { get; set; }
         public bool UseEwayTestEnviroment { get; set; }
         public bool EnableMultiCampusExtension { get; set; }
+
+        [NotMapped]
+        public bool IsUsingPostmarkSandbox { get {
+                return UsePostmarkTestEnviroment && PostmarkSandboxAPIKey is not null;
+            } 
+        }
     }
 }
