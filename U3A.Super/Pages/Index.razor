@@ -92,9 +92,8 @@
                             <DxGridDataColumn Caption="Postmark Enabled" FieldName="PostmarkEnabled"
                                               UnboundType=GridUnboundColumnType.Boolean
                                               UnboundExpression="[UsePostmarkTestEnviroment] = 0" />
-                            <DxGridDataColumn Caption="Postmark Sandbox" FieldName="PostmarkSandboxEnabled"
-                                              UnboundType=GridUnboundColumnType.Boolean
-                                              UnboundExpression="[UsePostmarkTestEnviroment] = 1 && [PostmarkSandboxAPIKey] != null " />
+                            <DxGridDataColumn Caption="Postmark Sandbox" FieldName="IsUsingPostmarkSandbox"
+                                              UnboundType=GridUnboundColumnType.Boolean  />
                             <DxGridDataColumn Caption=@($"Financial To {DateTime.Today.Year}") FieldName="FinancialMembers"
                                               UnboundType=GridUnboundColumnType.Integer Width="8rem" />
                             <DxGridDataColumn Caption="Email Sent" FieldName="EmailStatistics" Visible="@showPostmark"
