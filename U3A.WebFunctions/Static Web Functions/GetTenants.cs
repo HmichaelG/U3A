@@ -40,7 +40,10 @@ namespace U3A.WebFunctions.Static_Web_Functions
                                   ,[State]
                                   ,[Identifier]
                                   ,[Name]
-                              FROM [dbo].[TenantInfo] where UsePostmarkTestEnviroment=0 order by Name";
+                              FROM [dbo].[TenantInfo] where 
+                                    UsePostmarkTestEnviroment=0 or
+                                    (UsePostmarkTestEnviroment=1 and PostmarkSandboxAPIKey is null)
+                                    order by Name";
                 using (var cmd = new SqlCommand(cmdText, cnn))
                 {
                     try
