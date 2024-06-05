@@ -13,14 +13,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace U3A.UI.Reports
 {
-    public partial class MemberBadge : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContextFactory
+    public partial class MemberBadge 
+        : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContextFactory
     {
        
-        Term term { get; set; }
         public IDbContextFactory<U3ADbContext> U3Adbfactory { get; set; }
 
+        Term _term { get; set; }
         Guid? _personID;
         List<Guid> _personsID;
+        List<Person> _people;
         SystemSettings _settings;
 
         public MemberBadge()
@@ -30,10 +32,10 @@ namespace U3A.UI.Reports
 
         private void MemberBadge_BeforePrint(object sender, CancelEventArgs e)
         {
-            if (term == null) {
+            if (_term == null) {
                 using (var dbc = U3Adbfactory.CreateDbContext())
                 {
-                    term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                    _term = BusinessRule.CurrentEnrolmentTerm(dbc);
                 }
             }
         }
@@ -55,16 +57,28 @@ namespace U3A.UI.Reports
             _personsID = PersonsID;
             GetData();
         }
+        public void SetParameters(List<Person> People, SystemSettings settings, Term CurrentTerm)
+        {
+            this.Parameters.Clear();
+            _settings = settings;
+            _people = People;
+            _term = CurrentTerm;
+        }
         private void GetData()
         {
             using (var dbc = U3Adbfactory.CreateDbContext())
             {
-                term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                _term = BusinessRule.CurrentEnrolmentTerm(dbc);
             }
         }
 
         private void MaillingLabels_DataSourceDemanded(object sender, EventArgs e)
         {
+            if (_people is not null)
+            {
+                DataSource = _people;
+                return;
+            }
             using (var dbc = U3Adbfactory.CreateDbContext())
             {
                 _settings = dbc.SystemSettings.FirstOrDefault();
@@ -125,10 +139,10 @@ namespace U3A.UI.Reports
             var person = (Person)this.GetCurrentRow();
             xrTitle.Text = "";
             if (person == null) { return; }
-            if (person.FinancialTo == term.Year) { xrTitle.Text = $"Member {term.Year}"; }
-            if (person.IsCourseClerk) { xrTitle.Text = $"Course Clerk {term.Year}"; }
-            if (person.IsCourseLeader) { xrTitle.Text = $"Course Leader {term.Year}"; }
-            if (person.IsCommitteeMember) { xrTitle.Text = $"Committee Member {term.Year}"; }
+            if (person.FinancialTo == _term.Year) { xrTitle.Text = $"Member {_term.Year}"; }
+            if (person.IsCourseClerk) { xrTitle.Text = $"Course Clerk {_term.Year}"; }
+            if (person.IsCourseLeader) { xrTitle.Text = $"Course Leader {_term.Year}"; }
+            if (person.IsCommitteeMember) { xrTitle.Text = $"Committee Member {_term.Year}"; }
             if (person.IsLifeMember) { xrTitle.Text = "Life Member"; }
         }
 

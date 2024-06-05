@@ -22,6 +22,7 @@ else
 {
     <AntiforgeryToken />
     <Progress @ref=@progress />
+    <MessageBox @ref=@messageBox />
     <div class="vw-100">
         <div class="px-2 col-12 px-sm-0 col-md-10 col-lg-6 mx-auto">
             <div class="text-center alert alert-success text-dark w-100">
@@ -433,7 +434,12 @@ else
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
     {
-        await OnMenuOptionSelected.InvokeAsync(selection);
+        if (selection == PortalMenuSelection.PrintMemberBadge &&
+            loginState.SelectedPerson.FinancialTo < TimezoneAdjustment.GetLocalTime().Date.Year)
+        {
+            await messageBox.ShowOkOnlyAsync("Financial Members Only", "You must be a financial member to select this option.");
+        }
+        else { await OnMenuOptionSelected.InvokeAsync(selection); }
     }
 
     public void Dispose()

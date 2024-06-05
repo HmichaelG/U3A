@@ -262,7 +262,7 @@ else
         AmountDueText = $"{billingYear} {payType} is: {fee.ToString("c2")}. {clickText}";
         if (loginState.IsAdminOnBehalfOfMember) await DoShowFeesDue();
         IsProcessing = false;
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     async Task DoShowFeesDue()

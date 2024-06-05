@@ -245,6 +245,7 @@ else
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             var person = await dbc.Person.FindAsync(loginState.SelectedPerson.ID);
+            loginState.SelectedPerson = person;
             return person;
         }
     }

@@ -287,9 +287,13 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 }
                 if (DoMemberBadges)
                 {
-                        createdFilenames.Add(CreateMemberBadgesReport(Leader, 
+                    var fileName = await CreateMemberBadgesReport(Leader,
+                            Enrolments.Where(x => !x.IsWaitlisted).ToArray());
+                    if (!string.IsNullOrWhiteSpace(fileName)) {
+                        createdFilenames.Add(await CreateMemberBadgesReport(Leader,
                                 Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
                         reportNames.Add("Member Badges.pdf");
+                    }
                 }
                 if (DoAttendanceAnalysis)
                 {
@@ -345,18 +349,26 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                 RandomAllocationExecuted);
             }
         }
-        string CreateMemberBadgesReport(Person Leader,
+        async Task<string> CreateMemberBadgesReport(Person Leader,
                 Enrolment[] Enrolments)
         {
-            var report = new MemberBadge() { U3Adbfactory = U3AdbFactory };
+            var pdfFilename = string.Empty;
+            var report = new MemberBadge();
             var list = new List<Guid>();
             foreach (var enrollment in Enrolments)
             {
                 list.Add(enrollment.PersonID);
             }
-            report.Parameters["prmPersonID"].Value = list;
-            string pdfFilename = GetTempPdfFile();
-            report.ExportToPdf(pdfFilename, options);
+            var people = await BusinessRule.SelectableFinancialPeopleAsync(dbc);
+            var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+            if (list.Count > 0)
+            {
+                people = people.Where(x => list.Contains(x.ID)).ToList();
+                report.SetParameters(people,settings,term);
+                pdfFilename = GetTempPdfFile();
+                report.ExportToPdf(pdfFilename, options);
+            }
             return pdfFilename;
         }
         string CreateAttendanceAnalysisReport(AttendanceAnalysis report,
