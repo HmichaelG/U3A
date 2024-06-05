@@ -108,6 +108,7 @@ namespace U3A.BusinessRules
             
             // and everybody else
             await FixEnrolmentTerm(dbc, SelectedTerm);
+            var today = TimezoneAdjustment.GetLocalTime().Date;
             AutoEnrolments = new List<string>();
             List<Enrolment> enrolmentsToProcess;
             List<Person> CourseLeaders;
@@ -133,11 +134,14 @@ namespace U3A.BusinessRules
                                                 .Include(x => x.Course)
                                                 .Include(x => x.Term)
                                                 .Include(x => x.Person)
-                                                .Where(x => x.TermID == SelectedTerm.ID
+                                                .Where(x => (x.TermID == SelectedTerm.ID ||
+                                                             (x.Course.AllowMultiCampsuFrom != null &&
+                                                             x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))                                                                
                                                                 && x.CourseID == course.ID
                                                                 && x.Person.DateCeased == null
                                                                 && !CourseLeaders.Contains(x.Person))
                                                 .ToListAsync();
+
                     enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                     if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                     {
