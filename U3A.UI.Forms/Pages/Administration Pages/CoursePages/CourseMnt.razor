@@ -48,6 +48,7 @@ else
         <DxTab Text="Current" />
         <DxTab Text="Complete" />
         <DxTab Text="Activity/Events" />
+        <DxTab Text="Multi-Campus" />
     </DxTabs>
     <FullScreen DisplayOffset="10">
         <ContentTemplate>
@@ -101,6 +102,7 @@ else
                     <DxGridDataColumn Caption="Required Participants" FieldName="RequiredStudents" DisplayFormat="{0:n0}" />
                     <DxGridDataColumn Caption="Maximum Allowed" FieldName="MaximumStudents" DisplayFormat="{0:n0}" />
                     <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" />
+                    <DxGridDataColumn Caption="Multi-Campus" FieldName=@nameof(Course.AllowMultiCampsuFrom) />
                 </Columns>
 
                 <DetailRowTemplate>
@@ -280,6 +282,9 @@ else
                 break;
             case 3:
                 Courses = BusinessRule.ActivityOrEventCourses(Courses, currentTerm.TermNumber);
+                break;
+            case 4:
+                Courses = Courses.Where(x => x.AllowMultiCampsuFrom != null).ToList();
                 break;
             default:
                 break;
