@@ -32,10 +32,16 @@ namespace U3A.UI.Reports
 
         private void MemberBadge_BeforePrint(object sender, CancelEventArgs e)
         {
-            if (_term == null) {
-                using (var dbc = U3Adbfactory.CreateDbContext())
+            if (DataSource == null || (DataSource as IEnumerable<Person>).Count() == 0)
+            { e.Cancel = true; return; }
+            else
+            {
+                if (_term == null)
                 {
-                    _term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                    using (var dbc = U3Adbfactory.CreateDbContext())
+                    {
+                        _term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                    }
                 }
             }
         }
