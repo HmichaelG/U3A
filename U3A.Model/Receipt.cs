@@ -54,5 +54,8 @@ namespace U3A.Model
 
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
+
+        [NotMapped]
+        public bool EmailCashReceipt { get; set; }
     }
 }

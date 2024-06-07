@@ -21,7 +21,7 @@ namespace U3A.BusinessRules
             foreach (var entry in entries)
                 if (entry.Entity is Receipt r)
                 {
-                    if (entry.State == EntityState.Added)
+                    if (entry.State == EntityState.Added || entry.State == EntityState.Modified)
                     {
                         list.Add(r);
                     }

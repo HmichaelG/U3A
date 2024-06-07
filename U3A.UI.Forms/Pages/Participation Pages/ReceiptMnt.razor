@@ -96,6 +96,13 @@ else
                         <DxFormLayoutItem ColSpanMd="12">
                             <ValidationSummary />
                         </DxFormLayoutItem>
+                        <div class="w-100 d-flex">
+                            <div class="flex-grow-1" />
+                            <div class="flex-grow-0 me-2">
+                                <DxCheckBox @bind-Checked="@editItem.EmailCashReceipt"
+                                            LabelPosition="LabelPosition.Left">Email receipt to member?</DxCheckBox>
+                            </div>
+                        </div>
                         <DxFormLayoutGroup Caption="Participant's Receipt Details">
                             <DxFormLayoutItem Caption="Received From" ColSpanMd="12">
                                 <DxComboBox Data="Persons"
@@ -244,13 +251,15 @@ else
             originalReceipt = default;
             editModel.ProcessingYear = ProcessingYear;
             editModel.Date = DateTime.Today;
-            editModel.Description = "Manual Receipt Adjustment";
+            editModel.Description = "Membership Fees";
+            editModel.EmailCashReceipt = true;
             setFinancialTo = true;
         }
         else
         {
             originalReceipt = new Receipt();
             editModel.CopyTo(originalReceipt);
+            editModel.EmailCashReceipt = false;
             originalReceipt.Person = dbc.Person.Find(editModel.Person.ID);
             OnPersonOrAmountChanged(editModel);
         }
@@ -260,6 +269,22 @@ else
     {
         if (editItem == null) { return; }
         if (editItem.Person == null || editItem.Amount <= 0) { return; }
+        if (originalReceipt is not null)
+        {
+            var personChange = string.Empty;
+            var amountChange = string.Empty;
+            if (editItem.Person.ID != originalReceipt.Person.ID) 
+            { 
+                editItem.EmailCashReceipt = true;
+                personChange = $"Reassigned from: {originalReceipt.Person.PersonIdentity} {originalReceipt.Person.FullName}.";
+            }
+            if (editItem.Amount != originalReceipt.Amount) 
+            { 
+                editItem.EmailCashReceipt = true; 
+                amountChange = string.Format("Amount changed from {0:c2} to {1:c2}.", originalReceipt.Amount, editItem.Amount);
+            }
+            editItem.Description = ($"{personChange} {amountChange}").Trim();
+        }
         if (editItem.Person != null
             && editItem.Person.FinancialTo < ProcessingYear) { showFinancialToOptionsAsSet = true; }
         if (originalReceipt != null && ProcessingYear == originalReceipt.Person.FinancialTo) { showFinancialToOptionsAsSet = false; }
@@ -366,6 +391,7 @@ else
         if (!e.Cancel)
         {
             // Re-query a data item from the store.
+            dbc.ChangeTracker.Clear();
             var dataItem = e.IsNew
                                 ? new Receipt()
                                 : dbc.Receipt.Find(editModel.ID);
@@ -384,6 +410,7 @@ else
                 {
                     await ResetFinancialToDetails(dataItem);
                 }
+                if (dataItem.EmailCashReceipt) { BusinessRule.CreateReceiptSendMailAsync(dbc); }
                 if (await SaveChangesAsync()) await RefreshData();
             }
         }
