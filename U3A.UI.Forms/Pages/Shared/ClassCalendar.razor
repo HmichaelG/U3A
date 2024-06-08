@@ -93,7 +93,7 @@
 
 @code {
     [Parameter]
-    public int DisplayOffset { get; set; }
+    public int DisplayOffset { get; set; } = default;
 
     private List<Term> terms { get; set; }
     private Term? selectedTerm { get; set; }
