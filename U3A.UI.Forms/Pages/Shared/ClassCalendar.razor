@@ -1,0 +1,167 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+
+@if (IsReady)
+{
+    <DxFormLayout>
+        <div class="w-100 d-flex justify-content-center">
+            <DxFormLayoutGroup>
+                <HeaderContentTemplate>
+                    <div class="input-group">
+                        <div class="h5 pt-2 flex-grow-1">Calendar</div>
+                        <DxButton Text="@toggleButtonText" Click="OnToggleButtonClick"
+                                  RenderStyle="ButtonRenderStyle.Primary"
+                                  CssClass="my-2 flex-grow-0" />
+                    </div>
+                </HeaderContentTemplate>
+                <Items>
+                    <div class="w-100 pt-1 d-flex justify-content-center">
+                        <DxCalendar @bind-SelectedDate=@selectedDate CssClass="@CalendarCssClass"
+                                    @bind-SelectedDate:after=OnDateChanged
+                                    ShowClearButton=false
+                                    VisibleDate="@today"
+                                    MinDate="@today">
+                            <DayCellTemplate>
+                                <div class="@GetCssClassNames(context)">@context.Day.ToString()</div>
+                            </DayCellTemplate>
+                        </DxCalendar>
+                    </div>
+
+                    <DxGrid Data="@FilteredEvents" id="listBox" @ref=@grid
+                            KeyFieldName="Id"
+                            ShowAllRows=true
+                            VirtualScrollingEnabled=true
+                            AllowSelectRowByClick=false
+                            AutoExpandAllGroupRows=true
+                            AllowGroup=false
+                            AllowSort=false
+                            PagerVisible=false
+                            CssClass="mt-1 box-style">
+                        <Columns>
+                            <DxGridDataColumn Width="100%"
+                                              FieldName="Start"
+                                              GroupIndex="0" GroupInterval="GridColumnGroupInterval.Date">
+                                <GroupRowTemplate>
+                                    @{
+                                        <div class="pt-2">
+                                            <div class="h6 text-info">@(((DateTime)context.GroupValue).ToString(constants.FULL_DAY_DATE_FORMAT))</div>
+                                        </div>
+                                    }
+                                </GroupRowTemplate>
+                            </DxGridDataColumn>
+                            <DxGridDataColumn Width="100%">
+                                <HeaderCaptionTemplate />
+                                <CellDisplayTemplate>
+                                    @{
+                                        var e = (DxSchedulerAppointmentItem)context.DataItem;
+                                        if (e.AllDay)
+                                        {
+                                            <div>@e.Subject</div>
+                                        }
+                                        else
+                                        {
+                                            if ((int)e.LabelId == 9)    // Cancelled
+                                            {
+                                                <div><strong>Cancelled:</strong> @e.Subject</div>
+                                            }
+                                            else
+                                            {
+                                                <div class="font-weight-bold">@e.Subject</div>
+                                                <div>@e.Start.ToString(constants.SHORT_DAY_AND_TIME_FORMAT) to @e.End.ToShortTimeString()</div>
+                                                <div>@e.Location</div>
+                                            }
+                                        }
+                                    }
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                        </Columns>
+                    </DxGrid>
+                </Items>
+            </DxFormLayoutGroup>
+        </div>
+    </DxFormLayout>
+}
+<style>
+    .box-style {
+        height: calc(100dvh - @($"{DisplayOffset - hiddenCalendarOffset + 28}rem"));
+    }
+
+    .font-weight-bold {
+        font-weight: 800;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int DisplayOffset { get; set; }
+
+    private List<Term> terms { get; set; }
+    private Term? selectedTerm { get; set; }
+    IEnumerable<DxSchedulerAppointmentItem> Events;
+    IEnumerable<DxSchedulerAppointmentItem> FilteredEvents;
+    DateTime today;
+    DateTime selectedDate;
+    bool IsReady;
+    IGrid grid;
+
+    DxButton? toggleButton;
+    string toggleButtonText = "Hide";
+    bool isCalendarVisible = true;
+    string CalendarCssClass;
+    int hiddenCalendarOffset = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        today = selectedDate = TimezoneAdjustment.GetLocalTime().Date;
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+            selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+            if (selectedTerm != null)
+            {
+                var dataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm);
+                var range = new DxSchedulerDateTimeRange(DateTime.Today, new DateTime(selectedTerm.Year,12,31));
+                FilteredEvents = Events = dataStorage.GetAppointments(range);
+            }
+        }
+        IsReady = true;
+    }
+
+    void OnToggleButtonClick()
+    {
+        isCalendarVisible = !isCalendarVisible;
+        if (isCalendarVisible)
+        {
+            toggleButtonText = "Hide";
+            CalendarCssClass = "";
+            hiddenCalendarOffset = 0;
+        }
+        else
+        {
+            toggleButtonText = "Show";
+            CalendarCssClass = "d-none";
+            hiddenCalendarOffset = 17;
+        }
+    }
+
+    void OnDateChanged()
+    {
+        FilteredEvents = Events
+                            .Where(x => x.Start >= selectedDate)
+                            .OrderBy(x => x.Start).ThenBy(x => x.Subject);
+        grid?.MakeRowVisible(0);
+    }
+
+    string GetCssClassNames(DateTime date)
+    {
+        string result = "text-body";
+        if (Events is not null && Events.Any(d => DaysEqual(d.Start, date)))
+            result = "font-weight-bold text-info";
+        return result;
+    }
+
+    bool DaysEqual(DateTime date1, DateTime date2)
+    {
+        return (date1.Year == date2.Year && date1.DayOfYear == date2.DayOfYear);
+    }
+}

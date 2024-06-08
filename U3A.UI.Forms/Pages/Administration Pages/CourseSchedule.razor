@@ -116,12 +116,12 @@ else
 
 @code {
 
-    [Parameter]
-    public bool IsPortal { get; set; }
-    [Parameter]
-    public bool IsPublic { get; set; }
+        [Parameter]
+        public bool IsPortal { get; set; }
+        [Parameter]
+        public bool IsPublic { get; set; }
 
-    bool IsReady;
+        bool IsReady;
     public List<Venue>? AvailableVenues { get; set; }
     public IEnumerable<Venue>? VenuesToFilter { get; set; }
     LocalTime localTime;

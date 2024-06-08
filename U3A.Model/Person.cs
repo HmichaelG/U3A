@@ -89,6 +89,7 @@ namespace U3A.Model
             {
                 string result = FinancialTo.ToString("F0");
                 if (FinancialToTerm != null) { result = $"{result} Term {FinancialToTerm}"; }
+                if (FinancialTo == constants.START_OF_TIME) { result = "Pending";  }
                 return result;
             }
         }
@@ -98,6 +99,7 @@ namespace U3A.Model
             {
                 string result = FinancialTo.ToString();
                 if (FinancialToTerm != null) { result = $"{result}-T{FinancialToTerm}"; }
+                if (FinancialTo == constants.START_OF_TIME) { result = "Pending"; }
                 return result;
             }
         }

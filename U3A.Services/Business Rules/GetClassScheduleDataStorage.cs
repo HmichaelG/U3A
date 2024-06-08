@@ -14,9 +14,9 @@ namespace U3A.BusinessRules
         public static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc,
                     Term selectedTerm, IEnumerable<Venue> VenuesToFilter)
         {
+            var termsInYear = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc, selectedTerm);
             DxSchedulerDataStorage dataStorage = new DxSchedulerDataStorage()
             {
-                AppointmentsSource = await GetScheduleAsync(dbc, selectedTerm, VenuesToFilter),
                 AppointmentMappings = new DxSchedulerAppointmentMappings()
                 {
                     Type = "AppointmentType",
@@ -72,6 +72,13 @@ namespace U3A.BusinessRules
                     TextCssClass = "TextCssClass"
                 }
             };
+            var list = new List<ClassSchedule>();
+            foreach (var t in termsInYear)
+            {
+                list.AddRange(await GetScheduleAsync(dbc, t, VenuesToFilter));
+            }
+            list.AddRange(await GetPublicHolidays(dbc));
+            dataStorage.AppointmentsSource = list;
             // Set any class on a public holiday to LabelID = 9 (Xancellation)
             foreach (var ph in dbc.PublicHoliday.AsNoTracking().ToArray())
             {
@@ -146,9 +153,13 @@ namespace U3A.BusinessRules
                     }
                 }
             }
-            // Public Holidays
+            return list;
+        }
 
-            foreach (var ph in dbc.PublicHoliday.AsNoTracking().ToArray())
+        static async Task<List<ClassSchedule>> GetPublicHolidays(U3ADbContext dbc)
+        {
+            var list = new List<ClassSchedule>();
+            foreach (var ph in (await dbc.PublicHoliday.AsNoTracking().ToArrayAsync()))
             {
                 // Add the holiday as an all-day event
                 list.Add(new ClassSchedule()
@@ -161,7 +172,6 @@ namespace U3A.BusinessRules
             }
             return list;
         }
-
         public static DateTime? GetClassEndDate(Class c, Term selectedTerm)
         {
             DateTime? result = null;
