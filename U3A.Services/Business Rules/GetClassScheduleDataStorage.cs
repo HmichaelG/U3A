@@ -7,12 +7,21 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
+        public static async Task<DxSchedulerDataStorage> GetCalendarDataStorageAsync(U3ADbContext dbc, Term selectedTerm)
+        {
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>(), IsCalendarView: true);
+        }
         public static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc, Term selectedTerm)
         {
-            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>());
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>(), IsCalendarView: false);
         }
         public static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc,
                     Term selectedTerm, IEnumerable<Venue> VenuesToFilter)
+        {
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView: false);
+        }
+        static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc,
+                    Term selectedTerm, IEnumerable<Venue> VenuesToFilter, bool IsCalendarView)
         {
             var termsInYear = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc, selectedTerm);
             DxSchedulerDataStorage dataStorage = new DxSchedulerDataStorage()
@@ -73,9 +82,16 @@ namespace U3A.BusinessRules
                 }
             };
             var list = new List<ClassSchedule>();
-            foreach (var t in termsInYear)
+            if (IsCalendarView)
             {
-                list.AddRange(await GetScheduleAsync(dbc, t, VenuesToFilter));
+                foreach (var t in termsInYear)
+                {
+                    list.AddRange(await GetScheduleAsync(dbc, t, VenuesToFilter,IsCalendarView));
+                }
+            }
+            else
+            {
+                list= await GetScheduleAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView);
             }
             list.AddRange(await GetPublicHolidays(dbc));
             dataStorage.AppointmentsSource = list;
@@ -111,12 +127,20 @@ namespace U3A.BusinessRules
             return dataStorage;
         }
         static async Task<List<ClassSchedule>> GetScheduleAsync(U3ADbContext dbc,
-                        Term selectedTerm, IEnumerable<Venue> VenuesToFilter)
+                        Term selectedTerm, IEnumerable<Venue> VenuesToFilter, bool IsCalendarView)
         {
             List<ClassSchedule> list = new List<ClassSchedule>();
             if (selectedTerm == null) { return list; }
             ClassSchedule schedule;
-            var classes = await BusinessRule.SchedulledClassesWithCourseEnrolmentsAsync(dbc, selectedTerm);
+            List<Class> classes;
+            if (IsCalendarView)
+            {
+                classes = await BusinessRule.SchedulledClassesAsync(dbc, selectedTerm);
+            }
+            else
+            {
+                classes = await BusinessRule.SchedulledClassesWithCourseEnrolmentsAsync(dbc, selectedTerm);
+            }
             foreach (Class c in classes)
             {
                 if (VenuesToFilter.Count() <= 0 || VenuesToFilter.Where(x => x.ID == c.VenueID).Any())
@@ -142,6 +166,7 @@ namespace U3A.BusinessRules
                         {
                             schedule.AppointmentType = 0;
                         }
+                        
                         schedule.Caption = c.Course.Name;
                         schedule.Description = (c.Leader != null) ? c.Leader.FullName : "";
                         schedule.Location = c.Venue.Name;
@@ -417,6 +442,7 @@ namespace U3A.BusinessRules
             if (c.StartDate.HasValue)
             {
                 info.Start = GetDateTime(c.StartDate.Value, c.StartTime);
+                if (info.Start < term.StartDate) {info.Start = GetDateTime(term.StartDate, c.StartTime); }
             }
             else
             {
@@ -446,8 +472,8 @@ namespace U3A.BusinessRules
         static bool isOfferedInTerm(Term selectedTerm, Class c)
         {
             bool result = false;
-            if (c.StartDate.HasValue && c.Recurrence.HasValue && c.Recurrence > 0) result = true;
-            if (OccurrenceType.OnceOnly == (OccurrenceType)c.OccurrenceID) result = true;
+            //if (c.StartDate.HasValue && c.Recurrence.HasValue && c.Recurrence > 0) result = true;
+            //if (OccurrenceType.OnceOnly == (OccurrenceType)c.OccurrenceID) result = true;
             if (c.OfferedTerm1 && selectedTerm.TermNumber == 1) { result = true; }
             if (c.OfferedTerm2 && selectedTerm.TermNumber == 2) { result = true; }
             if (c.OfferedTerm3 && selectedTerm.TermNumber == 3) { result = true; }

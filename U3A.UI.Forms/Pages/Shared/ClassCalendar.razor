@@ -119,7 +119,7 @@
             selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
             if (selectedTerm != null)
             {
-                var dataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm);
+                var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, selectedTerm);
                 var range = new DxSchedulerDateTimeRange(DateTime.Today, new DateTime(selectedTerm.Year,12,31));
                 FilteredEvents = Events = dataStorage.GetAppointments(range);
             }

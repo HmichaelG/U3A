@@ -25,7 +25,11 @@
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
                     @bind-IsActive="@IsXtraLargeLayout" />
 
-@if (isReady)
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
 {
     <div class="webkit-prefix">
         @if ((AppleOSversion?[0] <= 12))

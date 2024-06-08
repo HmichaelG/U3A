@@ -36,6 +36,18 @@ namespace U3A.BusinessRules
                             .Where(x => IsClassInTerm(x, term.TermNumber))
                             .OrderBy(x => x.Course.Name).ThenBy(x => x.StartTime).ToList();
         }
+        public static async Task<List<Class>> SchedulledClassesAsync(U3ADbContext dbc, Term term)
+        {
+            // OccurenceID == 99 is an Unscheduled class
+            var classes = await dbc.Class.AsNoTracking()
+                            .Include(x => x.OnDay)
+                            .Include(x => x.Course)
+                            .Include(x => x.Occurrence)
+                            .Include(x => x.Venue)
+                            .Where(x => x.Course.Year == term.Year && x.OccurrenceID != 999)
+                            .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToListAsync();
+            return classes;
+        }
         public static async Task<List<Class>> SchedulledClassesWithCourseEnrolmentsAsync(U3ADbContext dbc, Term term)
         {
             // OccurenceID == 99 is an Unscheduled class
