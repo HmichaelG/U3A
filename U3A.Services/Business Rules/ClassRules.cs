@@ -44,7 +44,9 @@ namespace U3A.BusinessRules
                             .Include(x => x.Course)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == term.Year && x.OccurrenceID != 999)
+                            .Where(x => x.Course.Year == term.Year 
+                                            && (!x.Course.IsOffScheduleActivity)
+                                            && x.OccurrenceID != 999)
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToListAsync();
             return classes;
         }
