@@ -56,13 +56,13 @@
                                         var e = (DxSchedulerAppointmentItem)context.DataItem;
                                         if (e.AllDay)
                                         {
-                                            <div>@e.Subject</div>
+                                            <div class="font-weight-bold">@e.Subject</div>
                                         }
                                         else
                                         {
                                             if ((int)e.LabelId == 9)    // Cancelled
                                             {
-                                                <div><strong>Cancelled:</strong> @e.Subject</div>
+                                                <div class="text-muted text-decoration-line-through">@e.Subject</div>
                                             }
                                             else
                                             {
@@ -107,7 +107,7 @@
     DxButton? toggleButton;
     string toggleButtonText = "Hide";
     bool isCalendarVisible = true;
-    string CalendarCssClass;
+    string CalendarCssClass ="w-100";
     int hiddenCalendarOffset = 0;
 
     protected override async Task OnInitializedAsync()
@@ -133,7 +133,7 @@
         if (isCalendarVisible)
         {
             toggleButtonText = "Hide";
-            CalendarCssClass = "";
+            CalendarCssClass = "w-100";
             hiddenCalendarOffset = 0;
         }
         else

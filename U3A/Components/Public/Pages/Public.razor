@@ -90,8 +90,8 @@ else
                         <ErrorBoundary>
                             <ChildContent>
                                 <DxFormLayout>
-                                    <div class="row">
-                                        <div class="col-11 col-md-6 col-xl-7 mx-auto">
+                                    <div class="row mx-auto remainder-style">
+                                        <div class="">
                                             <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                                             <DxFormLayoutGroup Caption="Display the Class Schedule" ColSpanMd="12" CaptionCssClass="text-primary">
                                                 <div class="w-100 px-2 mt-2">
@@ -155,23 +155,21 @@ else
                                             <div class="row">
                                                 <DxButton Text="Return to website"
                                                           IconCssClass="bi bi-globe-asia-australia menu-icon me-3 h2"
-                                                          CssClass="col-6 mx-auto mt-4"
+                                                          CssClass="col-6 mx-auto mt-2"
                                                           Click="@OnClose"
                                                           RenderStyle="ButtonRenderStyle.Primary"
                                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                                 </DxButton>
-                                                <footer class="footer mt-2 text-muted">
+                                                <footer class="footer my-2 text-muted">
                                                     <div align="center">
                                                         &copy; @(DateTime.Today.Year) - Visit: <a href="https://u3admin.org.au">U3Admin.org.au</a>
                                                     </div>
                                                 </footer>
                                             </div>
                                         </div>
-
-                                        <div class="d-none d-md-inline-block col-md-6 col-xl-4">
-                                            <ClassCalendar />
-                                        </div>
-
+                                    </div>
+                                    <div class="d-none d-md-inline-block calendar-style">
+                                        <ClassCalendar />
                                     </div>
                                 </DxFormLayout>
                             </ChildContent>
@@ -200,6 +198,17 @@ else
     .box-height {
         height: @((IsXtraSmallLayout || IsSmallLayout) ? "" : "10rem");
     }
+
+    .calendar-style {
+        width: 20rem;
+    }
+
+    .remainder-style {
+        width: calc(100% - 20rem);
+        min-width: @((IsXtraSmallLayout || IsSmallLayout) ? "95%" : "") !important;
+        max-width: @((!IsXtraSmallLayout && !IsSmallLayout) ? "50rem" : "") !important;
+    }
+
 </style>
 
 @code {
