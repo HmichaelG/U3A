@@ -90,7 +90,7 @@ else
                         <ErrorBoundary>
                             <ChildContent>
                                 <DxFormLayout>
-                                    <div class="row mx-auto remainder-style">
+                                    <div class="row mx-auto form-style">
                                         <div class="">
                                             <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                                             <DxFormLayoutGroup Caption="Display the Class Schedule" ColSpanMd="12" CaptionCssClass="text-primary">
@@ -196,17 +196,17 @@ else
 }
 <style>
     .box-height {
-        height: @((IsXtraSmallLayout || IsSmallLayout) ? "" : "10rem");
+        height: @((IsXtraSmallLayout || IsSmallLayout) ? "" : (IsLargeLayout || IsXtraLargeLayout) ? "5rem" : "10rem");
     }
 
     .calendar-style {
         width: 20rem;
     }
 
-    .remainder-style {
+    .form-style {
         width: calc(100% - 20rem);
-        min-width: @((IsXtraSmallLayout || IsSmallLayout) ? "95%" : "") !important;
-        max-width: @((!IsXtraSmallLayout && !IsSmallLayout) ? "50rem" : "") !important;
+        min-width: @((IsXtraSmallLayout || IsSmallLayout) ? "95%" : "");
+        max-width: @((!IsXtraSmallLayout && !IsSmallLayout) ? "50rem" : "");
     }
 
 </style>

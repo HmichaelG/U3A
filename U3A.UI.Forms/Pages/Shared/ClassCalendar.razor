@@ -8,10 +8,10 @@
             <DxFormLayoutGroup>
                 <HeaderContentTemplate>
                     <div class="input-group">
-                        <div class="h5 pt-2 flex-grow-1">Calendar</div>
+                        <div class="h6 pt-2 flex-grow-1">Calendar</div>
                         <DxButton Text="@toggleButtonText" Click="OnToggleButtonClick"
                                   RenderStyle="ButtonRenderStyle.Primary"
-                                  CssClass="my-2 flex-grow-0" />
+                                  CssClass="my-1 flex-grow-0" />
                     </div>
                 </HeaderContentTemplate>
                 <Items>
@@ -142,6 +142,7 @@
             CalendarCssClass = "d-none";
             hiddenCalendarOffset = 17;
         }
+        grid?.MakeRowVisible(0);
     }
 
     void OnDateChanged()
