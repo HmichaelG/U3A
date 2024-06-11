@@ -3,15 +3,20 @@
 
 <Progress @ref=@progress />
 <DxToolbar CssClass="my-1">
+    <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
+                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                   Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
+                   IconCssClass="bi bi-filetype-png menu-icon" />
     <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
                    Alignment="ToolbarItemAlignment.Right"
                    IconCssClass="bi bi-database menu-icon" />
 </DxToolbar>
-<DxFormLayout CssClass="control-height">
-    <DxFormLayoutGroup Caption="Attendance Summary" ColSpanMd="9" CssClass="control-height">
+<DxFormLayout>
+    <DxFormLayoutGroup Caption=@title ColSpanMd="9" CssClass="control-height">
         <DxChart T="AttendClassSummaryByWeek" CssClass="control-height"
-                 Data="@ChartsData" id="myChart"
+                 Data="@ChartsData" id="myChart" @ref=@chart
                  Width="100%">
+            <DxChartTitle Text=@title />
             <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
                                          TArgument="DateTime"
                                          TValue="int"
@@ -74,7 +79,7 @@
 
 <style>
     .control-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14em"));
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14rem"));
     }
 </style>
 
@@ -82,6 +87,9 @@
 @code {
     List<AttendClassSummaryByWeek> ChartsData;
     Progress? progress;
+    DxChart chart;
+    string title = "Attendance Summary";
+
 
     async Task OnProcess()
     {

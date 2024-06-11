@@ -10,15 +10,20 @@
             </DxFormLayoutItem>
         </Template>
     </DxToolbarItem>
+    <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
+                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                   Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
+                   IconCssClass="bi bi-filetype-png menu-icon" />
     <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
                    Alignment="ToolbarItemAlignment.Right"
                    IconCssClass="bi bi-database menu-icon" />
 </DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutGroup Caption="New Member Summary" ColSpanLg="9" CssClass="controlHeight">
-        <DxChart Data="memberData" Id="newMemberChart"
-                 Width="100%" CssClass="controlHeight"
+    <DxFormLayoutGroup Caption=@title ColSpanLg="9" CssClass="controlHeight">
+        <DxChart Data="memberData" Id="newMemberChart" @ref=@chart 
+                 Width="100%" CssClass="controlHeight"                 
                  LabelOverlap="ChartLabelOverlap.Hide">
+            <DxChartTitle Text=@title />
             <DxChartStackedBarSeries Name="Male"
                                      Stack="true"
                                      Color="System.Drawing.Color.Blue"
@@ -100,6 +105,8 @@
     IEnumerable<MemberSummary> memberData;
     Progress? progress;
     int chartBreaks = 0;
+    DxChart chart;
+    string title = "New Member Summary";
 
     async Task OnProcess()
     {

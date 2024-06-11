@@ -13,15 +13,20 @@
             </DxFormLayoutItem>
         </Template>
     </DxToolbarItem>
+    <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
+                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                   Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
+                   IconCssClass="bi bi-filetype-png menu-icon" />
     <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
                    Alignment="ToolbarItemAlignment.Right"
                    IconCssClass="bi bi-database menu-icon" />
 </DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutGroup Caption="Enrolment Request Summary" ColSpanLg="9" CssClass="controlHeight">
-        <DxChart Data="enrolmentData" Id="enrolChart"
+    <DxFormLayoutGroup Caption=@title ColSpanLg="9" CssClass="controlHeight">
+        <DxChart Data="enrolmentData" Id="enrolChart" @ref=@chart
                  Width="100%" CssClass="controlHeight"
                  LabelOverlap="ChartLabelOverlap.Hide">
+            <DxChartTitle Text=@title />
             @if (enrolmentData != null)
             {
                 foreach (var cType in enrolmentData.Select(x => x.CourseType).Distinct())
@@ -87,6 +92,8 @@
     IEnumerable<EnrolmentSummary>? enrolmentData;
     Progress? progress;
     int chartBreaks = 0;
+    DxChart chart;
+    string title = "Enrolment Request Summary";
 
     async Task OnProcess()
     {

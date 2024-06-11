@@ -1,13 +1,19 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @using System.Drawing
 
-    <div class="row">
-        <DxPieChart Data="@memberData" CssClass="col-lg-4"
+<DxToolbar CssClass="my-1 d-print-none">
+    <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
+                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                   Click=@(async () => await ExportCharts())
+                   IconCssClass="bi bi-filetype-png menu-icon" />
+</DxToolbar>
+<div class="row">
+        <DxPieChart Data="@memberData" CssClass="col-lg-4" @ref=@chartMemberSummary
                     InnerDiameter="0.5"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     CustomizeSeriesPoint="CustomizeGenderSeriesPoint"
                     T="MemberSummary">
-            <DxChartTitle Text="Members" />
+            <DxChartTitle Text=@titleMembersByGender />
             <DxPieChartSeries T="MemberSummary"
                               TArgument="string"
                               TValue="int"
@@ -35,7 +41,7 @@
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
 
-        <DxChart Data="attritionData" CssClass="col-lg-4"
+        <DxChart Data="attritionData" CssClass="col-lg-4" @ref=@chartNetGainOrLoss
                  T="MemberSummary"
                  CustomizeSeriesPoint="CustomizeAttritionSeriesPoint"
                  LabelOverlap="ChartLabelOverlap.Hide">
@@ -62,12 +68,12 @@
             </DxChartTooltip>
         </DxChart>
 
-        <DxPieChart Data="@membershipLengthData" CssClass="col-lg-4"
+        <DxPieChart Data="@membershipLengthData" CssClass="col-lg-4" @ref=@chartLengthOfMship
                     InnerDiameter="0.5"
                     Palette="@memberLengthTheme"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     T="MemberSummary">
-            <DxChartTitle Text="Length of Membership" />
+            <DxChartTitle Text=@titleLengthOfMship />
             <DxPieChartSeries T="MemberSummary"
                               TArgument="string"
                               TValue="int"
@@ -96,7 +102,7 @@
         </DxPieChart>
     </div>
     <div class="row mt-2">
-        <DxPieChart Data="@enrolmentData" CssClass="col-lg-4"
+        <DxPieChart Data="@enrolmentData" CssClass="col-lg-4" @ref=@chartEnrolments
                     InnerDiameter="0.5"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     Palette="@enrolmentTheme"
@@ -129,7 +135,7 @@
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
 
-        <DxPieChart Data="@waitlistData" CssClass="col-lg-4"
+        <DxPieChart Data="@waitlistData" CssClass="col-lg-4" @ref=@chartWiatlist
                     InnerDiameter="0.5"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     Palette="@waitlistTheme"
@@ -161,12 +167,12 @@
                            Position="RelativePosition.Outside"
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
-    <DxPieChart Data="@membershipDOBData" CssClass="col-lg-4"
+    <DxPieChart Data="@membershipDOBData" CssClass="col-lg-4" @ref=@chartMemberAge
                 InnerDiameter="0.5"
                 Palette="@memberLengthTheme"
                 LabelOverlap="PieChartLabelOverlap.Hide"
                 T="MemberSummary">
-        <DxChartTitle Text="Age of Membership" />
+        <DxChartTitle Text=@titleMembersAge />
         <DxPieChartSeries T="MemberSummary"
                           TArgument="string"
                           TValue="int"
@@ -203,6 +209,18 @@
     IEnumerable<MemberSummary> waitlistData;
     IEnumerable<MemberSummary> attritionData;
     Term? term;
+    DxPieChart<MemberSummary> chartMemberSummary;
+    string titleMembersByGender = "Member By Gender";
+    DxPieChart<MemberSummary> chartLengthOfMship;
+    string titleMembersAge = "Member Age Summary";
+    DxPieChart<MemberSummary> chartMemberAge;
+    string titleLengthOfMship = "Length of Membership";
+    DxPieChart<MemberSummary> chartWiatlist;
+    string titleWaitlist = "Waitlist Summary";
+    DxPieChart<MemberSummary> chartEnrolments;
+    string titleEnrolments = "Enrolment Summary";
+    DxChart<MemberSummary> chartNetGainOrLoss;
+    string titleNetGainOrLoss = "Net Gain Or Loss";
 
     protected override async Task OnInitializedAsync()
     {
@@ -220,6 +238,17 @@
             }
         }
         await base.OnInitializedAsync();
+    }
+
+    async Task ExportCharts()
+    {
+        await chartMemberSummary.ExportAsync(titleMembersByGender, ChartExportFormat.Png);
+        await chartLengthOfMship.ExportAsync(titleLengthOfMship, ChartExportFormat.Png);
+        await chartNetGainOrLoss.ExportAsync(titleNetGainOrLoss, ChartExportFormat.Png);
+
+        await chartEnrolments.ExportAsync(titleEnrolments, ChartExportFormat.Png);
+        await chartWiatlist.ExportAsync(titleWaitlist, ChartExportFormat.Png);
+        await chartMemberAge.ExportAsync(titleMembersAge, ChartExportFormat.Png);
     }
 
     private void CustomizeGenderSeriesPoint(ChartSeriesPointCustomizationSettings settings)
