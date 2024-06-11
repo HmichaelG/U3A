@@ -81,7 +81,11 @@
                                 </CellDisplayTemplate>
                             </DxGridDataColumn>
                             <DxGridDataColumn Caption="Display Name" FieldName="Name" />
-                            <DxGridDataColumn Caption="Website" FieldName="Website" />
+                            <DxGridDataColumn Caption="Website" >
+                                <CellDisplayTemplate>
+                                    <a href="@(((TenantInfo)context.DataItem).Website)" >Website</a>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
                             <DxGridDataColumn Caption="Multi-Campus?" FieldName="EnableMultiCampusExtension" />
                             <DxGridDataColumn Caption="EWAY Enabled" FieldName="EwayEnabled"
                                               UnboundType=GridUnboundColumnType.Boolean
@@ -91,6 +95,8 @@
                                               UnboundExpression="[UsePostmarkTestEnviroment] = 0 && [PostmarkAPIKey] != null" />
                             <DxGridDataColumn Caption="Postmark Sandbox" FieldName="IsUsingPostmarkSandbox"
                                               UnboundType=GridUnboundColumnType.Boolean  />
+                            <DxGridDataColumn Caption="T1 Enrol Start" FieldName="Term1EnrolStart"
+                                              UnboundType=GridUnboundColumnType.Integer Width="8rem" />
                             <DxGridDataColumn Caption=@($"Financial To {DateTime.Today.Year}") FieldName="FinancialMembers"
                                               UnboundType=GridUnboundColumnType.Integer Width="8rem" />
                             <DxGridDataColumn Caption="Email Sent" FieldName="EmailStatistics" Visible="@showPostmark"
@@ -130,6 +136,7 @@
     DateTime startDate = DateTime.Today.AddMonths((-DateTime.Today.Month) + 1).AddDays((-DateTime.Today.Day) + 1);
     DateTime endDate = DateTime.Today;
     DxGrid? grid;
+    Dictionary<string, DateTime?> Term1EnrolmentStart { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -148,6 +155,14 @@
                 {
                     var finMembers = dbc.Person.Count(x => x.FinancialTo >= DateTime.Today.Year);
                     financialMembers.Add(tenant.Id!, finMembers);
+                    var lastTerm1 = await dbc.Term.OrderByDescending(x => x.Year)
+                                            .ThenBy(x => x.TermNumber).FirstOrDefaultAsync();
+
+                    if (lastTerm1 is not null) 
+                    { 
+                        Term1EnrolmentStart.Add(tenant.Id!, lastTerm1.EnrolmentStartDate); 
+                    }
+                    else Term1EnrolmentStart.Add(tenant.Id!, null);
                 }
                 catch (Exception e) { }
             }
@@ -166,6 +181,11 @@
         {
             PostmarkOutboundOverviewStats? result = default;
             if (EmailStats.TryGetValue(tenant.Id!, out result)) e.Value = result.Sent;
+        }
+        if (e.FieldName == "Term1EnrolStart")
+        {
+            DateTime? result = default;
+            if (Term1EnrolmentStart.TryGetValue(tenant.Id!, out result)) e.Value = result;
         }
 
     }
