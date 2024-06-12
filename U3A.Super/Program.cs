@@ -55,6 +55,7 @@ builder.Services.AddServerSideBlazor()
 builder.Services.AddScoped<DefaultAzureCredential>();
 
 var app = builder.Build();
+app.UseRequestLocalization("en-AU");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
