@@ -11,12 +11,12 @@
         </Template>
     </DxToolbarItem>
     <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
-                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1 my-2"
                    Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
-                   IconCssClass="bi bi-filetype-png menu-icon" />
+                   IconCssClass="bi bi-filetype-png" />
     <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
-                   Alignment="ToolbarItemAlignment.Right"
-                   IconCssClass="bi bi-database menu-icon" />
+                   Alignment="ToolbarItemAlignment.Right" CssClass="my-2"
+                   IconCssClass="bi bi-database" />
 </DxToolbar>
 <DxFormLayout>
     <DxFormLayoutGroup Caption=@title ColSpanLg="9" CssClass="controlHeight">

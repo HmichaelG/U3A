@@ -1,12 +1,40 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @using System.Drawing
 
-<DxToolbar CssClass="my-1 d-print-none">
-    <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
-                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                   Click=@(async () => await ExportCharts())
-                   IconCssClass="bi bi-filetype-png menu-icon" />
-</DxToolbar>
+@if (IsReady)
+{
+    <DxToolbar CssClass="my-1 d-print-none" SizeMode="SizeMode.Small">
+        <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
+                       Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                       IconCssClass="bi bi-filetype-png">
+            <Items>
+                <DxToolbarItem Text=@($"Export {titleMembersByGender}")
+                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                               Click=@(async () => await chartMemberSummary.ExportAsync(titleMembersByGender,ChartExportFormat.Png,100))
+                               IconCssClass="bi bi-filetype-png" />
+                <DxToolbarItem Text=@($"Export {titleNetGainOrLoss}")
+                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                               Click=@(async () => await chartNetGainOrLoss.ExportAsync(titleNetGainOrLoss,ChartExportFormat.Png,150))
+                               IconCssClass="bi bi-filetype-png" />
+                <DxToolbarItem Text=@($"Export {titleLengthOfMship}")
+                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                               Click=@(async () => await chartLengthOfMship.ExportAsync(titleLengthOfMship,ChartExportFormat.Png,100))
+                               IconCssClass="bi bi-filetype-png" />
+                <DxToolbarItem Text=@($"Export {titleEnrolments}")
+                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                               Click=@(async () => await chartEnrolments.ExportAsync(titleEnrolments,ChartExportFormat.Png,100))
+                               IconCssClass="bi bi-filetype-png" />
+                <DxToolbarItem Text=@($"Export {titleWaitlist}")
+                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                               Click=@(async () => await chartWiatlist.ExportAsync(titleWaitlist,ChartExportFormat.Png,100))
+                               IconCssClass="bi bi-filetype-png" />
+                <DxToolbarItem Text=@($"Export {titleMembersAge}")
+                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                               Click=@(async () => await chartMemberAge.ExportAsync(titleMembersAge,ChartExportFormat.Png,100))
+                               IconCssClass="bi bi-filetype-png" />
+            </Items>
+        </DxToolbarItem>
+    </DxToolbar>
 <div class="row">
         <DxPieChart Data="@memberData" CssClass="col-lg-4" @ref=@chartMemberSummary
                     InnerDiameter="0.5"
@@ -22,7 +50,7 @@
                               SummaryMethod="Enumerable.Sum">
                 <DxChartSeriesLabel Visible="true"
                                     Position="RelativePosition.Inside"
-                                    Format='ChartElementFormat.FromLdmlString("#0")' />
+                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
             </DxPieChartSeries>
             <DxChartTooltip Enabled="true"
                             Position="RelativePosition.Outside">
@@ -82,7 +110,7 @@
                               SummaryMethod="Enumerable.Sum">
                 <DxChartSeriesLabel Visible="true"
                                     Position="RelativePosition.Inside"
-                                    Format='ChartElementFormat.FromLdmlString("#0")' />
+                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
             </DxPieChartSeries>
             <DxChartTooltip Enabled="true"
                             Position="RelativePosition.Outside">
@@ -116,7 +144,7 @@
                               SummaryMethod="Enumerable.Sum">
                 <DxChartSeriesLabel Visible="true"
                                     Position="RelativePosition.Inside"
-                                    Format='ChartElementFormat.FromLdmlString("#0")' />
+                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
             </DxPieChartSeries>
             <DxChartTooltip Enabled="true"
                             Position="RelativePosition.Inside">
@@ -149,7 +177,7 @@
                               SummaryMethod="Enumerable.Sum">
                 <DxChartSeriesLabel Visible="true"
                                     Position="RelativePosition.Inside"
-                                    Format='ChartElementFormat.FromLdmlString("#0")' />
+                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
             </DxPieChartSeries>
             <DxChartTooltip Enabled="true"
                             Position="RelativePosition.Outside">
@@ -168,38 +196,40 @@
                            Orientation="Orientation.Vertical" />
         </DxPieChart>
     <DxPieChart Data="@membershipDOBData" CssClass="col-lg-4" @ref=@chartMemberAge
-                InnerDiameter="0.5"
-                Palette="@memberLengthTheme"
-                LabelOverlap="PieChartLabelOverlap.Hide"
-                T="MemberSummary">
-        <DxChartTitle Text=@titleMembersAge />
-        <DxPieChartSeries T="MemberSummary"
-                          TArgument="string"
-                          TValue="int"
-                          ValueField="si => si.Count"
-                          ArgumentField="si => si.Group"
-                          SummaryMethod="Enumerable.Sum">
-            <DxChartSeriesLabel Visible="true"
-                                Position="RelativePosition.Inside"
-                                Format='ChartElementFormat.FromLdmlString("#0")' />
-        </DxPieChartSeries>
-        <DxChartTooltip Enabled="true"
-                        Position="RelativePosition.Outside">
-            <div style="margin: 0.75rem">
-                <div class="fw-bold">@context.Point.Argument</div>
-                <div>
-                    @(
-                        $"{context.Point.Value:#,0.}"
-                        )
+                    InnerDiameter="0.5"
+                    Palette="@memberLengthTheme"
+                    LabelOverlap="PieChartLabelOverlap.Hide"
+                    T="MemberSummary">
+            <DxChartTitle Text=@titleMembersAge />
+            <DxPieChartSeries T="MemberSummary"
+                              TArgument="string"
+                              TValue="int"
+                              ValueField="si => si.Count"
+                              ArgumentField="si => si.Group"
+                              SummaryMethod="Enumerable.Sum">
+                <DxChartSeriesLabel Visible="true"
+                                    Position="RelativePosition.Inside"
+                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
+            </DxPieChartSeries>
+            <DxChartTooltip Enabled="true"
+                            Position="RelativePosition.Outside">
+                <div style="margin: 0.75rem">
+                    <div class="fw-bold">@context.Point.Argument</div>
+                    <div>
+                        @(
+                            $"{context.Point.Value:#,0.}"
+                            )
+                    </div>
                 </div>
-            </div>
-        </DxChartTooltip>
-        <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
-                       VerticalAlignment="VerticalEdge.Top"
-                       Position="RelativePosition.Outside"
-                       Orientation="Orientation.Vertical" />
-    </DxPieChart>
+            </DxChartTooltip>
+            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                           VerticalAlignment="VerticalEdge.Top"
+                           Position="RelativePosition.Outside"
+                           Orientation="Orientation.Vertical" />
+        </DxPieChart>
     </div>
+}
+
 
 @code {
     IEnumerable<MemberSummary> memberData;
@@ -221,6 +251,7 @@
     string titleEnrolments = "Enrolment Summary";
     DxChart<MemberSummary> chartNetGainOrLoss;
     string titleNetGainOrLoss = "Net Gain Or Loss";
+    bool IsReady;
 
     protected override async Task OnInitializedAsync()
     {
@@ -237,18 +268,7 @@
                 membershipDOBData = BusinessRule.GetMemberSummaryByDOB(dbc, term);
             }
         }
-        await base.OnInitializedAsync();
-    }
-
-    async Task ExportCharts()
-    {
-        await chartMemberSummary.ExportAsync(titleMembersByGender, ChartExportFormat.Png);
-        await chartLengthOfMship.ExportAsync(titleLengthOfMship, ChartExportFormat.Png);
-        await chartNetGainOrLoss.ExportAsync(titleNetGainOrLoss, ChartExportFormat.Png);
-
-        await chartEnrolments.ExportAsync(titleEnrolments, ChartExportFormat.Png);
-        await chartWiatlist.ExportAsync(titleWaitlist, ChartExportFormat.Png);
-        await chartMemberAge.ExportAsync(titleMembersAge, ChartExportFormat.Png);
+        IsReady = true;
     }
 
     private void CustomizeGenderSeriesPoint(ChartSeriesPointCustomizationSettings settings)
