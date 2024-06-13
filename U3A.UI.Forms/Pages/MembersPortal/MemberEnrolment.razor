@@ -81,8 +81,6 @@ else
                 AllowGroup=false
                 AllowSort=false
                 PagerVisible=false
-                SelectionMode="GridSelectionMode.Multiple"
-                SelectedDataItemChanged="SelectedDataItemChanged"
                 CssClass="mt-1 listbox-scroll">
             <Columns>
                 <DxGridDataColumn Width="100%">
@@ -92,6 +90,7 @@ else
                             {
                                 <div class="flex-grow-1" />
                                 <DxButton @ref=@listboxViewButton Text="@ListboxViewButtonText"
+                                          SizeMode="SizeMode.Small"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           Click="ToggleListboxViewButton" CssClass="flex-grow-0" />
                             }
@@ -104,16 +103,22 @@ else
                             @if (reportStyle == ReportStyle.Brief && !isListboxShowingSummary)
                             {
                                 <div class="mx-1 d-flex">
-                                    <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
+                                    <div class="flex-grow-1 @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
                                         @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
                                         <span>
-                                            @((!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                            ? $" | {c.Course.OfferedBy}" : ""))
+                                            @(
+                                            (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                            ? $" | {c.Course.OfferedBy}" : "")
+                                                )
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
                                     {
-                                        <DxCheckBox Checked="@c.IsSelected" ReadOnly=true />
+                                        <DxButton Text="@GetBriefStatus(c)" CssClass="flex-grow-0"
+                                                  SizeMode="SizeMode.Small"
+                                                  IconCssClass="@($"bi {selectButtonIcon}")"
+                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                  Click="@(async () => await SelectedDataItemChanged(c))" />
                                     }
                                 </div>
                             }
@@ -126,18 +131,16 @@ else
                                                 <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
                                                     @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
                                                 </div>
-                                                @if (IsEnrolmentRequestView)
-                                                {
-                                                    <DxCheckBox Checked="c.IsSelected" ReadOnly=true />
-                                                }
                                             </div>
                                         </CaptionTemplate>
                                         <Items>
-
-                                            <div class="row px-2 px-md-3 col-12">
-                                                <div class="text-info col-12 text-center h6">@GetStatus(@c)</div>
+                                            <div class="mt-2 d-flex justify-content-center w-100">
+                                                <DxButton Text="@GetStatus(c)"
+                                                          SizeMode="SizeMode.Large"
+                                                          IconCssClass="@($"bi {selectButtonIcon}")"
+                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                          Click="@(async () => await SelectedDataItemChanged(c))" />
                                             </div>
-
                                             @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                             {
                                                 <div class="row px-2 px-md-3 col-12">
@@ -481,6 +484,7 @@ else
     SystemSettings settings;
     DateTime today;
     MarkupString? enrolmentLockoutText;
+    string selectButtonIcon;
 
     // Search filter function
     string? _filterText = null;
@@ -777,6 +781,12 @@ else
         return result;
     }
 
+    string GetBriefStatus(Class context)
+    {
+        var status = GetStatus(context);
+        return (status.ToLower().Contains("select")) ? "Select" : "Withdraw";
+    }
+
     string GetStatus(Class context)
     {
         var result = string.Empty;
@@ -788,10 +798,12 @@ else
             {
                 (result, classEndDate) = getEnrolmentStatus(context);
                 result = $"{result} - Click to withdraw";
+                selectButtonIcon = "bi-x-circle";
             }
             else
             {
                 result = "Click to select";
+                selectButtonIcon = "bi-check-circle";
             }
         }
         else
@@ -804,6 +816,7 @@ else
             && classEndDate?.Date >= today)
             {
                 result += " - Click to withdraw";
+                selectButtonIcon = "bi-x-circle";
             }
         }
         return result;
@@ -943,12 +956,18 @@ else
         }
     }
 
-    async Task SelectedDataItemChanged(object value)
+    async Task<bool> SelectedDataItemChanged(bool IsSelected, Class selectedClass)
     {
-        if (value == null) { return; }
+        selectedClass.IsSelected = IsSelected;
+        await SelectedClassChanged(selectedClass);
+        return selectedClass.IsSelected;
+    }
+
+    async Task SelectedDataItemChanged(Class selectedClass)
+    {
+        if (selectedClass == null) { return; }
         if (showingWebLink) { return; }
         if (IsReadOnly || IsPreview) { return; }
-        selectedClass = (Class)value;
         SelectedClassChanged(selectedClass);
     }
 
