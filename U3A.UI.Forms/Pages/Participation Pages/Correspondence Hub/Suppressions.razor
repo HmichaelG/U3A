@@ -21,13 +21,15 @@ else
 {
     <div class="px-2">
         <h4>Suppressions</h4>
-        <CollapsableContent AlertText=@($@"A <strong>suppression</strong> is created when a participant unsubscribes, or an address hard bounces.<br/>
+        <CollapsableContent DismissKey="{A97A94BF-577E-4F4C-A6D9-1762DEB15A78}"
+                        AlertText=@($@"<p>A <strong>suppression</strong> is created when a participant unsubscribes, or an address hard bounces.<br/>
                         They are an essential part of maintaining good email reputation.<br/>
                         You may delete a suppression once you are sure...<br/>
-                        the email address is valid, or the unsubscribe was accidental, the address is no longer associated with a participant, or the participant is unfinancial.")
+                        the email address is valid, or the unsubscribe was accidental, the address is no longer associated with a participant, or the participant is unfinancial.</p>")
+                            OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
                             OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
-        <FullScreen @ref=@fullScreen DisplayOffset="16">
+        <FullScreen @ref=@fullScreen DisplayOffset="@contentSize">
             <ContentTemplate>
                 <DxGrid Data=@suppressions @ref=@mainGrid
                         @bind-SelectedDataItems="@SelectedDataItems">
@@ -62,6 +64,7 @@ else
 }
 
 @code {
+    int contentSize;
     bool IsReady;
     IEnumerable<EmailSuppression> suppressions { get; set; }
     IReadOnlyList<object>? SelectedDataItems { get; set; }
@@ -98,6 +101,12 @@ else
             IsReady = true;
             StateHasChanged();
         }
+    }
+
+    void OnContentChange(bool IsDismissed)
+    {
+        contentSize = (IsDismissed) ? 8 : 20;
+        StateHasChanged();
     }
 
     async Task OnReset()

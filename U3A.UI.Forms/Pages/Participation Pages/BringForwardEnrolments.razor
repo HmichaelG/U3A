@@ -15,8 +15,9 @@ else
 {
 
     <div class="container-md py-2">
-        <CollapsableContent AlertText=@($@"<strong>Bring Forward Enrolments</strong> is now an automated procedure.<br />
-                      The next expected run date is on or before: {automationMsg}.")
+        <CollapsableContent DismissKey="{63BDF361-E40E-4B15-9A12-736AAF535B74}"
+                        AlertText=@($@"<p><strong>Bring Forward Enrolments</strong> is now an automated procedure.<br />
+                      The next expected run date is on or before: {automationMsg}.</p>")
                           OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
         <div class="row">
             <div class="col col-md-2" />

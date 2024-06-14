@@ -28,8 +28,8 @@ else
             <div class="text-center alert alert-success text-dark w-100">
                 <div class="w-100">@welcomeText</div>
                 <DxButton Text="Today's Schedule" Click="@SetupClassesToday"
-                   RenderStyle="ButtonRenderStyle.Success" IconCssClass="bi bi-alarm"
-                    Visible=@(classText == null)  />
+                          RenderStyle="ButtonRenderStyle.Success" IconCssClass="bi bi-alarm"
+                          Visible=@(classText == null) />
                 <div class="w-100">@classText</div>
             </div>
             <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
@@ -43,6 +43,12 @@ else
                         </div>
                         <DxAccordionItem Text="Manage your course enrolments">
                             <ContentTemplate>
+                                <CollapsableContent DismissKey="{E76BA7CB-4922-441F-A4E6-A51FDEA0A710}"
+                                                    AlertText=@(@"<h6>What's New</h6>
+                                                        <p>To prevent accidental selection, you must now click the <strong>Click to select</strong> or <strong>Click to withraw</strong> button
+                                                        to enrol/withdraw from a class.</p>")
+                                                    OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+
                                 <DxButton Text="Request course enrolments" Context="ThisContext"
                                           IconCssClass="bi-mortarboard menu-icon me-3 h2"
                                           CssClass="col-12 mt-1"

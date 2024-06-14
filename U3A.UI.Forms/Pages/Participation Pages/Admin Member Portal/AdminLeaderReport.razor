@@ -32,8 +32,9 @@ else
     {
         <div class="p-2">
             <h3>Print Leader Report</h3>
-            <CollapsableContent AlertText=@(@"Creating a PDF report places a heavy burden on the server.<br />
-                        Please be a good digital citizen and use judiciously.")
+            <CollapsableContent DismissKey="{674F95B8-8507-40BB-9813-C7253886F15D}"
+                AlertText=@(@"<p>Creating a PDF report places a heavy burden on the server.<br />
+                        Please be a good digital citizen and use judiciously.</p>")
                                 OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
 
             <DxFormLayout>

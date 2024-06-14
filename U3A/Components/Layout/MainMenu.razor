@@ -16,7 +16,7 @@
 
 
 @{
-
+    <MessageBox @ref=@messageBox />
     <div class="@((IsTopMenu)
                 ? "card shadow-sm w-100"
                 : "sidebar")">
@@ -188,6 +188,8 @@
                                     <DxMenuItem BeginGroup=true
                                                 Text="Switch Menu Position"
                                                 Click="OnSwitchMenu" />
+                                    <DxMenuItem Text="Reset Factory Defaults"
+                                                Click="OnResetDefaults" />
                                 </Items>
                             </DxMenuItem>
                             <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")" IconCssClass="bi bi-shield" NavigateUrl="SecurityIntroduction">
@@ -324,10 +326,21 @@
         }
         await localStorage.SetItemAsync<bool>(key, useTopMenu);
         navMan.NavigateTo("/", true);
-
     }
 
-    async void OnChangeCredential(string page)
+    async Task OnResetDefaults()
+    {
+        if (await messageBox!.ShowAsync("Reset Factory Defaults",
+                        @"<p>This procedure will reset your application to factory defaults
+                        by deleting all customisations stored on your local device.</p>
+                        <p>Do you wish to continue?</p>"))
+        {
+            await localStorage.ClearAsync();
+            navMan.NavigateTo("/", true);
+        }
+    }
+
+    void OnChangeCredential(string page)
     {
         navMan.NavigateTo("Account/Manage/" + page, true);
     }

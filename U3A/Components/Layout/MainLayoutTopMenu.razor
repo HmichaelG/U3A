@@ -77,6 +77,10 @@
                     </ChildContent>
                     <ErrorContent>
                         <p class="u3admin-error-boundary mt-5">
+                            @if (constants.IS_DEVELOPMENT)
+                            {
+                                <div class="w-50">@context.ToString()</div>
+                            }
                             Oops! Something went wrong. An unexpected error has occurred.<br />
                             When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(TimezoneAdjustment.GetLocalTime()) Local ).
                             <button class="btn btn-warning" @onclick="ResetError">Reset</button>

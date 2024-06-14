@@ -17,10 +17,11 @@ else {
             <div class="col col-md-2" />
             <div class="col col-md-8 border border-primary py-2">
                 <ContextHelpTitle Title="Auto-Enrol Participants" HelpTopic="Auto-Enrol-Participants.html"></ContextHelpTitle>
-                <CollapsableContent AlertText=@($@"<strong>Auto-Enrol Participants</strong> is now an automated procedure.<br />
+                <CollapsableContent DismissKey="{B89FB2B1-3559-4A94-A6B2-9E19CDA285F7}"
+                                    AlertText=@($@"<p><strong>Auto-Enrol Participants</strong> is now an automated procedure.<br />
                               It is executed hourly to move waitlisted students into active enrolment if available.<br />
                               Randomised automatic enrolment occurs {autoEnrolOccirence.ToLower()} on
-                              {autoEnrolDay} in week {-settings?.AutoEnrolAllocationWeek} prior to term start.")
+                              {autoEnrolDay} in week {-settings?.AutoEnrolAllocationWeek} prior to term start.</p>")
                                   OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
                 <p>
                     This procedure will automatically enrol participants into their selected courses.<br />

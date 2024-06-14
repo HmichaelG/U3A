@@ -1,19 +1,36 @@
-﻿<section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
-    <button class="btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
-    @ContentTemplate
-    <div class="@($"strong {AlertTextRender}")">@(new MarkupString(AlertText))</div>
-</section>
-<div class="w-100 bg-primary muted" hidden="@(!isHidden)">
-    <button class="btn btn-close" onclick="@onOpenButtonClick" />
-</div>
+﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+@if (!IsDismissed)
+{
+    <section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
+        <button class="btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
+        @ContentTemplate
+        <div class="@($"strong {AlertTextRender}")">
+            @(new MarkupString(AlertText))
+            @if (!string.IsNullOrWhiteSpace(DismissKey))
+            {
+                <DxFormLayout>
+                    <div class="d-flex w-100 justify-content-center">
+                        <DxButton Text="Do not show again" Click="@OnDismiss" RenderStyle="ButtonRenderStyle.Info" />
+                    </div>
+                </DxFormLayout>
+            }
+        </div>
+    </section>
+    <div class="w-100 bg-primary muted" hidden="@(!isHidden)">
+        <button class="btn btn-close" onclick="@onOpenButtonClick" />
+    </div>
+}
 
 <style>
     .strong {
-        font-weight:500;
+        font-weight: 500;
     }
+
     .muted {
         --bs-bg-opacity: 0.1;
     }
+
     section {
         margin: auto;
     }
@@ -22,6 +39,9 @@
         float: right;
     }
 
+    .dismiss-style {
+        float: right;
+    }
 
 </style>
 @code {
@@ -29,10 +49,14 @@
     [Parameter] public string AlertType { get; set; } = "info";
     [Parameter] public string AlertText { get; set; }
     [Parameter] public EventCallback OnToggleAlert { get; set; }
+    [Parameter] public EventCallback<bool> OnDismissChanged { get; set; }
     [Parameter] public EventCallback OnContentExpanded { get; set; }
     [Parameter] public EventCallback OnContentCollapsed { get; set; }
     [Parameter] public RenderFragment ContentTemplate { get; set; }
     [Parameter] public string CssClass { get; set; }
+    [Parameter] public string? DismissKey { get; set; }
+
+    bool IsDismissed = true;
 
     bool isHidden = false;
     string AlertTextRender;
@@ -41,7 +65,8 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (AlertType.ToLower().Trim() != "none") { 
+        if (AlertType.ToLower().Trim() != "none")
+        {
             AlertTextRender = $"text-dark";
             alertRender = $"alert alert-{AlertType}";
         }
@@ -49,6 +74,26 @@
         {
             alertRender = "";
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            var original = IsDismissed;
+            if (!await localStorage.ContainKeyAsync(DismissKey)) { IsDismissed = false; }
+            await OnDismissChanged.InvokeAsync(IsDismissed);
+            StateHasChanged();
+        }
+    }
+
+    async Task OnDismiss()
+    {
+        IsDismissed = true;
+        await localStorage.SetItemAsStringAsync(DismissKey, "Dismiss");
+        await OnDismissChanged.InvokeAsync(IsDismissed);
+        await InvokeAsync(StateHasChanged);
     }
 
     async Task onOpenButtonClick()
