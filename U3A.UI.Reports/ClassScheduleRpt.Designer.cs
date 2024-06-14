@@ -38,6 +38,7 @@
             this.pageInfo2 = new DevExpress.XtraReports.UI.XRPageInfo();
             this.lblWatermark = new DevExpress.XtraReports.UI.XRLabel();
             this.ReportHeader = new DevExpress.XtraReports.UI.ReportHeaderBand();
+            this.xrMessage = new DevExpress.XtraReports.UI.XRLabel();
             this.xrTableOfContents1 = new DevExpress.XtraReports.UI.XRTableOfContents();
             this.xrLabel4 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel1 = new DevExpress.XtraReports.UI.XRLabel();
@@ -181,14 +182,44 @@
             // ReportHeader
             // 
             this.ReportHeader.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.xrMessage,
             this.xrTableOfContents1,
             this.xrLabel4,
             this.xrLabel1,
             this.xrLabel3,
             this.lblTitleWatermark,
             this.label1});
-            this.ReportHeader.HeightF = 224.3334F;
+            this.ReportHeader.HeightF = 319.1251F;
             this.ReportHeader.Name = "ReportHeader";
+            // 
+            // xrMessage
+            // 
+            this.xrMessage.AllowMarkupText = true;
+            this.xrMessage.BorderColor = System.Drawing.Color.Red;
+            this.xrMessage.BorderDashStyle = DevExpress.XtraPrinting.BorderDashStyle.Double;
+            this.xrMessage.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
+            | DevExpress.XtraPrinting.BorderSide.Right) 
+            | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.xrMessage.BorderWidth = 2F;
+            this.xrMessage.CanPublish = false;
+            this.xrMessage.CanShrink = true;
+            this.xrMessage.Font = new DevExpress.Drawing.DXFont("Arial", 18F);
+            this.xrMessage.ForeColor = System.Drawing.Color.Red;
+            this.xrMessage.LocationFloat = new DevExpress.Utils.PointFloat(142.4583F, 173.9167F);
+            this.xrMessage.Multiline = true;
+            this.xrMessage.Name = "xrMessage";
+            this.xrMessage.Padding = new DevExpress.XtraPrinting.PaddingInfo(5, 5, 5, 5, 100F);
+            this.xrMessage.SizeF = new System.Drawing.SizeF(457.2917F, 82.20837F);
+            this.xrMessage.StylePriority.UseBorderColor = false;
+            this.xrMessage.StylePriority.UseBorderDashStyle = false;
+            this.xrMessage.StylePriority.UseBorders = false;
+            this.xrMessage.StylePriority.UseBorderWidth = false;
+            this.xrMessage.StylePriority.UseFont = false;
+            this.xrMessage.StylePriority.UseForeColor = false;
+            this.xrMessage.StylePriority.UsePadding = false;
+            this.xrMessage.StylePriority.UseTextAlignment = false;
+            this.xrMessage.Text = "xrMessage";
+            this.xrMessage.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrTableOfContents1
             // 
@@ -204,7 +235,7 @@
             this.xrTableOfContents1.LevelTitle.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
             this.xrTableOfContents1.LevelTitle.Text = "Table of Contents";
             this.xrTableOfContents1.LevelTitle.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            this.xrTableOfContents1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 161.3334F);
+            this.xrTableOfContents1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 256.1251F);
             this.xrTableOfContents1.Name = "xrTableOfContents1";
             this.xrTableOfContents1.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
             this.xrTableOfContents1.StylePriority.UsePadding = false;
@@ -1211,5 +1242,6 @@
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell1;
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow10;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell3;
+        private DevExpress.XtraReports.UI.XRLabel xrMessage;
     }
 }

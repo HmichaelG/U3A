@@ -73,6 +73,8 @@ namespace U3A.UI.Reports
             prmTermSummary.Value = term?.TermSummary;
             lblWatermark.Text = (string)prmWatermark.Value;
             lblTitleWatermark.Text = (string)prmWatermark.Value;
+            xrMessage.Text = @"<p><b>This report consists of many pages</b></p>
+                                <p>Scroll down or use the page view controls on the menu to view report content</p>";
             // Sort
             OnDayGroupHeader.GroupFields.Clear();
             Detail.SortFields.Clear();
