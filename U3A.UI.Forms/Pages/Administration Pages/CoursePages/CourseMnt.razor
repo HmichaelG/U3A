@@ -144,6 +144,7 @@ else
               ShowFooter=true
               Scrollable=true
               BodyCssClass="h-100"
+              Closed="@(() => isPreviewOpen = false)"
               HeaderText="Preview">
         <HeaderTextTemplate>
             <div class="d-flex w-100">
@@ -197,6 +198,7 @@ else
     int Year;
     bool anyEnrolmentsInYear;
     DxWindow? previewWindow;
+    bool isPreviewOpen;
 
     List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
     List<CourseContactOrderWrapper> courseContactList = new CourseContactOrderList();
@@ -256,11 +258,20 @@ else
         }
     }
 
+    bool inPreview;
     async Task OnPreview(int TermNumber)
     {
-        previewTerm = dbc.Term.FirstOrDefault(x => x.Year == Year && x.TermNumber == TermNumber);
-        await previewWindow.CloseAsync();
-        await previewWindow?.ShowAsync();
+        if (inPreview) { return; }
+        try
+        {
+            inPreview = true;
+            await progressBar.ShowSmallSpinnerAsync();
+            if (isPreviewOpen) { await previewWindow.CloseAsync(); }
+            isPreviewOpen = true;
+            previewTerm = await dbc.Term.FirstOrDefaultAsync(x => x.Year == Year && x.TermNumber == TermNumber);
+            await previewWindow?.ShowAsync();
+        }
+        finally { inPreview = false; await progressBar.Close(); }
     }
 
     async Task OnTabChanged()
