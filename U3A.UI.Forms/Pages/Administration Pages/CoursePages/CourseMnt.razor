@@ -77,8 +77,19 @@ else
                             <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-check-circle"
                                            Text="Preview Schedule"
                                            RenderStyle="@ButtonRenderStyle.Info"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           Click="@(() => OnPreview(1))" />
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained">
+                                <Items>
+                                    <DxToolbarItem Enabled="@isPreviewReady"
+                                                   Text="Preview Term 1" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(1))" />
+                                    <DxToolbarItem Enabled="@isPreviewReady"
+                                                   Text="Preview Term 2" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(2))" />
+                                    <DxToolbarItem Enabled="@isPreviewReady"
+                                                   Text="Preview Term 3" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(3))" />
+                                    <DxToolbarItem Enabled="@isPreviewReady"
+                                                   Text="Preview Term 4" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(4))" />
+
+                                </Items>
+                            </DxToolbarItem>
                         </CustomButtonContent>
                     </GridToolbar>
                 </ToolbarTemplate>
@@ -144,28 +155,18 @@ else
               ShowFooter=true
               Scrollable=true
               BodyCssClass="h-100"
+              Closing="@((WindowClosingEventArgs e) => e.Cancel = !isPreviewReady)"
               Closed="@(() => isPreviewOpen = false)"
               HeaderText="Preview">
-        <HeaderTextTemplate>
-            <div class="d-flex w-100">
-                <div class="h6 flex-grow-1">@Year Preview</div>
-                <DxButton CssClass="flex-grow-0 me-1"
-                          Text="Term 1" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(1))" />
-                <DxButton CssClass="flex-grow-0 me-1"
-                          Text="Term 2" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(2))" />
-                <DxButton CssClass="flex-grow-0 me-1"
-                          Text="Term 3" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(3))" />
-                <DxButton CssClass="flex-grow-0 me-1"
-                          Text="Term 4" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(4))" />
-            </div>
-        </HeaderTextTemplate>
         <BodyTextTemplate>
-            <div class="overflow-hidden">
-                <MemberEnrolment IsPreview=true PreviewTerm="previewTerm" />
-            </div>
+            <DxLoadingPanel Visible="@(!isPreviewReady)" ApplyBackgroundShading="true">
+                <div class="overflow-hidden">
+                    <MemberEnrolment OneReadyStatusChanged="@((bool value) => {isPreviewReady = value; StateHasChanged();})"
+                                     IsPreview=true PreviewTerm="previewTerm" />
+                </div>
+            </DxLoadingPanel>
         </BodyTextTemplate>
     </DxWindow>
-
 
 }
 <style>
@@ -199,6 +200,7 @@ else
     bool anyEnrolmentsInYear;
     DxWindow? previewWindow;
     bool isPreviewOpen;
+    bool isPreviewReady = true;
 
     List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
     List<CourseContactOrderWrapper> courseContactList = new CourseContactOrderList();
@@ -265,13 +267,15 @@ else
         try
         {
             inPreview = true;
-            await progressBar.ShowSmallSpinnerAsync();
-            if (isPreviewOpen) { await previewWindow.CloseAsync(); }
-            isPreviewOpen = true;
+            if (isPreviewOpen)
+            {
+                await previewWindow.CloseAsync();
+            }
             previewTerm = await dbc.Term.FirstOrDefaultAsync(x => x.Year == Year && x.TermNumber == TermNumber);
             await previewWindow?.ShowAsync();
+            isPreviewOpen = true;
         }
-        finally { inPreview = false; await progressBar.Close(); }
+        finally { inPreview = false; }
     }
 
     async Task OnTabChanged()

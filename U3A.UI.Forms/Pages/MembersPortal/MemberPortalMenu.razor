@@ -44,9 +44,11 @@ else
                         <DxAccordionItem Text="Manage your course enrolments">
                             <ContentTemplate>
                                 <CollapsableContent DismissKey="{E76BA7CB-4922-441F-A4E6-A51FDEA0A710}"
-                                                    AlertText=@(@"<h6>What's New</h6>
-                                                        <p>To prevent accidental selection, you must now click the <strong>Click to select</strong> or <strong>Click to withraw</strong> button
-                                                        to enrol/withdraw from a class.</p>")
+                                                    AlertText=@(@"<h5 class=""text-info mb-3"">What's New</h5>
+                                                        <p>To prevent accidental selection, you must now click the 
+                                                            <span class=""text-primary""><strong>Click to select</strong></span> or
+                                                            <span class=""text-primary""><strong>Click to withraw</strong></span> button
+                                                        to request enrolment or withdraw from a class.</p>")
                                                     OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
 
                                 <DxButton Text="Request course enrolments" Context="ThisContext"

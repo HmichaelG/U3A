@@ -21,7 +21,10 @@
 
 @if (!IsReady)
 {
-    <LoadingIndicator />
+    if (!IsPreview)
+    {
+        <LoadingIndicator />
+    }
 }
 else
 {
@@ -422,6 +425,8 @@ else
 
     [Parameter]
     public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+    [Parameter]
+    public EventCallback<bool> OneReadyStatusChanged { get; set; }
 
     [Parameter]
     public bool IsReadOnly { get; set; }
@@ -573,6 +578,8 @@ else
     {
         await base.OnInitializedAsync();
 
+        await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
+
         var watch = Stopwatch.StartNew();
 
         deletedClasses = new List<Class>();
@@ -643,6 +650,7 @@ else
         Logger.LogInformation("Member Enrolment: OnInitializedAsync() {duration}ms", watch.ElapsedMilliseconds);
 
         IsReady = true;
+        await OneReadyStatusChanged.InvokeAsync(true); // enable external user input
     }
 
     void SetUnavialable(Term? term)
