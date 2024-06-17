@@ -14,6 +14,7 @@
         TextWrapEnabled=false
         PopupEditFormCssClass="classPopup-width"
         PopupEditFormHeaderText="Add/Edit Class"
+        CustomizeElement="Grid_CustomizeElement"
         CustomizeEditModel="Grid_CustomizeEditModel"
         EditModelSaving="Grid_EditModelSaving"
         DataItemDeleting="Grid_DataItemDeleting"
@@ -137,6 +138,10 @@
     .classPopup-width {
         min-width: 40rem;
     }
+    .deleted-item {
+        background-color: red;
+        color: white;
+    }
 </style>
 
 @code {
@@ -233,7 +238,7 @@
 
     async Task<bool> IsDataOk(Class EditModel, bool IsNew)
     {
-       return await commonClassProcedures.IsDataOk(DbContext, EditModel, IsNew);
+        return await commonClassProcedures.IsDataOk(DbContext, EditModel, IsNew);
     }
 
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
@@ -242,6 +247,7 @@
         Class classToDelete = (Class)e.DataItem;
         await BusinessRule.DeleteEnrolmentByClassID(DbContext, classToDelete.ID);
         DbContext.Remove<Class>(classToDelete);
+        Course.Classes.Remove(classToDelete);
         await DbContext.SaveChangesAsync();
         grid.ClearSelection();
     }
