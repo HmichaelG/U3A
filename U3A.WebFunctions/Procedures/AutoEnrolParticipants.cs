@@ -37,9 +37,14 @@ namespace U3A.WebFunctions.Procedures
                     allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
                     if (BusinessRule.IsPreRandomAllocationDay(currentTerm, settings, today))
                     {
-                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: No Auto-Allocation performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
+                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
                         return;
                     }
+                    //else if (BusinessRule.IsEnrolmentBlackoutPeriod(currentTerm,settings,today))
+                    //{
+                    //    logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout: {constants.RANDOM_ALLOCATION_PREVIEW} days from {allocationDate?.ToShortDateString()}");
+                    //    return;
+                    //}
                     else
                     {
                         IsClassAllocationFinalised = currentTerm.IsClassAllocationFinalised;

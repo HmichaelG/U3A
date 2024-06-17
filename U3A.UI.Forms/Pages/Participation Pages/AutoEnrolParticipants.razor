@@ -131,6 +131,7 @@ else {
             errorMessage = null;
             IsProcessing = true;
             StateHasChanged();
+
             await BusinessRule.AutoEnrolParticipantsAsync(dbc, processTerm,
                                                             IsClassAllocationFinalised,
                                                             ForceEmailQueue);
@@ -148,6 +149,18 @@ else {
             msg = "<p>*** You must select the current Term ***</p>";
             await messageBox.ShowOkOnlyAsync("Select the Term", msg);
             result = false;
+        }
+        else
+        {
+            var now = TimezoneAdjustment.GetLocalTime().Date;
+            if (BusinessRule.IsEnrolmentBlackoutPeriod(processTerm, settings, now))
+            {
+                result = await messageBox.ShowAsync("Enrolment Blackout",
+                                                @"<p>You are in the enrolment blackout period
+                                                    between random allocation and mailout.
+                                                    This procedure may cause enrolment email to be generated.</p>
+                                                <p>Are you sure you wish to continue?</p");
+            }
         }
         return result;
     }

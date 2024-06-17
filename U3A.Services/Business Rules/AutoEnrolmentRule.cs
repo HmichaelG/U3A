@@ -32,6 +32,14 @@ namespace U3A.BusinessRules
             allocationDate = allocationDate.AddDays(constants.RANDOM_ALLOCATION_PREVIEW);
             return IsPreRandomCutoffDate(currentEnrolmentTerm, settings, allocationDate, Today);
         }
+
+        public static bool IsEnrolmentBlackoutPeriod(Term currentEnrolmentTerm,
+                                            SystemSettings settings, DateTime Today)
+        {
+            var isAfterAllocation = !IsPreRandomAllocationDay(currentEnrolmentTerm, settings, Today);
+            var isOnOrBeforeMailout = IsPreRandomAllocationEmailDay(currentEnrolmentTerm, settings, Today.AddDays(-1));
+            return isAfterAllocation && isOnOrBeforeMailout;
+        }
         private static bool IsPreRandomCutoffDate(Term currentEnrolmentTerm,
                                             SystemSettings settings,
                                             DateTime CutoffDate,
@@ -105,7 +113,7 @@ namespace U3A.BusinessRules
             await WaitListPartPaidMembers(dbc, SelectedTerm);
             await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
             await dbc.SaveChangesAsync();
-            
+
             // and everybody else
             await FixEnrolmentTerm(dbc, SelectedTerm);
             var today = TimezoneAdjustment.GetLocalTime().Date;
@@ -136,7 +144,7 @@ namespace U3A.BusinessRules
                                                 .Include(x => x.Person)
                                                 .Where(x => (x.TermID == SelectedTerm.ID ||
                                                              (x.Course.AllowMultiCampsuFrom != null &&
-                                                             x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))                                                                
+                                                             x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
                                                                 && x.CourseID == course.ID
                                                                 && x.Person.DateCeased == null
                                                                 && !CourseLeaders.Contains(x.Person))
@@ -145,11 +153,11 @@ namespace U3A.BusinessRules
                     enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                     if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                     {
-                        await ProcessEnrolments(dbc, 
-                                        SelectedTerm, 
-                                        course, 
-                                        enrolmentsToProcess, 
-                                        peoplePreviouslyEnrolled, 
+                        await ProcessEnrolments(dbc,
+                                        SelectedTerm,
+                                        course,
+                                        enrolmentsToProcess,
+                                        peoplePreviouslyEnrolled,
                                         ForceEmailQueue);
                     }
                 }
@@ -158,7 +166,7 @@ namespace U3A.BusinessRules
                     foreach (var courseClass in course.Classes)
                     {
                         enrolmentsToProcess = await dbc.Enrolment
-                                                    .Include(x => x.Course)     
+                                                    .Include(x => x.Course)
                                                     .Include(x => x.Term)
                                                     .Include(x => x.Person)
                                                     .Where(x => x.TermID == SelectedTerm.ID
@@ -169,11 +177,11 @@ namespace U3A.BusinessRules
                         enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                         if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                         {
-                            await ProcessEnrolments(dbc, 
-                                                SelectedTerm, 
-                                                course, 
-                                                enrolmentsToProcess, 
-                                                peoplePreviouslyEnrolled, 
+                            await ProcessEnrolments(dbc,
+                                                SelectedTerm,
+                                                course,
+                                                enrolmentsToProcess,
+                                                peoplePreviouslyEnrolled,
                                                 ForceEmailQueue);
                             await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
                             await dbc.SaveChangesAsync();
