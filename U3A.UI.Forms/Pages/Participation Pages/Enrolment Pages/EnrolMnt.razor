@@ -96,7 +96,7 @@ else
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
 
-                <FullScreen @ref="@fullScreen" DisplayOffset="16">
+                <FullScreen @ref="@fullScreen" DisplayOffset="18">
                     <ContentTemplate>
                         <DxGrid Data="@Enrolments" @ref=@mainGrid
                                 ShowAllRows="true"
@@ -252,7 +252,8 @@ else
     }
 
     .statistics-height {
-        height: 14dvh;
+        height: 16dvh;
+        min-height: 16dvh;
     }
 
     .this-page {

@@ -49,18 +49,26 @@
                 <ValidationSummary />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Offered:" ColSpanMd="3" />
-            <DxFormLayoutItem Caption="Term-1" ColSpanMd="2" CssClass="border border-primary me-2">
+            <div class="border border-primary me-1">
+            <DxFormLayoutItem Caption="Term-1" ColSpanMd="2">
                 <DxCheckBox @bind-Checked="editItem.OfferedTerm1" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Term-2" ColSpanMd="2" CssClass="border border-primary me-2">
+            </div>
+            <div class="border border-primary me-1">
+            <DxFormLayoutItem Caption="Term-2" ColSpanMd="2">
                 <DxCheckBox @bind-Checked="editItem.OfferedTerm2" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Term-3" ColSpanMd="2" CssClass="border border-primary me-2">
+            </div>
+            <div class="border border-primary me-1">
+            <DxFormLayoutItem Caption="Term-3" ColSpanMd="2">
                 <DxCheckBox @bind-Checked="editItem.OfferedTerm3" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Term-4" ColSpanMd="2" CssClass="border border-primary">
+            </div>
+            <div class="border border-primary">
+            <DxFormLayoutItem Caption="Term-4" ColSpanMd="2">
                 <DxCheckBox @bind-Checked="editItem.OfferedTerm4" />
             </DxFormLayoutItem>
+            </div>
             <DxFormLayoutItem Caption="Guest Leader" ColSpanMd="12">
                 <DxTextBox @bind-Text="editItem.GuestLeader"
                            NullText="A non-member presenter, leader or speaker"
