@@ -33,13 +33,8 @@ namespace U3A.BusinessRules
             return IsPreRandomCutoffDate(currentEnrolmentTerm, settings, allocationDate, Today);
         }
 
-        public static bool IsEnrolmentBlackoutPeriod(Term currentEnrolmentTerm,
-                                            SystemSettings settings, DateTime Today)
-        {
-            var isAfterAllocation = !IsPreRandomAllocationDay(currentEnrolmentTerm, settings, Today);
-            var isOnOrBeforeMailout = IsPreRandomAllocationEmailDay(currentEnrolmentTerm, settings, Today.AddDays(-1));
-            return isAfterAllocation && isOnOrBeforeMailout;
-        }
+        public static bool IsEnrolmentBlackoutPeriod(SystemSettings settings)
+                                => DateTime.UtcNow < settings.EnrolmentBlackoutEndsUTC.GetValueOrDefault();
         private static bool IsPreRandomCutoffDate(Term currentEnrolmentTerm,
                                             SystemSettings settings,
                                             DateTime CutoffDate,

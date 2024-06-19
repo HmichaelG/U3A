@@ -55,6 +55,7 @@ namespace U3A.BusinessRules
 
         private static async Task DoParticipantEnrolmentAsync(U3ADbContext dbc, Enrolment[] enrolments, DateTime? AsAt)
         {
+            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
             var reportName = "Participant Enrolment";
             foreach (var e in enrolments)
             {
@@ -70,6 +71,7 @@ namespace U3A.BusinessRules
                         RecordKey = e.ID,
                         CreatedOn = AsAt,
                     };
+                    if (IsEnrolmentBlackoutPeriod(settings)) { mail.CreatedOn = settings.EnrolmentBlackoutEndsUTC; }
                     await dbc.AddAsync(mail);
                 }
             }

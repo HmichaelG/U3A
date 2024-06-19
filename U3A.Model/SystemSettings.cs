@@ -164,8 +164,8 @@ namespace U3A.Model
         public bool AllowMultiCampusExtensions { get; set; }
         public List<string> MultiCampusU3AAllowed { get; set; } = new();
         public ClassScheduleDisplayPeriod ClassScheduleDisplayPeriod { get; set; }
-
         public MemberFeePaymentType AllowedMemberFeePaymentTypes { get; set; }
+        public DateTime? EnrolmentBlackoutEndsUTC { get; set; }
     }
 
     public enum AutoEnrollOccurrence

@@ -14,16 +14,20 @@ namespace U3A.WebFunctions.Procedures
         {
             using (var dbc = new U3ADbContext(tenant))
             {
-                var IsClassAllocationFinalised = false;
-                var forceEmailQueue = false;
-                DateTime? emailDate = null;
-                // Get system settings
-                var today = await Common.GetTodayAsync(dbc);
-                var now = await Common.GetNowAsync(dbc);
-                DateTime? allocationDate = null;
                 var settings = await dbc.SystemSettings
                                     .OrderBy(x => x.ID)
                                     .FirstOrDefaultAsync();
+                if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
+                {
+                    logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
+                    return;
+                }
+                var IsClassAllocationFinalised = false;
+                var forceEmailQueue = false;
+                DateTime? emailDate = null;
+                var today = await Common.GetTodayAsync(dbc);
+                var now = await Common.GetNowAsync(dbc);
+                DateTime? allocationDate = null;
                 if (string.IsNullOrWhiteSpace(settings!.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
 
                 //get the current enrolment term
@@ -40,11 +44,6 @@ namespace U3A.WebFunctions.Procedures
                         logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
                         return;
                     }
-                    //else if (BusinessRule.IsEnrolmentBlackoutPeriod(currentTerm,settings,today))
-                    //{
-                    //    logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout: {constants.RANDOM_ALLOCATION_PREVIEW} days from {allocationDate?.ToShortDateString()}");
-                    //    return;
-                    //}
                     else
                     {
                         IsClassAllocationFinalised = currentTerm.IsClassAllocationFinalised;
@@ -55,6 +54,8 @@ namespace U3A.WebFunctions.Procedures
                             // emailDate will be 3 days from now less two hours to ensure it occurs.
                             emailDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, 0, 0, 0) +
                                             TimeSpan.FromHours(constants.RANDOM_ALLOCATION_PREVIEW * 24 - 2);
+                            // Set the enrolment period blackout end date
+                            settings.EnrolmentBlackoutEndsUTC = emailDate;
                             // force all members to get a report
                             forceEmailQueue = true;
                             // set TRUE to force all leaders to get a report

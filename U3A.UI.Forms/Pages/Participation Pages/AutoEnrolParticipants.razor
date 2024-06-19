@@ -23,6 +23,11 @@ else {
                               Randomised automatic enrolment occurs {autoEnrolOccirence.ToLower()} on
                               {autoEnrolDay} in week {-settings?.AutoEnrolAllocationWeek} prior to term start.</p>")
                                   OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+                @if (BusinessRule.IsEnrolmentBlackoutPeriod(settings))
+                {
+                    var localEndTime = GetEnrolmentBlackoutEndTime();
+                    <h5>Enrolment Blackout Period in force till @localEndTime.ToString(constants.STD_DATETIME_FORMAT)</h5>
+                }
                 <p>
                     This procedure will automatically enrol participants into their selected courses.<br />
                     Auto-enrolment is considered a fair and equitable way of allocating participants to an oversubscribed course.
@@ -131,10 +136,11 @@ else {
             errorMessage = null;
             IsProcessing = true;
             StateHasChanged();
-
+            DateTime? emailDate = (BusinessRule.IsEnrolmentBlackoutPeriod(settings))
+                                    ? settings.EnrolmentBlackoutEndsUTC : null;
             await BusinessRule.AutoEnrolParticipantsAsync(dbc, processTerm,
                                                             IsClassAllocationFinalised,
-                                                            ForceEmailQueue);
+                                                            ForceEmailQueue, emailDate);
             IsProcessing = false;
             StateHasChanged();
             await messageBox.ShowOkOnlyAsync("Process Complete", "Enrolments have been allocated.");
@@ -152,17 +158,23 @@ else {
         }
         else
         {
-            var now = TimezoneAdjustment.GetLocalTime().Date;
-            if (BusinessRule.IsEnrolmentBlackoutPeriod(processTerm, settings, now))
+            if (BusinessRule.IsEnrolmentBlackoutPeriod(settings))
             {
+                var localEndTime = GetEnrolmentBlackoutEndTime();
                 result = await messageBox.ShowAsync("Enrolment Blackout",
-                                                @"<p>You are in the enrolment blackout period
-                                                    between random allocation and mailout.
+                                                $@"<p>You are in the enrolment blackout period till
+                                                {localEndTime.ToString(constants.STD_DATETIME_FORMAT)}.
                                                     This procedure may cause enrolment email to be generated.</p>
                                                 <p>Are you sure you wish to continue?</p");
             }
         }
         return result;
+    }
+
+    DateTime GetEnrolmentBlackoutEndTime()
+    {
+        var utcEndTime = settings.EnrolmentBlackoutEndsUTC.GetValueOrDefault();
+        return TimezoneAdjustment.GetLocalTime(utcEndTime);
     }
 
     void Close() {
