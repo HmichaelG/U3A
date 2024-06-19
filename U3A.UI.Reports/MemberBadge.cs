@@ -145,10 +145,14 @@ namespace U3A.UI.Reports
             var person = (Person)this.GetCurrentRow();
             xrTitle.Text = "";
             if (person == null) { return; }
-            if (person.FinancialTo == _term.Year) { xrTitle.Text = $"Member {_term.Year}"; }
-            if (person.IsCourseClerk) { xrTitle.Text = $"Course Clerk {_term.Year}"; }
-            if (person.IsCourseLeader) { xrTitle.Text = $"Course Leader {_term.Year}"; }
-            if (person.IsCommitteeMember) { xrTitle.Text = $"Committee Member {_term.Year}"; }
+            var year = _term?.Year ?? person.FinancialTo;
+            xrTitle.Text = $"Member {year}";
+            if (_term != null)
+            {
+                if (person.IsCourseClerk) { xrTitle.Text = $"Course Clerk {_term.Year}"; }
+                if (person.IsCourseLeader) { xrTitle.Text = $"Course Leader {_term.Year}"; }
+                if (person.IsCommitteeMember) { xrTitle.Text = $"Committee Member {_term.Year}"; }
+            }
             if (person.IsLifeMember) { xrTitle.Text = "Life Member"; }
         }
 

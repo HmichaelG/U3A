@@ -21,21 +21,27 @@
 @using DevExpress.Blazor.Reporting
 @using DevExpress.Blazor.Reporting.Models
 @using U3A.Services
+@using U3A.UI.Common.Pages.Shared
 
 @attribute [Authorize]
 
 @using DevExpress.Blazor.Reporting
 @using Microsoft.Extensions.DependencyInjection
 
-
-<DxReportViewer @ref="@reportViewer"
-                Report="@Report"
-                SinglePagePreview="false"
-                Zoom="1"
-                CssClass="w-100"
-                OnCustomizeToolbar="OnCustomizeToolbar"
-                RootCssClasses="@RootCssClass" />
-
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxReportViewer @ref="@reportViewer"
+                    Report="@Report"
+                    SinglePagePreview="false"
+                    Zoom="1"
+                    CssClass="w-100"
+                    OnCustomizeToolbar="OnCustomizeToolbar"
+                    RootCssClasses="@RootCssClass" />
+}
 <style>
     .view-normal {
         height: @viewerHeight
@@ -113,6 +119,8 @@
     {
         if (firstRender)
         {
+            isReady = true;
+            await InvokeAsync(StateHasChanged);
             if (HideTabPanels)
             {
                 reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
@@ -126,9 +134,8 @@
             EditingFieldModelFactory.RegisterMaskEditor("Day", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|([1-2][0-9])|(3[0-1])" });
             EditingFieldModelFactory.RegisterMaskEditor("Month", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|(1[0-2])" });
             EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
-            reportViewer.LoadingPanelVisible = true;
-            await InvokeAsync(StateHasChanged);
         }
+        reportViewer.LoadingPanelVisible = true;
         await base.OnAfterRenderAsync(firstRender);
     }
 

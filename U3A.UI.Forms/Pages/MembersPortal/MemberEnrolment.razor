@@ -607,7 +607,11 @@ else
             {
                 // Fallback to read-only mode if enrolment term is null
                 var nextTerm = await BusinessRule.GetNextTermAsync(dbc);
-                SetUnavialable(nextTerm);
+                if (nextTerm != null)
+                {
+                    term = currentTerm = nextTerm;
+                    SetUnavialable(nextTerm);
+                }
             }
         }
         if (term != null)
@@ -649,6 +653,7 @@ else
         Logger.LogInformation("Member Enrolment: OnInitializedAsync() {duration}ms", watch.ElapsedMilliseconds);
 
         IsReady = true;
+        await ShowSelectedClasses();
         await OneReadyStatusChanged.InvokeAsync(true); // enable external user input
     }
 
@@ -670,7 +675,7 @@ else
         {
             today = TimezoneAdjustment.GetLocalTime().Date;
             filterText = null;
-            if (isNotInEnrolmentPeriod && (term == null || Classes == null))
+            if (IsEnrolmentRequestView && isNotInEnrolmentPeriod && (term == null || Classes == null))
             {
                 await ReturnToMenu(PortalMenuResult.EnrolmentCancelledTermNotDefined);
             }
@@ -712,7 +717,6 @@ else
             if (newHeight != listHeight)
             {
                 listHeight = newHeight;
-                if (ListboxData.Count == 0) { await ShowSelectedClasses(); }
                 InvokeAsync(StateHasChanged);
             }
         }
@@ -935,12 +939,18 @@ else
 
     void GetData()
     {
+        List<Class> c = new();
+        if (term != null)
+        {
+            c = Classes.Where(x => x.TermNumber >= term?.TermNumber).ToList();
+        }
         // only show this term's classes & inter-term classes from last term.
-        ListboxData = Classes.Where(x => x.TermNumber >= term?.TermNumber
-                                       || (x.TermNumber == prevTerm.TermNumber
-                                                && BusinessRule.IsClassEndDateInInterTermPeriod(
-                                                    dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)))
-                                                    .Select(x => x).Distinct().ToList();
+        if (prevTerm != null)
+        {
+            c.AddRange(Classes.Where(x => x.TermNumber == prevTerm.TermNumber
+                                                    && BusinessRule.IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)).ToList());
+        }
+        ListboxData = c.Distinct<Class>().ToList();
     }
 
     void ScrollListboxToTop()
