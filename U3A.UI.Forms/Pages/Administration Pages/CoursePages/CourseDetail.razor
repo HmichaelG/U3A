@@ -5,16 +5,11 @@
 <MessageBox @ref="@messageBox" />
 
 <DxFormLayout Data="@Course">
+
     <DxFormLayoutItem ColSpanMd="12">
         <ValidationSummary />
     </DxFormLayoutItem>
-    <div class="w-100 d-flex">
-        <div class="flex-grow-1" />
-        <div class="flex-grow-0 me-2">
-            <DxCheckBox @bind-Checked="@Course.IsOffScheduleActivity"
-                        LabelPosition="LabelPosition.Left">Off-Schedule Activity?</DxCheckBox>
-        </div>
-    </div>
+
     <DxTabs @ref=@TabPages CssClass="page-height" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
         <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>
             <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
@@ -80,12 +75,12 @@
                     </DxFormLayoutItem>
                 </DxFormLayout>
             </DxFormLayoutGroup>
-            <DxFormLayoutGroup Caption="Multi-Campus Enrolment" >
+            <DxFormLayoutGroup Caption="Multi-Campus Enrolment">
                 <DxFormLayoutItem Caption="Allow Multi-Campus Enrolment From"
-                                  ColSpanMd="12" >
-                    <DxDateEdit @bind-Date="Course.AllowMultiCampsuFrom" 
-                        Enabled="@EnableMultiCampus" 
-                        NullText=@((EnableMultiCampus) ? "" : "Not available for this course") />
+                                  ColSpanMd="12">
+                    <DxDateEdit @bind-Date="Course.AllowMultiCampsuFrom"
+                                Enabled="@EnableMultiCampus"
+                                NullText=@((EnableMultiCampus) ? "" : "Not available for this course") />
                 </DxFormLayoutItem>
                 <div class='mt-2 mx-4 alert alert-warning text-dark text-center'>
                     <h6>This feature is Experimental</h6>

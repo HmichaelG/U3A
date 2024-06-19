@@ -4,9 +4,14 @@
 <MessageBox @ref="@messageBox" />
 
 <DxFormLayout CssClass="px-4 pt-2">
-    <DxFormLayoutItem Caption="Course Number" ColSpanMd="12">
+    <DxFormLayoutItem Caption="Course Number" ColSpanMd="8">
         <DxMaskedInput @bind-Value="Course.ConversionID"
                        Mask="@NumericMask.WholeNumber" />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem Caption="Off-Schedule Activity?" ColSpanMd="4">
+        <DxCheckBox @bind-Checked="@Course.IsOffScheduleActivity"
+                    LabelPosition="LabelPosition.Right"
+                    Alignment="CheckBoxContentAlignment.Right" />
     </DxFormLayoutItem>
     <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
         <DxComboBox Data="CourseTypes"
@@ -36,21 +41,25 @@
         <DxTextBox @bind-Text="Course.AdditionalInformationURL"
                    NullText="A fully qualified URL: https://example.com.au. Keep it short, use TinyURL." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
     </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="3">
-        <DxMaskedInput @bind-Value="Course.Duration"
-                       Mask="n2" />
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Required Students" ColSpanMd="3">
-        <DxMaskedInput @bind-Value="Course.RequiredStudents"
-                       Mask="@NumericMask.WholeNumber" />
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Maximum Students" ColSpanMd="3">
-        <DxMaskedInput @bind-Value="Course.MaximumStudents"
-                       Mask="@NumericMask.WholeNumber" />
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Allow Auto-Enrol" ColSpanMd="3">
-        <DxCheckBox @bind-Checked="Course.AllowAutoEnrol" />
-    </DxFormLayoutItem>
+    
+    <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+        <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="3">
+            <DxMaskedInput @bind-Value="Course.Duration"
+                           Mask="n2" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Required Students" ColSpanMd="3">
+            <DxMaskedInput @bind-Value="Course.RequiredStudents"
+                           Mask="@NumericMask.WholeNumber" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Maximum Students" ColSpanMd="3">
+            <DxMaskedInput @bind-Value="Course.MaximumStudents"
+                           Mask="@NumericMask.WholeNumber" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Allow Auto-Enrol" ColSpanMd="3">
+            <DxCheckBox @bind-Checked="Course.AllowAutoEnrol" />
+        </DxFormLayoutItem>
+    </DxFormLayoutGroup>
+    
     <DxFormLayoutGroup Caption="Course Fee" ColSpanMd="6">
         <DxFormLayoutItem Caption="Course Fee" ColSpanMd="12">
             <DxMaskedInput @bind-Value="Course.CourseFeePerYear" Mask="@NumericMask.Currency" />
@@ -127,7 +136,7 @@
         if (AnyEnrolmentsInYear)
         {
             if (await messageBox.ShowAsync("Participation Type is changing",
-                    @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
+                        @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
                    have already been assigned to it in the current year.</p>
                    <p>If you continue, all enrolments will be assigned to the first class in the course.
                     You will be responsible for transfering enrolemnts between classes, if necessary.</p>

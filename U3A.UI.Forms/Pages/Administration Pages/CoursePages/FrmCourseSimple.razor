@@ -12,10 +12,14 @@
                 <div class="flex-grow-1">
                     Course Detail
                 </div>
-                <div class="flex-grow-0">
+                <div class="flex-grow-0 me-4">
                     <DxCheckBox CssClass="align-content-end" tabindex="-1"
                                 @bind-Checked=@showFullDetail
                                 LabelPosition="LabelPosition.Left">Show Detail</DxCheckBox>
+                </div>
+                <div class="flex-grow-0">
+                    <DxCheckBox @bind-Checked="@Course.IsOffScheduleActivity"
+                                LabelPosition="LabelPosition.Left">Off-Schedule Activity?</DxCheckBox>
                 </div>
             </div>
         </HeaderContentTemplate>
@@ -56,63 +60,66 @@
             <DxFormLayoutItem Caption="Allow Auto-Enrol" ColSpanMd="3">
                 <DxCheckBox @bind-Checked="Course.AllowAutoEnrol" />
             </DxFormLayoutItem>
-            <DxFormLayoutGroup Caption="Course Fee"
-                               ColSpanMd="@((CourseEditView == CourseEditViewType.Simplified) ? 6 : 12)"
-                               Expanded="false"
-                               ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
-                <HeaderContentTemplate>
-                    <div class="d-flex input-group">
-                        <div class="flex-grow-1">
-                            Course Fee
+
+            <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" Visible="@showFullDetail">
+                <DxFormLayoutGroup Caption="Course Fee"
+                                   ColSpanMd="@((CourseEditView == CourseEditViewType.Simplified) ? 6 : 12)"
+                                   Expanded="false"
+                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                    <HeaderContentTemplate>
+                        <div class="d-flex input-group">
+                            <div class="flex-grow-1">
+                                Course Fee
+                            </div>
+                            <div class="flex-grow-0 text-info text-end no-wrap">
+                                @($"{Course.CourseFeePerYear.ToString("c2")} {Course.CourseFeePerYearDescription}")
+                            </div>
                         </div>
-                        <div class="flex-grow-0 text-info text-end no-wrap">
-                            @($"{Course.CourseFeePerYear.ToString("c2")} {Course.CourseFeePerYearDescription}")
+                    </HeaderContentTemplate>
+                    <Items>
+                        <DxFormLayoutItem Caption="Course Fee" ColSpanMd="12">
+                            <DxMaskedInput @bind-Value="Course.CourseFeePerYear" Mask="@NumericMask.Currency" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
+                            <DxTextBox @bind-Text="Course.CourseFeePerYearDescription" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
+                            <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerYearFee" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
+                            <DxCheckBox @bind-Checked="Course.LeadersPayYearFee" />
+                        </DxFormLayoutItem>
+                    </Items>
+                </DxFormLayoutGroup>
+                <DxFormLayoutGroup Caption="Term Fee" ColSpanMd="6"
+                                   Visible=@(CourseEditView == CourseEditViewType.Simplified)
+                                   Expanded="false"
+                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                    <HeaderContentTemplate>
+                        <div class="d-flex input-group">
+                            <div class="flex-grow-1">
+                                Term Fee
+                            </div>
+                            <div class="flex-grow-0 text-info text-end no-wrap">
+                                @($"{Course.CourseFeePerTerm.ToString("c2")} {Course.CourseFeePerTermDescription}")
+                            </div>
                         </div>
-                    </div>
-                </HeaderContentTemplate>
-                <Items>
-                    <DxFormLayoutItem Caption="Course Fee" ColSpanMd="12">
-                        <DxMaskedInput @bind-Value="Course.CourseFeePerYear" Mask="@NumericMask.Currency" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
-                        <DxTextBox @bind-Text="Course.CourseFeePerYearDescription" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
-                        <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerYearFee" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
-                        <DxCheckBox @bind-Checked="Course.LeadersPayYearFee" />
-                    </DxFormLayoutItem>
-                </Items>
-            </DxFormLayoutGroup>
-            <DxFormLayoutGroup Caption="Term Fee" ColSpanMd="6"
-                               Visible=@(CourseEditView == CourseEditViewType.Simplified)
-                               Expanded="false"
-                               ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
-                <HeaderContentTemplate>
-                    <div class="d-flex input-group">
-                        <div class="flex-grow-1">
-                            Term Fee
-                        </div>
-                        <div class="flex-grow-0 text-info text-end no-wrap">
-                            @($"{Course.CourseFeePerTerm.ToString("c2")} {Course.CourseFeePerTermDescription}")
-                        </div>
-                    </div>
-                </HeaderContentTemplate>
-                <Items>
-                    <DxFormLayoutItem Caption="Course Fee / Term" ColSpanMd="12">
-                        <DxMaskedInput @bind-Value="Course.CourseFeePerTerm" Mask="@NumericMask.Currency" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
-                        <DxTextBox @bind-Text="Course.CourseFeePerTermDescription" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
-                        <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerTermFee" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
-                        <DxCheckBox @bind-Checked="Course.LeadersPayTermFee" />
-                    </DxFormLayoutItem>
-                </Items>
+                    </HeaderContentTemplate>
+                    <Items>
+                        <DxFormLayoutItem Caption="Course Fee / Term" ColSpanMd="12">
+                            <DxMaskedInput @bind-Value="Course.CourseFeePerTerm" Mask="@NumericMask.Currency" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
+                            <DxTextBox @bind-Text="Course.CourseFeePerTermDescription" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
+                            <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerTermFee" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
+                            <DxCheckBox @bind-Checked="Course.LeadersPayTermFee" />
+                        </DxFormLayoutItem>
+                    </Items>
+                </DxFormLayoutGroup>
             </DxFormLayoutGroup>
         </Items>
     </DxFormLayoutGroup>
