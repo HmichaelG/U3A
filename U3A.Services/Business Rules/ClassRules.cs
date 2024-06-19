@@ -533,6 +533,7 @@ namespace U3A.BusinessRules
             if (allTerms != null)
             {
                 var nextTermNo = GetNextTermOffered(Class, term.TermNumber);
+                if (nextTermNo ==0) { nextTermNo = defaultTerm.TermNumber; }
                 if (nextTermNo != term.TermNumber)
                 {
                     var t = allTerms.FirstOrDefault(x => x.TermNumber == nextTermNo && x.Year == term.Year);
@@ -541,7 +542,7 @@ namespace U3A.BusinessRules
             }
             DateTime? endDate = GetClassEndDate(Class, nextTerm);
             var localTime = TimezoneAdjustment.GetLocalTime();
-            if (endDate == null || endDate <= localTime) result = false;
+            if (endDate == null || endDate <= localTime) result = false; else result = true;
             return result;
         }
 
