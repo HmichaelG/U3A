@@ -44,72 +44,78 @@
                                       CssClass="border border-primary">
                         <DxCheckBox @bind-Checked="editItem.OfferedTerm4" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Guest Leader" ColSpanMd="12" Visible=@(showFullDetail || IsActivityView || editItem.GuestLeader !=null) >
-                        <DxTextBox @bind-Text="editItem.GuestLeader"
-                                   NullText="A non-member presenter, leader or speaker"
-                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
-                        <DxComboBox Data="Persons"
-                                    ListRenderMode="ListRenderMode.Virtual"
-                                    FilteringMode="DataGridFilteringMode.Contains"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                        @bind-Value="editItem.Leader"
-                                    TextFieldName="@nameof(Person.PersonSummary)">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Leader 2" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader2 != null)>
-                        <DxComboBox Data="Persons"
-                                    ListRenderMode="ListRenderMode.Virtual"
-                                    FilteringMode="DataGridFilteringMode.Contains"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                        @bind-Value="editItem.Leader2"
-                                    TextFieldName="@nameof(Person.PersonSummary)">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Leader 3" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader3 != null)>
-                        <DxComboBox Data="Persons"
-                                    ListRenderMode="ListRenderMode.Virtual"
-                                    FilteringMode="DataGridFilteringMode.Contains"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                        @bind-Value="editItem.Leader3"
-                                    TextFieldName="@nameof(Person.PersonSummary)">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
-                        <DxComboBox Data="Venues"
-                                    FilteringMode="DataGridFilteringMode.Contains"
-                        @bind-Value="editItem.Venue"
-                                    TextFieldName="@nameof(Venue.Name)">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Start Date" ColSpanMd="12" Visible=@(showFullDetail || IsActivityView || editItem.StartDate != null)>
-                        <DxDateEdit T="DateTime?" Date="@editItem.StartDate" DateExpression="@(() => editItem.StartDate)"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    NullText="Start Date of class. Only if not the Start of Term"
-                                    DateChanged="@((DateTime? newValue) => OnStartDateChanged(newValue, editItem))" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12" Visible=@(showFullDetail || editItem.Recurrence != null)>
-                        <DxSpinEdit @bind-Value="editItem.Recurrence" MinValue="1" MaxValue="52"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    NullText="The number of times the class recurs. Only if not End of Term." />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Occurrence" ColSpanMd="12" Visible=true>
-                        <DxComboBox Data="occurrence"
-                        @bind-Value="editItem.Occurrence"
-                                    TextFieldName="@nameof(Occurrence.Name)">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="On Day" ColSpanMd="12" Visible=@(showFullDetail || !IsActivityView)>
-                        <DxComboBox Data="WeekDays"
-                                    FilteringMode="DataGridFilteringMode.Contains"
-                        @bind-Value="editItem.OnDay"
-                                    TextFieldName="@nameof(WeekDay.Day)" ReadOnly="@IsOnDayReadOnly">
-                        </DxComboBox>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Start Time" ColSpanMd="12">
-                        <DxTimeEdit DisplayFormat="t" @bind-Time="editItem.StartTime" />
-                    </DxFormLayoutItem>
+
+                    <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="8">
+                        <DxFormLayoutItem Caption="Guest Leader" ColSpanMd="12" Visible=@(showFullDetail || IsActivityView || editItem.GuestLeader !=null)>
+                            <DxTextBox @bind-Text="editItem.GuestLeader"
+                                       NullText="A non-member presenter, leader or speaker"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
+                            <DxComboBox Data="Persons"
+                                        ListRenderMode="ListRenderMode.Virtual"
+                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        @bind-Value="editItem.Leader"
+                                        TextFieldName="@nameof(Person.PersonSummary)">
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Leader 2" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader2 != null)>
+                            <DxComboBox Data="Persons"
+                                        ListRenderMode="ListRenderMode.Virtual"
+                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        @bind-Value="editItem.Leader2"
+                                        TextFieldName="@nameof(Person.PersonSummary)">
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Leader 3" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader3 != null)>
+                            <DxComboBox Data="Persons"
+                                        ListRenderMode="ListRenderMode.Virtual"
+                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        @bind-Value="editItem.Leader3"
+                                        TextFieldName="@nameof(Person.PersonSummary)">
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
+                            <DxComboBox Data="Venues"
+                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        @bind-Value="editItem.Venue"
+                                        TextFieldName="@nameof(Venue.Name)">
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
+
+                    <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="4">
+                        <DxFormLayoutItem Caption="Start Date" ColSpanMd="12" Visible=@(showFullDetail || IsActivityView || editItem.StartDate != null)>
+                            <DxDateEdit T="DateTime?" Date="@editItem.StartDate" DateExpression="@(() => editItem.StartDate)"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        NullText="Start Date of class. Only if not the Start of Term"
+                                        DateChanged="@((DateTime? newValue) => OnStartDateChanged(newValue, editItem))" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12" Visible=@(showFullDetail || editItem.Recurrence != null)>
+                            <DxSpinEdit @bind-Value="editItem.Recurrence" MinValue="1" MaxValue="52"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        NullText="The number of times the class recurs. Only if not End of Term." />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Occurrence" ColSpanMd="12" Visible=true>
+                            <DxComboBox Data="occurrence"
+                                        @bind-Value="editItem.Occurrence"
+                                        TextFieldName="@nameof(Occurrence.Name)">
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="On Day" ColSpanMd="12">
+                            <DxComboBox Data="WeekDays"
+                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        @bind-Value="editItem.OnDay"
+                                        TextFieldName="@nameof(WeekDay.Day)" ReadOnly="@IsOnDayReadOnly">
+                            </DxComboBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Start Time" ColSpanMd="12">
+                            <DxTimeEdit DisplayFormat="t" @bind-Time="editItem.StartTime" />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
                 </Items>
             </DxFormLayoutGroup>
         </DxFormLayout>
@@ -167,10 +173,11 @@
                 { editItem.Occurrence = occurrence.First(x => x.ID == (int)OccurrenceType.Weekly); }
                 isNewRecord = true;
             }
-            else { 
-                editItem = Course.Classes[0]; 
+            else
+            {
+                editItem = Course.Classes[0];
                 if (editItem.StartDate != null) { IsOnDayReadOnly = true; }
-                isNewRecord = false; 
+                isNewRecord = false;
             }
         }
         await base.OnInitializedAsync();

@@ -35,8 +35,6 @@ else
         </div>
     </div>
 
-
-    <br />
     <Progress @ref=@progressBar />
     <MessageBox @ref="@messageBox" />
     <SelectCourseView @ref="selectCourseView" PopupWidth="40rem" />
@@ -50,7 +48,7 @@ else
         <DxTab Text="Activity/Events" />
         <DxTab Text="Multi-Campus" />
     </DxTabs>
-    <FullScreen DisplayOffset="10">
+    <FullScreen DisplayOffset="9">
         <ContentTemplate>
             <DxGrid Data="@Courses" @ref=@mainGrid
                     AutoCollapseDetailRow="true"
