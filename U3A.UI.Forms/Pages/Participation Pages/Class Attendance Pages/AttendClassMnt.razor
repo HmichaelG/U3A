@@ -22,21 +22,6 @@ else
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
                         @bind-IsActive="@IsXtraLargeLayout" />
 
-    @if (!IsMemberPortal)
-    {
-        <div class="row align-content-start">
-            <ContextHelpTitle Title="Class Attendance" HelpTopic="Class-Attendance.html" />
-        </div>
-        <div class="input-group">
-            <div class="flex-grow-9">
-                Mark the class attendance roll.
-            </div>
-            <DxButton Text="Communicate"
-                      Click="@OnCommunicate"
-                      RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-1" />
-        </div>
-    }
-
     <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
                                  DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
     <Progress @ref="@ProgressBar" />
@@ -67,8 +52,9 @@ else
 
     <DxFormLayout>
         <div class="col col-12 col-lg-9 p-2">
-            @if (!IsLargerLayout())
+            @if (IsMemberPortal)
             {
+
                 <div class="text-center col-12">
                     @(new MarkupString($"{SelectedTerm?.Name} {SelectedCourse?.Name}<br/>{SelectedClass?.ClassSummary}"))
                 </div>
@@ -85,6 +71,17 @@ else
             }
             else
             {
+                <div class="row align-content-start">
+                    <ContextHelpTitle Title="Class Attendance" HelpTopic="Class-Attendance.html" />
+                </div>
+                <div class="input-group mx-2">
+                    <div class="flex-grow-1">
+                        Mark the class attendance roll.
+                    </div>
+                    <DxButton Text="Communicate"
+                              Click="@OnCommunicate"
+                              RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" />
+                </div>
                 <DxFormLayoutGroup Caption="Attendance Details"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
                                    Expanded="true"
@@ -571,7 +568,7 @@ else
         if (ClassDate.Date.Date > now.Date)
         {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                            @"The class date you have selected is in the future.<br/>
+                                                @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
