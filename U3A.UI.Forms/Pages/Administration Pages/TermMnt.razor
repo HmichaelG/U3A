@@ -377,7 +377,7 @@ else
             {
                 if (term.EnrolmentStartDate < prevTerm.EnrolmentEndDate)
                 {
-                    await messageBox.ShowOkOnlyAsync("Enrolment Period not continuous",
+                    await messageBox.ShowOkOnlyAsync("Enrolment Period ambiguous",
                                                     $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
                                                 prior to last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
                                                 <p>The enrolment period is ambiguous which is not permitted.</p>");
@@ -401,7 +401,7 @@ else
             {
                 if (nextTerm.EnrolmentStartDate < term.EnrolmentEndDate.AddDays(-1))
                 {
-                    await messageBox.ShowOkOnlyAsync("Enrolment Period not continuous",
+                    await messageBox.ShowOkOnlyAsync("Enrolment Period ambiguous",
                                                 $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
                                             prior to next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is ambiguous which is not permitted.</p>");
