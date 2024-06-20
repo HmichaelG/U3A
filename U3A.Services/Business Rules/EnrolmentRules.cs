@@ -778,7 +778,12 @@ namespace U3A.BusinessRules
                     result.AppendLine($"<tr><td>{e.Course.Name}</td><td>{status}</td></tr>");
                 }
                 result.AppendLine("</tbody></table>");
-                result.AppendLine("<div class='alert alert-info text-center'>Pending allocations are processed hourly</div>");
+                var processMsg = "Pending allocations are processed hourly";
+                if (IsEnrolmentBlackoutPeriod(settings)) {
+                    var processDate = TimezoneAdjustment.GetLocalTime(settings.EnrolmentBlackoutEndsUTC.Value).ToString(constants.STD_DATETIME_FORMAT);
+                    processMsg = $"Pending allocations will be processed on or after<br/>{processDate}";
+                }
+                result.AppendLine($"<div class='alert alert-info text-center'>{processMsg}</div>");
             }
             return result.ToString();
         }
