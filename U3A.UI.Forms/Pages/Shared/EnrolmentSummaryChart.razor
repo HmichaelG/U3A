@@ -2,6 +2,7 @@
 @inject IJSRuntime js
 @using System.Drawing
 @using System.Text.Json
+@using Devexpress.Blazor
 
 <Progress @ref=@progress />
 
@@ -43,7 +44,7 @@
             <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks">
                 <DxChartAxisTitle Text="Requests including Waitlist" />
             </DxChartValueAxis>
-            <DxChartArgumentAxis TickInterval="ChartAxisTickInterval.Month" />
+            <DxChartArgumentAxis TickInterval="ChartAxisInterval.Month" />
             <DxChartLegend Position="RelativePosition.Outside"
                            Orientation="Orientation.Vertical"
                            HorizontalAlignment="HorizontalAlignment.Right" />
