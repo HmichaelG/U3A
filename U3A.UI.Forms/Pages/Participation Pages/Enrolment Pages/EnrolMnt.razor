@@ -130,7 +130,7 @@ else
                                 <DxGridSelectionColumn Width="2rem" />
                                 <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem"
                                                        EditButtonVisible="true" DeleteButtonVisible="true" />
-                                <DxGridDataColumn Caption="Name" FieldName="Person.FullName" Width="15rem">
+                                <DxGridDataColumn Caption="Name" FieldName="Person.FullName" MinWidth="250">
                                     <CellEditTemplate>
                                         @{
                                             var enrolment = (Enrolment)context.EditModel;
@@ -585,7 +585,7 @@ else
                 {
                     classes.AddRange(selectedCourse.Classes);
                 }
-               await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, classes, settings);
+                await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, classes, settings);
             }
         }
         else
@@ -607,7 +607,9 @@ else
                 // Post changes to the database.
                 if (e.IsNew) await dbc.AddAsync(dataItem);
                 // Create a mail item
-                await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
+                DateTime? emailAt = null;
+                if (BusinessRule.IsEnrolmentBlackoutPeriod(settings)) { emailAt = settings.EnrolmentBlackoutEndsUTC; }
+                await BusinessRule.CreateEnrolmentSendMailAsync(dbc,emailAt);
             }
         }
         await SaveChangesAsync();

@@ -646,6 +646,7 @@ else
                 }
             }
         }
+        dbc.ChangeTracker.Clear();
         googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
         if (string.IsNullOrWhiteSpace(googleMapAPIKey)) googleMapAPIKey = config.GetConnectionString("GoogleMapAPIKey");
 

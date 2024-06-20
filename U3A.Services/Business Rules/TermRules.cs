@@ -175,6 +175,13 @@ namespace U3A.BusinessRules
             if (termNo < 1) { termNo = 4; year--; }
             return await dbc.Term.FirstOrDefaultAsync(x => x.Year == year && x.TermNumber == termNo);
         }
+        public static async Task<Term?> GetNextTermAsync(U3ADbContext dbc, int Year, int TermNumber)
+        {
+            int termNo = ++TermNumber;
+            int year = Year;
+            if (termNo > 4) { termNo = 1; year++; }
+            return await dbc.Term.FirstOrDefaultAsync(x => x.Year == year && x.TermNumber == termNo);
+        }
         public static Term? GetPreviousTerm(U3ADbContext dbc, int Year, int TermNumber)
         {
             int termNo = TermNumber - 1;

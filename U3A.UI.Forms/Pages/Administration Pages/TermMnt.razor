@@ -109,17 +109,17 @@ else
     </DxGrid>
 
     <DxToolbar>
-            <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
-                <Template>
-                    <div class="d-flex">
-                        <div class="flex-grow-0 pt-1 pe-2">Year:</div>
-                        <DxSpinEdit @bind-Value=@year CssClass="flex-grow-1" />
-                    </div>
-                </Template>
-            </DxToolbarItem>
+        <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+            <Template>
+                <div class="d-flex">
+                    <div class="flex-grow-0 pt-1 pe-2">Year:</div>
+                    <DxSpinEdit @bind-Value=@year CssClass="flex-grow-1" />
+                </div>
+            </Template>
+        </DxToolbarItem>
     </DxToolbar>
-        <DxScheduler StartDate="@(new DateTime(year,1,1))"
-        AllowCreateAppointment="false"
+    <DxScheduler StartDate="@(new DateTime(year,1,1))"
+                 AllowCreateAppointment="false"
                  AllowDeleteAppointment="false"
                  AllowEditAppointment="false"
                  ShowAppointmentTooltip="true"
@@ -176,11 +176,12 @@ else
     .dxbs-sc-tb-wrapper {
         display: none !important;
     }
+
     .month-style {
         width: 8.33333333%;
-        text-align:center;
+        text-align: center;
         border-right: thin solid;
-        border-right-color:gainsboro;
+        border-right-color: gainsboro;
     }
 
     .month-style-nb {
@@ -370,12 +371,51 @@ else
         mainGrid.EndUpdate();
         if (term.TermNumber != 1)
         {
-            Term prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
-            if (prevTerm != null && term.EnrolmentStartDate >= prevTerm.EndDate)
+            Term prevTerm;
+            prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
+            if (prevTerm != null)
             {
-                await messageBox.ShowOkOnlyAsync("Invalid Enrolment Date",
-                                    $"The enrolment Start Date ({term.EnrolmentStartDate.ToShortDateString()}) must be at least one week prior to last term's End Date ({prevTerm.EndDate.ToShortDateString()}).");
-                result = false;
+                if (term.EnrolmentStartDate < prevTerm.EnrolmentEndDate)
+                {
+                    await messageBox.ShowOkOnlyAsync("Enrolment Period not continuous",
+                                                    $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
+                                                prior to last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
+                                                <p>The enrolment period is ambiguous which is not permitted.</p>");
+                    return false;
+                }
+                if (term.EnrolmentStartDate >= prevTerm.EnrolmentEndDate.AddDays(1))
+                {
+                    result = await messageBox.ShowAsync("Enrolment Period not continuous",
+                                                $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
+                                            is later than last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
+                                            <p>The enrolment period is not continuous and there will be a period where members
+                                            are not permitted to enrol.</p><p>Do you wish to continue?</p>");
+                    return result;
+                }
+            }
+        }
+        if (term.TermNumber != 4)
+        {
+            var nextTerm = await BusinessRule.GetNextTermAsync(dbc, term.Year, term.TermNumber);
+            if (nextTerm != null)
+            {
+                if (nextTerm.EnrolmentStartDate < term.EnrolmentEndDate.AddDays(-1))
+                {
+                    await messageBox.ShowOkOnlyAsync("Enrolment Period not continuous",
+                                                $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
+                                            prior to next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
+                                            <p>The enrolment period is ambiguous which is not permitted.</p>");
+                    return false;
+                }
+                if (nextTerm.EnrolmentStartDate >= term.EnrolmentEndDate.AddDays(1))
+                {
+                    result = await messageBox.ShowAsync("Enrolment Period not continuous",
+                                                    $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
+                                            is later than next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
+                                            <p>The enrolment period is not continuous and there will be a period where members
+                                            are not permitted to enrol.</p><p>Do you wish to continue?</p>");
+                    return result;
+                }
             }
         }
         return result;
