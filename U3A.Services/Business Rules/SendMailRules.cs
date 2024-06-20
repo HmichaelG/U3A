@@ -59,10 +59,10 @@ namespace U3A.BusinessRules
             var reportName = "Participant Enrolment";
             foreach (var e in enrolments)
             {
-                if (!(await dbc.SendMail.Where(x => x.RecordKey == e.ID
+                if (!(await dbc.SendMail.AnyAsync(x => x.RecordKey == e.ID
                             && x.Person.ID == e.Person.ID
                             && x.DocumentName == reportName
-                            && string.IsNullOrWhiteSpace(x.Status)).AnyAsync()))
+                            && string.IsNullOrWhiteSpace(x.Status))))
                 {
                     var mail = new SendMail()
                     {
@@ -71,7 +71,6 @@ namespace U3A.BusinessRules
                         RecordKey = e.ID,
                         CreatedOn = AsAt,
                     };
-                    if (IsEnrolmentBlackoutPeriod(settings)) { mail.CreatedOn = settings.EnrolmentBlackoutEndsUTC; }
                     await dbc.AddAsync(mail);
                 }
             }
@@ -90,11 +89,11 @@ namespace U3A.BusinessRules
                     var c = await dbc.Class.FindAsync(e.ClassID);
                     foreach (var p in await BusinessRule.GetLeaderReportRecipients(dbc, s, t, c))
                     {
-                        if (!(await dbc.SendMail.Where(x => x.RecordKey == c.ID           // Record key is the classID
+                        if (!(await dbc.SendMail.AnyAsync(x => x.RecordKey == c.ID           // Record key is the classID
                                     && x.TermID == e.TermID
                                     && x.PersonID == p.ID
                                     && x.DocumentName == reportName
-                                    && string.IsNullOrWhiteSpace(x.Status)).AnyAsync()))
+                                    && string.IsNullOrWhiteSpace(x.Status))))
                         {
                             var key = p.ID.ToString() + c.ID.ToString();
                             if (!keys.Contains(key))
