@@ -842,7 +842,7 @@ else
         string status;
         Enrolment? e = c.IsSelectedByEnrolment;
         // Enrolled in class - display the status
-        status = BusinessRule.GetMemberPortalEnrolmentStatus(e, term, settings);
+        status = BusinessRule.GetMemberPortalEnrolmentStatus(c, e, term, settings);
         classEndDate = term.EndDate;
         if (c.TermNumber != term.TermNumber)
         {

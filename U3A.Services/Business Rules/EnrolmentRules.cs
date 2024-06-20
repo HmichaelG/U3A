@@ -376,7 +376,7 @@ namespace U3A.BusinessRules
             }
             return result;
         }
-        public static string GetMemberPortalEnrolmentStatus(Enrolment? enrolment, Term term, SystemSettings settings)
+        public static string GetMemberPortalEnrolmentStatus(Class Class, Enrolment? enrolment, Term term, SystemSettings settings)
         {
             var result = "Pending";
             if (enrolment != null)
@@ -384,7 +384,14 @@ namespace U3A.BusinessRules
                 // Display if prior to allocation date irrespective of status
                 if (BusinessRule.IsPreRandomAllocationEmailDay(term, settings, TimezoneAdjustment.GetLocalTime()))
                 {
-                    result = "Waitlisted: (Awaiting Random Allocation)";
+                    if (Class.TermNumber >= term.TermNumber) 
+                    { 
+                        result = "Waitlisted: (Awaiting Random Allocation)"; 
+                    }
+                    else
+                    {
+                        result = (enrolment.IsWaitlisted) ? "Waitlisted" : "Enrolled";
+                    }
                 }
                 else
                 {
