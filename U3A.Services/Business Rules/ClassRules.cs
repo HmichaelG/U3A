@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 using Twilio.Rest.Trunking.V1;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Components;
+using System.Collections.Concurrent;
 
 namespace U3A.BusinessRules
 {
@@ -366,7 +367,7 @@ namespace U3A.BusinessRules
 
         public static List<Class> GetClassDetailsForStudent(IEnumerable<Class> Classes, Person Student)
         {
-            List<Class> result = new();
+            ConcurrentBag<Class> result = new();
             foreach (var c in Classes)
             {
                 c.IsSelected = false;
@@ -376,17 +377,17 @@ namespace U3A.BusinessRules
                 {
                     c.IsSelected = true;
                     c.IsSelectedByEnrolment = e;
-                    result.Add(c);
+                    if (!result.Contains(c)) { result.Add(c); }
                 }
                 // different participants in each class
                 foreach (var e in c.Enrolments.Where(x => x.PersonID == Student.ID))
                 {
                     c.IsSelected = true;
                     c.IsSelectedByEnrolment = e;
-                    result.Add(c);
+                    if (!result.Contains(c)) { result.Add(c); }
                 }
             }
-            return result;
+            return result.OrderBy(x => x.OnDayID).ToList();
         }
         public static bool IsCourseInTerm(Course course, Term term)
         {
