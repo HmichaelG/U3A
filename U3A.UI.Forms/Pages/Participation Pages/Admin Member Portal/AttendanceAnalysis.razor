@@ -38,7 +38,6 @@
                       DropDownVisible=@isTagboxDropDownVisible
                       Values=@selectedDates
                       ValuesChanged="OnTagBoxValuesChanged"
-                      EditFormat="dd-MMM-yyyy"
                       DropDownVisibleChanged="@((value) => OnTagBoxDropDownVisibleChanges(value))">
             </DxTagBox>
         </DxFormLayoutItem>
@@ -91,7 +90,7 @@
 }
 <style>
     .pivot-height{
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "16rem" : "12rem"));
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "17rem" : "15rem"));
     }
 </style>
 
@@ -170,7 +169,7 @@
         else {
             pivotData = attendance.Where(x => selectedDates.Contains(x.WeekEndDate)).ToList();
         }
-        tagBox.DropDownVisible = false;
+        isTagboxDropDownVisible = false;
         StateHasChanged();
     }
 
