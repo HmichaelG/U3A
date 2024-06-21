@@ -1,30 +1,28 @@
 ﻿@inherits DxGridCommandColumn
-@base.BuildRenderTree
-
 
 @code {
-    [CascadingParameter] 
-    public IGrid MyGrid { get; set; }
     [Parameter]
     public EventCallback<object> OnDeleteButtonClick { get; set; }
 
+    IGrid MyGrid { get; set; }
     protected override bool ShouldRender() => false;
 
     protected override void OnInitialized() {
         base.OnInitialized();
+        MyGrid = (IGrid) this.Parent;
         Width = (EditButtonVisible && DeleteButtonVisible) ? "5rem" : "2rem";
         if (NewButtonVisible) {
             HeaderTemplate = context => 
           @<DxButton RenderStyle="ButtonRenderStyle.Primary"
           RenderStyleMode="ButtonRenderStyleMode.Outline" title="Add new record"
-          IconCssClass="bi bi-plus" Click="async () => MyGrid.StartEditNewRowAsync()" />;
+          IconCssClass="bi bi-plus" Click="async () => await MyGrid.StartEditNewRowAsync()" />;
         };
         CellDisplayTemplate = context =>
     @<text>
         @if (EditButtonVisible) {
             <DxButton RenderStyle="ButtonRenderStyle.Warning"
               RenderStyleMode="ButtonRenderStyleMode.Outline" title="Edit this record"
-              IconCssClass="bi bi-pencil" Click="async () => MyGrid.StartEditDataItemAsync(context.DataItem)" />
+              IconCssClass="bi bi-pencil" Click="async () => await MyGrid.StartEditDataItemAsync(context.DataItem)" />
         }
         @if (DeleteButtonVisible) {
             <DxButton RenderStyle="ButtonRenderStyle.Danger" title="Delete this record"
@@ -37,7 +35,7 @@
     @<text>
         <DxButton RenderStyle="ButtonRenderStyle.Success"
               RenderStyleMode="ButtonRenderStyleMode.Outline" title="Save your changes"
-              IconCssClass="bi bi-hdd" Click="async () => MyGrid.SaveChangesAsync()" />
+              IconCssClass="bi bi-hdd" Click="async () => await MyGrid.SaveChangesAsync()" />
         <DxButton RenderStyle="ButtonRenderStyle.Danger" title="Cancel your changes"
               RenderStyleMode="ButtonRenderStyleMode.Outline"
               IconCssClass="bi bi-arrow-counterclockwise" Click="() => MyGrid.CancelEditAsync()" />
