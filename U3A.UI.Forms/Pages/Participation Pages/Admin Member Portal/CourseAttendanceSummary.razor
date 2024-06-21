@@ -89,7 +89,7 @@
     </DxFormLayout>
 </div>
 
-<DxWindow @ref=@detailsForm Width="max(35vw, 400px)"
+<DxWindow @ref=@detailsForm Width="max(55dvw, 98%)"
           AllowResize="true"
           Context="windowContext"
           CloseOnEscape=true
@@ -100,7 +100,7 @@
           BodyCssClass="grid-height"
           HeaderText=@detailsFormTitle>
     <BodyTextTemplate>
-        <div class="p-4">
+        <div class="p-2">
             <DxFormLayout>
                 <DxGrid Data="@ClassAttendance" @ref=@attendanceGrid
                         ShowAllRows="true"
