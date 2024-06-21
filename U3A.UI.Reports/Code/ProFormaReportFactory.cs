@@ -254,7 +254,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                     reportNames.Add("Leader's Report.pdf");
                 }
             }
-            if (Enrolments.Where(x => !x.IsWaitlisted).Any())
+            if (Enrolments.Any(x => !x.IsWaitlisted))
             {
                 if (DoLeaderAttendanceList)
                 {

@@ -44,7 +44,6 @@ else
                 <DxFormLayout>
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                         <DxComboBox Data="@terms" NullText="Select the Term required..."
-                                    FilteringMode="DataGridFilteringMode.Contains"
                                     TextFieldName="@nameof(Term.TermSummary)"
                                     Value="@selectedTerm"
                                     ValueChanged="@((Term term) => SelectedTermChanged(term))" />
@@ -116,12 +115,12 @@ else
 
 @code {
 
-        [Parameter]
-        public bool IsPortal { get; set; }
-        [Parameter]
-        public bool IsPublic { get; set; }
+    [Parameter]
+    public bool IsPortal { get; set; }
+    [Parameter]
+    public bool IsPublic { get; set; }
 
-        bool IsReady;
+    bool IsReady;
     public List<Venue>? AvailableVenues { get; set; }
     public IEnumerable<Venue>? VenuesToFilter { get; set; }
     LocalTime localTime;
@@ -141,23 +140,33 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-            AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
-            selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
-        }
-        if (IsPublic) IsPortal = true;
-        viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
-        if (selectedTerm != null)
-        {
-            SelectedTermChanged(selectedTerm);
-            if (IsPortal && DataStorage == null && selectedTerm != null)
-            {
-                await ProcessButtonClicked();
-            }
-        }
         IsReady = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+                AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
+                selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+            }
+            if (IsPublic) IsPortal = true;
+            viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
+            if (selectedTerm != null)
+            {
+                SelectedTermChanged(selectedTerm);
+                if (IsPortal && DataStorage == null && selectedTerm != null)
+                {
+                    await ProcessButtonClicked();
+                }
+            }
+            IsReady = true;
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     async void OnStartDateChanged(DateTime newStartDate) => StartDate = (await localTime.GetLocalTimeAsync(newStartDate)).Date;
@@ -167,8 +176,7 @@ else
     async Task SelectedTermChanged(Term term)
     {
         selectedTerm = term;
-        if (localTime == null) localTime = new LocalTime(js);
-        var now = (await localTime.GetLocalTimeAsync()).Date;
+        var now = TimezoneAdjustment.GetLocalTime().Date;
         if (now > term.StartDate && now <= term.EndDate)
         {
             StartDate = now;

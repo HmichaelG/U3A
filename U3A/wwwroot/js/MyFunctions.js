@@ -107,7 +107,7 @@ function setTheme() {
         localStorage.setItem("theme", theme);
     }
     // set the default
-    var href = '_content/DevExpress.Blazor.Themes/office-white.bs5.css';
+    var href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css';
     // load from localStorage & replace the default
     var theme = localStorage.getItem('theme');
     if (theme) {
