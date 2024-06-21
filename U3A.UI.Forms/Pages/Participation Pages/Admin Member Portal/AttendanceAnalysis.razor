@@ -11,7 +11,6 @@
     <DxFormLayout CssClass="col col-12">
         <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="6">
             <DxComboBox Data="@terms" NullText="Select the Term required..."
-                        FilteringMode="DataGridFilteringMode.Contains"
                         TextFieldName="@nameof(Term.TermSummary)"
             @bind-Value="@SelectedTerm">
                 <Buttons>
@@ -98,10 +97,9 @@
 </style>
 
 @code {
-
-    List<Term> terms { get; set; }
-    List<AttendClass>? pivotData { get; set; }
-    List<AttendClass>? attendance { get; set; }
+    IEnumerable<Term> terms;
+    IEnumerable<AttendClass>? pivotData { get; set; }
+    IEnumerable<AttendClass>? attendance { get; set; }
     IEnumerable<DateTime> availableDates;
     IEnumerable<DateTime>? selectedDates;
     Term SelectedTerm;
