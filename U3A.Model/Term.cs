@@ -31,7 +31,18 @@ namespace U3A.Model
         private bool mIsDefaultTerm { get; set; }
         private bool mIsClassAllocationFinalised { get; set; } = false;
 
+        public override int GetHashCode()
+        {
+            return Comparer;
+        }
 
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Term))
+                return false;
+            else
+                return this.Comparer == ((Term)obj).Comparer;
+        }
 
         [Key]
         public Guid ID

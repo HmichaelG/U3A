@@ -4,13 +4,13 @@
 
 <h3>Attendance Analysis</h3>
 
-@if (isReady) {
+@if (isReady)
+{
     <MessageBox @ref=@messageBox />
     <Progress @ref=@progress />
     <DxFormLayout CssClass="col col-12">
         <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="6">
             <DxComboBox Data="@terms" NullText="Select the Term required..."
-                        FilteringMode="DataGridFilteringMode.Contains"
                         TextFieldName="@nameof(Term.TermSummary)"
             @bind-Value="@SelectedTerm">
                 <Buttons>
@@ -38,7 +38,6 @@
                       DropDownVisible=@isTagboxDropDownVisible
                       Values=@selectedDates
                       ValuesChanged="OnTagBoxValuesChanged"
-                      EditFormat="dd-MMM-yyyy"
                       DropDownVisibleChanged="@((value) => OnTagBoxDropDownVisibleChanges(value))">
             </DxTagBox>
         </DxFormLayoutItem>
@@ -50,10 +49,11 @@
         </DxTabs>
 
         <DxPivotGrid @ref=pivotGrid Data="@pivotData"
-                     CssClass="pivot-height" 
+                     CssClass="pivot-height"
                      ShowFieldHeaders="false">
             @{
-                switch (selectedIndex) {
+                switch (selectedIndex)
+                {
                     case 1:
                         <DxPivotGridField Field="@nameof(AttendClass.VenueName)" Area="PivotGridFieldArea.Row" Caption="Venue" />
                         <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
@@ -69,37 +69,37 @@
 
                 }
             }
-            @if (isWeekByWeekTotalsDisplayed) {
-            <DxPivotGridField Field="@nameof(AttendClass.WeekEndDate)" Area="PivotGridFieldArea.Column" Caption="Wk Ending">
-                <HeaderTemplate>@(string.Format("{0:dd-MMM-yy}", context))</HeaderTemplate>
-            </DxPivotGridField>
+            @if (isWeekByWeekTotalsDisplayed)
+            {
+                <DxPivotGridField Field="@nameof(AttendClass.WeekEndDate)" Area="PivotGridFieldArea.Column" Caption="Wk Ending">
+                    <HeaderTemplate>@(string.Format("{0:dd-MMM-yy}", context))</HeaderTemplate>
+                </DxPivotGridField>
             }
             <DxPivotGridField Field="@nameof(AttendClass.Actual)" Caption="Act" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
             @if (!hideExpectedAnalysis)
             {
                 <DxPivotGridField Field="@nameof(AttendClass.Expected)" Caption="Exp" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
                 <DxPivotGridField Field="@nameof(AttendClass.Difference)" Caption="+/-" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum">
-                <DataTemplate>
-                    <div class="@((decimal?)context >= 0 ? "text-success" : "text-danger")">
-                        <strong>@context</strong>
-                    </div>
-                </DataTemplate>
-            </DxPivotGridField>
+                    <DataTemplate>
+                        <div class="@((decimal?)context >= 0 ? "text-success" : "text-danger")">
+                            <strong>@context</strong>
+                        </div>
+                    </DataTemplate>
+                </DxPivotGridField>
             }
         </DxPivotGrid>
     </DxFormLayout>
 }
 <style>
-    .pivot-height{
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "16rem" : "12rem"));
+    .pivot-height {
+        height: calc(100dvh - @(Workstation.UseTopMenu ? "17rem" : "15rem"));
     }
 </style>
 
 @code {
-
-    List<Term> terms { get; set; }
-    List<AttendClass>? pivotData { get; set; }
-    List<AttendClass>? attendance { get; set; }
+    IEnumerable<Term> terms;
+    IEnumerable<AttendClass>? pivotData { get; set; }
+    IEnumerable<AttendClass>? attendance { get; set; }
     IEnumerable<DateTime> availableDates;
     IEnumerable<DateTime>? selectedDates;
     Term SelectedTerm;
@@ -119,62 +119,73 @@
     bool hideExpectedAnalysis;
     int selectedIndex = 0;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         pivotData = new List<AttendClass>();
         dbc = await U3Adbfactory.CreateDbContextAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         SelectedTerm = await BusinessRule.CurrentTermAsync(dbc);
-        await base.OnInitializedAsync();
         isReady = true;
+        await base.OnInitializedAsync();
     }
 
-    async Task OnProcess() {
+    async Task OnProcess()
+    {
         await GetData();
         availableDates = selectedDates = attendance.Select(x => x.WeekEndDate).Distinct().OrderBy(x => x);
     }
-    async Task GetData() {
+    async Task GetData()
+    {
         await progress.ShowSmallSpinnerAsync();
         var service = new LocalTime(js);
         var now = await service.GetLocalDateAsync();
-        attendance = pivotData = await BusinessRule.GetAttendanceAsync(dbc, SelectedTerm,now);
+        attendance = pivotData = await BusinessRule.GetAttendanceAsync(dbc, SelectedTerm, now);
         await progress.Close();
     }
 
-    async void OnTabClick(TabClickEventArgs e) {
+    async void OnTabClick(TabClickEventArgs e)
+    {
         selectedIndex = e.TabIndex;
         await GetData();
         RefreshData();
     }
 
-    void OnTagBoxValuesChanged(IEnumerable<DateTime> values) {
+    void OnTagBoxValuesChanged(IEnumerable<DateTime> values)
+    {
         selectedDates = values;
         RefreshData();
     }
 
-    async void OnWeekeByWeekCheckChanged(bool value) {
+    async void OnWeekeByWeekCheckChanged(bool value)
+    {
         isWeekByWeekTotalsDisplayed = value;
         await GetData();
         RefreshData();
     }
-    async void HideExpectedAnalysis(bool value) {
+    async void HideExpectedAnalysis(bool value)
+    {
         hideExpectedAnalysis = value;
         await GetData();
         RefreshData();
     }
 
-    void RefreshData() {
+    void RefreshData()
+    {
         if (selectedDates == null) return;
-        if (selectedDates.Count() == availableDates.Count()) {
+        if (selectedDates.Count() == availableDates.Count())
+        {
             pivotData = attendance;
         }
-        else {
+        else
+        {
             pivotData = attendance.Where(x => selectedDates.Contains(x.WeekEndDate)).ToList();
         }
-        tagBox.DropDownVisible = false;
+        isTagboxDropDownVisible = false;
         StateHasChanged();
     }
 
-    void OnTagBoxDropDownVisibleChanges(bool value) {
+    void OnTagBoxDropDownVisibleChanges(bool value)
+    {
         isTagboxDropDownVisible = false;
     }
 

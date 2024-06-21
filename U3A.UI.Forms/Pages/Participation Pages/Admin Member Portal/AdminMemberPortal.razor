@@ -55,11 +55,17 @@ else
                                             <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
                                                 <DxComboBox Data="@people"
                                                             AllowUserInput=true
+                                                            SearchMode="ListSearchMode.AutoSearch"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                            FilteringMode="DataGridFilteringMode.Contains"
                                                             ListRenderMode="ListRenderMode.Virtual"
                                                             TextFieldName="@nameof(Person.PersonSummary)"
                                                             @bind-Value="@selectedPerson">
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(Person.FirstName)" Caption="First Name" />
+                                                        <DxListEditorColumn FieldName="@nameof(Person.LastName)" Caption="Last Name" />
+                                                        <DxListEditorColumn FieldName="@nameof(Person.Mobile)" Caption="Mobile" />
+                                                        <DxListEditorColumn FieldName="@nameof(Person.Email)" Caption="Mobile" />
+                                                    </Columns>
                                                     <Buttons>
                                                         <DxEditorButton Text="Process" CssClass="text-primary"
                                                                         IconCssClass="h5 bi bi-check-lg"
@@ -71,6 +77,7 @@ else
                                                                         Click="@OnClearSelection">
                                                         </DxEditorButton>
                                                     </Buttons>
+
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
                                         </Items>
