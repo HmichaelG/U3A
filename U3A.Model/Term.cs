@@ -33,15 +33,15 @@ namespace U3A.Model
 
         public override int GetHashCode()
         {
-            return Comparer;
+            int hash = 17; // Initial value (usually a prime number)
+            return hash * ID.GetHashCode();
         }
-
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is Term))
+            if (obj == null || !(obj is (Term)))
                 return false;
             else
-                return this.Comparer == ((Term)obj).Comparer;
+                return this.GetHashCode() == ((Term)obj).GetHashCode();
         }
 
         [Key]

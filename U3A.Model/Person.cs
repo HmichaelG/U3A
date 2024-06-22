@@ -16,12 +16,20 @@ namespace U3A.Model
     [Index(nameof(LastName), nameof(FirstName), nameof(Email))]
     public class Person : BaseEntity, ISoftDelete
     {
-        
+        public override int GetHashCode()
+        {
+            int hash = 17; // Initial value (usually a prime number)
+            return hash * ID.GetHashCode();
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is (Person)))
+                return false;
+            else
+                return this.GetHashCode() == ((Person)obj).GetHashCode();
+        }
+
         [Key]
-
-        [NotMapped]
-        TextInfo info = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo;
-
         public Guid ID { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -346,6 +354,7 @@ namespace U3A.Model
             string result = Name;
             if (result.ToUpper() == Name)
             {
+                TextInfo info = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo;
                 result = result.Replace("'", "\t");
                 result = info.ToTitleCase(result.ToLower());
                 result = result.Replace("\t", "'");
