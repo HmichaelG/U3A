@@ -92,6 +92,7 @@ builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
 // ***
 
 //DevExpress.Blazor.CompatibilitySettings.ComboBoxCompatibilityMode = true;
+
 builder.Services.AddDevExpressServerSideBlazorReportViewer();
 builder.Services.AddDevExpressBlazor(options => {
     options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
