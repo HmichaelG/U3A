@@ -89,7 +89,8 @@ else
                     ShowAllRows="true"
                     KeyFieldName="ID"
                     ValidationEnabled="true"
-                    EditMode="GridEditMode.EditRow"
+                    EditMode="GridEditMode.EditCell"
+                    KeyboardNavigationEnabled=true
                     CustomizeEditModel="Grid_CustomizeEditModel"
                     EditCanceling="Grid_EditCanceling"
                     DataItemDeleting="Grid_DataItemDeleting"
@@ -126,31 +127,31 @@ else
                                         ValueExpression="@(() => currentPerson)"
                                         ValueChanged="@((Person p) => OnPersonChanged(p,importData))"
                                         AllowUserInput="true"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         ListRenderMode="ListRenderMode.Virtual"
                                         DropDownWidthMode="DropDownWidthMode.ContentOrEditorWidth">
                                 <DxListEditorColumn FieldName="@nameof(Person.FullName)"
                                                     Caption="Name"
-                                                    Width="50%" />
+                                                    Width="15rem" />
                                 <DxListEditorColumn FieldName="@nameof(Person.FinancialTo)"
                                                     Caption="Fin-To"
-                                                    Width="16%" />
+                                                    Width="5rem" />
                                 <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
                                                     Caption="Mobile"
-                                                    Width="16%" />
+                                                    Width="8rem" />
                                 <DxListEditorColumn FieldName="@nameof(Person.PersonIdentity)"
                                                     Caption="ID"
-                                                    Width="16%" />
+                                                    Width="5rem" />
                                 <DxListEditorColumn FieldName="@nameof(Person.ConversionID)"
                                                     Caption="Legacy ID"
-                                                    Width="16%" />
+                                                    Width="5rem" />
                             </DxComboBox>
                         </CellEditTemplate>
                     </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Amount" Width="5rem"
+                    <DxGridDataColumn Caption="Amount" Width="10rem"
                                       FieldName="Amount" DisplayFormat="{0:c2}" />
                     <DxGridDataColumn Caption="Financial-To" DisplayFormat="{0:f0}"
-                                      FieldName="FinancialTo" Width="5rem">
+                                      FieldName="FinancialTo" Width="10rem">
                         <EditSettings>
                             <DxSpinEditSettings MaxValue="@(yearComponent?.Year+1)"
                                                 MinValue="@(yearComponent?.Year-1)" />
@@ -158,7 +159,7 @@ else
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="FinTo-Term"
                                       Visible=@(settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly)
-                                      FieldName="FinancialToTerm" Width="6rem">
+                                      FieldName="FinancialToTerm" Width="10rem">
                         <CellEditTemplate>
                             @{
                                 var importData = (ReceiptDataImport)context.EditModel;
