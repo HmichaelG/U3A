@@ -5,7 +5,6 @@
 @using U3A.Model
 @using System.Text.Json
 @using System.Text.Json.Nodes
-@inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
 
@@ -169,7 +168,7 @@ else
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    async void OnStartDateChanged(DateTime newStartDate) => StartDate = (await localTime.GetLocalTimeAsync(newStartDate)).Date;
+    async void OnStartDateChanged(DateTime newStartDate) => StartDate = TimezoneAdjustment.GetLocalTime(newStartDate).Date;
 
     async void OnViewTypeChanged(SchedulerViewType v) => viewType = v;
 
