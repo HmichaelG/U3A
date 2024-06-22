@@ -125,6 +125,20 @@ namespace U3A.Model
         public string? OfferedBy { get; set; } // The U3A that owns the course
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
+
+        public override int GetHashCode()
+        {
+            int hash = 17; // Initial value (usually a prime number)
+            return hash * ID.GetHashCode();
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Course))
+                return false;
+            else
+                return this.GetHashCode() == ((Course)obj).GetHashCode();
+        }
+
     }
 
     public class UrlAttribute : ValidationAttribute
