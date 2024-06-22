@@ -30,7 +30,7 @@ else
             <DxFormLayoutGroup Caption="Enrolment Details">
                 <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                     <DxComboBox Data="@terms" NullText="Select the Term required..."
-                                FilteringMode="DataGridFilteringMode.Contains"
+                                SearchMode="ListSearchMode.AutoSearch"
                                 TextFieldName="@nameof(Term.TermSummary)"
                                 Value="@selectedTerm"
                                 ValueChanged="@((Term term) => SelectedTermChanged(term))" />
@@ -39,7 +39,7 @@ else
                     <DxComboBox Data="@courses"
                                 Enabled="@courseComboEnabled"
                                 NullText="@courseComboNullText"
-                                FilteringMode="DataGridFilteringMode.Contains"
+                                SearchMode="ListSearchMode.AutoSearch"
                                 ListRenderMode="ListRenderMode.Virtual"
                                 TextFieldName="@nameof(Course.Name)"
                                 Value="@selectedCourse"

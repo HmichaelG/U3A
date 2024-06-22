@@ -32,7 +32,7 @@ else
                         <DxFormLayoutGroup Caption="Cancellation Details">
                             <DxFormLayoutItem Caption="Term" ColSpanMd="12">
                                 <DxComboBox Data="@terms" NullText="Select the Term required..."
-                                            FilteringMode="DataGridFilteringMode.Contains"
+                                            SearchMode="ListSearchMode.AutoSearch"
                                             TextFieldName="@nameof(Term.TermSummary)"
                                             Value="@selectedTerm"
                                             ValueChanged="@((Term term) => SelectedTermChanged(term))" />
@@ -41,7 +41,7 @@ else
                                 <DxComboBox Data="@courses"
                                             Enabled="@courseComboEnabled"
                                             NullText="Select the Course required..."
-                                            FilteringMode="DataGridFilteringMode.Contains"
+                                            SearchMode="ListSearchMode.AutoSearch"
                                             ListRenderMode="ListRenderMode.Virtual"
                                             TextFieldName="@nameof(Course.Name)"
                                             Value="@selectedCourse"

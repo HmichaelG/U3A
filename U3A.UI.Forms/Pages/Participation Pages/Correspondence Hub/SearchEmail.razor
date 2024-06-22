@@ -22,7 +22,7 @@ else
                 <DxComboBox Data="@people"
                             AllowUserInput=true
                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                            FilteringMode="DataGridFilteringMode.Contains"
+                            SearchMode="ListSearchMode.AutoSearch"
                             ListRenderMode="ListRenderMode.Virtual"
                             TextFieldName="@nameof(Person.PersonSummary)"
                             @bind-Value="@selectedPerson">
@@ -39,7 +39,7 @@ else
                 <DxComboBox Id="emailId" Data="@email"
                             AllowUserInput=true
                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                            FilteringMode="DataGridFilteringMode.Contains"
+                            SearchMode="ListSearchMode.AutoSearch"
                             ListRenderMode="ListRenderMode.Virtual"
                             @bind-Value="@emailAddressValue"
                             Text="@emailAddress"

@@ -54,7 +54,7 @@
                         <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
                             <DxComboBox Data="Persons"
                                         ListRenderMode="ListRenderMode.Virtual"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                         @bind-Value="editItem.Leader"
                                         TextFieldName="@nameof(Person.PersonSummary)">
@@ -63,7 +63,7 @@
                         <DxFormLayoutItem Caption="Leader 2" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader2 != null)>
                             <DxComboBox Data="Persons"
                                         ListRenderMode="ListRenderMode.Virtual"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                         @bind-Value="editItem.Leader2"
                                         TextFieldName="@nameof(Person.PersonSummary)">
@@ -72,7 +72,7 @@
                         <DxFormLayoutItem Caption="Leader 3" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader3 != null)>
                             <DxComboBox Data="Persons"
                                         ListRenderMode="ListRenderMode.Virtual"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                         @bind-Value="editItem.Leader3"
                                         TextFieldName="@nameof(Person.PersonSummary)">
@@ -80,7 +80,7 @@
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
                             <DxComboBox Data="Venues"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         @bind-Value="editItem.Venue"
                                         TextFieldName="@nameof(Venue.Name)">
                             </DxComboBox>
@@ -107,7 +107,7 @@
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="On Day" ColSpanMd="12">
                             <DxComboBox Data="WeekDays"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         @bind-Value="editItem.OnDay"
                                         TextFieldName="@nameof(WeekDay.Day)" ReadOnly="@IsOnDayReadOnly">
                             </DxComboBox>

@@ -87,7 +87,7 @@ else
                         <DxComboBox Data="@terms" NullText="Select the Term required..."
                                     Enabled="@(!IsMemberPortal)"
                                     AllowUserInput=false
-                                    FilteringMode="DataGridFilteringMode.Contains"
+                                    SearchMode="ListSearchMode.AutoSearch"
                                     TextFieldName="@nameof(Term.TermSummary)"
                                     Value="@SelectedTerm"
                                     ValueChanged="@((Term term) => SelectedTermChanged(term))" />
@@ -97,7 +97,7 @@ else
                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                     Enabled="@courseComboEnabled"
                                     NullText="@courseComboNullText"
-                                    FilteringMode="DataGridFilteringMode.Contains"
+                                    SearchMode="ListSearchMode.AutoSearch"
                                     ListRenderMode="ListRenderMode.Virtual"
                                     TextFieldName="@nameof(Course.Name)"
                                     Value="@SelectedCourse"

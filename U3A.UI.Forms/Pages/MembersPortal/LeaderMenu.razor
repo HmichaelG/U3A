@@ -52,7 +52,7 @@ else
                             <DxComboBox Data="@Students"
                                         AllowUserInput=true
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         ListRenderMode="ListRenderMode.Virtual"
                                         TextFieldName="@nameof(Person.FullName)"
                                         ValueChanged="@((Person student) => OnSelectedStudentChanged(student))"
@@ -82,7 +82,7 @@ else
                             <DxComboBox Data="@StudentsAndLeaders"
                                         AllowUserInput=true
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         ListRenderMode="ListRenderMode.Virtual"
                                         TextFieldName="@nameof(StudentDetails.FullName)"
                                         ValueChanged="@((StudentDetails student) => OnSelectedStudentLookupChanged(student))"

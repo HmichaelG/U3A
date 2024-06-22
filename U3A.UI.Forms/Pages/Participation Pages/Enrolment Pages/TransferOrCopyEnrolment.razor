@@ -11,7 +11,7 @@
         <DxFormLayout>
             <DxFormLayoutItem Caption=@($"{action} In Term") ColSpanMd="12">
                 <DxComboBox Data="@terms"
-                            FilteringMode="DataGridFilteringMode.Contains"
+                            SearchMode="ListSearchMode.AutoSearch"
                             TextFieldName="@nameof(Term.Name)"
                             Value="@selectedTerm"
                             ValueChanged="@((Term term) => SelectedTermChanged(term))" />
@@ -20,7 +20,7 @@
                 <DxComboBox Data="@courses"
                             Enabled="@courseComboEnabled"
                             NullText="@courseComboNullText"
-                            FilteringMode="DataGridFilteringMode.Contains"
+                            SearchMode="ListSearchMode.AutoSearch"
                             ListRenderMode="ListRenderMode.Virtual"
                             TextFieldName="@nameof(Course.Name)"
                             Value="@selectedCourse"

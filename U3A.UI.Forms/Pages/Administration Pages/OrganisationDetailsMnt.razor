@@ -154,7 +154,7 @@ else
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="On Day" ColSpanMd="12">
                                                     <DxComboBox Data="WeekDays"
-                                                                FilteringMode="DataGridFilteringMode.Contains"
+                                                                SearchMode="ListSearchMode.AutoSearch"
                                                                 @bind-Value="@systemSettings.AutoEnrolAllocationDay"
                                                                 ValueFieldName="@nameof(WeekDay.ID)"
                                                                 TextFieldName="@nameof(WeekDay.Day)">

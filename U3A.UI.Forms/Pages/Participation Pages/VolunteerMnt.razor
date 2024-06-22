@@ -55,7 +55,7 @@ else
                                     <DxFormLayout>
                                     <DxFormLayoutItem Caption="Activity" Context="layoutContext" ColSpanMd="12">
                                         <DxComboBox Data="@Activities" NullText="Select Voluntary Activity"
-                                                    FilteringMode="DataGridFilteringMode.Contains"
+                                                    SearchMode="ListSearchMode.AutoSearch"
                                                     Value="@selectedActivity"
                                                     ValueChanged="@((string activity) => SelectedActivityChanged(activity))" />
                                     </DxFormLayoutItem>
@@ -91,7 +91,7 @@ else
                         <DxFormLayoutItem Caption="Volunteer" ColSpanMd="12">
                             <DxComboBox Data="Persons"
                                         ListRenderMode="ListRenderMode.Virtual"
-                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        SearchMode="ListSearchMode.AutoSearch"
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                         @bind-Value="editItem.Person"
                                         TextFieldName="@nameof(Person.PersonSummary)">

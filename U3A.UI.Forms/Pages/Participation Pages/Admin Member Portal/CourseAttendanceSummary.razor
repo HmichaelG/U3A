@@ -12,7 +12,7 @@
         <div class="w-100">
             <DxFormLayoutItem Caption="Attendance Term" CssClass="my-4">
                 <DxComboBox Data="@terms" NullText="Select the Term required..."
-                            FilteringMode="DataGridFilteringMode.Contains"
+                            SearchMode="ListSearchMode.AutoSearch"
                             TextFieldName="@nameof(Term.TermSummary)"
                             @bind-Value="@SelectedTerm">
                     <Buttons>

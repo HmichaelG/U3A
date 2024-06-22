@@ -107,7 +107,7 @@ else
                             <DxFormLayoutItem Caption="Received From" ColSpanMd="12">
                                 <DxComboBox Data="Persons"
                                             ListRenderMode="ListRenderMode.Virtual"
-                                            FilteringMode="DataGridFilteringMode.Contains"
+                                            SearchMode="ListSearchMode.AutoSearch"
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                             @bind-Value=@editItem.Person
                                             @bind-Value:after=@(() => OnPersonOrAmountChanged(editItem))
