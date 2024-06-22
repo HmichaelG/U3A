@@ -84,7 +84,14 @@ builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
     });
 });
 
+// ***
+// If a DxComboBox does not displaye its bind value correctly,
+// temporarially uncomment the following line.
+// Correct the issue by overiding GetHashCode & Equals in the class.
+// Refer to Term & Person for inspiration.
+// ***
 
+//DevExpress.Blazor.CompatibilitySettings.ComboBoxCompatibilityMode = true;
 builder.Services.AddDevExpressServerSideBlazorReportViewer();
 builder.Services.AddDevExpressBlazor(options => {
     options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
