@@ -22,7 +22,7 @@ namespace U3A.Model
         public Guid? ClassID { get; set; }
         [JsonIgnore] public Class? Class { get; set; }
 
-        public Guid PersonID { get; set; }
+        [Required] public Guid PersonID { get; set; }
         [Required]
         [JsonIgnore] public Person Person { get; set; }
 
