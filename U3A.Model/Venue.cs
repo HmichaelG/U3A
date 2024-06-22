@@ -13,6 +13,18 @@ namespace U3A.Model
 {
     public class Venue
     {
+        public override int GetHashCode()
+        {
+            int hash = 17; // Initial value (usually a prime number)
+            return hash * ID.GetHashCode();
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Venue))
+                return false;
+            else
+                return this.GetHashCode() == ((Venue)obj).GetHashCode();
+        }
         [Key]
         public Guid ID { get; set; }
 

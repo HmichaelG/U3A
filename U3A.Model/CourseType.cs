@@ -33,5 +33,17 @@ namespace U3A.Model
         [JsonIgnore]
         public List<Course> Courses { get; set; } = new List<Course>();
 
+        public override int GetHashCode()
+        {
+            int hash = 17; // Initial value (usually a prime number)
+            return hash * ID.GetHashCode();
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is CourseType))
+                return false;
+            else
+                return this.GetHashCode() == ((CourseType)obj).GetHashCode();
+        }
     }
 }

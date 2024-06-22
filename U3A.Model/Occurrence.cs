@@ -10,6 +10,19 @@ namespace U3A.Model
 {
     public class Occurrence
     {
+        public override int GetHashCode()
+        {
+            int hash = 17; // Initial value (usually a prime number)
+            return hash * ID.GetHashCode();
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Occurrence))
+                return false;
+            else
+                return this.GetHashCode() == ((Occurrence)obj).GetHashCode();
+        }
+
         [Key]
         public int ID { get; set; }
         public string Name { get; set; }

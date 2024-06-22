@@ -38,7 +38,7 @@ namespace U3A.Model
         }
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is (Term)))
+            if (obj == null || !(obj is Term))
                 return false;
             else
                 return this.GetHashCode() == ((Term)obj).GetHashCode();

@@ -470,5 +470,19 @@ namespace U3A.Model
         public bool ShowMap { get; set; } = false;
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
+
+        public override int GetHashCode()
+        {
+            int hash = 17; // Initial value (usually a prime number)
+            return hash * ID.GetHashCode();
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Class))
+                return false;
+            else
+                return this.GetHashCode() == ((Class)obj).GetHashCode();
+        }
+
     }
 }
