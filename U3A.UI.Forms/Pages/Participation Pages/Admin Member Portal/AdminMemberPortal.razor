@@ -56,9 +56,9 @@ else
                                                 <DxComboBox Data="@people"
                                                             AllowUserInput=true
                                                             SearchMode="ListSearchMode.AutoSearch"
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                             ListRenderMode="ListRenderMode.Virtual"
-                                                            TextFieldName="@nameof(Person.PersonSummary)"
+                                                            TextFieldName="@nameof(Person.FullName)"
                                                             @bind-Value="@selectedPerson">
                                                     <Columns>
                                                         <DxListEditorColumn FieldName="@nameof(Person.FirstName)" Caption="First Name" />
@@ -71,11 +71,6 @@ else
                                                                         IconCssClass="h5 bi bi-check-lg"
                                                                         Tooltip="Click to process on behalf of the selected member"
                                                                         Click="@OnProcess" />
-                                                        <DxEditorButton CssClass="text-info"
-                                                                        IconCssClass="h5 bi bi-x-circle"
-                                                                        Tooltip="Click to clear the selection editor"
-                                                                        Click="@OnClearSelection">
-                                                        </DxEditorButton>
                                                     </Buttons>
 
                                                 </DxComboBox>

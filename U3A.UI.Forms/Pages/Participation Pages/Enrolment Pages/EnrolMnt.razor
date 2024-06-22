@@ -136,20 +136,17 @@ else
                                             var enrolment = (Enrolment)context.EditModel;
                                         }
                                         <DxComboBox Data="Persons"
-                                                    FilteringMode="DataGridFilteringMode.Contains"
                                                     ListRenderMode="ListRenderMode.Virtual"
-                                                    DropDownWidthMode="DropDownWidthMode.ContentOrEditorWidth"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    DropDownWidthMode="DropDownWidthMode.ContentWidth"
                                                     @bind-Value="enrolment.Person"
                                                     TextFieldName="@nameof(Person.FullName)">
                                             <DxListEditorColumn FieldName="@nameof(Person.FullName)"
-                                                                Caption="Name"
-                                                                Width="50%" />
+                                                                Caption="Name" Width="15rem"/>
                                             <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
-                                                                Caption="Mobile"
-                                                                Width="25%" />
+                                                                Caption="Mobile" Width="8rem" />
                                             <DxListEditorColumn FieldName="@nameof(Person.Email)"
-                                                                Caption="Email"
-                                                                Width="25%" />
+                                                                Caption="Email" Width="20rem"/>
                                         </DxComboBox>
                                     </CellEditTemplate>
                                 </DxGridDataColumn>
