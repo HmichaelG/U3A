@@ -318,15 +318,17 @@ namespace U3A.BusinessRules
                 {
                     schedules.Add(processClasses(c, settings, TenantIdentifier));
                     var now = TimezoneAdjustment.GetLocalTime().Date;
-                    if (c.Course.AllowMultiCampsuFrom != null
-                            && TimezoneAdjustment.GetLocalTime().Date >= c.Course.AllowMultiCampsuFrom
-                            && !c.Course.IsOffScheduleActivity)
+                    if (c.Course.AllowMultiCampsuFrom == null || 
+                            (c.Course.AllowMultiCampsuFrom != null
+                                && TimezoneAdjustment.GetLocalTime().Date >= c.Course.AllowMultiCampsuFrom
+                                && !c.Course.IsOffScheduleActivity))
                     {
                         multiCampusSchedules.Add(processClasses(c, settings, TenantIdentifier));
                     }
                 }
 
                 // local campus
+                dbc.ChangeTracker.Clear();
                 await dbc.Database.BeginTransactionAsync();
                 try
                 {
@@ -338,6 +340,7 @@ namespace U3A.BusinessRules
                 catch (Exception ex)
                 {
                     await dbc.Database.RollbackTransactionAsync();
+                    throw new Exception("Error saving shcedule cache yo database",ex);
                 }
 
                 //multi-campus
