@@ -82,10 +82,7 @@ else
                               Click="@OnCommunicate"
                               RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" />
                 </div>
-                <DxFormLayoutGroup Caption="Attendance Details"
-                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                                   Expanded="true"
-                                   ExpandedChanged="() => StateHasChanged()">
+                <DxFormLayoutGroup Caption="Attendance Details">
                     <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="12">
                         <DxComboBox Data="@terms" NullText="Select the Term required..."
                                     Enabled="@(!IsMemberPortal)"
@@ -491,6 +488,11 @@ else
                 NavMan.NavigateTo("/");
             }
         }
+        await SetGridHeight();
+    }
+
+    async Task SetGridHeight()
+    {
         var offset = (IsLargerLayout()) ? 0.075 : 0.4;
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
         if (Convert(newHeight) > Convert(gridHeight)) { gridHeight = newHeight; InvokeAsync(StateHasChanged); }
