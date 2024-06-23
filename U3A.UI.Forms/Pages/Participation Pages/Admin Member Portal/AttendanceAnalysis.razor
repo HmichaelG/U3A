@@ -10,7 +10,7 @@
     <Progress @ref=@progress />
     <DxFormLayout CssClass="col col-12">
         <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="6">
-            <TermComboBox SelectedTerm="@SelectedTerm"
+            <TermsComboBox SelectedTerm="@SelectedTerm"
                           Terms="@terms" ShowProcessButton="true"
                           OnProcessButtonClicked="(Term value) => {SelectedTerm = value; OnProcess();}" />
         </DxFormLayoutItem>

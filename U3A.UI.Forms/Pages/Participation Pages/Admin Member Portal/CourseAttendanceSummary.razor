@@ -11,7 +11,7 @@
     <DxFormLayout>
         <div class="w-100">
             <DxFormLayoutItem Caption="Attendance Term" CssClass="my-4">
-                <TermComboBox SelectedTerm="@SelectedTerm"
+                <TermsComboBox SelectedTerm="@SelectedTerm"
                               Terms="@terms" ShowProcessButton="true"
                               OnProcessButtonClicked="(Term value) => {SelectedTerm = value; OnProcess();}" />
             </DxFormLayoutItem>

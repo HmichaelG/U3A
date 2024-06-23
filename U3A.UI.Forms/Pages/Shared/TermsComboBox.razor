@@ -1,8 +1,7 @@
 ﻿
 <DxComboBox Data="@Terms" NullText="Select the Term required..."
             TextFieldName="@nameof(Term.Name)" Enabled="@Enabled"
-            @bind-Value="@SelectedTerm" 
-            @bind-Value:after="@ValueChanged">
+            @bind-Value="@SelectedTerm" >
     <Columns>
         <DxListEditorColumn FieldName="@nameof(Term.Name)" Caption="Term" Width="8rem" />
         <DxListEditorColumn FieldName="@nameof(Term.StartDateFormatted)" Caption="From" Width="10rem" />
@@ -18,12 +17,25 @@
     </Buttons>
 </DxComboBox>
 
-@code{
+@code {
+
+    private Term _term;
 
     [Parameter, EditorRequired]
-    public IEnumerable<Term>? Terms { get; set; }
+    public IEnumerable<Term> Terms { get; set; }
+
     [Parameter, EditorRequired]
-    public Term? SelectedTerm { get; set; }
+    public Term SelectedTerm
+    {
+        get => _term;
+        set
+        {
+            if (_term == value) { return; }
+            _term = value;
+            SelectedTermChanged.InvokeAsync(value);
+        }
+    }
+
     [Parameter]
     public bool ShowProcessButton { get; set; } = false;
     [Parameter]
@@ -31,8 +43,7 @@
     [Parameter]
     public EventCallback<Term> OnProcessButtonClicked { get; set; }
     [Parameter]
-    public EventCallback<Term> OnValueChanged { get; set; }
+    public EventCallback<Term> SelectedTermChanged { get; set; }
 
-    async Task ValueChanged() => await OnValueChanged.InvokeAsync(SelectedTerm);
 
 }

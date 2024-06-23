@@ -57,8 +57,9 @@ else {
 
                 <DxFormLayout Enabled=@IsProcessing>
                     <DxFormLayoutItem Caption="Current Enrolment Term" ColSpanMd="12">
-                        <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
-                                      OnValueChanged="(Term value) => SelectedTermChanged(value)" />
+                        <TermsComboBox Terms="@terms"
+                                       @bind-SelectedTerm="@selectedTerm"
+                                       @bind-SelectedTerm:after=@(() => SelectedTermChanged(selectedTerm)) />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Is Term Random Enrolment Finalised?" ColSpanMd="12">
                         <DxCheckBox Alignment="CheckBoxContentAlignment.Right" @bind-Checked="@IsClassAllocationFinalised"

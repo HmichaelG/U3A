@@ -62,10 +62,10 @@ else
                 <DxFormLayout Enabled=@IsProcessing>
                     <div class="text-danger">@(new MarkupString(errorMessage))</div>
                     <DxFormLayoutItem Caption="Current Enrolment Term" ColSpanMd="12">
-                        <TermComboBox Terms="@terms" SelectedTerm="@sourceTerm" />
+                        <TermsComboBox Terms="@terms" @bind-SelectedTerm="@sourceTerm" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="New Enrolment Term" ColSpanMd="12">
-                        <TermComboBox Terms="@terms" SelectedTerm="@targetTerm" />
+                        <TermsComboBox Terms="@terms" @bind-SelectedTerm="@targetTerm" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Set New Term to Current Term?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@SetCurrentTerm" />

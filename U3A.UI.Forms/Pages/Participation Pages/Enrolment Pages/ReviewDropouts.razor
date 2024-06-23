@@ -51,8 +51,9 @@ else
                                         <Template>
                                             <div class="d-flex">
                                                 <div class="flex-grow-0 pt-1 pe-2">Term:</div>
-                                                <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
-                                                              OnValueChanged="(Term value) => SelectedTermChanged(value)" />
+                                                <TermsComboBox Terms="@terms"
+                                                               @bind-SelectedTerm="@selectedTerm"
+                                                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
                                             </div>
                                         </Template>
                                     </DxToolbarItem>

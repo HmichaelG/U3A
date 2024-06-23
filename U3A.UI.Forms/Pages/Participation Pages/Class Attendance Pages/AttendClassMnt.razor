@@ -84,9 +84,9 @@ else
                 </div>
                 <DxFormLayoutGroup Caption="Attendance Details">
                     <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="12">
-                        <TermComboBox Terms="@terms" SelectedTerm="@SelectedTerm"
-                                      Enabled="@(!IsMemberPortal)"
-                                      OnValueChanged="(Term value) => SelectedTermChanged(value)" />
+                        <TermsComboBox Terms="@terms"
+                                       @bind-SelectedTerm="@SelectedTerm"
+                                       @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(SelectedTerm)) />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Course Attended" ColSpanMd="12">
                         <DxComboBox Data="@courses"

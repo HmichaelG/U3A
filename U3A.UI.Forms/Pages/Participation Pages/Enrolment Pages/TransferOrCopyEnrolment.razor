@@ -10,8 +10,9 @@
         @quickMessage
         <DxFormLayout>
             <DxFormLayoutItem Caption=@($"{action} In Term") ColSpanMd="12">
-                <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
-                              OnValueChanged="(Term value) => SelectedTermChanged(value)" />
+                <TermsComboBox Terms="@terms"
+                               @bind-SelectedTerm="@selectedTerm"
+                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption=@($"{action} To Course") ColSpanMd="12">
                 <DxComboBox Data="@courses"

@@ -31,8 +31,9 @@ else
                             OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
         <DxFormLayout>
             <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
-                <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
-                              OnValueChanged="(Term value) => SelectedTermChanged(value)" />
+                <TermsComboBox Terms="@terms"
+                               @bind-SelectedTerm="@selectedTerm"
+                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
             </DxFormLayoutItem>
         </DxFormLayout>
         <br />

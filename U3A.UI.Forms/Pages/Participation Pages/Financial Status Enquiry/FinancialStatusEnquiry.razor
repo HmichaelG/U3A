@@ -29,7 +29,7 @@
             </div>
             <DxFormLayoutGroup Caption="Enquiry Parameters">
                 <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="8">
-                    <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm" />
+                    <TermsComboBox Terms="@terms" @bind-SelectedTerm="@selectedTerm" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Balance Type" ColSpanMd="8">
                     <DxComboBox Data="@BalanceTypes" NullText="All Account Balances"
