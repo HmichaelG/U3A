@@ -11,12 +11,15 @@
         base.OnInitialized();
         MyGrid = (IGrid) this.Parent;
         Width = (EditButtonVisible && DeleteButtonVisible) ? "5rem" : "2rem";
-        if (NewButtonVisible) {
-            HeaderTemplate = context => 
-          @<DxButton RenderStyle="ButtonRenderStyle.Primary"
+        HeaderTemplate = context =>
+@<text>
+        @if (NewButtonVisible) {
+          <DxButton RenderStyle="ButtonRenderStyle.Primary"
           RenderStyleMode="ButtonRenderStyleMode.Outline" title="Add new record"
-          IconCssClass="bi bi-plus" Click="async () => await MyGrid.StartEditNewRowAsync()" />;
-        };
+          IconCssClass="bi bi-plus" Click="async () => await MyGrid.StartEditNewRowAsync()" />
+        }
+    </text>
+    ;
         CellDisplayTemplate = context =>
     @<text>
         @if (EditButtonVisible) {
