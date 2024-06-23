@@ -240,6 +240,32 @@ namespace U3A.Model
                 return $"{EndDate.ToString(constants.STD_DATE_FORMAT)} ({Duration} wks)";
             }
         }
+
+        [NotMapped]
+        public string StartDateFormatted
+        {
+            get
+            {
+                return StartDate.ToString(constants.STD_DATE_FORMAT);
+            }
+        }
+        [NotMapped]
+        public string EndDateFormatted
+        {
+            get
+            {
+                return EndDate.ToString(constants.STD_DATE_FORMAT);
+            }
+        }
+        [NotMapped]
+        public string DurationFormatted
+        {
+            get
+            {
+                return $"{Duration} weeks";
+            }
+        }
+
         [NotMapped]
         public string EnrolStartSummary
         {
