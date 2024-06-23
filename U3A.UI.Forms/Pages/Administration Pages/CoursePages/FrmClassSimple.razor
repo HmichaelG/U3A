@@ -52,31 +52,16 @@
                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
-                            <DxComboBox Data="Persons"
-                                        ListRenderMode="ListRenderMode.Virtual"
-                                        SearchMode="ListSearchMode.AutoSearch"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        @bind-Value="editItem.Leader"
-                                        TextFieldName="@nameof(Person.PersonSummary)">
-                            </DxComboBox>
+                            <PersonComboBox People="@Persons" SelectedPerson="@editItem.Leader"
+                                            OnValueChanged="@((Person value) => editItem.Leader=value)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Leader 2" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader2 != null)>
-                            <DxComboBox Data="Persons"
-                                        ListRenderMode="ListRenderMode.Virtual"
-                                        SearchMode="ListSearchMode.AutoSearch"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        @bind-Value="editItem.Leader2"
-                                        TextFieldName="@nameof(Person.PersonSummary)">
-                            </DxComboBox>
+                            <PersonComboBox People="@Persons" SelectedPerson="@editItem.Leader2"
+                                            OnValueChanged="@((Person value) => editItem.Leader2=value)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Leader 3" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader3 != null)>
-                            <DxComboBox Data="Persons"
-                                        ListRenderMode="ListRenderMode.Virtual"
-                                        SearchMode="ListSearchMode.AutoSearch"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        @bind-Value="editItem.Leader3"
-                                        TextFieldName="@nameof(Person.PersonSummary)">
-                            </DxComboBox>
+                            <PersonComboBox People="@Persons" SelectedPerson="@editItem.Leader3"
+                                            OnValueChanged="@((Person value) => editItem.Leader3=value)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
                             <DxComboBox Data="Venues"

@@ -131,19 +131,8 @@ else
                                         @{
                                             var enrolment = (Enrolment)context.EditModel;
                                         }
-                                        <DxComboBox Data="Persons"
-                                                    ListRenderMode="ListRenderMode.Virtual"
-                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                    DropDownWidthMode="DropDownWidthMode.ContentWidth"
-                                                    @bind-Value="enrolment.Person"
-                                                    TextFieldName="@nameof(Person.FullName)">
-                                            <DxListEditorColumn FieldName="@nameof(Person.FullName)"
-                                                                Caption="Name" Width="15rem"/>
-                                            <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
-                                                                Caption="Mobile" Width="8rem" />
-                                            <DxListEditorColumn FieldName="@nameof(Person.Email)"
-                                                                Caption="Email" Width="20rem"/>
-                                        </DxComboBox>
+                                    <PersonComboBox People="@Persons" SelectedPerson="@enrolment.Person"
+                                                    OnValueChanged="@((Person value) => enrolment.Person=value)" />
                                     </CellEditTemplate>
                                 </DxGridDataColumn>
                                 <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />

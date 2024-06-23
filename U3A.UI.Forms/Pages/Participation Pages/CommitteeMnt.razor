@@ -6,10 +6,12 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <div class="row  align-content-start">
         <ContextHelpTitle Title="Committee Members" HelpTopic="add_edit-committee.html" />
@@ -27,50 +29,45 @@ else {
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
     <FullScreen>
-    <ContentTemplate>
-    <DxGrid Data="@CommitteePositions" @ref=@mainGrid
-        ColumnResizeMode="GridColumnResizeMode.Disabled"
-        AllowSelectRowByClick="true"
-        ShowFilterRow="false"
-        ShowAllRows="true"
-        KeyFieldName="ID"
-        ValidationEnabled="true"
-        PopupEditFormCssClass="popup-width"
-        EditMode="GridEditMode.PopupEditForm"
-        DataItemDeleting="Grid_DataItemDeleting"
-        EditModelSaving="Grid_EditModelSaving">
-        <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridCommandColumnEx Width="8rem" />
-            <DxGridDataColumn Caption="Position" FieldName="Position" Width="10rem" />
-            <DxGridDataColumn Caption="Held By" FieldName="Person.PersonSummary" />
-        </Columns>
+        <ContentTemplate>
+            <DxGrid Data="@CommitteePositions" @ref=@mainGrid
+                    ColumnResizeMode="GridColumnResizeMode.Disabled"
+                    AllowSelectRowByClick="true"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    PopupEditFormCssClass="popup-width"
+                    EditMode="GridEditMode.PopupEditForm"
+                    DataItemDeleting="Grid_DataItemDeleting"
+                    EditModelSaving="Grid_EditModelSaving">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridCommandColumnEx Width="8rem" />
+                    <DxGridDataColumn Caption="Position" FieldName="Position" Width="10rem" />
+                    <DxGridDataColumn Caption="Held By" FieldName="Person.FullName" />
+                </Columns>
 
-        <EditFormTemplate Context="CommitteeContext">
-            @{
-                var editItem = (Committee)CommitteeContext.EditModel;
-            }
-            <DxFormLayout>
-                <DxFormLayoutItem ColSpanMd="12">
-                    <ValidationSummary />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Position" ColSpanMd="12">
-                    <DxComboBox Data="@Positions" @bind-Value="@editItem.Position" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Held By" ColSpanMd="12">
-                    <DxComboBox Data="Persons"
-                            ListRenderMode="ListRenderMode.Virtual"
-                            SearchMode="ListSearchMode.AutoSearch"
-                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                            @bind-Value="editItem.Person"
-                            TextFieldName="@nameof(Person.PersonSummary)">
-                    </DxComboBox>
-                </DxFormLayoutItem>
-            </DxFormLayout>
-        </EditFormTemplate>
-    </DxGrid>
+                <EditFormTemplate Context="CommitteeContext">
+                    @{
+                        var editItem = (Committee)CommitteeContext.EditModel;
+                    }
+                    <DxFormLayout>
+                        <DxFormLayoutItem ColSpanMd="12">
+                            <ValidationSummary />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Position" ColSpanMd="12">
+                            <DxComboBox Data="@Positions" @bind-Value="@editItem.Position" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Held By" ColSpanMd="12">
+                            <PersonComboBox People="@Persons" SelectedPerson="@editItem.Person"
+                                            OnValueChanged="@((Person value) => editItem.Person=value)" />
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                </EditFormTemplate>
+            </DxGrid>
         </ContentTemplate>
     </FullScreen>
 
@@ -100,14 +97,16 @@ else {
     internal string ErrorMessage;
     U3ADbContext dbc { get; set; }
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         await RefreshData();
         IsReady = true;
     }
 
-    async Task RefreshData() {
+    async Task RefreshData()
+    {
         Persons = await BusinessRule.EditablePersonAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         if (settings != null && !string.IsNullOrWhiteSpace(settings.CommitteePositions))
@@ -120,39 +119,48 @@ else {
     }
 
     bool isBusy;
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
         if (isBusy) return;
         isBusy = true;
-        try {
+        try
+        {
             await SaveRecord(e);
         }
-        finally {
+        finally
+        {
             isBusy = false;
         }
     }
 
-    async Task SaveRecord(GridEditModelSavingEventArgs e) {
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
         var editModel = (Committee)e.EditModel;
         // Re-query a data item from the store.
         var dataItem = e.IsNew ? new Committee() : dbc.Committee.Find(editModel.ID);
         // Assign changes from the edit model to the data item.
-        if (dataItem != null) {
+        if (dataItem != null)
+        {
             editModel.CopyTo(dataItem);
             if (editModel.Person != null) { dataItem.Person = dbc.Person.Find(editModel.Person.ID); }
-            try {
+            try
+            {
                 // Post changes to the database.
                 if (e.IsNew) await dbc.AddAsync(dataItem);
                 await dbc.SaveChangesAsync();
                 // update the Grid.
-                if (e.IsNew) {
+                if (e.IsNew)
+                {
                     CommitteePositions.Insert(0, dataItem);
                 }
-                else {
+                else
+                {
                     int idx = CommitteePositions.FindIndex(x => x.ID == dataItem.ID);
                     CommitteePositions[idx] = dataItem;
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 ErrorHeader = "Save to database error";
                 ErrorMessage = Helpers.GetErrorMessage(ex);
                 await ErrorPopup.ShowPopupAsync();
@@ -162,21 +170,25 @@ else {
         }
     }
 
-    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e) {
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
         var Committee = (Committee)e.DataItem;
         dbc.Remove(Committee);
         await SaveChangesAsync();
         await RefreshData();
     }
 
-    async Task<bool> SaveChangesAsync() {
+    async Task<bool> SaveChangesAsync()
+    {
         bool result = false;
-        try {
+        try
+        {
             // Post changes to the database.
             await dbc.SaveChangesAsync();
             result = true;
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             ErrorHeader = "Save to database error";
             ErrorMessage = Helpers.GetErrorMessage(ex);
             await ErrorPopup.ShowPopupAsync();
@@ -185,7 +197,8 @@ else {
         return result;
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 

@@ -105,22 +105,8 @@ else
                         </div>
                         <DxFormLayoutGroup Caption="Participant's Receipt Details">
                             <DxFormLayoutItem Caption="Received From" ColSpanMd="12">
-                                <DxComboBox Data="Persons"
-                                            ListRenderMode="ListRenderMode.Virtual"
-                                            SearchMode="ListSearchMode.AutoSearch"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            @bind-Value=@editItem.Person
-                                            @bind-Value:after=@(() => OnPersonOrAmountChanged(editItem))
-                                            TextFieldName="@nameof(Person.PersonSummary)">
-                                    <DxListEditorColumn FieldName="@nameof(Person.LastName)"
-                                                        Caption="Last Name" />
-                                    <DxListEditorColumn FieldName="@nameof(Person.FirstName)"
-                                                        Caption="First Name" />
-                                    <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
-                                                        Caption="Mobile" />
-                                    <DxListEditorColumn FieldName="@nameof(Person.Email)"
-                                                        Caption="Email" />
-                                </DxComboBox>
+                            <PersonComboBox People="@Persons" SelectedPerson="@editItem.Person"
+                                            OnValueChanged="@(async(Person value) => {editItem.Person=value;await OnPersonOrAmountChanged(editItem); })" />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Current Financial To" ColSpanMd="12" Visible="@(editItem.Person != null)">
                                 <div class="border p-1">@editItem?.Person?.FinancialToText</div>
