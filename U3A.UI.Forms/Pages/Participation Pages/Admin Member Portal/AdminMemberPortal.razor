@@ -53,27 +53,9 @@ else
                                         </HeaderContentTemplate>
                                         <Items>
                                             <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
-                                                <DxComboBox Data="@people"
-                                                            AllowUserInput=true
-                                                            SearchMode="ListSearchMode.AutoSearch"
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                            ListRenderMode="ListRenderMode.Virtual"
-                                                            TextFieldName="@nameof(Person.FullName)"
-                                                            @bind-Value="@selectedPerson">
-                                                    <Columns>
-                                                        <DxListEditorColumn FieldName="@nameof(Person.FirstName)" Caption="First Name" />
-                                                        <DxListEditorColumn FieldName="@nameof(Person.LastName)" Caption="Last Name" />
-                                                        <DxListEditorColumn FieldName="@nameof(Person.Mobile)" Caption="Mobile" />
-                                                        <DxListEditorColumn FieldName="@nameof(Person.Email)" Caption="Mobile" />
-                                                    </Columns>
-                                                    <Buttons>
-                                                        <DxEditorButton Text="Process" CssClass="text-primary"
-                                                                        IconCssClass="h5 bi bi-check-lg"
-                                                                        Tooltip="Click to process on behalf of the selected member"
-                                                                        Click="@OnProcess" />
-                                                    </Buttons>
-
-                                                </DxComboBox>
+                                                <PersonComboBox People="@people" SelectedPerson="@selectedPerson"
+                                                                ShowProcessButton="true"
+                                                                OnProcessButtonClicked="async(Person value) => {selectedPerson = value; await OnProcess();}" />
                                             </DxFormLayoutItem>
                                         </Items>
                                     </DxFormLayoutGroup>

@@ -121,31 +121,8 @@ else
                             @{
                                 var importData = (ReceiptDataImport)context.EditModel;
                             }
-                            <DxComboBox Data="@People" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        TextFieldName="@nameof(Person.FullName)"
-                                        Value="@currentPerson"
-                                        ValueExpression="@(() => currentPerson)"
-                                        ValueChanged="@((Person p) => OnPersonChanged(p,importData))"
-                                        AllowUserInput="true"
-                                        SearchMode="ListSearchMode.AutoSearch"
-                                        ListRenderMode="ListRenderMode.Virtual"
-                                        DropDownWidthMode="DropDownWidthMode.ContentOrEditorWidth">
-                                <DxListEditorColumn FieldName="@nameof(Person.FullName)"
-                                                    Caption="Name"
-                                                    Width="15rem" />
-                                <DxListEditorColumn FieldName="@nameof(Person.FinancialTo)"
-                                                    Caption="Fin-To"
-                                                    Width="5rem" />
-                                <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
-                                                    Caption="Mobile"
-                                                    Width="8rem" />
-                                <DxListEditorColumn FieldName="@nameof(Person.PersonIdentity)"
-                                                    Caption="ID"
-                                                    Width="5rem" />
-                                <DxListEditorColumn FieldName="@nameof(Person.ConversionID)"
-                                                    Caption="Legacy ID"
-                                                    Width="5rem" />
-                            </DxComboBox>
+                            <PersonComboBox People="@People" SelectedPerson="@currentPerson"
+                                            OnValueChanged="async(Person value) => {currentPerson = value; await OnPersonChanged(currentPerson,importData);}" />
                         </CellEditTemplate>
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Amount" Width="10rem"
@@ -171,10 +148,10 @@ else
                                         AllowUserInput="false" />
                         </CellEditTemplate>
                     </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Description" 
-                                        FieldName="Description" DataRowEditorVisible=false />
-                    <DxGridDataColumn Caption="Identifier" 
-                                        FieldName="Identifier" DataRowEditorVisible=false />
+                    <DxGridDataColumn Caption="Description"
+                                      FieldName="Description" DataRowEditorVisible=false />
+                    <DxGridDataColumn Caption="Identifier"
+                                      FieldName="Identifier" DataRowEditorVisible=false />
                 </Columns>
                 <DetailRowTemplate>
                     @{
@@ -323,8 +300,8 @@ else
                     OKButtonText = "Yes, I'm Ok with that!",
                     Caption = "Unexpected date range in Bank OFX file",
                     Message = $"<div class='text-center alert alert-danger alert text-dark p-2'><p>The OFX Bank date range <strong>{extract.InitialDate.ToShortDateString()}</strong> to <strong>{extract.FinalDate.ToShortDateString()}</strong>.<br>" +
-                                                                                                                                                        $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
-                                                                                                                                                            "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
+                                                                                                                                                            $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
+                                                                                                                                                                "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
                 };
             result = await messageBox.ShowAsync(args);
             hideReceiptDateRangeMessage = true;
@@ -475,7 +452,7 @@ else
             // process a payment
             if (settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly
                     && currentTerm.TermNumber <= 2
-                    && totalPaid >= minPartMembershipFee 
+                    && totalPaid >= minPartMembershipFee
                     && totalPaid < totalDue)
             {
                 importItem.FinancialTo = ProcessingYear;

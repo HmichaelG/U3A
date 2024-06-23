@@ -1,0 +1,43 @@
+﻿@if (People is not null)
+{
+    <DxComboBox Data="@People" Enabled="@Enabled"
+                SearchMode="ListSearchMode.AutoSearch"
+                ListRenderMode="ListRenderMode.Virtual"
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                TextFieldName="@nameof(Person.FullName)"
+                @bind-Value="@SelectedPerson"
+                @bind-Value:after="@ValueChanged">
+        <Columns>
+            <DxListEditorColumn FieldName="@nameof(Person.FirstName)" Caption="First Name" Width="10rem" />
+            <DxListEditorColumn FieldName="@nameof(Person.LastName)" Caption="Last Name" Width="10rem" />
+            <DxListEditorColumn FieldName="@nameof(Person.Mobile)" Caption="Mobile" Width="10rem" />
+            <DxListEditorColumn FieldName="@nameof(Person.Email)" Caption="Email" Width="20rem" />
+        </Columns>
+        <Buttons>
+            <DxEditorButton Text="Process" CssClass="text-primary" Visible="@ShowProcessButton"
+                            IconCssClass="h5 bi bi-check-lg"
+                            Tooltip="Click to process the selected member"
+                            Click="async() => await OnProcessButtonClicked.InvokeAsync(SelectedPerson)" />
+        </Buttons>
+
+    </DxComboBox>
+}
+
+@code {
+
+    [Parameter, EditorRequired]
+    public IEnumerable<Person>? People { get; set; }
+    [Parameter, EditorRequired]
+    public Person? SelectedPerson { get; set; }
+    [Parameter]
+    public bool ShowProcessButton { get; set; } = false;
+    [Parameter]
+    public bool Enabled { get; set; } = true;
+    [Parameter]
+    public EventCallback<Person> OnProcessButtonClicked { get; set; }
+    [Parameter]
+    public EventCallback<Person> OnValueChanged { get; set; }
+
+    async Task ValueChanged() => await OnValueChanged.InvokeAsync(SelectedPerson);
+
+}
