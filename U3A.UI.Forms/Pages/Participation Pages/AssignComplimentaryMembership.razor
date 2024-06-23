@@ -30,25 +30,25 @@ else {
                 <MessageBox @ref="@messageBox" />
                 <Progress @ref=@progress />
 
-                <DxFormLayout Enabled=@IsProcessing>
-                    <DxFormLayoutItem Caption="Year Financial To" ColSpanMd="6">
+                <DxFormLayout Enabled=@IsProcessing CssClass="w-100">
+                    <DxFormLayoutItem Caption="Year Financial To" ColSpanMd="12">
                         <DxComboBox Data="@years"
                                 @bind-Value="@processYear" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Assign to Life Members?" ColSpanMd="12" Enabled="false">
+                    <DxFormLayoutItem Caption="Assign to Life Members?" ColSpanMd="6" Enabled="false">
                         <DxCheckBox @bind-Checked="@DoLifeMembers" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Assign to Committee Members?" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Assign to Committee Members?" ColSpanMd="6">
                         <DxCheckBox @bind-Checked="@DoCommitteeMembers" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Assign to Course Leaders?" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Assign to Course Leaders?" ColSpanMd="6">
                         <DxCheckBox @bind-Checked="@DoCourseLeaders" />
                     </DxFormLayoutItem>
                     @if (Activities != null) {
                         for (var i = 0; i < Activities!.Count(); i++)
                         {
                             var iCopy = i;
-                            <DxFormLayoutItem Caption=@($"Assign to {Activities[i]} volunteers?") ColSpanMd="12">
+                            <DxFormLayoutItem Caption=@($"Assign to {Activities[i]} volunteers?") ColSpanMd="6">
                                 <DxCheckBox @bind-Checked="@ActivityIndex[iCopy]" />
                             </DxFormLayoutItem>
                         }
