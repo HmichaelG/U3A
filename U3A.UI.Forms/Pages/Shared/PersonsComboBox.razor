@@ -5,8 +5,7 @@
                 ListRenderMode="ListRenderMode.Virtual"
                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                 TextFieldName="@nameof(Person.FullName)"
-                @bind-Value="@SelectedPerson"
-                @bind-Value:after="@ValueChanged">
+                @bind-Value="@SelectedPerson">
         <Columns>
             <DxListEditorColumn FieldName="@nameof(Person.FirstName)" Caption="First Name" Width="10rem" />
             <DxListEditorColumn FieldName="@nameof(Person.LastName)" Caption="Last Name" Width="10rem" />
@@ -24,11 +23,22 @@
 }
 
 @code {
+    Person _person;
+    [Parameter, EditorRequired]
+    public Person SelectedPerson
+    {
+        get => _person;
+        set
+        {
+            if (_person == value) { return; }
+            _person = value;
+            SelectedPersonChanged.InvokeAsync(value);
+        }
+    }
+
 
     [Parameter, EditorRequired]
     public IEnumerable<Person> People { get; set; }
-    [Parameter, EditorRequired]
-    public Person SelectedPerson { get; set; }
     [Parameter]
     public bool ShowProcessButton { get; set; } = false;
     [Parameter]
@@ -36,8 +46,6 @@
     [Parameter]
     public EventCallback<Person> OnProcessButtonClicked { get; set; }
     [Parameter]
-    public EventCallback<Person> OnValueChanged { get; set; }
-
-    async Task ValueChanged() => await OnValueChanged.InvokeAsync(SelectedPerson);
+    public EventCallback<Person> SelectedPersonChanged { get; set; }
 
 }

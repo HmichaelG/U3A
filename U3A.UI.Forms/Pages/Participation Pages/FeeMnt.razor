@@ -35,7 +35,7 @@ else
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 
-    <FullScreen>
+    <FullScreen DisplayOffset="11">
         <ContentTemplate>
             <DxGrid Data="@Fees" @ref=@mainGrid
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -86,8 +86,7 @@ else
                             <ValidationSummary />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Apply To" ColSpanMd="12">
-                            <PersonComboBox People="@Persons" SelectedPerson="@editItem.Person"
-                                            OnValueChanged="@((Person value) => editItem.Person=value)" />
+                            <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Date" ColSpanMd="12">
                             <DxDateEdit @bind-Date="@editItem.Date" Mask=@constants.STD_DATE_FORMAT>

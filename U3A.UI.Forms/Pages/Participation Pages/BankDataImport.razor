@@ -75,7 +75,7 @@ else
     </div> @*row*@
 
     <div>@BankAccountDetails</div>
-    <FullScreen DisplayOffset="22">
+    <FullScreen DisplayOffset="16">
         <ContentTemplate>
             <DxGrid Data="@importData" @ref=@mainGrid
                     SelectionMode="GridSelectionMode.Single"
@@ -121,8 +121,8 @@ else
                             @{
                                 var importData = (ReceiptDataImport)context.EditModel;
                             }
-                            <PersonComboBox People="@People" SelectedPerson="@currentPerson"
-                                            OnValueChanged="async(Person value) => {currentPerson = value; await OnPersonChanged(currentPerson,importData);}" />
+                            <PersonsComboBox People="@People" @bind-SelectedPerson="@currentPerson"
+                                            @bind-SelectedPerson:after="async() => await OnPersonChanged(currentPerson,importData)" />
                         </CellEditTemplate>
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Amount" Width="10rem"

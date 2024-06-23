@@ -37,7 +37,7 @@ else
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
     <Progress @ref="@ProgressBar" />
 
-    <FullScreen>
+    <FullScreen DisplayOffset="12">
         <ContentTemplate>
             <DxGrid Data="@Receipts" @ref=@mainGrid
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -105,8 +105,8 @@ else
                         </div>
                         <DxFormLayoutGroup Caption="Participant's Receipt Details">
                             <DxFormLayoutItem Caption="Received From" ColSpanMd="12">
-                            <PersonComboBox People="@Persons" SelectedPerson="@editItem.Person"
-                                            OnValueChanged="@(async(Person value) => {editItem.Person=value;await OnPersonOrAmountChanged(editItem); })" />
+                            <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person"
+                                                 @bind-SelectedPerson:after="async() => OnPersonOrAmountChanged(editItem)" />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Current Financial To" ColSpanMd="12" Visible="@(editItem.Person != null)">
                                 <div class="border p-1">@editItem?.Person?.FinancialToText</div>

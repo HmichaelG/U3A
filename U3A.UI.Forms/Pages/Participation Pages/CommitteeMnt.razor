@@ -62,8 +62,7 @@ else
                             <DxComboBox Data="@Positions" @bind-Value="@editItem.Position" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Held By" ColSpanMd="12">
-                            <PersonComboBox People="@Persons" SelectedPerson="@editItem.Person"
-                                            OnValueChanged="@((Person value) => editItem.Person=value)" />
+                            <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person" />
                         </DxFormLayoutItem>
                     </DxFormLayout>
                 </EditFormTemplate>

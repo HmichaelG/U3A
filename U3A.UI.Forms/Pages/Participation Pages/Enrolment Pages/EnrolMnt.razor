@@ -132,8 +132,7 @@ else
                                         @{
                                             var enrolment = (Enrolment)context.EditModel;
                                         }
-                                    <PersonComboBox People="@Persons" SelectedPerson="@enrolment.Person"
-                                                    OnValueChanged="@((Person value) => enrolment.Person=value)" />
+                                    <PersonsComboBox People="@Persons" @bind-SelectedPerson="@enrolment.Person" />
                                     </CellEditTemplate>
                                 </DxGridDataColumn>
                                 <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />

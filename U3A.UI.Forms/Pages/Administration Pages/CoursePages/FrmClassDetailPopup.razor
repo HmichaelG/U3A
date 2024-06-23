@@ -68,13 +68,13 @@
                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
-                <PersonComboBox People="@Persons" SelectedPerson="@editItem.Leader" OnValueChanged="@((Person value) => editItem.Leader=value)" />
+                <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Leader 2" ColSpanMd="12">
-                <PersonComboBox People="@Persons" SelectedPerson="@editItem.Leader2" OnValueChanged="@((Person value) => editItem.Leader2=value)" />
+                <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader2" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Leader 3" ColSpanMd="12">
-                <PersonComboBox People="@Persons" SelectedPerson="@editItem.Leader3" OnValueChanged="@((Person value) => editItem.Leader3=value)" />
+                <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader3" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
                 <DxComboBox Data="Venues"

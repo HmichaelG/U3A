@@ -53,7 +53,7 @@ else
                                         </HeaderContentTemplate>
                                         <Items>
                                             <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
-                                                <PersonComboBox People="@people" SelectedPerson="@selectedPerson"
+                                                <PersonsComboBox People="@people" @bind-SelectedPerson="@selectedPerson"
                                                                 ShowProcessButton="true"
                                                                 OnProcessButtonClicked="async(Person value) => {selectedPerson = value; await OnProcess();}" />
                                             </DxFormLayoutItem>

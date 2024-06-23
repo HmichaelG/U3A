@@ -89,8 +89,8 @@ else
                             <ValidationSummary />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Volunteer" ColSpanMd="12">
-                                    <PersonComboBox People="@Persons" SelectedPerson="@editItem.Person"
-                                                    OnValueChanged="@((Person value) => editItem.Person=value)" />
+                                    <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person"
+                                             @bind-SelectedPerson:after="async() => OnPersonChangedAsync(editItem)"/>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
                             <DxTextBox @bind-Text="@editItem.Comment" />
@@ -171,6 +171,16 @@ else
         }
     }
 
+    async Task OnPersonChangedAsync(Volunteer volunteer)
+    {
+        var p = volunteer.Person;
+        if (p is null) return;
+        if (await dbc.Volunteer.Where(x => x.Activity == selectedActivity && x.PersonID == p.ID).CountAsync() >= 1)
+        {
+            await messageBox.ShowOkOnlyAsync("Volunteer on file", "Volunteer is already on file.");
+            volunteer.Person = null;
+        }
+    }
     async Task RefreshData()
     {
         Volunteers = await dbc.Volunteer.Where(x => x.Activity == selectedActivity).ToListAsync();
@@ -242,6 +252,7 @@ else
             await ErrorPopup.ShowPopupAsync();
             dbc?.ChangeTracker?.Clear();
         }
+        finally { await RefreshData(); StateHasChanged(); }
         return result;
     }
 
