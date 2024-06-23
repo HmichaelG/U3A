@@ -125,7 +125,7 @@ else
                             </ToolbarTemplate>
                             <Columns>
                                 <DxGridSelectionColumn Width="2rem" />
-                                <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem"
+                                <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem" NewButtonVisible="@(selectedCourse is not null)"
                                                        EditButtonVisible="true" DeleteButtonVisible="true" />
                                 <DxGridDataColumn Caption="Name" FieldName="Person.FullName" MinWidth="250">
                                     <CellEditTemplate>
