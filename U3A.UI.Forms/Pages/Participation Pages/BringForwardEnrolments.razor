@@ -62,14 +62,10 @@ else
                 <DxFormLayout Enabled=@IsProcessing>
                     <div class="text-danger">@(new MarkupString(errorMessage))</div>
                     <DxFormLayoutItem Caption="Current Enrolment Term" ColSpanMd="12">
-                        <DxComboBox Data="@terms" NullText="Select the Term to bring forward from."
-                                TextFieldName="@nameof(Term.TermSummary)"
-                                @bind-Value="@sourceTerm" />
+                        <TermComboBox Terms="@terms" SelectedTerm="@sourceTerm" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="New Enrolment Term" ColSpanMd="12">
-                        <DxComboBox Data="@terms" NullText="Select the Term to bring forward to."
-                                TextFieldName="@nameof(Term.TermSummary)"
-                                @bind-Value="@targetTerm" />
+                        <TermComboBox Terms="@terms" SelectedTerm="@targetTerm" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Set New Term to Current Term?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@SetCurrentTerm" />
@@ -165,7 +161,7 @@ else
             IsProcessing = true;
             StateHasChanged();
             await BusinessRule.BringForwardEnrolmentsAsync(dbc, sourceTerm, targetTerm, SetCurrentTerm);
-            await messageBox.ShowOkOnlyAsync("Process Complete", "The selected enrolment term has been brought forward.");
+            await messageBox.ShowOkOnlyAsync("Process Complete", $"{sourceTerm.Name} enrolments have been brought forward to {targetTerm.Name}.");
             NavigationManager.NavigateTo("/");
         }
     }

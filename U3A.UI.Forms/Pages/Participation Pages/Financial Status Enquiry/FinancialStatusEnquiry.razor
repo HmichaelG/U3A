@@ -29,10 +29,7 @@
             </div>
             <DxFormLayoutGroup Caption="Enquiry Parameters">
                 <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="8">
-                    <DxComboBox Data="@terms" NullText="Select the Term required..."
-                                SearchMode="ListSearchMode.AutoSearch"
-                                TextFieldName="@nameof(Term.TermSummary)"
-                                @bind-Value="@selectedTerm" />
+                    <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Balance Type" ColSpanMd="8">
                     <DxComboBox Data="@BalanceTypes" NullText="All Account Balances"
@@ -59,7 +56,7 @@
         <Progress @ref="@ProgressBar" />
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-        <FullScreen>
+        <FullScreen DisplayOffset="17">
             <ContentTemplate>
                 <DxGrid Data="@Persons" @ref=@mainGrid
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -271,7 +268,7 @@
     string[] customBools = { "IsComplimentary",
                                 "IsLifeMember",
                                 "IsCourseLeader"
-                        };
+                    };
 
     void Grid_CustomSummary(GridCustomSummaryEventArgs e)
     {

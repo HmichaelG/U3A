@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime js
+﻿
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
 
@@ -10,16 +10,9 @@
     <Progress @ref=@progress />
     <DxFormLayout CssClass="col col-12">
         <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="6">
-            <DxComboBox Data="@terms" NullText="Select the Term required..."
-                        TextFieldName="@nameof(Term.TermSummary)"
-            @bind-Value="@SelectedTerm">
-                <Buttons>
-                    <DxEditorButton Text="Process" CssClass="text-primary"
-                                    IconCssClass="h5 bi bi-check-lg"
-                                    Tooltip="Click to process the selected term"
-                                    Click="@OnProcess" />
-                </Buttons>
-            </DxComboBox>
+            <TermComboBox SelectedTerm="@SelectedTerm"
+                          Terms="@terms" ShowProcessButton="true"
+                          OnProcessButtonClicked="(Term value) => {SelectedTerm = value; OnProcess();}" />
         </DxFormLayoutItem>
         <DxFormLayoutItem Caption="Show week by week totals" ColSpanMd="2">
             <DxCheckBox Checked=@isWeekByWeekTotalsDisplayed
@@ -100,8 +93,8 @@
     IEnumerable<Term> terms;
     IEnumerable<AttendClass>? pivotData { get; set; }
     IEnumerable<AttendClass>? attendance { get; set; }
-    IEnumerable<DateTime> availableDates;
-    IEnumerable<DateTime>? selectedDates;
+    IEnumerable<DateTime> availableDates = new List<DateTime>();
+    IEnumerable<DateTime>? selectedDates = new List<DateTime>();
     Term SelectedTerm;
     MessageBox? messageBox;
     Progress? progress;
@@ -133,13 +126,14 @@
     {
         await GetData();
         availableDates = selectedDates = attendance.Select(x => x.WeekEndDate).Distinct().OrderBy(x => x);
+        StateHasChanged();
     }
     async Task GetData()
     {
         await progress.ShowSmallSpinnerAsync();
-        var service = new LocalTime(js);
-        var now = await service.GetLocalDateAsync();
-        attendance = pivotData = await BusinessRule.GetAttendanceAsync(dbc, SelectedTerm, now);
+        var now = TimezoneAdjustment.GetLocalTime();
+        attendance = await BusinessRule.GetAttendanceAsync(dbc, SelectedTerm, now);
+        RefreshData();
         await progress.Close();
     }
 
@@ -171,7 +165,6 @@
 
     void RefreshData()
     {
-        if (selectedDates == null) return;
         if (selectedDates.Count() == availableDates.Count())
         {
             pivotData = attendance;

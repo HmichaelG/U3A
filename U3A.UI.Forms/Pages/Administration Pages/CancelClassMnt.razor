@@ -31,11 +31,8 @@ else
                     <ChildContent>
                         <DxFormLayoutGroup Caption="Cancellation Details">
                             <DxFormLayoutItem Caption="Term" ColSpanMd="12">
-                                <DxComboBox Data="@terms" NullText="Select the Term required..."
-                                            SearchMode="ListSearchMode.AutoSearch"
-                                            TextFieldName="@nameof(Term.TermSummary)"
-                                            Value="@selectedTerm"
-                                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                                <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm" 
+                                    OnValueChanged="(Term value) => SelectedTermChanged(value)" />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Course" ColSpanMd="12">
                                 <DxComboBox Data="@courses"

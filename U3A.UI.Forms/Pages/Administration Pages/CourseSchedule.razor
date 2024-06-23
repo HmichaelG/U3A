@@ -42,10 +42,8 @@ else
             <div class="col-7">
                 <DxFormLayout>
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
-                        <DxComboBox Data="@terms" NullText="Select the Term required..."
-                                    TextFieldName="@nameof(Term.TermSummary)"
-                                    Value="@selectedTerm"
-                                    ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                        <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
+                                      OnValueChanged="(Term value) => SelectedTermChanged(value)" />
                     </DxFormLayoutItem>
                 </DxFormLayout>
             </div>

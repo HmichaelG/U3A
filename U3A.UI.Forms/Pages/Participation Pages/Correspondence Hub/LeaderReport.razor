@@ -30,12 +30,9 @@ else
                             OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
                             OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
         <DxFormLayout>
-            <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="4">
-                <DxComboBox Data="@terms" NullText="Select the Term required..."
-                            SearchMode="ListSearchMode.AutoSearch"
-                            TextFieldName="@nameof(Term.TermSummary)"
-                            Value="@selectedTerm"
-                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+            <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
+                <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
+                              OnValueChanged="(Term value) => SelectedTermChanged(value)" />
             </DxFormLayoutItem>
         </DxFormLayout>
         <br />

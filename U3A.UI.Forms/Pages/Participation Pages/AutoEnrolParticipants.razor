@@ -56,17 +56,15 @@ else {
                 <MessageBox @ref="@messageBox" />
 
                 <DxFormLayout Enabled=@IsProcessing>
-                    <DxFormLayoutItem Caption="Current Enrolment Term" ColSpanMd="8">
-                        <DxComboBox Data="@terms" NullText="Select the Term to bring forward from."
-                                    TextFieldName="@nameof(Term.TermSummary)"
-                                    Value="@processTerm"
-                                    ValueChanged="@((Term term) => OnTermChanged(term))" />
+                    <DxFormLayoutItem Caption="Current Enrolment Term" ColSpanMd="12">
+                        <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
+                                      OnValueChanged="(Term value) => SelectedTermChanged(value)" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Is Term Random Enrolment Finalised?" ColSpanMd="8">
+                    <DxFormLayoutItem Caption="Is Term Random Enrolment Finalised?" ColSpanMd="12">
                         <DxCheckBox Alignment="CheckBoxContentAlignment.Right" @bind-Checked="@IsClassAllocationFinalised"
                                     Enabled=@(!IsClassAllocationFinalised) />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Queue Email For ALL participants?" ColSpanMd="8">
+                    <DxFormLayoutItem Caption="Queue Email For ALL participants?" ColSpanMd="12">
                         <DxCheckBox Alignment="CheckBoxContentAlignment.Right" @bind-Checked="@ForceEmailQueue" />
                     </DxFormLayoutItem>
                     <p />
@@ -98,7 +96,7 @@ else {
     bool ForceEmailQueue;
     string? errorMessage;
     SystemSettings? settings;
-    Term? processTerm;
+    Term? selectedTerm;
     Term? FirstTermNextYear;
     string? autoEnrolDay;
     string? autoEnrolOccirence;
@@ -114,19 +112,19 @@ else {
         autoEnrolDay = dbc.WeekDay.First(x => x.ID == settings.AutoEnrolAllocationDay).Day;
         autoEnrolOccirence = new AutoEnrollOccurrences().First(x => x.Key == settings.AutoEnrolAllocationOccurs).Value;
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-        processTerm = await BusinessRule.CurrentTermAsync(dbc);
-        if (processTerm != null) {
-            FirstTermNextYear = await BusinessRule.FirstTermNextYearAsync(dbc, processTerm.Year);
+        selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+        if (selectedTerm != null) {
+            FirstTermNextYear = await BusinessRule.FirstTermNextYearAsync(dbc, selectedTerm.Year);
             if (FirstTermNextYear != null
-                && DateTime.Today >= FirstTermNextYear.EnrolmentStartDate) { processTerm = FirstTermNextYear; }
-            IsClassAllocationFinalised = processTerm.IsClassAllocationFinalised;
+                && DateTime.Today >= FirstTermNextYear.EnrolmentStartDate) { selectedTerm = FirstTermNextYear; }
+            IsClassAllocationFinalised = selectedTerm.IsClassAllocationFinalised;
         }
         IsReady = true;
     }
 
-    void OnTermChanged(Term newValue) {
-        processTerm = newValue;
-        IsClassAllocationFinalised = processTerm.IsClassAllocationFinalised;
+    void SelectedTermChanged(Term newValue) {
+        selectedTerm = newValue;
+        IsClassAllocationFinalised = selectedTerm.IsClassAllocationFinalised;
         StateHasChanged();
     }
 
@@ -138,12 +136,13 @@ else {
             StateHasChanged();
             DateTime? emailDate = (BusinessRule.IsEnrolmentBlackoutPeriod(settings))
                                     ? settings.EnrolmentBlackoutEndsUTC : null;
-            await BusinessRule.AutoEnrolParticipantsAsync(dbc, processTerm,
+            await BusinessRule.AutoEnrolParticipantsAsync(dbc, selectedTerm,
                                                             IsClassAllocationFinalised,
                                                             ForceEmailQueue, emailDate);
             IsProcessing = false;
             StateHasChanged();
-            await messageBox.ShowOkOnlyAsync("Process Complete", "Enrolments have been allocated.");
+            await messageBox.ShowOkOnlyAsync("Process Complete", 
+                    $"{selectedTerm.Name} Enrolments have been allocated.");
             NavigationManager.NavigateTo("/");
         }
     }
@@ -151,7 +150,7 @@ else {
     async Task<bool> IsDataOk() {
         bool result = true;
         string? msg = null;
-        if (processTerm == null) {
+        if (selectedTerm == null) {
             msg = "<p>*** You must select the current Term ***</p>";
             await messageBox.ShowOkOnlyAsync("Select the Term", msg);
             result = false;

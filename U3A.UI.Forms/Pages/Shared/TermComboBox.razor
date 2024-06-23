@@ -1,0 +1,38 @@
+﻿
+<DxComboBox Data="@Terms" NullText="Select the Term required..."
+            TextFieldName="@nameof(Term.Name)" Enabled="@Enabled"
+            @bind-Value="@SelectedTerm" 
+            @bind-Value:after="@ValueChanged">
+    <Columns>
+        <DxListEditorColumn FieldName="@nameof(Term.Name)" Caption="Term" Width="8rem" />
+        <DxListEditorColumn FieldName="@nameof(Term.StartDateFormatted)" Caption="From" Width="10rem" />
+        <DxListEditorColumn FieldName="@nameof(Term.EndDateFormatted)" Caption="To" Width="10rem" />
+        <DxListEditorColumn FieldName="@nameof(Term.DurationFormatted)" Caption="Weeks" Width="5rem" />
+    </Columns>
+
+    <Buttons>
+        <DxEditorButton Text="Process" CssClass="text-primary" Visible="ShowProcessButton"
+                        IconCssClass="h5 bi bi-check-lg"
+                        Tooltip="Click to process the selected term"
+                        Click="async() => await OnProcessButtonClicked.InvokeAsync(SelectedTerm)" />
+    </Buttons>
+</DxComboBox>
+
+@code{
+
+    [Parameter, EditorRequired]
+    public IEnumerable<Term>? Terms { get; set; }
+    [Parameter, EditorRequired]
+    public Term? SelectedTerm { get; set; }
+    [Parameter]
+    public bool ShowProcessButton { get; set; } = false;
+    [Parameter]
+    public bool Enabled { get; set; } = true;
+    [Parameter]
+    public EventCallback<Term> OnProcessButtonClicked { get; set; }
+    [Parameter]
+    public EventCallback<Term> OnValueChanged { get; set; }
+
+    async Task ValueChanged() => await OnValueChanged.InvokeAsync(SelectedTerm);
+
+}

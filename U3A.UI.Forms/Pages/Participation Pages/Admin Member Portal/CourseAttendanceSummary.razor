@@ -11,17 +11,9 @@
     <DxFormLayout>
         <div class="w-100">
             <DxFormLayoutItem Caption="Attendance Term" CssClass="my-4">
-                <DxComboBox Data="@terms" NullText="Select the Term required..."
-                            SearchMode="ListSearchMode.AutoSearch"
-                            TextFieldName="@nameof(Term.TermSummary)"
-                            @bind-Value="@SelectedTerm">
-                    <Buttons>
-                        <DxEditorButton Text="Process" CssClass="text-primary"
-                                        IconCssClass="h5 bi bi-check-lg"
-                                        Tooltip="Click to process the selected term"
-                                        Click="@OnProcess" />
-                    </Buttons>
-                </DxComboBox>
+                <TermComboBox SelectedTerm="@SelectedTerm"
+                              Terms="@terms" ShowProcessButton="true"
+                              OnProcessButtonClicked="(Term value) => {SelectedTerm = value; OnProcess();}" />
             </DxFormLayoutItem>
         </div>
 

@@ -21,12 +21,8 @@ else {
         @if (Enabled) {
 
             <DxFormLayoutItem Caption="Term" ColSpanXs="12">
-                <DxComboBox Data="@terms" NullText="Processing ... please wait"
-                            Enabled="@Enabled"
-                            SearchMode="ListSearchMode.AutoSearch"
-                            TextFieldName="@nameof(Term.TermSummary)"
-                            Value="@selectedTerm"
-                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
+                              OnValueChanged="(Term value) => SelectedTermChanged(value)" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Course" ColSpanMd="12">
                 <DxComboBox Data="@courses" NullText="@nullCourseText"

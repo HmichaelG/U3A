@@ -62,12 +62,8 @@ else
                                    ExpandedChanged="@(async () => await fullScreen.RefreshLayout())"
                                    Expanded="true">
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
-                        <DxComboBox Data="@terms" NullText="Select the Term required..."
-                                    AllowUserInput=false
-                                    SearchMode="ListSearchMode.AutoSearch"
-                                    TextFieldName="@nameof(Term.TermSummary)"
-                                    Value="@selectedTerm"
-                                    ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                        <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
+                                      OnValueChanged="(Term value) => SelectedTermChanged(value)" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Course To Enrol" ColSpanMd="12">
                         <DxComboBox Data="@courses"

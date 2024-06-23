@@ -51,12 +51,8 @@ else
                                         <Template>
                                             <div class="d-flex">
                                                 <div class="flex-grow-0 pt-1 pe-2">Term:</div>
-                                                     <DxComboBox Data="@terms" CssClass="flex-grow-1"
-                                                           Text="Select Term"
-                                                           SearchMode="ListSearchMode.AutoSearch"
-                                                           TextFieldName="@nameof(Term.Name)"
-                                                           Value="@selectedTerm"
-                                                           ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                                                <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
+                                                              OnValueChanged="(Term value) => SelectedTermChanged(value)" />
                                             </div>
                                         </Template>
                                     </DxToolbarItem>

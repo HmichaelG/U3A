@@ -10,11 +10,8 @@
         @quickMessage
         <DxFormLayout>
             <DxFormLayoutItem Caption=@($"{action} In Term") ColSpanMd="12">
-                <DxComboBox Data="@terms"
-                            SearchMode="ListSearchMode.AutoSearch"
-                            TextFieldName="@nameof(Term.Name)"
-                            Value="@selectedTerm"
-                            ValueChanged="@((Term term) => SelectedTermChanged(term))" />
+                <TermComboBox Terms="@terms" SelectedTerm="@selectedTerm"
+                              OnValueChanged="(Term value) => SelectedTermChanged(value)" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption=@($"{action} To Course") ColSpanMd="12">
                 <DxComboBox Data="@courses"

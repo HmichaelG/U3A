@@ -92,7 +92,7 @@ namespace U3A.BusinessRules
             {
                 terms = await dbc.Term.AsNoTracking()
                             .Where(x => x.Year >= currentTerm.Year - 1)
-                            .OrderByDescending(x => x.Year).ThenByDescending(x => x.TermNumber).ToListAsync();
+                            .OrderBy(x => x.Year).ThenBy(x => x.TermNumber).ToListAsync();
             }
             return terms;
         }
