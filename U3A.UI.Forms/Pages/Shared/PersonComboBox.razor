@@ -26,9 +26,9 @@
 @code {
 
     [Parameter, EditorRequired]
-    public IEnumerable<Person>? People { get; set; }
+    public IEnumerable<Person> People { get; set; }
     [Parameter, EditorRequired]
-    public Person? SelectedPerson { get; set; }
+    public Person SelectedPerson { get; set; }
     [Parameter]
     public bool ShowProcessButton { get; set; } = false;
     [Parameter]
