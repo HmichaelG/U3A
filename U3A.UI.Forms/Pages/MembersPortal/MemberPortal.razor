@@ -94,23 +94,24 @@ else
             break;
 
         case PortalMenuSelection.PrintMemberBadge:
-            <XtraReportViewer RootCssClass="report-viewer"
-                              HideTabPanels=true
-                              OnCloseButtonClick="@OnReportComplete"
-                              Report="GetMemberBadgeReport()" />
+            <div class="row w-100">
+                <PdfViewer Report="@(GetMemberBadgeReport())" 
+                    DisplayHeightOffset="10"
+                    OnCloseButtonClick="@(() => menuSelection = PortalMenuSelection.ShowMenu)" />
             <DxButton Text="Return to menu"
                       IconCssClass="bi-door-closed menu-icon me-3 h2"
-                      CssClass="mx-auto col-6 my-1"
+                      CssClass="mx-auto col-6 mt-4"
                       Click="@OnReportComplete"
                       RenderStyle="ButtonRenderStyle.Primary"
                       RenderStyleMode="ButtonRenderStyleMode.Outline">
             </DxButton>
+            </div>
             menuSelection = PortalMenuSelection.ShowMenu;
             break;
     }
 }
 <style>
-    .report-viewer{
+    .report-viewer {
         height: calc(100dvh - 12rem);
     }
 </style>
@@ -141,6 +142,7 @@ else
     string Title;
     string? SuccessMsg = null;
     Guid? QRClassID = default;
+    byte[] pdfContent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -190,14 +192,13 @@ else
 
     XtraReport GetMemberBadgeReport()
     {
-        MemberBadge report = new() {U3Adbfactory = U3Adbfactory};
+        MemberBadge report = new() { U3Adbfactory = U3Adbfactory };
         if (loginState.SelectedPerson is not null)
         {
             report.SetParameters(loginState.SelectedPerson.ID);
         }
         return report;
     }
-
 
     async Task GetQRRequestedClass()
     {

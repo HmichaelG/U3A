@@ -35,7 +35,7 @@ namespace U3A.UI.Reports
 
         IDbContextFactory<U3ADbContext> U3AdbFactory;
         U3ADbContext? dbc;
-        CustomReportStorageWebExtension storage;
+        public CustomReportStorageWebExtension ReportStorage { get; set; }
 
         IEmailService emailSender;
         PdfExportOptions options;
@@ -52,7 +52,7 @@ namespace U3A.UI.Reports
             isAzureFunction = true;
             isPreview = false;
             tenantID = tenant.Identifier;
-            storage = new CustomReportStorageWebExtension(tenant);
+            ReportStorage = new CustomReportStorageWebExtension(tenant);
             var settings = dbc.SystemSettings.FirstOrDefault() ?? throw new ArgumentNullException(nameof(SystemSettings));
             if (settings != null)
             {
@@ -71,7 +71,7 @@ namespace U3A.UI.Reports
         public ProFormaReportFactory(IWebHostEnvironment env, IDbContextFactory<U3ADbContext> U3AdbFactory, bool IsPreview)
         {
             this.U3AdbFactory = U3AdbFactory ?? throw new ArgumentNullException(nameof(U3AdbFactory));
-            storage = new CustomReportStorageWebExtension(env, this.U3AdbFactory);
+            ReportStorage = new CustomReportStorageWebExtension(env, this.U3AdbFactory);
             isPreview = IsPreview;
             dbc = this.U3AdbFactory.CreateDbContext();
             tenantID = dbc.TenantInfo.Identifier;
@@ -533,11 +533,11 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
 
         private string GetTempPdfFile()
         {
-            return Path.Combine(storage.TempDirectory, Guid.NewGuid() + ".pdf");
+            return Path.Combine(ReportStorage.TempDirectory, Guid.NewGuid() + ".pdf");
         }
         private string GetTempCSVFile()
         {
-            return Path.Combine(storage.TempDirectory, Guid.NewGuid() + ".csv");
+            return Path.Combine(ReportStorage.TempDirectory, Guid.NewGuid() + ".csv");
         }
         public void Dispose()
         {

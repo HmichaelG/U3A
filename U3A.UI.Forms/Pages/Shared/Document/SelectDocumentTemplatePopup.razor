@@ -108,9 +108,7 @@
                     @if (pdfVisible)
                     {
                         <div class="preview">
-                            <XtraReportViewer Report=@pdfReport
-                                              ReportName="none"
-                                              OnCloseButtonClick="@(() => pdfVisible = false)" />
+                            <PdfViewer DocumentContent="@pdfContent" OnCloseButtonClick="@(() => pdfVisible = false)" />
                         </div>
                     }
                     else
@@ -203,7 +201,7 @@
     IEnumerable<string?> displayNames = new List<string>();
     List<string?> attachments = new List<string>();
     AttachFile attachFile;
-    PDFReport? pdfReport;
+    byte[] pdfContent;
     string showHideText = "inline";
     string editorDiv = "col col-7";
     Progress? progressBar;
@@ -439,10 +437,8 @@
             {
                 await progressBar.ShowSmallSpinnerAsync();
                 var server = new DocumentServer(dbContext);
-                var pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
+                pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
                                                             ExportData, OverrideCommunicationPreference);
-                pdfReport = new();
-                pdfReport.PdfContent.Source = pdfContent;
                 await progressBar.Close();
             }
             else

@@ -162,6 +162,7 @@ else
 
     async Task ProcessReportsAsync(bool IsPreview)
     {
+        dbc.ChangeTracker.Clear();
         await ProgressBar.ShowAsync("Processing ... Please Wait", SelectedDataItems.Count);
         reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
         int count = 0;

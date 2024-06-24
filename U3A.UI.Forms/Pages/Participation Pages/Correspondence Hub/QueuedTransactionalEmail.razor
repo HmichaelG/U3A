@@ -26,7 +26,7 @@ else
     if (showPDF)
     {
         <div class="row w-100 viewer-height bg-secondary">
-            <XtraReportViewer Report=@pdfReport OnCloseButtonClick="@(() => showPDF = false)" />
+            <PdfViewer DocumentContent="@pdfContent" OnCloseButtonClick="@(() => showPDF = false)" />
         </div>
     }
     else
@@ -126,7 +126,7 @@ else
     TenantDbContext dbcT { get; set; }
     string tenant;
     SystemSettings? settings;
-    PDFReport? pdfReport;
+    Byte[] pdfContent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -353,9 +353,9 @@ else
         var pdfFilename = reportFactory.CreatePostalPDF();
         if (pdfFilename != null)
         {
-            pdfPath = $"{NavigationManager.BaseUri}Temp/" + pdfFilename;
-            pdfReport = new();
-            pdfReport.PdfContent.SourceUrl = pdfPath;
+            pdfPath = Path.Combine(reportFactory.ReportStorage.TempDirectory, pdfFilename);
+            pdfContent = File.ReadAllBytes(pdfPath);
+
             showPDF = true;
             await InvokeAsync(StateHasChanged);
         }

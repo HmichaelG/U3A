@@ -1,0 +1,108 @@
+﻿@page "/PdfViewer"
+@page "/PdfViewerViewer/{ReportName?}"
+
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>U3A Report</PageTitle>
+
+<AntiforgeryToken />
+
+@inject NavigationManager NavMan
+
+@using DevExpress.Blazor.PdfViewer
+@using DevExpress.XtraPrinting
+@using U3A.Services
+@using U3A.UI.Common.Pages.Shared
+@using DevExpress.Blazor.Reporting.Models
+@using Microsoft.Extensions.DependencyInjection
+
+@attribute [Authorize]
+
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxPdfViewer @ref="@reportViewer"
+                 DocumentContent="@DocumentContent"                 
+                 IsSinglePagePreview="false"
+                 ZoomLevel="1"
+                 CssClass="view-style"
+                 CustomizeToolbar="OnCustomizeToolbar" />
+}
+<style>
+    .view-style {
+        width:100%;
+        height: @viewerHeight
+    }
+
+</style>
+
+@code {
+    DxPdfViewer? reportViewer;
+    [Parameter]
+    public Byte[] DocumentContent { get; set; }
+    [Parameter]
+    public XtraReport Report { get; set; }
+    [Parameter]
+    public EventCallback OnCloseButtonClick { get; set; }
+    [Parameter]
+    public int DisplayHeightOffset { get; set; } = 4;
+
+    string viewerHeight;
+
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        viewerHeight = (Workstation.UseTopMenu) 
+        ? $"calc(100dvh - {DisplayHeightOffset+3}rem) !important;" 
+        : $"calc(100dvh - {DisplayHeightOffset}rem) !important;";
+        if (Report is not null)
+        {
+            using (var ms = new MemoryStream())
+            {
+                await Report.ExportToPdfAsync(ms);
+                ms.Position = 0;
+                DocumentContent = ms.ToArray();
+            }
+
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isReady = true;
+            await InvokeAsync(StateHasChanged);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    void OnCustomizeToolbar(ToolbarModel toolbarModel)
+    {
+        toolbarModel.AllItems.Add(new ToolbarItem()
+            {
+                IconCssClass = "bi bi-door-open",
+                BeginGroup = true,
+                Text = "Close Report",
+                AdaptiveText = "Close Report",
+                AdaptivePriority = 1,
+                Click = async (args) =>
+                {
+                    if (OnCloseButtonClick.HasDelegate)
+                    {
+                        await OnCloseButtonClick.InvokeAsync();
+                    }
+                    else
+                    {
+                        NavMan.NavigateTo("/");
+                    }
+                }
+            });
+    }
+
+}
