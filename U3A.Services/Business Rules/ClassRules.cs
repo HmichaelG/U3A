@@ -515,33 +515,41 @@ namespace U3A.BusinessRules
             switch (term.TermNumber)
             {
                 case 1:
-                    result = (Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4);
-                    break;
-                case 2:
                     result = Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4;
                     break;
-                case 3:
+                case 2:
                     result = Class.OfferedTerm3 || Class.OfferedTerm4;
+                    break;
+                case 3:
+                    result = Class.OfferedTerm4;
+                    break;
+                case 4:
+                    break;
+            }
+            if (result) {return true;}  // result is in future term
+
+            switch (term.TermNumber)
+            {
+                case 1:
+                    result = Class.OfferedTerm1;
+                    break;
+                case 2:
+                    result = Class.OfferedTerm2;
+                    break;
+                case 3:
+                    result = Class.OfferedTerm3;
                     break;
                 case 4:
                     result = Class.OfferedTerm4;
                     break;
-            }
+            }            
+            if (!result) {return result; } // Class has finished in previous term
+
             // no more tests if term is in previous year
             if (term.Year < defaultTerm.Year) return result;
-            // otherwise, only print classes that have not yet ended
-            var nextTerm = term;
-            if (allTerms != null)
-            {
-                var nextTermNo = GetNextTermOffered(Class, term.TermNumber);
-                if (nextTermNo ==0) { nextTermNo = defaultTerm.TermNumber; }
-                if (nextTermNo != term.TermNumber)
-                {
-                    var t = allTerms.FirstOrDefault(x => x.TermNumber == nextTermNo && x.Year == term.Year);
-                    if (t != null) { nextTerm = t; }
-                }
-            }
-            DateTime? endDate = GetClassEndDate(Class, nextTerm);
+
+            // otherwise, it is the current term. Only print classes that have not yet ended
+            DateTime? endDate = GetClassEndDate(Class, term);
             var localTime = TimezoneAdjustment.GetLocalTime();
             if (endDate == null || endDate <= localTime) result = false; else result = true;
             return result;
