@@ -45,7 +45,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.Course)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
-                            .Where(x => x.Course.Year == term.Year 
+                            .Where(x => x.Course.Year == term.Year
                                             && (!x.Course.IsOffScheduleActivity)
                                             && x.OccurrenceID != 999)
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToListAsync();
@@ -511,47 +511,92 @@ namespace U3A.BusinessRules
         public static bool IsClassInRemainingYear(U3ADbContext dbc,
                             Class Class, Term term, Term defaultTerm, IEnumerable<Term> allTerms = null)
         {
+            Console.ForegroundColor = ConsoleColor.White;
+            if (constants.IS_DEVELOPMENT) Console.WriteLine($"Processing {Class.Course.Name}...");
+
             bool result = false;
+            var startDate = Class.StartDate;
+            var recurrence = Class.Recurrence;
+            var occurrence = (OccurrenceType)Class.OccurrenceID;
+            var today = TimezoneAdjustment.GetLocalTime().Date;
+
+            // Return true if startDate is in future
+            if (startDate != null && startDate >= today)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return TRUE because start {startDate} >= today {today}.");
+                return true;
+            }
+
+            // Return false if single day activity && startDate is prior to today
+            if (startDate != null && startDate < today && occurrence == OccurrenceType.OnceOnly)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return FALSE because start {startDate} < today {today} && once-only activity.");
+                return true;
+            }
+
+            // return True if term number is current or future
+            // && startDate/recurrence are null
             switch (term.TermNumber)
             {
                 case 1:
+                    result = Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4;
+                    break;
+                case 2:
                     result = Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4;
                     break;
-                case 2:
+                case 3:
                     result = Class.OfferedTerm3 || Class.OfferedTerm4;
                     break;
-                case 3:
-                    result = Class.OfferedTerm4;
-                    break;
                 case 4:
+                    result = Class.OfferedTerm4;
                     break;
             }
-            if (result) {return true;}  // result is in future term
-
-            switch (term.TermNumber)
+            if (result && startDate == null && recurrence == null)
             {
-                case 1:
-                    result = Class.OfferedTerm1;
-                    break;
-                case 2:
-                    result = Class.OfferedTerm2;
-                    break;
-                case 3:
-                    result = Class.OfferedTerm3;
-                    break;
-                case 4:
-                    result = Class.OfferedTerm4;
-                    break;
-            }            
-            if (!result) {return result; } // Class has finished in previous term
+                Console.ForegroundColor = ConsoleColor.Green;
+                if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return TRUE because term [{term.Name}] is current or in future {Class.OfferedSummary}.");
+                return true;
+            }
+
+            // Return FALSE if in previous term (result == false) 
+            // && startDate/recurrence are null
+            if (!result && startDate == null && recurrence == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return FALSE because class [{Class.OfferedSummary}] is prior to current term [{term.Name}].");
+                return false;
+            }
 
             // no more tests if term is in previous year
             if (term.Year < defaultTerm.Year) return result;
 
-            // otherwise, it is the current term. Only print classes that have not yet ended
+            // failed all simple tests - calculate the end date
             DateTime? endDate = GetClassEndDate(Class, term);
             var localTime = TimezoneAdjustment.GetLocalTime();
             if (endDate == null || endDate <= localTime) result = false; else result = true;
+            if (constants.IS_DEVELOPMENT)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"    Dropped thu initial tests.");
+                Console.WriteLine($"    Start Date:         {startDate}");
+                Console.WriteLine($"    Occurence:          {occurrence}");
+                Console.WriteLine($"    Recurence:          {Class.Recurrence}");
+                Console.WriteLine($"    Current Term:       {term.Name}");
+                Console.WriteLine($"    Offered:            {Class.OfferedSummary}");
+                Console.WriteLine($"    Calculated EndDate: {endDate}");
+                if (result)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"    Return TRUE because local time {localTime} is prior to EndDate");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"    Return FALSE because local time {localTime} is later than EndDate");
+                }
+            }
             return result;
         }
 
