@@ -1,11 +1,27 @@
 ﻿@page "/Fix"
 
-<DxFormLayout>
-    <div class="col-8" style="background-color:red">
-        <ClassCalendar />
-    </div>
-</DxFormLayout>
+@inject IDbContextFactory<U3ADbContext> dbf
+@using U3A.Services
+
+<MessageBox @ref=@messageBox />
+<h3>Fixing Course Descriptions</h3>
 
 @code {
+    MessageBox messageBox;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        using (var dbc = dbf.CreateDbContext())
+        {
+            var l = dbc.Course.ToList();
+            foreach (var c in l)
+            {
+                c.Description = c.Description.ToHtml();
+            }
+            dbc.SaveChanges();
+        }
+
+       if (messageBox != null) messageBox.ShowOkOnlyAsync("done");
+    }
 
 }

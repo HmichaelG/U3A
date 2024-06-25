@@ -10,7 +10,8 @@
         <ValidationSummary />
     </DxFormLayoutItem>
 
-    <DxTabs @ref=@TabPages CssClass="page-height" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
+    <DxTabs @ref=@TabPages style="width:100%;"
+        CssClass="page-height" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
         <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>
             <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
                              Settings=@Settings CourseEditView="@CourseEditViewType.Simplified"
@@ -48,6 +49,13 @@
                 <FrmClassDetailPopup @ref="classDetail" Course="@Course" AllowEdit="true"
                                      Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" Occurrences="Occurrences"
                                      DbContext="@DbContext" />
+            </DxFormLayoutItem>
+        </DxTabPage>
+
+        <DxTabPage Text="Description">
+            <DxFormLayoutItem ColSpanMd="12">
+                <HtmlEditor @bind-Markup="@Course.Description" 
+                        Height="30rem" Width="100%" />
             </DxFormLayoutItem>
         </DxTabPage>
 
@@ -152,6 +160,9 @@
     {
         switch (e.TabIndex)
         {
+            case 0:
+                CourseViewType = CourseEditViewType.Simplified;
+                break;
             case 1:
                 CourseViewType = CourseEditViewType.Activity;
                 break;
@@ -159,13 +170,16 @@
                 CourseViewType = CourseEditViewType.Detail;
                 break;
             case 3:
+                CourseViewType = CourseEditViewType.Description;
+                break;
+            case 4:
                 CourseViewType = CourseEditViewType.Settings;
                 break;
             default:
-                CourseViewType = CourseEditViewType.Simplified;
                 break;
         }
-        if (CourseViewType != CourseEditViewType.Settings) { Course.EditType = CourseViewType; }
+        if (CourseViewType != CourseEditViewType.Settings && 
+            CourseViewType != CourseEditViewType.Description) { Course.EditType = CourseViewType; }
     }
 
 }

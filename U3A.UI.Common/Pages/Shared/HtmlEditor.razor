@@ -1,0 +1,65 @@
+﻿@using System.Xml
+@using System.Text
+@using AngleSharp
+@using AngleSharp.Html
+@using AngleSharp.Html.Parser
+
+<DxTabs style="width:100%">
+    <DxTabPage Text="Editor">
+        <DxHtmlEditor @bind-Markup="@Markup" Width="@Width" Height="@Height" />
+    </DxTabPage>
+    <DxTabPage Text="Code">
+        <DxMemo @bind-Text="@Markup" Rows="20" />
+    </DxTabPage>
+
+</DxTabs>
+
+@code {
+    string _markup = "";
+    [Parameter]
+    public string Markup
+    {
+        get { return PrettyPrint(_markup); }
+        set
+        {
+            if (_markup == value) { return; }
+            _markup = (value == null) ? "" : MinifyHtml(value);
+            MarkupChanged.InvokeAsync(_markup);
+        }
+    }
+    [Parameter]
+    public EventCallback<string> MarkupChanged { get; set; }
+
+    [Parameter]
+    public string Width { get; set; } = "100%";
+    [Parameter]
+    public string Height { get; set; }
+
+    static string PrettyPrint(string html)
+    {
+        string result = string.Empty;
+        if (string.IsNullOrWhiteSpace(html)) return result;
+        var parser = new HtmlParser();
+        var document = parser.ParseDocument(html);
+
+        using (var writer = new StringWriter())
+        {
+            document.ToHtml(writer, new PrettyMarkupFormatter());
+            result = writer.ToString();
+        }
+
+        return result;
+    }
+
+    static string MinifyHtml(string html)
+    {
+        string result = string.Empty;
+        if (string.IsNullOrWhiteSpace(html)) return result;
+        var parser = new HtmlParser();
+        var document = parser.ParseDocument(html);
+        result = document.Minify();
+        return result;
+    }
+
+
+}

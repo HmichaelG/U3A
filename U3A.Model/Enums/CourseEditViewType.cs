@@ -11,6 +11,8 @@ namespace U3A.Model
         Activity,
         [Display(Name = "Detail: Typically used when there are multiple classes per course.", ShortName = "Detail")]
         Detail,
+        [Display(Name = "Description: The Description HTML editor.", ShortName = "Description")]
+        Description,
         [Display(Name = "Settings: System settings applicable to all Course/Classes.", ShortName = "Settings")]
         Settings
     }
