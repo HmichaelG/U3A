@@ -350,7 +350,7 @@ else
         if (e.IsNew)
         {
             anyEnrolmentsInYear = false;
-            editModel.Description = string.Empty; // Req'd by HtmlEditor
+            editModel.Description = selectCourseView.descriptionHtml;
             editModel.Duration = 2.00M;
             editModel.MaximumStudents = 28;
             editModel.RequiredStudents = 6;
