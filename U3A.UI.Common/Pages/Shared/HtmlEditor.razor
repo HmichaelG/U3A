@@ -2,16 +2,20 @@
 @using System.Text
 @using AngleSharp
 @using AngleSharp.Html
+@using AngleSharp.Html.Dom
 @using AngleSharp.Html.Parser
+
+<MessageBox @ref=@messageBox />
 
 <DxTabs style="width:100%">
     <DxTabPage Text="Editor">
         <DxHtmlEditor @bind-Markup="@Markup" Width="@Width" Height="@Height" />
     </DxTabPage>
     <DxTabPage Text="Code">
-        <DxMemo @bind-Text="@Markup" Rows="20" />
+        <DxMemo @bind-Text="@Markup" Rows="20" ReadOnly="@(!isCodeEditable)" />
+        <DxButton Text="Edit" Click="OnEditClicked" />
+        <div class="text-danger">@errorText</div>
     </DxTabPage>
-
 </DxTabs>
 
 @code {
@@ -35,19 +39,33 @@
     [Parameter]
     public string Height { get; set; }
 
+    MessageBox? messageBox;
+    bool isCodeEditable;
+    static string errorText = "";
+
+    static IHtmlDocument? ParseHtml(string html)
+    {
+        IHtmlDocument result = null!;
+        var parser = new HtmlParser();
+        try
+        {
+            result = parser.ParseDocument(html);
+        }
+        catch (Exception e) { errorText = e.ToString(); }
+        return result;
+    }
+
     static string PrettyPrint(string html)
     {
         string result = string.Empty;
         if (string.IsNullOrWhiteSpace(html)) return result;
-        var parser = new HtmlParser();
-        var document = parser.ParseDocument(html);
-
+        var document = ParseHtml(html);
+        if (document is null) return result;
         using (var writer = new StringWriter())
         {
             document.ToHtml(writer, new PrettyMarkupFormatter());
             result = writer.ToString();
         }
-
         return result;
     }
 
@@ -55,11 +73,19 @@
     {
         string result = string.Empty;
         if (string.IsNullOrWhiteSpace(html)) return result;
-        var parser = new HtmlParser();
-        var document = parser.ParseDocument(html);
+        var document = ParseHtml(html);
+        if (document is null) return result;
         result = document.Minify();
         return result;
     }
 
+    async Task OnEditClicked()
+    {
+        isCodeEditable = await messageBox!.ShowAsync("Advanced Only",
+                        @"<p>Editing code requires advanced knowledge of HTML programming.
+                Errors in code may render unpredictable results or system errors.</p>
+                Do you wsih to continue?");
+        StateHasChanged();
+    }
 
 }
