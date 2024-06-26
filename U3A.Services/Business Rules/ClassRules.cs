@@ -133,7 +133,9 @@ namespace U3A.BusinessRules
                             .ToListAsync());
             classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
-            classes = classes.Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
+            classes = classes
+                .OrderBy(x => x.Course.Name)
+                .Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
             classes = classes.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term)).ToList();
             foreach (var c in classes)
             {

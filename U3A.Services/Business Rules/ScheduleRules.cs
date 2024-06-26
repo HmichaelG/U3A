@@ -313,15 +313,14 @@ namespace U3A.BusinessRules
             var term = BusinessRule.CurrentEnrolmentTerm(dbc);
             if (term != null)
             {
+                var now = TimezoneAdjustment.GetLocalTime().Date;
                 var classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
                 foreach (var c in classes)
                 {
                     schedules.Add(processClasses(c, settings, TenantIdentifier));
-                    var now = TimezoneAdjustment.GetLocalTime().Date;
-                    if (c.Course.AllowMultiCampsuFrom == null || 
-                            (c.Course.AllowMultiCampsuFrom != null
+                    if (c.Course.AllowMultiCampsuFrom != null
                                 && TimezoneAdjustment.GetLocalTime().Date >= c.Course.AllowMultiCampsuFrom
-                                && !c.Course.IsOffScheduleActivity))
+                                && !c.Course.IsOffScheduleActivity)
                     {
                         multiCampusSchedules.Add(processClasses(c, settings, TenantIdentifier));
                     }
