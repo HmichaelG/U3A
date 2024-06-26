@@ -535,7 +535,7 @@ namespace U3A.BusinessRules
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return FALSE because start {startDate} < today {today} && once-only activity.");
-                return true;
+                return false;
             }
 
             // return True if term number is current or future
