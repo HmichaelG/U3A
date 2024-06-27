@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using U3A.Database;
 using U3A.Model;
+using Serilog;
 
 namespace U3A.Services
 {
@@ -15,9 +16,7 @@ namespace U3A.Services
     {
         readonly IDbContextFactory<TenantDbContext> _tenantDbFactory;
         readonly TenantInfoService _tenantInfoSvc;
-        readonly ILogger<ErrorBoundaryLoggingService> _logger;
         public ErrorBoundaryLoggingService(IDbContextFactory<TenantDbContext> TenantDbFactory,
-                                            ILogger<ErrorBoundaryLoggingService> logger,
                                             TenantInfoService TenantInfoService)
         {
             _tenantInfoSvc = TenantInfoService;
@@ -27,7 +26,7 @@ namespace U3A.Services
         {
             using (var dbc = await _tenantDbFactory.CreateDbContextAsync())
             {
-                _logger.LogError(exception.ToString());
+                Log.Error(exception.ToString());
                 var ex = new ExceptionLog() { Tenant = await _tenantInfoSvc.GetTenantIdentifierAsync(), 
                                                 Log = exception.ToString() };
                 await dbc.AddAsync(ex);

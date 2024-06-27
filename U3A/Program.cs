@@ -19,6 +19,10 @@ using U3A.Model;
 using System;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +37,17 @@ var builder = WebApplication.CreateBuilder(args);
 //}
 
 // **** Start local modifications ****
+
+LoggingLevelSwitch WarningLevelSwitch
+        = new LoggingLevelSwitch(LogEventLevel.Warning);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", WarningLevelSwitch)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(formatProvider: new CultureInfo("en-AU"))
+    .CreateLogger();
+
+builder.Services.AddSerilog();
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
 DevExpress.Drawing.Internal.DXDrawingEngine.ForceSkia();
@@ -94,7 +109,8 @@ builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
 //DevExpress.Blazor.CompatibilitySettings.ComboBoxCompatibilityMode = true;
 
 builder.Services.AddDevExpressServerSideBlazorReportViewer();
-builder.Services.AddDevExpressBlazor(options => {
+builder.Services.AddDevExpressBlazor(options =>
+{
     options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });

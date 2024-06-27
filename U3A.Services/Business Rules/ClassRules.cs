@@ -18,6 +18,8 @@ using Twilio.Rest.Trunking.V1;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace U3A.BusinessRules
 {
@@ -133,39 +135,31 @@ namespace U3A.BusinessRules
                             .ToListAsync());
             classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
+            var totalClasses = classes.Count();
             classes = classes
                 .OrderBy(x => x.Course.Name)
                 .Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
+            var TotalClassesRemainingInYear = classes.Count();
             classes = classes.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term)).ToList();
+            var TotalClassesInReportingPeriod = classes.Count();
             foreach (var c in classes)
             {
                 AssignClassTerm(c, terms, term);
                 AssignClassContacts(c, term, settings);
                 AssignClassCounts(term, c);
             }
-            var prevTerm = await GetPreviousTermAsync(dbc, term.Year, term.TermNumber);
-            if (prevTerm != null && prevTerm.Year == term.Year)
-            {
-                var prevTermShoulderClasses = await GetSameParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities, LastScheduleUpdate)
-                            .ToListAsync();
-                prevTermShoulderClasses.AddRange(await GetDifferentParticipantClasses(dbc, prevTerm, ExludeOffScheduleActivities, LastScheduleUpdate)
-                            .ToListAsync());
-                prevTermShoulderClasses = prevTermShoulderClasses
-                                            .Where(x => x.StartDate.GetValueOrDefault() > prevTerm.EndDate
-                                                            && x.StartDate.GetValueOrDefault() < term.StartDate
-                                                            && IsClassInRemainingYear(dbc, x, prevTerm, defaultTerm, terms)).ToList();
-                prevTermShoulderClasses = prevTermShoulderClasses.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term)).ToList();
-                foreach (var c in prevTermShoulderClasses)
-                {
-                    AssignClassTerm(c, terms, prevTerm);
-                    AssignClassContacts(c, prevTerm, settings);
-                    AssignClassCounts(prevTerm, c);
-                }
-                classes.AddRange(prevTermShoulderClasses);
-            }
             classes = GetClassSummaries(classes).ToList();
-            return EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)
+
+            Log.Information("");
+            Log.Information("{p1} Total classes retrieved", totalClasses);
+            Log.Information("{p1} Total classes remaing in year", TotalClassesRemainingInYear);
+            Log.Information("{p1} Total classes in reporting period", TotalClassesRemainingInYear);
+
+            classes = EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)
                         .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name).ToList();
+
+            Log.Information("{p1} Unique classes returned", TotalClassesRemainingInYear);
+            return classes;
         }
 
         static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes)
@@ -513,8 +507,9 @@ namespace U3A.BusinessRules
         public static bool IsClassInRemainingYear(U3ADbContext dbc,
                             Class Class, Term term, Term defaultTerm, IEnumerable<Term> allTerms = null)
         {
-            Console.ForegroundColor = ConsoleColor.White;
-            if (constants.IS_DEVELOPMENT) Console.WriteLine($"Processing {Class.Course.Name}...");
+
+            Log.Information("Processing {p0}...", Class.Course.Name);
+            LogClassDetails(Class, term);
 
             bool result = false;
             var startDate = Class.StartDate;
@@ -525,16 +520,18 @@ namespace U3A.BusinessRules
             // Return true if startDate is in future
             if (startDate != null && startDate >= today)
             {
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return TRUE because start {startDate} >= today {today}.");
+                Console.BackgroundColor = ConsoleColor.Green;
+                Log.Information("    Return {p0} because start {p1} >= today {p2}."
+                        ,true,DateOnly.FromDateTime(startDate.Value), DateOnly.FromDateTime(today));
                 return true;
             }
 
             // Return false if single day activity && startDate is prior to today
             if (startDate != null && startDate < today && occurrence == OccurrenceType.OnceOnly)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return FALSE because start {startDate} < today {today} && once-only activity.");
+                Console.BackgroundColor = ConsoleColor.Red;
+                Log.Information("    Return {p0} because start {p1} < today {p2} && {p3}.",
+                    false, DateOnly.FromDateTime(startDate.Value), DateOnly.FromDateTime(today), "Once-only activity");
                 return false;
             }
 
@@ -557,8 +554,9 @@ namespace U3A.BusinessRules
             }
             if (result && startDate == null && recurrence == null)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return TRUE because term [{term.Name}] is current or in future {Class.OfferedSummary}.");
+                Console.BackgroundColor = ConsoleColor.Green;
+                Log.Information("    Return {p0} because term {p1} is current or in future {p2}."
+                    ,true, term.Name, Class.OfferedSummary);
                 return true;
             }
 
@@ -566,40 +564,43 @@ namespace U3A.BusinessRules
             // && startDate/recurrence are null
             if (!result && startDate == null && recurrence == null)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                if (constants.IS_DEVELOPMENT) Console.WriteLine($"    Return FALSE because class [{Class.OfferedSummary}] is prior to current term [{term.Name}].");
+                Console.BackgroundColor = ConsoleColor.Red;
+                Log.Information("    Return {p0} because class {p1} is prior to current term {p2}.",
+                        false, Class.OfferedSummary, term.Name);
                 return false;
             }
 
             // no more tests if term is in previous year
             if (term.Year < defaultTerm.Year) return result;
 
+            Log.Warning("    Dropped thru initial tests.");
+
             // failed all simple tests - calculate the end date
             DateTime? endDate = GetClassEndDate(Class, term);
-            var localTime = TimezoneAdjustment.GetLocalTime();
-            if (endDate == null || endDate <= localTime) result = false; else result = true;
-            if (constants.IS_DEVELOPMENT)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"    Dropped thu initial tests.");
-                Console.WriteLine($"    Start Date:         {startDate}");
-                Console.WriteLine($"    Occurence:          {occurrence}");
-                Console.WriteLine($"    Recurence:          {Class.Recurrence}");
-                Console.WriteLine($"    Current Term:       {term.Name}");
-                Console.WriteLine($"    Offered:            {Class.OfferedSummary}");
-                Console.WriteLine($"    Calculated EndDate: {endDate}");
+            if (endDate == null || endDate <= term.StartDate) result = false; else result = true;
+                Log.Information("    Calculated EndDate: {p}", endDate);
                 if (result)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"    Return TRUE because local time {localTime} is prior to EndDate");
+                    Log.Information("    Return {p0} because term Start {p1} is prior to class End {p2}",
+                                        true, term.StartDate,endDate);
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"    Return FALSE because local time {localTime} is later than EndDate");
+                    Log.Information("    Return {p0} because term Start {p1} is later class End {p2}",
+                                            false, term.StartDate,endDate);
                 }
-            }
             return result;
+        }
+
+        private static void LogClassDetails(Class Class, Term term)
+        {
+            Log.Information("    Start Date:         {p}", Class.StartDate);
+            Log.Information("    Occurence:          {p}", (OccurrenceType) Class.OccurrenceID);
+            Log.Information("    Recurence:          {p}", Class.Recurrence);
+            Log.Information("    Current Term:       {p}", term.Name);
+            Log.Information("    Offered:            {p}", Class.OfferedSummary);
         }
 
         public static async Task AssignTermForOnceOnlyClass(U3ADbContext dbc, Class c)

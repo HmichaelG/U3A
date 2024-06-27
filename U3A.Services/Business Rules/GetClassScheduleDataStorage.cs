@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using U3A.Database;
 using U3A.Model;
+using Serilog;
 
 namespace U3A.BusinessRules
 {
@@ -86,12 +87,12 @@ namespace U3A.BusinessRules
             {
                 foreach (var t in termsInYear)
                 {
-                    list.AddRange(await GetScheduleAsync(dbc, t, VenuesToFilter,IsCalendarView));
+                    list.AddRange(await GetScheduleAsync(dbc, t, VenuesToFilter, IsCalendarView));
                 }
             }
             else
             {
-                list= await GetScheduleAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView);
+                list = await GetScheduleAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView);
             }
             list.AddRange(await GetPublicHolidays(dbc));
             dataStorage.AppointmentsSource = list;
@@ -166,7 +167,7 @@ namespace U3A.BusinessRules
                         {
                             schedule.AppointmentType = 0;
                         }
-                        
+
                         schedule.Caption = c.Course.Name;
                         schedule.Description = (c.Leader != null) ? c.Leader.FullName : "";
                         schedule.Location = c.Venue.Name;
@@ -209,8 +210,17 @@ namespace U3A.BusinessRules
             }
             else
             {
-                var termOffered = GetNextTermOffered(c, thisTerm.TermNumber);
-                schedule.StartDate = GetDateTime(thisTerm.StartDate, c.StartTime);
+                if (IsClassInTerm(c, thisTerm.TermNumber))
+                {
+                    schedule.StartDate = GetDateTime(thisTerm.StartDate, c.StartTime);
+                }
+                if (schedule.StartDate == DateTime.MinValue)
+                {
+                    var endDate = selectedTerm.StartDate.AddMinutes(-1);
+                    Log.Warning("        End Date set to Term Start date minus 1 minute {p0}", endDate);
+                    Log.Warning("        Because clacluated start date is null.");
+                    return endDate;
+                }
             }
             schedule.EndDate = GetDateTime(schedule.StartDate, c.Course.Duration);
 
@@ -244,7 +254,7 @@ namespace U3A.BusinessRules
                 },
                 AppointmentLabelsSource = new List<LabelObject>()
             };
-            var range = new DxSchedulerDateTimeRange(thisTerm.StartDate,
+            var range = new DxSchedulerDateTimeRange(schedule.StartDate,
                             new DateTime(thisTerm.Year, 12, 31));
             var a = dataStorage.GetAppointments(range)
                         .OrderByDescending(x => x.End).FirstOrDefault();
@@ -442,7 +452,10 @@ namespace U3A.BusinessRules
             if (c.StartDate.HasValue)
             {
                 info.Start = GetDateTime(c.StartDate.Value, c.StartTime);
-                if (info.Start < term.StartDate) {info.Start = GetDateTime(term.StartDate, c.StartTime); }
+                if (info.Start < term.StartDate && IsClassInTerm(c, term.TermNumber))
+                {
+                    info.Start = GetDateTime(term.StartDate, c.StartTime);
+                }
             }
             else
             {
