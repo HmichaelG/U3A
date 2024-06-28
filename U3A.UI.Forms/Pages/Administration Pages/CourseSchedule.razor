@@ -138,14 +138,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        IsReady = true;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
                 AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
@@ -162,9 +155,7 @@ else
                 }
             }
             IsReady = true;
-            StateHasChanged();
-        }
-        await base.OnAfterRenderAsync(firstRender);
+            await base.OnInitializedAsync();
     }
 
     async void OnStartDateChanged(DateTime newStartDate) => StartDate = TimezoneAdjustment.GetLocalTime(newStartDate).Date;

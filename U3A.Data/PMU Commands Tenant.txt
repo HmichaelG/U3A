@@ -1,8 +1,8 @@
-﻿update-database -cont TenantDbContext -project U3A.Database TdB_Term_delCompositeKey
+﻿update-database -cont TenantDbContext -project U3A.Database TdB_ExceptionLog
 
-remove-migration -cont TenantDbContext -project U3A.Database -args TdB_ExceptionLog
+remove-migration -cont TenantDbContext -project U3A.Database -args TdB_LogEvents
 
-add-migration -cont TenantDbContext -project U3A.Database TdB_ExceptionLog
+add-migration -cont TenantDbContext -project U3A.Database TdB_LogEvents
 
 update-database -cont TenantDbContext -project U3A.Database
 

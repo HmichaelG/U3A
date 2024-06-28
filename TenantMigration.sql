@@ -57,7 +57,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220806103408_EFCoreStore_Initial', N'8.0.5');
+    VALUES (N'20220806103408_EFCoreStore_Initial', N'8.0.6');
 END;
 GO
 
@@ -82,7 +82,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220824073049_EFCoreStore_EFCoreStore_SendGridAPIKey', N'8.0.5');
+    VALUES (N'20220824073049_EFCoreStore_EFCoreStore_SendGridAPIKey', N'8.0.6');
 END;
 GO
 
@@ -107,7 +107,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220901022532_EFCoreStore_EmailTestEnv', N'8.0.5');
+    VALUES (N'20220901022532_EFCoreStore_EmailTestEnv', N'8.0.6');
 END;
 GO
 
@@ -150,7 +150,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220908050744_EFCoreStore_TwilioSMS', N'8.0.5');
+    VALUES (N'20220908050744_EFCoreStore_TwilioSMS', N'8.0.6');
 END;
 GO
 
@@ -175,7 +175,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20220909035907_EFCoreStore_EFCoreStore_TwilioSMSTextEnv', N'8.0.5');
+    VALUES (N'20220909035907_EFCoreStore_EFCoreStore_TwilioSMSTextEnv', N'8.0.6');
 END;
 GO
 
@@ -229,7 +229,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20221125194407_EFCoreStore_Eway', N'8.0.5');
+    VALUES (N'20221125194407_EFCoreStore_Eway', N'8.0.6');
 END;
 GO
 
@@ -283,7 +283,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230107033050_Postmark', N'8.0.5');
+    VALUES (N'20230107033050_Postmark', N'8.0.6');
 END;
 GO
 
@@ -318,7 +318,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230829214618_ContactRequest', N'8.0.5');
+    VALUES (N'20230829214618_ContactRequest', N'8.0.6');
 END;
 GO
 
@@ -343,7 +343,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20230829220435_ContactRequest_u3a', N'8.0.5');
+    VALUES (N'20230829220435_ContactRequest_u3a', N'8.0.6');
 END;
 GO
 
@@ -383,7 +383,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240323025122_TenantInfo_Id', N'8.0.5');
+    VALUES (N'20240323025122_TenantInfo_Id', N'8.0.6');
 END;
 GO
 
@@ -418,7 +418,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240406033746_Schedule', N'8.0.5');
+    VALUES (N'20240406033746_Schedule', N'8.0.6');
 END;
 GO
 
@@ -461,7 +461,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240406034104_Schedules_to_Schedule', N'8.0.5');
+    VALUES (N'20240406034104_Schedules_to_Schedule', N'8.0.6');
 END;
 GO
 
@@ -514,7 +514,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240408031030_MultiCampusPerson', N'8.0.5');
+    VALUES (N'20240408031030_MultiCampusPerson', N'8.0.6');
 END;
 GO
 
@@ -575,7 +575,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240408031351_MultiCampusPerson_delBaseEntity', N'8.0.5');
+    VALUES (N'20240408031351_MultiCampusPerson_delBaseEntity', N'8.0.6');
 END;
 GO
 
@@ -662,7 +662,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240408035853_createMCPeopleAndScheduleCache', N'8.0.5');
+    VALUES (N'20240408035853_createMCPeopleAndScheduleCache', N'8.0.6');
 END;
 GO
 
@@ -741,7 +741,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240409203006_createMCTerm', N'8.0.5');
+    VALUES (N'20240409203006_createMCTerm', N'8.0.6');
 END;
 GO
 
@@ -766,7 +766,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240409204722_TdB_MCTerm_identifier', N'8.0.5');
+    VALUES (N'20240409204722_TdB_MCTerm_identifier', N'8.0.6');
 END;
 GO
 
@@ -831,7 +831,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240409213342_TdB_MCEnrolment', N'8.0.5');
+    VALUES (N'20240409213342_TdB_MCEnrolment', N'8.0.6');
 END;
 GO
 
@@ -856,7 +856,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240412021802_TdB_EnableMCExtensions', N'8.0.5');
+    VALUES (N'20240412021802_TdB_EnableMCExtensions', N'8.0.6');
 END;
 GO
 
@@ -893,7 +893,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240412192917_TdB_MCSendMail', N'8.0.5');
+    VALUES (N'20240412192917_TdB_MCSendMail', N'8.0.6');
 END;
 GO
 
@@ -945,7 +945,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240413013952_TdB_MCPerson_Address', N'8.0.5');
+    VALUES (N'20240413013952_TdB_MCPerson_Address', N'8.0.6');
 END;
 GO
 
@@ -994,7 +994,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240413212359_TdB_Term_CompositeKey', N'8.0.5');
+    VALUES (N'20240413212359_TdB_Term_CompositeKey', N'8.0.6');
 END;
 GO
 
@@ -1043,7 +1043,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240413214118_TdB_Term_delCompositeKey', N'8.0.5');
+    VALUES (N'20240413214118_TdB_Term_delCompositeKey', N'8.0.6');
 END;
 GO
 
@@ -1074,7 +1074,53 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20240531034359_TdB_ExceptionLog', N'8.0.5');
+    VALUES (N'20240531034359_TdB_ExceptionLog', N'8.0.6');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240628041721_TdB_LogEvents'
+)
+BEGIN
+    DROP TABLE [ExceptionLog];
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240628041721_TdB_LogEvents'
+)
+BEGIN
+    CREATE TABLE [LogEvents] (
+        [Id] int NOT NULL IDENTITY,
+        [Message] nvarchar(max) NOT NULL,
+        [MessageTemplate] nvarchar(max) NOT NULL,
+        [Level] nvarchar(max) NOT NULL,
+        [TimeStamp] datetime2 NOT NULL,
+        [Exception] nvarchar(max) NULL,
+        [Properties] nvarchar(max) NULL,
+        [LogEvent] nvarchar(max) NULL,
+        [Tenant] nvarchar(max) NULL,
+        [User] nvarchar(max) NULL,
+        CONSTRAINT [PK_LogEvents] PRIMARY KEY ([Id])
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240628041721_TdB_LogEvents'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240628041721_TdB_LogEvents', N'8.0.6');
 END;
 GO
 

@@ -23,6 +23,10 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using System.Globalization;
+using Serilog.Sinks.MSSqlServer;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.ObjectModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,16 +42,45 @@ var builder = WebApplication.CreateBuilder(args);
 
 // **** Start local modifications ****
 
+string? tenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
+if (tenantConnectionString is null)
+{
+    tenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString");
+}
+
 LoggingLevelSwitch WarningLevelSwitch
         = new LoggingLevelSwitch(LogEventLevel.Warning);
+
+var columnOptions = new ColumnOptions
+{
+    AdditionalColumns = new Collection<SqlColumn>
+    {
+        new SqlColumn
+                { ColumnName = "Tenant", PropertyName = "Tenant", DataType = SqlDbType.NVarChar, DataLength = 64 },
+        new SqlColumn
+                { ColumnName = "User", PropertyName = "User", DataType = SqlDbType.NVarChar, DataLength = 64 },
+        new SqlColumn
+                { ColumnName = "LogEvent", PropertyName = "LogEvent", DataType = SqlDbType.NVarChar, DataLength = 64 },
+    }
+};
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", WarningLevelSwitch)
     .Enrich.FromLogContext()
     .WriteTo.Console(formatProvider: new CultureInfo("en-AU"))
+    .WriteTo.MSSqlServer(connectionString: tenantConnectionString,
+                            formatProvider: new CultureInfo("en-AU"),
+                            restrictedToMinimumLevel: LogEventLevel.Error,
+                            sinkOptions: new MSSqlServerSinkOptions
+                            {
+                                TableName = "LogEvents"
+                            },
+                                columnOptions: columnOptions
+                            )
     .CreateLogger();
 
-builder.Services.AddSerilog();
+//.Services.AddSerilog();
+builder.Host.UseSerilog(Log.Logger);
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
 DevExpress.Drawing.Internal.DXDrawingEngine.ForceSkia();
@@ -59,15 +92,9 @@ foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
 
 
 // TenantDbContextFactory
-string? MultiTenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
-if (MultiTenantConnectionString is null)
-{
-    MultiTenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString");
-}
-
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
-    options.UseSqlServer(MultiTenantConnectionString);
+    options.UseSqlServer(tenantConnectionString);
 }, ServiceLifetime.Scoped);
 
 // U3ADbContextFactory

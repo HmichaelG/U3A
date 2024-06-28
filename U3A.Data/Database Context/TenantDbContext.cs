@@ -47,7 +47,7 @@ namespace U3A.Database
         public DbSet<MultiCampusSendMail> MultiCampusSendMail { get; set; }
         public DbSet<MultiCampusTerm> MultiCampusTerm { get; set; }
         public DbSet<TenantInfo> TenantInfo { get; set; }
-        public DbSet<ExceptionLog> ExceptionLog { get; set; }
+        public DbSet<LogEvents> LogEvents { get; set; }
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
                             CancellationToken cancellationToken = default(CancellationToken))
         {

@@ -9,30 +9,30 @@ using System.Threading.Tasks;
 using U3A.Database;
 using U3A.Model;
 using Serilog;
+using Serilog.Context;
 
 namespace U3A.Services
 {
     public class ErrorBoundaryLoggingService : IErrorBoundaryLogger
     {
-        readonly IDbContextFactory<TenantDbContext> _tenantDbFactory;
         readonly TenantInfoService _tenantInfoSvc;
-        public ErrorBoundaryLoggingService(IDbContextFactory<TenantDbContext> TenantDbFactory,
-                                            TenantInfoService TenantInfoService)
+        public ErrorBoundaryLoggingService(TenantInfoService TenantInfoService)
         {
             _tenantInfoSvc = TenantInfoService;
-            _tenantDbFactory = TenantDbFactory;
         }
         public async ValueTask LogErrorAsync(Exception exception)
         {
-            using (var dbc = await _tenantDbFactory.CreateDbContextAsync())
+            using (LogContext.PushProperty("LogEvent","Unhandled Exception"))
             {
-                Log.Error(exception.ToString());
-                var ex = new ExceptionLog() { Tenant = await _tenantInfoSvc.GetTenantIdentifierAsync(), 
-                                                Log = exception.ToString() };
-                await dbc.AddAsync(ex);
-                var expiredLogs = dbc.ExceptionLog.Where(x => x.Date > DateTime.UtcNow.AddDays(30)).ToList();
-                dbc.RemoveRange(expiredLogs);
-                await dbc.SaveChangesAsync();
+                using (LogContext.PushProperty("Tenant",
+                            await _tenantInfoSvc.GetTenantIdentifierAsync()))
+                {
+                    using (LogContext.PushProperty("User",
+                            _tenantInfoSvc.GetUserIdentity()))
+                    {
+                        Log.Error(exception,"{p0}",exception.Message);
+                    }
+                }
             }
             return;
         }
