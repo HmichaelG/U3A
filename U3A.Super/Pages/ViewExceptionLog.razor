@@ -9,12 +9,10 @@
 
 <PageTitle>Tenant Summary</PageTitle>
 
-<DxLoadingPanel @bind-Visible="PanelVisible"
-                IsContentBlocked="true"
-                ApplyBackgroundShading="true"
-                IndicatorAreaVisible="false"
-                Text="Fetching Data...">
+<MessageBox @ref="@messageBox" PopupWidth="50rem" />
 
+@if (isReady)
+{
     <div class="w-100 px-4">
         <h2>Exceptions</h2>
         <div class="pb-2">
@@ -35,12 +33,14 @@
                         <Columns>
                             <DxGridCommandColumnEx Width="10rem" EditButtonVisible="false" DeleteButtonVisible="true" />
                             <DxGridDataColumn Width="10rem" Caption="Date" FieldName="TimeStamp" DisplayFormat=@constants.STD_DATETIME_FORMAT />
-                            <DxGridDataColumn Width="10rem" Caption="Tenant" FieldName="Tenant" />
-                            <DxGridDataColumn Caption="Exception" FieldName="Log">
+                            <DxGridDataColumn Width="10rem" FieldName="Tenant" />
+                            <DxGridDataColumn Width="10rem" FieldName="User" />
+                            <DxGridDataColumn FieldName="Message" />
+                            <DxGridDataColumn Width="8rem" FieldName="Exception" Caption="Exception Detail" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
                                 <CellDisplayTemplate>
-                                    <DxMemo CssClass="text-size"
-                                            Rows=5
-                                            Text="@(((LogEvents)context.DataItem).Exception)" />
+                                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                              RenderStyle="ButtonRenderStyle.Primary" Text=@("Event Details")
+                                              Click="() => OnLogButtonClick((LogEvents)context.DataItem)"></DxButton>
                                 </CellDisplayTemplate>
                             </DxGridDataColumn>
                         </Columns>
@@ -54,7 +54,8 @@
             </FullScreen>
         </div>
     </div>
-</DxLoadingPanel>
+}
+
 <style>
     .text-size {
         font-size: 1rem;
@@ -65,11 +66,19 @@
     List<LogEvents>? exceptions { get; set; }
     bool PanelVisible;
     DxGrid? grid;
+    MessageBox? messageBox;
+    bool isReady;
 
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
         await GetData();
+        isReady = true;
+    }
+
+    async Task OnLogButtonClick(LogEvents log)
+    {
+        await messageBox!.ShowOkOnlyAsync("Exception Details", log.Exception!);
     }
 
     async Task GetData()
