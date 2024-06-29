@@ -28,11 +28,26 @@
                             KeyFieldName="Id"
                             ValidationEnabled="true">
                         <ToolbarTemplate>
-                            <GridToolbar LinkedGrid=@grid />
+                            <GridToolbar LinkedGrid=@grid>
+                                <CustomButtonContent>
+                                    <DxToolbarItem IconCssClass="bi bi-envelope" Text="Show All"
+                                                   BeginGroup=true
+                                                   Click=@OnShowAllToggle
+                                                   RenderStyle="ButtonRenderStyle.Primary"
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   Alignment="ToolbarItemAlignment.Right"
+                                                   Tooltip="Show/hide non-tenant exceptions">
+                                    </DxToolbarItem>
+                                </CustomButtonContent>
+                            </GridToolbar>
                         </ToolbarTemplate>
                         <Columns>
                             <DxGridCommandColumnEx Width="10rem" EditButtonVisible="false" DeleteButtonVisible="true" />
-                            <DxGridDataColumn Width="10rem" Caption="Date" FieldName="TimeStamp" DisplayFormat=@constants.STD_DATETIME_FORMAT />
+                            <DxGridDataColumn Width="10rem" Caption="Date" FieldName="TimeStamp"  >
+                                <CellDisplayTemplate>
+                                    <div>@(GetLocalTime((DateTime)context.Value)) </div>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
                             <DxGridDataColumn Width="10rem" FieldName="Tenant" />
                             <DxGridDataColumn Width="10rem" FieldName="User" />
                             <DxGridDataColumn FieldName="Message" />
@@ -68,12 +83,25 @@
     DxGrid? grid;
     MessageBox? messageBox;
     bool isReady;
+    bool showAll = false;
 
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
         await GetData();
         isReady = true;
+    }
+
+    DateTime GetLocalTime(DateTime value) {
+        var result = TimezoneAdjustment.GetLocalTime(value);
+        return result;
+    }
+
+    async Task OnShowAllToggle()
+    {
+        showAll = !showAll;
+        await GetData();
+
     }
 
     async Task OnLogButtonClick(LogEvents log)
@@ -86,6 +114,7 @@
         using (var dbc = await tenantDbfactory.CreateDbContextAsync())
         {
             exceptions = await dbc.LogEvents.OrderByDescending(x => x.TimeStamp).ToListAsync();
+            if (!showAll) { exceptions = exceptions.Where(x => !string.IsNullOrWhiteSpace(x.Tenant)).ToList(); }
         }
     }
 
