@@ -7,7 +7,7 @@ namespace U3A.Model
 
         public static DateTime GetLocalTime(DateTime time)
         {
-            return time.ToUniversalTime() + TimezoneOffset;
+            return time + TimezoneOffset;
         }
         public static DateTime GetLocalTime()
         {

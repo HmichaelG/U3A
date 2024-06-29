@@ -21,38 +21,26 @@ namespace U3A.Services
         {
             if (userTime == null)
             {
-                int timeDiffer = await jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
+                int timeDiffer = await jsRuntime.InvokeAsync<int>("eval", "(function(){try { return new Date().getTimezoneOffset(); } catch(e) {} return 0;}())");
                 userTime = TimeSpan.FromMinutes(-timeDiffer);
             }
             return userTime.Value;
         }
         public async Task<DateTime> GetLocalTimeAsync()
         {
-            if (userTime == null)
-            {
-                int timeDiffer = await jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
-                userTime = TimeSpan.FromMinutes(-timeDiffer);
-            }
+            if (userTime == null) { _= await GetTimezoneOffsetAsync(); }
             // Converting to local time using UTC and local time minute difference.
             return DateTimeOffset.UtcNow.ToOffset(userTime.Value).DateTime;
         }
         public async Task<DateTime> GetLocalDateAsync()
         {
-            if (userTime == null)
-            {
-                int timeDiffer = await jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
-                userTime = TimeSpan.FromMinutes(-timeDiffer);
-            }
+            if (userTime == null) { _ = await GetTimezoneOffsetAsync(); }
             // Converting to local time using UTC and local time minute difference.
             return DateTimeOffset.UtcNow.ToOffset(userTime.Value).Date;
         }
         public async Task<DateTime> GetLocalTimeAsync(DateTime UTCTime)
         {
-            if (userTime == null)
-            {
-                int timeDiffer = await jsRuntime.InvokeAsync<int>("GetTimezoneOffset");
-                userTime = TimeSpan.FromMinutes(-timeDiffer);
-            }
+            if (userTime == null) { _ = await GetTimezoneOffsetAsync(); }
             // Converting to local time using UTC and local time minute difference.
             return UTCTime.Add(userTime.Value);
         }
