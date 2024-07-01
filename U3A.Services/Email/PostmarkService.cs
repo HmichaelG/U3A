@@ -56,7 +56,7 @@ namespace U3A.Services.Email
         {
             var result = new List<EmailOutboundOverviewStats>();
             PostmarkOutboundOverviewStats stats;
-            DateTime To = (DateTime.Now + offset).Date;
+            DateTime To = (DateTime.UtcNow + offset).Date;
             foreach (var day in new int[] { -1, -5, -6, -6, -6 })
             {
                 DateTime From = To.AddDays(day);

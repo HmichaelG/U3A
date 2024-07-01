@@ -631,7 +631,7 @@ else
             dataItem.Term = dbc.Term.Find(SelectedTerm.ID);
             dataItem.AttendClassStatus = dbc.AttendClassStatus.Find(editModel.AttendClassStatus.ID);
             if (SelectedClass != null) { dataItem.Class = dbc.Class.Find(SelectedClass.ID); }
-            dataItem.DateProcessed = DateTime.Now;
+            dataItem.DateProcessed = DateTime.UtcNow;
             // Post changes to the database.
             if (e.IsNew) await dbc.AddAsync(dataItem);
             if (await SaveChangesAsync())
@@ -805,7 +805,7 @@ else
                         ac.Comment = adHocAttendanceMnt.AttendanceComment;
                         ac.Person = await dbc.Person.FindAsync(p.ID);
                         ac.Date = selectedDate.Date;
-                        ac.DateProcessed = DateTime.Now;
+                        ac.DateProcessed = DateTime.UtcNow;
                         ac.Class = await dbc.Class.FindAsync(SelectedClass.ID);
                         ac.IsAdHoc = true;
                         ac.Term = await dbc.Term.FindAsync(SelectedTerm.ID);
@@ -853,7 +853,7 @@ else
                 {
                     if (QuickSelectionStatus != null) { ac.AttendClassStatus = QuickSelectionStatus; }
                     ac.Comment = (QuickAttendanceComment != null) ? QuickAttendanceComment : string.Empty;
-                    ac.DateProcessed = DateTime.Now;
+                    ac.DateProcessed = DateTime.UtcNow;
                 }
             }
             // apply leave
@@ -896,7 +896,7 @@ else
                 {
                     ac.AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithApology;
                     ac.AttendClassStatus = ClassAttendanceStatus.Find(x => x.ID == ac.AttendClassStatusID);
-                    ac.DateProcessed = DateTime.Now;
+                    ac.DateProcessed = DateTime.UtcNow;
                     ac.Comment = leave.Reason;
                     result++;
                 }

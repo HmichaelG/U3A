@@ -11,7 +11,7 @@ namespace U3A.UI.Reports
         public ComplimentaryMembershipRpt()
         {
             InitializeComponent();
-            prmMembershipYear.Value = DateTime.Now.Year;
+            prmMembershipYear.Value = TimezoneAdjustment.GetLocalTime().Year;
         }
 
         public U3ADbContext DbContext { get; set; }

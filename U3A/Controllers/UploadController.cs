@@ -51,7 +51,7 @@ namespace U3A.Controllers
         {
             Directory.GetFiles(dirName)
                  .Select(f => new FileInfo(f))
-                 .Where(f => f.LastAccessTime < DateTime.Now.AddHours(-6))
+                 .Where(f => f.LastAccessTime < DateTime.UtcNow.AddHours(-6))
                  .ToList()
                  .ForEach(f => f.Delete());
         }

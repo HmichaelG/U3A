@@ -226,8 +226,8 @@ namespace U3A.WebFunctions
                         cmd.Parameters.AddWithValue("PhoneNumber", phone);
                         cmd.Parameters.AddWithValue("Message", message);
                         cmd.Parameters.AddWithValue("@U3A", u3a);
-                        cmd.Parameters.AddWithValue("@CreatedOn", DateTime.Now);
-                        cmd.Parameters.AddWithValue("@UpdatedOn", DateTime.Now);
+                        cmd.Parameters.AddWithValue("@CreatedOn", DateTime.UtcNow);
+                        cmd.Parameters.AddWithValue("@UpdatedOn", DateTime.UtcNow);
                         cmd.Parameters.AddWithValue("@User", "Initial Web Request");
                         await cnn.OpenAsync();
                         await cmd.ExecuteNonQueryAsync();

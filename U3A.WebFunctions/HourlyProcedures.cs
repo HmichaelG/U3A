@@ -79,7 +79,7 @@ namespace U3A.WebFunctions
                     _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
             }
-            _logger.LogInformation($"Hourly Procedures at: {DateTime.Now}");
+            _logger.LogInformation($"Hourly Procedures at: {DateTime.UtcNow}");
         }
 
     }

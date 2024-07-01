@@ -40,7 +40,7 @@ namespace U3A.Services
             BatchSuccessCount = 0;
             BatchFailureCount = 0;
             BulkRecipientCount = 0;
-            sendTime = DateTime.Now;
+            sendTime = DateTime.UtcNow;
         }
 
         Dictionary<string, int> Result;

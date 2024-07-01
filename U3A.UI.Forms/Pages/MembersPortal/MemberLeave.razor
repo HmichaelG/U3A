@@ -47,10 +47,10 @@ else
                     <DxFormLayout CssClass="w-100">
 
                         <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
-                            <DxDateEdit @bind-Date="@leave.StartDate" MinDate="@(new DateTime(DateTime.Now.Year,1,1))" />
+                            <DxDateEdit @bind-Date="@leave.StartDate" MinDate="@(new DateTime(TimezoneAdjustment.GetLocalTime().Year,1,1))" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Return Date" ColSpanMd="12">
-                            <DxDateEdit @bind-Date="@leave.EndDate" MinDate="@(new DateTime(DateTime.Now.Year,1,1))" />
+                            <DxDateEdit @bind-Date="@leave.EndDate" MinDate="@(new DateTime(TimezoneAdjustment.GetLocalTime().Year,1,1))" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="For Course" ColSpanMd="12">
                             <DxComboBox Data="Courses" @bind-Value="@leave.Course"

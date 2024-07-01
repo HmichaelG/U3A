@@ -163,8 +163,7 @@ else {
     }
 
     async Task Process() {
-        var localTime = new LocalTime(js);
-        DateTime now = await localTime.GetLocalTimeAsync();
+        DateTime now = TimezoneAdjustment.GetLocalTime();
         if (AdHocPersonsToAssign != null && string.IsNullOrWhiteSpace(Reason)) {
             await messageBox.ShowOkOnlyAsync("Enter Reason", "You must assign a resaon to ad hoc complimentary memberships.");
             return;

@@ -70,7 +70,7 @@ namespace U3A.Services
                               CancellationToken cancellationToken)
         {
             var kvp = CircuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
-            if (kvp!.Value != null) { kvp.Value.Down = DateTime.Now; }
+            if (kvp!.Value != null) { kvp.Value.Down = DateTime.UtcNow; }
             return base.OnConnectionDownAsync(circuit,
                              cancellationToken);
         }
@@ -89,14 +89,14 @@ namespace U3A.Services
         public string Id { get; set; }
         public string? Name { get; set; }
         public string? Tenant { get; set; }
-        public DateTime? Created { get; set; } = DateTime.Now;
+        public DateTime? Created { get; set; } = DateTime.UtcNow;
         public DateTime? Down { get; set; }
 
         public string UpTime
         {
             get
             {
-                return ((TimeSpan)(DateTime.Now - Created!)).ToString(@"hh\:mm\:ss");
+                return ((TimeSpan)(DateTime.UtcNow - Created!)).ToString(@"hh\:mm\:ss");
             }
         }
         public string DownTime
@@ -104,7 +104,7 @@ namespace U3A.Services
             get
             {
                 return (Down != null)
-                        ? "Down: " + ((TimeSpan)(DateTime.Now - Down!)).ToString(@"hh\:mm\:ss")
+                        ? "Down: " + ((TimeSpan)(DateTime.UtcNow - Down!)).ToString(@"hh\:mm\:ss")
                         : "Active";
             }
         }

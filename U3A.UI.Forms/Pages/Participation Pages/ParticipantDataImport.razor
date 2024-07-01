@@ -364,7 +364,7 @@ else {
         DateTime tempDate;
         foreach (var fi in UploadedFiles) {
             FileProcessed = fi.Name;
-            TimeProcessed = DateTime.Now;
+            TimeProcessed = DateTime.UtcNow;
             var file = Path.Combine("uploads", fi.Name);
             var records = CountLines(new FileInfo(file));
             await ProgressBar.ShowAsync("Processing ... Please Wait", records);
@@ -492,8 +492,8 @@ else {
                         if ((ParticipationType?)course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses) {
                             enrolment = new Enrolment() {
                                     Course = course,
-                                    Created = DateTime.Now,
-                                    DateEnrolled = DateTime.Today,
+                                    Created = DateTime.UtcNow,
+                                    DateEnrolled = DateTime.UtcNow.Date,
                                     Person = person,
                                     Term = term,
                                     IsWaitlisted = true

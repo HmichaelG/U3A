@@ -41,7 +41,7 @@ namespace U3A.BusinessRules
             if (settings != null)
             {
                 var persons = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
-                foreach (var p in persons.Where(x => BusinessRule.IsCourseLeader(dbc,x,DateTime.Now)))
+                foreach (var p in persons.Where(x => BusinessRule.IsCourseLeader(dbc,x,Now)))
                 {
                     if (maxComplimentaryCourses == 0 || GetCourseCount(dbc, p, FinancialTo) <= maxComplimentaryCourses)
                     {

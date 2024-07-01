@@ -69,7 +69,7 @@ namespace U3A.UI.Reports
         {
             Directory.GetFiles(dirName)
                  .Select(f => new FileInfo(f))
-                 .Where(f => f.LastAccessTime < DateTime.Now.AddHours(-6))
+                 .Where(f => f.LastAccessTime < DateTime.UtcNow.AddHours(-6))
                  .ToList()
                  .ForEach(f => f.Delete());
         }

@@ -59,7 +59,7 @@ namespace U3A.Database
         private void OnBeforeSaving()
         {
             var entries = ChangeTracker.Entries();
-            var utcNow = DateTime.Now;
+            var utcNow = DateTime.UtcNow;
             foreach (var entry in entries)
             {
                 if (entry.Entity is MultiCampusEnrolment e)

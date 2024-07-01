@@ -88,7 +88,7 @@ namespace U3A.WebFunctions
                 await DatabaseCleanup.Process(tenant, _logger);
             }
 
-            _logger.LogInformation($"Daily Procedures completed at: {DateTime.Now}");
+            _logger.LogInformation($"Daily Procedures completed at: {DateTime.UtcNow}");
         }
     }
 

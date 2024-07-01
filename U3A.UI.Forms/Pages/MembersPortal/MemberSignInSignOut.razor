@@ -131,7 +131,7 @@
     U3ADbContext dbc { get; set; }
     MessageBox? messageBox;
     LocalTime? locaTime;
-    DateTime now = DateTime.Now;
+    DateTime now = TimezoneAdjustment.GetLocalTime();
 
     List<SignInOrOut>? signInDetails;
     SignInOrOut selectedSignIn;

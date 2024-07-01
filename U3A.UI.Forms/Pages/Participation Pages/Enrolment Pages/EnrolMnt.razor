@@ -772,7 +772,7 @@ else
             {
                 var e = new Enrolment()
                     {
-                        Created = DateTime.Now
+                        Created = DateTime.UtcNow
                     };
                 e.Person = await dbc.Person.FindAsync(enrolment.Person.ID);
                 e.Term = await dbc.Term.FindAsync(transferOrCopyEnrolment.selectedTerm.ID);
@@ -923,7 +923,7 @@ else
                     {
                         var e = new Enrolment()
                             {
-                                Created = DateTime.Now
+                                Created = DateTime.UtcNow
                             };
                         // Only allow enrolment if financial
                         if (person.FinancialTo >= selectedTerm.Year)

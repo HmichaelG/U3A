@@ -222,7 +222,7 @@ namespace U3A.Services
                 var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(dbc, person);
 
                 // Special Rule: set Financial To if amount paid greater than minimum amount
-                var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, processingYear, DateTime.Now);
+                var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, processingYear, DateTime.UtcNow);
                 if (receipt.Amount + previouslyPaid >= minMembershipFee)
                 {
                     receipt.FinancialTo = (person.FinancialTo >= processingYear) ? person.FinancialTo : processingYear;
