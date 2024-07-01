@@ -98,6 +98,7 @@ namespace U3A.BusinessRules
                                                         && x.PersonID == d.PersonID
                                                         && x.Created == d.Created);
                     }
+                    AssignClassCounts(term, c);
                     classes.Add(c);
                 }
             });
