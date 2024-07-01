@@ -330,6 +330,7 @@
     async Task SelectedTemplateChanged(DocumentTemplate template)
     {
         SelectedDocumentTemplate = template;
+        if (SelectedDocumentTemplate is null) { return; }
         IsEmail = SelectedDocumentTemplate.DocumentType.IsEmail;
         IsEmailOrPostal = SelectedDocumentTemplate.DocumentType.IsEmail ||
                                 SelectedDocumentTemplate.DocumentType.IsPostal;
