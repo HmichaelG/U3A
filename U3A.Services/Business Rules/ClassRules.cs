@@ -143,10 +143,11 @@ namespace U3A.BusinessRules
             Parallel.ForEach(diffParticipants, c =>
                 {
                     c.Enrolments = enrolments
-                                            .Where(x => x.CourseID == c.CourseID).ToList();
+                                   .Where(x => x.ClassID == c.ID).ToList();
                 }
             );
             classes.AddRange(diffParticipants);
+
             var totalClasses = classes.Count();
             classes = classes
                 .OrderBy(x => x.Course.Name)
@@ -161,7 +162,6 @@ namespace U3A.BusinessRules
                 AssignClassCounts(term, c);
             }
             classes = GetClassSummaries(classes).ToList();
-
             Log.Information("");
             Log.Information("{p1} Total classes retrieved", totalClasses);
             Log.Information("{p1} Total classes remaing in year", TotalClassesRemainingInYear);
@@ -172,6 +172,18 @@ namespace U3A.BusinessRules
 
             Log.Information("{p1} Unique classes returned", TotalClassesRemainingInYear);
             return classes;
+        }
+
+        static (int sameInClasses,int differentInClasses) GetEnrolmentTotals(IEnumerable<Class> classes)
+        {
+            var same = 0;
+            var diff = 0;
+            foreach (var c in classes)
+            {
+                same += c.Course.Enrolments.Count();
+                diff += c.Enrolments.Count();
+            }
+            return (same, diff);    
         }
 
         static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes)
@@ -434,12 +446,33 @@ namespace U3A.BusinessRules
         public static int GetNextTermOffered(Class Class, int TermNumber)
         {
             int result = 0;
-            for (int i = TermNumber; i < 4; i++)
+            for (int i = TermNumber; i <= 4; i++)
             {
                 if (i == 1 && Class.OfferedTerm1) { result = i; break; }
                 if (i == 2 && Class.OfferedTerm2) { result = i; break; }
                 if (i == 3 && Class.OfferedTerm3) { result = i; break; }
                 if (i == 4 && Class.OfferedTerm4) { result = i; break; }
+            }
+            if (result == 0 && TermNumber > 1)
+            {
+                for (int i = TermNumber; i <= 4; i++)
+                {
+                    if (i == 2 && Class.OfferedTerm1) { result = 1; break; }
+                    if (i == 3 && Class.OfferedTerm2) { result = 2; break; }
+                    if (i == 4 && Class.OfferedTerm3) { result = 3; break; }
+                }
+            }
+            if (result == 0 && TermNumber > 2)
+            {
+                for (int i = TermNumber; i <= 4; i++)
+                {
+                    if (i == 3 && Class.OfferedTerm1) { result = 1; break; }
+                    if (i == 4 && Class.OfferedTerm2) { result = 2; break; }
+                }
+            }
+            if (result == 0 && TermNumber > 3)
+            {
+                    if (Class.OfferedTerm1) { result = 1; }
             }
             return result;
         }
@@ -588,7 +621,7 @@ namespace U3A.BusinessRules
             Log.Warning("    Dropped thru initial tests.");
 
             // failed all simple tests - calculate the end date
-            DateTime? endDate = GetClassEndDate(Class, term);
+            var endDate = GetClassEndDate(Class, term);
             if (endDate == null || endDate <= term.StartDate) result = false; else result = true;
             Log.Information("    Calculated EndDate: {p}", endDate);
             if (result)
