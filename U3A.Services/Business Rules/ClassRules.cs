@@ -446,6 +446,7 @@ namespace U3A.BusinessRules
         public static int GetNextTermOffered(Class Class, int TermNumber)
         {
             int result = 0;
+            // Find the 1st term >= the current term
             for (int i = TermNumber; i <= 4; i++)
             {
                 if (i == 1 && Class.OfferedTerm1) { result = i; break; }
@@ -453,26 +454,16 @@ namespace U3A.BusinessRules
                 if (i == 3 && Class.OfferedTerm3) { result = i; break; }
                 if (i == 4 && Class.OfferedTerm4) { result = i; break; }
             }
-            if (result == 0 && TermNumber > 1)
+            if (result == 0)
             {
-                for (int i = TermNumber; i <= 4; i++)
+                // Find the 1st term <= the current term
+                for (int i = TermNumber; i == 0; i--)
                 {
-                    if (i == 2 && Class.OfferedTerm1) { result = 1; break; }
-                    if (i == 3 && Class.OfferedTerm2) { result = 2; break; }
-                    if (i == 4 && Class.OfferedTerm3) { result = 3; break; }
+                    if (i == 4 && Class.OfferedTerm4) { result = i; break; }
+                    if (i == 3 && Class.OfferedTerm3) { result = i; break; }
+                    if (i == 2 && Class.OfferedTerm2) { result = i; break; }
+                    if (i == 1 && Class.OfferedTerm1) { result = i; break; }
                 }
-            }
-            if (result == 0 && TermNumber > 2)
-            {
-                for (int i = TermNumber; i <= 4; i++)
-                {
-                    if (i == 3 && Class.OfferedTerm1) { result = 1; break; }
-                    if (i == 4 && Class.OfferedTerm2) { result = 2; break; }
-                }
-            }
-            if (result == 0 && TermNumber > 3)
-            {
-                    if (Class.OfferedTerm1) { result = 1; }
             }
             return result;
         }
