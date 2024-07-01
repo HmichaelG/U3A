@@ -78,8 +78,9 @@
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12" Visible=@(showFullDetail || editItem.Recurrence != null)>
                             <DxSpinEdit @bind-Value="editItem.Recurrence" MinValue="1" MaxValue="52"
+                                        Enabled="@(!isRecurrenceReadonly)"
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="The number of times the class recurs. Only if not End of Term." />
+                                        NullText="The number of times the class recurs. Requires Start Date." />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Occurrence" ColSpanMd="12" Visible=true>
                             <DxComboBox Data="occurrence"
@@ -137,6 +138,8 @@
     CommonClassProcedures? commonClassProcedures;
 
     bool IsOnDayReadOnly;
+    bool isRecurrenceReadonly;
+
     bool showFullDetail = false;
     public bool isNewRecord { get; set; } = false;
 
@@ -158,7 +161,8 @@
             else
             {
                 editItem = Course.Classes[0];
-                if (editItem.StartDate != null) { IsOnDayReadOnly = true; }
+                IsOnDayReadOnly = (editItem.StartDate != null);
+                isRecurrenceReadonly = (editItem.StartDate == null);
                 isNewRecord = false;
             }
         }
@@ -181,6 +185,8 @@
     async Task OnStartDateChanged(DateTime? newStartDate, Class editItem)
     {
         IsOnDayReadOnly = await commonClassProcedures.OnStartDateChanged(newStartDate, editItem);
+        isRecurrenceReadonly = (newStartDate == null);
+        if (isRecurrenceReadonly) editItem.Recurrence = null;
     }
 }
 

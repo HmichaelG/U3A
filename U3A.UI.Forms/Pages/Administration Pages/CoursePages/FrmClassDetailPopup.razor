@@ -91,8 +91,9 @@
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12">
                 <DxSpinEdit @bind-Value="editItem.Recurrence" MinValue="1" MaxValue="52"
+                            Enabled="@(!isRecurrenceReadonly)"
                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                            NullText="The number of times the class recurs. Only if not End of Term." />
+                            NullText="The number of times the class recurs. Requires Start Date." />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Occurrence" ColSpanMd="12">
                 <DxComboBox Data="Occurrences"
@@ -152,19 +153,17 @@
 
 
     bool IsOnDayReadOnly;
+    bool isRecurrenceReadonly;
 
     async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
     {
         var editModel = (Class)e.EditModel;
-        IsOnDayReadOnly = false;
         if (e.IsNew)
         {
             editModel.Occurrence = Occurrences.FirstOrDefault(x => x.ID == (int)OccurrenceType.Weekly);
         }
-        else
-        {
-            if (editModel.StartDate != null) { IsOnDayReadOnly = true; }
-        }
+        IsOnDayReadOnly = (editModel.StartDate != null);
+        isRecurrenceReadonly = (editModel.StartDate == null);
     }
 
 
@@ -239,6 +238,8 @@
     async Task OnStartDateChanged(DateTime? newStartDate, Class editItem)
     {
         IsOnDayReadOnly = await commonClassProcedures.OnStartDateChanged(newStartDate, editItem);
+        isRecurrenceReadonly = (newStartDate == null);
+        if (isRecurrenceReadonly) editItem.Recurrence = null;
     }
 
 }
