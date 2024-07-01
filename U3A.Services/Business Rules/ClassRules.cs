@@ -457,7 +457,7 @@ namespace U3A.BusinessRules
             if (result == 0)
             {
                 // Find the 1st term <= the current term
-                for (int i = TermNumber; i == 0; i--)
+                for (int i = TermNumber; i > 0; i--)
                 {
                     if (i == 4 && Class.OfferedTerm4) { result = i; break; }
                     if (i == 3 && Class.OfferedTerm3) { result = i; break; }

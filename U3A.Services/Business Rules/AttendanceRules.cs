@@ -37,8 +37,9 @@ namespace U3A.BusinessRules
 
         public static async Task<List<AttendClassSummaryByWeek>> GetClassAttendanceSummaryByWeek(U3ADbContext dbc)
         {
-            var endDate = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + 6);
-            var startDate = DateTime.Today.AddDays(-364).Date; // get the date 52 weeks ago
+            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var endDate = today.AddDays(-(int)DateTime.Today.DayOfWeek + 6);
+            var startDate = today.AddDays(-364).Date; // get the date 52 weeks ago
             startDate = startDate.AddDays(-(int)startDate.DayOfWeek + 6);
             // A class with valid attendance has at least 1 present
             var validAttendance = (await dbc.AttendClass

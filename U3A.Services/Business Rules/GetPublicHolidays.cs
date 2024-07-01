@@ -27,7 +27,7 @@ namespace U3A.BusinessRules
         public static async Task<List<PublicHoliday>> RebuildPublicHolidaysAsync(U3ADbContext dbc)
         {
             string state = dbc.TenantInfo.State.ToLower();
-            DateTime endOfYear = new DateTime(DateTime.Today.Year - 1, 12, 31);
+            DateTime endOfYear = new DateTime(TimezoneAdjustment.GetLocalTime().Year - 1, 12, 31);
             DateTime thisDate;
             PublicHolidayRecord? thisRecord;
 

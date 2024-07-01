@@ -34,7 +34,7 @@ namespace U3A.BusinessRules
         public static Term? CurrentEnrolmentTermEx(U3ADbContext dbc)
         {
             var result = CurrentEnrolmentTerm(dbc);
-            var today = DateTime.Today;
+            var today = TimezoneAdjustment.GetLocalTime().Date;
             if (result == null) { result = CurrentTerm(dbc, today); }
             if (result == null) { result = NextTerm(dbc, today); }
             return result;

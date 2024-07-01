@@ -464,7 +464,7 @@ namespace U3A.BusinessRules
                 Occupation = ImportData.Occupation,
                 Communication = ImportData.Communication,
             };
-            if (ImportData.IsNewPerson) person.DateJoined = DateTime.Today;
+            if (ImportData.IsNewPerson) person.DateJoined = TimezoneAdjustment.GetLocalTime().Date;
             return person;
         }
         public static Person ConvertPersonImportToPerson(Person person, PersonImport ImportData)
@@ -487,7 +487,7 @@ namespace U3A.BusinessRules
             person.VaxCertificateViewed = ImportData.VaxCertificateViewed;
             person.Occupation = ImportData.Occupation;
             person.Communication = ImportData.Communication;
-            if (ImportData.IsNewPerson) person.DateJoined = DateTime.Today;
+            if (ImportData.IsNewPerson) person.DateJoined = TimezoneAdjustment.GetLocalTime().Date;
             return person;
         }
         public static async Task<Person?> FindPersonByImportDataID(U3ADbContext dbc, string Timestamp)

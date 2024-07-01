@@ -16,7 +16,7 @@ namespace U3A.Model
         {
             int? result = 0;
             if (FromDate == null) return result;
-            var now = (Now == null) ? DateTime.Today : Now;
+            var now = (Now == null) ? DateTime.UtcNow.Date : Now;
             TimeSpan span = (TimeSpan)(now - FromDate);
             if (span >= TimeSpan.Zero)
             {

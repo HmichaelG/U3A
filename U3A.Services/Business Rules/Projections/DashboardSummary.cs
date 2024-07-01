@@ -14,7 +14,8 @@ namespace U3A.BusinessRules
     {
         public static List<ReceiptSummary> GetReceiptSummaryByMonth(U3ADbContext dbc)
         {
-            var to = DateTime.Today.AddMonths(1).AddDays(-DateTime.Today.Day);
+            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var to = today.AddMonths(1).AddDays(-today.Day);
             var start = to.AddMonths(-25).AddDays(1);
             while (start.Day != 1) { start = start.AddDays(1); }
             var monthlyTotals = dbc.Receipt
@@ -60,7 +61,8 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<EnrolmentSummary>> GetEnrolmentSummaryByTerm(U3ADbContext dbc, Term term)
         {
-            var to = DateTime.Today.AddMonths(1).AddDays(-DateTime.Today.Day);
+            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var to = today.AddMonths(1).AddDays(-today.Day);
             var start = to.AddMonths(-13).AddDays(1);
             while (start.Day != 1) { start = start.AddDays(1); }
 
@@ -251,7 +253,7 @@ namespace U3A.BusinessRules
         }
         public static List<MemberSummary> GetMemberSummaryByMshipLength(U3ADbContext dbc, Term term)
         {
-            var today = DateTime.Today;
+            var today = TimezoneAdjustment.GetLocalTime().Date;
             var result = dbc.Person
                 .Where(p => p.DateJoined != null && p.FinancialTo >= term.Year).AsEnumerable()
                 .GroupBy(p => GetAge(p.DateJoined.Value))
@@ -266,7 +268,7 @@ namespace U3A.BusinessRules
         }
         public static List<MemberSummary> GetMemberSummaryByDOB(U3ADbContext dbc, Term term)
         {
-            var today = DateTime.Today;
+            var today = TimezoneAdjustment.GetLocalTime().Date;
             var result = dbc.Person
                 .Where(p => p.BirthDate != null && p.FinancialTo >= term.Year).AsEnumerable()
                 .GroupBy(p => GetAge(p.BirthDate.Value))
@@ -362,8 +364,8 @@ namespace U3A.BusinessRules
 
         public static async Task<List<MemberSummary>> GetNewMemberSummaryByMonth(U3ADbContext dbc)
         {
-
-            var endDate = DateTime.Today.AddMonths(1).AddDays(-DateTime.Today.Day);
+            var today = TimezoneAdjustment.GetLocalTime();
+            var endDate = today.AddMonths(1).AddDays(-today.Day);
             var startDate = endDate.AddMonths(-25).AddDays(1);
             while (startDate.Day != 1) { startDate = startDate.AddDays(1); }
 

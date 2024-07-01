@@ -109,7 +109,7 @@ namespace U3A.Model
         public string? VolunteerActivities { get; set; }
 
         [Required]
-        public DateTime? LastCashReceiptDate { get; set; } = DateTime.Today;
+        public DateTime? LastCashReceiptDate { get; set; } = DateTime.UtcNow.Date;
 
         public double MailLabelTopMargin { get; set; }
         public double MailLabelBottomMargin { get; set; }

@@ -51,7 +51,7 @@ namespace U3A.BusinessRules
                 person.FinancialTo = ReceiptToCreate.ProcessingYear;
                 ReceiptToCreate.DateJoined = person.DateJoined.Value;
             }
-            if (person.DateJoined == null) person.DateJoined = DateTime.Today;
+            if (person.DateJoined == null) person.DateJoined = TimezoneAdjustment.GetLocalTime().Date;
             ReceiptToCreate.FinancialTo = ReceiptToCreate.ProcessingYear;
             dbc.Update(person);
         }

@@ -246,7 +246,7 @@ namespace U3A.BusinessRules
                                                         Term term,
                                                         bool IsClassAllocationDone)
         {
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.Date; ;
             var settings = await dbc.SystemSettings
                                     .OrderBy(x => x.ID)
                                     .FirstAsync();
@@ -291,7 +291,7 @@ namespace U3A.BusinessRules
                                     List<Guid> PeoplePreviouslyEnrolled,
                                     bool ForceEmailQueue)
         {
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.Date;
             var AlreadyEnrolledInCourse = new List<Guid>();
             if (course.EnforceOneStudentPerClass
                 && course.CourseParticipationTypeID == (int?)ParticipationType.DifferentParticipantsInEachClass)
