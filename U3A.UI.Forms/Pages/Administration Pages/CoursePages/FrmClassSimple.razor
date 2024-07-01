@@ -78,7 +78,6 @@
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12" Visible=@(showFullDetail || editItem.Recurrence != null)>
                             <DxSpinEdit @bind-Value="editItem.Recurrence" MinValue="1" MaxValue="52"
-                                        Enabled="@(!isRecurrenceReadonly)"
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                         NullText="The number of times the class recurs. Requires Start Date." />
                         </DxFormLayoutItem>
@@ -138,6 +137,8 @@
     CommonClassProcedures? commonClassProcedures;
 
     bool IsOnDayReadOnly;
+
+    // TODO: Enable during Xmas break???
     bool isRecurrenceReadonly;
 
     bool showFullDetail = false;

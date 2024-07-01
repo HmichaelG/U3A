@@ -91,7 +91,6 @@
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12">
                 <DxSpinEdit @bind-Value="editItem.Recurrence" MinValue="1" MaxValue="52"
-                            Enabled="@(!isRecurrenceReadonly)"
                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                             NullText="The number of times the class recurs. Requires Start Date." />
             </DxFormLayoutItem>
@@ -153,6 +152,8 @@
 
 
     bool IsOnDayReadOnly;
+
+    // TODO: Enable during Xmas break???
     bool isRecurrenceReadonly;
 
     async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
