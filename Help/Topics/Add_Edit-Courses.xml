@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-07-01T19:12:18.542+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-07-02T07:01:49.928+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Add/Edit Courses</title>
   <body>
     <header>
@@ -357,7 +357,9 @@
                 <para styleclass="Normal">Recurrence</para>
               </td>
               <td style="width:1288px;">
-                <para styleclass="Normal">Optional. Enter how many times the class will recur. By default it is left blank meaning the course will recur till the end of term. <text style="font-weight:bold;">Note:</text> A class must have a <text style="font-style:italic;">Start Date</text> before it can have a <text style="font-style:italic;">Recurrence</text> value.</para>
+                <para styleclass="Normal">Optional. Enter how many times the class will recur. By default it is left blank meaning the course will recur till the end of term. </para>
+                <para styleclass="Normal"><text style="font-weight:bold;">Note:</text> A class should have a <text style="font-style:italic;">Start Date</text> if it has a <text style="font-style:italic;">Recurrence</text> value. Leaving the Start Date blank or null causes it to be set to the term&apos;s Start Date with every new term. This can cause issues with classes that recur (repeat) past the end of term. </para>
+                <para styleclass="Normal">For example, if a class occurs Monthly and recurs (repeats) 10 times, the expectation would be that it starts in February (term 1) and continues till November. However, if the Start Date is left blank (null), then it is set to the start date of the current term. This would mean that if term 4 starts in October, the class will not finish till 10 months later in July the following year. In addition, there will be multiple classes calculated that overlap in terms 2, 3 and 4.</para>
               </td>
             </tr>
             <tr style="vertical-align:top">
