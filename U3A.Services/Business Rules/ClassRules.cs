@@ -74,8 +74,6 @@ namespace U3A.BusinessRules
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Course)
-                                .ThenInclude(x => x.Enrolments.Where(e => e.ClassID == null))
-                                .ThenInclude(e => e.Person)
                             .Include(x => x.Leader)
                             .Include(x => x.Leader2)
                             .Include(x => x.Leader3)
@@ -91,8 +89,6 @@ namespace U3A.BusinessRules
                                             Term term, bool ExludeOffScheduleActivities, DateTime? LastScheduleUpdate)
         {
             return dbc.Class.AsNoTracking()
-                                .Include(x => x.Enrolments.Where(e => e.ClassID != null))
-                                .ThenInclude(e => e.Person)
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Leader)
@@ -129,12 +125,28 @@ namespace U3A.BusinessRules
         public static async Task<List<Class>> GetClassDetailsAsync(U3ADbContext dbc,
             Term term, SystemSettings settings, bool ExludeOffScheduleActivities = false, DateTime? LastScheduleUpdate = null)
         {
+            var enrolments = await dbc.Enrolment
+                                        .Include(x => x.Person)
+                                        .Where(x => x.Term.Year == term.Year).ToListAsync();
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
-            classes.AddRange(await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
-                            .ToListAsync());
+            Parallel.ForEach(classes, c =>
+                {
+                    c.Course.Enrolments = enrolments
+                                            .Where(x => x.CourseID == c.CourseID).ToList();
+                }
+            );
+            var diffParticipants = await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
+                            .ToListAsync();
+            Parallel.ForEach(diffParticipants, c =>
+                {
+                    c.Enrolments = enrolments
+                                            .Where(x => x.CourseID == c.CourseID).ToList();
+                }
+            );
+            classes.AddRange(diffParticipants);
             var totalClasses = classes.Count();
             classes = classes
                 .OrderBy(x => x.Course.Name)
@@ -522,7 +534,7 @@ namespace U3A.BusinessRules
             {
                 Console.BackgroundColor = ConsoleColor.Green;
                 Log.Information("    Return {p0} because start {p1} >= today {p2}."
-                        ,true,DateOnly.FromDateTime(startDate.Value), DateOnly.FromDateTime(today));
+                        , true, DateOnly.FromDateTime(startDate.Value), DateOnly.FromDateTime(today));
                 return true;
             }
 
@@ -556,7 +568,7 @@ namespace U3A.BusinessRules
             {
                 Console.BackgroundColor = ConsoleColor.Green;
                 Log.Information("    Return {p0} because term {p1} is current or in future {p2}."
-                    ,true, term.Name, Class.OfferedSummary);
+                    , true, term.Name, Class.OfferedSummary);
                 return true;
             }
 
@@ -578,26 +590,26 @@ namespace U3A.BusinessRules
             // failed all simple tests - calculate the end date
             DateTime? endDate = GetClassEndDate(Class, term);
             if (endDate == null || endDate <= term.StartDate) result = false; else result = true;
-                Log.Information("    Calculated EndDate: {p}", endDate);
-                if (result)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Log.Information("    Return {p0} because term Start {p1} is prior to class End {p2}",
-                                        true, term.StartDate,endDate);
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Log.Information("    Return {p0} because term Start {p1} is later class End {p2}",
-                                            false, term.StartDate,endDate);
-                }
+            Log.Information("    Calculated EndDate: {p}", endDate);
+            if (result)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Log.Information("    Return {p0} because term Start {p1} is prior to class End {p2}",
+                                    true, term.StartDate, endDate);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Log.Information("    Return {p0} because term Start {p1} is later class End {p2}",
+                                        false, term.StartDate, endDate);
+            }
             return result;
         }
 
         private static void LogClassDetails(Class Class, Term term)
         {
             Log.Information("    Start Date:         {p}", Class.StartDate);
-            Log.Information("    Occurence:          {p}", (OccurrenceType) Class.OccurrenceID);
+            Log.Information("    Occurence:          {p}", (OccurrenceType)Class.OccurrenceID);
             Log.Information("    Recurence:          {p}", Class.Recurrence);
             Log.Information("    Current Term:       {p}", term.Name);
             Log.Information("    Offered:            {p}", Class.OfferedSummary);
