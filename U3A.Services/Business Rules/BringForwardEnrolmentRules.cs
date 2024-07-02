@@ -79,10 +79,15 @@ namespace U3A.BusinessRules
                             .Include(x => x.Person)
                             .Where(x => x.Term.Year == targetTerm.Year && x.Term.TermNumber >= targetTerm.TermNumber
                                                     && x.Person.DateCeased == null
+                                                    && x.Person.FinancialTo <= targetTerm.Year
                                                     && (x.Person.FinancialToTerm != null
                                                         && x.Person.FinancialToTerm < targetTerm.TermNumber)))
             {
-                e.IsWaitlisted = true;
+               if (!e.IsWaitlisted) { 
+                    e.IsWaitlisted = true; 
+                    e.DateEnrolled = null; 
+                    dbc.Update(e);
+                }
             }
         }
         static async Task BringForwardEnrolmentsAsync(U3ADbContext dbc,
