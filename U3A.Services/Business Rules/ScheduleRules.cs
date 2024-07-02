@@ -52,8 +52,7 @@ namespace U3A.BusinessRules
             var enrolmentKeys = await dbc.Enrolment
                                                 .AsNoTracking()
                                                 .Include(x => x.Term)
-                                                .Where(x => x.Term.Year == term.Year
-                                                            && x.Term.TermNumber >= term.TermNumber)
+                                                .Where(x => x.Term.Year == term.Year)
                                                 .Select(x => x.ID).ToListAsync();
             enrolmentKeys.AddRange(await dbcT.MultiCampusEnrolment
                                                 .AsNoTracking()
@@ -213,6 +212,10 @@ namespace U3A.BusinessRules
                 }
                 result.AddRange(classes);
             }
+            Parallel.ForEach(result, c =>
+            {
+                AssignClassCounts(term, c);
+            });
 
             // sort & return the result
             return result.OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)

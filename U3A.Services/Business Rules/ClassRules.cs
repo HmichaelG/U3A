@@ -339,7 +339,7 @@ namespace U3A.BusinessRules
                 c.CourseContacts.Add(new CourseContact() { ContactType = contactType, Person = person });
             }
         }
-        private static void AssignClassCounts(Term term, Class c)
+        public static void AssignClassCounts(Term term, Class c)
         {
             var nextTerm = GetNextTermOffered(c, term.TermNumber);
             double maxStudents = c.Course.MaximumStudents; ;

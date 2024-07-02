@@ -1054,6 +1054,10 @@ else
             await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, Classes, settings);
             await dbc.SaveChangesAsync();
             await dbcT.SaveChangesAsync();
+            foreach (var c in Classes)
+            {
+                BusinessRule.AssignClassCounts(term, c);
+            }
             if (addedEnrolments.Count() > 0)
             {
                 await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, term, settings));
