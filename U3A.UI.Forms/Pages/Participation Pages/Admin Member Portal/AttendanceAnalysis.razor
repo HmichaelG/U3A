@@ -74,8 +74,8 @@
                 <DxPivotGridField Field="@nameof(AttendClass.Expected)" Caption="Exp" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
                 <DxPivotGridField Field="@nameof(AttendClass.Difference)" Caption="+/-" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum">
                     <DataTemplate>
-                        <div class="@((decimal?)context >= 0 ? "text-success" : "text-danger")">
-                            <strong>@context</strong>
+                        <div class="@((decimal?)context >= 0 ? "fw-bolder text-success" : "fw-bolder text-danger")">
+                            @context
                         </div>
                     </DataTemplate>
                 </DxPivotGridField>
