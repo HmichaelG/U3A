@@ -193,10 +193,11 @@ namespace U3A.BusinessRules
 
         public static bool IsPersonFinancial(Person person, Term term)
         {
-            return person.FinancialTo >= term.Year
+            var result = person.FinancialTo > term.Year
                     || (person.FinancialTo == term.Year
                         && (person.FinancialToTerm == null
                             || person.FinancialToTerm >= term.TermNumber));
+            return result;
         }
 
         public static async Task FixEnrolmentTerm(U3ADbContext dbc, Term term)
