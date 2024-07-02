@@ -76,25 +76,23 @@ else
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        if (settings != null)
+        {
+            if (settings.InMaintenanceTill == null)
+            {
+                DoEnterMaintenance = true;
+                var today = TimezoneAdjustment.GetLocalTime();
+                settings.InMaintenanceTill = new DateTime(today.Year, today.Month, today.Day, today.Hour, 0, 0).AddHours(2);
+            }
+        }
         IsReady = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender)
         {
-            localTime = new LocalTime(js);
-            var today = await localTime.GetLocalTimeAsync();
-            if (settings != null)
-            {
-                if (settings.InMaintenanceTill == null)
-                {
-                    DoEnterMaintenance = true;
-                    settings.InMaintenanceTill = new DateTime(today.Year,today.Month,today.Day,today.Hour,0,0).AddHours(2);
-                    InvokeAsync(StateHasChanged);
-                }
-            }
-            else
+            if (settings == null)
             {
                 await messageBox.ShowOkOnlyAsync("Organisation Details are undefined", "Please define organisation details before using this procedure.");
                 Close();
