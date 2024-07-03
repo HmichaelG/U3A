@@ -12,16 +12,20 @@
             break;
         case HelpActivationStyle.ButtonOnly:
         case HelpActivationStyle.ButtonOnlyNoMaintenanceWarning:
-            if (settings?.InMaintenanceTill != null && ActivationStyle == HelpActivationStyle.ButtonOnly)
+            @if (ActivationStyle == HelpActivationStyle.ButtonOnly)
             {
-                <div class="alert alert-danger text-center text-dark">Warning: You are in Member Portal Maintenance Mode</div>
-            }
-            if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!) && ActivationStyle == HelpActivationStyle.ButtonOnly)
-            {
-                <div class="alert alert-warning text-center text-dark">
-                    Warning: Enrolment email blackout until
-                    @($"{TimezoneAdjustment.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}")
-                </div>
+                if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
+                {
+                    <div class="mx-2 mt-2 alert alert-danger text-center">@inMaintenanceMessage</div>
+                }
+                if (!string.IsNullOrWhiteSpace(informationMessage))
+                {
+                    {
+                        <div class="mx-2 mt-2 alert alert-info text-center">
+                            @informationMessage
+                        </div>
+                    }
+                }
             }
             <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
                       SizeMode=SizeMode.Small
@@ -32,23 +36,24 @@
         default:
             <PageTitle>@Title</PageTitle>
             <div class="d-flex">
-            <h3 class="@TitleCssClass">
-                <DxButton IconCssClass="@ButtonIconCssClass" Text="Help" SizeMode=SizeMode.Small CssClass="@ButtonCssClass"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline" style="float: left; margin-right: 0.5rem;"
-                          Click="ShowTopicAsync" Id="helpButton" />
-                @Title
-            </h3>
-            @if (settings?.InMaintenanceTill != null)
-            {
-                <div class="flex-grow-1 mx-4 alert-style alert alert-danger text-center text-dark">Warning: You are in Member Portal Maintenance Mode</div>
-            }
-                @if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
-            {
-                <div class="flex-grow-1 mx-4 alert-style alert alert-warning text-center text-dark">
-                    Warning: Enrolment email blackout until
-                    @($"{TimezoneAdjustment.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}")
-                </div>
-            }
+                <h3 class="@TitleCssClass">
+                    <DxButton IconCssClass="@ButtonIconCssClass" Text="Help" SizeMode=SizeMode.Small CssClass="@ButtonCssClass"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline" style="float: left; margin-right: 0.5rem;"
+                              Click="ShowTopicAsync" Id="helpButton" />
+                    @Title
+                </h3>
+                @if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
+                {
+                    <div class="flex-grow-1 mx-4 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
+                }
+                @if (!string.IsNullOrWhiteSpace(informationMessage))
+                {
+                    {
+                        <div class="flex-grow-1 mx-4 alert-style alert alert-info text-center">
+                            @informationMessage
+                        </div>
+                    }
+                }
             </div>
             break;
     }
@@ -77,9 +82,10 @@
         width: 100%;
         padding-bottom: 5px;
     }
+
     .alert-style {
         height: 2rem !important;
-        text-align:center !important;
+        text-align: center !important;
         padding-top: 0.25dvh;
     }
 </style>
@@ -87,22 +93,22 @@
 
 @code {
 
-    [Parameter]
-    [EditorRequired]
-    public string? Title { get; set; }
-    [Parameter]
-    [EditorRequired]
-    public string? HelpTopic { get; set; }
-    [Parameter]
-    public HelpActivationStyle ActivationStyle { get; set; }
-    [Parameter]
-    public string? ButtonCssClass { get; set; }
-    [Parameter]
-    public string TitleCssClass { get; set; } = "flex-grow-0 align-items-center";
-    [Parameter]
-    public string ButtonIconCssClass { get; set; } = "bi bi-question menu-icon";
-    [Parameter]
-    public bool IncludeTableOfContents { get; set; } = false;
+        [Parameter]
+        [EditorRequired]
+        public string? Title { get; set; }
+        [Parameter]
+        [EditorRequired]
+        public string? HelpTopic { get; set; }
+        [Parameter]
+        public HelpActivationStyle ActivationStyle { get; set; }
+        [Parameter]
+        public string? ButtonCssClass { get; set; }
+        [Parameter]
+        public string TitleCssClass { get; set; } = "flex-grow-0 align-items-center";
+        [Parameter]
+        public string ButtonIconCssClass { get; set; } = "bi bi-question menu-icon";
+        [Parameter]
+        public bool IncludeTableOfContents { get; set; } = false;
 
     public string? windowWidth { get; set; }
 
@@ -114,11 +120,40 @@
 
     SystemSettings? settings;
     bool isReady;
+    string? inMaintenanceMessage = default;
+    string? informationMessage = default;
 
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        if (settings != null)
+        {
+            if (settings.InMaintenanceTill != null)
+            {
+                inMaintenanceMessage = "Warning: You are in Member Portal Maintenance Mode";
+            }
+
+            var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
+            if (currentTerm != null)
+            {
+                if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
+                {
+                    var today = TimezoneAdjustment.GetLocalTime().Date;
+                    DateTime allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
+                    int days = (int)(allocationDate - today).TotalDays;
+                    if (days > 0 && days < 8)
+                    {
+                        informationMessage = $"Reminder: Random Enrolment Allocation Day in {days} days: {allocationDate.ToString(constants.FULL_DAY_DATE_FORMAT)}.";
+                    }
+                }
+            }
+
+            if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
+            {
+                informationMessage = $"Enrolment email blackout until {TimezoneAdjustment.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
+            }
+        }
         isReady = true;
         await base.OnInitializedAsync();
     }

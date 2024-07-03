@@ -92,13 +92,13 @@ namespace U3A.WebFunctions.Procedures
                     int days = (int)(allocationDate - today).TotalDays;
                     if (days > 0 && days < 8)
                     {
-                        msg += $"<H3>Reminder: Auto-Enrolment Allocation Day in {days} days.<h3>";
+                        msg += $"<H3>Reminder: Random Enrolment Allocation Day in {days} days.<h3>";
                         DoEnrolledButUnfinancial |= true;
                     }
-                    if (days == 0) msg += $"<H3>Auto-Enrolment has been performed! You have {constants.RANDOM_ALLOCATION_PREVIEW} days to review before members are advised.<h3>";
+                    if (days == 0) msg += $"<H3>Random Enrolment has been performed! You have {constants.RANDOM_ALLOCATION_PREVIEW} days to review before members are advised.<h3>";
                     if (days < 0 && Math.Abs(days) < constants.RANDOM_ALLOCATION_PREVIEW)
                     {
-                        msg += $"<H3>Reminder: Auto-Enrolment has been performed! Member notification emails in {constants.RANDOM_ALLOCATION_PREVIEW + days} days.<h3>";
+                        msg += $"<H3>Reminder: Random Enrolment has been performed! Member notification emails in {constants.RANDOM_ALLOCATION_PREVIEW + days} days.<h3>";
                     }
                 }
             }
