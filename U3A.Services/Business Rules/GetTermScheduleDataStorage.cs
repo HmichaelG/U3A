@@ -89,7 +89,7 @@ namespace U3A.BusinessRules
                     // The term
                     schedule = new TermSchedule();
                     schedule.StartDate = t.StartDate;
-                    schedule.EndDate = t.EndDate.Date.AddDays(1);
+                    schedule.EndDate = t.EndDate.Date.AddDays(1).AddMinutes(-1);
                     schedule.AppointmentType = 0;
                     schedule.Caption = t.Name;
                     schedule.Label = (t.IsDefaultTerm) ? 1 : 0;
@@ -99,7 +99,7 @@ namespace U3A.BusinessRules
                     // The enrolment period
                     schedule = new TermSchedule();
                     schedule.StartDate = t.EnrolmentStartDate;
-                    schedule.EndDate = t.EnrolmentEndDate.Date.AddDays(1);
+                    schedule.EndDate = t.EnrolmentEndDate.Date.AddDays(1).AddMinutes(-1);
                     schedule.AppointmentType = 0;
                     schedule.Caption = $"{t.Name} Enrolment Period";
                     schedule.Label = 2;
