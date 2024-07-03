@@ -34,7 +34,7 @@ namespace U3A.BusinessRules
         }
 
         public static bool IsEnrolmentBlackoutPeriod(SystemSettings settings)
-                                => DateTime.UtcNow < settings.EnrolmentBlackoutEndsUTC.GetValueOrDefault();
+                      => settings != null && DateTime.UtcNow < settings.EnrolmentBlackoutEndsUTC.GetValueOrDefault();
         private static bool IsPreRandomCutoffDate(Term currentEnrolmentTerm,
                                             SystemSettings settings,
                                             DateTime CutoffDate,
