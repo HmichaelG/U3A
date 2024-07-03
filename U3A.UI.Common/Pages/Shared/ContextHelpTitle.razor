@@ -11,29 +11,30 @@
         case HelpActivationStyle.None:
             break;
         case HelpActivationStyle.ButtonOnly:
-        case HelpActivationStyle.ButtonOnlyNoMaintenanceWarning:
-            @if (ActivationStyle == HelpActivationStyle.ButtonOnly)
-            {
-                if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
+        case HelpActivationStyle.ButtonOnlyNoMessges:
+                @if (ActivationStyle == HelpActivationStyle.ButtonOnly)
                 {
-                    <div class="mx-2 mt-2 alert alert-danger text-center">@inMaintenanceMessage</div>
-                }
-                if (!string.IsNullOrWhiteSpace(informationMessage))
-                {
+                    if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
                     {
-                        <div class="mx-2 mt-2 alert alert-info text-center">
-                            @informationMessage
-                        </div>
+                    <div class="mx-2 mt-2 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
+                    }
+                    if (!string.IsNullOrWhiteSpace(informationMessage))
+                    {
+                        {
+                        <div class="mx-2 mt-2 alert-style alert alert-info text-center">
+                                @informationMessage
+                            </div>
+                        }
                     }
                 }
-            }
-            <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
-                      SizeMode=SizeMode.Small
-                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                      CssClass="@ButtonCssClass"
-                      Click="ShowTopicAsync" Id="helpButton" />
+                <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
+                          SizeMode=SizeMode.Small
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          CssClass="@ButtonCssClass"
+                          Click="ShowTopicAsync" Id="helpButton" />
             break;
-        default:
+        case HelpActivationStyle.StandardButtonAndTitle:
+        case HelpActivationStyle.ButtonAndTitleNoMessages:
             <PageTitle>@Title</PageTitle>
             <div class="d-flex">
                 <h3 class="@TitleCssClass">
@@ -42,17 +43,20 @@
                               Click="ShowTopicAsync" Id="helpButton" />
                     @Title
                 </h3>
-                @if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
+                @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
+                {
+                if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
                 {
                     <div class="flex-grow-1 mx-4 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
                 }
-                @if (!string.IsNullOrWhiteSpace(informationMessage))
+                if (!string.IsNullOrWhiteSpace(informationMessage))
                 {
                     {
                         <div class="flex-grow-1 mx-4 alert-style alert alert-info text-center">
                             @informationMessage
                         </div>
                     }
+                }
                 }
             </div>
             break;
@@ -84,31 +88,31 @@
     }
 
     .alert-style {
-        height: 2rem !important;
-        text-align: center !important;
-        padding-top: 0.25dvh;
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+        margin-bottom: 0.5dvh !important;
     }
 </style>
 
 
 @code {
 
-        [Parameter]
-        [EditorRequired]
-        public string? Title { get; set; }
-        [Parameter]
-        [EditorRequired]
-        public string? HelpTopic { get; set; }
-        [Parameter]
-        public HelpActivationStyle ActivationStyle { get; set; }
-        [Parameter]
-        public string? ButtonCssClass { get; set; }
-        [Parameter]
-        public string TitleCssClass { get; set; } = "flex-grow-0 align-items-center";
-        [Parameter]
-        public string ButtonIconCssClass { get; set; } = "bi bi-question menu-icon";
-        [Parameter]
-        public bool IncludeTableOfContents { get; set; } = false;
+    [Parameter]
+    [EditorRequired]
+    public string? Title { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public string? HelpTopic { get; set; }
+    [Parameter]
+    public HelpActivationStyle ActivationStyle { get; set; }
+    [Parameter]
+    public string? ButtonCssClass { get; set; }
+    [Parameter]
+    public string TitleCssClass { get; set; } = "flex-grow-0 align-items-center";
+    [Parameter]
+    public string ButtonIconCssClass { get; set; } = "bi bi-question menu-icon";
+    [Parameter]
+    public bool IncludeTableOfContents { get; set; } = false;
 
     public string? windowWidth { get; set; }
 
@@ -144,14 +148,14 @@
                     int days = (int)(allocationDate - today).TotalDays;
                     if (days > 0 && days < 8)
                     {
-                        informationMessage = $"Reminder: Random Enrolment Allocation Day in {days} days: {allocationDate.ToString(constants.FULL_DAY_DATE_FORMAT)}.";
+                        informationMessage = $"Reminder: Random Enrolment Allocation in {days} days: {allocationDate.ToString(constants.FULL_DAY_DATE_FORMAT)}.";
                     }
                 }
             }
 
             if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
             {
-                informationMessage = $"Enrolment email blackout until {TimezoneAdjustment.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
+                informationMessage = $"Reminder: Enrolment email blackout until {TimezoneAdjustment.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
             }
         }
         isReady = true;

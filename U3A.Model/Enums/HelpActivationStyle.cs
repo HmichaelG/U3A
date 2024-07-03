@@ -8,9 +8,10 @@ namespace U3A.Model
 {
     public enum HelpActivationStyle
     {
-        StandardButtonAndTitle = 0,
-        ButtonOnly = 1,
-        ButtonOnlyNoMaintenanceWarning = 2,
+        StandardButtonAndTitle,
+        ButtonOnly,
+        ButtonOnlyNoMessges,
+        ButtonAndTitleNoMessages,
         None = 99
     }
 }

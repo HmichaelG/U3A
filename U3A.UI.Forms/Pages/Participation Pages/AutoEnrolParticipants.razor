@@ -7,22 +7,26 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <div class="container-md py-md-5">
         <div class="row">
             <div class="col col-md-2" />
             <div class="col col-md-8 border border-primary py-2">
-                <ContextHelpTitle Title="Auto-Enrol Participants" HelpTopic="Auto-Enrol-Participants.html"></ContextHelpTitle>
+                <ContextHelpTitle Title="Auto-Enrol Participants"
+                                  ActivationStyle="HelpActivationStyle.ButtonAndTitleNoMessages"
+                                  HelpTopic="Auto-Enrol-Participants.html" />
                 <CollapsableContent DismissKey="{B89FB2B1-3559-4A94-A6B2-9E19CDA285F7}"
                                     AlertText=@($@"<p><strong>Auto-Enrol Participants</strong> is now an automated procedure.<br />
-                              It is executed hourly to move waitlisted students into active enrolment if available.<br />
-                              Randomised automatic enrolment occurs {autoEnrolOccirence.ToLower()} on
-                              {autoEnrolDay} in week {-settings?.AutoEnrolAllocationWeek} prior to term start.</p>")
-                                  OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+                                It is executed hourly to move waitlisted students into active enrolment if available.<br />
+                                Randomised automatic enrolment occurs {autoEnrolOccirence.ToLower()} on
+                                {autoEnrolDay} in week {-settings?.AutoEnrolAllocationWeek} prior to term start.</p>")
+                                    OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
                 @if (BusinessRule.IsEnrolmentBlackoutPeriod(settings))
                 {
                     var localEndTime = GetEnrolmentBlackoutEndTime();
@@ -106,7 +110,8 @@ else {
     MessageBox? messageBox;
     U3ADbContext dbc { get; set; }
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
@@ -114,7 +119,8 @@ else {
         autoEnrolOccirence = new AutoEnrollOccurrences().First(x => x.Key == settings.AutoEnrolAllocationOccurs).Value;
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
-        if (selectedTerm != null) {
+        if (selectedTerm != null)
+        {
             FirstTermNextYear = await BusinessRule.FirstTermNextYearAsync(dbc, selectedTerm.Year);
             if (FirstTermNextYear != null
                 && DateTime.Today >= FirstTermNextYear.EnrolmentStartDate) { selectedTerm = FirstTermNextYear; }
@@ -123,15 +129,18 @@ else {
         IsReady = true;
     }
 
-    void SelectedTermChanged(Term newValue) {
+    void SelectedTermChanged(Term newValue)
+    {
         selectedTerm = newValue;
         IsClassAllocationFinalised = selectedTerm.IsClassAllocationFinalised;
         StateHasChanged();
     }
 
 
-    async Task Process() {
-        if (await IsDataOk()) {
+    async Task Process()
+    {
+        if (await IsDataOk())
+        {
             errorMessage = null;
             IsProcessing = true;
             StateHasChanged();
@@ -142,16 +151,18 @@ else {
                                                             ForceEmailQueue, emailDate);
             IsProcessing = false;
             StateHasChanged();
-            await messageBox.ShowOkOnlyAsync("Process Complete", 
+            await messageBox.ShowOkOnlyAsync("Process Complete",
                     $"{selectedTerm.Name} Enrolments have been allocated.");
             NavigationManager.NavigateTo("/");
         }
     }
 
-    async Task<bool> IsDataOk() {
+    async Task<bool> IsDataOk()
+    {
         bool result = true;
         string? msg = null;
-        if (selectedTerm == null) {
+        if (selectedTerm == null)
+        {
             msg = "<p>*** You must select the current Term ***</p>";
             await messageBox.ShowOkOnlyAsync("Select the Term", msg);
             result = false;
@@ -162,8 +173,8 @@ else {
             {
                 var localEndTime = GetEnrolmentBlackoutEndTime();
                 result = await messageBox.ShowAsync("Enrolment Blackout",
-                                                $@"<p>You are in the enrolment blackout period till
-                                                {localEndTime.ToString(constants.STD_DATETIME_FORMAT)}.
+                                                    $@"<p>You are in the enrolment blackout period till
+                                            {localEndTime.ToString(constants.STD_DATETIME_FORMAT)}.
                                                     This procedure may cause enrolment email to be generated.</p>
                                                 <p>Are you sure you wish to continue?</p");
             }
@@ -177,11 +188,13 @@ else {
         return TimezoneAdjustment.GetLocalTime(utcEndTime);
     }
 
-    void Close() {
+    void Close()
+    {
         NavigationManager.NavigateTo("/");
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
