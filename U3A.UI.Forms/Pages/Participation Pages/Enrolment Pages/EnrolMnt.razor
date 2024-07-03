@@ -233,9 +233,6 @@ else
         height: 11dvh;
     }
 
-  @*   .this-page {
-        overflow: hidden;
-    } *@
 </style>
 
 
@@ -586,12 +583,9 @@ else
                     await messageBox.ShowOkOnlyAsync("Participant Waitlisted", $"{dataItem.Person.FullName} was waitlisted because the class is full.</p>");
                     dataItem.IsWaitlisted = true;
                 }
+
                 // Post changes to the database.
                 if (e.IsNew) await dbc.AddAsync(dataItem);
-                // Create a mail item
-                DateTime? emailAt = null;
-                if (BusinessRule.IsEnrolmentBlackoutPeriod(settings)) { emailAt = settings.EnrolmentBlackoutEndsUTC; }
-                await BusinessRule.CreateEnrolmentSendMailAsync(dbc,emailAt);
             }
         }
         await SaveChangesAsync();
@@ -635,6 +629,11 @@ else
         bool result = false;
         try
         {
+            // Create mail items
+            DateTime? emailAt = null;
+            if (BusinessRule.IsEnrolmentBlackoutPeriod(settings)) { emailAt = settings.EnrolmentBlackoutEndsUTC; }
+            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, emailAt);
+
             // Post changes to the database.
             await dbc.SaveChangesAsync();
             await dbcT.SaveChangesAsync();
