@@ -10,11 +10,18 @@
     {
         case HelpActivationStyle.None:
             break;
-        case HelpActivationStyle.ButtonOnly: 
+        case HelpActivationStyle.ButtonOnly:
         case HelpActivationStyle.ButtonOnlyNoMaintenanceWarning:
             if (settings?.InMaintenanceTill != null && ActivationStyle == HelpActivationStyle.ButtonOnly)
             {
                 <div class="alert alert-danger text-center text-dark">Warning: You are in Member Portal Maintenance Mode</div>
+            }
+            if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!) && ActivationStyle == HelpActivationStyle.ButtonOnly)
+            {
+                <div class="alert alert-warning text-center text-dark">
+                    Warning: Enrolment email blackout until
+                    @($"{TimezoneAdjustment.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}")
+                </div>
             }
             <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
                       SizeMode=SizeMode.Small
@@ -24,16 +31,25 @@
             break;
         default:
             <PageTitle>@Title</PageTitle>
-            if (settings?.InMaintenanceTill != null)
-            {
-                <div class="alert alert-danger text-center text-dark">Warning: You are in Member Portal Maintenance Mode</div>
-            }
+            <div class="d-flex">
             <h3 class="@TitleCssClass">
                 <DxButton IconCssClass="@ButtonIconCssClass" Text="Help" SizeMode=SizeMode.Small CssClass="@ButtonCssClass"
                           RenderStyleMode="ButtonRenderStyleMode.Outline" style="float: left; margin-right: 0.5rem;"
                           Click="ShowTopicAsync" Id="helpButton" />
                 @Title
             </h3>
+            @if (settings?.InMaintenanceTill != null)
+            {
+                <div class="flex-grow-1 mx-4 alert-style alert alert-danger text-center text-dark">Warning: You are in Member Portal Maintenance Mode</div>
+            }
+                @if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
+            {
+                <div class="flex-grow-1 mx-4 alert-style alert alert-warning text-center text-dark">
+                    Warning: Enrolment email blackout until
+                    @($"{TimezoneAdjustment.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}")
+                </div>
+            }
+            </div>
             break;
     }
     <DxWindow @ref=@helpWindow Width="@windowWidth"
@@ -61,7 +77,11 @@
         width: 100%;
         padding-bottom: 5px;
     }
-
+    .alert-style {
+        height: 2rem !important;
+        text-align:center !important;
+        padding-top: 0.25dvh;
+    }
 </style>
 
 
@@ -78,7 +98,7 @@
     [Parameter]
     public string? ButtonCssClass { get; set; }
     [Parameter]
-    public string TitleCssClass { get; set; } = "d-flex align-items-center";
+    public string TitleCssClass { get; set; } = "flex-grow-0 align-items-center";
     [Parameter]
     public string ButtonIconCssClass { get; set; } = "bi bi-question menu-icon";
     [Parameter]
@@ -91,7 +111,7 @@
     string? standardWidth;
 
     U3ADbContext? dbc { get; set; }
-    
+
     SystemSettings? settings;
     bool isReady;
 
@@ -120,7 +140,7 @@
 
     void OnClosed()
     {
-        standardWidth=windowWidth;
+        standardWidth = windowWidth;
     }
 
     public void Dispose()
