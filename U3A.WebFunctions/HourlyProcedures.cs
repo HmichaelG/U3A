@@ -25,9 +25,9 @@ namespace U3A.WebFunctions
         }
 
         [Function("HouryProcedures")]
-        public async Task Run([TimerTrigger("0 0 0-13,18-23 * * *"      
+        public async Task Run([TimerTrigger("0 0 23-11 * * *"      
 #if DEBUG
-            , RunOnStartup=true
+            //, RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
