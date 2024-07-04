@@ -121,11 +121,6 @@ namespace U3A.Model
         public string BankBSB { get; set; }
         public string BankAccountNo { get; set; }
 
-        [Required]
-        [Range(-12, 12)]
-        [DefaultValue(10)]
-        public int UTCOffset { get; set; }
-
         [DefaultValue(true)]
         public bool IncludeMembershipFeeInComplimentary { get; set; }
         [DefaultValue(true)]
@@ -166,6 +161,23 @@ namespace U3A.Model
         public ClassScheduleDisplayPeriod ClassScheduleDisplayPeriod { get; set; }
         public MemberFeePaymentType AllowedMemberFeePaymentTypes { get; set; }
         public DateTime? EnrolmentBlackoutEndsUTC { get; set; }
+
+        private string mTimeZoneId;
+        [DefaultValue("Australia/Sydney")]
+        public string TimeZoneId { 
+            get 
+            { 
+                return mTimeZoneId; 
+            } 
+            set
+            {
+                mTimeZoneId = value;
+                var tz = TimeZoneInfo.FindSystemTimeZoneById(value);
+                UTCOffset = tz.GetUtcOffset(DateTime.UtcNow).Duration();
+            } 
+        }
+        [NotMapped]
+        public TimeSpan UTCOffset { get; set; }
     }
 
     public enum AutoEnrollOccurrence

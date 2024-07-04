@@ -7,6 +7,7 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
+@using System.Collections.ObjectModel
 
 
 @attribute [Authorize]
@@ -47,9 +48,22 @@ else
                                 <DxStackLayoutItem>
                                     <Template>
                                         <DxFormLayoutGroup Caption="Organisation Details" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
-                                            <DxFormLayoutItem Caption="UTC Local Time Offset" ColSpanMd="12">
-                                                <DxSpinEdit @bind-Value="@systemSettings.UTCOffset" />
-                                            </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Timezone" ColSpanMd="12">
+                                                    <DxComboBox Data="@timezones" TValue="TimeZoneInfo" TData="TimeZoneInfo"
+                                                                ValueFieldName="@nameof(TimeZoneInfo.DisplayName)"
+                                                                TextFieldName="@nameof(TimeZoneInfo.Id)"
+                                                                @bind-Text=@systemSettings.TimeZoneId>
+                                                        <Columns>
+                                                            <DxListEditorColumn FieldName="@nameof(TimeZoneInfo.Id)" Caption="TimeZone" Width="25rem" />
+                                                            <DxListEditorColumn FieldName="@nameof(TimeZoneInfo.DisplayName)" Caption="Details" Width="25rem" />
+                                                        </Columns>
+                                                        <Buttons>
+                                                        <DxEditorButton Text="@systemSettings.UTCOffset.ToString()" CssClass="text-primary"
+                                                                        Enabled="false"
+                                                                        IconCssClass="h5 bi bi-clock" />
+                                                        </Buttons>
+                                                    </DxComboBox>
+                                                </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="U3A Group" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@systemSettings.U3AGroup" />
                                             </DxFormLayoutItem>
@@ -376,10 +390,12 @@ else
     DxGrid? AssignedGrid;
     IReadOnlyList<object> SelectedUnassignedItems { get; set; }
     IReadOnlyList<object> SelectedAssignedItems { get; set; }
+    ReadOnlyCollection<TimeZoneInfo>? timezones;
 
 
     protected override async Task OnInitializedAsync()
     {
+        timezones = TimeZoneInfo.GetSystemTimeZones();
         // wire up the data
         AutoEnrolAllocationMethods = new List<string>();
         AutoEnrolAllocationMethods.Add("Random");
@@ -403,6 +419,8 @@ else
                     MailLabelHeight = 25
                 };
         }
+        var tz = TimeZoneInfo.FindSystemTimeZoneById(systemSettings.TimeZoneId);
+        if (systemSettings.TimeZoneId != tz.Id) { systemSettings.TimeZoneId = tz.Id; dbc.Update(systemSettings); }
         await GetTenantData();
         if (systemSettings.AutoEnrolAllocationDay < 0 ||
                 systemSettings.AutoEnrolAllocationDay > 6) systemSettings.AutoEnrolAllocationDay = 2;
