@@ -106,7 +106,7 @@ namespace U3A.WebFunctions.Procedures
             // Email suppressions
 
             var service = new PostmarkService(dbc.TenantInfo);
-            var tzOffSet = new TimeSpan(settings.UTCOffset, 0, 0);
+            var tzOffSet = settings.UTCOffset;
             var suppressions = await service.GetSuppressions(dbc, tzOffSet, (DateTime.UtcNow + tzOffSet).AddDays(-7));
             if (suppressions.Count > 0)
             {

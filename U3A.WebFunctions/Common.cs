@@ -86,8 +86,8 @@ namespace U3A.WebFunctions
             var settings = await dbc.SystemSettings
                                 .OrderBy(x => x.ID)
                                 .FirstOrDefaultAsync();
-            TimezoneAdjustment.TimezoneOffset = new TimeSpan(settings!.UTCOffset, 0, 0);
-            return DateTime.UtcNow.AddHours(settings.UTCOffset);
+            TimezoneAdjustment.TimezoneOffset = settings!.UTCOffset;
+            return DateTime.UtcNow+settings.UTCOffset;
         }
 
     }

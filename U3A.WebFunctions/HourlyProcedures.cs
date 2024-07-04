@@ -39,16 +39,25 @@ namespace U3A.WebFunctions
             }
 
             //Retrieve the tenants
-            _logger.LogInformation($"Retrieve tenant list from database.");
             var tenants = new List<TenantInfo>();
             var cn = _config.GetConnectionString(Common.TENANT_CN_CONFIG);
             Common.GetTeanats(tenants, cn!);
+
             _logger.LogInformation($"{tenants.Count} tenants retrieved from database.");
+            _logger.LogInformation($"UTC Time is: {DateTime.UtcNow}");
 
             bool isBackgroundProcessingEnabled = true;
             List<Task> TaskList = new List<Task>();
             foreach (var tenant in tenants)
             {
+                // *** Do not delete ***
+                // Common.GetNowAsync(dbc) has side effect of populating TimezoneAdjustment
+                using (var dbc = new U3ADbContext(tenant))
+                {
+                    _logger.LogInformation($"[{tenant.Identifier}] Local Time is: {await Common.GetNowAsync(dbc)}");
+                    _logger.LogInformation($"[{tenant.Identifier}] TimeZone Offset: {TimezoneAdjustment.TimezoneOffset}");
+                }
+
                 isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                 TaskList.Add(AutoEnrolParticipants.Process(tenant, cn!, _logger));
             }
@@ -79,7 +88,7 @@ namespace U3A.WebFunctions
                     _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
             }
-            _logger.LogInformation($"Hourly Procedures at: {DateTime.UtcNow}");
+            _logger.LogInformation($"Hourly Procedures complete at: {DateTime.UtcNow} UTC");
         }
 
     }
