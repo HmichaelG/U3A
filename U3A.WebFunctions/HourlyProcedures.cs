@@ -25,9 +25,9 @@ namespace U3A.WebFunctions
         }
 
         [Function("HouryProcedures")]
-        public async Task Run([TimerTrigger("0 0 23-11 * * *"      
+        public async Task Run([TimerTrigger("0 0 22-23,0-11 * * *"      
 #if DEBUG
-            //, RunOnStartup=true
+            , RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
@@ -54,8 +54,7 @@ namespace U3A.WebFunctions
                 // Common.GetNowAsync(dbc) has side effect of populating TimezoneAdjustment
                 using (var dbc = new U3ADbContext(tenant))
                 {
-                    _logger.LogInformation($"[{tenant.Identifier}] Local Time is: {await Common.GetNowAsync(dbc)}");
-                    _logger.LogInformation($"[{tenant.Identifier}] TimeZone Offset: {TimezoneAdjustment.TimezoneOffset}");
+                    _logger.LogInformation($"[{tenant.Identifier}] Local Time: {await Common.GetNowAsync(dbc)}. UTC Offset: {TimezoneAdjustment.TimezoneOffset}");
                 }
 
                 isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
