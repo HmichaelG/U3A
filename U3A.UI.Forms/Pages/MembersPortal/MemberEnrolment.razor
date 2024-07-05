@@ -1,5 +1,4 @@
-﻿@implements IAsyncDisposable
-
+﻿
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
@@ -258,7 +257,7 @@ else
                                                                 <DxButton CssClass="flex-grow-1"
                                                                           IconCssClass="bi bi-arrow-right"
                                                                           IconPosition="ButtonIconPosition.AfterText"
-                                                                          Text="Next"
+                                                                          Text="Contact"
                                                                           RenderStyleMode="ButtonRenderStyleMode.Outline"
                                                                           RenderStyle="@ButtonRenderStyle.Primary"
                                                                           Click="async() => await GetNextCourseContact(c)" />
@@ -450,9 +449,6 @@ else
     Progress? ProgressBar;
     bool isProgressVisible { get; set; }
 
-    U3ADbContext? dbc { get; set; }
-    TenantDbContext? dbcT { get; set; }
-
     Term? term;
     Term? prevTerm;
     List<Class> ListboxData;
@@ -585,69 +581,72 @@ else
 
         deletedClasses = new List<Class>();
         activeTabIndex = 0;
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        dbcT = await TenantDbfactory.CreateDbContextAsync();
-        // wire up the data
-        settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-        if (IsPreview)
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            term = PreviewTerm;
-        }
-        else
-        {
-            term = BusinessRule.CurrentEnrolmentTerm(dbc);
-        }
-        if (term == null)
-        {
-            var currentTerm = BusinessRule.CurrentTerm(dbc);
-            if (TimezoneAdjustment.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
+            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
             {
-                SetUnavialable(currentTerm);
-            }
-            else
-            {
-                // Fallback to read-only mode if enrolment term is null
-                var nextTerm = await BusinessRule.GetNextTermAsync(dbc);
-                if (nextTerm != null)
+                // wire up the data
+                settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+                if (IsPreview)
                 {
-                    term = currentTerm = nextTerm;
-                    SetUnavialable(nextTerm);
+                    term = PreviewTerm;
                 }
-            }
-        }
-        if (term != null)
-        {
-            prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
-            var exludeOffScheduleActivities = (IsReadOnly) ? false : true;
+                else
+                {
+                    term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                }
+                if (term == null)
+                {
+                    var currentTerm = BusinessRule.CurrentTerm(dbc);
+                    if (TimezoneAdjustment.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
+                    {
+                        SetUnavialable(currentTerm);
+                    }
+                    else
+                    {
+                        // Fallback to read-only mode if enrolment term is null
+                        var nextTerm = await BusinessRule.GetNextTermAsync(dbc);
+                        if (nextTerm != null)
+                        {
+                            term = currentTerm = nextTerm;
+                            SetUnavialable(nextTerm);
+                        }
+                    }
+                }
+                if (term != null)
+                {
+                    prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
+                    var exludeOffScheduleActivities = (IsReadOnly) ? false : true;
 
-            if (PreviewTerm != null)
-            {
-                // slow database lookup, required because PreviewTerm is selectable.
-                Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
-            }
-            else
-            {
-                // Fast lookup from Schedule cache
-                isFinancial = false;
-                if (loginState.SelectedPerson.FinancialTo >= term.Year) { isFinancial = true; }
-                Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
-            }
-            if (Classes != null)
-            {
-                if (loginState?.SelectedPerson != null)
-                {
-                    selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
-                    if (selectedClasses.Count() > 0) isListboxShowingSummary = false;
-                    if (IsReadOnly && selectedClasses.Count() <= 0) Classes.Clear();
-                    SetReviewButtonText();
-                }
-                else if (IsPreview)
-                {
-                    isListboxShowingSummary = true; // force a flip
+                    if (PreviewTerm != null)
+                    {
+                        // slow database lookup, required because PreviewTerm is selectable.
+                        Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
+                    }
+                    else
+                    {
+                        // Fast lookup from Schedule cache
+                        isFinancial = false;
+                        if (loginState.SelectedPerson.FinancialTo >= term.Year) { isFinancial = true; }
+                        Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
+                    }
+                    if (Classes != null)
+                    {
+                        if (loginState?.SelectedPerson != null)
+                        {
+                            selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
+                            if (selectedClasses.Count() > 0) isListboxShowingSummary = false;
+                            if (IsReadOnly && selectedClasses.Count() <= 0) Classes.Clear();
+                            SetReviewButtonText();
+                        }
+                        else if (IsPreview)
+                        {
+                            isListboxShowingSummary = true; // force a flip
+                        }
+                    }
                 }
             }
         }
-        dbc.ChangeTracker.Clear();
         googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
         if (string.IsNullOrWhiteSpace(googleMapAPIKey)) googleMapAPIKey = config.GetConnectionString("GoogleMapAPIKey");
 
@@ -914,7 +913,7 @@ else
         else
         {
             ListboxViewButtonText = "Show selected only";
-            GetData();
+            await GetData();
         }
         await InvokeAsync(StateHasChanged);
     }
@@ -926,7 +925,7 @@ else
         {
             //Enrolment request view
             filterText = null;
-            GetData();
+            await GetData();
             isListboxShowingSummary = false;
         }
         else
@@ -939,7 +938,7 @@ else
         ScrollListboxToTop();
     }
 
-    void GetData()
+    async Task GetData()
     {
         List<Class> c = new();
         if (term != null)
@@ -949,8 +948,11 @@ else
         // only show this term's classes & inter-term classes from last term.
         if (prevTerm != null)
         {
-            c.AddRange(Classes.Where(x => x.TermNumber == prevTerm.TermNumber
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                    c.AddRange(Classes.Where(x => x.TermNumber == prevTerm.TermNumber
                                                     && BusinessRule.IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)).ToList());
+            }
         }
         ListboxData = c.Distinct<Class>().ToList();
     }
@@ -1042,37 +1044,44 @@ else
     async Task SaveChanges()
     {
         if (isWorking) return;
-        try
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            isWorking = true;
-            // Post changes to the database.
-            dbc.ChangeTracker.Clear();
-            var acceptableClasses = await GetAcceptableClasses();
-            await BusinessRule.DeleteEnrolmentsRescinded(dbc, dbcT, deletedClasses, loginState.SelectedPerson, term, prevTerm);
-            var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, dbcT, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
-            await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
-            await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, Classes, settings);
-            await dbc.SaveChangesAsync();
-            await dbcT.SaveChangesAsync();
-            foreach (var c in Classes)
+            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
             {
-                BusinessRule.AssignClassCounts(term, c);
+                try
+                {
+                    isWorking = true;
+                    // Post changes to the database.
+                    dbc.ChangeTracker.Clear();
+                    var acceptableClasses = await GetAcceptableClasses();
+                    await BusinessRule.DeleteEnrolmentsRescinded(dbc, dbcT, deletedClasses, loginState.SelectedPerson, term, prevTerm);
+                    var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, dbcT, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
+                    await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
+                    await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, Classes, settings);
+                    await dbc.SaveChangesAsync();
+                    await dbcT.SaveChangesAsync();
+                    foreach (var c in Classes)
+                    {
+                        BusinessRule.AssignClassCounts(term, c);
+                    }
+                    if (addedEnrolments.Count() > 0)
+                    {
+                        await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, term, settings));
+                    }
+                    InvokeAsync(StateHasChanged);
+                    isDirty = false;
+                }
+                catch (Exception ex)
+                {
+                    ErrorHeader = "Save to database error";
+                    ErrorMessage = Helpers.GetErrorMessage(ex);
+                    await ErrorPopup.ShowPopupAsync();
+                }
+                finally
+                {
+                    isWorking = false;
+                }
             }
-            if (addedEnrolments.Count() > 0)
-            {
-                await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, term, settings));
-            }
-            InvokeAsync(StateHasChanged);
-            isDirty = false;
-        }
-        catch (Exception ex)
-        {
-            ErrorHeader = "Save to database error";
-            ErrorMessage = Helpers.GetErrorMessage(ex);
-            await ErrorPopup.ShowPopupAsync();
-        }
-        finally { 
-            isWorking = false; 
         }
     }
 
@@ -1157,9 +1166,4 @@ else
         }
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        dbc?.Dispose();
-        dbcT?.Dispose();
-    }
 }
