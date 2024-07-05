@@ -56,13 +56,20 @@ namespace U3A.BusinessRules
                                                   Course thisCourse, Class thisClass, Term thisTerm)
         {
             var enrolments = new List<Enrolment>();
-            if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == thisTerm.ID))
+            var testTerm = thisTerm;
+            var termNumber = GetNextTermOffered(thisClass, thisTerm.TermNumber);
+            if (testTerm.TermNumber != termNumber)
+            {
+                testTerm = await dbc.Term.FirstOrDefaultAsync(x=> x.Year == thisTerm.Year
+                                            && x.TermNumber == termNumber);
+            }
+            if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == testTerm.ID))
             {
                 enrolments = await dbc.Enrolment.AsNoTracking()
                                           .Include(x => x.Person)
                                           .Include(x => x.Course)
                                           .Where(x => x.ClassID == thisClass.ID
-                                                    && x.TermID == thisTerm.ID).ToListAsync();
+                                                    && x.TermID == testTerm.ID).ToListAsync();
             }
             else
             {
@@ -70,7 +77,7 @@ namespace U3A.BusinessRules
                                             .Include(x => x.Person)
                                             .Include(x => x.Course)
                                             .Where(x => x.CourseID == thisCourse.ID
-                                                            && x.TermID == thisTerm.ID).ToListAsync();
+                                                            && x.TermID == testTerm.ID).ToListAsync();
             };
             Enrolment? dummy;
             if (enrolments.Count > 0)
