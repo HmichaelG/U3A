@@ -104,8 +104,10 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<Term>> SelectableTermsInCurrentYearAsync(U3ADbContext dbc, Term CurrentTerm)
         {
+            int termNoToTest = CurrentTerm.TermNumber;
+            if (TimezoneAdjustment.GetLocalTime().Date < CurrentTerm.StartDate) termNoToTest--;
             return await dbc.Term.AsNoTracking()
-                .Where(x => x.Year == CurrentTerm.Year && x.TermNumber >= CurrentTerm.TermNumber)
+                .Where(x => x.Year == CurrentTerm.Year && x.TermNumber >= termNoToTest)
                 .OrderBy(x => x.Year).ThenBy(x => x.TermNumber)
                 .ToListAsync();
         }
