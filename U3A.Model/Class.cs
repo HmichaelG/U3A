@@ -465,6 +465,7 @@ namespace U3A.Model
         [NotMapped]
         [Comment("Only used in Member Portal - Member Enrolment")]
         public int TermNumber { get; set; }
+
         [NotMapped]
         [Comment("Only used in Member Portal - Member Enrolment")]
         public bool ShowMap { get; set; } = false;

@@ -211,9 +211,9 @@ namespace U3A.BusinessRules
             {
                 if (e.Class != null)
                 {
-                    if (!BusinessRule.IsClassInTerm(e.Class, term.TermNumber))
+                    if (!IsClassInTerm(e.Class, term.TermNumber))
                     {
-                        int termNo = BusinessRule.GetRequiredTerm(term.TermNumber, e.Class);
+                        int termNo = GetNextTermOffered(e.Class, term.TermNumber );
                         var newTerm = terms.FirstOrDefault(x => x.Year == term.Year && x.TermNumber == termNo);
                         if (newTerm != null) { e.TermID = newTerm.ID; }
                     }
@@ -225,8 +225,8 @@ namespace U3A.BusinessRules
                     var list = new SortedList<int, int?>();
                     foreach (var c in e.Course.Classes)
                     {
-                        if (BusinessRule.IsClassInTerm(c, term.TermNumber)) { isInTerm = true; break; }
-                        int key = BusinessRule.GetRequiredTerm(term.TermNumber, c);
+                        if (IsClassInTerm(c, term.TermNumber)) { isInTerm = true; break; }
+                        int key = GetNextTermOffered(c,term.TermNumber);
                         list.TryAdd(key, key);
                     }
                     if (!isInTerm)
