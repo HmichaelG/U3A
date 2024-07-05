@@ -1,7 +1,8 @@
-﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@implements IAsyncDisposable
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
-@implements IAsyncDisposable
 @inject IJSRuntime js
 @inject NavigationManager NavMan
 @inject IConfiguration config
@@ -1028,7 +1029,6 @@ else
             if (result)
             {
                 selectedClasses.Insert(0, selectedClass);
-                if (deletedClasses.Contains(selectedClass)) { deletedClasses.Remove(selectedClass); }
                 selectedClass.IsSelected = true;
                 isDirty = true;
             }
@@ -1071,7 +1071,9 @@ else
             ErrorMessage = Helpers.GetErrorMessage(ex);
             await ErrorPopup.ShowPopupAsync();
         }
-        finally { isWorking = false; }
+        finally { 
+            isWorking = false; 
+        }
     }
 
     string WaitlistWarning()

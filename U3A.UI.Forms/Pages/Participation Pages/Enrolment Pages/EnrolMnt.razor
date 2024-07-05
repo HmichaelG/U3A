@@ -542,6 +542,7 @@ else
 
     async Task SaveRecord(GridEditModelSavingEventArgs e)
     {
+        dbc?.ChangeTracker?.Clear();
         var editModel = (Enrolment)e.EditModel;
         if (!await IsDataOk(editModel))
         {
@@ -647,6 +648,7 @@ else
             ErrorMessage = Helpers.GetErrorMessage(ex);
             await ErrorPopup.ShowPopupAsync();
             dbc?.ChangeTracker?.Clear();
+            dbcT?.ChangeTracker?.Clear();
         }
         return result;
     }
@@ -760,6 +762,7 @@ else
 
     async Task BulkProcess(bool IsCopy)
     {
+        dbc?.ChangeTracker?.Clear();
         var action = (IsCopy) ? "Copy" : "Transfer";
         // Add transfers as new enrolments in the selected course.
         int failures = 0;
@@ -911,6 +914,7 @@ else
         }
         else
         {
+            dbc?.ChangeTracker?.Clear();
             if (await quickEnrolment.ShowAsync())
             {
                 int failures = 0;
