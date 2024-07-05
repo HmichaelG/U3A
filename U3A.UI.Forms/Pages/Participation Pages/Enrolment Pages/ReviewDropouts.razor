@@ -20,7 +20,7 @@ else
             <ContextHelpTitle Title="Review Class Dropouts" HelpTopic="Review-Class-Dropouts.html" />
         </div>
         <div class="row">
-            <div class="d-none col-lg-8 d-lg-inline">
+            <div class="d-none col-lg-8 d-lg-inline pb-2">
                 Review / Reinstate deleted class enrolments.
             </div>
         </div>
@@ -32,7 +32,7 @@ else
                                      DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
         <Progress @ref="@ProgressBar" />
 
-        <DxFormLayout CssClass="mt-2">
+        <DxFormLayout>
             <FullScreen>
                 <ContentTemplate>
                     <DxGrid Data="@Dropouts" @ref=@mainGrid
