@@ -149,47 +149,47 @@
                                                 AllowUserInput="true" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.FirstName" />
+                                    <DxTextBox @bind-Text="@editItem.FirstName" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.LastName" />
+                                    <DxTextBox @bind-Text="@editItem.LastName" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12">
                                     <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
                                                @bind-Text="@editItem.PostNominals" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
-                                    <DxComboBox Data="@gender" @bind-Value="@editItem.Gender" />
+                                    <DxComboBox Data="@gender" @bind-Value="@editItem.Gender" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
                                     <DxDateEdit @bind-Date="@editItem.BirthDate"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
-                                    <DxMemo @bind-Text="@editItem.Occupation" Rows="3" />
+                                    <DxMemo @bind-Text="@editItem.Occupation" Rows="3" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                             </DxFormLayoutGroup>
                             <DxFormLayoutGroup Caption="Address / Contact Information" ColSpanMd="6">
                                 <DxFormLayoutItem Caption="Street" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Address" />
+                                    <DxTextBox @bind-Text="@editItem.Address" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="City" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.City" />
+                                    <DxTextBox @bind-Text="@editItem.City" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="State" ColSpanMd="6">
-                                    <DxComboBox Data="@states" @bind-Value="@editItem.State" />
+                                    <DxComboBox Data="@states" @bind-Value="@editItem.State" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
-                                    <DxSpinEdit @bind-Value="@editItem.Postcode" />
+                                    <DxSpinEdit @bind-Value="@editItem.Postcode" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Email" />
+                                    <DxTextBox @bind-Text="@editItem.Email" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Home Phone" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.HomePhone" />
+                                    <DxTextBox @bind-Text="@editItem.HomePhone" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Mobile Phone" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Mobile" />
+                                    <DxTextBox @bind-Text="@editItem.Mobile" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
                                     <DxComboBox Data="silentContactList"
@@ -199,19 +199,19 @@
                                     </DxComboBox>
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Mail Preference" ColSpanMd="6">
-                                    <DxComboBox Data="@Communication" @bind-Value="@editItem.Communication" />
+                                    <DxComboBox Data="@Communication" @bind-Value="@editItem.Communication" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
                                     <DxCheckBox @bind-Checked="@editItem.SMSOptOut"
-                                                Alignment="CheckBoxContentAlignment.Right" />
+                                                Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                             </DxFormLayoutGroup>
                             <DxFormLayoutGroup Caption="In Case of Emergency" ColSpanMd="6">
                                 <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.ICEContact" />
+                                    <DxTextBox @bind-Text="@editItem.ICEContact" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.ICEPhone" />
+                                    <DxTextBox @bind-Text="@editItem.ICEPhone" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                             </DxFormLayoutGroup>
 
