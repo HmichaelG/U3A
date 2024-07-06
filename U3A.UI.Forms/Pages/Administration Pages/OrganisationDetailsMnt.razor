@@ -58,7 +58,7 @@ else
                                                             <DxListEditorColumn FieldName="@nameof(TimeZoneInfo.DisplayName)" Caption="Details" Width="25rem" />
                                                         </Columns>
                                                         <Buttons>
-                                                        <DxEditorButton Text="@systemSettings.UTCOffset.ToString()" CssClass="text-primary"
+                                                        <DxEditorButton Text="@($"UTC {systemSettings?.UTCOffset.ToString(@"hh\:mm")}")" CssClass="text-primary"
                                                                         Enabled="false"
                                                                         IconCssClass="h5 bi bi-clock" />
                                                         </Buttons>
@@ -391,6 +391,7 @@ else
     IReadOnlyList<object> SelectedUnassignedItems { get; set; }
     IReadOnlyList<object> SelectedAssignedItems { get; set; }
     ReadOnlyCollection<TimeZoneInfo>? timezones;
+    string utcOffset;
 
 
     protected override async Task OnInitializedAsync()
@@ -425,6 +426,7 @@ else
         if (systemSettings.AutoEnrolAllocationDay < 0 ||
                 systemSettings.AutoEnrolAllocationDay > 6) systemSettings.AutoEnrolAllocationDay = 2;
         server = new DocumentServer(dbc);
+        utcOffset ="";
         IsReady = true;
     }
 

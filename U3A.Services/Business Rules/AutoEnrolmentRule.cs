@@ -2,6 +2,7 @@
 using DevExpress.Utils.Serializing;
 using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using Twilio.Rest.Trunking.V1;
@@ -82,6 +83,16 @@ namespace U3A.BusinessRules
         // Return the date random allocation will occur, if it occurs this term.
         public static DateTime GetThisTermAllocationDay(Term currentEnrolmentTerm, SystemSettings settings)
         {
+            var termNumber = currentEnrolmentTerm.TermNumber;
+            switch (settings.AutoEnrolAllocationOccurs)
+            {
+                case AutoEnrollOccurrence.Annually:
+                    if (termNumber != 1) { return DateTime.MinValue; }
+                    break;
+                case AutoEnrollOccurrence.Semester:
+                    if (termNumber != 1 && termNumber != 3) { return DateTime.MinValue; }
+                    break;              
+            }
             var week = settings.AutoEnrolAllocationWeek;
             var onDay = (DayOfWeek)settings.AutoEnrolAllocationDay;
             var allocationDate = currentEnrolmentTerm.StartDate.Date.AddDays(7 * week);
