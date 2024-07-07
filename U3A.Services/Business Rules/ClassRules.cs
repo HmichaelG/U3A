@@ -341,22 +341,22 @@ namespace U3A.BusinessRules
         }
         public static void AssignClassCounts(Term term, Class c)
         {
-            var nextTerm = GetRequiredTerm( term.TermNumber,c);
+            var termOffered = GetNextTermOffered(c, term.TermNumber);
             double maxStudents = c.Course.MaximumStudents; ;
             c.ParticipationRate = 0;
             if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
             {
                 c.TotalActiveStudents = c.Course.Enrolments
-                                        .Where(e => !e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
+                                        .Where(e => !e.IsWaitlisted && e.Term?.TermNumber == termOffered).Count();
                 c.TotalWaitlistedStudents = c.Course.Enrolments
-                                        .Where(e => e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
+                                        .Where(e => e.IsWaitlisted && e.Term?.TermNumber == termOffered).Count();
             }
             else
             {
                 c.TotalActiveStudents = c.Enrolments
-                                            .Where(e => !e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
+                                            .Where(e => !e.IsWaitlisted && e.Term?.TermNumber == termOffered).Count();
                 c.TotalWaitlistedStudents = c.Enrolments
-                                            .Where(e => e.IsWaitlisted && e.Term?.TermNumber == nextTerm).Count();
+                                            .Where(e => e.IsWaitlisted && e.Term?.TermNumber == termOffered).Count();
             }
             if (maxStudents != 0) c.ParticipationRate = (double)((c.TotalActiveStudents + c.TotalWaitlistedStudents) / maxStudents);
         }
