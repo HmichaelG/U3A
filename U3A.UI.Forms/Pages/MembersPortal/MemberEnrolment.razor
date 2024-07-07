@@ -1,5 +1,4 @@
-﻿
-@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
 @inject IJSRuntime js
@@ -150,6 +149,16 @@ else
                                                     <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
                                                 </div>
                                             }
+                                            <div class="w-100 text-center">
+                                                @if (c.Course.CourseFeePerYear != 0)
+                                                {
+                                                    <div class="text-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
+                                                }
+                                                @if (c.Course.CourseFeePerTerm != 0)
+                                                {
+                                                    <div class="text-info"><strong>Fee / Term: @($"{c.Course.CourseFeePerTerm.ToString("c2")} {c.Course.CourseFeePerTermDescription}")</strong></div>
+                                                }
+                                            </div>
 
                                             <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
                                                 <em style="white-space: pre-line">
@@ -161,16 +170,6 @@ else
                                             {
                                                 <div class="col-small ps-1"><strong>Offered:</strong></div>
                                                 <div class="col-large">@c.OfferedSummary</div>
-                                                @if (c.Course.CourseFeePerYear != 0)
-                                                {
-                                                    <div class="col-small ps-1"><strong>Course Fee:</strong></div>
-                                                    <div class="col-large">@($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</div>
-                                                }
-                                                @if (c.Course.CourseFeePerTerm != 0)
-                                                {
-                                                    <div class="col-small ps-1"><strong>Term Fee:</strong></div>
-                                                    <div class="col-large">@($"{c.Course.CourseFeePerTerm.ToString("c2")} {c.Course.CourseFeePerTermDescription}")</div>
-                                                }
                                                 <div class="col-small ps-1"><strong>Type:</strong></div>
                                                 <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
                                                 <div class="col-small ps-1"><strong>Class:</strong></div>
@@ -1101,7 +1100,7 @@ else
             {
                 foreach (var e in thisClass.Course.Enrolments.Where(x => x.PersonID == loginState.SelectedPerson.ID))
                 {
-                    deleteList.Add(e);                    
+                    deleteList.Add(e);
                 }
                 foreach (var e in deleteList) { c.Course.Enrolments.Remove(e); }
 
