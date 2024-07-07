@@ -103,22 +103,16 @@ namespace U3A.BusinessRules
                                         && !x.Course.IsOffScheduleActivity)));
         }
 
-        private static void AssignClassTerm(Class c, IEnumerable<Term> terms, Term currentTerm)
+        private static void AssignClassTerm(Class c, IEnumerable<Term> terms, Term term)
         {
-            var thisTerm = currentTerm;
-            var termNumber = GetNextTermOffered(c, currentTerm.TermNumber);
-            if (termNumber != currentTerm.TermNumber)
-            {
-                thisTerm = terms.FirstOrDefault(x => x.Year == currentTerm.Year && x.TermNumber == termNumber);
-            }
-            c.TermNumber = termNumber;
+            c.TermNumber = GetRequiredTerm(term.TermNumber, c);
             Parallel.ForEach(c.Course.Enrolments, e =>
             {
-                e.Term = thisTerm;
+                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
             });
             Parallel.ForEach(c.Enrolments, e =>
             {
-                e.Term = thisTerm;
+                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
             });
         }
 
@@ -139,18 +133,18 @@ namespace U3A.BusinessRules
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
             Parallel.ForEach(classes, c =>
-                {
-                    c.Course.Enrolments = enrolments
-                                            .Where(x => x.CourseID == c.CourseID).ToList();
-                }
+            {
+                c.Course.Enrolments = enrolments
+                                        .Where(x => x.CourseID == c.CourseID).ToList();
+            }
             );
             var diffParticipants = await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync();
             Parallel.ForEach(diffParticipants, c =>
-                {
-                    c.Enrolments = enrolments
-                                   .Where(x => x.ClassID == c.ID).ToList();
-                }
+            {
+                c.Enrolments = enrolments
+                               .Where(x => x.ClassID == c.ID).ToList();
+            }
             );
             classes.AddRange(diffParticipants);
 
@@ -180,7 +174,7 @@ namespace U3A.BusinessRules
             return classes;
         }
 
-        static (int sameInClasses,int differentInClasses) GetEnrolmentTotals(IEnumerable<Class> classes)
+        static (int sameInClasses, int differentInClasses) GetEnrolmentTotals(IEnumerable<Class> classes)
         {
             var same = 0;
             var diff = 0;
@@ -189,7 +183,7 @@ namespace U3A.BusinessRules
                 same += c.Course.Enrolments.Count();
                 diff += c.Enrolments.Count();
             }
-            return (same, diff);    
+            return (same, diff);
         }
 
         static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes)
@@ -225,29 +219,18 @@ namespace U3A.BusinessRules
             syncTask.Wait();
             return syncTask.Result;
         }
-        public static int GetNextTermOffered(Class Class, int TermNumber)
+        public static int GetRequiredTerm(int termNumber, Class c)
         {
-            int result = 0;
-            // Find the 1st term >= the current term
-            for (int i = TermNumber; i <= 4; i++)
+            int Result = termNumber - 1;
+            while (true)
             {
-                if (i == 1 && Class.OfferedTerm1) { result = i; break; }
-                if (i == 2 && Class.OfferedTerm2) { result = i; break; }
-                if (i == 3 && Class.OfferedTerm3) { result = i; break; }
-                if (i == 4 && Class.OfferedTerm4) { result = i; break; }
+                Result++;
+                if (Result == 1 && c.OfferedTerm1) return Result;
+                if (Result == 2 && c.OfferedTerm2) return Result;
+                if (Result == 3 && c.OfferedTerm3) return Result;
+                if (Result == 4 && c.OfferedTerm4) return Result;
+                if (Result > 4) { return termNumber; }
             }
-            if (result == 0)
-            {
-                // Find the 1st term <= the current term
-                for (int i = TermNumber; i > 0; i--)
-                {
-                    if (i == 4 && Class.OfferedTerm4) { result = i; break; }
-                    if (i == 3 && Class.OfferedTerm3) { result = i; break; }
-                    if (i == 2 && Class.OfferedTerm2) { result = i; break; }
-                    if (i == 1 && Class.OfferedTerm1) { result = i; break; }
-                }
-            }
-            return result;
         }
         private static IEnumerable<Class> EnsureOneClassOnlyForSameParticipantsInEachClass(U3ADbContext dbc, IEnumerable<Class> classes)
         {
@@ -358,7 +341,7 @@ namespace U3A.BusinessRules
         }
         public static void AssignClassCounts(Term term, Class c)
         {
-            var nextTerm = GetNextTermOffered(c, term.TermNumber);
+            var nextTerm = GetRequiredTerm( term.TermNumber,c);
             double maxStudents = c.Course.MaximumStudents; ;
             c.ParticipationRate = 0;
             if (c.Course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
@@ -460,6 +443,30 @@ namespace U3A.BusinessRules
             return result;
         }
 
+        public static int GetNextTermOffered(Class Class, int TermNumber)
+        {
+            int result = 0;
+            // Find the 1st term >= the current term
+            for (int i = TermNumber; i <= 4; i++)
+            {
+                if (i == 1 && Class.OfferedTerm1) { result = i; break; }
+                if (i == 2 && Class.OfferedTerm2) { result = i; break; }
+                if (i == 3 && Class.OfferedTerm3) { result = i; break; }
+                if (i == 4 && Class.OfferedTerm4) { result = i; break; }
+            }
+            if (result == 0)
+            {
+                // Find the 1st term <= the current term
+                for (int i = TermNumber; i > 0; i--)
+                {
+                    if (i == 4 && Class.OfferedTerm4) { result = i; break; }
+                    if (i == 3 && Class.OfferedTerm3) { result = i; break; }
+                    if (i == 2 && Class.OfferedTerm2) { result = i; break; }
+                    if (i == 1 && Class.OfferedTerm1) { result = i; break; }
+                }
+            }
+            return result;
+        }
 
         public static bool IsClassInTerm(Class Class, int TermNumber)
         {

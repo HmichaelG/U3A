@@ -213,7 +213,7 @@ namespace U3A.BusinessRules
                 {
                     if (!IsClassInTerm(e.Class, term.TermNumber))
                     {
-                        int termNo = GetNextTermOffered(e.Class, term.TermNumber );
+                        int termNo = GetRequiredTerm( term.TermNumber, e.Class);
                         var newTerm = terms.FirstOrDefault(x => x.Year == term.Year && x.TermNumber == termNo);
                         if (newTerm != null) { e.TermID = newTerm.ID; }
                     }
@@ -226,7 +226,7 @@ namespace U3A.BusinessRules
                     foreach (var c in e.Course.Classes)
                     {
                         if (IsClassInTerm(c, term.TermNumber)) { isInTerm = true; break; }
-                        int key = GetNextTermOffered(c,term.TermNumber);
+                        int key = GetRequiredTerm(term.TermNumber, c);
                         list.TryAdd(key, key);
                     }
                     if (!isInTerm)
