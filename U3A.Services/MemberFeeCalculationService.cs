@@ -446,7 +446,7 @@ namespace U3A.Services
             var classesLead = dbc.Class
                                     .Include(x => x.Course)
                                     .Where(x =>
-                                            ((x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee) ||
+                                            (x.Course.Year == term.Year && (x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee) ||
                                             (x.Course.CourseFeePerYear > 0 && x.Course.LeadersPayYearFee)) &&
                                             (x.LeaderID == person.ID ||
                                             x.Leader2ID == person.ID ||

@@ -1,5 +1,4 @@
-﻿
-@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
 @inject IJSRuntime js
@@ -150,6 +149,16 @@ else
                                                     <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
                                                 </div>
                                             }
+                                            <div class="w-100 text-center">
+                                                @if (c.Course.CourseFeePerYear != 0)
+                                                {
+                                                    <div class="text-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
+                                                }
+                                                @if (c.Course.CourseFeePerTerm != 0)
+                                                {
+                                                    <div class="text-info"><strong>Fee / Term: @($"{c.Course.CourseFeePerTerm.ToString("c2")} {c.Course.CourseFeePerTermDescription}")</strong></div>
+                                                }
+                                            </div>
 
                                             <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
                                                 <em style="white-space: pre-line">
@@ -161,16 +170,6 @@ else
                                             {
                                                 <div class="col-small ps-1"><strong>Offered:</strong></div>
                                                 <div class="col-large">@c.OfferedSummary</div>
-                                                @if (c.Course.CourseFeePerYear != 0)
-                                                {
-                                                    <div class="col-small ps-1"><strong>Course Fee:</strong></div>
-                                                    <div class="col-large">@($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</div>
-                                                }
-                                                @if (c.Course.CourseFeePerTerm != 0)
-                                                {
-                                                    <div class="col-small ps-1"><strong>Term Fee:</strong></div>
-                                                    <div class="col-large">@($"{c.Course.CourseFeePerTerm.ToString("c2")} {c.Course.CourseFeePerTermDescription}")</div>
-                                                }
                                                 <div class="col-small ps-1"><strong>Type:</strong></div>
                                                 <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
                                                 <div class="col-small ps-1"><strong>Class:</strong></div>
@@ -862,7 +861,8 @@ else
         List<Class> leaderExceptions = new List<Class>();
         List<Class> acceptableClasses = new List<Class>();
         bool isClassInTerm = false;
-        foreach (var c in selectedClasses)
+        //IsSelectedByEnrolment == null when newly selected
+        foreach (var c in selectedClasses.Where(x => x.IsSelectedByEnrolment == null))
         {
             if ((new Guid?[] { c.LeaderID, c.Leader2ID, c.Leader3ID }).Contains(loginState.SelectedPerson.ID))
             {
@@ -950,8 +950,8 @@ else
         {
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                    c.AddRange(Classes.Where(x => x.TermNumber == prevTerm.TermNumber
-                                                    && BusinessRule.IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)).ToList());
+                c.AddRange(Classes.Where(x => x.TermNumber == prevTerm.TermNumber
+                                                && BusinessRule.IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)).ToList());
             }
         }
         ListboxData = c.Distinct<Class>().ToList();
@@ -1050,6 +1050,7 @@ else
             {
                 try
                 {
+                    listGrid.BeginUpdate();
                     isWorking = true;
                     // Post changes to the database.
                     dbc.ChangeTracker.Clear();
@@ -1060,7 +1061,9 @@ else
                     await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, Classes, settings);
                     await dbc.SaveChangesAsync();
                     await dbcT.SaveChangesAsync();
-                    foreach (var c in Classes)
+                    RemoveDeletedFromMaster();
+                    selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
+                    foreach (var c in selectedClasses)
                     {
                         BusinessRule.AssignClassCounts(term, c);
                     }
@@ -1068,7 +1071,7 @@ else
                     {
                         await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, term, settings));
                     }
-                    InvokeAsync(StateHasChanged);
+                    StateHasChanged();
                     isDirty = false;
                 }
                 catch (Exception ex)
@@ -1079,10 +1082,37 @@ else
                 }
                 finally
                 {
+                    await ShowSelectedClasses();
+                    listGrid.EndUpdate();
                     isWorking = false;
                 }
             }
         }
+    }
+
+    void RemoveDeletedFromMaster()
+    {
+        List<Enrolment> deleteList = new();
+        foreach (var c in deletedClasses)
+        {
+            var thisClass = Classes.FirstOrDefault(x => x.ID == c.ID);
+            if (thisClass != null)
+            {
+                foreach (var e in thisClass.Course.Enrolments.Where(x => x.PersonID == loginState.SelectedPerson.ID))
+                {
+                    deleteList.Add(e);
+                }
+                foreach (var e in deleteList) { c.Course.Enrolments.Remove(e); }
+
+                deleteList.Clear();
+                foreach (var e in thisClass.Enrolments.Where(x => x.PersonID == loginState.SelectedPerson.ID))
+                {
+                    deleteList.Add(e);
+                }
+                foreach (var e in deleteList) { c.Enrolments.Remove(e); }
+            }
+        }
+        deletedClasses.Clear();
     }
 
     string WaitlistWarning()
