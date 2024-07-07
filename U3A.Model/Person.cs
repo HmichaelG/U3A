@@ -389,7 +389,7 @@ namespace U3A.Model
         {
             get
             {
-                if (!string.IsNullOrWhiteSpace(FirstName) && string.IsNullOrWhiteSpace( LastName))
+                if (!string.IsNullOrWhiteSpace(FirstName) && !string.IsNullOrWhiteSpace(LastName))
                 {
                     return $"{FirstName.Substring(0, 1).ToLower()}{LastName.Substring(0, 1).ToLower()}{PersonID.ToString("0000")}";
                 }
