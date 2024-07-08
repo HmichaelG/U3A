@@ -1,6 +1,8 @@
 ﻿@page "/BringForwardEnrolments"
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
@@ -163,6 +165,8 @@ else
             IsProcessing = true;
             StateHasChanged();
             await BusinessRule.BringForwardEnrolmentsAsync(dbc, sourceTerm, targetTerm, SetCurrentTerm);
+            var tenant = await tenantService.GetTenantInfoAsync();
+            await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory, tenant.Identifier);
             await messageBox.ShowOkOnlyAsync("Process Complete", $"{sourceTerm.Name} enrolments have been brought forward to {targetTerm.Name}.");
             NavigationManager.NavigateTo("/");
         }

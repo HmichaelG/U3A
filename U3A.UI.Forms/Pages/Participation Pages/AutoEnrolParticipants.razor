@@ -1,6 +1,8 @@
 ﻿@page "/AutoEnrolParticipants"
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
@@ -149,6 +151,8 @@ else
             await BusinessRule.AutoEnrolParticipantsAsync(dbc, selectedTerm,
                                                             IsClassAllocationFinalised,
                                                             ForceEmailQueue, emailDate);
+            var tenant = await tenantService.GetTenantInfoAsync();
+            await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory, tenant.Identifier);
             IsProcessing = false;
             StateHasChanged();
             await messageBox.ShowOkOnlyAsync("Process Complete",
