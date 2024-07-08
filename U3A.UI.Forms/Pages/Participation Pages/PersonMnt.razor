@@ -536,7 +536,9 @@
         {
             case 0:             // All financial participants not Ceased
                 co = CriteriaOperator.FromLambda<Person>(x => x.DateCeased == null
-                        && (x.FinancialTo >= currentTerm.Year));
+                        && (x.FinancialTo >= currentTerm.Year)
+                        && (x.FinancialToTerm == null || x.FinancialToTerm >= currentTerm.TermNumber )
+                        );
                 break;
             case 1:             // Leaders
                 co = CriteriaOperator.FromLambda<Person>(x => x.IsCourseLeader && x.DateCeased == null && x.FinancialTo >= currentTerm.Year);
@@ -554,7 +556,11 @@
                 co = CriteriaOperator.FromLambda<Person>(x => x.IsVolunteer && x.DateCeased == null);
                 break;
             case 9:             // Unfinancial
-                co = CriteriaOperator.FromLambda<Person>(x => x.FinancialTo < currentTerm.Year && x.DateCeased == null);
+                co = CriteriaOperator.FromLambda<Person>(x => (x.FinancialTo < currentTerm.Year 
+                                                                || (x.FinancialTo == currentTerm.Year
+                                                                    && (x.FinancialToTerm != null && x.FinancialToTerm < currentTerm.TermNumber))
+                                                                )
+                                                                && x.DateCeased == null);
                 break;
             case 10:             // All Records
                 co = null;
