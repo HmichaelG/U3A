@@ -103,18 +103,6 @@ namespace U3A.BusinessRules
                                         && !x.Course.IsOffScheduleActivity)));
         }
 
-        private static void AssignClassTerm(Class c, IEnumerable<Term> terms, Term term)
-        {
-            c.TermNumber = GetRequiredTerm(term.TermNumber, c);
-            Parallel.ForEach(c.Course.Enrolments, e =>
-            {
-                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-            });
-            Parallel.ForEach(c.Enrolments, e =>
-            {
-                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-            });
-        }
 
         /// <summary>
         /// Get available classes for the current year
@@ -162,7 +150,6 @@ namespace U3A.BusinessRules
             var TotalClassesInReportingPeriod = classes.Count();
             foreach (var c in classes)
             {
-                AssignClassTerm(c, terms, term);
                 AssignClassContacts(c, term, settings);
                 AssignClassCounts(term, c);
             }
@@ -611,13 +598,34 @@ namespace U3A.BusinessRules
                 return false;
             }
 
+
             // no more tests if term is in previous year
             if (term.Year < defaultTerm.Year) return result;
+
+            DateTime? endDate;
+
+            // if Recurrence is null, the end date is the final date in the term offered.
+            if (Class.Recurrence == null)
+            {
+                var offeredTermNumber = GetNextTermOffered(Class, term.TermNumber);
+                var offeredTerm = allTerms.FirstOrDefault(x => x.TermNumber == offeredTermNumber);
+                if (offeredTerm != null)
+                {
+                    endDate = offeredTerm.EndDate;
+                    if (endDate < today)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Red;
+                        Log.Information("    Return {p0} because class end: {p1} is prior to today: {p2}.",
+                                false, endDate, startDate);
+                        return false;
+                    }
+                }
+            }
 
             Log.Warning("    Dropped thru initial tests.");
 
             // failed all simple tests - calculate the end date
-            var endDate = GetClassEndDate(Class, term);
+            endDate = GetClassEndDate(Class, term);
             if (endDate == null || endDate <= term.StartDate) result = false; else result = true;
             Log.Information("    Calculated EndDate: {p}", endDate);
             if (result)
