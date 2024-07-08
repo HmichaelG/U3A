@@ -240,6 +240,11 @@ namespace U3A.Database
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Person>()
                 .HasQueryFilter(x => x.IsDeleted == false);
+            modelBuilder.Entity<Enrolment>()
+                    .HasIndex(x => new { x.TermID, x.CourseID, x.ClassID, x.PersonID }) 
+                    .HasDatabaseName("idxUniqueEnrolments")
+                    .IsUnique(true)
+                    .HasFilter("IsDeleted = 0"); 
             modelBuilder.Entity<Fee>()
                 .HasQueryFilter(x => x.Person.IsDeleted == false);
             modelBuilder.Entity<Leave>()

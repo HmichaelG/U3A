@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection.Metadata.Ecma335;
@@ -6,6 +7,13 @@ using System.Text.Json.Serialization;
 
 namespace U3A.Model
 {
+    // *** Defined in fluent API ***
+    //CREATE UNIQUE NONCLUSTERED INDEX idxUniqueEnrolments
+    //ON enrolment([TermID]
+    //  , [CourseID]
+    //  , [ClassID]
+    //  , [PersonID])
+    //WHERE isDeleted = 0
     public class Enrolment : ISoftDelete
     {
         public Enrolment() { Created = DateTime.UtcNow; }

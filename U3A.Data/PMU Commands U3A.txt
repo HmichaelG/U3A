@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_TimeZonId
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_remove_UTCOffset
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_remove_UTCOffset
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Enrolment_add_uniqueIndex
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_remove_UTCOffset
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Enrolment_add_uniqueIndex
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
