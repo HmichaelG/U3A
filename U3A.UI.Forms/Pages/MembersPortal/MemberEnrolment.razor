@@ -79,7 +79,7 @@ else
                 KeyFieldName="ID"
                 ShowAllRows=true
                 VirtualScrollingEnabled=true
-                AllowSelectRowByClick=true
+                AllowSelectRowByClick=false
                 AllowGroup=false
                 AllowSort=false
                 PagerVisible=false
@@ -137,11 +137,18 @@ else
                                         </CaptionTemplate>
                                         <Items>
                                             <div class="mt-2 d-flex justify-content-center w-100">
-                                                <DxButton Text="@GetStatus(c)"
-                                                          SizeMode="SizeMode.Large"
-                                                          IconCssClass="@($"bi {selectButtonIcon}")"
-                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                          Click="@(async () => await SelectedDataItemChanged(c))" />
+                                            @if (IsReadOnly)
+                                                {
+                                                    <div class="h6 text-primary">@GetStatus(c)</div>
+                                                }
+                                                else
+                                                {
+                                                    <DxButton Text="@GetStatus(c)"
+                                                    SizeMode="SizeMode.Large"
+                                                    IconCssClass="@($"bi {selectButtonIcon}")"
+                                                    RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                    Click="@(async () => await SelectedDataItemChanged(c))" />
+                                                }
                                             </div>
                                             @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                             {
