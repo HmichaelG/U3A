@@ -35,7 +35,7 @@ namespace U3A.BusinessRules
         public static async Task<Term?> GetNextTermAsync(U3ADbContext dbc)
         {
             var term = await CurrentTermAsync(dbc);
-            return await GetNextTermAsync(dbc,term);
+            return await GetNextTermAsync(dbc, term);
         }
         public static async Task<Term?> GetFirstTermNextYearAsync(U3ADbContext dbc, Term? sourceTerm)
         {
@@ -46,13 +46,14 @@ namespace U3A.BusinessRules
         public static async Task BringForwardEnrolmentsAsync(U3ADbContext dbc,
                     Term? sourceTerm, Term? targetTerm, bool SetCurrentTerm)
         {
+            var addedEnrolments = new List<Enrolment>();
             var terms = await dbc.Term.Where(x => x.Year == sourceTerm.Year
                                                 && x.TermNumber <= sourceTerm.TermNumber)
                                         .OrderByDescending(x => x.TermNumber)
                                         .ToListAsync();
             foreach (var term in terms)
             {
-                await BringForwardEnrolmentsAsync(dbc, term, targetTerm);
+                await BringForwardEnrolmentsAsync(dbc, addedEnrolments, term, targetTerm);
             }
             if (SetCurrentTerm)
             {
@@ -69,7 +70,7 @@ namespace U3A.BusinessRules
             await dbc.SaveChangesAsync();
         }
 
-        static async Task WaitListPartPaidMembers(U3ADbContext dbc,Term targetTerm)
+        static async Task WaitListPartPaidMembers(U3ADbContext dbc, Term targetTerm)
         {
             if (targetTerm.TermNumber < 3) { return; }
             foreach (var e in dbc.Enrolment
@@ -83,57 +84,61 @@ namespace U3A.BusinessRules
                                                     && (x.Person.FinancialToTerm != null
                                                         && x.Person.FinancialToTerm < targetTerm.TermNumber)))
             {
-               if (!e.IsWaitlisted) { 
-                    e.IsWaitlisted = true; 
-                    e.DateEnrolled = null; 
+                if (!e.IsWaitlisted)
+                {
+                    e.IsWaitlisted = true;
+                    e.DateEnrolled = null;
                     dbc.Update(e);
                 }
             }
         }
         static async Task BringForwardEnrolmentsAsync(U3ADbContext dbc,
+                                    List<Enrolment> addedEnrolments,
                                     Term sourceTerm, Term targetTerm)
         {
-
             var enrolments = await dbc.Enrolment
                             .Include(x => x.Term)
                             .Include(x => x.Class)
                             .Include(x => x.Course)
                             .Include(x => x.Person)
-                            .Where(enrolment => enrolment.Term == sourceTerm
-                                                    && enrolment.Person.DateCeased == null
-                                                    && enrolment.Person.FinancialTo >= sourceTerm.Year)
+                            .Where(e => !e.IsDeleted && e.Term == sourceTerm
+                                                    && e.Person.DateCeased == null
+                                                    && e.Person.FinancialTo >= sourceTerm.Year)
                             .ToListAsync();
             foreach (var e in enrolments)
             {
                 if (ShouldBringForwardPrevTerm(dbc, sourceTerm, targetTerm, e.Class))
                 {
-                    await CreateEnrolment(dbc, e, targetTerm);
+                    await CreateEnrolment(dbc, addedEnrolments, e, targetTerm);
                 }
                 else
                 {
-                    foreach (var course in dbc.Course
+                    foreach (var course in await dbc.Course
                                         .Include(x => x.Classes)
-                                        .Where(x => x.ID == e.Course.ID).ToList())
+                                        .Where(x => x.ID == e.Course.ID).ToListAsync())
                     {
                         foreach (var clss in course.Classes)
                         {
                             if (ShouldBringForwardPrevTerm(dbc, sourceTerm, targetTerm, clss))
                             {
-                                await CreateEnrolment(dbc, e, targetTerm);
+                                await CreateEnrolment(dbc, addedEnrolments, e, targetTerm);
                                 break;  // we only need one new enrolment
                             }
                         }
                     }
                 }
             }
-
         }
 
-        static async Task CreateEnrolment(U3ADbContext dbc, Enrolment currentEnrolment, Term? targetTerm)
+        static async Task CreateEnrolment(U3ADbContext dbc,
+                            List<Enrolment> addedEnrolments,
+                            Enrolment currentEnrolment,
+                            Term? targetTerm)
         {
             var newEnrolment = new Enrolment();
             currentEnrolment.CopyTo(newEnrolment);
             newEnrolment.Term = await dbc.Term.FindAsync(targetTerm.ID);
+            newEnrolment.TermID = targetTerm.ID;
             newEnrolment.Course = await dbc.Course.FindAsync(currentEnrolment.CourseID);
             if (newEnrolment.Course == null) return;
             newEnrolment.Person = await dbc.Person.FindAsync(currentEnrolment.PersonID);
@@ -144,7 +149,34 @@ namespace U3A.BusinessRules
                 if (newEnrolment.Class == null) return;
             }
             newEnrolment.ID = Guid.Empty;
-            if (!await IsAlreadyEnrolled(dbc, newEnrolment)) { await dbc.Enrolment.AddAsync(newEnrolment); }
+            if (!await IsAlreadyEnrolled(dbc, newEnrolment)
+                    && !IsNewlyEnrolled(newEnrolment, addedEnrolments))
+            {
+                await dbc.Enrolment.AddAsync(newEnrolment);
+                addedEnrolments.Add(newEnrolment);
+            }
+        }
+
+        static bool IsNewlyEnrolled(Enrolment e, List<Enrolment> AddedEnrolments)
+        {
+            var result = false;
+            if (e.ClassID == null)
+            {
+                result = AddedEnrolments.Any(x => x.TermID == e.Term.ID &&
+                                                x.CourseID == e.Course.ID &&
+                                                x.ClassID == null &&
+                                                x.PersonID == e.Person.ID &&
+                                                !x.IsDeleted);
+            }
+            else
+            {
+                result = AddedEnrolments.Any(x => x.TermID == e.Term.ID &&
+                                x.CourseID == e.Course.ID &&
+                                x.PersonID == e.Person.ID &&
+                                x.ClassID == e.Class.ID &&
+                                !x.IsDeleted);
+            }
+            return result;
         }
         static async Task<bool> IsAlreadyEnrolled(U3ADbContext dbc, Enrolment e)
         {
@@ -153,14 +185,17 @@ namespace U3A.BusinessRules
             {
                 result = await dbc.Enrolment.AnyAsync(x => x.TermID == e.Term.ID &&
                                                 x.CourseID == e.Course.ID &&
-                                                x.PersonID == e.Person.ID);
+                                                x.ClassID == null &&
+                                                x.PersonID == e.Person.ID &&
+                                                !x.IsDeleted);
             }
             else
             {
                 result = await dbc.Enrolment.AnyAsync(x => x.TermID == e.Term.ID &&
                                 x.CourseID == e.Course.ID &&
                                 x.PersonID == e.Person.ID &&
-                                x.ClassID == e.Class.ID);
+                                x.ClassID == e.Class.ID &&
+                                !x.IsDeleted);
             }
             return result;
         }
