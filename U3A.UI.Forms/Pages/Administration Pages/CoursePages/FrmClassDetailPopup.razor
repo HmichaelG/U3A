@@ -5,10 +5,9 @@
 <Progress @ref=@progressBar />
 <CommonClassProcedures @ref=@commonClassProcedures />
 
-<DxGrid @ref="@grid" Data="@Course.Classes"
+<DxGrid @ref="@grid" Data="@Course.Classes" CssClass="grid-style"
         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-        PageSize="5"
-        PagerVisible="@((Course?.Classes.Count() > 5) ? true : false)"
+        PagerVisible=false
         KeyFieldName="ID"
         ValidationEnabled="true"
         TextWrapEnabled=false
@@ -117,6 +116,9 @@
 </DxGrid>
 
 <style>
+    .grid-style {
+        height: 10rem;
+    }
     .classPopup-width {
         min-width: 50rem;
         max-width: 98%;
