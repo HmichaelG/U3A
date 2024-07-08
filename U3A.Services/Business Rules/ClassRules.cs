@@ -126,6 +126,7 @@ namespace U3A.BusinessRules
             Term term, SystemSettings settings, bool ExludeOffScheduleActivities = false, DateTime? LastScheduleUpdate = null)
         {
             var enrolments = await dbc.Enrolment
+                                        .Include(x => x.Term)
                                         .Include(x => x.Person)
                                         .Where(x => x.Term.Year == term.Year).ToListAsync();
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
@@ -133,18 +134,22 @@ namespace U3A.BusinessRules
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
             Parallel.ForEach(classes, c =>
-            {
-                c.Course.Enrolments = enrolments
-                                        .Where(x => x.CourseID == c.CourseID).ToList();
-            }
+                {
+                    c.Course.Enrolments = enrolments
+                             .Where(x => x.CourseID == c.CourseID
+                                         && x.Term.TermNumber == GetNextTermOffered(c,defaultTerm.TermNumber)
+                             ).ToList();
+                }
             );
             var diffParticipants = await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync();
             Parallel.ForEach(diffParticipants, c =>
-            {
-                c.Enrolments = enrolments
-                               .Where(x => x.ClassID == c.ID).ToList();
-            }
+                {
+                    c.Enrolments = enrolments
+                                   .Where(x => x.ClassID == c.ID
+                                         && x.Term.TermNumber == GetNextTermOffered(c, defaultTerm.TermNumber)
+                                   ).ToList();
+                }
             );
             classes.AddRange(diffParticipants);
 
