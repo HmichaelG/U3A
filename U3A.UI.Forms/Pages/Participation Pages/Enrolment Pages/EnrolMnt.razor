@@ -51,20 +51,20 @@ else
 
         <DxFormLayout>
             <div class="col col-12 col-lg-9 p-2">
-        <div class="row align-content-start">
-            <ContextHelpTitle Title="Enrol Participants" HelpTopic="Enrol-Participants.html" />
-        </div>
-        <div class="mx-2">
-            Register participants in courses and/or activities offered in the selected term.
-        </div>
+                <div class="row align-content-start">
+                    <ContextHelpTitle Title="Enrol Participants" HelpTopic="Enrol-Participants.html" />
+                </div>
+                <div class="mx-2">
+                    Register participants in courses and/or activities offered in the selected term.
+                </div>
                 <DxFormLayoutGroup Caption="Enrolment Details"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
                                    ExpandedChanged="@(async () => await fullScreen.RefreshLayout())"
                                    Expanded="true">
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
-                                <TermsComboBox Terms="@terms" 
-                                    @bind-SelectedTerm="@selectedTerm"
-                                    @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm))/>
+                        <TermsComboBox Terms="@terms"
+                                       @bind-SelectedTerm="@selectedTerm"
+                                       @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Course To Enrol" ColSpanMd="12">
                         <DxComboBox Data="@courses"
@@ -132,7 +132,7 @@ else
                                         @{
                                             var enrolment = (Enrolment)context.EditModel;
                                         }
-                                    <PersonsComboBox People="@Persons" @bind-SelectedPerson="@enrolment.Person" />
+                                        <PersonsComboBox People="@Persons" @bind-SelectedPerson="@enrolment.Person" />
                                     </CellEditTemplate>
                                 </DxGridDataColumn>
                                 <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />
@@ -493,7 +493,10 @@ else
         feesDue = new();
         foreach (var e in Enrolments)
         {
-            feesDue.Add(e.PersonID,await service.CalculateFeeAsync(dbc, e.Person, currentTerm));
+            if (!feesDue.ContainsKey(e.PersonID))
+            {
+                feesDue.Add(e.PersonID, await service.CalculateFeeAsync(dbc, e.Person, currentTerm));
+            }
         }
         await InvokeAsync(StateHasChanged);
     }
