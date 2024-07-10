@@ -164,6 +164,7 @@ namespace U3A.BusinessRules
             var TotalClassesInReportingPeriod = classes.Count();
             foreach (var c in classes)
             {
+                AssignClassTerm(c, terms, term);
                 AssignClassContacts(c, term, settings);
                 AssignClassCounts(term, c);
             }
@@ -192,6 +193,18 @@ namespace U3A.BusinessRules
             return (same, diff);
         }
 
+        private static void AssignClassTerm(Class c, IEnumerable<Term> terms, Term term)
+        {
+            c.TermNumber = GetRequiredTerm(term.TermNumber, c);
+            Parallel.ForEach(c.Course.Enrolments, e =>
+            {
+                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
+            });
+            Parallel.ForEach(c.Enrolments, e =>
+            {
+                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
+            });
+        }
         static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes)
         {
             foreach (var c in classes)
