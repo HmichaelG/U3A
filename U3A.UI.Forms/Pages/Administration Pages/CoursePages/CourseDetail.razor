@@ -4,14 +4,17 @@
 
 <MessageBox @ref="@messageBox" />
 
-<DxFormLayout Data="@Course">
+<DxFormLayout Data="@Course" CssClass="w-100 p-1">
 
-    <DxFormLayoutItem ColSpanMd="12">
-        <ValidationSummary />
-    </DxFormLayoutItem>
+    @if (!IsReadOnly)
+    {
+        <DxFormLayoutItem ColSpanMd="12">
+            <ValidationSummary />
+        </DxFormLayoutItem>
+    }
 
-    <DxTabs @ref=@TabPages style="width:100%;"
-        CssClass="page-height" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
+    <DxTabs @ref=@TabPages
+            CssClass="page-height w-100" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
         <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>
             <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
                              Settings=@Settings CourseEditView="@CourseEditViewType.Simplified"
@@ -40,6 +43,7 @@
 
         <DxTabPage Text="Detail View">
             <FrmCourseDetail @ref="@frmCourseDetail" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+                             IsReadOnly="@IsReadOnly"
                              Settings=@Settings
                              Course="Course"
                              Persons="@Persons" CourseTypes="@CourseTypes"
@@ -54,8 +58,8 @@
 
         <DxTabPage Text="Description">
             <DxFormLayoutItem ColSpanMd="12">
-                <HtmlEditor @bind-Markup="@Course.Description" 
-                        Height="30rem" Width="100%" />
+                <HtmlEditor @bind-Markup="@Course.Description"
+                            Height="30rem" Width="100%" />
             </DxFormLayoutItem>
         </DxTabPage>
 
@@ -107,13 +111,14 @@
 </style>
 
 @code {
-
+    [Parameter]
+    public bool IsReadOnly { get; set; }
     [Parameter]
     public bool AnyEnrolmentsInYear { get; set; }
     [Parameter]
     public Course Course { get; set; }
     [Parameter]
-    public IEnumerable<CourseParticipationType> CourseParticipationTypes { get; set; }
+    public List<CourseParticipationType> CourseParticipationTypes { get; set; }
     [Parameter]
     public List<Occurrence>? Occurrences { get; set; }
     [Parameter]
@@ -178,7 +183,7 @@
             default:
                 break;
         }
-        if (CourseViewType != CourseEditViewType.Settings && 
+        if (CourseViewType != CourseEditViewType.Settings &&
             CourseViewType != CourseEditViewType.Description) { Course.EditType = CourseViewType; }
     }
 

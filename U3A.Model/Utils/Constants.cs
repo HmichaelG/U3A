@@ -16,6 +16,7 @@ namespace U3A.Model
         public const string STD_DATE_FORMAT = "ddd dd-MMM-yyy";
         public const string FULL_DAY_DATE_FORMAT = "dddd, dd MMM yyy";
         public const string STD_DATETIME_FORMAT = "ddd dd-MMM-yyy hh:mm tt";
+        public const string STD_TIME_FORMAT = "hh:mm tt";
         public const string STD_DATE_MONTH_ONLY_FORMAT = "ddd dd-MMM";
         public const string SHORT_DATE_FORMAT = "dd-MMM-yyy";
         public const string SHORT_DAY_AND_TIME_FORMAT = "ddd dd MMM, hh:mm tt";

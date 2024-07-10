@@ -15,15 +15,14 @@
     </DxFormLayoutItem>
     <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
         <DxComboBox Data="CourseTypes"
-                    @bind-Value="Course.CourseType"
+                    @bind-Value="@Course.CourseType"
                     TextFieldName="@nameof(CourseType.NameWithStatus)">
         </DxComboBox>
     </DxFormLayoutItem>
     <DxFormLayoutItem Caption="Participation Type" ColSpanMd="8">
         <DxComboBox Data="CourseParticipationTypes"
-                    Value="Course.CourseParticipationType"
-                    ValueChanged="@((CourseParticipationType type) => OnCourseParticipationTypeChange(type))"
-                    ValueExpression="@(() => Course.CourseParticipationType)"
+                    @bind-Value="Course.CourseParticipationType"
+                    @bind-Value:after="@(() => OnCourseParticipationTypeChange(Course.CourseParticipationType))"
                     TextFieldName="@nameof(CourseParticipationType.Name)">
         </DxComboBox>
     </DxFormLayoutItem>
@@ -38,7 +37,7 @@
         <DxTextBox @bind-Text="Course.AdditionalInformationURL"
                    NullText="A fully qualified URL: https://example.com.au. Keep it short, use TinyURL." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
     </DxFormLayoutItem>
-    
+
     <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
         <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="3">
             <DxMaskedInput @bind-Value="Course.Duration"
@@ -56,7 +55,7 @@
             <DxCheckBox @bind-Checked="Course.AllowAutoEnrol" />
         </DxFormLayoutItem>
     </DxFormLayoutGroup>
-    
+
     <DxFormLayoutGroup Caption="Course Fee" ColSpanMd="6">
         <DxFormLayoutItem Caption="Course Fee" ColSpanMd="12">
             <DxMaskedInput @bind-Value="Course.CourseFeePerYear" Mask="@NumericMask.Currency" />
@@ -88,13 +87,14 @@
 </DxFormLayout>
 
 @code {
-
+    [Parameter]
+    public bool IsReadOnly { get; set; }
     [Parameter]
     public bool AnyEnrolmentsInYear { get; set; }
     [Parameter]
     public Course Course { get; set; }
     [Parameter]
-    public IEnumerable<CourseParticipationType> CourseParticipationTypes { get; set; }
+    public List<CourseParticipationType> CourseParticipationTypes { get; set; }
     [Parameter]
     public IEnumerable<Person> Persons { get; set; }
     [Parameter]
@@ -133,7 +133,7 @@
         if (AnyEnrolmentsInYear)
         {
             if (await messageBox.ShowAsync("Participation Type is changing",
-                        @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
+                                    @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
                    have already been assigned to it in the current year.</p>
                    <p>If you continue, all enrolments will be assigned to the first class in the course.
                     You will be responsible for transfering enrolemnts between classes, if necessary.</p>

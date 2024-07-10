@@ -25,6 +25,20 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
+        public static async Task<List<Class>> SelectableClassesInYearAsync(U3ADbContext dbc, int Year)
+        {
+            return await dbc.Class.AsNoTracking()
+                            .Include(x => x.OnDay)
+                            .Include(x => x.Course).ThenInclude(x => x.CourseType)
+                            .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
+                            .Include(x => x.Leader)
+                            .Include(x => x.Leader2)
+                            .Include(x => x.Leader3)
+                            .Include(x => x.Occurrence)
+                            .Include(x => x.Venue)
+                            .Where(x => x.Course.Year == Year)
+                            .OrderBy(x => x.Course.Name).ThenBy(x => x.StartTime).ToListAsync();
+        }
         public static async Task<List<Class>> SelectableClassesAsync(U3ADbContext dbc, Term term)
         {
             return dbc.Class.AsNoTracking()

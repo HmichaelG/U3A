@@ -1,0 +1,181 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxWindow @ref=@viewWindow Width="65rem"
+              Visible=@(selectedCourse != null)
+              HorizontalAlignment="HorizontalAlignment.Center"
+              VerticalAlignment="VerticalAlignment.Center"
+              AllowResize="true"
+              Context="ViewContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              HeaderText="View Course Detail">
+        <BodyTextTemplate>
+            <CourseDetail @ref="@courseDetail"
+                          IsReadOnly="true"
+                          AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+                          Settings=@Settings
+                          Course=@selectedCourse
+                          Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
+                          Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
+                          CourseParticipationTypes="@CourseParticipationTypes" />
+        </BodyTextTemplate>
+        <FooterTemplate>
+            <div class="d-flex p-2">
+                <div class="flex-grow-1" />
+                <DxButton CssClass="flex-grow-0" Text="OK (Read Only)" RenderStyle="@ButtonRenderStyle.Primary" Click="@OnClose" />
+            </div>
+        </FooterTemplate>
+    </DxWindow>
+
+    <FullScreen DisplayOffset="9">
+        <ContentTemplate>
+            <DxGrid Data="@classes" @ref=@mainGrid ColumnResizeMode="GridColumnResizeMode.NextColumn">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridCommandColumn Caption="Details"
+                                         Width="4rem" FixedPosition="GridColumnFixedPosition.Left"
+                                         CancelButtonVisible="false"
+                                         NewButtonVisible="false"
+                                         DeleteButtonVisible="false">
+                        <CellDisplayTemplate>
+                            <a class="bi bi-search" @onclick="@(() => OnStartEditRowAsync(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                        </CellDisplayTemplate>
+                    </DxGridCommandColumn>
+                    <DxGridBandColumn Caption="Course">
+                        <Columns>
+                            <DxGridDataColumn Caption="Name" FieldName="Course.Name" FixedPosition="GridColumnFixedPosition.Left" />
+                            <DxGridDataColumn Caption="Year" FieldName="Course.Year" Width="3rem" DisplayFormat="####" />
+                            <DxGridDataColumn Caption="Type" FieldName="Course.CourseType.Name" Visible="false" />
+                        </Columns>
+                    </DxGridBandColumn>
+                    <DxGridBandColumn Caption="Offered">
+                        <Columns>
+                            <DxGridDataColumn Caption="T1" FieldName="OfferedTerm1" Width="1rem" />
+                            <DxGridDataColumn Caption="T2" FieldName="OfferedTerm2" Width="1rem" />
+                            <DxGridDataColumn Caption="T3" FieldName="OfferedTerm3" Width="1rem" />
+                            <DxGridDataColumn Caption="T4" FieldName="OfferedTerm4" Width="1rem" />
+                        </Columns>
+                    </DxGridBandColumn>
+                    <DxGridBandColumn Caption="Schedule">
+                        <Columns>
+                            <DxGridDataColumn Caption="Start" FieldName="StartDate" Width="7rem">
+                                <EditSettings>
+                                    <DxDateEditSettings NullText="Term Start" DisplayFormat="@constants.SHORT_DATE_FORMAT" />
+                                </EditSettings>
+                            </DxGridDataColumn>
+                            <DxGridDataColumn Caption="On Day" FieldName="OnDayID" Width="2rem" SortMode="GridColumnSortMode.Value">
+                                <EditSettings>
+                                    <DxComboBoxSettings Data="WeekDays"
+                                                        ValueFieldName="ID"
+                                                        TextFieldName="Day" />
+                                </EditSettings>
+                            </DxGridDataColumn>
+                            <DxGridDataColumn Caption="Time" FieldName="StartTime" Width="1rem" DisplayFormat="@constants.STD_TIME_FORMAT" />
+                            <DxGridDataColumn Caption="Till" FieldName="EndTime" Width="1rem" DisplayFormat="@constants.STD_TIME_FORMAT" />
+                            <DxGridDataColumn Caption="Occurs" FieldName="Occurrence.Name" Width="8rem" DisplayFormat="@constants.STD_TIME_FORMAT" />
+                            <DxGridDataColumn Caption="Recurs" FieldName="Recurrence" Width="1rem">
+                                <EditSettings>
+                                    <DxSpinEditSettings NullText="Term End" />
+                                </EditSettings>
+                            </DxGridDataColumn>
+                        </Columns>
+                    </DxGridBandColumn>
+                    <DxGridBandColumn Caption="Venue">
+                        <Columns>
+                            <DxGridDataColumn Caption="Name" FieldName="Venue.Name" />
+                            <DxGridDataColumn Caption="Address" FieldName="Venue.Address" Visible="false" />
+                        </Columns>
+                    </DxGridBandColumn>
+                    <DxGridBandColumn Caption="Leader Details">
+                        <Columns>
+                            <DxGridDataColumn Caption="Guest" FieldName="GuestLeader" Visible="false" />
+                            <DxGridDataColumn Caption="Leader1" FieldName="Leader.FullName" />
+                            <DxGridDataColumn Caption="Leader2" FieldName="Leader2.FullName" Visible="false" />
+                            <DxGridDataColumn Caption="Leader3" FieldName="Leader3.FullName" Visible="false" />
+                        </Columns>
+                    </DxGridBandColumn>
+                </Columns>
+                <GroupSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                       FieldName="ID" DisplayText="{0:n0}  Classes"
+                                       FooterColumnName="Course.Name" />
+                </GroupSummary>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                       FieldName="ID" DisplayText="{0:n0}  Classes"
+                                       FooterColumnName="Course.Name" />
+                </TotalSummary>
+
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
+}
+
+@code {
+    [Parameter] public int Year { get; set; }
+
+    [Parameter]
+    public bool AnyEnrolmentsInYear { get; set; }
+    [Parameter]
+    public List<CourseParticipationType> CourseParticipationTypes { get; set; }
+    [Parameter]
+    public List<Occurrence>? Occurrences { get; set; }
+    [Parameter]
+    public IEnumerable<Person> Persons { get; set; }
+    [Parameter]
+    public IList<CourseType> CourseTypes { get; set; }
+    [Parameter]
+    public IEnumerable<Venue> Venues { get; set; }
+    [Parameter]
+    public IEnumerable<WeekDay> WeekDays { get; set; }
+    [Parameter]
+    public U3ADbContext? DbContext { get; set; }
+    [Parameter]
+    public SystemSettings Settings { get; set; }
+
+    IEnumerable<Class> classes;
+    CourseDetail? courseDetail;
+    Course selectedCourse;
+    U3ADbContext? dbc;
+    DxWindow? viewWindow;
+
+    DxGrid? mainGrid;
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            classes = await BusinessRule.SelectableClassesInYearAsync(dbc, Year);
+        }
+        isReady = true;
+        await base.OnInitializedAsync();
+    }
+
+    async Task OnStartEditRowAsync(object dataItem)
+    {
+        if (dataItem is Class)
+        {
+            using (dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                selectedCourse = (dataItem as Class).Course;
+            }
+        }
+    }
+
+    async Task OnClose()
+    {
+        await viewWindow.CloseAsync();
+        selectedCourse = null;
+    }
+}
