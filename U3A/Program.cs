@@ -79,6 +79,8 @@ Log.Logger = new LoggerConfiguration()
                             )
     .CreateLogger();
 
+builder.Services.AddScoped<LocalTime>();
+
 //.Services.AddSerilog();
 builder.Host.UseSerilog(Log.Logger);
 

@@ -13,6 +13,7 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
+@inject LocalTime lt
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
                     @bind-IsActive="@IsXtraSmallLayout" />
@@ -180,7 +181,7 @@ else
                                         <div class="w-50">@context.ToString()</div>
                                     }
                                     Oops! Something went wrong. An unexpected error has occurred.<br />
-                                    When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(TimezoneAdjustment.GetLocalTime()) Local ).
+                                    When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(lt.GetLocalTimeAsync()) Local ).
                                     <button class="btn btn-warning" @onclick="ResetError">Reset</button>
                                 </p>
 
@@ -256,7 +257,7 @@ else
                 using (var dbc = await U3Adbfactory.CreateDbContextAsync())
                 {
                     // no ernolment term in force
-                    var localTime = TimezoneAdjustment.GetLocalTime();
+                    var localTime = await lt.GetLocalTimeAsync();
                     var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc, localTime);
                     if (currentTerm == null)
                     {
@@ -278,7 +279,7 @@ else
                         }
                     }
                     // Enrolment day lockout
-                    var openingTime = await BusinessRule.IsEnrolmentDayLockoutPeriod(dbc, TimezoneAdjustment.GetLocalTime().Date);
+                    var openingTime = await BusinessRule.IsEnrolmentDayLockoutPeriod(dbc, await lt.GetLocalDateAsync());
                     if (openingTime != null)
                     {
                         isBeforeEnrolmentDay = true;

@@ -10,6 +10,7 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject LocalTime lt
 
 <div class="page overflow-auto">
     <DxGridLayout CssClass="page-layout">
@@ -49,7 +50,7 @@
                                     <div class="w-50">@context.ToString()</div>
                                 }
                                 Oops! Something went wrong. An unexpected error has occurred.<br />
-                                When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(TimezoneAdjustment.GetLocalTime()) Local ).
+                                When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(lt.GetLocalTimeAsync()) Local ).
                                 <button class="btn btn-warning" @onclick="ResetError">Reset</button>
                             </p>
                         </ErrorContent>

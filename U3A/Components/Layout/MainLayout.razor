@@ -139,14 +139,13 @@
     {
         if (firstRender)
         {
-            bool DoStateChange = false;
 
             //Set timeout
             dotNetObjectReference = DotNetObjectReference.Create(this);
             await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
             // Timezone adjustment
-            var lt = new LocalTime(js);
-            TimezoneAdjustment.TimezoneOffset = await lt.GetTimezoneOffsetAsync();
+            // var lt = new LocalTime(js);
+            // TimezoneAdjustment.TimezoneOffset = await lt.GetTimezoneOffsetAsync();
             // Set the workstation ID
             await Workstation.SetWorkstationDetail(js, localStorage);
             useTopMenu = Workstation.UseTopMenu;

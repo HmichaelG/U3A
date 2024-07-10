@@ -18,13 +18,6 @@ namespace U3A.Model
         }
         public DateTime? UpdatedOn { get; set; }
 
-        public DateTime? LocalUpdateOn
-        {
-            get
-            {
-                return (CreatedOn != null) ? TimezoneAdjustment.GetLocalTime(CreatedOn.Value) : null;
-            }
-        }
         public string? User { get; set; }
 
     }

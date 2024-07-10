@@ -28,13 +28,16 @@ namespace U3A.Database
         [ActivatorUtilitiesConstructor] // force DI to use this constructor
         public U3ADbContext(AuthenticationStateProvider? AuthStateProvider,
                     IDbContextFactory<TenantDbContext> TenantDbFactory = default,
-                    IHttpContextAccessor HttpContextAccessor = default)
+                    IHttpContextAccessor HttpContextAccessor = default,
+                    LocalTime localTime = null)
         {
             if (AuthStateProvider != null) authenticationStateProvider = AuthStateProvider;
             _httpContextAccessor = HttpContextAccessor;
             _TenantDbFactory = TenantDbFactory;
             GetTenantInfo();
+            this.UtcOffset = localTime.UtcOffset;
         }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             GetTenantInfo();
@@ -45,7 +48,7 @@ namespace U3A.Database
 
         private void GetTenantInfo()
         {
-            if (useCachedTenentInfo) { return;  }
+            if (useCachedTenentInfo) { return; }
             HostStrategy hs = new HostStrategy();
 
             var identifirer = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);

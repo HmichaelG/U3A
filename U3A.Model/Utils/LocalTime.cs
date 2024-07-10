@@ -5,44 +5,59 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace U3A.Services
+namespace U3A.Model
 {
     public class LocalTime
     {
         private IJSRuntime jsRuntime;
-        private TimeSpan? userTime;
-
+        private TimeSpan? _utcOfffset;
+        
+        public TimeSpan UtcOffset
+        {
+            get
+            {
+                return (_utcOfffset == null) ? TimeSpan.Zero : _utcOfffset.Value;
+            }
+            set
+            {
+                _utcOfffset = value;
+            }
+        }
         public LocalTime(IJSRuntime js)
         {
             jsRuntime = js;
         }
+        public LocalTime(TimeSpan UTCOffset)
+        {
+            this.UtcOffset = UTCOffset;
+        }
 
         public async Task<TimeSpan> GetTimezoneOffsetAsync()
         {
-            if (userTime == null)
+            if (_utcOfffset == null)
             {
                 int timeDiffer = await jsRuntime.InvokeAsync<int>("eval", "(function(){try { return new Date().getTimezoneOffset(); } catch(e) {} return 0;}())");
-                userTime = TimeSpan.FromMinutes(-timeDiffer);
+                _utcOfffset = TimeSpan.FromMinutes(-timeDiffer);
             }
-            return userTime.Value;
+            return _utcOfffset.Value;
         }
         public async Task<DateTime> GetLocalTimeAsync()
         {
-            if (userTime == null) { _= await GetTimezoneOffsetAsync(); }
+            if (_utcOfffset == null) { _= await GetTimezoneOffsetAsync(); }
             // Converting to local time using UTC and local time minute difference.
-            return DateTimeOffset.UtcNow.ToOffset(userTime.Value).DateTime;
+            return DateTimeOffset.UtcNow.ToOffset(_utcOfffset.Value).DateTime;
         }
         public async Task<DateTime> GetLocalDateAsync()
         {
-            if (userTime == null) { _ = await GetTimezoneOffsetAsync(); }
+            if (_utcOfffset == null) { _ = await GetTimezoneOffsetAsync(); }
             // Converting to local time using UTC and local time minute difference.
-            return DateTimeOffset.UtcNow.ToOffset(userTime.Value).Date;
+            return DateTimeOffset.UtcNow.ToOffset(_utcOfffset.Value).Date;
         }
         public async Task<DateTime> GetLocalTimeAsync(DateTime UTCTime)
         {
-            if (userTime == null) { _ = await GetTimezoneOffsetAsync(); }
+            if (_utcOfffset == null) { _ = await GetTimezoneOffsetAsync(); }
             // Converting to local time using UTC and local time minute difference.
-            return UTCTime.Add(userTime.Value);
+            return UTCTime.Add(_utcOfffset.Value);
         }
     }
 }

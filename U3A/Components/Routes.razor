@@ -1,4 +1,8 @@
-﻿@using U3A.Components.Account.Shared
+﻿@using U3A.Model
+@using U3A.Components.Account.Shared
+
+@inject LocalTime localTime
+
 <CascadingAuthenticationState>
 <Router AppAssembly="@typeof(Program).Assembly"
             AdditionalAssemblies="new[] {typeof(U3A.UI.Common.About).Assembly,
@@ -15,3 +19,14 @@
 </Router>
 </CascadingAuthenticationState>
 
+@code{
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            TimezoneAdjustment.TimezoneOffset = await localTime.GetTimezoneOffsetAsync();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+}

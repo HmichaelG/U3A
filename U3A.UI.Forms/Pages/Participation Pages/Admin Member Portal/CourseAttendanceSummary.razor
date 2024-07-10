@@ -181,7 +181,7 @@
     {
         await progress.ShowSmallSpinnerAsync();
         mainGrid.BeginUpdate();
-        var localTime = new U3A.Services.LocalTime(js);
+        var localTime = new LocalTime(js);
         now = await localTime.GetLocalTimeAsync();
         termSummary = await BusinessRule.GetClassAttendanceSummaryByCourse(dbc, SelectedTerm, now);
         classSummary = await BusinessRule.GetAttendanceRecordedAsync(dbc, SelectedTerm, now);

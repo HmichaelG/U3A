@@ -14,7 +14,7 @@ namespace U3A.Database
         //Set in U3ADbContext ctor
         internal AuthenticationStateProvider authenticationStateProvider;
         public TenantInfo TenantInfo { get; set; }
-
+        public TimeSpan UtcOffset { get; set; } = TimeSpan.Zero;
 
         public DbSet<SystemSettings> SystemSettings { get; set; }
         public DbSet<PublicHoliday> PublicHoliday { get; set; }

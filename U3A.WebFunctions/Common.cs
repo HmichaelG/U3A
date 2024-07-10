@@ -87,7 +87,15 @@ namespace U3A.WebFunctions
                                 .OrderBy(x => x.ID)
                                 .FirstOrDefaultAsync();
             TimezoneAdjustment.TimezoneOffset = settings!.UTCOffset;
-            return DateTime.UtcNow+settings.UTCOffset;
+            return DateTime.UtcNow + settings.UTCOffset;
+        }
+        public static async Task<TimeSpan> GetUtcOffsetAsync(U3ADbContext dbc)
+        {
+            // Get system settings
+            var settings = await dbc.SystemSettings
+                                .OrderBy(x => x.ID)
+                                .FirstOrDefaultAsync();
+            return settings!.UTCOffset;
         }
 
     }
