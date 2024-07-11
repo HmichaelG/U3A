@@ -166,10 +166,7 @@ else
     {
         if (dataItem is Class)
         {
-            using (dbc = await U3Adbfactory.CreateDbContextAsync())
-            {
                 selectedCourse = (dataItem as Class).Course;
-            }
         }
     }
 
