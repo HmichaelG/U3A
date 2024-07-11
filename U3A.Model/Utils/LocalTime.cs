@@ -36,8 +36,12 @@ namespace U3A.Model
         {
             if (_utcOfffset == null)
             {
-                int timeDiffer = await jsRuntime.InvokeAsync<int>("eval", "(function(){try { return new Date().getTimezoneOffset(); } catch(e) {} return 0;}())");
-                _utcOfffset = TimeSpan.FromMinutes(-timeDiffer);
+                try
+                {
+                    int timeDiffer = await jsRuntime.InvokeAsync<int>("eval", "(function(){try { return new Date().getTimezoneOffset(); } catch(e) {} return 0;}())");
+                    _utcOfffset = TimeSpan.FromMinutes(-timeDiffer);
+                }
+                catch { _utcOfffset = TimeSpan.Zero; }
             }
             return _utcOfffset.Value;
         }

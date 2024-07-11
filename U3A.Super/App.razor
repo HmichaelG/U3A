@@ -23,7 +23,7 @@
         if (firstRender)
         {
             var lt = new LocalTime(js);
-            TimezoneAdjustment.TimezoneOffset = await lt.GetTimezoneOffsetAsync();
+            _ = await lt.GetTimezoneOffsetAsync();
         }
     }
 }

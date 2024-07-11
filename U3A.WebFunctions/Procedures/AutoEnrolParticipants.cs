@@ -14,6 +14,7 @@ namespace U3A.WebFunctions.Procedures
         {
             using (var dbc = new U3ADbContext(tenant))
             {
+                dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 var settings = await dbc.SystemSettings
                                     .OrderBy(x => x.ID)
                                     .FirstOrDefaultAsync();

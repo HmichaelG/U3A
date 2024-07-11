@@ -81,7 +81,7 @@
                     || EditModel.OfferedTerm4 != original.OfferedTerm4
             ))
         {
-            var today = TimezoneAdjustment.GetLocalTime().Date.ToString(constants.STD_DATETIME_FORMAT);
+            var today = DbContext.GetLocalTime().Date.ToString(constants.STD_DATETIME_FORMAT);
             msg = $@"<p>Changing the class schedule will cause
                         any <strong>future</strong> attendance records for this class to be deleted
                         and re-created with the new schedule details. Records previous to today ({today}) will remain as is.</p>

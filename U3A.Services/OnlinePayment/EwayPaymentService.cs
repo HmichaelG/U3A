@@ -159,7 +159,7 @@ namespace U3A.Services
                 }
                 result = new PaymentResult()
                 {
-                    Date = paymentStatus.LocalCreatedOn.Value,
+                    Date = dbc.GetLocalDate(paymentStatus.CreatedOn.Value),
                     TermsPaid = paymentStatus.TermsPaid,
                     AccessCode = eWayResponse.AccessCode,
                     AuthorizationCode = eWayResponse.AuthorisationCode,

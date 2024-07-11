@@ -111,7 +111,7 @@ namespace U3A.BusinessRules
 
             // and everybody else
             await FixEnrolmentTerm(dbc, SelectedTerm);
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
             AutoEnrolments = new List<string>();
             List<Enrolment> enrolmentsToProcess;
             List<Person> CourseLeaders;

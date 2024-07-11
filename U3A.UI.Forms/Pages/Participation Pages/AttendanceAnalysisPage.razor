@@ -59,7 +59,7 @@
     bool isPopupVisible = true;
     U3ADbContext dbc;
 
-    int ReportForYear = TimezoneAdjustment.GetLocalTime().Year;
+    int ReportForYear;
     int MinimumMonthsToReport = 0;
     IEnumerable<Course> Courses;
     IEnumerable<CourseType> CourseTypes;
@@ -69,6 +69,7 @@
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        ReportForYear = dbc.GetLocalTime().Year;
         CourseTypes = await BusinessRule.SelectableCourseTypesAsync(dbc);
         await OnReportForYearChanged(ReportForYear);
         await base.OnInitializedAsync();

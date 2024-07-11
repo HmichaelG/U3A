@@ -20,6 +20,7 @@ namespace U3A.WebFunctions.Procedures
             IList<SendMail> mailItems;
             using (var dbc = new U3ADbContext(tenant))
             {
+                dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 using (var dbcT = new TenantDbContext(tenantConnectionString))
                 {
                     List<(Guid, Guid, Guid?)> onFile = new();

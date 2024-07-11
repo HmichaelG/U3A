@@ -131,7 +131,7 @@
     async Task GetData()
     {
         await progress.ShowSmallSpinnerAsync();
-        var now = TimezoneAdjustment.GetLocalTime();
+        var now = dbc.GetLocalTime();
         attendance = await BusinessRule.GetAttendanceAsync(dbc, SelectedTerm, now);
         RefreshData();
         await progress.Close();

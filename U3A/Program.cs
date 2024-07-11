@@ -29,6 +29,7 @@ using System.Data.SqlClient;
 using System.Collections.ObjectModel;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<LocalTime>();
 
 //if (!builder.Environment.IsDevelopment())
 //{
@@ -78,8 +79,6 @@ Log.Logger = new LoggerConfiguration()
                                 columnOptions: columnOptions
                             )
     .CreateLogger();
-
-builder.Services.AddScoped<LocalTime>();
 
 //.Services.AddSerilog();
 builder.Host.UseSerilog(Log.Logger);

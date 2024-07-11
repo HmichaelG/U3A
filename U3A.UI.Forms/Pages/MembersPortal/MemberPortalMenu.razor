@@ -313,12 +313,14 @@ else
     string? SuccessMsg = null;
     Progress? progress;
     private string? currentUrl;
+    DateTime localTime;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
+            localTime = dbc.GetLocalTime();
             settings = await dbc.SystemSettings.AsNoTracking().OrderBy(x => x.ID).FirstOrDefaultAsync();
         }
         await SetupTitle();
@@ -346,7 +348,7 @@ else
                 person = await dbc.Person.FindAsync(loginState.SelectedPerson.ID);
                 nextTerm = await BusinessRule.GetNextTermAsync(dbc, CurrentTerm);
                 //Special case: enrolment day
-                openingTime = await BusinessRule.IsEnrolmentDayLockoutPeriod(dbc, TimezoneAdjustment.GetLocalTime().Date);
+                openingTime = await BusinessRule.IsEnrolmentDayLockoutPeriod(dbc, dbc.GetLocalTime().Date);
             }
             var welcome = $"Welcome <strong>{person.FullName}</strong>";
             if (person.IsLifeMember)
@@ -373,7 +375,7 @@ else
         //
         if (CurrentTerm != null)
         {
-            if (TimezoneAdjustment.GetLocalTime().Date > CurrentTerm.EndDate)
+            if (localTime.Date > CurrentTerm.EndDate)
             {
                 if (nextTerm != null)
                 {
@@ -403,7 +405,7 @@ else
         {
             settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             classText = null;
-            var classesToday = await BusinessRule.GetMemberClassesToday(dbc, loginState.SelectedPerson, TimezoneAdjustment.GetLocalTime().Date);
+            var classesToday = await BusinessRule.GetMemberClassesToday(dbc, loginState.SelectedPerson, localTime.Date);
             if (classesToday?.Count > 0)
             {
                 var txt = new System.Text.StringBuilder();
@@ -443,7 +445,7 @@ else
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
     {
         if (selection == PortalMenuSelection.PrintMemberBadge &&
-            loginState.SelectedPerson.FinancialTo < TimezoneAdjustment.GetLocalTime().Date.Year)
+            loginState.SelectedPerson.FinancialTo < localTime.Year)
         {
             await messageBox.ShowOkOnlyAsync("Financial Members Only", "You must be a financial member to select this option.");
         }

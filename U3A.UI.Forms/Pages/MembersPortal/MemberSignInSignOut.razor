@@ -130,8 +130,7 @@
 
     U3ADbContext dbc { get; set; }
     MessageBox? messageBox;
-    LocalTime? locaTime;
-    DateTime now = TimezoneAdjustment.GetLocalTime();
+    DateTime now;
 
     List<SignInOrOut>? signInDetails;
     SignInOrOut selectedSignIn;
@@ -145,15 +144,15 @@
 
     protected override async Task OnInitializedAsync() {
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        now = dbc.GetLocalTime();
     }
 
     protected override async void OnAfterRender(bool firstRender) {
         base.OnAfterRender(firstRender);
         if (firstRender) {
-            localTime = new LocalTime(js);
             SetClock(null);
             selectedPerson = loginState.SelectedPerson;
-            var dateNow = await localTime.GetLocalTimeAsync();
+            var dateNow = dbc.GetLocalTime();
             signInDetails = await BusinessRule.GetClassesToSignInAsync(dbc, loginState.SelectedPerson, dateNow);
             if (signInDetails != null && signInDetails.Count > 0) {
                 selectedSignIn = signInDetails[0];
@@ -166,7 +165,7 @@
     }
 
     private async void SetClock(object stateInfo) {
-        now = await localTime.GetLocalTimeAsync();
+        now = dbc.GetLocalTime();
         InvokeAsync(StateHasChanged);
     }
 

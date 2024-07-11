@@ -589,6 +589,7 @@ else
         activeTabIndex = 0;
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
+            today = dbc.GetLocalTime().Date;
             using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
             {
                 // wire up the data
@@ -604,7 +605,7 @@ else
                 if (term == null)
                 {
                     var currentTerm = BusinessRule.CurrentTerm(dbc);
-                    if (TimezoneAdjustment.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
+                    if (dbc.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
                     {
                         SetUnavialable(currentTerm);
                     }
@@ -680,7 +681,6 @@ else
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            today = TimezoneAdjustment.GetLocalTime().Date;
             filterText = null;
             if (IsEnrolmentRequestView && isNotInEnrolmentPeriod && (term == null || Classes == null))
             {
@@ -848,7 +848,7 @@ else
         string status;
         Enrolment? e = c.IsSelectedByEnrolment;
         // Enrolled in class - display the status
-        status = BusinessRule.GetMemberPortalEnrolmentStatus(c, e, term, settings);
+        status = BusinessRule.GetMemberPortalEnrolmentStatus(c, e, term, settings,today);
         classEndDate = term.EndDate;
         if (c.TermNumber != term.TermNumber)
         {

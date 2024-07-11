@@ -18,7 +18,7 @@ namespace U3A.UI.Reports
         public LeaderReport()
         {
             InitializeComponent();
-            prmFromDate.Value = TimezoneAdjustment.GetLocalTime().Date.AddDays(-7);
+            prmFromDate.Value = DateTime.UtcNow.Date.AddDays(-7);
         }
 
     }

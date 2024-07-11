@@ -477,7 +477,7 @@ else
         base.OnAfterRender(firstRender);
         if (!firstRender)
         {
-            now = TimezoneAdjustment.GetLocalTime();
+            now = dbc.GetLocalTime();
             if (SelectedTerm == null)
             {
                 await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");

@@ -158,14 +158,14 @@ else
             await base.OnInitializedAsync();
     }
 
-    async void OnStartDateChanged(DateTime newStartDate) => StartDate = TimezoneAdjustment.GetLocalTime(newStartDate).Date;
+    async void OnStartDateChanged(DateTime newStartDate) => StartDate = dbc.GetLocalTime(newStartDate).Date;
 
     async void OnViewTypeChanged(SchedulerViewType v) => viewType = v;
 
     async Task SelectedTermChanged(Term term)
     {
         selectedTerm = term;
-        var now = TimezoneAdjustment.GetLocalTime().Date;
+        var now = dbc.GetLocalTime().Date;
         if (now > term.StartDate && now <= term.EndDate)
         {
             StartDate = now;

@@ -27,7 +27,7 @@ namespace U3A.UI.Reports
         private void AttendanceAnalysis_DataSourceDemanded(object sender, EventArgs e)
         {
             int year = (int)prmYear.Value;
-            if (year == 0) { year = TimezoneAdjustment.GetLocalTime().Year; }
+            if (year == 0) { year = DbContext.GetLocalTime().Year; }
             xrChart1.Titles[0].Text = $"{year} Attendance Analysis";
             data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext, year);
             objectDataSource1.DataSource = data;

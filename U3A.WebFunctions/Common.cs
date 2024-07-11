@@ -17,6 +17,7 @@ namespace U3A.WebFunctions
             bool result = false;
             using (var dbc = new U3ADbContext(tenant))
             {
+                dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
                 if (settings != null) { result = settings.DisableBackgroundProcessing; }
             }
@@ -83,11 +84,8 @@ namespace U3A.WebFunctions
         public static async Task<DateTime> GetNowAsync(U3ADbContext dbc)
         {
             // Get system settings
-            var settings = await dbc.SystemSettings
-                                .OrderBy(x => x.ID)
-                                .FirstOrDefaultAsync();
-            TimezoneAdjustment.TimezoneOffset = settings!.UTCOffset;
-            return DateTime.UtcNow + settings.UTCOffset;
+            var utcOffset = await GetUtcOffsetAsync(dbc);   
+            return DateTime.UtcNow + utcOffset;
         }
         public static async Task<TimeSpan> GetUtcOffsetAsync(U3ADbContext dbc)
         {

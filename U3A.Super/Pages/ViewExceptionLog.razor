@@ -6,6 +6,7 @@
 @inject IDbContextFactory<TenantDbContext> tenantDbfactory
 @inject IJSRuntime js
 @inject NavigationManager navMan
+@inject LocalTime lt
 
 <PageTitle>Tenant Summary</PageTitle>
 
@@ -93,7 +94,7 @@
     }
 
     DateTime GetLocalTime(DateTime value) {
-        var result = TimezoneAdjustment.GetLocalTime(value);
+        var result = value + lt.UtcOffset;
         return result;
     }
 

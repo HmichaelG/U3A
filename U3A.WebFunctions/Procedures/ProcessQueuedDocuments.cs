@@ -14,6 +14,7 @@ namespace U3A.WebFunctions.Procedures
         {
             using (var dbc = new U3ADbContext(tenant))
             {
+                dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 var today = await Common.GetTodayAsync(dbc);
                 if (dbc.DocumentQueue.Any(x => x.Status == DocumentQueueStatus.ReadyToSend))
                 {

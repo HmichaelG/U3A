@@ -20,6 +20,7 @@ namespace U3A.WebFunctions.Procedures
 
             using (var dbc = new U3ADbContext(tenant))
             {
+                dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 var msg = await CreateEmailMessage(dbc);
                 if (!string.IsNullOrWhiteSpace(msg))
                 {
@@ -36,10 +37,10 @@ namespace U3A.WebFunctions.Procedures
                     await ProcessEmail(sendEmailAddress,
                                         sendEmailDisplayName,
                                         msg,
-                                        emailSender);
+                                        emailSender!);
                     // send to System Postman CC addresses
                     var validator = new EmailAddressAttribute();
-                    foreach (var address in settings.SystemPostmanCCAddresses.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
+                    foreach (var address in settings!.SystemPostmanCCAddresses.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         sendEmailAddress = address.Trim();
                         if (validator.IsValid(sendEmailAddress))
@@ -47,7 +48,7 @@ namespace U3A.WebFunctions.Procedures
                             await ProcessEmail(sendEmailAddress,
                                                 string.Empty,
                                                 msg,
-                                                emailSender);
+                                                emailSender!);
                         }
                     }
                 }

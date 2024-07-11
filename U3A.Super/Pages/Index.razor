@@ -6,6 +6,7 @@
 @inject IDbContextFactory<TenantDbContext> tenantDbfactory
 @inject IJSRuntime js
 @inject NavigationManager navMan
+@inject LocalTime lt
 
 <PageTitle>Tenant Summary</PageTitle>
 
@@ -99,7 +100,7 @@
                                                   UnboundType=GridUnboundColumnType.Boolean />
                                 <DxGridDataColumn Caption="T1 Enrol Start" FieldName="Term1EnrolStart" DisplayFormat="ddd, dd-MMM-yyyy"
                                                   UnboundType=GridUnboundColumnType.Integer Width="8rem" />
-                                <DxGridDataColumn Caption=@($"Financial To {TimezoneAdjustment.GetLocalTime().Year}") FieldName="FinancialMembers"
+                                <DxGridDataColumn Caption=@($"Financial To {Year}") FieldName="FinancialMembers"
                                                   UnboundType=GridUnboundColumnType.Integer Width="8rem" />
                                 <DxGridDataColumn Caption="Email Sent" FieldName="EmailStatistics" Visible="@showPostmark"
                                                   UnboundType=GridUnboundColumnType.Integer Width="8rem" />
@@ -141,12 +142,10 @@
     DxGrid? grid;
     Dictionary<string, DateTime?> Term1EnrolmentStart { get; set; } = new();
     bool IsReady = false;
+    int Year;
 
     protected override async Task OnInitializedAsync()
     {
-        var today = TimezoneAdjustment.GetLocalTime().Date;
-        startDate = today.AddMonths((-today.Month) + 1).AddDays((-today.Day) + 1);
-        endDate = today.AddDays(-today.Day);
 
         // wire up the data
         using (var dbc = await tenantDbfactory.CreateDbContextAsync())
@@ -176,6 +175,17 @@
             }
         }
         IsReady = true;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var today = (await lt.GetLocalDateAsync());
+            Year = today.Year;
+            startDate = today.AddMonths((-today.Month) + 1).AddDays((-today.Day) + 1);
+            endDate = today.AddDays(-today.Day);
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     void GetUnboundColumnData(GridUnboundColumnDataEventArgs e)

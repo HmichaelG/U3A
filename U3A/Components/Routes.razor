@@ -24,7 +24,7 @@
     {
         if (firstRender)
         {
-            TimezoneAdjustment.TimezoneOffset = await localTime.GetTimezoneOffsetAsync();
+            _ = await localTime.GetTimezoneOffsetAsync();
         }
         await base.OnAfterRenderAsync(firstRender);
     }

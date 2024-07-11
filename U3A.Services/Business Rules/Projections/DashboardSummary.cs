@@ -14,7 +14,7 @@ namespace U3A.BusinessRules
     {
         public static List<ReceiptSummary> GetReceiptSummaryByMonth(U3ADbContext dbc)
         {
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
             var to = today.AddMonths(1).AddDays(-today.Day);
             var start = to.AddMonths(-25).AddDays(1);
             while (start.Day != 1) { start = start.AddDays(1); }
@@ -61,7 +61,7 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<EnrolmentSummary>> GetEnrolmentSummaryByTerm(U3ADbContext dbc, Term term)
         {
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
             var to = today.AddMonths(1).AddDays(-today.Day);
             var start = to.AddMonths(-13).AddDays(1);
             while (start.Day != 1) { start = start.AddDays(1); }
@@ -240,9 +240,9 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        private static int GetAge(DateTime birthDate)
+        private static int GetAge(DateTime birthDate,DateTime LocalTime)
         {
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = LocalTime.Date;
 
             // Calculate the age.
             var age = today.Year - birthDate.Year;
@@ -253,10 +253,10 @@ namespace U3A.BusinessRules
         }
         public static List<MemberSummary> GetMemberSummaryByMshipLength(U3ADbContext dbc, Term term)
         {
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
             var result = dbc.Person
                 .Where(p => p.DateJoined != null && p.FinancialTo >= term.Year).AsEnumerable()
-                .GroupBy(p => GetAge(p.DateJoined.Value))
+                .GroupBy(p => GetAge(p.DateJoined.Value,dbc.GetLocalTime()))
                 .Select(g => new MemberSummary
                 {
                     Year = g.Key,
@@ -268,10 +268,10 @@ namespace U3A.BusinessRules
         }
         public static List<MemberSummary> GetMemberSummaryByDOB(U3ADbContext dbc, Term term)
         {
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
             var result = dbc.Person
                 .Where(p => p.BirthDate != null && p.FinancialTo >= term.Year).AsEnumerable()
-                .GroupBy(p => GetAge(p.BirthDate.Value))
+                .GroupBy(p => GetAge(p.BirthDate.Value,dbc.GetLocalTime()))
                 .Select(g => new MemberSummary
                 {
                     Year = g.Key,
@@ -364,7 +364,7 @@ namespace U3A.BusinessRules
 
         public static async Task<List<MemberSummary>> GetNewMemberSummaryByMonth(U3ADbContext dbc)
         {
-            var today = TimezoneAdjustment.GetLocalTime();
+            var today = dbc.GetLocalTime();
             var endDate = today.AddMonths(1).AddDays(-today.Day);
             var startDate = endDate.AddMonths(-25).AddDays(1);
             while (startDate.Day != 1) { startDate = startDate.AddDays(1); }

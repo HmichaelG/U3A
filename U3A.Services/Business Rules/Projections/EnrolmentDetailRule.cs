@@ -27,7 +27,7 @@ namespace U3A.BusinessRules
             var pt = dbc.CourseParticpationType.Find(cr.CourseParticipationTypeID);
             var ct = dbc.CourseType.Find(cr.CourseTypeID);
             var classes = new List<Class>();
-            var IsPreRandomAllocationPeriod = BusinessRule.IsPreRandomAllocationEmailDay(t, settings, TimezoneAdjustment.GetLocalTime());
+            var IsPreRandomAllocationPeriod = BusinessRule.IsPreRandomAllocationEmailDay(t, settings, dbc.GetLocalTime());
             if (enrolment.ClassID != null)
             {
                 classes.Add(dbc.Class
@@ -101,7 +101,7 @@ namespace U3A.BusinessRules
                     EnrolmentIsWaitlisted = enrolment.IsWaitlisted,
                     EnrolmentIsClerk = enrolment.IsCourseClerk,
                     EnrolmentIsLeader = enrolment.isLeader,
-                    EnrolmentStatus = GetEnrolmentStatus(enrolment, t, settings),
+                    EnrolmentStatus = GetEnrolmentStatus(enrolment, t, settings, dbc.GetLocalTime()),
                     WaitlistSort = enrolment.WaitlistSort
                 };
                 ed.ClassLeader = c.LeaderNamesOnly;

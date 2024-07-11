@@ -14,6 +14,7 @@ namespace U3A.WebFunctions.Procedures
             var feeService = new MemberFeeCalculationService();
             using (var dbc = new U3ADbContext(tenant))
             {
+                dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 var term = BusinessRule.CurrentEnrolmentTerm(dbc);
                 if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
                 if (term == null) { return; }

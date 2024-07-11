@@ -365,7 +365,7 @@ else
         foreach (var fi in UploadedFiles)
         {
             FileProcessed = fi.Name;
-            TimeProcessed = TimezoneAdjustment.GetLocalTime();
+            TimeProcessed = dbc.GetLocalTime();
             var file = Path.Combine("uploads", fi.Name);
 
             var parserSettings = new ParserSettings();
@@ -510,7 +510,7 @@ else
         var people = new List<Person>();
         int currentRecord = 0;
         ShowAllBankTransactions = true;
-        var startTime = TimezoneAdjustment.GetLocalTime();
+        var startTime = dbc.GetLocalTime();
         await ProgressBar.ShowAsync("Processing ... Please Wait", importData.Where(x => x.Person != null).Count());
         await ImportReceiptData();
         foreach (ReceiptDataImport importItem in importData)

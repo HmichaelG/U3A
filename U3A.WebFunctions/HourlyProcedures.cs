@@ -27,7 +27,7 @@ namespace U3A.WebFunctions
         [Function("HouryProcedures")]
         public async Task Run([TimerTrigger("0 0 22-23,0-11 * * *"      
 #if DEBUG
-            //, RunOnStartup=true
+            , RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
@@ -48,13 +48,15 @@ namespace U3A.WebFunctions
 
             bool isBackgroundProcessingEnabled = true;
             List<Task> TaskList = new List<Task>();
+
+            TimeSpan utcOffset;
             foreach (var tenant in tenants)
             {
-                // *** Do not delete ***
-                // Common.GetNowAsync(dbc) has side effect of populating TimezoneAdjustment
                 using (var dbc = new U3ADbContext(tenant))
                 {
-                    _logger.LogInformation($"[{tenant.Identifier}] Local Time: {await Common.GetNowAsync(dbc)}. UTC Offset: {TimezoneAdjustment.TimezoneOffset}");
+                    utcOffset = await Common.GetUtcOffsetAsync(dbc);
+                    dbc.UtcOffset = utcOffset;
+                    _logger.LogInformation($"[{tenant.Identifier}] Local Time: {DateTime.UtcNow + utcOffset}. UTC Offset: {utcOffset}");
                 }
 
                 isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
@@ -73,13 +75,14 @@ namespace U3A.WebFunctions
                 }
                 else
                 {
-                    _logger.LogInformation($"Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
+                    _logger.LogInformation($"[{tenant.Identifier}]: Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
                 }
             }
             foreach (var tenant in tenants)
             {
                 using (var dbc = new U3ADbContext(tenant))
                 {
+                    dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                     using (var dbcT = new TenantDbContext(cn!))
                     {
                         await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);

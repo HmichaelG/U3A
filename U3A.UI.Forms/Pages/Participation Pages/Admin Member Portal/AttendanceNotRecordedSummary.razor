@@ -60,7 +60,7 @@
     {
         await progress.ShowSmallSpinnerAsync();
         mainGrid.BeginUpdate();
-        data = await BusinessRule.GetAttendanceNotRecordedAsync(dbc, SelectedTerm, TimezoneAdjustment.GetLocalTime());
+        data = await BusinessRule.GetAttendanceNotRecordedAsync(dbc, SelectedTerm, dbc.GetLocalTime());
         mainGrid.EndUpdate();
         InvokeAsync(StateHasChanged);
         await progress.Close();

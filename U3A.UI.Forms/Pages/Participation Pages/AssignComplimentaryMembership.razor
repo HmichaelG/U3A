@@ -163,7 +163,7 @@ else {
     }
 
     async Task Process() {
-        DateTime now = TimezoneAdjustment.GetLocalTime();
+        DateTime now = dbc.GetLocalTime();
         if (AdHocPersonsToAssign != null && string.IsNullOrWhiteSpace(Reason)) {
             await messageBox.ShowOkOnlyAsync("Enter Reason", "You must assign a resaon to ad hoc complimentary memberships.");
             return;

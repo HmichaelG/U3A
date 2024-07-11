@@ -222,7 +222,7 @@ namespace U3A.Services
             if (result == null)
             {
                 result = await BusinessRule.CurrentTermAsync(dbc);
-                if (result.TermNumber == 4 && TimezoneAdjustment.GetLocalTime(DateTime.UtcNow) > result.EndDate)
+                if (result.TermNumber == 4 && dbc.GetLocalTime(DateTime.UtcNow) > result.EndDate)
                 {
                     result = null; // End of year, no enrolment period - no man's land.
                 }

@@ -47,10 +47,10 @@ else
                     <DxFormLayout CssClass="w-100">
 
                         <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
-                            <DxDateEdit @bind-Date="@leave.StartDate" MinDate="@(new DateTime(TimezoneAdjustment.GetLocalTime().Year,1,1))" />
+                            <DxDateEdit @bind-Date="@leave.StartDate" MinDate="@minDate" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Return Date" ColSpanMd="12">
-                            <DxDateEdit @bind-Date="@leave.EndDate" MinDate="@(new DateTime(TimezoneAdjustment.GetLocalTime().Year,1,1))" />
+                            <DxDateEdit @bind-Date="@leave.EndDate" MinDate="@minDate" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="For Course" ColSpanMd="12">
                             <DxComboBox Data="Courses" @bind-Value="@leave.Course"
@@ -127,10 +127,12 @@ else
     DateTime today = DateTime.Today;
     string gridHeight;
     bool IsReady;
+    DateTime minDate;
 
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        minDate = new DateTime(dbc.GetLocalTime().Year, 1, 1);
         IsReady = true;
     }
 

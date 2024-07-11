@@ -149,7 +149,7 @@ else
     {
         if (e.FieldName == "CreatedOnLocal")
         {
-            e.Value = TimezoneAdjustment.GetLocalTime( ((SendMail)e.DataItem).CreatedOn.Value);
+            e.Value = dbc.GetLocalTime( ((SendMail)e.DataItem).CreatedOn.Value);
         }
     }
 

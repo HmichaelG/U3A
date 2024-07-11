@@ -12,7 +12,6 @@
 @inject NavigationManager navMan
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject CircuitHandler circuitHandler
-@inject LocalTime localTime
 
 @if (@homePage == "")
 {
@@ -30,7 +29,7 @@ else
         else
         {
             <div class="input-group align-items-center mt-2 d-print-none">
-                <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in at {now}.")</div>
+                <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                   ButtonIconCssClass="bi bi-check2-circle"
                                   HelpTopic="2024-Version-History.html"
@@ -110,8 +109,8 @@ else
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        now = dbc.GetLocalTime();
         homePage = dbc.TenantInfo.Website;
-        now = await localTime.GetLocalTimeAsync();
         await base.OnInitializedAsync();
     }
 

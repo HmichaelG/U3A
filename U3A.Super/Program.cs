@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using U3A.Database;
+using U3A.Model;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<LocalTime>();
 
 var MultiTenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
 var assemblyName = typeof(U3ADbContext).Namespace;

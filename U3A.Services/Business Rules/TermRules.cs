@@ -34,7 +34,7 @@ namespace U3A.BusinessRules
         public static Term? CurrentEnrolmentTermEx(U3ADbContext dbc)
         {
             var result = CurrentEnrolmentTerm(dbc);
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
             if (result == null) { result = CurrentTerm(dbc, today); }
             if (result == null) { result = NextTerm(dbc, today); }
             return result;
@@ -53,7 +53,7 @@ namespace U3A.BusinessRules
         }
         public static Term? CurrentEnrolmentTerm(U3ADbContext dbc)
         {
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
             return dbc.Term.AsNoTracking().AsEnumerable()
                         .OrderByDescending(x => x.Year).ThenByDescending(x => x.TermNumber).AsEnumerable()
                         .Where(x => today >= x.EnrolmentStartDate && today <= x.EnrolmentEndDate)
@@ -105,7 +105,7 @@ namespace U3A.BusinessRules
         public static async Task<List<Term>> SelectableTermsInCurrentYearAsync(U3ADbContext dbc, Term CurrentTerm)
         {
             int termNoToTest = CurrentTerm.TermNumber;
-            if (TimezoneAdjustment.GetLocalTime().Date < CurrentTerm.StartDate) termNoToTest--;
+            if (dbc.GetLocalTime().Date < CurrentTerm.StartDate) termNoToTest--;
             return await dbc.Term.AsNoTracking()
                 .Where(x => x.Year == CurrentTerm.Year && x.TermNumber >= termNoToTest)
                 .OrderBy(x => x.Year).ThenBy(x => x.TermNumber)

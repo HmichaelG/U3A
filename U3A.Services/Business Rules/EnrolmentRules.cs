@@ -336,7 +336,7 @@ namespace U3A.BusinessRules
                             Leader = c.LeaderSummary,
                             Venue = c.Venue.Name,
                             VenueLocation = c.Venue.Address,
-                            EnrolmentStatus = GetEnrolmentStatus(e, term, settings)
+                            EnrolmentStatus = GetEnrolmentStatus(e, term, settings,dbc.GetLocalTime())
                         });
                     }
                 }
@@ -356,20 +356,20 @@ namespace U3A.BusinessRules
                         Leader = e.Class?.LeaderSummary,
                         Venue = e.Class?.Venue.Name,
                         VenueLocation = e.Class?.Venue.Address,
-                        EnrolmentStatus = GetEnrolmentStatus(e, term, settings)
+                        EnrolmentStatus = GetEnrolmentStatus(e, term, settings, dbc.GetLocalTime())
                     }); ;
                 }
             }
             return result;
         }
 
-        public static string GetEnrolmentStatus(Enrolment? enrolment, Term term, SystemSettings settings)
+        public static string GetEnrolmentStatus(Enrolment? enrolment, Term term, SystemSettings settings, DateTime localTime)
         {
             var result = "Pending";
             if (enrolment != null)
             {
                 result = (enrolment.IsWaitlisted) ? "Waitlisted" : "Enrolled";
-                if (enrolment.IsWaitlisted && BusinessRule.IsPreRandomAllocationEmailDay(term, settings, TimezoneAdjustment.GetLocalTime()))
+                if (enrolment.IsWaitlisted && BusinessRule.IsPreRandomAllocationEmailDay(term, settings, localTime))
                 {
                     result += " (Awaiting Random Allocation)";
                 }
@@ -383,13 +383,13 @@ namespace U3A.BusinessRules
             }
             return result;
         }
-        public static string GetMemberPortalEnrolmentStatus(Class Class, Enrolment? enrolment, Term term, SystemSettings settings)
+        public static string GetMemberPortalEnrolmentStatus(Class Class, Enrolment? enrolment, Term term, SystemSettings settings, DateTime localTime)
         {
             var result = "Pending";
             if (enrolment != null)
             {
                 // Display if prior to allocation date irrespective of status
-                if (BusinessRule.IsPreRandomAllocationEmailDay(term, settings, TimezoneAdjustment.GetLocalTime()))
+                if (BusinessRule.IsPreRandomAllocationEmailDay(term, settings, localTime))
                 {
                     if (Class.TermNumber >= term.TermNumber) 
                     { 
@@ -580,7 +580,7 @@ namespace U3A.BusinessRules
             var query2 = dbc.AttendClass
                         .Where(x => x.ClassID == enrolment.ClassID
                                     && x.PersonID == enrolment.PersonID).AsEnumerable()
-                                    .Where(x => x.Date >= TimezoneAdjustment.GetLocalTime()).ToList();
+                                    .Where(x => x.Date >= dbc.GetLocalTime()).ToList();
             dbc.RemoveRange(query2);
         }
 
@@ -782,19 +782,20 @@ namespace U3A.BusinessRules
         public static async Task<string> GetEnrolmentStatusMarkup(U3ADbContext dbc,
                 IEnumerable<Enrolment> enrolments, Term term, SystemSettings settings)
         {
+            var localTime = dbc.GetLocalTime();
             var result = new StringBuilder();
             if (enrolments.Count() > 0)
             {
                 createEnrolmentSummaryTable(result, "Course Requested");
                 foreach (var e in enrolments)
                 {
-                    var status = GetEnrolmentStatus(e, term, settings);
+                    var status = GetEnrolmentStatus(e, term, settings,localTime);
                     result.AppendLine($"<tr><td>{e.Course.Name}</td><td>{status}</td></tr>");
                 }
                 result.AppendLine("</tbody></table>");
                 var processMsg = "Pending allocations are processed hourly";
                 if (IsEnrolmentBlackoutPeriod(settings)) {
-                    var processDate = TimezoneAdjustment.GetLocalTime(settings.EnrolmentBlackoutEndsUTC.Value).ToString(constants.STD_DATETIME_FORMAT);
+                    var processDate = dbc.GetLocalTime(settings.EnrolmentBlackoutEndsUTC.Value).ToString(constants.STD_DATETIME_FORMAT);
                     processMsg = $"Pending allocations will be processed on or after<br/>{processDate}";
                 }
                 result.AppendLine($"<div class='alert alert-info text-center'>{processMsg}</div>");

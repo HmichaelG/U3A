@@ -168,7 +168,7 @@ namespace U3A.BusinessRules
                 AssignClassContacts(c, term, settings);
                 AssignClassCounts(term, c);
             }
-            classes = GetClassSummaries(classes).ToList();
+            classes = GetClassSummaries(classes,dbc.GetLocalTime()).ToList();
             Log.Information("");
             Log.Information("{p1} Total classes retrieved", totalClasses);
             Log.Information("{p1} Total classes remaing in year", TotalClassesRemainingInYear);
@@ -205,7 +205,7 @@ namespace U3A.BusinessRules
                 e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
             });
         }
-        static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes)
+        static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes, DateTime localTime)
         {
             foreach (var c in classes)
             {
@@ -216,7 +216,7 @@ namespace U3A.BusinessRules
                 var course = c.Course;
                 course.ClassSummaries.Clear();
                 foreach (var thisClass in course.Classes
-                    .Where(x => x.StartDate >= TimezoneAdjustment.GetLocalTime().Date)
+                    .Where(x => x.StartDate >= localTime.Date)
                     .OrderBy(x => x.StartDate).ThenBy(x => x.StartTime))
                 {
                     if (!course.ClassSummaries.Contains(thisClass.ClassDetail))
@@ -570,7 +570,7 @@ namespace U3A.BusinessRules
             var startDate = Class.StartDate;
             var recurrence = Class.Recurrence;
             var occurrence = (OccurrenceType)Class.OccurrenceID;
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
 
             // Return true if startDate is in future
             if (startDate != null && startDate >= today)
@@ -796,7 +796,7 @@ namespace U3A.BusinessRules
             {
                 var itesmToRenove = dbc.AttendClass
                           .Where(x => x.ClassID == c.ID
-                                  && x.Date > TimezoneAdjustment.GetLocalTime().Date).ToList();
+                                  && x.Date > dbc.GetLocalTime().Date).ToList();
                 dbc.RemoveRange(itesmToRenove);
             }
 

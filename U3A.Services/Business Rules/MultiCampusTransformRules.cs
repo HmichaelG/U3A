@@ -31,7 +31,7 @@ namespace U3A.BusinessRules
                 State = p.State,
                 Postcode = p.Postcode,
                 IsMultiCampusVisitor = true,
-                FinancialTo = TimezoneAdjustment.GetLocalTime().Date.Year
+                FinancialTo = DateTime.UtcNow.Year
             };
         }
 

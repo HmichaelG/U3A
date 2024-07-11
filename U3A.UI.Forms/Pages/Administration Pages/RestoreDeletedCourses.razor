@@ -135,7 +135,7 @@ else
             var deletedAt = (e.DataItem as Course).DeletedAt;
             if (deletedAt != null)
             {
-                e.Value = TimezoneAdjustment.GetLocalTime(deletedAt.Value).ToString(constants.STD_DATETIME_FORMAT);
+                e.Value = dbc.GetLocalTime(deletedAt.Value).ToString(constants.STD_DATETIME_FORMAT);
             }
         }
     }

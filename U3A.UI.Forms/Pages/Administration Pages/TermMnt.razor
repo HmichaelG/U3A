@@ -221,7 +221,7 @@ else
         Terms = await BusinessRule.EditableTermsAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         Years = new List<int>();
-        var localDate = TimezoneAdjustment.GetLocalTime().Date;
+        var localDate = dbc.GetLocalTime().Date;
         for (int i = -1; i < 5; i++)
         {
             Years.Add(localDate.AddYears(i).Year);
@@ -276,7 +276,7 @@ else
             }
             else
             {
-                var today = TimezoneAdjustment.GetLocalTime().Date;
+                var today = dbc.GetLocalTime().Date;
                 editModel.Year = today.Year;
                 editModel.TermNumber = 1;
                 editModel.StartDate = today.AddDays(((int)today.DayOfWeek - 1) * -1);

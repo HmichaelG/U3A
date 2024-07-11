@@ -112,9 +112,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        today = selectedDate = TimezoneAdjustment.GetLocalTime().Date;
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
+            today = selectedDate = dbc.GetLocalTime().Date;
             terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
             selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
             if (selectedTerm != null)

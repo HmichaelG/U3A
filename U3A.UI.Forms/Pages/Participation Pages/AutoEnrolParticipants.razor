@@ -189,7 +189,7 @@ else
     DateTime GetEnrolmentBlackoutEndTime()
     {
         var utcEndTime = settings.EnrolmentBlackoutEndsUTC.GetValueOrDefault();
-        return TimezoneAdjustment.GetLocalTime(utcEndTime);
+        return dbc.GetLocalTime(utcEndTime);
     }
 
     void Close()

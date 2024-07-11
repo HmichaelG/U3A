@@ -143,7 +143,7 @@
             {
                 if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
                 {
-                    var today = TimezoneAdjustment.GetLocalTime().Date;
+                    var today = dbc.GetLocalTime().Date;
                     DateTime allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
                     int days = (int)(allocationDate - today).TotalDays;
                     if (days > 0 && days < 8)
@@ -155,7 +155,7 @@
 
             if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
             {
-                informationMessage = $"Reminder: Enrolment email blackout until {TimezoneAdjustment.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
+                informationMessage = $"Reminder: Enrolment email blackout until {dbc.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
             }
         }
         isReady = true;

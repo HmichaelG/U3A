@@ -83,7 +83,7 @@ else
             if (settings.InMaintenanceTill == null)
             {
                 DoEnterMaintenance = true;
-                var today = TimezoneAdjustment.GetLocalTime();
+                var today = dbc.GetLocalTime();
                 settings.InMaintenanceTill = new DateTime(today.Year, today.Month, today.Day, today.Hour, 0, 0).AddHours(2);
             }
         }

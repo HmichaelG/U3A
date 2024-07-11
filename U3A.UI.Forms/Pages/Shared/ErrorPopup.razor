@@ -6,7 +6,7 @@
          ShowFooter=true
          BodyText="@PopupMessage"  >
         <FooterContentTemplate>
-            <DxTextBox Text="@TimezoneAdjustment.GetLocalTime().ToString()" ReadOnly="true" />
+            <DxTextBox Text="@($"{DateTime.UtcNow.ToString()} UTC")" ReadOnly="true" />
             <DxButton CssClass="popup-button" RenderStyle="ButtonRenderStyle.Danger" Text="OK" Click="@(() => Visible = false)" />
         </FooterContentTemplate>
     </DxPopup>

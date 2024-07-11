@@ -12,6 +12,7 @@ namespace U3A.WebFunctions.Procedures
         {
             using (var dbc = new U3ADbContext(tenant))
             {
+                dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 try
                 {
                     await dbc.Database.ExecuteSqlRawAsync(@"execute [dbo].[prcDbCleanup]");

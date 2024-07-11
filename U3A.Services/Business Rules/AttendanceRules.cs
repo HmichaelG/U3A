@@ -37,7 +37,7 @@ namespace U3A.BusinessRules
 
         public static async Task<List<AttendClassSummaryByWeek>> GetClassAttendanceSummaryByWeek(U3ADbContext dbc)
         {
-            var today = TimezoneAdjustment.GetLocalTime().Date;
+            var today = dbc.GetLocalTime().Date;
             var endDate = today.AddDays(-(int)DateTime.Today.DayOfWeek + 6);
             var startDate = today.AddDays(-364).Date; // get the date 52 weeks ago
             startDate = startDate.AddDays(-(int)startDate.DayOfWeek + 6);

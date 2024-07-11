@@ -34,15 +34,6 @@ namespace U3A.Model
 
         public DateTime DropoutDate { get; set; }
 
-        [NotMapped]
-        public DateTime? LocalDropoutDate
-        {
-            get
-            {
-                return (DropoutDate != null) ? TimezoneAdjustment.GetLocalTime(DropoutDate) : null;
-            }
-        }
-
         public bool IsWaitlisted { get; set; }
 
         public string? DeletedBy { get; set; }

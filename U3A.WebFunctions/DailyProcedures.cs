@@ -49,16 +49,13 @@ namespace U3A.WebFunctions
             bool isBackgroundProcessingEnabled = true;
             List<Task> TaskList = new List<Task>();
             TimeSpan utcOffset;
-            LocalTime lt;
             foreach (var tenant in tenants)
             {
-                // *** Do not delete ***
-                // Common.GetNowAsync(dbc) has side effect of populating TimezoneAdjustment
                 using (var dbc = new U3ADbContext(tenant))
                 {
                     utcOffset = await Common.GetUtcOffsetAsync(dbc);
-                    lt = new LocalTime(utcOffset) { UtcOffset = utcOffset };
-                    _logger.LogInformation($"[{tenant.Identifier}] Local Time: {await Common.GetNowAsync(dbc)}. UTC Offset: {utcOffset}");
+                    dbc.UtcOffset = utcOffset;
+                    _logger.LogInformation($"[{tenant.Identifier}] Local Time: {DateTime.UtcNow + utcOffset}. UTC Offset: {utcOffset}");
                 }
 
                 isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
