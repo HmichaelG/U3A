@@ -35,7 +35,7 @@ namespace U3A.Model
         }
 
         // The enrolment that caused Iselected = true
-        [NotMapped]public Enrolment? IsSelectedByEnrolment { get; set; }
+        [NotMapped] public Enrolment? IsSelectedByEnrolment { get; set; }
 
         [NotMapped] public bool IsNotSelected { get { return !IsSelected; } }
 
@@ -75,6 +75,38 @@ namespace U3A.Model
                 if (OfferedTerm2) { result = $"{result} T2"; }
                 if (OfferedTerm3) { result = $"{result} T3"; }
                 if (OfferedTerm4) { result = $"{result} T4"; }
+                if (Course != null) { result = $"{Course.Year}{result}"; }
+                return result.Trim();
+            }
+        }
+        [NotMapped]
+        public string OfferedSummaryAdjusted
+        {
+            get
+            {
+                string result = string.Empty;
+                switch (TermNumber)
+                {
+                    case 0:
+                    case 1:
+                        if (OfferedTerm1) { result = $"{result} T1"; }
+                        if (OfferedTerm2) { result = $"{result} T2"; }
+                        if (OfferedTerm3) { result = $"{result} T3"; }
+                        if (OfferedTerm4) { result = $"{result} T4"; }
+                        break;
+                    case 2:
+                        if (OfferedTerm2) { result = $"{result} T2"; }
+                        if (OfferedTerm3) { result = $"{result} T3"; }
+                        if (OfferedTerm4) { result = $"{result} T4"; }
+                        break;
+                    case 3:
+                        if (OfferedTerm3) { result = $"{result} T3"; }
+                        if (OfferedTerm4) { result = $"{result} T4"; }
+                        break;
+                    case 4:
+                        if (OfferedTerm4) { result = $"{result} T4"; }
+                        break;
+                }
                 if (Course != null) { result = $"{Course.Year}{result}"; }
                 return result.Trim();
             }
