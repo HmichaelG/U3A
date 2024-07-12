@@ -494,5 +494,16 @@ namespace U3A.BusinessRules
         {
             return await dbc.Person.Where(x => x.DataImportTimestamp.Trim() == Timestamp.Trim()).FirstOrDefaultAsync();
         }
+
+        public static bool IsFinancial(Person person, Term currentTerm)
+        {
+            if (person.DateCeased != null) return false;
+            if (person.FinancialTo < currentTerm.Year) return false;
+            if (person.FinancialTo > currentTerm.Year) return true;
+            // financialTo == current year
+            if (person.FinancialToTerm == null) return true;
+            if (person.FinancialToTerm >= currentTerm.TermNumber) return true;
+            return false;
+        }
     }
 }
