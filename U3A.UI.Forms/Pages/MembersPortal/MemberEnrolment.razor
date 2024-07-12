@@ -312,7 +312,7 @@ else
                                             </div>
                                             @{
                                                 string? message = null;
-                                                if (c.TermNumber != term.TermNumber) { message = $"Enrol for {c.OfferedSummary}"; }
+                                                if (c.TermNumber != term.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
                                                 if (c.TermNumber == prevTerm.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
                                                 if (c.TotalActiveStudents >= c.Course.MaximumStudents) { message = "Class is Full"; }
                                                 if (!c.Course.AllowAutoEnrol) { message = "Class is Closed"; }
