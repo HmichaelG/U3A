@@ -122,7 +122,7 @@
             {
                 if (col is DxGridDataColumn)
                 {
-                    col.MinWidth = 75;
+                    if (col.MinWidth < 75) { col.MinWidth = 75; }
                 }
             }
             LinkedGrid.EndUpdate();
