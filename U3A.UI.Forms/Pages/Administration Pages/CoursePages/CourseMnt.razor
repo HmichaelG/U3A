@@ -103,9 +103,13 @@ else
                         <DxGridCommandColumnEx @ref="GridCommandColumn"
                                                NewButtonVisible="true"
                                                EditButtonVisible="true"
-                                               DeleteButtonVisible="true" />
-                        <DxGridDataColumn Caption="Year" FieldName="Year" Width="3rem" DisplayFormat="####" />
-                        <DxGridDataColumn Caption="ID" FieldName="ConversionID" Visible="false" Width="3rem" DisplayFormat="#####" />
+                                               DeleteButtonVisible="true" FixedPosition="GridColumnFixedPosition.Left" />
+                        <DxGridDataColumn Caption="Year" FieldName="Year"
+                                          FixedPosition="GridColumnFixedPosition.Left"
+                                          Width="3rem" DisplayFormat="####" />
+                        <DxGridDataColumn Caption="ID" FieldName="ConversionID"
+                                          FixedPosition="GridColumnFixedPosition.Left"
+                                          Visible="false" Width="3rem" DisplayFormat="#####" />
                         <DxGridDataColumn Caption="Name" FieldName="Name" Width="20rem" />
                         <DxGridDataColumn Caption="Type" FieldName="CourseType.Name" />
                         <DxGridDataColumn Caption="Off Schedule?" FieldName="IsOffScheduleActivity" />
