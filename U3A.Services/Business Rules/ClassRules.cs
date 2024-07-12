@@ -139,7 +139,7 @@ namespace U3A.BusinessRules
                 {
                     c.Course.Enrolments = enrolments
                              .Where(x => x.CourseID == c.CourseID
-                                         && x.Term.TermNumber == GetNextTermOffered(c,defaultTerm.TermNumber)
+                                         && x.Term.TermNumber == GetNextTermOffered(c,term.TermNumber)
                              ).ToList();
                 }
             );
@@ -149,7 +149,7 @@ namespace U3A.BusinessRules
                 {
                     c.Enrolments = enrolments
                                    .Where(x => x.ClassID == c.ID
-                                         && x.Term.TermNumber == GetNextTermOffered(c, defaultTerm.TermNumber)
+                                         && x.Term.TermNumber == GetNextTermOffered(c, term.TermNumber)
                                    ).ToList();
                 }
             );
