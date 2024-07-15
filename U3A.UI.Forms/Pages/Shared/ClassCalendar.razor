@@ -8,10 +8,8 @@
             <DxFormLayoutGroup>
                 <HeaderContentTemplate>
                     <div class="input-group">
-                        <div class="h6 pt-2 flex-grow-1">Calendar</div>
-                        <DxButton Text="@toggleButtonText" Click="OnToggleButtonClick"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  CssClass="my-1 flex-grow-0" />
+                        <div class="flex-grow-1">Calendar</div>
+                        <a class="link" onclick="@OnToggleButtonClick">@toggleButtonText</a>
                     </div>
                 </HeaderContentTemplate>
                 <Items>
@@ -82,8 +80,9 @@
     </DxFormLayout>
 }
 <style>
+
     .box-style {
-        height: calc(100dvh - @($"{DisplayOffset - hiddenCalendarOffset + 26}rem"));
+        height: calc(100dvh - @($"{DisplayOffset - hiddenCalendarOffset + 24}rem"));
     }
 
     .font-weight-bold {
@@ -107,7 +106,7 @@
     DxButton? toggleButton;
     string toggleButtonText = "Hide";
     bool isCalendarVisible = true;
-    string CalendarCssClass ="w-100";
+    string CalendarCssClass = "w-100";
     int hiddenCalendarOffset = 0;
 
     protected override async Task OnInitializedAsync()
@@ -120,7 +119,7 @@
             if (selectedTerm != null)
             {
                 var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, selectedTerm);
-                var range = new DxSchedulerDateTimeRange(DateTime.Today, new DateTime(selectedTerm.Year,12,31));
+                var range = new DxSchedulerDateTimeRange(DateTime.Today, new DateTime(selectedTerm.Year, 12, 31));
                 FilteredEvents = Events = dataStorage.GetAppointments(range);
             }
         }
@@ -140,7 +139,7 @@
         {
             toggleButtonText = "Show";
             CalendarCssClass = "d-none";
-            hiddenCalendarOffset = 19;
+            hiddenCalendarOffset = 20;
         }
         grid?.MakeRowVisible(0);
     }
