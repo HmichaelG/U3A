@@ -765,39 +765,39 @@ else
 
     async Task BulkProcess(bool IsCopy)
     {
-        dbc?.ChangeTracker?.Clear();
+        //dbc?.ChangeTracker?.Clear();
         var action = (IsCopy) ? "Copy" : "Transfer";
-        // Add transfers as new enrolments in the selected course.
+            // Add transfers as new enrolments in the selected course.
         int failures = 0;
-        foreach (var enrolment in SelectedDataItems.Cast<Enrolment>())
-        {
-            if (await BusinessRule.DuplicateEnrolment(dbc,
-                                 enrolment.Person, transferOrCopyEnrolment.selectedTerm,
-                                 transferOrCopyEnrolment.selectedCourse, transferOrCopyEnrolment.selectedClass) == null)
+            foreach (var enrolment in SelectedDataItems.Cast<Enrolment>())
             {
-                var e = new Enrolment()
-                    {
-                        Created = DateTime.UtcNow
-                    };
-                e.Person = await dbc.Person.FindAsync(enrolment.Person.ID);
-                e.Term = await dbc.Term.FindAsync(transferOrCopyEnrolment.selectedTerm.ID);
-                e.IsWaitlisted = (e.Term.Comparer <= selectedTerm.Comparer)
-                                        ? e.IsWaitlisted = enrolment.IsWaitlisted
-                                        : e.IsWaitlisted = true;
-                e.Course = await dbc.Course.FindAsync(transferOrCopyEnrolment.selectedCourse.ID);
-                if (transferOrCopyEnrolment.selectedClass != null)
+                if (await BusinessRule.DuplicateEnrolment(dbc,
+                                     enrolment.Person, transferOrCopyEnrolment.selectedTerm,
+                                     transferOrCopyEnrolment.selectedCourse, transferOrCopyEnrolment.selectedClass) == null)
                 {
-                    e.Class = await dbc.Class.FindAsync(transferOrCopyEnrolment.selectedClass.ID);
+                    var e = new Enrolment()
+                        {
+                            Created = DateTime.UtcNow
+                        };
+                    e.Person = await dbc.Person.FindAsync(enrolment.Person.ID);
+                    e.Term = await dbc.Term.FindAsync(transferOrCopyEnrolment.selectedTerm.ID);
+                    e.IsWaitlisted = (e.Term.Comparer <= selectedTerm.Comparer)
+                                            ? e.IsWaitlisted = enrolment.IsWaitlisted
+                                            : e.IsWaitlisted = true;
+                    e.Course = await dbc.Course.FindAsync(transferOrCopyEnrolment.selectedCourse.ID);
+                    if (transferOrCopyEnrolment.selectedClass != null)
+                    {
+                        e.Class = await dbc.Class.FindAsync(transferOrCopyEnrolment.selectedClass.ID);
+                    }
+                    await dbc.AddAsync<Enrolment>(e);
                 }
-                await dbc.AddAsync<Enrolment>(e);
+                else { failures++; }
             }
-            else { failures++; }
-        }
         int count = SelectedDataItems.Count() - failures;
-        // If transfer, delete the selected items
-        if (!IsCopy) dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
-        // and save...
-        await SaveChangesAsync();
+            // If transfer, delete the selected items
+            if (!IsCopy) dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
+            // and save...
+            await SaveChangesAsync();
         string msg = $"<p>{count} Enrolments processed successfully. &nbsp";
         if (failures > 0) { msg += $"{failures} failed because they were already enrolled."; }
         msg += "</p>";
