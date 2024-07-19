@@ -1,11 +1,11 @@
 ﻿@page "/"
 
-<h3>Welcome!</h3>
 <AuthorizeView>
     <Authorized>
-        <p>Please select an option from the menu.</p>
+        <DoTenantSummary/>
     </Authorized>
     <NotAuthorized>
+        <h3>Welcome!</h3>
         <p>Please login to use this software.</p>
     </NotAuthorized>
 </AuthorizeView>
