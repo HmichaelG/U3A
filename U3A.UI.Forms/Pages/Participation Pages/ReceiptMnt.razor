@@ -76,7 +76,7 @@ else
                 </Columns>
                 <GroupSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                       FieldName="Description" DisplayText="{0:n0} Receipts"
+                                       FieldName="ID" DisplayText="{0:n0} Receipts"
                                        FooterColumnName="Identifier" />
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
                                        DisplayText="{0:c2}"
@@ -84,7 +84,7 @@ else
                                        FooterColumnName="Amount" />
                 </GroupSummary>
                 <TotalSummary>
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0} Receipts" FieldName="Description" FooterColumnName="Identifier" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0} Receipts" FieldName="ID" FooterColumnName="Identifier" />
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
                 </TotalSummary>
 
@@ -269,7 +269,7 @@ else
                 editItem.EmailCashReceipt = true; 
                 amountChange = string.Format("Amount changed from {0:c2} to {1:c2}.", originalReceipt.Amount, editItem.Amount);
             }
-            editItem.Description = ($"{personChange} {amountChange}").Trim();
+            if (editItem.Description == null) editItem.Description = ($"{personChange} {amountChange}").Trim();
         }
         if (editItem.Person != null
             && editItem.Person.FinancialTo < ProcessingYear) { showFinancialToOptionsAsSet = true; }
@@ -377,7 +377,6 @@ else
         if (!e.Cancel)
         {
             // Re-query a data item from the store.
-            dbc.ChangeTracker.Clear();
             var dataItem = e.IsNew
                                 ? new Receipt()
                                 : dbc.Receipt.Find(editModel.ID);
@@ -442,6 +441,13 @@ else
         else
         {
             if (resetOriginalFinancialTo) await BusinessRule.ResetPersonDetailsForDeletedReceipt(dbc, originalReceipt, ProcessingYear);
+            if (setFinancialTo)
+            {
+                receipt.Person.FinancialTo = ProcessingYear;
+                receipt.Person.FinancialToTerm = null;
+                receipt.FinancialTo = ProcessingYear;
+                receipt.TermPaid = null;
+            }
         }
     }
 
