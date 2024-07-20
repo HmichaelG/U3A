@@ -106,7 +106,7 @@ else
                             {
                                 <div class="mx-1 d-flex">
                                     <div class="flex-grow-1 @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
-                                        @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
+                                        @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
                                             (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
@@ -131,7 +131,7 @@ else
                                         <CaptionTemplate>
                                             <div class="mx-1 d-flex w-100 my-auto">
                                                 <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
-                                                    @(HighlightSearchText($"{c.OnDay.Day.Trim()}: {c.Course.NameAndNumber}"))
+                                                    @(HighlightSearchText(ClassTitle(c)))
                                                 </div>
                                             </div>
                                         </CaptionTemplate>
@@ -1173,6 +1173,17 @@ else
     void OnMapLink(MouseEventArgs args)
     {
         NavMan.NavigateTo("https://www.google.com/maps/embed/v1/place?key=AIzaSyCWgrdB2BvU2ShE9Q5xOSBcTdigmAzUm4k&q=Space+Needle,Seattle+WA", true);
+    }
+
+    string ClassTitle(Class c)
+    {
+        string result = string.Empty;
+        if ((OccurrenceType)c.OccurrenceID == OccurrenceType.Unscheduled)
+        {
+            result = "Unscheduled";
+        }
+        else { result = c.OnDay.Day.Trim(); }
+        return $"{result}: {c.Course.Name}";
     }
 
     async Task OnReturnToMenu()

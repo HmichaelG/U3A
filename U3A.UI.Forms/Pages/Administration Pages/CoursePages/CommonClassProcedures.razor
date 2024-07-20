@@ -97,4 +97,18 @@
         return true;
     }
 
+    public bool IsNotUnscheduled(Class editItem,IEnumerable<WeekDay> weekday)
+    {
+        if (editItem == null) return true;
+        if (editItem.Occurrence == null) return true;
+        if ((OccurrenceType)editItem.Occurrence.ID == OccurrenceType.Unscheduled)
+        {
+            editItem.OnDay = weekday.FirstOrDefault();
+            editItem.OnDayID = 0;
+            editItem.StartTime = DateTime.Parse("12 am");
+            return false;
+        }
+        return true;
+    }
+
 }

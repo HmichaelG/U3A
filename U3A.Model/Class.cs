@@ -243,7 +243,7 @@ namespace U3A.Model
                         result = $"{result} {GetDateRange()}";
                         break;
                     case OccurrenceType.Unscheduled:
-                        result = "Unschedulled (Varies)";
+                        result = "Unscheduled (Varies)";
                         break;
                 }
                 return result;

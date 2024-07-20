@@ -87,15 +87,16 @@
                                         TextFieldName="@nameof(Occurrence.Name)">
                             </DxComboBox>
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="On Day" ColSpanMd="12">
-                            <DxComboBox Data="WeekDays"
+                        <DxFormLayoutItem Caption="On Day" ColSpanMd="12" >
+                            <DxComboBox Data="WeekDays" Enabled="@commonClassProcedures.IsNotUnscheduled(editItem,WeekDays)"
                                         SearchMode="ListSearchMode.AutoSearch"
                                         @bind-Value="editItem.OnDay"
                                         TextFieldName="@nameof(WeekDay.Day)" ReadOnly="@IsOnDayReadOnly">
                             </DxComboBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Start Time" ColSpanMd="12">
-                            <DxTimeEdit DisplayFormat="t" @bind-Time="editItem.StartTime" />
+                            <DxTimeEdit DisplayFormat="t" @bind-Time="editItem.StartTime" 
+                                Enabled="@commonClassProcedures.IsNotUnscheduled(editItem,WeekDays)" />
                         </DxFormLayoutItem>
                     </DxFormLayoutGroup>
                 </Items>
@@ -189,5 +190,6 @@
         isRecurrenceReadonly = (newStartDate == null);
         if (isRecurrenceReadonly) editItem.Recurrence = null;
     }
+
 }
 

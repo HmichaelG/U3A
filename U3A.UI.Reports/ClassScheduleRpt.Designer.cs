@@ -27,11 +27,11 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             DevExpress.XtraReports.UI.XRTableOfContentsLevel xrTableOfContentsLevel1 = new DevExpress.XtraReports.UI.XRTableOfContentsLevel();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClassScheduleRpt));
             DevExpress.XtraPrinting.BarCode.QRCodeGenerator qrCodeGenerator1 = new DevExpress.XtraPrinting.BarCode.QRCodeGenerator();
             DevExpress.XtraReports.Parameters.DynamicListLookUpSettings dynamicListLookUpSettings1 = new DevExpress.XtraReports.Parameters.DynamicListLookUpSettings();
             DevExpress.XtraReports.Parameters.StaticListLookUpSettings staticListLookUpSettings1 = new DevExpress.XtraReports.Parameters.StaticListLookUpSettings();
             DevExpress.XtraReports.Parameters.StaticListLookUpSettings staticListLookUpSettings2 = new DevExpress.XtraReports.Parameters.StaticListLookUpSettings();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClassScheduleRpt));
             this.objectDataSource2 = new DevExpress.DataAccess.ObjectBinding.ObjectDataSource(this.components);
             this.TopMargin = new DevExpress.XtraReports.UI.TopMarginBand();
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
@@ -61,6 +61,7 @@
             this.xrTableCell3 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableRow2 = new DevExpress.XtraReports.UI.XRTableRow();
             this.xrTableCell4 = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrRichText1 = new DevExpress.XtraReports.UI.XRRichText();
             this.xrTableCell2 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrBarCode1 = new DevExpress.XtraReports.UI.XRBarCode();
             this.xrTableRow8 = new DevExpress.XtraReports.UI.XRTableRow();
@@ -119,12 +120,11 @@
             this.prmHideStatistics = new DevExpress.XtraReports.Parameters.Parameter();
             this.prmSort = new DevExpress.XtraReports.Parameters.Parameter();
             this.prmTOC = new DevExpress.XtraReports.Parameters.Parameter();
-            this.xrRichText1 = new DevExpress.XtraReports.UI.XRRichText();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.table2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrRichText1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // objectDataSource2
@@ -357,6 +357,7 @@
             this.tableCellOnDay.StyleName = "GroupData1";
             this.tableCellOnDay.StylePriority.UseFont = false;
             this.tableCellOnDay.Weight = 1D;
+            this.tableCellOnDay.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.tableCellOnDay_BeforePrint);
             // 
             // GroupHeader3
             // 
@@ -503,6 +504,20 @@
             this.xrTableCell4.StylePriority.UsePadding = false;
             this.xrTableCell4.Text = "xrTableCell4";
             this.xrTableCell4.Weight = 2.5335513467388324D;
+            // 
+            // xrRichText1
+            // 
+            this.xrRichText1.Borders = DevExpress.XtraPrinting.BorderSide.None;
+            this.xrRichText1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Html", "[Course].[Description]")});
+            this.xrRichText1.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
+            this.xrRichText1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 1.525879E-05F);
+            this.xrRichText1.Name = "xrRichText1";
+            this.xrRichText1.Padding = new DevExpress.XtraPrinting.PaddingInfo(5, 5, 0, 0, 100F);
+            this.xrRichText1.SerializableRtfString = resources.GetString("xrRichText1.SerializableRtfString");
+            this.xrRichText1.SizeF = new System.Drawing.SizeF(612.2499F, 37.99995F);
+            this.xrRichText1.StylePriority.UseBorders = false;
+            this.xrRichText1.StylePriority.UsePadding = false;
             // 
             // xrTableCell2
             // 
@@ -1096,20 +1111,6 @@
             this.prmTOC.Type = typeof(bool);
             this.prmTOC.ValueInfo = "True";
             // 
-            // xrRichText1
-            // 
-            this.xrRichText1.Borders = DevExpress.XtraPrinting.BorderSide.None;
-            this.xrRichText1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Html", "[Course].[Description]")});
-            this.xrRichText1.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
-            this.xrRichText1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 1.525879E-05F);
-            this.xrRichText1.Name = "xrRichText1";
-            this.xrRichText1.Padding = new DevExpress.XtraPrinting.PaddingInfo(5, 5, 0, 0, 100F);
-            this.xrRichText1.SerializableRtfString = resources.GetString("xrRichText1.SerializableRtfString");
-            this.xrRichText1.SizeF = new System.Drawing.SizeF(612.2499F, 37.99995F);
-            this.xrRichText1.StylePriority.UseBorders = false;
-            this.xrRichText1.StylePriority.UsePadding = false;
-            // 
             // ClassScheduleRpt
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -1166,8 +1167,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.table2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrRichText1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
 
         }

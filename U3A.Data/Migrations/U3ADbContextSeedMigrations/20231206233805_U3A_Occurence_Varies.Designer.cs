@@ -1049,7 +1049,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                         new
                         {
                             ID = 999,
-                            Name = "Unschedulled (Varies)",
+                            Name = "Unscheduled (Varies)",
                             ShortName = "Varies"
                         });
                 });

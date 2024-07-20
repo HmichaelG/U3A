@@ -136,6 +136,20 @@ namespace U3A.UI.Reports
                 if (text != string.Empty) tableCellClassDetail.Text  = text;
             }
         }
+
+        private void tableCellOnDay_BeforePrint(object sender, CancelEventArgs e)
+        {
+            Class c = (Class)GetCurrentRow();
+            if ((OccurrenceType)c.OccurrenceID == OccurrenceType.Unscheduled)
+            {
+                tableCellOnDay.Text = "Unscheduled (Varies)";
+            }
+            else
+            {
+                tableCellOnDay.Text = c.OnDay.Day;
+            }
+            tableCellOnDay.Bookmark = tableCellOnDay.Text;
+        }
     }
 
 
