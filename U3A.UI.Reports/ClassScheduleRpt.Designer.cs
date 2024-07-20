@@ -349,8 +349,7 @@
             // tableCellOnDay
             // 
             this.tableCellOnDay.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[OnDay].[Day]"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Bookmark", "[OnDay].[Day]\n")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Bookmark", "\n")});
             this.tableCellOnDay.Font = new DevExpress.Drawing.DXFont("Arial", 12F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.tableCellOnDay.Name = "tableCellOnDay";

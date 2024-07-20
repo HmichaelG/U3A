@@ -57,19 +57,30 @@ namespace U3A.UI.Reports
             prmU3AGroup.Value = settings.U3AGroup;
             prmABN.Value = settings.ABN;
             var term = DbContext.Term.Find(id);
+            List<Class> classes = new();
             if (term != null)
             {
                 if ((int)prmIntendedUse.Value == 0)
                 {
-                    DataSource = BusinessRule.RestoreClassesFromSchedule(DbContext,
+                    classes = BusinessRule.RestoreClassesFromSchedule(DbContext,
                                         TenantDbContext, TenantService,
                                         term, settings, exludeOffScheduleActivities: true);
                 }
                 else
                 {
-                    DataSource = BusinessRule.GetClassDetails(DbContext, term, settings, ExludeOffScheduleActivities: false);
+                    classes = BusinessRule.GetClassDetails(DbContext, term, settings, ExludeOffScheduleActivities: false);
                 }
             }
+            foreach (var c in classes)
+            {
+                // Force unscheduled class into its own group
+                if ((OccurrenceType)c.OccurrenceID == OccurrenceType.Unscheduled)
+                {
+                    c.OnDayID = -1;
+                }
+
+            }
+            DataSource = classes;
             prmTermSummary.Value = term?.TermSummary;
             lblWatermark.Text = (string)prmWatermark.Value;
             lblTitleWatermark.Text = (string)prmWatermark.Value;
