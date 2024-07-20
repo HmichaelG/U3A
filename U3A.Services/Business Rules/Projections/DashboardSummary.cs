@@ -171,7 +171,7 @@ namespace U3A.BusinessRules
             result.Add(new MemberSummary
             {
                 Year = 1,
-                Group = "New members",
+                Group = "Retained members",
                 Count = joined
             });
             result.Add(new MemberSummary
