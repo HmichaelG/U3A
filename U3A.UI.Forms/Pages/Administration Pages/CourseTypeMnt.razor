@@ -47,6 +47,7 @@ else
                     <DxGridCommandColumnEx @ref="GridCommandColumn" Width="60px" EditButtonVisible="true" DeleteButtonVisible="false" />
                     <DxGridDataColumn Width="6rem" Caption="Discontinued" FieldName="Discontinued" />
                     <DxGridDataColumn Width="25rem" Caption="Name" FieldName="Name" />
+                    <DxGridDataColumn Width="10rem" Caption="Short Name" FieldName="ShortName" />
                     <DxGridDataColumn Caption="Comment" FieldName="Comment" />
                 </Columns>
 
@@ -59,7 +60,10 @@ else
                             <ValidationSummary />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@editItem.Name" />
+                            <DxTextBox @bind-Text="@editItem.Name" @bind-Text:after="@(() => SetupShortName(editItem))" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Shrot Name" ColSpanMd="12">
+                            <DxTextBox @bind-Text="@editItem.ShortName" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
                             <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
@@ -107,6 +111,21 @@ else
         finally
         {
             isBusy = false;
+        }
+    }
+
+    void SetupShortName(CourseType editItem)
+    {
+        if (string.IsNullOrWhiteSpace(editItem.Name)) return;
+        if (!string.IsNullOrWhiteSpace(editItem.ShortName)) return;
+        if (editItem.Name.Length <= 15)
+        {
+            editItem.ShortName = editItem.Name;
+        }
+        else
+        {
+            var splits = editItem.Name.Split(" ");
+            editItem.ShortName = splits[0];
         }
     }
 

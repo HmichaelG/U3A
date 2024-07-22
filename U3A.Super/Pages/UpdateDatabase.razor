@@ -54,11 +54,31 @@
             {
                 dbc.TenantInfo = tenant;
                 await dbc.Database.MigrateAsync();
+                await ApplyFix(dbc);
                 result += $"<li>Database schema for [{tenant.Identifier}] has been updated</li>";
                 await InvokeAsync(StateHasChanged);
             }
         }
         msgComplete = "Schema Update Complete";
+    }
+
+    async Task ApplyFix(U3ADbContextSeed dbc)
+    {
+        foreach (var ct in dbc.CourseType)
+        {
+            if (string.IsNullOrWhiteSpace(ct.Name)) continue;
+            if (!string.IsNullOrWhiteSpace(ct.ShortName)) continue;
+            if (ct.Name.Length <= 15)
+            {
+                ct.ShortName = ct.Name;
+            }
+            else
+            {
+                var splits = ct.Name.Split(new char[] { ' ', '/'});
+                ct.ShortName = splits[0];
+            }
+        }
+        await dbc.SaveChangesAsync();
     }
 
     void DoCancel() { NavMan.NavigateTo("/"); }

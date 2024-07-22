@@ -73,7 +73,7 @@ namespace U3A.BusinessRules
                 .Select(x => new
                 {
                     Period = x.Created.Date.AddMonths(1).AddDays(-x.Created.Day),
-                    CourseType = x.Course.CourseType.Name
+                    CourseType = x.Course.CourseType.ShortName
                 })
                 .GroupBy(x => new
                 {
@@ -198,7 +198,7 @@ namespace U3A.BusinessRules
                 .Where(x => x.Term.ID == term.ID && x.IsWaitlisted == IsWaitlisted)
                 .Select(x => new
                 {
-                    CourseType = x.Course.CourseType.Name
+                    CourseType = x.Course.CourseType.ShortName
                 })
                 .GroupBy(x => new
                 {

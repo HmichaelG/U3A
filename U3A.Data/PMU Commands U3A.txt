@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_remove_UTCOffset
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_CourseType_ShortName
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Enrolment_add_uniqueIndex
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_CourseType_ShortName15
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Enrolment_add_uniqueIndex
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_CourseType_ShortName15
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

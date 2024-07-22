@@ -19,6 +19,11 @@ namespace U3A.Model
         [Required]
         public string Name { get; set; }
 
+        [MaxLength(15)]
+        [Required]
+        public string ShortName { get; set; } = string.Empty;
+
+
         [Required(AllowEmptyStrings = true)]
         public string Comment { get; set; } = string.Empty;
 
