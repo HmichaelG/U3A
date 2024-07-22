@@ -26,6 +26,7 @@
         <DxFormLayoutItem Context="layoutContext" Caption="Selected Week Ending Dates" ColSpanMd="12">
             <DxTagBox Data=@availableDates @ref=@tagBox
                       NullText="Click Process to reset date selection"
+                      EditFormat="dd-MMM-yyyy"
                       TData="DateTime"
                       TValue="DateTime"
                       DropDownVisible=@isTagboxDropDownVisible
