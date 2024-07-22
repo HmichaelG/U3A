@@ -34,7 +34,7 @@ namespace U3A.Services
 
         public async Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink)
         {
-            var emailText = $"<a href='{ resetLink}'>Click here to confirm your U3A Member Protal account.</a>";
+            var emailText = $"<a href='{ resetLink}'>Click here to confirm your U3A Member Portal account.</a>";
             await SendEmailAsync(email, "U3A Member Portal password reset", emailText);
         }
         private async Task SendEmailAsync(string email, string subject, string htmlMessage)
