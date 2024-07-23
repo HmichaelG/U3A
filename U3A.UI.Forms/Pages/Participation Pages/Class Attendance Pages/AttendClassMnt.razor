@@ -28,9 +28,14 @@ else
 
     <MessageBox @ref="@messageBox" />
 
+
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
     <AdHocAttendanceMnt @ref="adHocAttendanceMnt" AvailablePersons=Persons IsLargerLayout=@(IsLargerLayout()) />
+    <NewDateDialog @ref="@newDateDialog" 
+        NewDateTime="@newClassDate" 
+        MaxDateTime="@maxDate" 
+        MinDateTime="@SelectedTerm.StartDate"/>
 
     <DxFlyout @bind-IsOpen=IsFlyoutOpen
               PositionTarget="@FlyoutTargetID"
@@ -83,12 +88,12 @@ else
                               RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" />
                 </div>
                 <DxFormLayoutGroup Caption="Attendance Details">
-                    <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms"
                                        @bind-SelectedTerm="@SelectedTerm"
                                        @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(SelectedTerm)) />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Course Attended" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Course" ColSpanMd="12">
                         <DxComboBox Data="@courses"
                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                     Enabled="@courseComboEnabled"
@@ -100,7 +105,7 @@ else
                                     ValueChanged="@((Course course) => SelectedCourseChanged(course))">
                         </DxComboBox>
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Class Attended" ColSpanMd="8">
+                    <DxFormLayoutItem Caption="Class" ColSpanMd="8">
                         <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
                                     AllowUserInput=false
                                     TextFieldName="@nameof(Class.ClassSummary)"
@@ -113,7 +118,11 @@ else
                                     NullText="@dateComboNullText"
                                     TextFieldName="@nameof(ClassDate.ClassDateName)"
                                     Value="@selectedDate"
-                                    ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))" />
+                                    ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))">
+                            <Buttons>
+                                <DxEditorButton IconCssClass="bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
+                            </Buttons>
+                        </DxComboBox>
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
             }
@@ -435,6 +444,9 @@ else
     int documentsSent;
     internal Progress? ProgressBar;
     DateTime now;
+    DateTime newClassDate;
+    DateTime maxDate;
+    NewDateDialog newDateDialog;
 
     bool IsLargerLayout() => (IsLargeLayout || IsXtraLargeLayout);
 
@@ -566,7 +578,7 @@ else
         if (ClassDate.Date.Date > now.Date)
         {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                                @"The class date you have selected is in the future.<br/>
+                                                                @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
@@ -595,6 +607,22 @@ else
         ClassAttendance = await BusinessRule.EditableAttendanceAsync(dbc, SelectedTerm, SelectedCourse, SelectedClass, selectedDate.Date);
         Enrolments = await BusinessRule.EditableEnrolmentsAsync(dbc, SelectedTerm, SelectedCourse, SelectedClass);
         await ApplyStudentLeaveAsync();
+    }
+
+    async Task OnNewDateButtonClick()
+    {
+        maxDate = now.Date.AddMinutes(-1);
+        newClassDate = maxDate.Date;
+        if (await newDateDialog.ShowAsync())
+        {
+            selectedDate = new()
+                {
+                    TermStart = SelectedTerm.StartDate,
+                    Date = newDateDialog.NewDateTime
+                };
+            ClassDates.Add(selectedDate);
+            await GetClassAttendance();
+        }
     }
 
     bool isBusy;

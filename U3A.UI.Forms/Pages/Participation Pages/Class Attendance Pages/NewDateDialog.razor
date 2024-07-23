@@ -1,0 +1,71 @@
+﻿@namespace U3A.UI.Forms
+
+@using System.ComponentModel.DataAnnotations
+
+<DxPopup Visible="@popupVisible" @ref="@popup"
+         CloseButtonClick="@NegativeButtonClicked"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="Add New Class Date">
+    <BodyTemplate Context="PopupContext">
+        <DxFormLayout CssClass="m-2">
+            <DxFormLayoutItem Caption="Class Date / Time" ColSpanMd="12">
+                <DxDateEdit @bind-Date="@NewDateTime"
+                            MaxDate="@MaxDateTime"
+                            MinDate="@MinDateTime"
+                            TimeSectionVisible="true" />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </BodyTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  Text="Create new class"
+                  Click="@AffirmativeButtonClicked" />
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="Cancel" Click="@NegativeButtonClicked" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+
+    [Parameter]
+    public DateTime NewDateTime { get; set; }
+    [Parameter]
+    public DateTime MaxDateTime { get; set; }
+    [Parameter]
+    public DateTime MinDateTime { get; set; }
+
+
+    bool popupVisible { get; set; }
+    DxPopup? popup;
+
+    TaskCompletionSource<bool>? tcs;
+
+    public Task<bool> ShowAsync()
+    {
+
+        popupVisible = true;
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
+            popupVisible = false;
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    void AffirmativeButtonClicked()
+    {
+        popupVisible = false;
+        tcs?.SetResult(true);
+    }
+    void NegativeButtonClicked()
+    {
+        popupVisible = false;
+        tcs?.SetResult(false);
+    }
+
+}

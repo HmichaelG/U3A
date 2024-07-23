@@ -251,7 +251,7 @@ namespace U3A.BusinessRules
         public static async Task<List<ClassDate>> SelectableAttendanceDatesAsync(U3ADbContext dbc,
                     Term selectedTerm, Class selectedClass, DateTime Today)
         {
-            var cutoffDate = Today.Date;
+            var cutoffDate = Today.Date.AddDays(1).AddSeconds(-1);
             List<ClassDate> result = new();
             
             // a list of attendance records already created up till today's date
