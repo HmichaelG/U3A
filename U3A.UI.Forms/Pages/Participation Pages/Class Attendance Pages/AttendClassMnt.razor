@@ -613,6 +613,13 @@ else
     {
         maxDate = now.Date.AddMinutes(-1);
         newClassDate = maxDate.Date;
+        if (maxDate <= SelectedTerm.StartDate)
+        {
+            await messageBox.ShowOkOnlyAsync("Re-select term",
+                    @"Today's date is prior to the selected term's start date.<br/>
+                    Select a term with a start date prior to today.");
+            return;
+        }
         if (await newDateDialog.ShowAsync())
         {
             selectedDate = new()
