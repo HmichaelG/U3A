@@ -110,20 +110,22 @@ else
                         <DxGridDataColumn Caption="ID" FieldName="ConversionID"
                                           FixedPosition="GridColumnFixedPosition.Left"
                                           Visible="false" Width="3rem" DisplayFormat="#####" />
-                        <DxGridDataColumn Caption="Name" FieldName="Name" Width="20rem" />
-                        <DxGridDataColumn Caption="Type" FieldName="CourseType.Name" />
-                        <DxGridDataColumn Caption="Off Schedule?" FieldName="IsOffScheduleActivity" />
-                        <DxGridDataColumn Caption="Enrol In" FieldName="CourseParticipationType.ShortName" />
-                        <DxGridDataColumn Caption="Addn-Info?" FieldName="Weblink" UnboundType="GridUnboundColumnType.Boolean" />
-                        <DxGridDataColumn FieldName="SendReportsTo" UnboundType="GridUnboundColumnType.String" />
-                        <DxGridDataColumn FieldName="ContactOrder" UnboundType="GridUnboundColumnType.String" />
-                        <DxGridDataColumn Caption="Course Fee" FieldName="CourseFeePerYear" DisplayFormat="{0:c}" />
-                        <DxGridDataColumn Caption="Fee / Term" FieldName="CourseFeePerTerm" DisplayFormat="{0:c}" />
-                        <DxGridDataColumn Caption="Duration" FieldName="Duration" DisplayFormat="{0:n2}" />
-                        <DxGridDataColumn Caption="Required Participants" FieldName="RequiredStudents" DisplayFormat="{0:n0}" />
-                        <DxGridDataColumn Caption="Maximum Allowed" FieldName="MaximumStudents" DisplayFormat="{0:n0}" />
-                        <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" />
-                        <DxGridDataColumn Caption="Multi-Campus" FieldName=@nameof(Course.AllowMultiCampsuFrom) />
+                        <DxGridDataColumn Caption="Name" FieldName="Name"
+                                          FixedPosition="GridColumnFixedPosition.Left"
+                                          Width="15rem" />
+                        <DxGridDataColumn Caption="Type" FieldName="CourseType.ShortName" Width="6rem" />
+                        <DxGridDataColumn Caption="Off Schedule?" FieldName="IsOffScheduleActivity" Width="7rem" />
+                        <DxGridDataColumn Caption="Enrol In" FieldName="CourseParticipationType.ShortName" Width="5rem" />
+                        <DxGridDataColumn Caption="Addn-Info?" FieldName="Weblink" UnboundType="GridUnboundColumnType.Boolean" Width="6rem"/>
+                        <DxGridDataColumn Caption="Reports To" FieldName="SendReportsTo" UnboundType="GridUnboundColumnType.String" Width="6rem" />
+                        <DxGridDataColumn FieldName="ContactOrder" UnboundType="GridUnboundColumnType.String" Width="7rem" />
+                        <DxGridDataColumn Caption="Course Fee" FieldName="CourseFeePerYear" DisplayFormat="{0:c}" Width="6rem"/>
+                        <DxGridDataColumn Caption="Fee / Term" FieldName="CourseFeePerTerm" DisplayFormat="{0:c}" Width="6rem" />
+                        <DxGridDataColumn Caption="Duration" FieldName="Duration" DisplayFormat="{0:n2}" Width="6rem" />
+                        <DxGridDataColumn Caption="Required #" FieldName="RequiredStudents" DisplayFormat="{0:n0}" Width="6rem" />
+                        <DxGridDataColumn Caption="Maximum #" FieldName="MaximumStudents" DisplayFormat="{0:n0}" Width="6rem" />
+                        <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" Width="6rem" />
+                        <DxGridDataColumn Caption="Multi-Campus" FieldName=@nameof(Course.AllowMultiCampsuFrom) Width="8rem" />
                     </Columns>
 
                     <DetailRowTemplate>

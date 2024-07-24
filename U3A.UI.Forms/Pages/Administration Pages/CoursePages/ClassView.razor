@@ -53,13 +53,13 @@ else
                     </DxGridCommandColumn>
                     <DxGridBandColumn Caption="Course">
                         <Columns>
-                            <DxGridDataColumn Caption="Name" FieldName="Course.Name" />
-                            <DxGridDataColumn Caption="Year" FieldName="Course.Year" Width="3rem" DisplayFormat="####" />
+                            <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
                             <DxGridDataColumn Caption="Type" FieldName="Course.CourseType.Name" Visible="false" />
                         </Columns>
                     </DxGridBandColumn>
                     <DxGridBandColumn Caption="Offered">
                         <Columns>
+                            <DxGridDataColumn Caption="Year" FieldName="Course.Year" Width="3rem" DisplayFormat="####" />
                             <DxGridDataColumn Caption="T1" FieldName="OfferedTerm1" Width="1rem" />
                             <DxGridDataColumn Caption="T2" FieldName="OfferedTerm2" Width="1rem" />
                             <DxGridDataColumn Caption="T3" FieldName="OfferedTerm3" Width="1rem" />
