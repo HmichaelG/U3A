@@ -183,6 +183,12 @@ namespace U3A.Model
                         case OccurrenceType.Every6Weeks:
                             result = $" {OnDay.Day}, Week 6";
                             break;
+                        case OccurrenceType.FirstAndThirdWeekOfMonth:
+                            result = $" {OnDay.Day}, Weeks 1 & 3";
+                            break;
+                        case OccurrenceType.SecondAndFourthWeekOfMonth:
+                            result = $" {OnDay.Day}, Weeks 2 & 4";
+                            break;
                         case OccurrenceType.Unscheduled:
                             result = "Varies";
                             break;
@@ -240,6 +246,14 @@ namespace U3A.Model
                         break;
                     case OccurrenceType.Every6Weeks:
                         result = $" {OnDay.Day}, Week 6";
+                        result = $"{result} {GetDateRange()}";
+                        break;
+                    case OccurrenceType.FirstAndThirdWeekOfMonth:
+                        result = $" {OnDay.Day}, Weeks 1 & 3";
+                        result = $"{result} {GetDateRange()}";
+                        break;
+                    case OccurrenceType.SecondAndFourthWeekOfMonth:
+                        result = $" {OnDay.Day}, Weeks 2 & 4";
                         result = $"{result} {GetDateRange()}";
                         break;
                     case OccurrenceType.Unscheduled:

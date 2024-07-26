@@ -44,6 +44,8 @@ namespace U3A.Model
         LastWeekOfMonth,
         Every5Weeks,
         Every6Weeks,
+        FirstAndThirdWeekOfMonth,
+        SecondAndFourthWeekOfMonth,
         Unscheduled = 999
     }
 

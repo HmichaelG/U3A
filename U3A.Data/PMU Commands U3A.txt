@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_CourseType_ShortName
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_CourseType_ShortName15
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_CourseType_ShortName15
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Occurence_Additions
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_CourseType_ShortName15
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Occurence_Additions
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

@@ -148,38 +148,57 @@ namespace U3A.BusinessRules
                 {
                     if (isOfferedInTerm(selectedTerm, c))
                     {
-                        schedule = new ClassSchedule();
-                        if (c.StartDate.HasValue)
+                        OccurrenceType occurrenceType = (OccurrenceType)c.OccurrenceID;
+                        switch (occurrenceType)
                         {
-                            schedule.StartDate = GetDateTime(c.StartDate.Value, c.StartTime);
+                            case OccurrenceType.FirstAndThirdWeekOfMonth:
+                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.FirstWeekOfMonth));
+                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.ThirdWeekOfMonth));
+                                break;
+                            case OccurrenceType.SecondAndFourthWeekOfMonth:
+                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.SecondWeekOfMonth));
+                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.FourthWeekOfMonth));
+                                break;
+                            default:
+                                list.Add(CreateSchedule(selectedTerm, c, occurrenceType));
+                                break;
                         }
-                        else
-                        {
-                            schedule.StartDate = GetDateTime(selectedTerm.StartDate, c.StartTime);
-                        }
-                        schedule.EndDate = GetDateTime(schedule.StartDate, c.Course.Duration);
-
-                        if ((OccurrenceType?)c.OccurrenceID != OccurrenceType.OnceOnly)
-                        {
-                            schedule.AppointmentType = 1;
-                        }
-                        else
-                        {
-                            schedule.AppointmentType = 0;
-                        }
-
-                        schedule.Caption = c.Course.Name;
-                        schedule.Description = (c.Leader != null) ? c.Leader.FullName : "";
-                        schedule.Location = c.Venue.Name;
-                        schedule.Label = GetLabelStatus(c, selectedTerm);
-                        schedule.AllDay = false;
-                        schedule.Recurrence = GetRecurrence(c, selectedTerm);
-                        schedule.Class = c;
-                        list.Add(schedule);
                     }
                 }
             }
             return list;
+        }
+
+        private static ClassSchedule CreateSchedule(Term selectedTerm, Class c, OccurrenceType occurrenceType)
+        {
+            ClassSchedule schedule = new ClassSchedule();
+            if (c.StartDate.HasValue)
+            {
+                schedule.StartDate = GetDateTime(c.StartDate.Value, c.StartTime);
+            }
+            else
+            {
+                schedule.StartDate = GetDateTime(selectedTerm.StartDate, c.StartTime);
+            }
+            schedule.EndDate = GetDateTime(schedule.StartDate, c.Course.Duration);
+
+            if ((OccurrenceType?)c.OccurrenceID != OccurrenceType.OnceOnly)
+            {
+                schedule.AppointmentType = 1;
+            }
+            else
+            {
+                schedule.AppointmentType = 0;
+            }
+
+            schedule.Caption = c.Course.Name;
+            schedule.Description = (c.Leader != null) ? c.Leader.FullName : "";
+            schedule.Location = c.Venue.Name;
+            schedule.Label = GetLabelStatus(c, selectedTerm);
+            schedule.AllDay = false;
+            schedule.Recurrence = GetRecurrence(c, selectedTerm, occurrenceType);
+            schedule.Class = c;
+            return schedule;
         }
 
         static async Task<List<ClassSchedule>> GetPublicHolidays(U3ADbContext dbc)
@@ -232,7 +251,10 @@ namespace U3A.BusinessRules
             {
                 schedule.AppointmentType = 0;
             }
-            schedule.Recurrence = GetRecurrence(c, thisTerm);
+            OccurrenceType occurrenceType = (OccurrenceType)c.OccurrenceID;
+            if (occurrenceType == OccurrenceType.FirstAndThirdWeekOfMonth) { occurrenceType = OccurrenceType.ThirdWeekOfMonth; }
+            if (occurrenceType == OccurrenceType.SecondAndFourthWeekOfMonth) { occurrenceType = OccurrenceType.FourthWeekOfMonth; }
+            schedule.Recurrence = GetRecurrence(c, thisTerm,occurrenceType);
             list.Add(schedule);
             DxSchedulerDataStorage dataStorage = new DxSchedulerDataStorage()
             {
@@ -275,10 +297,10 @@ namespace U3A.BusinessRules
             if (ClassStatus.ToLower() == "off-schedule activity") { result = 3; }
             return result;
         }
-        static string GetRecurrence(Class c, Term term)
+        static string GetRecurrence(Class c, Term term, OccurrenceType occurrenceType)
         {
             DxSchedulerRecurrenceInfo info = new DxSchedulerRecurrenceInfo() { Id = Guid.NewGuid() };
-            switch ((OccurrenceType)c.OccurrenceID)
+            switch (occurrenceType)
             {
                 case OccurrenceType.OnceOnly:
                     {

@@ -340,6 +340,8 @@ namespace U3A.Database
                         new Occurrence { ID = 8, Name = "Last Week of Month", ShortName = "Last Week" },
                         new Occurrence { ID = 9, Name = "Every 5 Weeks", ShortName = "5 Weeks" },
                         new Occurrence { ID = 10, Name = "Every 6 Weeks", ShortName = "6 Weeks" },
+                        new Occurrence { ID = 11, Name = "1st & 3rd Week of Month", ShortName = "Weeks 1 & 3" },
+                        new Occurrence { ID = 12, Name = "2nd & 4th Week of Month", ShortName = "Weeks 2 & 4" },
                         new Occurrence { ID = 999, Name = "Unscheduled (Varies)", ShortName = "Varies" }
                        );
             modelBuilder.Entity<WeekDay>()
