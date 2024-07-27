@@ -28,6 +28,7 @@ else
                 <DxFormLayout>
                     <DxFormLayoutItem Caption="Filter By Venue" ColSpanMd="12">
                         <DxTagBox Data="@AvailableVenues"
+                                  ClearButtonDisplayMode="default"
                                   TextFieldName="@nameof(Venue.Name)"
                                   NullText="Optionally filter by one or more venue locations."
                                   @bind-Values="@VenuesToFilter">
@@ -138,24 +139,22 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+        AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
+        selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+        if (IsPublic) IsPortal = true;
+        viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
+        if (selectedTerm != null)
+        {
+            SelectedTermChanged(selectedTerm);
+            if (IsPortal && DataStorage == null && selectedTerm != null)
             {
-                terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-                AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
-                selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+                await ProcessButtonClicked();
             }
-            if (IsPublic) IsPortal = true;
-            viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
-            if (selectedTerm != null)
-            {
-                SelectedTermChanged(selectedTerm);
-                if (IsPortal && DataStorage == null && selectedTerm != null)
-                {
-                    await ProcessButtonClicked();
-                }
-            }
-            IsReady = true;
-            await base.OnInitializedAsync();
+        }
+        IsReady = true;
+        await base.OnInitializedAsync();
     }
 
     async void OnStartDateChanged(DateTime newStartDate) => StartDate = dbc.GetLocalTime(newStartDate).Date;
@@ -164,6 +163,7 @@ else
 
     async Task SelectedTermChanged(Term term)
     {
+        if (dbc == null) { return; }
         selectedTerm = term;
         var now = dbc.GetLocalTime().Date;
         if (now > term.StartDate && now <= term.EndDate)
