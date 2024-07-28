@@ -110,7 +110,6 @@ namespace U3A.BusinessRules
             await dbc.SaveChangesAsync();
 
             // and everybody else
-            await FixEnrolmentTerm(dbc, SelectedTerm);
             var today = dbc.GetLocalTime().Date;
             AutoEnrolments = new List<string>();
             List<Enrolment> enrolmentsToProcess;
@@ -198,49 +197,6 @@ namespace U3A.BusinessRules
                         && (person.FinancialToTerm == null
                             || person.FinancialToTerm >= term.TermNumber));
             return result;
-        }
-
-        public static async Task FixEnrolmentTerm(U3ADbContext dbc, Term term)
-        {
-            var terms = await dbc.Term.AsNoTracking().ToListAsync();
-            foreach (var e in await dbc.Enrolment
-                                    .Include(x => x.Class)
-                                    .Include(x => x.Course)
-                                    .Include(x => x.Course.Classes)
-                                    .Where(x => x.TermID == term.ID).ToListAsync())
-            {
-                if (e.Class != null)
-                {
-                    if (!IsClassInTerm(e.Class, term.TermNumber))
-                    {
-                        int termNo = GetRequiredTerm( term.TermNumber, e.Class);
-                        var newTerm = terms.FirstOrDefault(x => x.Year == term.Year && x.TermNumber == termNo);
-                        if (newTerm != null) { e.TermID = newTerm.ID; }
-                    }
-                }
-                else
-                {
-                    bool isInTerm = false;
-                    // load term numbers into sorted list so we can find the first one
-                    var list = new SortedList<int, int?>();
-                    foreach (var c in e.Course.Classes)
-                    {
-                        if (IsClassInTerm(c, term.TermNumber)) { isInTerm = true; break; }
-                        int key = GetRequiredTerm(term.TermNumber, c);
-                        list.TryAdd(key, key);
-                    }
-                    if (!isInTerm)
-                    {
-                        var kvp = list.FirstOrDefault();
-                        if (kvp.Value is not null)
-                        {
-                            var newTerm = terms.FirstOrDefault(x => x.Year == term.Year && x.TermNumber == kvp.Key);
-                            if (newTerm != null) { e.TermID = newTerm.ID; }
-                        }
-                    }
-                }
-            }
-            await dbc.SaveChangesAsync();
         }
 
         private static async Task SetClassAllocationDone(U3ADbContext dbc,
