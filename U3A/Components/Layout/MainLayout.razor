@@ -157,7 +157,11 @@
     [JSInvokable]
     public void OnTimeout()
     {
-        navMan.NavigateTo("/closed.html", true);
+        try
+        {
+            navMan.NavigateTo("closed.html", true);
+        }
+        catch (Exception e){};
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)
