@@ -27,6 +27,7 @@ using Serilog.Sinks.MSSqlServer;
 using System.Data;
 using System.Data.SqlClient;
 using System.Collections.ObjectModel;
+using Serilog.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<LocalTime>();
@@ -68,6 +69,7 @@ var columnOptions = new ColumnOptions
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", WarningLevelSwitch)
     .Enrich.FromLogContext()
+    .Enrich.WithExceptionDetails()
     .WriteTo.Console(formatProvider: new CultureInfo("en-AU"))
     .WriteTo.MSSqlServer(connectionString: tenantConnectionString,
                             formatProvider: new CultureInfo("en-AU"),
