@@ -922,7 +922,7 @@
             // prmFinancialStatus
             // 
             this.prmFinancialStatus.AllowNull = true;
-            this.prmFinancialStatus.Description = "Financial Status (None =Iignore Status)";
+            this.prmFinancialStatus.Description = "Financial Status (None =Ignore Status)";
             this.prmFinancialStatus.Name = "prmFinancialStatus";
             this.prmFinancialStatus.Type = typeof(int);
             this.prmFinancialStatus.ValueInfo = "0";

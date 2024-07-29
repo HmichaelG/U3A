@@ -216,8 +216,11 @@ namespace U3A.BusinessRules
                 var course = c.Course;
                 course.ClassSummaries.Clear();
                 foreach (var thisClass in course.Classes
-                    .Where(x => x.StartDate >= localTime.Date)
-                    .OrderBy(x => x.StartDate).ThenBy(x => x.StartTime))
+                    .Where(x => x.StartDate == null || x.StartDate >= localTime.Date)
+                    .OrderBy(x => x.StartDate)
+                    .ThenBy(x => x.OccurrenceID)
+                    .ThenBy(x => x.OnDayID)
+                    .ThenBy(x => x.StartTime))
                 {
                     if (!course.ClassSummaries.Contains(thisClass.ClassDetail))
                     { course.ClassSummaries.Add(thisClass.ClassDetail); }

@@ -137,17 +137,17 @@ else
                                         </CaptionTemplate>
                                         <Items>
                                             <div class="mt-2 d-flex justify-content-center w-100">
-                                            @if (IsReadOnly)
+                                                @if (IsReadOnly)
                                                 {
                                                     <div class="h6 text-primary">@GetStatus(c)</div>
                                                 }
                                                 else
                                                 {
                                                     <DxButton Text="@GetStatus(c)"
-                                                    SizeMode="SizeMode.Large"
-                                                    IconCssClass="@($"bi {selectButtonIcon}")"
-                                                    RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                    Click="@(async () => await SelectedDataItemChanged(c))" />
+                                                              SizeMode="SizeMode.Large"
+                                                              IconCssClass="@($"bi {selectButtonIcon}")"
+                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                              Click="@(async () => await SelectedDataItemChanged(c))" />
                                                 }
                                             </div>
                                             @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
@@ -181,9 +181,12 @@ else
                                                 <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
                                                 <div class="col-small ps-1"><strong>Class:</strong></div>
                                                 <div class="col-large">@(GetClassDetails(c))</div>
-                                                <div class="col-small ps-1"><strong>Venue:</strong></div>
-                                                <div class="col-large">@HighlightSearchText(c.Venue?.Name)</div>
-                                                <div class="offset-small col-large">@c.Venue?.Address</div>
+                                                @if (c.Course.ClassSummaries.Count <= 1)
+                                                {
+                                                    <div class="col-small ps-1"><strong>Venue:</strong></div>
+                                                    <div class="col-large">@HighlightSearchText(c.Venue?.Name)</div>
+                                                    <div class="offset-small col-large">@c.Venue?.Address</div>
+                                                }
                                                 <div class="col-small px-1"><strong>Leader:</strong></div>
                                                 <div class="col-large">@HighlightSearchText(c.PrimaryLeader)</div>
 
@@ -848,7 +851,7 @@ else
         string status;
         Enrolment? e = c.IsSelectedByEnrolment;
         // Enrolled in class - display the status
-        status = BusinessRule.GetMemberPortalEnrolmentStatus(c, e, term, settings,today);
+        status = BusinessRule.GetMemberPortalEnrolmentStatus(c, e, term, settings, today);
         classEndDate = term.EndDate;
         if (c.TermNumber != term.TermNumber)
         {

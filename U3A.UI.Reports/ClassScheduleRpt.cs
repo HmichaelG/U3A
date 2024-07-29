@@ -161,6 +161,12 @@ namespace U3A.UI.Reports
             }
             tableCellOnDay.Bookmark = tableCellOnDay.Text;
         }
+
+        private void xrVenueRow_BeforePrint(object sender, CancelEventArgs e)
+        {
+            Class c = (Class)GetCurrentRow();
+            xrVenueRow.Visible = (c.Course.ClassSummaries.Count <= 1) ? true : false; 
+        }
     }
 
 

@@ -81,7 +81,7 @@
             this.xrTableRow4 = new DevExpress.XtraReports.UI.XRTableRow();
             this.xrTableCell7 = new DevExpress.XtraReports.UI.XRTableCell();
             this.tableCellClassDetail = new DevExpress.XtraReports.UI.XRTableCell();
-            this.xrTableRow5 = new DevExpress.XtraReports.UI.XRTableRow();
+            this.xrVenueRow = new DevExpress.XtraReports.UI.XRTableRow();
             this.xrTableCell9 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell10 = new DevExpress.XtraReports.UI.XRTableCell();
             this.rowStatisticsTitle = new DevExpress.XtraReports.UI.XRTableRow();
@@ -393,7 +393,7 @@
             this.rowLeaderDetail,
             this.xrTableRow6,
             this.xrTableRow4,
-            this.xrTableRow5,
+            this.xrVenueRow,
             this.rowStatisticsTitle,
             this.rowStatistics,
             this.xrTableRow9});
@@ -714,13 +714,14 @@
             this.tableCellClassDetail.Weight = 2.4568839969096805D;
             this.tableCellClassDetail.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.tableCellClassDetail_BeforePrint);
             // 
-            // xrTableRow5
+            // xrVenueRow
             // 
-            this.xrTableRow5.Cells.AddRange(new DevExpress.XtraReports.UI.XRTableCell[] {
+            this.xrVenueRow.Cells.AddRange(new DevExpress.XtraReports.UI.XRTableCell[] {
             this.xrTableCell9,
             this.xrTableCell10});
-            this.xrTableRow5.Name = "xrTableRow5";
-            this.xrTableRow5.Weight = 1D;
+            this.xrVenueRow.Name = "xrVenueRow";
+            this.xrVenueRow.Weight = 1D;
+            this.xrVenueRow.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrVenueRow_BeforePrint);
             // 
             // xrTableCell9
             // 
@@ -1210,7 +1211,7 @@
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow4;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell7;
         private DevExpress.XtraReports.UI.XRTableCell tableCellClassDetail;
-        private DevExpress.XtraReports.UI.XRTableRow xrTableRow5;
+        private DevExpress.XtraReports.UI.XRTableRow xrVenueRow;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell9;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell10;
         private DevExpress.XtraReports.UI.PageHeaderBand PageHeader;
