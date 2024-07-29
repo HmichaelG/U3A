@@ -51,6 +51,10 @@ namespace U3A.Database
             if (useCachedTenentInfo) { return; }
             HostStrategy hs = new HostStrategy();
 
+            if (_httpContextAccessor == null) { return; }
+            if (_httpContextAccessor.HttpContext == null) { return; }
+            if (_httpContextAccessor.HttpContext.Request == null) { return; }
+            if (_httpContextAccessor.HttpContext.Request.Host == null) { return; }
             var identifirer = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);
             using (var dbc = _TenantDbFactory.CreateDbContext())
             {
