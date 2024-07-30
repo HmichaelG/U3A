@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class MultiCampusTerm 
+    public class MultiCampusTerm
     {
         [Key]
         public Guid ID { get; set; }
@@ -24,6 +24,6 @@ namespace U3A.Model
         public int EnrolmentEnds { get; set; }
         public bool IsDefaultTerm { get; set; }
         public bool IsClassAllocationFinalised { get; set; }
-    
+
     }
 }

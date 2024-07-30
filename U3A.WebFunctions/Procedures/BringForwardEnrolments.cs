@@ -54,7 +54,7 @@ namespace U3A.WebFunctions.Procedures
                     else
                     {
                         // target is null. Must be a new year. Set the default term only
-                        targetTerm = await BusinessRule.GetFirstTermNextYearAsync(dbc,sourceTerm);
+                        targetTerm = await BusinessRule.GetFirstTermNextYearAsync(dbc, sourceTerm);
                         if (targetTerm != null)
                         {
                             // make sure there are no classes left to run
@@ -72,7 +72,7 @@ namespace U3A.WebFunctions.Procedures
                                     {
                                         foreach (var t in dbc.Term.Where(x => x.IsDefaultTerm)) { t.IsDefaultTerm = false; }
                                         trm.IsDefaultTerm = true;
-                                        dbc.SaveChanges();
+                                        _ = dbc.SaveChanges();
                                         logger.LogInformation($"Current Term brought forward to Term {targetTerm.TermNumber}.");
                                     }
                                 }

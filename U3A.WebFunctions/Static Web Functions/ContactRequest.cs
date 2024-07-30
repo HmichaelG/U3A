@@ -81,7 +81,7 @@ namespace U3A.WebFunctions
             <p>Again, thank you for your interest in our software.</p>
             <p><strong>The U3Admin support Team</strong></p>
             ";
-            await emailSender.SendEmailAsync(EmailType.Transactional,
+            _ = await emailSender.SendEmailAsync(EmailType.Transactional,
                 "system@u3admin.org.au",
                 "U3Admin system support",
                 email,
@@ -93,7 +93,7 @@ namespace U3A.WebFunctions
                             {table}
                             <p>Please respond at your earliest convenience.</p>
                             ";
-            await emailSender.SendEmailAsync(EmailType.Transactional,
+            _ = await emailSender.SendEmailAsync(EmailType.Transactional,
                 "system@u3admin.org.au",
                 "U3Admin system support",
                 supportEmail,
@@ -106,34 +106,34 @@ namespace U3A.WebFunctions
         string BuildTable(string name, string email, string phone, string message, string u3a)
         {
             var txt = new StringBuilder();
-            txt.AppendLine(@"<table style='width: 100%;
+            _ = txt.AppendLine(@"<table style='width: 100%;
                                         border: 1pt solid black;'>");
-            txt.AppendLine(@"<tr>
+            _ = txt.AppendLine(@"<tr>
                                     <th style='text-align: left;
                                             padding-left: 10pt;
                                             border-bottom: 1pt solid black;'>
                                             Field</th>
                                     <th style='text-align: left;border-bottom: 1pt solid black;'>Your response</th>
                                 </tr>");
-            txt.AppendLine(@$"<tr>
+            _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             <strong>Name</strong></td>
                                     <td>{name}</td>
                                     </tr>");
-            txt.AppendLine(@$"<tr>
+            _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             <strong>Email</strong></td>
                                     <td>{email}</td>
                                     </tr>");
-            txt.AppendLine(@$"<tr>
+            _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             <strong>Phone Number</strong></td>
                                     <td>{phone}</td>
                                     </tr>");
-            txt.AppendLine(@$"<tr>
+            _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             <strong>Your U3A</strong></td>
@@ -141,18 +141,18 @@ namespace U3A.WebFunctions
                                     </tr>");
             if (!string.IsNullOrWhiteSpace(message))
             {
-                txt.AppendLine(@$"<tr>
+                _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             <strong>Message</strong></td>
                                     <td>{message}</td>
                                     </tr>");
             }
-            txt.AppendLine(@$"<tr>
+            _ = txt.AppendLine(@$"<tr>
                                     <td colspan='3' >
                                     </td>
                                     </tr>");
-            txt.AppendLine("</table>");
+            _ = txt.AppendLine("</table>");
             return txt.ToString();
         }
         public async Task<bool> IsReCaptchaOK(string token)
@@ -220,17 +220,17 @@ namespace U3A.WebFunctions
                 {
                     try
                     {
-                        cmd.Parameters.AddWithValue("Id", Guid.NewGuid());
-                        cmd.Parameters.AddWithValue("Name", name);
-                        cmd.Parameters.AddWithValue("Email", email);
-                        cmd.Parameters.AddWithValue("PhoneNumber", phone);
-                        cmd.Parameters.AddWithValue("Message", message);
-                        cmd.Parameters.AddWithValue("@U3A", u3a);
-                        cmd.Parameters.AddWithValue("@CreatedOn", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@UpdatedOn", DateTime.UtcNow);
-                        cmd.Parameters.AddWithValue("@User", "Initial Web Request");
+                        _ = cmd.Parameters.AddWithValue("Id", Guid.NewGuid());
+                        _ = cmd.Parameters.AddWithValue("Name", name);
+                        _ = cmd.Parameters.AddWithValue("Email", email);
+                        _ = cmd.Parameters.AddWithValue("PhoneNumber", phone);
+                        _ = cmd.Parameters.AddWithValue("Message", message);
+                        _ = cmd.Parameters.AddWithValue("@U3A", u3a);
+                        _ = cmd.Parameters.AddWithValue("@CreatedOn", DateTime.UtcNow);
+                        _ = cmd.Parameters.AddWithValue("@UpdatedOn", DateTime.UtcNow);
+                        _ = cmd.Parameters.AddWithValue("@User", "Initial Web Request");
                         await cnn.OpenAsync();
-                        await cmd.ExecuteNonQueryAsync();
+                        _ = await cmd.ExecuteNonQueryAsync();
                     }
                     catch (Exception ex)
                     {

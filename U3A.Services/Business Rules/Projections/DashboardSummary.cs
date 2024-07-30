@@ -213,12 +213,13 @@ namespace U3A.BusinessRules
                 .ToListAsync();
             if (result.Count == 0)
             {
-                result.Add(new MemberSummary { 
+                result.Add(new MemberSummary
+                {
                     Count = 0,
                     Month = 1,
                     Group = "Enrolments",
                     Year = term.Year,
-                    });
+                });
             }
             return result;
         }
@@ -240,7 +241,7 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        private static int GetAge(DateTime birthDate,DateTime LocalTime)
+        private static int GetAge(DateTime birthDate, DateTime LocalTime)
         {
             var today = LocalTime.Date;
 
@@ -256,7 +257,7 @@ namespace U3A.BusinessRules
             var today = dbc.GetLocalTime().Date;
             var result = dbc.Person
                 .Where(p => p.DateJoined != null && p.FinancialTo >= term.Year).AsEnumerable()
-                .GroupBy(p => GetAge(p.DateJoined.Value,dbc.GetLocalTime()))
+                .GroupBy(p => GetAge(p.DateJoined.Value, dbc.GetLocalTime()))
                 .Select(g => new MemberSummary
                 {
                     Year = g.Key,
@@ -271,7 +272,7 @@ namespace U3A.BusinessRules
             var today = dbc.GetLocalTime().Date;
             var result = dbc.Person
                 .Where(p => p.BirthDate != null && p.FinancialTo >= term.Year).AsEnumerable()
-                .GroupBy(p => GetAge(p.BirthDate.Value,dbc.GetLocalTime()))
+                .GroupBy(p => GetAge(p.BirthDate.Value, dbc.GetLocalTime()))
                 .Select(g => new MemberSummary
                 {
                     Year = g.Key,

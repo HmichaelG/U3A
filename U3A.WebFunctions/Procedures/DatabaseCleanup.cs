@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 
@@ -15,7 +14,7 @@ namespace U3A.WebFunctions.Procedures
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 try
                 {
-                    await dbc.Database.ExecuteSqlRawAsync(@"execute [dbo].[prcDbCleanup]");
+                    _ = await dbc.Database.ExecuteSqlRawAsync(@"execute [dbo].[prcDbCleanup]");
                     logger.LogInformation("Execute [dbo].[prcDbCleanup] completed.");
                 }
                 catch (Exception ex)

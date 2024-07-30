@@ -154,7 +154,7 @@ namespace U3A.Model
         public int RetainFinancialsForYears { get; set; } = 5;
         public int RetainEnrolmentForYears { get; set; } = 2;
         public int RetainUnfinancialPersonsForYears { get; set; } = 2;
-        public int RetainRegistrationsNeverCompletedForDays { get; set; } = 60; 
+        public int RetainRegistrationsNeverCompletedForDays { get; set; } = 60;
         public string U3AdminEmailRecipients { get; set; }
         public bool AllowMultiCampusExtensions { get; set; }
         public List<string> MultiCampusU3AAllowed { get; set; } = new();
@@ -164,17 +164,18 @@ namespace U3A.Model
 
         private string mTimeZoneId;
         [DefaultValue("Australia/Sydney")]
-        public string TimeZoneId { 
-            get 
-            { 
-                return mTimeZoneId; 
-            } 
+        public string TimeZoneId
+        {
+            get
+            {
+                return mTimeZoneId;
+            }
             set
             {
                 mTimeZoneId = value;
                 var tz = TimeZoneInfo.FindSystemTimeZoneById(value);
                 UTCOffset = tz.GetUtcOffset(DateTime.UtcNow).Duration();
-            } 
+            }
         }
         [NotMapped]
         public TimeSpan UTCOffset { get; set; }

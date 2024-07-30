@@ -2,9 +2,8 @@
 using DnsClient.Protocol;
 using PostmarkDotNet;
 using PostmarkDotNet.Model;
-using U3A.Super;
 
-namespace U3A.Services
+namespace U3A.Super.Services
 {
     public class PostmarkAdminService
     {
@@ -50,7 +49,7 @@ namespace U3A.Services
             {
                 try
                 {
-                    await client.DeleteServerAsync(server.ID);
+                    _ = await client.DeleteServerAsync(server.ID);
                 }
                 catch (Exception) { throw; }
                 finally { result = server.Name; }
@@ -97,7 +96,7 @@ namespace U3A.Services
             {
                 try
                 {
-                    await client.DeleteDomainAsync(domain.ID);
+                    _ = await client.DeleteDomainAsync(domain.ID);
                 }
                 catch (Exception) { throw; }
                 finally { result = domain.Name; }
@@ -111,7 +110,7 @@ namespace U3A.Services
             var dnsResult = await dnsLookup.QueryAsync(domain.DKIMPendingHost, QueryType.TXT);
             if (dnsResult.Answers.Count == 0) { throw new Exception($"Unable to resolve hostname [{domain.DKIMPendingHost}]"); };
             var answer = dnsResult.Answers[0] as TxtRecord;
-            if (answer.Text.First<string>() != domain.DKIMPendingTextValue) { throw new Exception($"Hostname [{domain.DKIMPendingHost}] of type TXT found but text values do not match."); };
+            if (answer.Text.First() != domain.DKIMPendingTextValue) { throw new Exception($"Hostname [{domain.DKIMPendingHost}] of type TXT found but text values do not match."); };
             var result = await client.VerifyDomainDkim(domain.ID);
             return result;
         }

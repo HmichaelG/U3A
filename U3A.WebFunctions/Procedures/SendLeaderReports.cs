@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -49,7 +48,7 @@ namespace U3A.WebFunctions.Procedures
 
         static async Task ProcessReportAsync(U3ADbContext dbc, Term selectedTerm, Person Leader, Course Course, Class Class)
         {
-            var enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc,Course,Class,selectedTerm);
+            var enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, Course, Class, selectedTerm);
             if (enrolments.Count > 0)
             {
                 var PrintLeaderReport = true;
@@ -59,7 +58,7 @@ namespace U3A.WebFunctions.Procedures
                 var PrintCSVFile = true;
                 var PrintMemberBadges = true;
                 var PrintAttendanceAnalysis = false;
-                await reportFactory!.CreateLeaderReports(
+                _ = await reportFactory!.CreateLeaderReports(
                     PrintLeaderReport,
                     PrintAttendanceRecord,
                     PrintClassList,

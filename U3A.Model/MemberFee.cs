@@ -12,7 +12,7 @@ namespace U3A.Model
     {
         public Guid PersonID { get; set; }
         public MemberFeeSortOrder SortOrder { get; set; }
-        public DateTime? Date {  get; set; }
+        public DateTime? Date { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
     }

@@ -25,8 +25,8 @@ namespace U3A.WebFunctions.Procedures
                 var end = today.AddDays(1);
                 var range = new DxSchedulerDateTimeRange(today, end);
                 var classes = (from a in storage.GetAppointments(range)
-                               where (a.CustomFields["Source"] != null
-                                         && (int)a.LabelId != 9) // Cancelled/Postponed
+                               where a.CustomFields["Source"] != null
+                                         && (int)a.LabelId != 9 // Cancelled/Postponed
                                select a.CustomFields["Source"] as Class).ToList();
                 if (classes?.Any() == true)
                 {

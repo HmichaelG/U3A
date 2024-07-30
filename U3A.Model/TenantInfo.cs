@@ -34,9 +34,12 @@ namespace U3A.Model
         public bool EnableMultiCampusExtension { get; set; }
 
         [NotMapped]
-        public bool IsUsingPostmarkSandbox { get {
+        public bool IsUsingPostmarkSandbox
+        {
+            get
+            {
                 return UsePostmarkTestEnviroment && PostmarkSandboxAPIKey is not null;
-            } 
+            }
         }
     }
 }

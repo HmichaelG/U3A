@@ -30,7 +30,7 @@ namespace U3A.WebFunctions.Procedures
                         {
                             List<ExportData>? exportData = JsonSerializer.Deserialize<List<ExportData>>(queueItem.ExportDataJSON);
                             queueItem.Status = DocumentQueueStatus.InProcess;
-                            await dbc.SaveChangesAsync();
+                            _ = await dbc.SaveChangesAsync();
                             if (queueItem.DocumentAttachments != null)
                             {
                                 documentTemplate!.AttachmentBytes = new List<byte[]>();
@@ -58,7 +58,7 @@ namespace U3A.WebFunctions.Procedures
                             queueItem.Status = DocumentQueueStatus.Error;
                             queueItem.Result = "Processing Error";
                         }
-                        finally { await dbc.SaveChangesAsync(); }
+                        finally { _ = await dbc.SaveChangesAsync(); }
                     }
                     logger.LogInformation($"Queued Documents: {server.BatchCount} Batches, {server.BatchSuccessCount} Accepted, {server.BatchFailureCount} Failures.");
                 }
@@ -70,7 +70,7 @@ namespace U3A.WebFunctions.Procedures
                 var deleted = dbc.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
                 if (deleted > 0)
                 {
-                    await dbc.SaveChangesAsync();
+                    _ = await dbc.SaveChangesAsync();
                     logger.LogInformation($"Deleted {deleted} document queue records because they are more than 7 days old.");
                 }
             }

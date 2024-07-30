@@ -10,7 +10,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-			migrationBuilder.Sql(
+            migrationBuilder.Sql(
     @"EXECUTE ('
 
 -- =============================================

@@ -1,8 +1,8 @@
 ﻿using DevExpress.Blazor;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using U3A.Database;
 using U3A.Model;
-using Serilog;
 
 namespace U3A.BusinessRules
 {
@@ -254,7 +254,7 @@ namespace U3A.BusinessRules
             OccurrenceType occurrenceType = (OccurrenceType)c.OccurrenceID;
             if (occurrenceType == OccurrenceType.FirstAndThirdWeekOfMonth) { occurrenceType = OccurrenceType.ThirdWeekOfMonth; }
             if (occurrenceType == OccurrenceType.SecondAndFourthWeekOfMonth) { occurrenceType = OccurrenceType.FourthWeekOfMonth; }
-            schedule.Recurrence = GetRecurrence(c, thisTerm,occurrenceType);
+            schedule.Recurrence = GetRecurrence(c, thisTerm, occurrenceType);
             list.Add(schedule);
             DxSchedulerDataStorage dataStorage = new DxSchedulerDataStorage()
             {

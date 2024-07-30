@@ -1,6 +1,5 @@
 using DevExpress.Drawing;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -58,7 +57,7 @@ namespace U3A.WebFunctions
                     _logger.LogInformation($"[{tenant.Identifier}] Local Time: {DateTime.UtcNow + utcOffset}. UTC Offset: {utcOffset}");
                 }
 
-                isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
+                isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                 _logger.LogInformation($"****** Processing Daily Procedures for {tenant.Identifier}: {tenant.Name}. ******");
                 RandomAllocationExecuted.Add(tenant.Identifier!, false);
                 TaskList.Add(FinaliseOnlinePayment.Process(tenant, _logger));
@@ -74,7 +73,7 @@ namespace U3A.WebFunctions
             foreach (var tenant in tenants)
             {
                 _logger.LogInformation($"****** Processing Email Procedures for {tenant.Identifier}: {tenant.Name}. ******");
-                isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
+                isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                 if (isBackgroundProcessingEnabled)
                 {
                     await ProcessCorrespondence.Process(tenant, cn!, _logger, IsHourlyProcedure: false);

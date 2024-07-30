@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
-using U3A.Model;
 using U3A.Data;
+using U3A.Model;
 
 namespace U3A.Database
 {
@@ -153,7 +153,7 @@ namespace U3A.Database
                     {
                         // Not Waitlisted, therefore set DateEnrolled if required.
                         if (e.DateEnrolled == null) { e.DateEnrolled = utcNow; }
-                    }                    
+                    }
                 }
                 // Soft delete entities implementing ISoftDelete.
                 // We do this first so we also pick up the BaseEntity stuff.
@@ -245,10 +245,10 @@ namespace U3A.Database
             modelBuilder.Entity<Person>()
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Enrolment>()
-                    .HasIndex(x => new { x.TermID, x.CourseID, x.ClassID, x.PersonID }) 
+                    .HasIndex(x => new { x.TermID, x.CourseID, x.ClassID, x.PersonID })
                     .HasDatabaseName("idxUniqueEnrolments")
                     .IsUnique(true)
-                    .HasFilter("IsDeleted = 0"); 
+                    .HasFilter("IsDeleted = 0");
             modelBuilder.Entity<Fee>()
                 .HasQueryFilter(x => x.Person.IsDeleted == false);
             modelBuilder.Entity<Leave>()

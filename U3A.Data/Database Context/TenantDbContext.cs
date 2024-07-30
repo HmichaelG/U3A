@@ -15,7 +15,8 @@ namespace U3A.Database
         internal AuthenticationStateProvider authenticationStateProvider;
         private readonly string cnnStr;
 
-        public TenantDbContext(String ConnectionString) { 
+        public TenantDbContext(String ConnectionString)
+        {
             cnnStr = ConnectionString;
         }
 

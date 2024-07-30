@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 
 namespace U3A.Services
 {
@@ -20,7 +20,7 @@ namespace U3A.Services
 
         public async Task<(bool Success, string[] ErrorCodes)> Post(string reCAPTCHAResponse)
         {
-           // { "secret", this.reCAPTCHAVerificationOptions.CurrentValue.Secret},
+            // { "secret", this.reCAPTCHAVerificationOptions.CurrentValue.Secret},
             var s = "6LcT11spAAAAAG_OoyJ7eFHpHpSTYXuMyKJd5Bjb";
             var url = "https://www.google.com/recaptcha/api/siteverify";
             var content = new FormUrlEncodedContent(new Dictionary<string, string>

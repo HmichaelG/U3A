@@ -103,7 +103,7 @@ namespace U3A.Services
             return result;
         }
 
-        public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc, 
+        public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc,
                                         Person person, Term term, int? CalclateForTerm = null)
         {
             var result = decimal.Zero;
@@ -154,7 +154,7 @@ namespace U3A.Services
                         PersonWithFinancialStatus.MembershipFees = await CalculateMembershipFeeAsync(dbc, person.DateJoined.GetValueOrDefault(), term, person);
                         var fee = PersonWithFinancialStatus.MembershipFees;
                         if (fee != 0)
-                                {
+                        {
                             if (CalclateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalclateForTerm, 2); }
                             AddFee(person.ID,
                                 MemberFeeSortOrder.MemberFee, null, $"{term.Year} membership fee", fee);
@@ -231,7 +231,7 @@ namespace U3A.Services
             return result;
         }
 
-        public async Task<decimal> CalculateMinimumFeePayableAsync(IDbContextFactory<U3ADbContext> U3Adbfactory, 
+        public async Task<decimal> CalculateMinimumFeePayableAsync(IDbContextFactory<U3ADbContext> U3Adbfactory,
                                         Person person, int? CalclateForTerm = null)
         {
             var result = decimal.Zero;
@@ -241,7 +241,7 @@ namespace U3A.Services
             }
             return result;
         }
-        public async Task<decimal> CalculateMinimumFeePayableAsync(U3ADbContext dbc, 
+        public async Task<decimal> CalculateMinimumFeePayableAsync(U3ADbContext dbc,
                                         Person person, int? CalclateForTerm = null)
         {
             var result = decimal.Zero;

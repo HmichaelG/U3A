@@ -37,7 +37,7 @@ namespace U3A.BusinessRules
                 await dbc.AddAsync(mail);
             }
         }
-        public static async Task CreateEnrolmentSendMailAsync(U3ADbContext dbc, DateTime? AsAt = null )
+        public static async Task CreateEnrolmentSendMailAsync(U3ADbContext dbc, DateTime? AsAt = null)
         {
             var list = new List<Enrolment>();
             var entries = dbc.ChangeTracker.Entries<Enrolment>();
@@ -49,7 +49,7 @@ namespace U3A.BusinessRules
                         list.Add(r);
                     }
                 }
-            await DoParticipantEnrolmentAsync(dbc, list.ToArray(),AsAt);
+            await DoParticipantEnrolmentAsync(dbc, list.ToArray(), AsAt);
             await DoLeaderEnrolmentAsync(dbc, list.ToArray());
         }
 

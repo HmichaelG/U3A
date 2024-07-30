@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using U3A.Database;
 using U3A.Model;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 
 namespace U3A.WebFunctions
@@ -24,7 +23,7 @@ namespace U3A.WebFunctions
             return result;
         }
 
-        public static void GetTeanats(List<TenantInfo> tenants,string ConnectionString)
+        public static void GetTeanats(List<TenantInfo> tenants, string ConnectionString)
         {
             using (var cnn = new SqlConnection(ConnectionString))
             {
@@ -65,7 +64,7 @@ namespace U3A.WebFunctions
                             rdr.Close();
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         var eID = new EventId(10000);
                     }
@@ -84,7 +83,7 @@ namespace U3A.WebFunctions
         public static async Task<DateTime> GetNowAsync(U3ADbContext dbc)
         {
             // Get system settings
-            var utcOffset = await GetUtcOffsetAsync(dbc);   
+            var utcOffset = await GetUtcOffsetAsync(dbc);
             return DateTime.UtcNow + utcOffset;
         }
         public static async Task<TimeSpan> GetUtcOffsetAsync(U3ADbContext dbc)

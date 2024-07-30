@@ -7,7 +7,7 @@ using DevExpress.AspNetCore.Reporting.WebDocumentViewer.Native.Services;
 using DevExpress.Blazor.Reporting.Controllers;
 using DevExpress.Blazor.Reporting.Internal.Services;
 
-namespace BlazorReportDefinition.Controllers
+namespace U3A.Controllers
 {
     public class DownloadExportResultController : DownloadExportResultControllerBase
     {

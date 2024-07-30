@@ -1,15 +1,15 @@
 ﻿using DevExpress.XtraPrinting.Native;
 using DevExpress.XtraRichEdit.Model;
 using Microsoft.AspNetCore.Components.Server.Circuits;
-using ASP_CORE = Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using U3A.Database;
-using Microsoft.AspNetCore.Http;
 using U3A.Model;
+using ASP_CORE = Microsoft.AspNetCore.Http;
 
 namespace U3A.Services
 {
@@ -61,7 +61,7 @@ namespace U3A.Services
         {
             CircuitDetail circuitRemoved;
             CircuitDetails.TryRemove(circuit.Id, out circuitRemoved);
-            OnCircuitsChanged();           
+            OnCircuitsChanged();
             return base.OnCircuitClosedAsync(circuit,
                               cancellationToken);
         }

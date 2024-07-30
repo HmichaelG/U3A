@@ -9,7 +9,7 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class ProcessCorrespondence
     {
-        public static async Task Process(TenantInfo tenant, 
+        public static async Task Process(TenantInfo tenant,
             string tenantConnectionString,
             ILogger logger, bool IsHourlyProcedure)
         {
@@ -31,7 +31,7 @@ namespace U3A.WebFunctions.Procedures
                                             .Include(x => x.Person)
                                             .Where(x => string.IsNullOrWhiteSpace(x.Status)
                                                     && utcTime >= x.CreatedOn).ToListAsync();
-                    foreach (var sm in await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant.Identifier!)) 
+                    foreach (var sm in await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant.Identifier!))
                     {
                         if (string.IsNullOrWhiteSpace(sm.Status)) { mailItems.Add(sm); }
                     }
@@ -166,7 +166,7 @@ namespace U3A.WebFunctions.Procedures
                             default:
                                 break;
                         }
-                        await dbc.SaveChangesAsync();
+                        _ = await dbc.SaveChangesAsync();
                     }
 
                     // process enrolments because they receive one email per member
@@ -183,8 +183,8 @@ namespace U3A.WebFunctions.Procedures
                             if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
                         }
                     }
-                    await dbc.SaveChangesAsync();
-                    await dbcT.SaveChangesAsync();
+                    _ = await dbc.SaveChangesAsync();
+                    _ = await dbcT.SaveChangesAsync();
                     var postalCount = reportFactory.PostalReports.Count;
                     if (postalCount > 0)
                     {
@@ -204,8 +204,8 @@ namespace U3A.WebFunctions.Procedures
                     {
                         logger.LogInformation($"Deleted {deleted} correspondence queue records because they are more than 30 days old.");
                     }
-                    await dbc.SaveChangesAsync();
-                    await dbcT.SaveChangesAsync();
+                    _ = await dbc.SaveChangesAsync();
+                    _ = await dbcT.SaveChangesAsync();
                 }
             }
         }

@@ -8,7 +8,7 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class AutoEnrolParticipants
     {
-        public static async Task Process(TenantInfo tenant, 
+        public static async Task Process(TenantInfo tenant,
                                             string tenantConnectionString,
                                             ILogger logger)
         {
@@ -53,7 +53,7 @@ namespace U3A.WebFunctions.Procedures
                             var utcNow = DateTime.UtcNow;
                             // emailDate will be 3 days from now less two hours to ensure it occurs.
                             emailDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, 0, 0, 0) +
-                                            TimeSpan.FromHours(constants.RANDOM_ALLOCATION_PREVIEW * 24 - 2);
+                                            TimeSpan.FromHours((constants.RANDOM_ALLOCATION_PREVIEW * 24) - 2);
                             // Set the enrolment period blackout end date
                             settings.EnrolmentBlackoutEndsUTC = emailDate;
                             // force all members to get a report

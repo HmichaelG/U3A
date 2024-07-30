@@ -19,7 +19,7 @@ namespace U3A.UI.Reports
         }
         public U3ADbContext DbContext { get; set; }
         List<AttendClassDetailByWeek> data;
-        string[] courseFilter = new string[]{};
+        string[] courseFilter = new string[] { };
         private void AttendanceAnalysis_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
             //prmYear.Value = TimezoneAdjustment.GetLocalTime().Year;

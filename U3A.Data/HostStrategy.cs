@@ -1,15 +1,15 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace U3A.Database
 {
     public class HostStrategy
-    { 
+    {
         public string GetIdentifier(String Host)
         {
             string? identifier = null;

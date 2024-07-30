@@ -41,7 +41,7 @@ public static class ColorThemeGenerator
     public static String[] GenerateThemeStrings(Color primaryColor)
     {
         List<string> result = new();
-        foreach (Color color in GenerateTheme(primaryColor)){ result.Add(ToHtmlHexadecimal( color)); }
+        foreach (Color color in GenerateTheme(primaryColor)) { result.Add(ToHtmlHexadecimal(color)); }
         return result.ToArray();
     }
 

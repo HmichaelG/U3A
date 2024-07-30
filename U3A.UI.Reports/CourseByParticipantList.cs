@@ -33,7 +33,8 @@ namespace U3A.UI.Reports
 
         private void CourseByParticipantList_ParametersRequestValueChanged(object sender, DevExpress.XtraReports.Parameters.ParametersRequestValueChangedEventArgs e)
         {
-            if (e.ChangedParameterInfo.Parameter == paramTerm) {
+            if (e.ChangedParameterInfo.Parameter == paramTerm)
+            {
                 var term = DbContext.Term.Find((Guid)paramTerm.Value);
                 objectDataSource3.DataSource = BusinessRule.SelectableCourses(DbContext, term);
             }

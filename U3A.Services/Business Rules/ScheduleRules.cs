@@ -1,19 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DevExpress.Blazor;
+using DevExpress.XtraRichEdit.Import.OpenXml;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using U3A.Database;
+using U3A.Database.Migrations.TenantStoreDb;
+using U3A.Database.Migrations.U3ADbContextSeedMigrations;
 using U3A.Model;
 using U3A.Services;
-using DevExpress.Blazor;
-using System.Text.Json;
-using Microsoft.AspNetCore.Http;
-using U3A.Database.Migrations.TenantStoreDb;
-using DevExpress.XtraRichEdit.Import.OpenXml;
-using U3A.Database.Migrations.U3ADbContextSeedMigrations;
 
 namespace U3A.BusinessRules
 {
@@ -342,7 +342,7 @@ namespace U3A.BusinessRules
                 catch (Exception ex)
                 {
                     await dbc.Database.RollbackTransactionAsync();
-                    throw new Exception("Error saving shcedule cache yo database",ex);
+                    throw new Exception("Error saving shcedule cache yo database", ex);
                 }
 
                 //multi-campus

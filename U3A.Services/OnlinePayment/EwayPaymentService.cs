@@ -315,8 +315,9 @@ namespace U3A.Services
     {
         public string Message { get; set; }
         public PaymentResult PaymentResult { get; set; }
-        public EwayResponseException(string Message, PaymentResult PaymentResult) { 
-            this.Message = Message; 
+        public EwayResponseException(string Message, PaymentResult PaymentResult)
+        {
+            this.Message = Message;
             this.PaymentResult = PaymentResult;
         }
     }

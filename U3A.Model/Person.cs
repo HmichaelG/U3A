@@ -97,7 +97,7 @@ namespace U3A.Model
             {
                 string result = FinancialTo.ToString("F0");
                 if (FinancialToTerm != null) { result = $"{result} Term {FinancialToTerm}"; }
-                if (FinancialTo == constants.START_OF_TIME) { result = "Pending";  }
+                if (FinancialTo == constants.START_OF_TIME) { result = "Pending"; }
                 return result;
             }
         }
@@ -303,7 +303,7 @@ namespace U3A.Model
         {
             get
             {
-                return $"{ToTitleText(FirstName.Trim())} {ToTitleText(LastName.Trim())}"; 
+                return $"{ToTitleText(FirstName.Trim())} {ToTitleText(LastName.Trim())}";
             }
         }
         public string FullNameWithPostNominals
@@ -505,13 +505,13 @@ public class DateOfBirthAttribute : ValidationAttribute
 
         var year = DateTime.UtcNow.Year - 110;
         var startDate = new DateOnly(year, 1, 1);
-        var endDate = new DateOnly(year+60,1,1);
+        var endDate = new DateOnly(year + 60, 1, 1);
         ErrorMessage = $"Invalid birth date: not in range {startDate.ToString()} to {endDate.ToString()}";
-        
-        var birthDate = DateOnly.FromDateTime( ((DateTime)value));
+
+        var birthDate = DateOnly.FromDateTime(((DateTime)value));
 
         if (birthDate >= startDate && birthDate <= endDate) return ValidationResult.Success;
-        return new ValidationResult(ErrorMessage) ;
+        return new ValidationResult(ErrorMessage);
     }
 }
 

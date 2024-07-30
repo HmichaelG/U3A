@@ -62,7 +62,7 @@ namespace U3A.WebFunctions.Procedures
                                         IEmailService emailSender)
         {
             if (string.IsNullOrWhiteSpace(sendEmailAddress)) { return; }
-            await emailSender.SendEmailAsync(
+            _ = await emailSender.SendEmailAsync(
                             EmailType.Transactional,
                             "system@u3admin.org.au",
                             "System Postman",
@@ -200,10 +200,10 @@ namespace U3A.WebFunctions.Procedures
         private static string FormatSuppressions(IEnumerable<EmailSuppression> suppressions, string introduction)
         {
             var txt = new StringBuilder();
-            txt.AppendLine(introduction);
-            txt.AppendLine(@"<table style='width: 100%;
+            _ = txt.AppendLine(introduction);
+            _ = txt.AppendLine(@"<table style='width: 100%;
                                         border: 1pt solid black;'>");
-            txt.AppendLine(@"<tr>
+            _ = txt.AppendLine(@"<tr>
                                     <th style='text-align: left;
                                             padding-left: 10pt;
                                             border-bottom: 1pt solid black;'>
@@ -215,7 +215,7 @@ namespace U3A.WebFunctions.Procedures
                                 </tr>");
             foreach (var sup in suppressions.OrderBy(x => x.CreatedAt))
             {
-                txt.AppendLine(@$"<tr>
+                _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             {sup.CreatedAt.ToString("dd-MM-yy")}</td>
@@ -225,17 +225,17 @@ namespace U3A.WebFunctions.Procedures
                                     <td>{sup.Person?.FullName}</td>
                                     </tr>");
             }
-            txt.AppendLine("</table>");
+            _ = txt.AppendLine("</table>");
             return txt.ToString();
         }
 
         private static string FormatCourse(IEnumerable<Course> courses, string introduction, DateTime now)
         {
             var txt = new StringBuilder();
-            txt.AppendLine(introduction);
-            txt.AppendLine(@"<table style='width: 100%;
+            _ = txt.AppendLine(introduction);
+            _ = txt.AppendLine(@"<table style='width: 100%;
                                         border: 1pt solid black;'>");
-            txt.AppendLine(@"<tr>
+            _ = txt.AppendLine(@"<tr>
                                     <th style='text-align: left;
                                             padding-left: 10pt;
                                             border-bottom: 1pt solid black;'>
@@ -258,7 +258,7 @@ namespace U3A.WebFunctions.Procedures
                     status = "Modified";
                 }
                 if (course.User != null) { user = course.User; }
-                txt.AppendLine(@$"<tr>
+                _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             <strong>{course.Name}</strong></td>
@@ -277,45 +277,45 @@ namespace U3A.WebFunctions.Procedures
                         status = "Modified";
                     }
                     if (c.User != null) { user = c.User; }
-                    txt.AppendLine(@$"<tr>
+                    _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>&emsp;
                                             Offered: {c.OfferedSummary}</td>
                                     <td>{status}</td>
                                     <td>{user}</td>
                                     </tr>");
-                    txt.AppendLine(@$"<tr>
+                    _ = txt.AppendLine(@$"<tr>
                                     <td colspan='3' style='text-align: left;
                                             padding-left: 10pt;'>&emsp;
                                             {c.ClassDetailWithoutVenue}</td>
                                     </tr>");
-                    txt.AppendLine(@$"<tr>
+                    _ = txt.AppendLine(@$"<tr>
                                     <td colspan='3' style='text-align: left;
                                             padding-left: 10pt;'>&emsp;
                                             {c.Venue.Name}</td>
                                     </tr>");
-                    txt.AppendLine(@$"<tr>
+                    _ = txt.AppendLine(@$"<tr>
                                     <td colspan='3' style='text-align: left;
                                             padding-left: 10pt;'>&emsp;
                                             Leader: {c.Leader?.FullName}</td>
                                     </tr>");
                 }
-                txt.AppendLine(@$"<tr>
+                _ = txt.AppendLine(@$"<tr>
                                     <td colspan='3' >
                                     </td>
                                     </tr>");
             }
-            txt.AppendLine("</table>");
-            txt.AppendLine("<div style='font-size: 8.75pt;' ><strong>NB: The above detail is a summary only. Consult the course/class record for full details.</strong></div>");
+            _ = txt.AppendLine("</table>");
+            _ = txt.AppendLine("<div style='font-size: 8.75pt;' ><strong>NB: The above detail is a summary only. Consult the course/class record for full details.</strong></div>");
             return txt.ToString();
         }
         private static string FormatPeople(IEnumerable<Person> people, string introduction)
         {
             var txt = new StringBuilder();
-            txt.AppendLine(introduction);
-            txt.AppendLine(@"<table style='width: 100%;
+            _ = txt.AppendLine(introduction);
+            _ = txt.AppendLine(@"<table style='width: 100%;
                                         border: 1pt solid black;'>");
-            txt.AppendLine(@"<tr>
+            _ = txt.AppendLine(@"<tr>
                                     <th style='text-align: left;
                                             padding-left: 10pt;
                                             border-bottom: 1pt solid black;'>
@@ -327,7 +327,7 @@ namespace U3A.WebFunctions.Procedures
                                 </tr>");
             foreach (var person in people.OrderBy(x => x.FullName))
             {
-                txt.AppendLine(@$"<tr>
+                _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             {person.PersonIdentity}</td>
@@ -337,16 +337,16 @@ namespace U3A.WebFunctions.Procedures
                                     <td>{person.Email}</td>
                                     </tr>");
             }
-            txt.AppendLine("</table>");
+            _ = txt.AppendLine("</table>");
             return txt.ToString();
         }
         private static string FormatPeopleAndClasses(IEnumerable<Person> people, string introduction)
         {
             var txt = new StringBuilder();
-            txt.AppendLine(introduction);
-            txt.AppendLine(@"<table style='width: 100%;
+            _ = txt.AppendLine(introduction);
+            _ = txt.AppendLine(@"<table style='width: 100%;
                                         border: 1pt solid black;'>");
-            txt.AppendLine(@"<tr>
+            _ = txt.AppendLine(@"<tr>
                                     <th style='text-align: left;
                                             padding-left: 10pt;
                                             border-bottom: 1pt solid black;'>
@@ -358,7 +358,7 @@ namespace U3A.WebFunctions.Procedures
                                 </tr>");
             foreach (var person in people.OrderBy(x => x.FullName))
             {
-                txt.AppendLine(@$"<tr>
+                _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             {person.PersonIdentity}</td>
@@ -368,16 +368,16 @@ namespace U3A.WebFunctions.Procedures
                                     <td>{person.Email}</td>
                                     </tr>");
             }
-            txt.AppendLine(" </table>");
+            _ = txt.AppendLine(" </table>");
             return txt.ToString();
         }
         private static string FormatPublicHolidays(IEnumerable<PublicHoliday> holidays, string introduction)
         {
             var txt = new StringBuilder();
-            txt.AppendLine(introduction);
-            txt.AppendLine(@"<table style='width: 100%;
+            _ = txt.AppendLine(introduction);
+            _ = txt.AppendLine(@"<table style='width: 100%;
                                         border: 1pt solid black;'>");
-            txt.AppendLine(@"<tr>
+            _ = txt.AppendLine(@"<tr>
                                     <th style='text-align: left;
                                             width: 30%;
                                             padding-left: 10pt;
@@ -387,14 +387,14 @@ namespace U3A.WebFunctions.Procedures
                                 </tr>");
             foreach (var h in holidays.OrderBy(x => x.Date))
             {
-                txt.AppendLine(@$"<tr>
+                _ = txt.AppendLine(@$"<tr>
                                     <td style='text-align: left;
                                             padding-left: 10pt;'>
                                             {h.Date.ToString("dddd, dd-MMMM-yyyy")}</td>
                                     <td>{h.Name}</td>
                                     </tr>");
             }
-            txt.AppendLine("</table>");
+            _ = txt.AppendLine("</table>");
             return txt.ToString();
         }
     }

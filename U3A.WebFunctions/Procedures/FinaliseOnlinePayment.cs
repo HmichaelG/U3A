@@ -11,7 +11,7 @@ namespace U3A.WebFunctions.Procedures
     {
         public static async Task Process(TenantInfo tenant, ILogger logger)
         {
-            var feeService = new MemberFeeCalculationService();
+            _ = new MemberFeeCalculationService();
             using (var dbc = new U3ADbContext(tenant))
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);

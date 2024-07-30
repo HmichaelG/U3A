@@ -25,7 +25,8 @@ namespace U3A.Model
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (IsCaptchaRequired && Captcha.ToLower() != CaptchaResponse.ToLower()) {
+            if (IsCaptchaRequired && Captcha.ToLower() != CaptchaResponse.ToLower())
+            {
                 yield return new ValidationResult("Your entry must match the Captcha code exactly.");
             }
             if (string.IsNullOrWhiteSpace(Email) && string.IsNullOrWhiteSpace(Phone) && string.IsNullOrWhiteSpace(Mobile))

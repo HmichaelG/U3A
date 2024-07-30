@@ -45,10 +45,12 @@ namespace U3A.Model
 
     }
 
-    public class MemberFeePaidToTerm : List<int?> { 
-        public MemberFeePaidToTerm() {
+    public class MemberFeePaidToTerm : List<int?>
+    {
+        public MemberFeePaidToTerm()
+        {
             this.Add(2);
-        } 
+        }
     }
 
 }

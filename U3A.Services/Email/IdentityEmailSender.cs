@@ -16,7 +16,7 @@ namespace U3A.Services
 {
     public class IdentityEmailSender : IEmailSender<ApplicationUser>
     {
-       readonly IDbContextFactory<U3ADbContext> dbFactory;
+        readonly IDbContextFactory<U3ADbContext> dbFactory;
         public IdentityEmailSender(IDbContextFactory<U3ADbContext> contextFactory)
         {
             dbFactory = contextFactory;
@@ -24,7 +24,7 @@ namespace U3A.Services
         public async Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink)
         {
             var emailText = $"<a href='{confirmationLink}'>Click here to confirm your email address.</a>";
-            await SendEmailAsync(email,"U3A Member Portal email confirmation", emailText);
+            await SendEmailAsync(email, "U3A Member Portal email confirmation", emailText);
         }
 
         public async Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode)
@@ -34,7 +34,7 @@ namespace U3A.Services
 
         public async Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink)
         {
-            var emailText = $"<a href='{ resetLink}'>Click here to confirm your U3A Member Portal account.</a>";
+            var emailText = $"<a href='{resetLink}'>Click here to confirm your U3A Member Portal account.</a>";
             await SendEmailAsync(email, "U3A Member Portal password reset", emailText);
         }
         private async Task SendEmailAsync(string email, string subject, string htmlMessage)

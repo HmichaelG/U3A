@@ -1,4 +1,5 @@
-﻿using DevExpress.Web.Internal;
+﻿using DevExpress.Drawing;
+using DevExpress.Web.Internal;
 using DevExpress.XtraReports.UI;
 using System;
 using System.Collections;
@@ -6,7 +7,6 @@ using System.ComponentModel;
 using System.Drawing;
 using U3A.BusinessRules;
 using U3A.Database;
-using DevExpress.Drawing;
 
 namespace U3A.UI.Reports
 {

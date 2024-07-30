@@ -2,24 +2,24 @@
 using DevExpress.Blazor.Internal;
 using DevExpress.Blazor.Popup.Internal;
 using Eway.Rapid.Abstractions.Response;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Serilog;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Twilio.Rest.Trunking.V1;
 using U3A.Database;
 using U3A.Database.Migrations.U3ADbContextSeedMigrations;
 using U3A.Model;
 using U3A.Services;
-using System.Text.Json;
-using Microsoft.AspNetCore.Http.Json;
-using System.Text.Json.Serialization;
-using System.Runtime.InteropServices;
-using Twilio.Rest.Trunking.V1;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.AspNetCore.Components;
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace U3A.BusinessRules
 {
@@ -139,7 +139,7 @@ namespace U3A.BusinessRules
                 {
                     c.Course.Enrolments = enrolments
                              .Where(x => x.CourseID == c.CourseID
-                                         && x.Term.TermNumber == GetNextTermOffered(c,term.TermNumber)
+                                         && x.Term.TermNumber == GetNextTermOffered(c, term.TermNumber)
                              ).ToList();
                 }
             );
@@ -168,7 +168,7 @@ namespace U3A.BusinessRules
                 AssignClassContacts(c, term, settings);
                 AssignClassCounts(term, c);
             }
-            classes = GetClassSummaries(classes,dbc.GetLocalTime()).ToList();
+            classes = GetClassSummaries(classes, dbc.GetLocalTime()).ToList();
             Log.Information("");
             Log.Information("{p1} Total classes retrieved", totalClasses);
             Log.Information("{p1} Total classes remaing in year", TotalClassesRemainingInYear);

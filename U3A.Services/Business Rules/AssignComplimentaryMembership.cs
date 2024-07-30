@@ -41,7 +41,7 @@ namespace U3A.BusinessRules
             if (settings != null)
             {
                 var persons = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
-                foreach (var p in persons.Where(x => BusinessRule.IsCourseLeader(dbc,x,Now)))
+                foreach (var p in persons.Where(x => BusinessRule.IsCourseLeader(dbc, x, Now)))
                 {
                     if (maxComplimentaryCourses == 0 || GetCourseCount(dbc, p, FinancialTo) <= maxComplimentaryCourses)
                     {
@@ -126,7 +126,7 @@ namespace U3A.BusinessRules
                     await dbc.Receipt.Where(x => x.PersonID == person.ID
                                         && x.FinancialTo >= FinancialTo
                                         && x.Amount == 0).ExecuteDeleteAsync();
-                    if (person.FinancialTo >= FinancialTo) { person.FinancialTo = FinancialTo-1; }
+                    if (person.FinancialTo >= FinancialTo) { person.FinancialTo = FinancialTo - 1; }
                     if (person.FinancialTo < constants.START_OF_TIME) { person.FinancialTo = constants.START_OF_TIME; }
                     result++;
                 }
@@ -135,7 +135,7 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        private static async Task<int> CreateCashReceipt(U3ADbContext dbc, Person person, string Description, int FinancialTo , DateTime Now)
+        private static async Task<int> CreateCashReceipt(U3ADbContext dbc, Person person, string Description, int FinancialTo, DateTime Now)
         {
             int result = 0;
             var isOnFile = await dbc.Receipt.AnyAsync(x => x.PersonID == person.ID

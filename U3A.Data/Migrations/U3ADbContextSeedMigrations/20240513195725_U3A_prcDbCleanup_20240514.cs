@@ -123,8 +123,8 @@ BEGIN
 endall:
 	return 0
 END')"
-    ); 
-			
+    );
+
         }
 
         /// <inheritdoc />

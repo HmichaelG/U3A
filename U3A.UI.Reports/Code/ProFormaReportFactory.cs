@@ -289,7 +289,8 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 {
                     var fileName = await CreateMemberBadgesReport(Leader,
                             Enrolments.Where(x => !x.IsWaitlisted).ToArray());
-                    if (!string.IsNullOrWhiteSpace(fileName)) {
+                    if (!string.IsNullOrWhiteSpace(fileName))
+                    {
                         createdFilenames.Add(await CreateMemberBadgesReport(Leader,
                                 Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
                         reportNames.Add("Member Badges.pdf");
@@ -365,7 +366,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             if (list.Count > 0)
             {
                 people = people.Where(x => list.Contains(x.ID)).ToList();
-                report.SetParameters(people,settings,term);
+                report.SetParameters(people, settings, term);
                 pdfFilename = GetTempPdfFile();
                 report.ExportToPdf(pdfFilename, options);
             }
@@ -405,7 +406,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                     ed.CourseTotalWaitlistedStudents = (int)totalWaitListed;
                     if (ed.CourseMaximumStudents > 0)
                     {
-                        ed.CourseParticipationRate = (totalEnrolled+totalWaitListed)/(double)ed.CourseMaximumStudents;
+                        ed.CourseParticipationRate = (totalEnrolled + totalWaitListed) / (double)ed.CourseMaximumStudents;
                     }
                 }
             }

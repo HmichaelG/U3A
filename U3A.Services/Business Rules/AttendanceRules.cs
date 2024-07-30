@@ -253,7 +253,7 @@ namespace U3A.BusinessRules
         {
             var cutoffDate = Today.Date.AddDays(1).AddSeconds(-1);
             List<ClassDate> result = new();
-            
+
             // a list of attendance records already created up till today's date
             List<ClassDate> onFileDates = await dbc.AttendClass
                                                     .Where(x => x.TermID == selectedTerm.ID
@@ -263,8 +263,8 @@ namespace U3A.BusinessRules
                                                     {
                                                         Date = x.Date,
                                                         TermStart = selectedTerm.StartDate
-                                                    } ).Distinct().ToListAsync();
-            
+                                                    }).Distinct().ToListAsync();
+
             // Calculate the date range for class schedule calculation ( tart & end)
 
             // the last class date for term
@@ -277,7 +277,7 @@ namespace U3A.BusinessRules
             if (!onFileDates.Any(x => x.Date >= selectedTerm.StartDate && x.Date < cutoffDate)) { start = selectedTerm.StartDate; }
             DateTime end = start.AddDays(700); // an arbitarially large number
             end = (end > start && end <= lastAllowedClassDate) ? end : lastAllowedClassDate;
-            
+
             // calculate class dates
             DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(start, end);
             result = (from a in storage.GetAppointments(range)
@@ -285,7 +285,7 @@ namespace U3A.BusinessRules
                                 && (int)a.LabelId != 9    // Cancelled/Postponed
                                 && selectedClass.ID == (a.CustomFields["Source"] as Class).ID)
                       select new ClassDate() { TermStart = start, Date = a.Start }).ToList();
-            
+
             // merge what is already on file & sort
             result.AddRange(onFileDates);
             return result.OrderBy(a => a.Date).ToList();

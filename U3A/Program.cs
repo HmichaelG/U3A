@@ -1,33 +1,27 @@
-using U3A.Components;
-using U3A.Components.Account;
-using U3A.Data;
+using Blazored.LocalStorage;
+using DevExpress.Blazor.RichEdit.SpellCheck;
+using DevExpress.Drawing;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.Circuits;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using U3A.Database;
-using Blazored.LocalStorage;
-using DevExpress.Drawing;
-using Microsoft.AspNetCore.Components.Server.Circuits;
-using U3A.Services;
-using DevExpress.Blazor.RichEdit.SpellCheck;
 using Microsoft.Extensions.FileProviders;
-using System.Reflection;
-using Azure.Identity;
-using Microsoft.AspNetCore.Builder;
-using DevExpress.XtraCharts;
-using U3A.Model;
-using System;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using System.Globalization;
-using Serilog.Sinks.MSSqlServer;
-using System.Data;
-using System.Data.SqlClient;
-using System.Collections.ObjectModel;
 using Serilog.Exceptions;
+using Serilog.Sinks.MSSqlServer;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Globalization;
+using System.Reflection;
+using U3A.Components;
+using U3A.Components.Account;
+using U3A.Data;
+using U3A.Database;
+using U3A.Model;
+using U3A.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,14 +83,14 @@ foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
 // TenantDbContextFactory
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
-    options.UseSqlServer(tenantConnectionString);
+    _ = options.UseSqlServer(tenantConnectionString);
 }, ServiceLifetime.Scoped);
 
 // U3ADbContextFactory
 builder.Services.AddDbContext<U3ADbContext>(options => options.UseSqlServer());
 builder.Services.AddDbContextFactory<U3ADbContext>(options =>
 {
-    options.UseSqlServer();
+    _ = options.UseSqlServer();
 }, ServiceLifetime.Scoped);
 
 // Get / Set local storage data
@@ -190,7 +184,7 @@ builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>()
 
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddApplicationInsightsTelemetry(options =>
+    _ = builder.Services.AddApplicationInsightsTelemetry(options =>
        options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 }
 
@@ -200,13 +194,13 @@ app.UseRequestLocalization("en-AU");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+    _ = app.UseMigrationsEndPoint();
 }
 else
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    _ = app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    _ = app.UseHsts();
 }
 
 app.UseHttpsRedirection();

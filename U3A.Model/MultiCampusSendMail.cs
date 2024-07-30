@@ -9,7 +9,7 @@ namespace U3A.Model
     public class MultiCampusSendMail : BaseEntity
     {
         public Guid ID { get; set; }
-        public string TenantIdentifier { get; set; }    
+        public string TenantIdentifier { get; set; }
         public string DocumentName { get; set; }
         public Guid PersonID { get; set; }
         public Guid RecordKey { get; set; }

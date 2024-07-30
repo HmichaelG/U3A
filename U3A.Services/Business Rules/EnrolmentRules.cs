@@ -60,7 +60,7 @@ namespace U3A.BusinessRules
             var termNumber = GetNextTermOffered(thisClass, thisTerm.TermNumber);
             if (testTerm.TermNumber != termNumber)
             {
-                testTerm = await dbc.Term.FirstOrDefaultAsync(x=> x.Year == thisTerm.Year
+                testTerm = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisTerm.Year
                                             && x.TermNumber == termNumber);
             }
             if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == testTerm.ID))
@@ -336,7 +336,7 @@ namespace U3A.BusinessRules
                             Leader = c.LeaderSummary,
                             Venue = c.Venue.Name,
                             VenueLocation = c.Venue.Address,
-                            EnrolmentStatus = GetEnrolmentStatus(e, term, settings,dbc.GetLocalTime())
+                            EnrolmentStatus = GetEnrolmentStatus(e, term, settings, dbc.GetLocalTime())
                         });
                     }
                 }
@@ -391,9 +391,9 @@ namespace U3A.BusinessRules
                 // Display if prior to allocation date irrespective of status
                 if (BusinessRule.IsPreRandomAllocationEmailDay(term, settings, localTime))
                 {
-                    if (Class.TermNumber >= term.TermNumber) 
-                    { 
-                        result = "Waitlisted: (Awaiting Random Allocation)"; 
+                    if (Class.TermNumber >= term.TermNumber)
+                    {
+                        result = "Waitlisted: (Awaiting Random Allocation)";
                     }
                     else
                     {
@@ -789,12 +789,13 @@ namespace U3A.BusinessRules
                 createEnrolmentSummaryTable(result, "Course Requested");
                 foreach (var e in enrolments)
                 {
-                    var status = GetEnrolmentStatus(e, term, settings,localTime);
+                    var status = GetEnrolmentStatus(e, term, settings, localTime);
                     result.AppendLine($"<tr><td>{e.Course.Name}</td><td>{status}</td></tr>");
                 }
                 result.AppendLine("</tbody></table>");
                 var processMsg = "Pending allocations are processed hourly";
-                if (IsEnrolmentBlackoutPeriod(settings)) {
+                if (IsEnrolmentBlackoutPeriod(settings))
+                {
                     var processDate = dbc.GetLocalTime(settings.EnrolmentBlackoutEndsUTC.Value).ToString(constants.STD_DATETIME_FORMAT);
                     processMsg = $"Pending allocations will be processed on or after<br/>{processDate}";
                 }

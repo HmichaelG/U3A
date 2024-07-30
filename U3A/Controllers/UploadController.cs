@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.IO;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace U3A.Controllers
 {
@@ -43,7 +36,7 @@ namespace U3A.Controllers
             var pathname = "uploads";
             var path = Path.Combine(ContentRootPath, pathname);
             if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+                _ = Directory.CreateDirectory(path);
             DeleteOldTempFiles(path);
             return path;
         }

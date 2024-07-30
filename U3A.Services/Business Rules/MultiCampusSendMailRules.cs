@@ -14,7 +14,7 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
-        public static async Task<IEnumerable<SendMail>> GetMultiCampusMailAsync(TenantDbContext dbcT,string Tenant)
+        public static async Task<IEnumerable<SendMail>> GetMultiCampusMailAsync(TenantDbContext dbcT, string Tenant)
         {
             List<SendMail> result = new();
             var mcMail = await dbcT.MultiCampusSendMail.Where(x => x.TenantIdentifier == Tenant).ToListAsync();
@@ -23,13 +23,13 @@ namespace U3A.BusinessRules
                 var mcPerson = dbcT.MultiCampusPerson.Find(m.PersonID);
                 if (mcPerson != null)
                 {
-                    result.Add(BusinessRule.GetSendMailFromMCSendMail(m,mcPerson));
+                    result.Add(BusinessRule.GetSendMailFromMCSendMail(m, mcPerson));
                 }
             }
             return result;
         }
         public static async Task CreateMultiCampusEnrolmentSendMailAsync(
-                                            TenantDbContext dbcT, 
+                                            TenantDbContext dbcT,
                                             IEnumerable<Class> classes,
                                             SystemSettings settings,
                                             DateTime? AsAt = null)
@@ -45,7 +45,7 @@ namespace U3A.BusinessRules
                     }
                 }
             await DoParticipantMultiCampusEnrolmentAsync(dbcT, list.ToArray(), AsAt);
-            await DoLeaderMultiCampusEnrolmentAsync(dbcT, classes,settings, list.ToArray());
+            await DoLeaderMultiCampusEnrolmentAsync(dbcT, classes, settings, list.ToArray());
         }
 
         private static async Task DoParticipantMultiCampusEnrolmentAsync(
@@ -73,7 +73,7 @@ namespace U3A.BusinessRules
             }
         }
         private static async Task DoLeaderMultiCampusEnrolmentAsync(
-                                    TenantDbContext dbcT, 
+                                    TenantDbContext dbcT,
                                     IEnumerable<Class> classes,
                                     SystemSettings settings,
                                     MultiCampusEnrolment[] enrolments)
@@ -86,7 +86,7 @@ namespace U3A.BusinessRules
                 if (e.ClassID != null)
                 {
                     // Different participants in each class
-                    var c = classes.FirstOrDefault(x => x.ID ==e.ClassID);
+                    var c = classes.FirstOrDefault(x => x.ID == e.ClassID);
                     foreach (var p in await BusinessRule.GetLeaderReportRecipients(dbcT, settings, t, c))
                     {
                         if (!(await dbcT.MultiCampusSendMail.Where(x => x.RecordKey == c.ID           // Record key is the classID

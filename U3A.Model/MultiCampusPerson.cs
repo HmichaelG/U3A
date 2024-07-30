@@ -47,5 +47,5 @@ namespace U3A.Model
         public string Communication { get; set; } = "Email";
 
     }
- 
+
 }

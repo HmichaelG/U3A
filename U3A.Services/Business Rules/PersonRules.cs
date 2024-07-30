@@ -16,7 +16,7 @@ namespace U3A.BusinessRules
     public static partial class BusinessRule
     {
 
-        public static async Task<bool> CanDelete(U3ADbContext dbc,Person person)
+        public static async Task<bool> CanDelete(U3ADbContext dbc, Person person)
         {
             // return false if person has any transactions
             bool result = true;
@@ -39,12 +39,12 @@ namespace U3A.BusinessRules
             return people;
         }
 
-        public static async Task<List<Person>> EditableDeletedPersonsAsync(U3ADbContext dbc,int CurrentYear)
+        public static async Task<List<Person>> EditableDeletedPersonsAsync(U3ADbContext dbc, int CurrentYear)
         {
             var people = dbc.Person.IgnoreQueryFilters()
                             .Include(x => x.Enrolments)
                             .Include(x => x.Receipts)
-                            .Where(x => x.IsDeleted && (x.FinancialTo >= CurrentYear-1 || x.FinancialTo == constants.START_OF_TIME))
+                            .Where(x => x.IsDeleted && (x.FinancialTo >= CurrentYear - 1 || x.FinancialTo == constants.START_OF_TIME))
                             .OrderBy(x => x.LastName)
                             .ThenBy(x => x.FirstName)
                             .ThenBy(x => x.Email).ToList();
@@ -91,7 +91,7 @@ namespace U3A.BusinessRules
                                 .FirstOrDefaultAsync();
             if (currentTerm == null) { return null; }
             var people = await dbc.Person.AsNoTracking()
-                            .Where(x => x.ID == PersonID                                        
+                            .Where(x => x.ID == PersonID
                                         && x.FinancialTo >= currentTerm.Year)
                             .OrderBy(x => x.LastName)
                             .ThenBy(x => x.FirstName)
@@ -188,7 +188,7 @@ namespace U3A.BusinessRules
                                             x.Course.Year == term.Year)
                                             .AsEnumerable()
                                             .Where(x => IsClassInTerm(x, term.TermNumber))
-                            .AsEnumerable().Where(x => IsCourseInTerm(x.Course,term)).ToList();
+                            .AsEnumerable().Where(x => IsCourseInTerm(x.Course, term)).ToList();
                 foreach (var c in person.LeaderOf)
                 {
                     c.Enrolments.AddRange(BusinessRule.SelectableEnrolmentsByClass(dbc, c, term, c.Course));
@@ -267,7 +267,7 @@ namespace U3A.BusinessRules
         public static bool IsCourseLeader(U3ADbContext dbc, Person person, DateTime LocalNow)
         {
             var result = false;
-            Term term = BusinessRule.CurrentEnrolmentTerm(dbc,LocalNow);
+            Term term = BusinessRule.CurrentEnrolmentTerm(dbc, LocalNow);
             var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
             return dbc.Class
                             .Include(x => x.Course).AsEnumerable()
@@ -313,11 +313,12 @@ namespace U3A.BusinessRules
                 .Include(x => x.Class).ThenInclude(x => x.OnDay)
                 .Include(x => x.Class).ThenInclude(x => x.Leader)
                 .Include(x => x.Class).ThenInclude(x => x.Occurrence)
-                .Where(x => x.TermID == TermID                             
+                .Where(x => x.TermID == TermID
                             && (WaitlistStatus == null || x.IsWaitlisted == WaitlistStatus))
-                            .AsEnumerable().Where(x => IsCourseInTerm(x.Course,x.Term)).ToList();
-            foreach (var person in people) { 
-                person.Enrolments=enrolments.Where(e => e.PersonID == person.ID).ToList();
+                            .AsEnumerable().Where(x => IsCourseInTerm(x.Course, x.Term)).ToList();
+            foreach (var person in people)
+            {
+                person.Enrolments = enrolments.Where(e => e.PersonID == person.ID).ToList();
                 person.EnrolledClasses.Clear();
                 foreach (var e in person.Enrolments)
                 {
@@ -349,7 +350,7 @@ namespace U3A.BusinessRules
                         newClass.IsSelected = !e.IsWaitlisted;
                         newClass.IsSelectedByEnrolment = (newClass.IsSelected) ? e : null;
                         person.EnrolledClasses.Add(newClass);
-                    }                    
+                    }
                 }
             }
             return people.Where(x => x.EnrolledClasses.Any()).ToList();

@@ -32,7 +32,7 @@ namespace U3A.BusinessRules
                             .ToListAsync();
         }
 
-        public static async Task ResetPersonDetailsForDeletedReceipt(U3ADbContext dbc, 
+        public static async Task ResetPersonDetailsForDeletedReceipt(U3ADbContext dbc,
                 Receipt ReceiptToDelete, int ProcessingYear)
         {
             var person = ReceiptToDelete.Person;

@@ -1,9 +1,9 @@
-using U3A.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
+using U3A.Data;
 
 namespace U3A.Components.Account
 {

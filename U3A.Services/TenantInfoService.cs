@@ -15,12 +15,12 @@ namespace U3A.Services
         public TenantInfoService(
                                 IDbContextFactory<TenantDbContext> TenantDbFactory,
                                 IHttpContextAccessor httpContextAccessor)
-        { 
+        {
             this.TenantDbFactory = TenantDbFactory;
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public string GetUserIdentity ()
+        public string GetUserIdentity()
         {
             var result = "Anonymous(Public)";
             if (httpContextAccessor.HttpContext == null) { return result; }

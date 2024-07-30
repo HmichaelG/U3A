@@ -20,7 +20,7 @@ namespace U3A.BusinessRules
             {
                 using (var dbcT = new TenantDbContext(tenantConnectionString))
                 {
-                    
+
                     var mcEnrolments = dbcT.MultiCampusEnrolment
                                             .Where(x => x.TenantIdentifier == tenant.Identifier)
                                             .OrderByDescending(x => x.Created)
@@ -34,7 +34,8 @@ namespace U3A.BusinessRules
                             var classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
                             foreach (var e in mcEnrolments)
                             {
-                                if (e.ClassID != null) { 
+                                if (e.ClassID != null)
+                                {
                                     // Different participants in each class
                                     var c = classes.FirstOrDefault(x => x.ID == e.ClassID);
                                     if (c != null) { await ProcessMCenrolment(c, e, today); }
@@ -60,7 +61,7 @@ namespace U3A.BusinessRules
             }
         }
 
-        private static async Task ProcessMCenrolment(Class c,MultiCampusEnrolment e,DateTime today)
+        private static async Task ProcessMCenrolment(Class c, MultiCampusEnrolment e, DateTime today)
         {
             if (e.IsWaitlisted)
             {

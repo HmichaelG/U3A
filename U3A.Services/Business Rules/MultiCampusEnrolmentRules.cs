@@ -42,14 +42,15 @@ namespace U3A.BusinessRules
         {
             ConcurrentBag<Enrolment> result = new();
             var mcEnrolment = await dbcT.MultiCampusEnrolment.Where(x => x.TenantIdentifier == Tenant).ToListAsync();
-            if (CourseID != null && ClassID == null) 
-            { 
-                mcEnrolment = mcEnrolment.Where(x => x.CourseID == CourseID && x.ClassID == null).ToList(); 
+            if (CourseID != null && ClassID == null)
+            {
+                mcEnrolment = mcEnrolment.Where(x => x.CourseID == CourseID && x.ClassID == null).ToList();
             }
-            if (CourseID != null && ClassID != null) { 
+            if (CourseID != null && ClassID != null)
+            {
                 mcEnrolment = mcEnrolment
                                 .Where(x => x.CourseID == CourseID
-                                            && x.ClassID == ClassID).ToList(); 
+                                            && x.ClassID == ClassID).ToList();
             }
             foreach (var e in mcEnrolment)
             {

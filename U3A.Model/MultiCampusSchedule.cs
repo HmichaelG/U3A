@@ -15,6 +15,6 @@ namespace U3A.Model
         public string TenantIdentifier { get; set; }
         public string jsonClass { get; set; }
         public string jsonClassEnrolments { get; set; }
-        public string jsonCourseEnrolments { get; set;}
+        public string jsonCourseEnrolments { get; set; }
     }
 }

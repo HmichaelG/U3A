@@ -76,7 +76,7 @@ namespace U3A.BusinessRules
                 TermID = e.TermID,
                 Term = GetTermFromMCTerm(t),
                 CourseID = e.CourseID,
-                Course = (c != null) ? c.Course : null, 
+                Course = (c != null) ? c.Course : null,
                 ClassID = e.ClassID,
                 Created = e.Created,
                 DateEnrolled = e.DateEnrolled,

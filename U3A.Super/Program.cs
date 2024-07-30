@@ -15,14 +15,14 @@ builder.Services.AddDbContext<TenantDbContext>(options =>
     options.UseSqlServer(MultiTenantConnectionString,
      b =>
      {
-         b.MigrationsAssembly(assemblyName);
+         _ = b.MigrationsAssembly(assemblyName);
      }
      )
 );
 
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
-    options.UseSqlServer();
+    _ = options.UseSqlServer();
 }, ServiceLifetime.Scoped);
 
 var initialScopes = builder.Configuration["DownstreamApi:Scopes"]?.Split(' ') ?? builder.Configuration["MicrosoftGraph:Scopes"]?.Split(' ');
@@ -62,9 +62,9 @@ app.UseRequestLocalization("en-AU");
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    _ = app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    _ = app.UseHsts();
 }
 
 app.UseHttpsRedirection();

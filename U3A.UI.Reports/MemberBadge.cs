@@ -1,22 +1,22 @@
-﻿using DevExpress.Web.Internal;
+﻿using DevExpress.Data.Browsing.Design;
+using DevExpress.Drawing;
+using DevExpress.Web.Internal;
 using DevExpress.XtraReports.UI;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using U3A.BusinessRules;
 using U3A.Database;
-using DevExpress.Drawing;
 using U3A.Model;
-using DevExpress.Data.Browsing.Design;
-using Microsoft.EntityFrameworkCore;
 
 namespace U3A.UI.Reports
 {
-    public partial class MemberBadge 
+    public partial class MemberBadge
         : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContextFactory
     {
-       
+
         public IDbContextFactory<U3ADbContext> U3Adbfactory { get; set; }
 
         Term _term { get; set; }

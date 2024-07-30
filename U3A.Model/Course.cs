@@ -90,7 +90,7 @@ namespace U3A.Model
         public bool ExcludeFromLeaderComplimentaryCount { get; set; }
         public SendLeaderReportsTo? SendLeaderReportsTo { get; set; }
         public CourseContactOrder? CourseContactOrder { get; set; }
-        
+
         [Url]
         public string? AdditionalInformationURL { get; set; }
 

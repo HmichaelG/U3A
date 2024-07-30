@@ -16,9 +16,9 @@ using U3A.Services;
 
 namespace U3A.UI.Reports
 {
-    public partial class ClassScheduleRpt 
-        : DevExpress.XtraReports.UI.XtraReport, 
-            IXtraReportWithDbContextAndTenantDbContext, 
+    public partial class ClassScheduleRpt
+        : DevExpress.XtraReports.UI.XtraReport,
+            IXtraReportWithDbContextAndTenantDbContext,
             IXtraReportWithNavManager
     {
         public ClassScheduleRpt()
@@ -138,13 +138,14 @@ namespace U3A.UI.Reports
             var Class = GetCurrentRow() as Class;
             if (Class == null) { return; }
             var course = Class.Course;
-            if (course.ClassSummaries.Count > 1 ) {
+            if (course.ClassSummaries.Count > 1)
+            {
                 string text = string.Empty;
                 foreach (var thisClass in course.ClassSummaries)
                 {
                     text = $"{text}{thisClass}{Environment.NewLine}";
                 }
-                if (text != string.Empty) tableCellClassDetail.Text  = text;
+                if (text != string.Empty) tableCellClassDetail.Text = text;
             }
         }
 
@@ -165,7 +166,7 @@ namespace U3A.UI.Reports
         private void xrVenueRow_BeforePrint(object sender, CancelEventArgs e)
         {
             Class c = (Class)GetCurrentRow();
-            xrVenueRow.Visible = (c.Course.ClassSummaries.Count <= 1) ? true : false; 
+            xrVenueRow.Visible = (c.Course.ClassSummaries.Count <= 1) ? true : false;
         }
     }
 

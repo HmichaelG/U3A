@@ -11,7 +11,7 @@ namespace U3A.Model
     {
         private IJSRuntime jsRuntime;
         private TimeSpan? _utcOfffset;
-        
+
         public TimeSpan UtcOffset
         {
             get
@@ -47,7 +47,7 @@ namespace U3A.Model
         }
         public async Task<DateTime> GetLocalTimeAsync()
         {
-            if (_utcOfffset == null) { _= await GetTimezoneOffsetAsync(); }
+            if (_utcOfffset == null) { _ = await GetTimezoneOffsetAsync(); }
             // Converting to local time using UTC and local time minute difference.
             return DateTimeOffset.UtcNow.ToOffset(_utcOfffset.Value).DateTime;
         }

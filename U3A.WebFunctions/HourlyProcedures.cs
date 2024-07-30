@@ -1,7 +1,5 @@
-using DevExpress.DirectX.NativeInterop.Direct2D;
 using DevExpress.Drawing;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -59,7 +57,7 @@ namespace U3A.WebFunctions
                     _logger.LogInformation($"[{tenant.Identifier}] Local Time: {DateTime.UtcNow + utcOffset}. UTC Offset: {utcOffset}");
                 }
 
-                isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
+                isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                 TaskList.Add(AutoEnrolParticipants.Process(tenant, cn!, _logger));
             }
             // Make sure all processing is complete before email starts.
@@ -68,7 +66,7 @@ namespace U3A.WebFunctions
             foreach (var tenant in tenants)
             {
                 _logger.LogInformation($"****** Processing Email Procedures for {tenant.Identifier}: {tenant.Name}. ******");
-                isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
+                isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                 if (isBackgroundProcessingEnabled)
                 {
                     await ProcessCorrespondence.Process(tenant, cn!, _logger, IsHourlyProcedure: true);
