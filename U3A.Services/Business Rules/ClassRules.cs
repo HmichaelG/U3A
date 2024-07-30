@@ -72,7 +72,7 @@ namespace U3A.BusinessRules
             // OccurenceID == 99 is an Unscheduled class
             var classes = await dbc.Class.AsNoTracking()
                             .Include(x => x.OnDay)
-                            .Include(x => x.Course).ThenInclude(x => x.Enrolments)
+                            .Include(x => x.Course)
                             .Include(x => x.Leader)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
