@@ -19,7 +19,7 @@
     <div class="w-100 px-4">
         <h2>Exceptions</h2>
         <div class="pb-2">
-            <FullScreen DisplayOffset="12" HideToggle="true">
+            <FullScreen DisplayOffset="10" HideToggle="true">
                 <ContentTemplate>
                     <DxGrid @ref="grid" Data="@exceptions"
                             DataItemDeleting="Grid_DataItemDeleting"
@@ -36,17 +36,23 @@
                                     <DxToolbarItem IconCssClass="bi bi-envelope" Text="Show All"
                                                    BeginGroup=true
                                                    Click=@OnShowAllToggle
+                                                   RenderStyle="ButtonRenderStyle.Info"
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   Alignment="ToolbarItemAlignment.Right"
+                                                   Tooltip="Show/hide non-tenant exceptions" />
+                                    <DxToolbarItem IconCssClass="bi bi-trash" Text="Delete All"
+                                                   BeginGroup=true
+                                                   Click=@OnDeleteAll
                                                    RenderStyle="ButtonRenderStyle.Primary"
                                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                                    Alignment="ToolbarItemAlignment.Right"
-                                                   Tooltip="Show/hide non-tenant exceptions">
-                                    </DxToolbarItem>
+                                                   Tooltip="Delete all exceptions" />
                                 </CustomButtonContent>
                             </GridToolbar>
                         </ToolbarTemplate>
                         <Columns>
                             <DxGridCommandColumnEx Width="10rem" EditButtonVisible="false" DeleteButtonVisible="true" />
-                            <DxGridDataColumn Width="10rem" Caption="Date" FieldName="TimeStamp"  >
+                            <DxGridDataColumn Width="10rem" Caption="Date" FieldName="TimeStamp">
                                 <CellDisplayTemplate>
                                     <div>@(GetLocalTime((DateTime)context.Value)) </div>
                                 </CellDisplayTemplate>
@@ -95,7 +101,8 @@
         isReady = true;
     }
 
-    DateTime GetLocalTime(DateTime value) {
+    DateTime GetLocalTime(DateTime value)
+    {
         var result = value + lt.UtcOffset;
         return result;
     }
@@ -105,6 +112,18 @@
         showAll = !showAll;
         await GetData();
 
+    }
+
+    async Task OnDeleteAll()
+    {
+        if (await messageBox!.ShowAsync("Delete all logs", "Do you really want to delete all logs?"))
+        {
+            using (var dbc = await tenantDbfactory.CreateDbContextAsync())
+            {
+                dbc.LogEvents.ExecuteDelete();
+            }
+            await GetData();
+        }
     }
 
     async Task OnLogButtonClick(LogEvents log)
