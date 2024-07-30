@@ -141,11 +141,11 @@
 
             //Set timeout
             dotNetObjectReference = DotNetObjectReference.Create(this);
-            await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
-            // Timezone adjustment
-            // var lt = new LocalTime(js);
-            // TimezoneAdjustment.TimezoneOffset = await lt.GetTimezoneOffsetAsync();
-            // Set the workstation ID
+            try
+            {
+                await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
+            }
+            catch { };
             await Workstation.SetWorkstationDetail(js, localStorage);
             useTopMenu = Workstation.UseTopMenu;
             await InvokeAsync(StateHasChanged);
