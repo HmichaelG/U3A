@@ -30,19 +30,11 @@ using System.Collections.ObjectModel;
 using Serilog.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddScoped<LocalTime>();
-
-//if (!builder.Environment.IsDevelopment())
-//{
-//    var uri = Environment.GetEnvironmentVariable("VaultUri");
-//    if (uri != null )
-//    {
-//        var keyVaultEndpoint = new Uri(uri);
-//        builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
-//    }
-//}
 
 // **** Start local modifications ****
+
+builder.Services.AddScoped<LocalTime>();
+builder.Services.AddScoped<TenantInfoService>();
 
 string? tenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
 if (tenantConnectionString is null)
@@ -195,7 +187,6 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 
 
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
-builder.Services.AddScoped<TenantInfoService>();
 
 if (!builder.Environment.IsDevelopment())
 {

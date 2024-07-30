@@ -23,7 +23,7 @@ namespace U3A.Services
         }
         public async ValueTask LogErrorAsync(Exception exception)
         {
-            if (exception is AntiforgeryValidationException) { return; }
+            if (exception.Message.Contains("AntiforgeryValidationException")) { return; }
             using (LogContext.PushProperty("LogEvent","Unhandled Exception"))
             {
                 using (LogContext.PushProperty("Tenant",
