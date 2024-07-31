@@ -150,6 +150,24 @@ else
                         <div class="month-style-nb">Dec</div>
                     </div>
                 </DateHeaderCellTemplate>
+                <HorizontalAppointmentTemplate>
+                    @if ((int)context.Label.Id == 3)
+                    {
+                        <div class="card appointment-height
+                                @context.Label.BackgroundCssClass">
+                        @string.Empty
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card text-center
+                                @context.Label.TextCssClass
+                                @context.Label.BackgroundCssClass">
+                            <b>@(context.Appointment.Subject)</b>
+                            @($"{context.Appointment.Start.ToString(constants.SHORTER_DATE_FORMAT)} to {context.Appointment.End.ToString(constants.SHORTER_DATE_FORMAT)}")
+                        </div>
+                    }
+                </HorizontalAppointmentTemplate>
             </DxSchedulerTimelineView>
         </Views>
         <AppointmentTooltipHeaderTemplate>
@@ -170,10 +188,15 @@ else
 <style>
     .grid-height {
         overflow: auto;
-        height: 40vh;
+        height: 50dvh;
     }
 
-    .dxbs-sc-tb-wrapper {
+    .appointment-height {
+        overflow: hidden;
+        height: 7dvh;
+    }
+
+    .dxbl-sc-tb-wrapper {
         display: none !important;
     }
 
@@ -379,7 +402,7 @@ else
                 if (term.EnrolmentStartDate < prevTerm.EnrolmentEndDate)
                 {
                     await messageBox.ShowOkOnlyAsync("Enrolment Period ambiguous",
-                                                    $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
+                                                                        $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
                                                 prior to last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
                                                 <p>The enrolment period is ambiguous which is not permitted.</p>");
                     return false;
@@ -387,7 +410,7 @@ else
                 if (term.EnrolmentStartDate >= prevTerm.EnrolmentEndDate.AddDays(1))
                 {
                     result = await messageBox.ShowAsync("Enrolment Period not continuous",
-                                                $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
+                                                                    $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
                                             is later than last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is not continuous and there will be a period where members
                                             are not permitted to enrol.</p><p>Do you wish to continue?</p>");
@@ -403,7 +426,7 @@ else
                 if (nextTerm.EnrolmentStartDate < term.EnrolmentEndDate.AddDays(-1))
                 {
                     await messageBox.ShowOkOnlyAsync("Enrolment Period ambiguous",
-                                                $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
+                                                                    $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
                                             prior to next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is ambiguous which is not permitted.</p>");
                     return false;
@@ -411,7 +434,7 @@ else
                 if (nextTerm.EnrolmentStartDate >= term.EnrolmentEndDate.AddDays(1))
                 {
                     result = await messageBox.ShowAsync("Enrolment Period not continuous",
-                                                    $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
+                                                                        $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
                                             is later than next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is not continuous and there will be a period where members
                                             are not permitted to enrol.</p><p>Do you wish to continue?</p>");

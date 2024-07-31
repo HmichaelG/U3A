@@ -69,6 +69,8 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<Class>> SchedulledClassesWithCourseEnrolmentsAsync(U3ADbContext dbc, Term term)
         {
+            var enrolments = await dbc.Enrolment.AsNoTracking()
+                                    .Where(x => x.TermID == term.ID).ToListAsync();
             // OccurenceID == 99 is an Unscheduled class
             var classes = await dbc.Class.AsNoTracking()
                             .Include(x => x.OnDay)
@@ -78,6 +80,17 @@ namespace U3A.BusinessRules
                             .Include(x => x.Venue)
                             .Where(x => x.Course.Year == term.Year && x.OccurrenceID != 999)
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToListAsync();
+            Parallel.ForEach(classes, c =>
+            {
+                if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                {
+                    c.Course.Enrolments = enrolments.Where(x => x.CourseID == c.CourseID).ToList();
+                }
+                else
+                {
+                    c.Course.Enrolments = enrolments.Where(x => x.ClassID == c.ID).ToList();
+                }
+            });
             return classes;
         }
 
