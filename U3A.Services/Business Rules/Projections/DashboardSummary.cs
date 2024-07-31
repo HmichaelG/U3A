@@ -295,7 +295,7 @@ namespace U3A.BusinessRules
             }
             else if (years >= 56 && years <= 60)
             {
-                return "56-50 years";
+                return "56-60 years";
             }
             else if (years >= 61 && years <= 65)
             {
