@@ -23,9 +23,7 @@ namespace U3A.Services
         public string GetUserIdentity()
         {
             var result = "Anonymous(Public)";
-            if (httpContextAccessor.HttpContext == null) { return result; }
-            if (httpContextAccessor.HttpContext.User == null) { return result; }
-            if (httpContextAccessor.HttpContext.User.Identity == null) { return result; }
+            if (httpContextAccessor?.HttpContext?.User?.Identity == null) { return result; }
             result = httpContextAccessor.HttpContext.User.Identity.Name;
             return result;
         }

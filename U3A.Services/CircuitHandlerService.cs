@@ -35,12 +35,8 @@ namespace U3A.Services
         {
             IHttpContextAccessor accessor = new ASP_CORE.HttpContextAccessor();
             if (accessor == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            if (accessor.HttpContext == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            if (accessor.HttpContext.User == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            if (accessor.HttpContext.User.Identity == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            if (accessor.HttpContext.Request == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            if (accessor.HttpContext.Request.Host == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            if (accessor.HttpContext.Request.Host.Host == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
+            if (accessor.HttpContext?.User?.Identity == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
+            if (accessor.HttpContext?.Request?.Host == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
             var id = accessor.HttpContext.User.Identity;
             HostStrategy hs = new HostStrategy();
             var tenant = hs.GetIdentifier(accessor.HttpContext.Request.Host.Host);
