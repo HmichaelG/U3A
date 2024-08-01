@@ -29,6 +29,7 @@ else
             <DxDrawer Position="DrawerPosition.Right"
                       PanelWidth="25rem"
                       Mode="DrawerMode.Overlap"
+                      CssClass="drawer-style"
                       @bind-IsOpen="@isDrawerOpen">
                 <HeaderTemplate>
                     <DxButton SizeMode="SizeMode.Small"
@@ -38,7 +39,7 @@ else
                               CssClass="calendar-button-style" />
                 </HeaderTemplate>
                 <BodyTemplate>
-                    <ClassCalendar DisplayOffset="@(Workstation.UseTopMenu ? 7 : 5.35)" />
+                    <ClassCalendar DisplayOffset="@(Workstation.UseTopMenu ? 8 : 5.4)" />
                 </BodyTemplate>
                 <TargetContent>
                     <DxTabs RenderMode="TabsRenderMode.OnDemand" CssClass="tabs-style">
@@ -175,6 +176,10 @@ else
         width:98%;
     }
 
+    .drawer-style {
+        height: calc(100dvh - @drawerHeightAdjustment);
+    }
+
 </style>
 
 @code {
@@ -188,6 +193,7 @@ else
     bool isSelected = false;
     bool isProcessing;
     bool isDrawerOpen;
+    string drawerHeightAdjustment;
 
     MessageBox? messageBox;
     U3ADbContext dbc { get; set; }
@@ -202,6 +208,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await OnRefresh();
+        drawerHeightAdjustment = Workstation.UseTopMenu ? "4rem" : "1.35rem";
         IsReady = true;
     }
 

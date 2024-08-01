@@ -110,7 +110,7 @@
     string toggleButtonText = "Hide";
     bool isCalendarVisible = true;
     string CalendarCssClass = "w-100";
-    int hiddenCalendarOffset = 0;
+    double hiddenCalendarOffset = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,7 +142,7 @@
         {
             toggleButtonText = "Show";
             CalendarCssClass = "d-none";
-            hiddenCalendarOffset = 17;
+            hiddenCalendarOffset = 16.5;
         }
         grid?.MakeRowVisible(0);
     }
