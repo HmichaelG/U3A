@@ -7,7 +7,7 @@
         <div class="w-100 d-flex justify-content-center">
             <DxFormLayoutGroup>
                 <HeaderContentTemplate>
-                    <div class="input-group">
+                    <div class="input-group fs-6">
                         <div class="flex-grow-1">Calendar</div>
                         <a class="link" onclick="@OnToggleButtonClick">@toggleButtonText</a>
                     </div>
@@ -16,6 +16,7 @@
                     <div class="w-100 pt-1 d-flex justify-content-center">
                         <DxCalendar @bind-SelectedDate=@selectedDate CssClass="@CalendarCssClass"
                                     @bind-SelectedDate:after=OnDateChanged
+                                    SizeMode="SizeMode.Small"
                                     ShowClearButton=false
                                     VisibleDate="@today"
                                     MinDate="@today">
@@ -34,6 +35,7 @@
                             AllowGroup=false
                             AllowSort=false
                             PagerVisible=false
+                            SizeMode="SizeMode.Small"
                             CssClass="mt-1 box-style">
                         <Columns>
                             <DxGridDataColumn Width="100%"
@@ -82,12 +84,13 @@
 <style>
 
     .box-style {
-        height: calc(100dvh - @($"{DisplayOffset - hiddenCalendarOffset + 24}rem"));
+        height: calc(100dvh - @($"{DisplayOffset - hiddenCalendarOffset + 21}rem"));
     }
 
     .font-weight-bold {
         font-weight: 800;
     }
+
 </style>
 
 @code {
@@ -139,7 +142,7 @@
         {
             toggleButtonText = "Show";
             CalendarCssClass = "d-none";
-            hiddenCalendarOffset = 20;
+            hiddenCalendarOffset = 17;
         }
         grid?.MakeRowVisible(0);
     }
