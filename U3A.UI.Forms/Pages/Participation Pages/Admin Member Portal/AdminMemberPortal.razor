@@ -38,10 +38,10 @@ else
                               CssClass="calendar-button-style" />
                 </HeaderTemplate>
                 <BodyTemplate>
-                    <ClassCalendar DisplayOffset="@(Workstation.UseTopMenu ? 7 : 5)" />
+                    <ClassCalendar DisplayOffset="@(Workstation.UseTopMenu ? 7 : 5.35)" />
                 </BodyTemplate>
                 <TargetContent>
-                    <DxTabs RenderMode="TabsRenderMode.OnDemand">
+                    <DxTabs RenderMode="TabsRenderMode.OnDemand" CssClass="tabs-style">
                         <DxTabPage Text="Process On Behalf Of">
                             <DxFormLayout CssClass="my-2">
                                 <CollapsableContent AlertType="none" CssClass="w-100"
@@ -168,9 +168,12 @@ else
     .calendar-button-style {
         position: absolute;
         top: 0;
-        right: 1rem;
+        right: 0;
     }
 
+    .tabs-style {
+        width:98%;
+    }
 
 </style>
 
