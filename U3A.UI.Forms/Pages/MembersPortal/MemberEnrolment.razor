@@ -422,62 +422,62 @@ else
     }
 </style>
 @code {
-    const string EXPERIMENTAL_TEXT = $@"<div class='alert alert-warning text-dark text-center'><h5>This class is Experimental</h5>
+        const string EXPERIMENTAL_TEXT = $@"<div class='alert alert-warning text-dark text-center'><h5>This class is Experimental</h5>
                         You have requested enrolment in a class that is currently experimental.<br/>
                         This means the class has features that are new and are still undergoing full implementation.
                         While you are encouraged to participate in this class, you should be aware that implementation
                         and the feature-set may change. Thank you for your participation!
                         </div>";
 
-    [CascadingParameter]
-    LoginState loginState { get; set; }
+        [CascadingParameter]
+        LoginState loginState { get; set; }
 
-    [Parameter]
-    public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
-    [Parameter]
-    public EventCallback<bool> OneReadyStatusChanged { get; set; }
+        [Parameter]
+        public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+        [Parameter]
+        public EventCallback<bool> OneReadyStatusChanged { get; set; }
 
-    [Parameter]
-    public bool IsReadOnly { get; set; }
+        [Parameter]
+        public bool IsReadOnly { get; set; }
 
-    [Parameter]
-    public bool IsPreview { get; set; }
+        [Parameter]
+        public bool IsPreview { get; set; }
 
-    [Parameter]
-    public bool IsEnrolmentRequestView { get; set; }
+        [Parameter]
+        public bool IsEnrolmentRequestView { get; set; }
 
-    [Parameter]
-    public bool IsEnrolmentWithdrawalView { get; set; }
+        [Parameter]
+        public bool IsEnrolmentWithdrawalView { get; set; }
 
-    [Parameter]
-    public Guid? QRClassID { get; set; }
+        [Parameter]
+        public Guid? QRClassID { get; set; }
 
-    [Parameter]
-    public Term PreviewTerm { get; set; }
+        [Parameter]
+        public Term PreviewTerm { get; set; }
 
-    Progress? ProgressBar;
-    bool isProgressVisible { get; set; }
+        Progress? ProgressBar;
+        bool isProgressVisible { get; set; }
 
-    Term? term;
-    Term? prevTerm;
-    List<Class> ListboxData;
-    List<Class>? Classes;
-    List<Class> selectedClasses = new List<Class>();
-    List<Class> deletedClasses = new List<Class>();
-    Class selectedClass;
-    List<ReportStyleWrapper> ReportStyleList = new ReportStyleList();
-    ReportStyle reportStyle = ReportStyle.Detail;
+        Term? term;
+        Term? prevTerm;
+        List<Class> ListboxData;
+        List<Class>? Classes;
+        List<Class> selectedClasses = new List<Class>();
+        List<Class> deletedClasses = new List<Class>();
+        Class selectedClass;
+        List<ReportStyleWrapper> ReportStyleList = new ReportStyleList();
+        ReportStyle reportStyle = ReportStyle.Detail;
 
-    DxButton? listboxViewButton;
-    DxTabs? dxTabs;
-    DxGrid? listGrid;
-    DxTextBox filterTextBox;
+        DxButton? listboxViewButton;
+        DxTabs? dxTabs;
+        DxGrid? listGrid;
+        DxTextBox filterTextBox;
 
-    int activeTabIndex;
-    string listHeight = "60vh;";
+        int activeTabIndex;
+        string listHeight;
 
-    string selectionCountText = string.Empty;
-    bool isListboxShowingSummary = true;
+        string selectionCountText = string.Empty;
+        bool isListboxShowingSummary = true;
     internal ErrorPopup? ErrorPopup { get; set; }
     internal string? ErrorHeader;
     internal string? ErrorMessage;
@@ -583,6 +583,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+        listHeight = IsReadOnly || IsEnrolmentWithdrawalView
+                        ? Workstation.UseTopMenu ? "70dvh;" : "75dvh;"
+                        : Workstation.UseTopMenu ? "60dvh;" : "65dvh;";
 
         await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
 
@@ -721,13 +725,6 @@ else
                     await messageBox?.ShowOkOnlyAsync("Selected class is not available",
                             $"We're very sorry. Your selected class is no longer available.");
                 }
-            }
-            var offset = (loginState.IsAdminOnBehalfOfMember) ? 0.175 : 0.15;
-            var newHeight = await Window.FitToRemainingHeight(js, "listBox", listHeight, offset);
-            if (newHeight != listHeight)
-            {
-                listHeight = newHeight;
-                InvokeAsync(StateHasChanged);
             }
         }
         ProgressBar?.Close();
