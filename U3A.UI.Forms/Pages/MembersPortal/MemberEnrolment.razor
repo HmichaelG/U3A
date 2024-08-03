@@ -641,7 +641,7 @@ else
                     {
                         // Fast lookup from Schedule cache
                         isFinancial = false;
-                        if (loginState.SelectedPerson.FinancialTo >= term.Year) { isFinancial = true; }
+                        if (loginState?.SelectedPerson?.FinancialTo >= term.Year) { isFinancial = true; }
                         Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
                     }
                     if (Classes != null)
