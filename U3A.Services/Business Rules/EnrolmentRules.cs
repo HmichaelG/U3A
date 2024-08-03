@@ -63,6 +63,7 @@ namespace U3A.BusinessRules
                 testTerm = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisTerm.Year
                                             && x.TermNumber == termNumber);
             }
+            if (testTerm == null) { return enrolments; }
             if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == testTerm.ID))
             {
                 enrolments = await dbc.Enrolment.AsNoTracking()
