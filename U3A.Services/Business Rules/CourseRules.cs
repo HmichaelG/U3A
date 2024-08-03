@@ -1,6 +1,7 @@
 ﻿using DevExpress.Blazor.Internal;
 using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using U3A.Database;
@@ -132,10 +133,10 @@ namespace U3A.BusinessRules
         public static async Task<List<Course>> SelectableCoursesForLeader(U3ADbContext dbc,
                                             Term term, Person Leader)
         {
-            var allCourses = await SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
+            var coursesInTerm = await SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
             var courses = new List<Course>();
             bool isCourseLeader;
-            foreach (var course in allCourses)
+            foreach (var course in coursesInTerm)
             {
                 foreach (var c in course.Classes)
                 {
@@ -155,7 +156,7 @@ namespace U3A.BusinessRules
                     if (isCourseLeader && !courses.Contains(course)) { courses.Add(course); }
                 }
             }
-            foreach (var course in await GetClassDetailsForClerk(dbc, Leader, term))
+            foreach (var course in await GetClassDetailsForClerk(dbc, coursesInTerm, Leader, term))
             {
                 if (!courses.Contains(course)) { courses.Add(course); }
             }
@@ -166,15 +167,18 @@ namespace U3A.BusinessRules
             return courses.OrderBy(x => x.Name).ToList();
         }
 
-        public static async Task<List<Course>> GetClassDetailsForClerk(U3ADbContext dbc, Person Student, Term term)
+        public static async Task<List<Course>> GetClassDetailsForClerk(U3ADbContext dbc, List<Course> CoursesInTerm, Person Student, Term term)
         {
-            List<Course> result;
-            result = await dbc.Course
+            ConcurrentBag<Course> result = new();
+            var allCourses = await dbc.Course
                                 .Include(c => c.Enrolments)
                                 .Where(c => c.Enrolments.Any(e => e.PersonID == Student.ID &&
                                     e.TermID == term.ID &&
                                     e.IsCourseClerk && !e.IsWaitlisted)).ToListAsync();
-            return result;
+            Parallel.ForEach(allCourses, x => {
+                if (CoursesInTerm.Contains(x)) { result.Add(x); }
+            });
+            return result.ToList();
         }
 
         public static List<Person> SelectableCourseLeaders(Course SelectedCourse, Class? SelectedClass)
