@@ -48,22 +48,22 @@ else
                                 <DxStackLayoutItem>
                                     <Template>
                                         <DxFormLayoutGroup Caption="Organisation Details" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
-                                                <DxFormLayoutItem Caption="Timezone" ColSpanMd="12">
-                                                    <DxComboBox Data="@timezones" TValue="TimeZoneInfo" TData="TimeZoneInfo"
-                                                                ValueFieldName="@nameof(TimeZoneInfo.DisplayName)"
-                                                                TextFieldName="@nameof(TimeZoneInfo.Id)"
-                                                                @bind-Text=@systemSettings.TimeZoneId>
-                                                        <Columns>
-                                                            <DxListEditorColumn FieldName="@nameof(TimeZoneInfo.Id)" Caption="TimeZone" Width="25rem" />
-                                                            <DxListEditorColumn FieldName="@nameof(TimeZoneInfo.DisplayName)" Caption="Details" Width="25rem" />
-                                                        </Columns>
-                                                        <Buttons>
+                                            <DxFormLayoutItem Caption="Timezone" ColSpanMd="12">
+                                                <DxComboBox Data="@timezones" TValue="TimeZoneInfo" TData="TimeZoneInfo"
+                                                            ValueFieldName="@nameof(TimeZoneInfo.DisplayName)"
+                                                            TextFieldName="@nameof(TimeZoneInfo.Id)"
+                                                            @bind-Text=@systemSettings.TimeZoneId>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(TimeZoneInfo.Id)" Caption="TimeZone" Width="25rem" />
+                                                        <DxListEditorColumn FieldName="@nameof(TimeZoneInfo.DisplayName)" Caption="Details" Width="25rem" />
+                                                    </Columns>
+                                                    <Buttons>
                                                         <DxEditorButton Text="@($"UTC {systemSettings?.UTCOffset.ToString(@"hh\:mm")}")" CssClass="text-primary"
                                                                         Enabled="false"
                                                                         IconCssClass="h5 bi bi-clock" />
-                                                        </Buttons>
-                                                    </DxComboBox>
-                                                </DxFormLayoutItem>
+                                                    </Buttons>
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="U3A Group" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@systemSettings.U3AGroup" />
                                             </DxFormLayoutItem>
@@ -291,55 +291,64 @@ else
                             <Items>
                                 <DxStackLayoutItem>
                                     <Template>
-                                        <DxFormLayoutItem Caption="Allow Multi-Campus Extensions?" ColSpanMd="12">
-                                            <DxCheckBox @bind-Checked="@systemSettings.AllowMultiCampusExtensions" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutGroup Caption="Multi-Campus U3A"
-                                                           ColSpanMd="12"
-                                                           Visible="@systemSettings.AllowMultiCampusExtensions">
-                                            <DxFormLayoutGroup Caption="U3A Not Allowed" ColSpanMd="5">
-                                                <DxGrid @ref=@UnassignedGrid Data=@UnassignedU3A AllowColumnReorder=false CssClass="m-1"
-                                                        @bind-SelectedDataItems="SelectedUnassignedItems"
-                                                        SelectionMode="GridSelectionMode.Multiple"
-                                                        VirtualScrollingEnabled=true
-                                                        KeyFieldName="Id"
-                                                        AllowGroup=false
-                                                        AllowSelectRowByClick=true>
-                                                    <Columns>
-                                                        <DxGridSelectionColumn Width="2rem" />
-                                                        <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
-                                                        <DxGridDataColumn Caption="Name" FieldName="Name" />
-                                                    </Columns>
-                                                </DxGrid>
-                                            </DxFormLayoutGroup>
+                                        <DxFormLayout class="m-2" Enabled="@thisTenant.EnableMultiCampusExtension">
+                                            @if (thisTenant.EnableMultiCampusExtension)
+                                            {
+                                                <DxFormLayoutItem Caption="Allow Multi-Campus Extensions?" ColSpanMd="12">
+                                                    <DxCheckBox @bind-Checked="@systemSettings.AllowMultiCampusExtensions" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutGroup Caption="Multi-Campus U3A"
+                                                                   ColSpanMd="12"
+                                                                   Visible="@systemSettings.AllowMultiCampusExtensions">
+                                                    <DxFormLayoutGroup Caption="U3A Not Allowed" ColSpanMd="5">
+                                                        <DxGrid @ref=@UnassignedGrid Data=@UnassignedU3A AllowColumnReorder=false CssClass="m-1"
+                                                                @bind-SelectedDataItems="SelectedUnassignedItems"
+                                                                SelectionMode="GridSelectionMode.Multiple"
+                                                                VirtualScrollingEnabled=true
+                                                                KeyFieldName="Id"
+                                                                AllowGroup=false
+                                                                AllowSelectRowByClick=true>
+                                                            <Columns>
+                                                                <DxGridSelectionColumn Width="2rem" />
+                                                                <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
+                                                                <DxGridDataColumn Caption="Name" FieldName="Name" />
+                                                            </Columns>
+                                                        </DxGrid>
+                                                    </DxFormLayoutGroup>
 
-                                            <DxFormLayoutGroup Caption="Action" ColSpanMd="2">
-                                                <DxButton Text="Allow >>"
-                                                          Enabled='@(SelectedUnassignedItems?.Count > 0)'
-                                                          Click="OnAllowSelected"
-                                                          CssClass="mx-2 mt-2 w-100" />
-                                                <DxButton Text="<< Disallow"
-                                                          Enabled='@(SelectedAssignedItems?.Count > 0)'
-                                                          Click="OnDisallowSelected"
-                                                          CssClass="mx-2 mt-2 w-100" />
-                                            </DxFormLayoutGroup>
+                                                    <DxFormLayoutGroup Caption="Action" ColSpanMd="2">
+                                                        <DxButton Text="Allow >>"
+                                                                  Enabled='@(SelectedUnassignedItems?.Count > 0)'
+                                                                  Click="OnAllowSelected"
+                                                                  CssClass="mx-2 mt-2 w-100" />
+                                                        <DxButton Text="<< Disallow"
+                                                                  Enabled='@(SelectedAssignedItems?.Count > 0)'
+                                                                  Click="OnDisallowSelected"
+                                                                  CssClass="mx-2 mt-2 w-100" />
+                                                    </DxFormLayoutGroup>
 
-                                            <DxFormLayoutGroup Caption="U3A Allowed" ColSpanMd="5">
-                                                <DxGrid @ref=@AssignedGrid Data=@AssignedU3A AllowColumnReorder=false CssClass="m-1"
-                                                        @bind-SelectedDataItems="SelectedAssignedItems"
-                                                        SelectionMode="GridSelectionMode.Multiple"
-                                                        VirtualScrollingEnabled=true
-                                                        KeyFieldName="Id"
-                                                        AllowGroup=false
-                                                        AllowSelectRowByClick=true>
-                                                    <Columns>
-                                                        <DxGridSelectionColumn Width="2rem" />
-                                                        <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
-                                                        <DxGridDataColumn Caption="Name" FieldName="Name" />
-                                                    </Columns>
-                                                </DxGrid>
-                                            </DxFormLayoutGroup>
-                                        </DxFormLayoutGroup>
+                                                    <DxFormLayoutGroup Caption="U3A Allowed" ColSpanMd="5">
+                                                        <DxGrid @ref=@AssignedGrid Data=@AssignedU3A AllowColumnReorder=false CssClass="m-1"
+                                                                @bind-SelectedDataItems="SelectedAssignedItems"
+                                                                SelectionMode="GridSelectionMode.Multiple"
+                                                                VirtualScrollingEnabled=true
+                                                                KeyFieldName="Id"
+                                                                AllowGroup=false
+                                                                AllowSelectRowByClick=true>
+                                                            <Columns>
+                                                                <DxGridSelectionColumn Width="2rem" />
+                                                                <DxGridDataColumn Caption="State" FieldName="State" Width="4rem" />
+                                                                <DxGridDataColumn Caption="Name" FieldName="Name" />
+                                                            </Columns>
+                                                        </DxGrid>
+                                                    </DxFormLayoutGroup>
+                                                </DxFormLayoutGroup>
+                                            }
+                                            else
+                                            {
+                                                <div class="m-4 h6 opacity-50 text-info">Multi-Campus Extensions are disabled on Tenant record</div>
+                                            }
+                                        </DxFormLayout>
                                     </Template>
                                 </DxStackLayoutItem>
                             </Items>
@@ -392,6 +401,7 @@ else
     IReadOnlyList<object> SelectedAssignedItems { get; set; }
     ReadOnlyCollection<TimeZoneInfo>? timezones;
     string utcOffset;
+    TenantInfo? thisTenant;
 
 
     protected override async Task OnInitializedAsync()
@@ -426,27 +436,35 @@ else
         if (systemSettings.AutoEnrolAllocationDay < 0 ||
                 systemSettings.AutoEnrolAllocationDay > 6) systemSettings.AutoEnrolAllocationDay = 2;
         server = new DocumentServer(dbc);
-        utcOffset ="";
+        utcOffset = "";
         IsReady = true;
     }
 
     async Task GetTenantData()
     {
-        var thisTenant = await tenantService.GetTenantIdentifierAsync();
-        UnassignedU3A = await dbcT.TenantInfo
-                                    .AsNoTracking()
-                                    .Where(x => x.Identifier != thisTenant
-                                                && x.EnableMultiCampusExtension
-                                                && !systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
-                                    .OrderBy(x => x.State).ThenBy(x => x.Name)
-                                    .ToListAsync();
-        AssignedU3A = await dbcT.TenantInfo
-                                    .AsNoTracking()
-                                    .Where(x => x.Identifier != thisTenant
-                                                && x.EnableMultiCampusExtension
-                                                && systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
-                                    .OrderBy(x => x.State).ThenBy(x => x.Name)
-                                    .ToListAsync();
+        thisTenant = await tenantService.GetTenantInfoAsync();
+        var id = thisTenant.Identifier;
+        if (thisTenant.EnableMultiCampusExtension)
+        {
+            UnassignedU3A = await dbcT.TenantInfo
+                                        .AsNoTracking()
+                                        .Where(x => x.Identifier != id
+                                                    && x.EnableMultiCampusExtension
+                                                    && !systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
+                                        .OrderBy(x => x.State).ThenBy(x => x.Name)
+                                        .ToListAsync();
+            AssignedU3A = await dbcT.TenantInfo
+                                        .AsNoTracking()
+                                        .Where(x => x.Identifier != id
+                                                    && x.EnableMultiCampusExtension
+                                                    && systemSettings.MultiCampusU3AAllowed.Contains(x.Identifier))
+                                        .OrderBy(x => x.State).ThenBy(x => x.Name)
+                                        .ToListAsync();
+        }
+        else
+        {
+            systemSettings.AllowMultiCampusExtensions = false;
+        }
     }
 
     async void ValidFormSubmitted(EditContext editContext)
