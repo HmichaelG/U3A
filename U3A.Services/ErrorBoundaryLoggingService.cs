@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -16,21 +17,21 @@ namespace U3A.Services
 {
     public class ErrorBoundaryLoggingService : IErrorBoundaryLogger
     {
-        readonly TenantInfoService _tenantInfoSvc;
-        public ErrorBoundaryLoggingService(TenantInfoService TenantInfoService)
+        private readonly IHttpContextAccessor httpContextAccessor;
+
+        public ErrorBoundaryLoggingService(IHttpContextAccessor httpContextAccessor)
         {
-            _tenantInfoSvc = TenantInfoService;
+            this.httpContextAccessor = httpContextAccessor;
         }
         public async ValueTask LogErrorAsync(Exception exception)
         {
-            if (exception.Message.Contains("AntiforgeryValidationException")) { return; }
             using (LogContext.PushProperty("LogEvent", "Unhandled Exception"))
             {
                 using (LogContext.PushProperty("Tenant",
-                            await _tenantInfoSvc.GetTenantIdentifierAsync()))
+                            httpContextAccessor?.HttpContext?.Request?.Host.Host))
                 {
                     using (LogContext.PushProperty("User",
-                            _tenantInfoSvc.GetUserIdentity()))
+                            httpContextAccessor?.HttpContext.User.Identity.Name))
                     {
                         Log.Error(exception, "{p0}", exception.Message);
                     }

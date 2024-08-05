@@ -15,39 +15,42 @@ namespace U3A.Services
 {
     public class CircuitHandlerService : CircuitHandler
     {
+        private readonly IHttpContextAccessor httpContextAccessor;
         public ConcurrentDictionary<string, CircuitDetail> CircuitDetails
         {
             get;
             set;
         }
+
         public event EventHandler CircuitsChanged;
 
         protected virtual void OnCircuitsChanged()
              => CircuitsChanged?.Invoke(this, EventArgs.Empty);
 
-        public CircuitHandlerService()
+        public CircuitHandlerService(IHttpContextAccessor httpContextAccessor)
         {
+            this.httpContextAccessor = httpContextAccessor;
             CircuitDetails = new ConcurrentDictionary<string, CircuitDetail>();
         }
 
         public override Task OnCircuitOpenedAsync(Circuit circuit,
                              CancellationToken cancellationToken)
         {
-            IHttpContextAccessor accessor = new ASP_CORE.HttpContextAccessor();
-            if (accessor == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            if (accessor.HttpContext?.User?.Identity == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            if (accessor.HttpContext?.Request?.Host == null) { return base.OnCircuitOpenedAsync(circuit, cancellationToken); }
-            var id = accessor.HttpContext.User.Identity;
-            HostStrategy hs = new HostStrategy();
-            var tenant = hs.GetIdentifier(accessor.HttpContext.Request.Host.Host);
-            var cd = new CircuitDetail()
+            var id = httpContextAccessor?.HttpContext?.User?.Identity;
+            var host = httpContextAccessor?.HttpContext?.Request?.Host.Host;
+            if (host != null)
             {
-                Id = circuit.Id,
-                Name = (!string.IsNullOrWhiteSpace(id?.Name)) ? id.Name : "Anonymous (Public)",
-                Tenant = tenant,
-            };
-            CircuitDetails.TryAdd(circuit.Id, cd);
-            OnCircuitsChanged();
+                HostStrategy hs = new HostStrategy();
+                var tenant = hs.GetIdentifier(host);
+                var cd = new CircuitDetail()
+                {
+                    Id = circuit.Id,
+                    Name = (!string.IsNullOrWhiteSpace(id?.Name)) ? id.Name : "Anonymous (Public)",
+                    Tenant = tenant,
+                };
+                CircuitDetails.TryAdd(circuit.Id, cd);
+                OnCircuitsChanged();
+            }
             return base.OnCircuitOpenedAsync(circuit,
                                   cancellationToken);
         }
@@ -56,8 +59,10 @@ namespace U3A.Services
                   CancellationToken cancellationToken)
         {
             CircuitDetail circuitRemoved;
-            CircuitDetails.TryRemove(circuit.Id, out circuitRemoved);
-            OnCircuitsChanged();
+            if (CircuitDetails.TryRemove(circuit.Id, out circuitRemoved))
+            {
+                OnCircuitsChanged();
+            }
             return base.OnCircuitClosedAsync(circuit,
                               cancellationToken);
         }
