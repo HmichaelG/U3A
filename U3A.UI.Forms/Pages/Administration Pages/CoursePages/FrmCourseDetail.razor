@@ -3,88 +3,95 @@
 
 <MessageBox @ref="@messageBox" />
 
-<DxFormLayout CssClass="px-4 pt-2">
-    <DxFormLayoutItem Caption="Course Number" ColSpanMd="8">
-        <DxMaskedInput @bind-Value="Course.ConversionID"
-                       Mask="@NumericMask.WholeNumber" />
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Off-Schedule Activity?" ColSpanMd="4">
-        <DxCheckBox @bind-Checked="@Course.IsOffScheduleActivity"
-                    LabelPosition="LabelPosition.Right"
-                    Alignment="CheckBoxContentAlignment.Right" />
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
-        <DxComboBox Data="CourseTypes"
-                    @bind-Value="@Course.CourseType"
-                    TextFieldName="@nameof(CourseType.NameWithStatus)">
-        </DxComboBox>
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Participation Type" ColSpanMd="8">
-        <DxComboBox Data="CourseParticipationTypes"
-                    @bind-Value="Course.CourseParticipationType"
-                    @bind-Value:after="@(() => OnCourseParticipationTypeChange(Course.CourseParticipationType))"
-                    TextFieldName="@nameof(CourseParticipationType.Name)">
-        </DxComboBox>
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Enforce One Class Per Student?" ColSpanMd="4" Context="context">
-        <DxCheckBox @bind-Checked="Course.EnforceOneStudentPerClass"
-                    Alignment=CheckBoxContentAlignment.Right Enabled=@isDifferentParticipantsInEachClass />
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Course Name" ColSpanMd="12">
-        <DxTextBox @bind-Text="Course.Name" />
-    </DxFormLayoutItem>
-    <DxFormLayoutItem Caption="Additional Info URL" ColSpanMd="12">
-        <DxTextBox @bind-Text="Course.AdditionalInformationURL"
-                   NullText="A fully qualified URL: https://example.com.au. Keep it short, use TinyURL." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-    </DxFormLayoutItem>
-
-    <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
-        <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="3">
-            <DxMaskedInput @bind-Value="Course.Duration"
-                           Mask="n2" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Required Students" ColSpanMd="3">
-            <DxMaskedInput @bind-Value="Course.RequiredStudents"
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxFormLayout CssClass="px-4 pt-2">
+        <DxFormLayoutItem Caption="Course Number" ColSpanMd="8">
+            <DxMaskedInput @bind-Value="Course.ConversionID"
                            Mask="@NumericMask.WholeNumber" />
         </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Maximum Students" ColSpanMd="3">
-            <DxMaskedInput @bind-Value="Course.MaximumStudents"
-                           Mask="@NumericMask.WholeNumber" />
+        <DxFormLayoutItem Caption="Off-Schedule Activity?" ColSpanMd="4">
+            <DxCheckBox @bind-Checked="@Course.IsOffScheduleActivity"
+                        LabelPosition="LabelPosition.Right"
+                        Alignment="CheckBoxContentAlignment.Right" />
         </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Allow Auto-Enrol" ColSpanMd="3">
-            <DxCheckBox @bind-Checked="Course.AllowAutoEnrol" />
+        <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
+            <DxComboBox Data="CourseTypes"
+                        @bind-Value="@Course.CourseType"
+                        TextFieldName="@nameof(CourseType.NameWithStatus)">
+            </DxComboBox>
         </DxFormLayoutItem>
-    </DxFormLayoutGroup>
+        <DxFormLayoutItem Caption="Participation Type" ColSpanMd="8">
+            <DxComboBox Data="CourseParticipationTypes"
+                        @bind-Value="Course.CourseParticipationType"
+                        @bind-Value:after="@(() => OnCourseParticipationTypeChange(Course.CourseParticipationType))"
+                        TextFieldName="@nameof(CourseParticipationType.Name)">
+            </DxComboBox>
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Enforce One Class Per Student?" ColSpanMd="4" Context="context">
+            <DxCheckBox @bind-Checked="Course.EnforceOneStudentPerClass"
+                        Alignment=CheckBoxContentAlignment.Right Enabled=@isDifferentParticipantsInEachClass />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Course Name" ColSpanMd="12">
+            <DxTextBox @bind-Text="Course.Name" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Additional Info URL" ColSpanMd="12">
+            <DxTextBox @bind-Text="Course.AdditionalInformationURL"
+                       NullText="A fully qualified URL: https://example.com.au. Keep it short, use TinyURL." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+        </DxFormLayoutItem>
 
-    <DxFormLayoutGroup Caption="Course Fee" ColSpanMd="6">
-        <DxFormLayoutItem Caption="Course Fee" ColSpanMd="12">
-            <DxMaskedInput @bind-Value="Course.CourseFeePerYear" Mask="@NumericMask.Currency" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
-            <DxTextBox @bind-Text="Course.CourseFeePerYearDescription" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
-            <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerYearFee" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
-            <DxCheckBox @bind-Checked="Course.LeadersPayYearFee" />
-        </DxFormLayoutItem>
-    </DxFormLayoutGroup>
-    <DxFormLayoutGroup Caption="Term Fees" ColSpanMd="6">
-        <DxFormLayoutItem Caption="Course Fee / Term" ColSpanMd="12">
-            <DxMaskedInput @bind-Value="Course.CourseFeePerTerm" Mask="@NumericMask.Currency" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
-            <DxTextBox @bind-Text="Course.CourseFeePerTermDescription" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
-            <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerTermFee" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
-            <DxCheckBox @bind-Checked="Course.LeadersPayTermFee" />
-        </DxFormLayoutItem>
-    </DxFormLayoutGroup>
-</DxFormLayout>
+        <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+            <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="3">
+                <DxMaskedInput @bind-Value="Course.Duration"
+                               Mask="n2" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Required Students" ColSpanMd="3">
+                <DxMaskedInput @bind-Value="Course.RequiredStudents"
+                               Mask="@NumericMask.WholeNumber" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Maximum Students" ColSpanMd="3">
+                <DxMaskedInput @bind-Value="Course.MaximumStudents"
+                               Mask="@NumericMask.WholeNumber" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Allow Auto-Enrol" ColSpanMd="3">
+                <DxCheckBox @bind-Checked="Course.AllowAutoEnrol" />
+            </DxFormLayoutItem>
+        </DxFormLayoutGroup>
+
+        <DxFormLayoutGroup Caption="Course Fee" ColSpanMd="6">
+            <DxFormLayoutItem Caption="Course Fee" ColSpanMd="12">
+                <DxMaskedInput @bind-Value="Course.CourseFeePerYear" Mask="@NumericMask.Currency" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
+                <DxTextBox @bind-Text="Course.CourseFeePerYearDescription" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
+                <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerYearFee" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
+                <DxCheckBox @bind-Checked="Course.LeadersPayYearFee" />
+            </DxFormLayoutItem>
+        </DxFormLayoutGroup>
+        <DxFormLayoutGroup Caption="Term Fees" ColSpanMd="6">
+            <DxFormLayoutItem Caption="Course Fee / Term" ColSpanMd="12">
+                <DxMaskedInput @bind-Value="Course.CourseFeePerTerm" Mask="@NumericMask.Currency" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
+                <DxTextBox @bind-Text="Course.CourseFeePerTermDescription" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
+                <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerTermFee" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
+                <DxCheckBox @bind-Checked="Course.LeadersPayTermFee" />
+            </DxFormLayoutItem>
+        </DxFormLayoutGroup>
+    </DxFormLayout>
+}
 
 @code {
     [Parameter]
@@ -113,11 +120,13 @@
     string leaderReportsToNullText;
     string contactOrderNullText;
     bool isDifferentParticipantsInEachClass = false;
+    bool isReady;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
+        base.OnInitialized();
         isDifferentParticipantsInEachClass = (Course.CourseParticipationTypeID == 1) ? true : false;
-        await base.OnParametersSetAsync();
+        isReady = true;
     }
 
     async Task OnCourseParticipationTypeChange(CourseParticipationType participationType)
@@ -133,7 +142,7 @@
         if (AnyEnrolmentsInYear)
         {
             if (await messageBox.ShowAsync("Participation Type is changing",
-                                    @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
+                                        @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
                    have already been assigned to it in the current year.</p>
                    <p>If you continue, all enrolments will be assigned to the first class in the course.
                     You will be responsible for transfering enrolemnts between classes, if necessary.</p>

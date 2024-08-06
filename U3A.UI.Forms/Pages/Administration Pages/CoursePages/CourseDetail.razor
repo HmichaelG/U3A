@@ -4,106 +4,113 @@
 
 <MessageBox @ref="@messageBox" />
 
-<DxFormLayout Data="@Course" CssClass="w-100 p-1">
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxFormLayout Data="@Course" CssClass="w-100 p-1">
 
-    @if (!IsReadOnly)
-    {
-        <DxFormLayoutItem ColSpanMd="12">
-            <ValidationSummary />
-        </DxFormLayoutItem>
-    }
-
-    <DxTabs @ref=@TabPages
-            CssClass="page-height w-100" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
-        <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>
-            <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
-                             Settings=@Settings CourseEditView="@CourseEditViewType.Simplified"
-                             Course="Course"
-                             Persons="@Persons" CourseTypes="@CourseTypes"
-                             Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
-                             CourseParticipationTypes="@CourseParticipationTypes" />
+        @if (!IsReadOnly)
+        {
             <DxFormLayoutItem ColSpanMd="12">
-                <FrmClassSimple @ref="frmClassSimple" Course="@Course" IsActivityView="false"
-                                Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" DbContext="@DbContext" />
+                <ValidationSummary />
             </DxFormLayoutItem>
-        </DxTabPage>
+        }
 
-        <DxTabPage Text="Activity View" Enabled=@(Course.Classes.Count <= 1)>
-            <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
-                             Settings=@Settings CourseEditView="@CourseEditViewType.Activity"
-                             Course="Course"
-                             Persons="@Persons" CourseTypes="@CourseTypes"
-                             Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
-                             CourseParticipationTypes="@CourseParticipationTypes" />
-            <DxFormLayoutItem ColSpanMd="12">
-                <FrmClassSimple @ref="frmClassSimple" Course="@Course" IsActivityView="true"
-                                Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" DbContext="@DbContext" />
-            </DxFormLayoutItem>
-        </DxTabPage>
-
-        <DxTabPage Text="Detail View">
-            <FrmCourseDetail @ref="@frmCourseDetail" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
-                             IsReadOnly="@IsReadOnly"
-                             Settings=@Settings
-                             Course="Course"
-                             Persons="@Persons" CourseTypes="@CourseTypes"
-                             Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
-                             CourseParticipationTypes="@CourseParticipationTypes" />
-            <DxFormLayoutItem ColSpanMd="12">
-                <FrmClassDetailPopup @ref="classDetail" Course="@Course" AllowEdit="true"
-                                     Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" Occurrences="Occurrences"
-                                     DbContext="@DbContext" />
-            </DxFormLayoutItem>
-        </DxTabPage>
-
-        <DxTabPage Text="Description">
-            <DxFormLayoutItem ColSpanMd="12">
-                <HtmlEditor @bind-Markup="@Course.Description"
-                            Height="30rem" Width="100%" />
-            </DxFormLayoutItem>
-        </DxTabPage>
-
-        <DxTabPage Text="Settings">
-            <DxFormLayoutGroup Caption="System Overrides">
-                <DxFormLayoutItem Caption="Send Leader Reports To" ColSpanMd="12">
-                    <DxComboBox Data="sendLeaderReportsToList" NullText=@leaderReportsToNullText
-                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                @bind-Value="@Course.SendLeaderReportsTo"
-                                ValueFieldName="@nameof(SendLeaderReportsToWrapper.Type)"
-                                TextFieldName="@nameof(SendLeaderReportsToWrapper.DisplayText)">
-                    </DxComboBox>
+        <DxTabs @ref=@TabPages
+                CssClass="page-height w-100" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
+            <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>
+                <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+                                 Settings=@Settings CourseEditView="@CourseEditViewType.Simplified"
+                                 Course="Course"
+                                 Persons="@Persons" CourseTypes="@CourseTypes"
+                                 Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
+                                 CourseParticipationTypes="@CourseParticipationTypes" />
+                <DxFormLayoutItem ColSpanMd="12">
+                    <FrmClassSimple @ref="frmClassSimple" Course="@Course" IsActivityView="false"
+                                    Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" DbContext="@DbContext" />
                 </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Course Contact Order" ColSpanMd="12">
-                    <DxComboBox Data="contactOrder" NullText=@contactOrderNullText
-                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                @bind-Value="@Course.CourseContactOrder"
-                                ValueFieldName="@nameof(CourseContactOrderWrapper.Type)"
-                                TextFieldName="@nameof(CourseContactOrderWrapper.DisplayText)">
-                    </DxComboBox>
+            </DxTabPage>
+
+            <DxTabPage Text="Activity View" Enabled=@(Course.Classes.Count <= 1)>
+                <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+                                 Settings=@Settings CourseEditView="@CourseEditViewType.Activity"
+                                 Course="Course"
+                                 Persons="@Persons" CourseTypes="@CourseTypes"
+                                 Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
+                                 CourseParticipationTypes="@CourseParticipationTypes" />
+                <DxFormLayoutItem ColSpanMd="12">
+                    <FrmClassSimple @ref="frmClassSimple" Course="@Course" IsActivityView="true"
+                                    Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" DbContext="@DbContext" />
                 </DxFormLayoutItem>
-                <DxFormLayout CssClass="p-2 w-100">
-                    <DxFormLayoutItem Caption="Exclude this Course from the Leaders Complimentary count?" ColSpanMd="12">
-                        <DxCheckBox @bind-Checked="Course.ExcludeFromLeaderComplimentaryCount" Alignment="CheckBoxContentAlignment.Right" />
+            </DxTabPage>
+
+            <DxTabPage Text="Detail View">
+                <FrmCourseDetail @ref="@frmCourseDetail" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+                                 IsReadOnly="@IsReadOnly"
+                                 Settings=@Settings
+                                 Course="Course"
+                                 Persons="@Persons" CourseTypes="@CourseTypes"
+                                 Venues="@Venues" WeekDays="@WeekDays" DbContext="@DbContext"
+                                 CourseParticipationTypes="@CourseParticipationTypes" />
+                <DxFormLayoutItem ColSpanMd="12">
+                    <FrmClassDetailPopup @ref="classDetail" Course="@Course" AllowEdit="true"
+                                         Venues="@Venues" WeekDays="@WeekDays" Persons="@Persons" Occurrences="Occurrences"
+                                         DbContext="@DbContext" />
+                </DxFormLayoutItem>
+            </DxTabPage>
+
+            <DxTabPage Text="Description">
+                <DxFormLayoutItem ColSpanMd="12">
+                    <HtmlEditor @bind-Markup="@Course.Description"
+                                Height="30rem" Width="100%" />
+                </DxFormLayoutItem>
+            </DxTabPage>
+
+            <DxTabPage Text="Settings">
+                <DxFormLayoutGroup Caption="System Overrides">
+                    <DxFormLayoutItem Caption="Send Leader Reports To" ColSpanMd="12">
+                        <DxComboBox Data="sendLeaderReportsToList" NullText=@leaderReportsToNullText
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    @bind-Value="@Course.SendLeaderReportsTo"
+                                    ValueFieldName="@nameof(SendLeaderReportsToWrapper.Type)"
+                                    TextFieldName="@nameof(SendLeaderReportsToWrapper.DisplayText)">
+                        </DxComboBox>
                     </DxFormLayoutItem>
-                </DxFormLayout>
-            </DxFormLayoutGroup>
-            <DxFormLayoutGroup Caption="Multi-Campus Enrolment">
-                <DxFormLayoutItem Caption="Allow Multi-Campus Enrolment From"
-                                  ColSpanMd="12">
-                    <DxDateEdit @bind-Date="Course.AllowMultiCampsuFrom"
-                                Enabled="@EnableMultiCampus"
-                                NullText=@((EnableMultiCampus) ? "" : "Not available for this course") />
-                </DxFormLayoutItem>
-                <div class='mt-2 mx-4 alert alert-warning text-dark text-center'>
-                    <h6>This feature is Experimental</h6>
-                    Experimental features are new and are still undergoing full implementation.
-                    While you are encouraged to participate in this using this feature, you should be aware that implementation
-                    and the feature-set may change. Thank you for your participation!
-                </div>
-            </DxFormLayoutGroup>
-        </DxTabPage>
-    </DxTabs>
-</DxFormLayout>
+                    <DxFormLayoutItem Caption="Course Contact Order" ColSpanMd="12">
+                        <DxComboBox Data="contactOrder" NullText=@contactOrderNullText
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    @bind-Value="@Course.CourseContactOrder"
+                                    ValueFieldName="@nameof(CourseContactOrderWrapper.Type)"
+                                    TextFieldName="@nameof(CourseContactOrderWrapper.DisplayText)">
+                        </DxComboBox>
+                    </DxFormLayoutItem>
+                    <DxFormLayout CssClass="p-2 w-100">
+                        <DxFormLayoutItem Caption="Exclude this Course from the Leaders Complimentary count?" ColSpanMd="12">
+                            <DxCheckBox @bind-Checked="Course.ExcludeFromLeaderComplimentaryCount" Alignment="CheckBoxContentAlignment.Right" />
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                </DxFormLayoutGroup>
+                <DxFormLayoutGroup Caption="Multi-Campus Enrolment">
+                    <DxFormLayoutItem Caption="Allow Multi-Campus Enrolment From"
+                                      ColSpanMd="12">
+                        <DxDateEdit @bind-Date="Course.AllowMultiCampsuFrom"
+                                    Enabled="@EnableMultiCampus"
+                                    NullText=@((EnableMultiCampus) ? "" : "Not available for this course") />
+                    </DxFormLayoutItem>
+                    <div class='mt-2 mx-4 alert alert-warning text-dark text-center'>
+                        <h6>This feature is Experimental</h6>
+                        Experimental features are new and are still undergoing full implementation.
+                        While you are encouraged to participate in this using this feature, you should be aware that implementation
+                        and the feature-set may change. Thank you for your participation!
+                    </div>
+                </DxFormLayoutGroup>
+            </DxTabPage>
+        </DxTabs>
+    </DxFormLayout>
+}
 <style>
     .page-height {
         min-height: 30rem !important;
@@ -145,12 +152,14 @@
     string contactOrderNullText;
     DxTabs? TabPages;
     bool EnableMultiCampus;
+    bool isReady;
 
     List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
     List<CourseContactOrderWrapper> contactOrder = new CourseContactOrderList();
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
         if (Settings != null)
         {
             leaderReportsToNullText = $"(Optional) {Settings.SendLeaderReportsTo.GetAttribute<DisplayAttribute>().Name}";
@@ -158,7 +167,7 @@
         }
         CourseViewType = Course.EditType;
         EnableMultiCampus = BusinessRule.AllowMultiCampusForCourse(Course, Settings);
-        base.OnInitialized();
+        isReady = true;
     }
 
     void OnTabPageClick(TabClickEventArgs e)
