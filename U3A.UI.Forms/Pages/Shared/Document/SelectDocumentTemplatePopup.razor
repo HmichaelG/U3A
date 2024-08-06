@@ -10,9 +10,8 @@
 
 <Progress @ref=@progressBar />
 
-<DxPopup Visible="@popupVisible" @ref="@popup" Width="100vw" CssClass="editor-popup"
-         PositionY="0"
-         PositionX="0"
+<DxPopup Visible="@popupVisible" @ref="@popup" Width="95dvw" CssClass="editor-popup"
+         PositionY="5"
          CloseButtonClick="@NegativeButtonClicked"
          CloseOnEscape="false"
          CloseOnOutsideClick="false"
@@ -29,24 +28,24 @@
     <BodyContentTemplate Context="PopupContext">
         <DxFormLayout>
             <div class="row vw-100 m-1">
-                <div class="col col-5 show-hide">
+                <div class="col col-4 show-hide">
                     <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
-                    <div class="alert alert-warning text-dark text-center warning-style" >
-                        The mail system is currently disabled or in sandbox mode.<br/>
-                        Your email will be routed through Postmark's servers but your members wil not receive it.<br/>
+                    <div class="alert alert-warning text-dark text-center warning-style">
+                        The mail system is currently disabled or in sandbox mode.<br />
+                        Your email will be routed through Postmark's servers but your members wil not receive it.<br />
                         Please use sparingly, all email delivered or not incurs usage cost.
                     </div>
-                    <DxFormLayoutGroup Caption="Parameters">
+                    <DxFormLayoutGroup Caption="Parameters" CaptionPosition="CaptionPosition.Vertical">
                         <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
                             <DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
                                         Value="@SelectedDocumentTemplate"
                                         ValueChanged="@((DocumentTemplate template) => SelectedTemplateChanged(template))"
                                         EditFormat="{0}">
                                 <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Name)"
-                                                    Caption="Template" Width="15rem" />
+                                                    Caption="Template" Width="25rem" />
                                 <DxListEditorColumn FieldName="@nameof(DocumentTemplate.DocumentTypeName)"
-                                                    Caption="Type" Width="15rem" />
-                                <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Subject)" />
+                                                    Caption="Type" Width="8rem" />
+                                <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Subject)" Width="25rem" />
                             </DxComboBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Email Subject" ColSpanMd="12" Visible="@IsEmail">
@@ -87,6 +86,7 @@
                         </DxFormLayoutItem>
                         <DxFormLayout CssClass="m-2">
                             <DxFormLayoutItem Caption="Override Communication Preference?"
+                                              Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
                                               ColSpanMd="12">
                                 <DxCheckBox @bind-Checked="@OverrideCommunicationPreference" />
                             </DxFormLayoutItem>
@@ -114,23 +114,21 @@
                     else
                     {
                         <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
-                        <div class="rtf-content">
-                            <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
-                                        ViewType="ViewType.PrintLayout"
-                                        ActiveRibbonTabIndex="@ActiveTabIndex"
-                                        CheckSpelling=true
-                                        BarMode=BarMode.Ribbon
-                                        DocumentContent="@SelectedDocumentTemplate.Content"
-                                        DocumentFormat="DocumentFormat.Rtf"
-                                        CustomizeRibbon="OnCustomizeRichEditToolbar"
-                                        DocumentLoaded="OnDocumentLoaded"
-                                        DocumentContentChanged="OnDocumentContentChanged"
-                                        CssClass="w-100 rtf-style">
-                                <MailMergeSettings>
-                                    <DxMailMergeSettings Data="@ExportData" />
-                                </MailMergeSettings>
-                            </DxRichEdit>
-                        </div>
+                        <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
+                                    ViewType="ViewType.PrintLayout"
+                                    ActiveRibbonTabIndex="@ActiveTabIndex"
+                                    CheckSpelling=true
+                                    BarMode=BarMode.Ribbon
+                                    DocumentContent="@SelectedDocumentTemplate.Content"
+                                    DocumentFormat="DocumentFormat.Rtf"
+                                    CustomizeRibbon="OnCustomizeRichEditToolbar"
+                                    DocumentLoaded="OnDocumentLoaded"
+                                    DocumentContentChanged="OnDocumentContentChanged"
+                                    CssClass="w-100 rtf-style">
+                            <MailMergeSettings>
+                                <DxMailMergeSettings Data="@ExportData" />
+                            </MailMergeSettings>
+                        </DxRichEdit>
                     }
                 </div>
             </div>
@@ -140,16 +138,16 @@
 
 <style>
     .editor-popup {
-        height: 100vh !important;
+        height: calc(100dvh - 2rem);
     }
 
     .preview {
-        height: calc(100dvh - 3.5rem) !important;
+        height: calc(100dvh - 5rem) !important;
         overflow: hidden;
     }
 
     .rtf-style {
-        height: calc(100dvh - 5rem) !important;
+        height: calc(100dvh - 7rem) !important;
         overflow: hidden;
     }
 
@@ -203,7 +201,7 @@
     AttachFile attachFile;
     byte[] pdfContent;
     string showHideText = "inline";
-    string editorDiv = "col col-7";
+    string editorDiv = "col col-8";
     Progress? progressBar;
     bool isEmailEnabled;
 
@@ -242,7 +240,7 @@
     void OnCollapseClick()
     {
         showHideText = (showHideText == "inline") ? "none" : "inline";
-        editorDiv = (showHideText == "inline") ? "col col-7" : "col col-12";
+        editorDiv = (showHideText == "inline") ? "col col-8" : "col col-12";
     }
 
     void OnAttachedItemsChanged(IEnumerable<string> items)
