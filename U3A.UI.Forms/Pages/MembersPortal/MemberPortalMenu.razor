@@ -170,7 +170,7 @@ else
                                     <DxButton Text="Return to Admin Portal"
                                               IconCssClass="bi-door-closed menu-icon me-3 h2"
                                               CssClass="col-12 my-1"
-                                              Click="@OnReturnHome"
+                                              Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoReturnToAdminPortal))"
                                               RenderStyle="ButtonRenderStyle.Primary"
                                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                                     </DxButton>
@@ -438,8 +438,6 @@ else
     {
         NavigationManager.NavigateTo("Account/Manage/" + page, true);
     }
-
-    void OnReturnHome() => NavigationManager.NavigateTo("/AdminMemberPortal", true);
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
     {

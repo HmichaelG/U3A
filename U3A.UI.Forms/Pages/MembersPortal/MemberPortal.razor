@@ -108,6 +108,9 @@ else
             </div>
             menuSelection = PortalMenuSelection.ShowMenu;
             break;
+        case PortalMenuSelection.DoReturnToAdminPortal:
+            OnReturnToAdminPortal.InvokeAsync();
+            break;
     }
 }
 <style>
@@ -124,6 +127,9 @@ else
 
     [CascadingParameter(Name = "QueryResult")]
     string? QueryResult { get; set; }
+
+    [Parameter]
+    public EventCallback OnReturnToAdminPortal { get; set; }
 
     Progress? ProgressBar { get; set; }
 

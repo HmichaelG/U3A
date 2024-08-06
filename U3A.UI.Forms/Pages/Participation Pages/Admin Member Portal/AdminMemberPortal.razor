@@ -77,8 +77,8 @@ else
                                 </CollapsableContent>
                                 @if (isSelected)
                                 {
-                                    <MemberPortal />
-                                }
+                                    <MemberPortal OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
+                            }
                                 else
                                 {
                                     <div class="@formWidth">
@@ -306,6 +306,14 @@ else
             await collapsableContent.ToggleLayoutAsync(isCollapsed: true);
             isSelected = true;
         }
+    }
+
+    async Task OnReturnFormPortal()
+    {
+        isSelected = false;
+        selectedPerson = null;
+        await collapsableContent.ToggleLayoutAsync(isCollapsed: false);
+        StateHasChanged();
     }
 
     void Grid_UnboundColumnData(GridUnboundColumnDataEventArgs e)

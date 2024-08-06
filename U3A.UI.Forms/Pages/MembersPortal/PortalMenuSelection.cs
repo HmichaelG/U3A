@@ -27,6 +27,7 @@ namespace U3A.UI.Forms
         DoWhatsOn,
         DoSignInSignOut,
         PrintMemberBadge,
+        DoReturnToAdminPortal,
         NotImplemented
     }
 

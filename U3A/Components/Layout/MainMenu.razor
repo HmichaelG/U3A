@@ -5,6 +5,7 @@
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.JSInterop
 @using System.IO
+@using System.Web;
 
 
 @inject IJSRuntime js
@@ -179,7 +180,9 @@
                                 </DxMenuItem>
                             }
 
-                            <DxMenuItem Text="@((isVertical) ? "Theme & Settings" : "")" IconCssClass="bi bi-palette" NavigateUrl="ThemeIntroduction">
+                            <DxMenuItem Text="@((isVertical) ? "Theme & Settings" : "")" 
+                                        Enabled="@(!isRedirected)"
+                                        IconCssClass="bi bi-palette" NavigateUrl="ThemeIntroduction">
                                 <Items>
                                     <DxMenuItem Text="Office White" />
                                     <DxMenuItem Text="Blazing Berry" />
@@ -192,7 +195,9 @@
                                                 Click="OnResetDefaults" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")" IconCssClass="bi bi-shield" NavigateUrl="SecurityIntroduction">
+                            <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")"
+                                        Enabled="@(!isRedirected)"
+                                        IconCssClass="bi bi-shield" NavigateUrl="SecurityIntroduction">
                                 <Items>
                                     @if (IsTopMenu)
                                     {
@@ -208,7 +213,7 @@
                             </DxMenuItem>
                             @if (!IsTopMenu)
                             {
-                                <DxMenuItem Click="OnLogout" Text="Logout" IconCssClass="bi bi-door-open" />
+                                <DxMenuItem Click="OnLogout" Text="Logout" IconCssClass="bi bi-door-open" Enabled="@(!isRedirected)" />
                             }
                         }
                     }
@@ -247,6 +252,7 @@
     bool isCourseAdminRole { get; set; }
     bool isReportViewRole { get; set; }
     bool isOfficeRole { get; set; }
+    bool isRedirected;
     string? userName { get; set; }
     string OrganisationName = string.Empty;
     ContextHelpTitle? help;
@@ -274,6 +280,28 @@
         }
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
         navMan.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ParseQueryString();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    void ParseQueryString()
+    {
+        var colQueryString = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
+        if (colQueryString.Count > 0)
+        {
+            var page = colQueryString.GetValues("Page");
+            if (page != null && page.Count() > 0)
+            {
+                isRedirected = true;
+            }
+        }
     }
 
     protected override void OnParametersSet()
@@ -322,18 +350,22 @@
         var useTopMenu = true;
         if (await localStorage.ContainKeyAsync(key))
         {
-            useTopMenu = !(await localStorage.GetItemAsync<bool>(key));
+            useTopMenu = !(await localStorage.GetItemAsync<bool>
+    (key));
         }
-        await localStorage.SetItemAsync<bool>(key, useTopMenu);
+        await localStorage.SetItemAsync<bool>
+            (key, useTopMenu);
         navMan.NavigateTo("/", true);
     }
 
     async Task OnResetDefaults()
     {
         if (await messageBox!.ShowAsync("Reset Factory Defaults",
-                        @"<p>This procedure will reset your application to factory defaults
-                        by deleting all customisations stored on your local device.</p>
-                        <p>Do you wish to continue?</p>"))
+                    @"<p>
+            This procedure will reset your application to factory defaults
+            by deleting all customisations stored on your local device.
+        </p>
+        <p>Do you wish to continue?</p>"))
         {
             await localStorage.ClearAsync();
             navMan.NavigateTo("/", true);
@@ -351,6 +383,5 @@
         navMan.LocationChanged -= OnLocationChanged;
         dbc?.Dispose();
     }
-
 }
 
