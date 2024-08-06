@@ -132,6 +132,20 @@ namespace U3A.Model
             }
         }
 
+        [NotMapped]
+        public string SendTransactionalEmailVia
+        {
+            get
+            {
+                string result = "Email";
+                if (string.IsNullOrWhiteSpace(Email))
+                {
+                    result = "Post";
+                }
+                return result;
+            }
+        }
+
         public string Domain
         {
             get

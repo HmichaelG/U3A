@@ -100,7 +100,7 @@ namespace U3A.UI.Reports
                 cashReceiptProForma.DataSource = list;
                 string pdfFilename = GetTempPdfFile();
                 cashReceiptProForma.ExportToPdf(pdfFilename, options);
-                if (!isPreview && person.Communication.ToLower() == "email")
+                if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
                 {
                     return await emailSender.SendEmailAsync(EmailType.Transactional,
                                     SendEmailAddress,
@@ -167,7 +167,7 @@ namespace U3A.UI.Reports
                 }
                 var pdfFilename = CreateMergedPDF(personsFiles);
                 if (string.IsNullOrWhiteSpace(pdfFilename)) { continue; }
-                if (!isPreview && person.Communication.ToLower() == "email")
+                if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
                 {
                     result.Add(kvp.Key, await emailSender.SendEmailAsync(
                                    EmailType.Transactional,
@@ -443,7 +443,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                             <p>Please keep enrolment details confidential until students have received their email.</p>"
                 : "";
 
-            if (!isPreview && Leader.Communication.ToLower() == "email")
+            if (!isPreview && !string.IsNullOrEmpty(Leader.Email))
             {
                 return await emailSender.SendEmailAsync(
                                 EmailType.Transactional,
