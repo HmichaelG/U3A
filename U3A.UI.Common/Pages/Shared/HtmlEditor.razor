@@ -5,18 +5,26 @@
 @using AngleSharp.Html.Dom
 @using AngleSharp.Html.Parser
 
-<MessageBox @ref=@messageBox />
+@if (isReady)
+{
+    <MessageBox @ref=@messageBox />
 
-<DxTabs style="width:100%">
-    <DxTabPage Text="Editor">
-        <DxHtmlEditor @bind-Markup="@Markup" Width="@Width" Height="@Height" />
-    </DxTabPage>
-    <DxTabPage Text="Code">
-        <DxMemo @bind-Text="@Markup" Rows="20" ReadOnly="@(!isCodeEditable)" />
-        <DxButton Text="Edit" Click="OnEditClicked" />
-        <div class="text-danger">@errorText</div>
-    </DxTabPage>
-</DxTabs>
+    <DxTabs style="width:100%">
+        <DxTabPage Text="Editor">
+            <DxHtmlEditor 
+                TableResizeEnabled="true" 
+                @bind-Markup="@Markup" 
+                Width="@Width" Height="@Height" />
+        </DxTabPage>
+        <DxTabPage Text="Code">
+            <DxMemo @bind-Text="@Markup"
+                    Rows="20" 
+                    ReadOnly="@(!isCodeEditable)" />
+            <DxButton Text="Edit" Click="OnEditClicked" />
+            <div class="text-danger">@errorText</div>
+        </DxTabPage>
+    </DxTabs>
+}
 
 @code {
     string _markup = "";
@@ -37,12 +45,18 @@
     [Parameter]
     public string Width { get; set; } = "100%";
     [Parameter]
-    public string Height { get; set; }
+    public string? Height { get; set; }
 
     MessageBox? messageBox;
     bool isCodeEditable;
     static string errorText = "";
+    bool isReady;
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        isReady = true;
+    }
     static IHtmlDocument? ParseHtml(string html)
     {
         IHtmlDocument result = null!;
@@ -82,7 +96,7 @@
     async Task OnEditClicked()
     {
         isCodeEditable = await messageBox!.ShowAsync("Advanced Only",
-                        @"<p>Editing code requires advanced knowledge of HTML programming.
+                            @"<p>Editing code requires advanced knowledge of HTML programming.
                 Errors in code may render unpredictable results or system errors.</p>
                 Do you wsih to continue?");
         StateHasChanged();

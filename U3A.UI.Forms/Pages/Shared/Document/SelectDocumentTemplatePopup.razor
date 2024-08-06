@@ -30,8 +30,10 @@
             <div class="row vw-100 m-1">
                 <div class="col col-4 show-hide">
                     <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
-                    <div class="alert alert-warning text-dark text-center warning-style">
-                        The mail system is currently disabled or in sandbox mode.
+                    <div class="alert alert-warning text-dark text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
+                        The mail system is currently disabled or in sandbox mode.<br />
+                        Your email will be routed through Postmark's servers but members wil not receive it.<br />
+                        Please use sparingly, all email delivered or not incurs usage cost.
                     </div>
                     <DxFormLayoutGroup Caption="Parameters" CaptionPosition="CaptionPosition.Vertical">
                         <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
@@ -68,7 +70,7 @@
                                         TValue="string"
                                         @bind-Text="@SelectedDocumentTemplate.FromDisplayName" />
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Attachments" ColSpanMd="10" Visible="@IsEmail">
+                        <DxFormLayoutItem Caption="Attachments" ColSpanMd="9" Visible="@IsEmail">
                             <DxTagBox Data="@attachments" DropDownVisible=false
                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                       NullText="Upload attachments, if required."
