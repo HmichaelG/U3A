@@ -69,7 +69,9 @@
                         PopupEditFormHeaderText="Add/Edit Participant"
                         DataItemDeleting="Grid_DataItemDeleting">
                     <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid ToolbarFilterClosed="@(OnToolbarFilterClosed)">
+                        <GridToolbar LinkedGrid=@mainGrid 
+                            SpreadsheetHeaderRows="2"
+                            ToolbarFilterClosed="@(OnToolbarFilterClosed)">
                             <CustomButtonContent>
                                 <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
                                                BeginGroup=true
@@ -91,24 +93,45 @@
                                           Caption="ID" FieldName="PersonIdentity" Width="4rem" />
                         <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
                                           Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
-                        <DxGridDataColumn Caption="LegacyID" FieldName="ConversionID" Visible=false DisplayFormat="{0:F0}" />
-                        <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
-                        <DxGridDataColumn Caption="City" FieldName="City" Width="9rem" />
-                        <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
-                        <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" />
-                        <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true />
-                        <DxGridDataColumn Caption="Domain" FieldName="Domain" Visible=false />
-                        <DxGridDataColumn Caption="Phone" FieldName="HomePhone" Visible=false />
-                        <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="5rem" />
-                        <DxGridDataColumn Caption="Silent?" FieldName="SilentNumberShortDisplayText" Visible=true Width="4rem" />
-                        <DxGridDataColumn Caption="Mail Via" FieldName="Communication" Visible=true Width="5rem" />
-                        <DxGridDataColumn Caption="SMS Opt-Out?" FieldName="SMSOptOut" Visible=false Width="6rem" />
-                        <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="5rem" />
-                        <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Visible="@true" Width="5rem" />
-                        <DxGridDataColumn Caption="Life?" FieldName="IsLifeMember" Visible="@true" Width="5rem" />
                         <DxGridDataColumn Caption="Gender" FieldName="Gender" Width="5rem" />
-                        <DxGridDataColumn Caption="ICE Contact" FieldName="ICEContact" Visible=false />
-                        <DxGridDataColumn Caption="ICE Phone" FieldName="ICEPhone" Visible=false />
+                        <DxGridDataColumn Caption="LegacyID" FieldName="ConversionID" Visible=false DisplayFormat="{0:F0}" />
+                        <DxGridBandColumn Caption="Address">
+                            <Columns>
+                                <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
+                                <DxGridDataColumn Caption="City" FieldName="City" Width="9rem" />
+                                <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
+                                <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Contact Detasil">
+                            <Columns>
+                                <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="15rem" />
+                                <DxGridDataColumn Caption="Domain" FieldName="Domain" Visible=false />
+                                <DxGridDataColumn Caption="Phone" FieldName="HomePhone" Visible=false />
+                                <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="5rem" />
+                                <DxGridDataColumn Caption="Silent?" FieldName="SilentNumberShortDisplayText" Visible=true Width="4rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Mail Options">
+                            <Columns>
+                                <DxGridDataColumn Caption="Trx Via" FieldName="@nameof(Person.SendTransactionalEmailVia)" Visible=true Width="5rem" />
+                                <DxGridDataColumn Caption="B'cast Via" FieldName="Communication" Visible=true Width="5rem" />
+                                <DxGridDataColumn Caption="SMS Opt-Out?" FieldName="SMSOptOut" Visible=false Width="6rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Leadership Role">
+                            <Columns>
+                                <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="5rem" />
+                                <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Visible="@true" Width="5rem" />
+                                <DxGridDataColumn Caption="Life?" FieldName="IsLifeMember" Visible="@true" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Emergency Contact" Visible="false">
+                            <Columns>
+                                <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=false />
+                                <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=false />
+                            </Columns>
+                        </DxGridBandColumn>
                         <DxGridDataColumn Caption="Vax-Cert?" FieldName="VaxCertificateViewed" Visible="@settings.RequireVaxCertificate" Width="4rem" />
                         <DxGridDataColumn Caption="Occupation" FieldName="Occupation" Visible=false />
                         <DxGridDataColumn Caption="DOB" FieldName="BirthDate" Visible=false />
@@ -557,7 +580,7 @@
                 co = CriteriaOperator.FromLambda<Person>(x => x.IsVolunteer && x.DateCeased == null);
                 break;
             case 9:             // Unfinancial
-                co = CriteriaOperator.FromLambda<Person>(x => (x.FinancialTo < currentTerm.Year 
+                co = CriteriaOperator.FromLambda<Person>(x => (x.FinancialTo < currentTerm.Year
                                                                 || (x.FinancialTo == currentTerm.Year
                                                                     && (x.FinancialToTerm != null && x.FinancialToTerm < currentTerm.TermNumber))
                                                                 )
