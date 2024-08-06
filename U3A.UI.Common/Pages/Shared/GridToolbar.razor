@@ -92,11 +92,12 @@
     [Parameter] public bool HideSearchBox { get; set; }
     [Parameter] public bool IsMasterDetail { get; set; }
     [Parameter] public bool DisableVirtualScroll { get; set; }
-    [Parameter] public RenderFragment CustomButtonContent { get; set; }
+    [Parameter] public RenderFragment? CustomButtonContent { get; set; }
     [Parameter] public EventCallback ToolbarFilterClosed { get; set; }
+    [Parameter] public int SpreadsheetHeaderRows { get; set; } = 1;
 
     internal bool IsToggleExpanded { get; set; } = false;
-    internal string ExpandCollapseText { get; set; }
+    internal string? ExpandCollapseText { get; set; }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -226,10 +227,10 @@
                     {
                         if (col.ExportEnabled && col.GroupIndex < 0) count++;
                     }
-                    var positionEnd = new DevExpress.Export.Xl.XlCellPosition(count - 1, 0);
+                    var positionEnd = new DevExpress.Export.Xl.XlCellPosition(count - 1, SpreadsheetHeaderRows);
                     e.Sheet.AutoFilterRange = new DevExpress.Export.Xl.XlCellRange(positionStart, positionEnd);
-                    // Freeze the top row
-                    e.Sheet.SplitPosition = new DevExpress.Export.Xl.XlCellPosition(0, 1);
+                    // Freeze the top row(s)
+                    e.Sheet.SplitPosition = new DevExpress.Export.Xl.XlCellPosition(0, SpreadsheetHeaderRows);
                 },
                 CustomizeCell = e =>
                 {
