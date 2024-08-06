@@ -144,6 +144,7 @@ namespace U3A.Services
 
         public static bool HasMergeCodesAndAttachments(DocumentTemplate DocumentTemplate)
         {
+            if (DocumentTemplate?.Content == null) { return false; }
             if (!DocumentTemplate.Attachments.Any()) return false;
             var server = new RichEditDocumentServer();
             server.RtfText = System.Text.Encoding.UTF8.GetString(DocumentTemplate.Content);

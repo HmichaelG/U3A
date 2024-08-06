@@ -309,6 +309,12 @@
                 msg += "<div class='text-center' style='color: red'>*** From Display Name is required ***<br/></div>";
             }
             await richEdit.SaveDocumentAsync();
+            bool isEmpty = await richEdit.DocumentAPI.GetIsEmptyAsync();
+            if (isEmpty || SelectedDocumentTemplate.Content == null)
+            {
+                msg += @"<div class='text-center' style='color: red'>*** This email does not contain text ***<br/>
+                                Enter your email text using the editor provided.</div>";
+            }
             if (DocumentServer.HasMergeCodesAndAttachments(SelectedDocumentTemplate))
             {
                 msg += @"<div class='text-center' style='color: red'>*** An email may not contain both merge codes and attachments ***<br/>
