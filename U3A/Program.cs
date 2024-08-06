@@ -36,8 +36,8 @@ if (tenantConnectionString is null)
     tenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString");
 }
 
-LoggingLevelSwitch WarningLevelSwitch
-        = new LoggingLevelSwitch(LogEventLevel.Warning);
+LoggingLevelSwitch FatalLevelSwitch
+        = new LoggingLevelSwitch(LogEventLevel.Fatal);
 
 var columnOptions = new ColumnOptions
 {
@@ -53,7 +53,7 @@ var columnOptions = new ColumnOptions
 };
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft", WarningLevelSwitch)
+    .MinimumLevel.Override("Microsoft", FatalLevelSwitch)
     .Enrich.FromLogContext()
     .Enrich.WithExceptionDetails()
     .WriteTo.Console(formatProvider: new CultureInfo("en-AU"))
