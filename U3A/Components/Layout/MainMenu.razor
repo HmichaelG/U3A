@@ -130,7 +130,10 @@
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole | isOfficeRole)
                             {
-                                <DxMenuItem Text="Portal (Admin)" IconCssClass="bi bi-people" NavigateUrl="AdminMemberPortal" />
+                                <DxMenuItem Text="Portal (Admin)" oncontextmenu="return false"
+                                    Enabled="@(!isRedirected)"
+                                    IconCssClass="bi bi-people" 
+                                    NavigateUrl="AdminMemberPortal" />
                             }
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole)
@@ -201,7 +204,10 @@
                                 <Items>
                                     @if (IsTopMenu)
                                     {
-                                        <DxMenuItem Click="OnLogout" Text="Logout" IconCssClass="bi bi-door-open" />
+                                        <DxMenuItem Click="OnLogout" 
+                                            oncontextmenu="return false"
+                                            Text="Logout" 
+                                            IconCssClass="bi bi-door-open" />
                                     }
                                     <DxMenuItem Text="Change Email Address" IconCssClass="bi bi-shield"
                                                 Click="@(() => OnChangeCredential("Email"))" />
@@ -213,7 +219,11 @@
                             </DxMenuItem>
                             @if (!IsTopMenu)
                             {
-                                <DxMenuItem Click="OnLogout" Text="Logout" IconCssClass="bi bi-door-open" Enabled="@(!isRedirected)" />
+                                <DxMenuItem Click="OnLogout" 
+                                    oncontextmenu="return false"
+                                    Text="Logout" 
+                                    IconCssClass="bi bi-door-open" 
+                                    Enabled="@(!isRedirected)" />
                             }
                         }
                     }
@@ -299,7 +309,11 @@
             var page = colQueryString.GetValues("Page");
             if (page != null && page.Count() > 0)
             {
-                isRedirected = true;
+                var path = page[0];
+                if (path != "/~/" && path != "~/")
+                {
+                    isRedirected = true;
+                }
             }
         }
     }
