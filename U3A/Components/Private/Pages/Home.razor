@@ -12,6 +12,7 @@
 @inject NavigationManager navMan
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject CircuitHandler circuitHandler
+@inject WorkStation ws
 
 @if (@homePage == "")
 {
@@ -84,7 +85,7 @@ else
     .iframe-style {
         width: 85vw;
         min-height: 40dvh;
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "10rem" : "7.5rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem"));
         border-style: none;
         padding-bottom: 5px;
     }

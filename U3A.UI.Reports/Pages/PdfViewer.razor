@@ -6,6 +6,7 @@
 <PageTitle>U3A Report</PageTitle>
 
 @inject NavigationManager NavMan
+@inject WorkStation ws
 
 @using DevExpress.Blazor.PdfViewer
 @using DevExpress.XtraPrinting
@@ -55,7 +56,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        viewerHeight = (Workstation.UseTopMenu) 
+        viewerHeight = (ws.UseTopMenu) 
         ? $"calc(100dvh - {DisplayHeightOffset+3}rem) !important;" 
         : $"calc(100dvh - {DisplayHeightOffset}rem) !important;";
         if (Report is not null)

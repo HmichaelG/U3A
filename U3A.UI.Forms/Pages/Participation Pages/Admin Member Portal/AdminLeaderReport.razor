@@ -9,6 +9,8 @@
 @inject ILogger<LeaderReport> Logger
 @inject IWebHostEnvironment Environment
 @inject NavigationManager navMan;
+@inject WorkStation ws
+
 @implements IDisposable
 
 
@@ -96,7 +98,7 @@ else
 }
 <style>
     .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "19rem" : "15rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "19rem" : "15rem"));
     }
 
     .viewer-height {

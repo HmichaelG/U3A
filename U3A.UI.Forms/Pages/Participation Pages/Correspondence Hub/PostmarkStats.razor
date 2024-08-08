@@ -8,6 +8,7 @@
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager NavigationManager
+@inject WorkStation ws
 
 <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 <Progress @ref="@ProgressBar" />
@@ -218,7 +219,7 @@
 
 <style>
     .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "30rem" : "28rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "30rem" : "28rem"));
     }
     .badge-size {
         font-size: 0.7rem !important;

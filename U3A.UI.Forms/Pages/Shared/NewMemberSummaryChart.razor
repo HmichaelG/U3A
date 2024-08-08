@@ -1,5 +1,6 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
+@inject WorkStation ws
 
 <Progress @ref=@progress />
 <DxToolbar CssClass="my-1">
@@ -96,7 +97,7 @@
 
 <style>
     .controlHeight {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "18rem" : "14rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "18rem" : "14rem"));
     }
 </style>
 

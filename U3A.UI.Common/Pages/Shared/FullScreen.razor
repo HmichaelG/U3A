@@ -1,4 +1,5 @@
 ﻿@inject IJSRuntime js
+@inject WorkStation ws
 
 <div id="fullscreen-element" class="d-flex normalscreen">
     @ContentTemplate
@@ -30,7 +31,7 @@
     }
 
     .normalscreen {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? $"{DisplayOffset + 4}rem" : $"{DisplayOffset}rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? $"{DisplayOffset + 4}rem" : $"{DisplayOffset}rem"));
         width: calc(100% + 1.5rem);
     }
 

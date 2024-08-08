@@ -3,6 +3,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
 @inject IJSRuntime js
+@inject WorkStation ws
 
 
 @if (!IsReady)
@@ -97,7 +98,7 @@ else
     }
 
     .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? (LeaderCourse != null) ? "30rem" : "14rem" : (LeaderCourse != null) ? "28rem" : "12rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? (LeaderCourse != null) ? "30rem" : "14rem" : (LeaderCourse != null) ? "28rem" : "12rem"));
     }
 </style>
 

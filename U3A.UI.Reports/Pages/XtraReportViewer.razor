@@ -9,6 +9,8 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService TenantService
+@inject WorkStation ws
+
 @implements IDisposable
 
 @using DevExpress.XtraReports.Services
@@ -69,7 +71,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        viewerHeight = (Workstation.UseTopMenu) ? "calc(100dvh - 4rem) !important;" : "calc(100dvh - 1rem) !important;";
+        viewerHeight = (ws.UseTopMenu) ? "calc(100dvh - 4rem) !important;" : "calc(100dvh - 1rem) !important;";
         dbc = await U3Adbfactory.CreateDbContextAsync();
         dbcT = await TenantDbfactory.CreateDbContextAsync();
         if (Report == null)

@@ -1,6 +1,7 @@
 ﻿@namespace U3A.UI.Forms
 
 @inject IJSRuntime js
+@inject WorkStation ws
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 
@@ -90,7 +91,7 @@ else
 }
 <style>
     .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "26rem" : "22rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "26rem" : "22rem"));
     }
 
     .badge-size {

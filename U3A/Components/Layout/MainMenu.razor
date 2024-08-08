@@ -13,6 +13,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject NavigationManager navMan
+@inject WorkStation ws
 @implements IDisposable;
 
 
@@ -364,11 +365,9 @@
         var useTopMenu = true;
         if (await localStorage.ContainKeyAsync(key))
         {
-            useTopMenu = !(await localStorage.GetItemAsync<bool>
-    (key));
+            useTopMenu = !(await localStorage.GetItemAsync<bool>(key));
         }
-        await localStorage.SetItemAsync<bool>
-            (key, useTopMenu);
+        await localStorage.SetItemAsync<bool>(key, useTopMenu);
         navMan.NavigateTo("/", true);
     }
 

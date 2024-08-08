@@ -1,6 +1,7 @@
 ﻿@namespace U3A.UI.Forms
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
+@inject WorkStation ws
 
 <DxLayoutBreakpoint MaxWidth="768"
                     @bind-IsActive="@IsSmallLayout" />
@@ -62,7 +63,7 @@ else {
 }
 <style>
     .grid-height {
-        height: calc(100dvh - @(Workstation.UseTopMenu ? "24rem" : "20rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "24rem" : "20rem"));
     }
 
 </style>

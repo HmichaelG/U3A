@@ -6,6 +6,7 @@
 @inject IConfiguration config
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject ILogger<MemberEnrolment> Logger
+@inject WorkStation ws
 
 @using System.Web
 @using Microsoft.AspNetCore.Builder
@@ -585,8 +586,8 @@ else
         await base.OnInitializedAsync();
 
         listHeight = IsReadOnly || IsEnrolmentWithdrawalView
-                        ? Workstation.UseTopMenu ? "70dvh;" : "75dvh;"
-                        : Workstation.UseTopMenu ? "60dvh;" : "65dvh;";
+                        ? ws.UseTopMenu ? "70dvh;" : "75dvh;"
+                        : ws.UseTopMenu ? "60dvh;" : "65dvh;";
 
         await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
 

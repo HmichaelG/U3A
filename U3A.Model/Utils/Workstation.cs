@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public static class Workstation
+    public class WorkStation
     {
-        public static bool UseTopMenu { get; private set; }
-        public static string ID { get; private set; }
+        public bool UseTopMenu { get; private set; }
+        public string ID { get; private set; }
 
         const string WORKSTATION_ID = "WorkstationID";
         const string USE_TOP_MENU_KEY = "use-topmenu";
 
-        public static async Task SetWorkstationDetail(IJSRuntime js, ILocalStorageService localStorage)
+        public async Task SetWorkstationDetail(IJSRuntime js, ILocalStorageService localStorage)
         {
             //workstation ID
             var id = await localStorage.GetItemAsync<string>(WORKSTATION_ID);

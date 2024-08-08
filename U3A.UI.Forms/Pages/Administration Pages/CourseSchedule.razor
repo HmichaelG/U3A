@@ -6,6 +6,8 @@
 @using System.Text.Json
 @using System.Text.Json.Nodes
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject WorkStation ws
+
 @implements IDisposable
 
 
@@ -107,7 +109,7 @@ else
 <style>
     .schedule-height {
         overflow: auto;
-        height: calc(100dvh - @(Workstation.UseTopMenu ? (IsPortal) ? "9rem" : "13rem" : (IsPortal) ? "5rem" : "10rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? (IsPortal) ? "9rem" : "13rem" : (IsPortal) ? "5rem" : "10rem"));
     }
 
 </style>

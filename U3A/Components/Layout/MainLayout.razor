@@ -13,6 +13,7 @@
 @inject CircuitHandler circuitHandler
 @inject NavigationManager navMan
 @inject IJSRuntime js
+@inject WorkStation ws
 @implements IDisposable
 
 @if (isReady && Body != null)
@@ -129,7 +130,6 @@
         ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count;
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
-
         isReady = true;
         await base.OnInitializedAsync();
     }
@@ -146,8 +146,8 @@
                 await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
             }
             catch { };
-            await Workstation.SetWorkstationDetail(js, localStorage);
-            useTopMenu = Workstation.UseTopMenu;
+            await ws.SetWorkstationDetail(js, localStorage);
+            useTopMenu = ws.UseTopMenu;
             await InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);
