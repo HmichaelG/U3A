@@ -131,8 +131,7 @@
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole | isOfficeRole)
                             {
-                                <DxMenuItem Text="Portal (Admin)" oncontextmenu="return false"
-                                    Enabled="@(!isRedirected)"
+                                <DxMenuItem Text="Portal (Admin)"
                                     IconCssClass="bi bi-people" 
                                     NavigateUrl="AdminMemberPortal" />
                             }
