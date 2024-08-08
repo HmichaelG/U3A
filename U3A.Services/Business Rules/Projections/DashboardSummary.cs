@@ -279,55 +279,55 @@ namespace U3A.BusinessRules
                     Group = GetBirthDateRange(g.Key),
                     Count = g.Count()
                 })
-                .OrderBy(r => r.Year).ToList();
+                .OrderBy(r => r.Group).ToList();
             return result;
         }
 
         private static string GetBirthDateRange(int years)
         {
-            if (years < 50)
+            if (years <= 50)
             {
-                return "< 50 year";
+                return " <= 50 years";
             }
             else if (years >= 51 && years <= 55)
             {
-                return "51-55 years";
+                return " 51-55 years";
             }
             else if (years >= 56 && years <= 60)
             {
-                return "56-60 years";
+                return " 56-60 years";
             }
             else if (years >= 61 && years <= 65)
             {
-                return "61-65 years";
+                return " 61-65 years";
             }
             else if (years >= 66 && years <= 70)
             {
-                return "66-70 years";
+                return " 66-70 years";
             }
             else if (years >= 71 && years <= 75)
             {
-                return "71-75 years";
+                return " 71-75 years";
             }
             else if (years >= 76 && years <= 80)
             {
-                return "76-80 years";
+                return " 76-80 years";
             }
             else if (years >= 81 && years <= 85)
             {
-                return "81-85 years";
+                return " 81-85 years";
             }
             else if (years >= 86 && years <= 90)
             {
-                return "86-90 years";
+                return " 86-90 years";
             }
             else if (years >= 91 && years <= 95)
             {
-                return "91-95 years";
+                return " 91-95 years";
             }
             else if (years >= 96 && years <= 100)
             {
-                return "96-100 years";
+                return " 96-100 years";
             }
             else
             {
