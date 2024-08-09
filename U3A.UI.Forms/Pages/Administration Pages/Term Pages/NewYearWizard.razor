@@ -1,0 +1,213 @@
+﻿@using System.Globalization
+@inject IDbContextFactory<U3ADbContext> dbFactory
+
+<DxWindow Visible="@popupVisible" @ref="@popup"
+          Width="40rem"
+          CloseOnEscape="false"
+          ShowFooter="true"
+          HeaderText="New Year Wizard">
+    <BodyTemplate Context="PopupContext">
+        <div class="p-2">
+            <ContextHelpTitle Title="New Year Wizard" HelpTopic="add_edit-enrolment-terms.html"></ContextHelpTitle>
+            <p>
+                Use this wizard to quickly create enrolment terms for the new year.<br />
+                Simply review / correct the term start date and duration. We'll do the rest.
+            </p>
+            <DxGrid Data="@Terms" @ref=@mainGrid CssClass="grid-height"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    HighlightRowOnHover="true"
+                    ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                    EditMode="GridEditMode.EditCell"
+                    EditModelSaving="Grid_EditModelSaving">
+                <Columns>
+                    <DxGridDataColumn Caption="Year"
+                                      FieldName="Year"
+                                      DisplayFormat="{0:D}"
+                                      Width="4rem">
+                        <EditSettings>
+                            <DxSpinEditSettings Enabled="false" />
+                        </EditSettings>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn Caption="Term"
+                                      FieldName="TermNumber"
+                                      DisplayFormat="Term-{0:D}" Width="6rem">
+                        <EditSettings>
+                            <DxSpinEditSettings Enabled="false" />
+                        </EditSettings>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn Caption="Term Start" FieldName="StartDate"
+                                      DisplayFormat="@constants.STD_DATE_FORMAT">
+                        <EditSettings>
+                            <DxDateEditSettings MinDate="@(mondaysInYear.First())"
+                                                MaxDate="@(mondaysInYear.Last())"
+                                                CustomDisabledDate="@GetDisabledDates" />
+                        </EditSettings>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn Caption="Duration (weeks)" FieldName="Duration">
+                        <EditSettings>
+                            <DxSpinEditSettings MaxValue="13" MinValue="1" />
+                        </EditSettings>
+                    </DxGridDataColumn>
+
+                    <DxGridDataColumn Caption="Term End" FieldName="EndDate" DisplayFormat="@constants.STD_DATE_FORMAT">
+                        <EditSettings>
+                            <DxDateEditSettings Enabled="false" />
+                        </EditSettings>
+                    </DxGridDataColumn>
+                </Columns>
+            </DxGrid>
+
+
+        </div>
+    </BodyTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  Text="Select"
+                  Click="@AffirmativeButtonClicked" />
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="Cancel" Click="@NegativeButtonClicked" />
+    </FooterContentTemplate>
+</DxWindow>
+
+@code {
+    bool isReady;
+    bool popupVisible { get; set; }
+    TaskCompletionSource<bool>? tcs;
+
+    List<Term> Terms = new();
+    DxWindow? popup;
+    IGrid? mainGrid;
+    DxGridCommandColumnEx? GridCommandColumn;
+    U3ADbContext? dbc;
+    int newYear;
+    List<DateTime> mondaysInYear;
+
+
+    public Task<bool> ShowAsync()
+    {
+        GetData();
+        popupVisible = true;
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
+            popupVisible = false;
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    async Task GetData()
+    {
+        dbc = await dbFactory.CreateDbContextAsync();
+        newYear = dbc.GetLocalDate().Year;
+        var allTerms = await BusinessRule.EditableTermsAsync(dbc);
+        newYear = (allTerms?.Count <= 0)
+                    ? dbc.GetLocalDate().Year
+                    : dbc.GetLocalDate().Year + 1;
+        GetMondaysInYear();
+        Terms = new();
+        for (int i = 0; i < 4; i++)
+        {
+            var t = allTerms.FirstOrDefault(x => x.Year == newYear && x.TermNumber == i);
+            if (t == null)
+            {
+                t = new Term()
+                    {
+                        ID = Guid.NewGuid(),
+                        Year = newYear,
+                        TermNumber = i + 1,
+                        Duration = 8
+                    };
+                switch (t.TermNumber)
+                {
+                    case 1:
+                        t.StartDate = mondaysInYear[4];
+                        if (t.StartDate.Month != 2)
+                        {
+                            t.StartDate = t.StartDate.AddDays(7);
+                        }
+                        break;
+                    case 2:
+                        t.StartDate = mondaysInYear[16];
+                        break;
+                    case 3:
+                        t.StartDate = mondaysInYear[28];
+                        break;
+                    case 4:
+                        t.StartDate = mondaysInYear[40];
+                        break;
+                }
+            }
+            Terms.Add(t);
+        }
+    }
+
+    void AffirmativeButtonClicked()
+    {
+        popupVisible = false;
+        tcs?.SetResult(true);
+    }
+    void NegativeButtonClicked()
+    {
+        popupVisible = false;
+        tcs?.SetResult(false);
+    }
+
+    bool isBusy;
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (isBusy) return;
+        isBusy = true;
+        try
+        {
+            await SaveRecord(e);
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (Term)e.EditModel;
+        e.Cancel = !IsDataOK(editModel);
+        if (!e.Cancel)
+        {
+            // Re-query a data item from the store.
+            var dataItem = Terms.First(x => x.ID == editModel.ID);
+            // Assign changes from the edit model to the data item.
+            if (dataItem != null)
+            {
+                editModel.CopyTo(dataItem);
+            }
+        }
+    }
+
+    bool IsDataOK(Term EditModel)
+    {
+        return true;
+    }
+
+    void GetMondaysInYear()
+    {
+        mondaysInYear = new();
+        DateTime date = new DateTime(newYear, 1, 1);
+        for (int i = 0; i < 366; i++)
+        {
+            if (date.DayOfWeek == DayOfWeek.Monday) mondaysInYear.Add(date);
+            date = date.AddDays(1);
+        }
+    }
+
+    void GetDisabledDates(CalendarCustomDisabledDateEventArgs e)
+    {
+        e.IsDisabled = (!mondaysInYear.Contains(e.Date));
+    }
+
+}

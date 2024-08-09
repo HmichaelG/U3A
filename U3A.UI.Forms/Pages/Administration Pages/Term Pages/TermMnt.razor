@@ -16,6 +16,8 @@
 else
 {
 
+    <NewYearWizard @ref=@newYearWizard />
+
     <NavigationLock OnBeforeInternalNavigation="OnBeforeNavigation" />
 
     <div class="row  align-content-start">
@@ -42,7 +44,16 @@ else
             EditMode="GridEditMode.PopupEditForm"
             EditModelSaving="Grid_EditModelSaving">
         <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid />
+            <GridToolbar LinkedGrid=@mainGrid>
+                <CustomButtonContentAtStart>
+                    <DxToolbarItem 
+                        RenderStyle="ButtonRenderStyle.Info"
+                        Alignment="ToolbarItemAlignment.Left"
+                        Text="New Year Wizard"
+                        Click="@(async() => await DoNewYearWizard())"
+                        IconCssClass="bi bi-lightning-charge-fill text-warning" />
+                </CustomButtonContentAtStart>
+            </GridToolbar>
         </ToolbarTemplate>
         <Columns>
             <DxGridCommandColumnEx @ref="GridCommandColumn" Width="6rem" EditButtonVisible="true" DeleteButtonVisible="false" />
@@ -155,7 +166,7 @@ else
                     {
                         <div class="card appointment-height
                                 @context.Label.BackgroundCssClass">
-                        @string.Empty
+                            @string.Empty
                         </div>
                     }
                     else
@@ -226,6 +237,7 @@ else
     private DxGridCommandColumnEx? GridCommandColumn;
     private DxFormLayoutItem? customValidations;
     MessageBox? messageBox;
+    NewYearWizard? newYearWizard;
     string? messageBoxWidth;
 
     internal IGrid? mainGrid { get; set; }
@@ -241,7 +253,6 @@ else
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
-        Terms = await BusinessRule.EditableTermsAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         Years = new List<int>();
         var localDate = dbc.GetLocalTime().Date;
@@ -260,12 +271,21 @@ else
 
     async Task GetSchedule()
     {
+        Terms = await BusinessRule.EditableTermsAsync(dbc);
         if (Terms != null)
         {
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 TermDataStorage = await BusinessRule.GetTermScheduleDataStorageAsync(dbc);
             }
+        }
+    }
+
+    async Task DoNewYearWizard()
+    {
+        if (await newYearWizard.ShowAsync())
+        {
+            await GetSchedule();
         }
     }
 
@@ -402,7 +422,7 @@ else
                 if (term.EnrolmentStartDate < prevTerm.EnrolmentEndDate)
                 {
                     await messageBox.ShowOkOnlyAsync("Enrolment Period ambiguous",
-                                                                        $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
+                                                                            $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
                                                 prior to last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
                                                 <p>The enrolment period is ambiguous which is not permitted.</p>");
                     return false;
@@ -410,7 +430,7 @@ else
                 if (term.EnrolmentStartDate >= prevTerm.EnrolmentEndDate.AddDays(1))
                 {
                     result = await messageBox.ShowAsync("Enrolment Period not continuous",
-                                                                    $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
+                                                                        $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
                                             is later than last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is not continuous and there will be a period where members
                                             are not permitted to enrol.</p><p>Do you wish to continue?</p>");
@@ -426,7 +446,7 @@ else
                 if (nextTerm.EnrolmentStartDate < term.EnrolmentEndDate.AddDays(-1))
                 {
                     await messageBox.ShowOkOnlyAsync("Enrolment Period ambiguous",
-                                                                    $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
+                                                                        $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
                                             prior to next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is ambiguous which is not permitted.</p>");
                     return false;
@@ -434,7 +454,7 @@ else
                 if (nextTerm.EnrolmentStartDate >= term.EnrolmentEndDate.AddDays(1))
                 {
                     result = await messageBox.ShowAsync("Enrolment Period not continuous",
-                                                                        $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
+                                                                            $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
                                             is later than next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is not continuous and there will be a period where members
                                             are not permitted to enrol.</p><p>Do you wish to continue?</p>");

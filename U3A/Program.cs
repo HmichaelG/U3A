@@ -128,7 +128,7 @@ builder.Services.AddDevExpressServerSideBlazorReportViewer();
 builder.Services.AddDevExpressBlazor(options =>
 {
     options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
-    options.SizeMode = DevExpress.Blazor.SizeMode.Small;
+    options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
 

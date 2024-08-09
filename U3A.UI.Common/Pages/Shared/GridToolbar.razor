@@ -10,8 +10,10 @@
            CssClass="me-4"
            ItemClick="OnItemClick">
     <Items>
+        @CustomButtonContentAtStart
         <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
                        Visible = "@(LinkedGrid?.GetGroupCount() > 0)"
+                       BeginGroup="true"
                        Alignment="ToolbarItemAlignment.Left">
             <Items>
                 <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
@@ -92,6 +94,7 @@
     [Parameter] public bool HideSearchBox { get; set; }
     [Parameter] public bool IsMasterDetail { get; set; }
     [Parameter] public bool DisableVirtualScroll { get; set; }
+    [Parameter] public RenderFragment? CustomButtonContentAtStart { get; set; }
     [Parameter] public RenderFragment? CustomButtonContent { get; set; }
     [Parameter] public EventCallback ToolbarFilterClosed { get; set; }
     [Parameter] public int SpreadsheetHeaderRows { get; set; } = 1;
