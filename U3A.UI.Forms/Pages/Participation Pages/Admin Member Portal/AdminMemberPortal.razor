@@ -27,134 +27,111 @@ else
                         ApplyBackgroundShading="true"
                         IndicatorAreaVisible="false"
                         Text="Processing Eway receipts...">
-            <DxDrawer Position="DrawerPosition.Right"
-                      PanelWidth="25rem"
-                      Mode="DrawerMode.Overlap"
-                      CssClass="drawer-style"
-                      @bind-IsOpen="@isDrawerOpen">
-                <HeaderTemplate>
-                    <DxButton SizeMode="SizeMode.Small"
-                              IconCssClass="bi bi-calendar-date"
-                              RenderStyle="ButtonRenderStyle.Info"
-                              Click="@(() => isDrawerOpen = !isDrawerOpen)"
-                              CssClass="calendar-button-style" />
-                </HeaderTemplate>
-                <BodyTemplate>
-                    <ClassCalendar DisplayOffset="@(ws.UseTopMenu ? 8 : 5.4)" />
-                </BodyTemplate>
-                <TargetContent>
-                    <DxTabs RenderMode="TabsRenderMode.OnDemand" CssClass="tabs-style">
-                        <DxTabPage Text="Process On Behalf Of">
-                            <DxFormLayout CssClass="my-2">
-                                <CollapsableContent AlertType="none" CssClass="w-100"
-                                                    ShowCollapseButton=false
-                                                    OnContentExpanded="@(async() => await OnClearSelection())"
-                                                    @ref=@collapsableContent>
-                                    <ContentTemplate>
-                                        <div class="@formWidth">
-                                            <div class="h3 text-center">Member Portal (Administration)</div>
-                                            <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
-                                            <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" ColSpanMd="12" Context="groupContext">
-                                                <HeaderContentTemplate>
-                                                    <div class="d-flex input-group">
-                                                        <div class="text-start flex-grow-1">
-                                                            Process Member
-                                                        </div>
-                                                        <div class="flex-grow-0">
-                                                            <DxButton Text="Refresh" Click="OnRefresh" IconCssClass="bi bi-arrow-clockwise" Tooltip="Click to refresh lookup data" />
-                                                        </div>
-                                                    </div>
-                                                </HeaderContentTemplate>
-                                                <Items>
-                                                    <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
-                                                        <PersonsComboBox People="@people" @bind-SelectedPerson="@selectedPerson"
-                                                                         ShowProcessButton="true"
-                                                                         OnProcessButtonClicked="async(Person value) => {selectedPerson = value; await OnProcess();}" />
-                                                    </DxFormLayoutItem>
-                                                </Items>
-                                            </DxFormLayoutGroup>
-                                        </div>
-                                    </ContentTemplate>
-                                </CollapsableContent>
-                                @if (isSelected)
-                                {
-                                    <MemberPortal OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
-                            }
-                                else
-                                {
-                                    <div class="@formWidth">
-                                        <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
-                                                     ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
-                                            <Items>
-                                                <DxAccordionItem Text="Received Today" Expanded="true" Context="receiptContext">
-                                                    <ContentTemplate>
-                                                        <div class="m-2">
-                                                            <DxGrid Data="@RecevivedToday" CssClass="member-grid-height"
-                                                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                                                    UnboundColumnData="Grid_UnboundColumnData"
-                                                                    TextWrapEnabled="false"
-                                                                    ShowFilterRow="false"
-                                                                    ShowAllRows="true"
-                                                                    KeyFieldName="ID">
-                                                                <Columns>
-                                                                    <DxGridDataColumn Width="5rem" Caption="Time"
-                                                                                      FieldName="CreatedTime"
-                                                                                      DisplayFormat="hh:mm tt"
-                                                                                      UnboundType="GridUnboundColumnType.DateTime" />
-                                                                    <DxGridDataColumn Width="10rem" Caption="Name" FieldName="Person.FullName" />
-                                                                    <DxGridDataColumn Width="12rem" Caption="Description" FieldName="Description" />
-                                                                    <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
-                                                                    <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="Person.FinancialToBriefText" DisplayFormat="f0" />
-                                                                    <DxGridDataColumn Width="5rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
-                                                                </Columns>
-                                                                <TotalSummary>
-                                                                    <DxGridSummaryItem FieldName="Amount"
-                                                                                       SummaryType="GridSummaryItemType.Sum"
-                                                                                       FooterColumnName="Amount"
-                                                                                       ValueDisplayFormat="c2" />
-                                                                </TotalSummary>
-                                                            </DxGrid>
-                                                        </div>
-                                                    </ContentTemplate>
-                                                </DxAccordionItem>
-                                                <DxAccordionItem Text="Add/Edit Member Details" Expanded="false" Context="memberContext">
-                                                    <ContentTemplate>
-                                                        <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
-                                                        <div class="mx-2"><PersonMnt IsEmbedded="true" /></div>
-                                                    </ContentTemplate>
-                                                </DxAccordionItem>
-                                            </Items>
-                                        </DxAccordion>
-                                    </div>
-                                }
-                            </DxFormLayout>
-                        </DxTabPage>
-                        <DxTabPage Text="What's on today?">
-                            <CourseSchedule IsPortal=true />
-                        </DxTabPage>
-                        <DxTabPage Text="Record Attendance">
-                            <AttendClassMnt />
-                        </DxTabPage>
-                        <DxTabPage Text="Attendance Summary">
-                            <CourseAttendanceSummary />
-                        </DxTabPage>
-                        <DxTabPage Text="Attendance Not Recorded">
-                            <AttendanceNotRecordedSummary />
-                        </DxTabPage>
-                        <DxTabPage Text="Attendance Analysis">
-                            <AttendanceAnalysis />
-                        </DxTabPage>
-                        <DxTabPage Text="Leader Report" TabIconCssClass="bi bi-printer">
-                            <AdminLeaderReport />
-                        </DxTabPage>
-                    </DxTabs>
-                    <DxButton SizeMode="SizeMode.Small"
-                              IconCssClass="bi bi-calendar-date"
-                              RenderStyle="ButtonRenderStyle.Info"
-                              Click="@(() => isDrawerOpen = !isDrawerOpen)"
-                              CssClass="calendar-button-style" />
-                </TargetContent>
-            </DxDrawer>
+            <DxTabs RenderMode="TabsRenderMode.OnDemand" CssClass="tabs-style">
+                <DxTabPage Text="Process On Behalf Of">
+                    <DxFormLayout CssClass="my-2">
+                        <CollapsableContent AlertType="none" CssClass="w-100"
+                                            ShowCollapseButton=false
+                                            OnContentExpanded="@(async() => await OnClearSelection())"
+                                            @ref=@collapsableContent>
+                            <ContentTemplate>
+                                <div class="@formWidth">
+                                    <div class="h3 text-center">Member Portal (Administration)</div>
+                                    <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
+                                    <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" ColSpanMd="12" Context="groupContext">
+                                        <HeaderContentTemplate>
+                                            <div class="d-flex input-group">
+                                                <div class="text-start flex-grow-1">
+                                                    Process Member
+                                                </div>
+                                                <div class="flex-grow-0">
+                                                    <DxButton Text="Refresh" Click="OnRefresh" IconCssClass="bi bi-arrow-clockwise" Tooltip="Click to refresh lookup data" />
+                                                </div>
+                                            </div>
+                                        </HeaderContentTemplate>
+                                        <Items>
+                                            <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
+                                                <PersonsComboBox People="@people" @bind-SelectedPerson="@selectedPerson"
+                                                                 ShowProcessButton="true"
+                                                                 OnProcessButtonClicked="async(Person value) => {selectedPerson = value; await OnProcess();}" />
+                                            </DxFormLayoutItem>
+                                        </Items>
+                                    </DxFormLayoutGroup>
+                                </div>
+                            </ContentTemplate>
+                        </CollapsableContent>
+                        @if (isSelected)
+                        {
+                            <MemberPortal OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
+                        }
+                        else
+                        {
+                            <div class="@formWidth">
+                                <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
+                                             ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
+                                    <Items>
+                                        <DxAccordionItem Text="Received Today" Expanded="true" Context="receiptContext">
+                                            <ContentTemplate>
+                                                <div class="m-2">
+                                                    <DxGrid Data="@RecevivedToday" CssClass="member-grid-height"
+                                                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                            UnboundColumnData="Grid_UnboundColumnData"
+                                                            TextWrapEnabled="false"
+                                                            ShowFilterRow="false"
+                                                            ShowAllRows="true"
+                                                            KeyFieldName="ID">
+                                                        <Columns>
+                                                            <DxGridDataColumn Width="5rem" Caption="Time"
+                                                                              FieldName="CreatedTime"
+                                                                              DisplayFormat="hh:mm tt"
+                                                                              UnboundType="GridUnboundColumnType.DateTime" />
+                                                            <DxGridDataColumn Width="10rem" Caption="Name" FieldName="Person.FullName" />
+                                                            <DxGridDataColumn Width="12rem" Caption="Description" FieldName="Description" />
+                                                            <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
+                                                            <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="Person.FinancialToBriefText" DisplayFormat="f0" />
+                                                            <DxGridDataColumn Width="5rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
+                                                        </Columns>
+                                                        <TotalSummary>
+                                                            <DxGridSummaryItem FieldName="Amount"
+                                                                               SummaryType="GridSummaryItemType.Sum"
+                                                                               FooterColumnName="Amount"
+                                                                               ValueDisplayFormat="c2" />
+                                                        </TotalSummary>
+                                                    </DxGrid>
+                                                </div>
+                                            </ContentTemplate>
+                                        </DxAccordionItem>
+                                        <DxAccordionItem Text="Add/Edit Member Details" Expanded="false" Context="memberContext">
+                                            <ContentTemplate>
+                                                <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
+                                                <div class="mx-2"><PersonMnt IsEmbedded="true" /></div>
+                                            </ContentTemplate>
+                                        </DxAccordionItem>
+                                    </Items>
+                                </DxAccordion>
+                            </div>
+                        }
+                    </DxFormLayout>
+                </DxTabPage>
+                <DxTabPage Text="What's on today?">
+                    <CourseSchedule IsPortal=true />
+                </DxTabPage>
+                <DxTabPage Text="Record Attendance">
+                    <AttendClassMnt />
+                </DxTabPage>
+                <DxTabPage Text="Attendance Summary">
+                    <CourseAttendanceSummary />
+                </DxTabPage>
+                <DxTabPage Text="Attendance Not Recorded">
+                    <AttendanceNotRecordedSummary />
+                </DxTabPage>
+                <DxTabPage Text="Attendance Analysis">
+                    <AttendanceAnalysis />
+                </DxTabPage>
+                <DxTabPage Text="Leader Report" TabIconCssClass="bi bi-printer">
+                    <AdminLeaderReport />
+                </DxTabPage>
+            </DxTabs>
         </DxLoadingPanel>
     </CascadingValue>
 }
@@ -167,18 +144,9 @@ else
         height: 40vh;
     }
 
-    .calendar-button-style {
-        position: absolute;
-        top: 0;
-        right: 0;
-    }
 
     .tabs-style {
-        width:98%;
-    }
-
-    .drawer-style {
-        height: calc(100dvh - @drawerHeightAdjustment);
+        width: 98%;
     }
 
 </style>
