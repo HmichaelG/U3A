@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using System.Diagnostics
 @inject IDbContextFactory<U3ADbContext> dbFactory
 
 <DxWindow Visible="@popupVisible" @ref="@popup"
@@ -8,11 +9,14 @@
           HeaderText="New Year Wizard">
     <BodyTemplate Context="PopupContext">
         <div class="p-2">
-            <ContextHelpTitle Title="New Year Wizard" HelpTopic="add_edit-enrolment-terms.html"></ContextHelpTitle>
+            <ContextHelpTitle Title="New Year Wizard" HelpTopic="add_edit-enrolment-terms.html" />
             <p>
                 Use this wizard to quickly create enrolment terms for the new year.<br />
                 Simply review / correct the term start date and duration. We'll do the rest.
             </p>
+            <div class="text-danger text-center w-100">
+                @validationMessage
+            </div>
             <DxGrid Data="@Terms" @ref=@mainGrid CssClass="grid-height"
                     ShowFilterRow="false"
                     ShowAllRows="true"
@@ -48,10 +52,10 @@
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Duration (weeks)" FieldName="Duration">
                         <EditSettings>
-                            <DxSpinEditSettings MaxValue="13" MinValue="1" />
+                            <DxSpinEditSettings MaxValue="13"
+                                                MinValue="1" />
                         </EditSettings>
                     </DxGridDataColumn>
-
                     <DxGridDataColumn Caption="Term End" FieldName="EndDate" DisplayFormat="@constants.STD_DATE_FORMAT">
                         <EditSettings>
                             <DxDateEditSettings Enabled="false" />
@@ -66,7 +70,7 @@
     <FooterContentTemplate>
         <DxButton CssClass="popup-button"
                   RenderStyle="ButtonRenderStyle.Primary"
-                  Text="Select"
+                  Text="Save"
                   Click="@AffirmativeButtonClicked" />
         <DxButton CssClass="popup-button"
                   RenderStyle="ButtonRenderStyle.Secondary"
@@ -86,11 +90,20 @@
     U3ADbContext? dbc;
     int newYear;
     List<DateTime> mondaysInYear;
+    MarkupString? validationMessage;
+    Term lastTermLastYear;
 
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) { await GetData(); }
+    }
 
     public Task<bool> ShowAsync()
     {
-        GetData();
         popupVisible = true;
         tcs = new TaskCompletionSource<bool>();
         tcs.Task.ContinueWith(_ =>
@@ -103,59 +116,84 @@
 
     async Task GetData()
     {
-        dbc = await dbFactory.CreateDbContextAsync();
-        newYear = dbc.GetLocalDate().Year;
-        var allTerms = await BusinessRule.EditableTermsAsync(dbc);
-        newYear = (allTerms?.Count <= 0)
-                    ? dbc.GetLocalDate().Year
-                    : dbc.GetLocalDate().Year + 1;
-        GetMondaysInYear();
-        Terms = new();
-        for (int i = 0; i < 4; i++)
+        using (var dbc = await dbFactory.CreateDbContextAsync())
         {
-            var t = allTerms.FirstOrDefault(x => x.Year == newYear && x.TermNumber == i);
-            if (t == null)
+            newYear = dbc.GetLocalDate().Year;
+            var allTerms = await BusinessRule.EditableTermsAsync(dbc);
+            newYear = (allTerms?.Count <= 0)
+                        ? dbc.GetLocalDate().Year
+                        : dbc.GetLocalDate().Year + 1;
+            lastTermLastYear = await dbc.Term.FirstOrDefaultAsync(t => t.Year == newYear - 1 && t.TermNumber == 4);
+            mondaysInYear = GetMondaysInYear();
+            Terms = new();
+            for (int i = 0; i < 4; i++)
             {
-                t = new Term()
-                    {
-                        ID = Guid.NewGuid(),
-                        Year = newYear,
-                        TermNumber = i + 1,
-                        Duration = 8
-                    };
-                switch (t.TermNumber)
+                var t = allTerms.FirstOrDefault(x => x.Year == newYear && x.TermNumber == i);
+                if (t == null)
                 {
-                    case 1:
-                        t.StartDate = mondaysInYear[4];
-                        if (t.StartDate.Month != 2)
+                    t = new Term()
                         {
-                            t.StartDate = t.StartDate.AddDays(7);
-                        }
-                        break;
-                    case 2:
-                        t.StartDate = mondaysInYear[16];
-                        break;
-                    case 3:
-                        t.StartDate = mondaysInYear[28];
-                        break;
-                    case 4:
-                        t.StartDate = mondaysInYear[40];
-                        break;
+                            ID = Guid.NewGuid(),
+                            Year = newYear,
+                            TermNumber = i + 1,
+                            Duration = 8
+                        };
+                    switch (t.TermNumber)
+                    {
+                        case 1:
+                            t.StartDate = mondaysInYear[4];
+                            if (t.StartDate.Month != 2)
+                            {
+                                t.StartDate = t.StartDate.AddDays(7);
+                            }
+                            break;
+                        case 2:
+                            t.StartDate = mondaysInYear[16];
+                            break;
+                        case 3:
+                            t.StartDate = mondaysInYear[28];
+                            break;
+                        case 4:
+                            t.StartDate = mondaysInYear[40];
+                            break;
+                    }
+
+                    Terms.Add(t);
                 }
             }
-            Terms.Add(t);
         }
     }
 
     void AffirmativeButtonClicked()
     {
-        popupVisible = false;
-        tcs?.SetResult(true);
+        if (IsDataOK())
+        {
+            SaveData();
+            popupVisible = false;
+            tcs?.SetResult(true);
+        }
     }
+
     void NegativeButtonClicked()
     {
         popupVisible = false;
         tcs?.SetResult(false);
+    }
+
+    void SaveData()
+    {
+        using (var dbc = dbFactory.CreateDbContext())
+        {
+            foreach (var t in Terms)
+            {
+                var isNew = false;
+                var dataItem = dbc.Term.Find(t.ID);
+                if (dataItem == null) { dataItem = new Term(); isNew = true; }
+                t.CopyTo(dataItem);
+                if (isNew) { dbc.Add(dataItem); } else { dbc.Update(dataItem); }
+            }
+            dbc.SaveChanges();
+        }
     }
 
     bool isBusy;
@@ -176,7 +214,6 @@
     async Task SaveRecord(GridEditModelSavingEventArgs e)
     {
         var editModel = (Term)e.EditModel;
-        e.Cancel = !IsDataOK(editModel);
         if (!e.Cancel)
         {
             // Re-query a data item from the store.
@@ -189,25 +226,77 @@
         }
     }
 
-    bool IsDataOK(Term EditModel)
+
+    bool IsDataOK()
     {
-        return true;
+        var result = true;
+        validationMessage = null;
+        string errorMsg = string.Empty;
+        for (int i = 0; i < 4; i++)
+        {
+            var thisTerm = Terms[i];
+            var lastTerm = i == 0 ? lastTermLastYear : Terms[i - 1];
+            if (thisTerm.StartDate <= lastTerm.EndDate)
+            {
+                errorMsg += $"Term {thisTerm.TermNumber} start date must be later than previous term's end date.<br/>";
+            }
+            else
+            {
+                thisTerm.EnrolmentStarts = i == 0
+                        ? GetTerm1EnrolmentStart(thisTerm.StartDate)-1
+                        : GetEnrolmentDate(thisTerm.StartDate, lastTerm.EndDate)-1;
+                thisTerm.EnrolmentEnds = GetEnrolmentDate(thisTerm.StartDate, thisTerm.EndDate);
+            }
+        }
+        if (errorMsg != string.Empty)
+        {
+            validationMessage = new MarkupString(errorMsg);
+            result = false;
+        }
+        return result;
     }
 
-    void GetMondaysInYear()
+    int GetWeekInYear(DateTime startDate)
     {
-        mondaysInYear = new();
+        int result = 0;
+        for (int i = mondaysInYear.Count - 1; i > 0; i--)
+        {
+            if (mondaysInYear[i] == startDate)
+            {
+                result = i;
+                break;
+            }
+        }
+        return result;
+    }
+
+    int GetTerm1EnrolmentStart(DateTime startDate)
+    {
+        var termEndDate = lastTermLastYear == null
+                            ? mondaysInYear[0]
+                            : lastTermLastYear.EndDate;
+        return GetEnrolmentDate(startDate, termEndDate);
+    }
+
+    int GetEnrolmentDate(DateTime termStartDate, DateTime termEndDate)
+    {
+        return ((termEndDate - termStartDate).Days) / 7;
+    }
+
+    List<DateTime> GetMondaysInYear()
+    {
+        List<DateTime> mondays = new();
         DateTime date = new DateTime(newYear, 1, 1);
         for (int i = 0; i < 366; i++)
         {
-            if (date.DayOfWeek == DayOfWeek.Monday) mondaysInYear.Add(date);
+            if (date.DayOfWeek == DayOfWeek.Monday) mondays.Add(date);
             date = date.AddDays(1);
         }
+        return mondays;
     }
 
     void GetDisabledDates(CalendarCustomDisabledDateEventArgs e)
     {
         e.IsDisabled = (!mondaysInYear.Contains(e.Date));
     }
-
 }
