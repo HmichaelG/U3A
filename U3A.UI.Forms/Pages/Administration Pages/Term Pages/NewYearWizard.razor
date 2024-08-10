@@ -28,19 +28,15 @@
                     EditModelSaving="Grid_EditModelSaving">
                 <Columns>
                     <DxGridDataColumn Caption="Year"
+                                      DataRowEditorVisible="false"
                                       FieldName="Year"
                                       DisplayFormat="{0:D}"
                                       Width="4rem">
-                        <EditSettings>
-                            <DxSpinEditSettings Enabled="false" />
-                        </EditSettings>
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Term"
+                                      DataRowEditorVisible="false"
                                       FieldName="TermNumber"
                                       DisplayFormat="Term-{0:D}" Width="6rem">
-                        <EditSettings>
-                            <DxSpinEditSettings Enabled="false" />
-                        </EditSettings>
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Term Start" FieldName="StartDate"
                                       DisplayFormat="@constants.STD_DATE_FORMAT">
@@ -56,11 +52,11 @@
                                                 MinValue="1" />
                         </EditSettings>
                     </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Term End" FieldName="EndDate" DisplayFormat="@constants.STD_DATE_FORMAT">
-                        <EditSettings>
-                            <DxDateEditSettings Enabled="false" />
-                        </EditSettings>
-                    </DxGridDataColumn>
+                    <DxGridDataColumn 
+                        DataRowEditorVisible="false"
+                        Caption="Term End" 
+                        FieldName="EndDate" 
+                        DisplayFormat="@constants.STD_DATE_FORMAT" />
                 </Columns>
             </DxGrid>
 
@@ -93,10 +89,6 @@
     MarkupString? validationMessage;
     Term lastTermLastYear;
 
-    protected override async Task OnInitializedAsync()
-    {
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender) { await GetData(); }
@@ -128,7 +120,7 @@
             Terms = new();
             for (int i = 0; i < 4; i++)
             {
-                var t = allTerms.FirstOrDefault(x => x.Year == newYear && x.TermNumber == i);
+                var t = allTerms.FirstOrDefault(x => x.Year == newYear && x.TermNumber == i + 1);
                 if (t == null)
                 {
                     t = new Term()
@@ -157,9 +149,8 @@
                             t.StartDate = mondaysInYear[40];
                             break;
                     }
-
-                    Terms.Add(t);
                 }
+                Terms.Add(t);
             }
         }
     }
@@ -235,7 +226,7 @@
         for (int i = 0; i < 4; i++)
         {
             var thisTerm = Terms[i];
-            var lastTerm = i == 0 ? lastTermLastYear : Terms[i - 1];
+            var lastTerm = (i == 0) ? lastTermLastYear : Terms[i - 1];
             if (thisTerm.StartDate <= lastTerm.EndDate)
             {
                 errorMsg += $"Term {thisTerm.TermNumber} start date must be later than previous term's end date.<br/>";
@@ -243,8 +234,8 @@
             else
             {
                 thisTerm.EnrolmentStarts = i == 0
-                        ? GetTerm1EnrolmentStart(thisTerm.StartDate)-1
-                        : GetEnrolmentDate(thisTerm.StartDate, lastTerm.EndDate)-1;
+                        ? GetTerm1EnrolmentStart(thisTerm.StartDate) - 1
+                        : GetEnrolmentDate(thisTerm.StartDate, lastTerm.EndDate) - 1;
                 thisTerm.EnrolmentEnds = GetEnrolmentDate(thisTerm.StartDate, thisTerm.EndDate);
             }
         }

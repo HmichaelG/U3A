@@ -248,6 +248,7 @@ else
     U3ADbContext? dbc { get; set; }
     SystemSettings settings;
     int year = DateTime.Today.Year;
+    bool isAfterNewYearWizard;
 
     protected override async Task OnInitializedAsync()
     {
@@ -274,6 +275,7 @@ else
         Terms = await BusinessRule.EditableTermsAsync(dbc);
         if (Terms != null)
         {
+            if (isAfterNewYearWizard) { year = Terms.Select(x => x.Year).Max(); }
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 TermDataStorage = await BusinessRule.GetTermScheduleDataStorageAsync(dbc);
@@ -285,7 +287,9 @@ else
     {
         if (await newYearWizard.ShowAsync())
         {
+            isAfterNewYearWizard = true;
             await GetSchedule();
+            await messageBox.ShowOkOnlyAsync("New Year Wizard", "Your Term records have been updated.");
         }
     }
 
