@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-06-22T08:18:28.350+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-08-10T12:44:25.114+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Add/Edit Enrolment Terms</title>
   <body>
     <header>
@@ -8,13 +8,14 @@
     </header>
     <para styleclass="Normal">A <text style="font-weight:bold;">Term</text> is the period of time in which course, classes and other activities normally occur. Every class must be assigned at least one Term and may be assigned up to four in any one year.</para>
     <para styleclass="Normal">If a class or activity occurs during a term break it is assigned to the term immediately preceding it. For example, If an activity occurs during the Term 1 to Term 2 break, it will be assigned to Term 1.</para>
+    <para styleclass="Normal">To create a set of terms for the new year, click the <text style="font-weight:bold;">Create New Year Wizard</text>. This will create a set of terms for the new year providing a &quot;best guess&quot; of your terms&apos; start date and duration. These may be edited by changing the values displayed in the grid. When complete, click the <text style="font-style:italic;">Save</text> button and the software will calculate the set of enrolment dates and duration fro each term.</para>
     <para styleclass="Normal">Once created, a Term cannot be deleted.</para>
     <para styleclass="Normal">The Term record contains two important sets of dates...</para>
     <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal"><text style="font-weight:bold;">The Term Start &amp; End.</text> The start date is always a Monday. The end date is a calculated variable being the start date plus the number of weeks in the term as entered by you.</li>
-      <li styleclass="Normal"><text style="font-weight:bold;">The Enrolment Start &amp; End.</text> This is the date range in which new student enrolments will be assigned to the term. Typically, an enrolment period will start immediately after the end of the previous term and end at the end of the current term. Thus there will be no break from one enrolment period to the next.</li>
+      <li styleclass="Normal"><text style="font-weight:bold;">The Enrolment Start &amp; End.</text> This is the date range in which new student enrolments will be assigned to the term. Typically, an enrolment period will start one week prior to the end of the previous term and end one week prior to the end of the current term. Thus there will be no break from one enrolment period to the next.</li>
     </list>
-    <para styleclass="Normal" style="margin-left:13px;">However, although not encouraged, you are allowed to create a break in the enrolment period where the start of a new period does not begin immediately after the end of the last. A break does not allow members to enrol via the Member Portal. It is intended to allow administrators time to finalise course/enrolment details prior to the start of a new period. </para>
+    <para styleclass="Normal" style="margin-left:13px;">However, although not encouraged, you are allowed to create a break in the enrolment period where the start of a new period does not begin immediately after the end of the last. A break does not allow members to enrol via the Member Portal and is intended to allow administrators time to finalise course/enrolment details prior to the start of a new period. </para>
     <para styleclass="Normal">A timeline is provided within the procedure to assist in visualising term dates within the year.</para>
     <para styleclass="Normal">At any one time there is one and one only <text style="font-style:italic;">Default</text> or <text style="font-style:italic;">Current </text>term. Normally, this is set automatically after the last course for the term is complete. However, it can also be set manually by ticking the <text style="font-style:italic;">Is this the current term? </text>check box.</para>
     <para styleclass="Normal"></para>
