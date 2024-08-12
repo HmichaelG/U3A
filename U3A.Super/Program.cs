@@ -55,6 +55,7 @@ builder.Services.AddServerSideBlazor()
     .AddMicrosoftIdentityConsentHandler();
 
 builder.Services.AddScoped<DefaultAzureCredential>();
+builder.Services.AddScoped<WorkStation>();
 
 var app = builder.Build();
 app.UseRequestLocalization("en-AU");

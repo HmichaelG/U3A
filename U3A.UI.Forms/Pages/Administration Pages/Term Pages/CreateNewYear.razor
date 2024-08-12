@@ -6,12 +6,12 @@
           Width="40rem"
           CloseOnEscape="false"
           ShowFooter="true"
-          HeaderText="New Year Wizard">
+          HeaderText="Create/Edit New Year">
     <BodyTemplate Context="PopupContext">
         <div class="p-2">
-            <ContextHelpTitle Title="New Year Wizard" HelpTopic="add_edit-enrolment-terms.html" />
+            <ContextHelpTitle Title=@($"Create/Edit Terms for {newYear}") HelpTopic="add_edit-enrolment-terms.html" />
             <p>
-                Use this wizard to quickly create enrolment terms for the new year.<br />
+                Use this procedure to quickly create enrolment terms for the new year.<br />
                 Simply review / correct the term start date and duration. We'll do the rest.
             </p>
             <div class="text-danger text-center w-100">
@@ -27,18 +27,12 @@
                     EditMode="GridEditMode.EditCell"
                     EditModelSaving="Grid_EditModelSaving">
                 <Columns>
-                    <DxGridDataColumn Caption="Year"
-                                      DataRowEditorVisible="false"
-                                      FieldName="Year"
-                                      DisplayFormat="{0:D}"
-                                      Width="4rem">
-                    </DxGridDataColumn>
                     <DxGridDataColumn Caption="Term"
                                       DataRowEditorVisible="false"
                                       FieldName="TermNumber"
                                       DisplayFormat="Term-{0:D}" Width="6rem">
                     </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Term Start" FieldName="StartDate"
+                    <DxGridDataColumn Caption="Term Start" FieldName="StartDate" Width="12rem"
                                       DisplayFormat="@constants.STD_DATE_FORMAT">
                         <EditSettings>
                             <DxDateEditSettings MinDate="@(mondaysInYear.First())"
@@ -53,7 +47,7 @@
                         </EditSettings>
                     </DxGridDataColumn>
                     <DxGridDataColumn 
-                        DataRowEditorVisible="false"
+                        DataRowEditorVisible="false" Width="12rem"
                         Caption="Term End" 
                         FieldName="EndDate" 
                         DisplayFormat="@constants.STD_DATE_FORMAT" />
@@ -73,6 +67,11 @@
                   Text="Cancel" Click="@NegativeButtonClicked" />
     </FooterContentTemplate>
 </DxWindow>
+<style>
+    .grid-height {
+        height:10rem;
+    }
+</style>
 
 @code {
     bool isReady;

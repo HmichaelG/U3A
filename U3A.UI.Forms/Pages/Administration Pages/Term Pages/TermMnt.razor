@@ -16,7 +16,7 @@
 else
 {
 
-    <NewYearWizard @ref=@newYearWizard />
+    <CreateNewYear @ref=@newYearWizard />
 
     <NavigationLock OnBeforeInternalNavigation="OnBeforeNavigation" />
 
@@ -35,23 +35,22 @@ else
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 
     <DxGrid Data="@Terms" @ref=@mainGrid CssClass="grid-height"
-            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
             ShowFilterRow="false"
             ShowAllRows="true"
             KeyFieldName="ID"
             ValidationEnabled="true"
+            AutoExpandAllGroupRows="true"
             CustomizeEditModel="OnCustomizeEditModel"
             EditMode="GridEditMode.PopupEditForm"
             EditModelSaving="Grid_EditModelSaving">
         <ToolbarTemplate>
-            <GridToolbar LinkedGrid=@mainGrid>
+            <GridToolbar LinkedGrid=@mainGrid HideGroupPanel="true">
                 <CustomButtonContentAtStart>
-                    <DxToolbarItem 
-                        RenderStyle="ButtonRenderStyle.Info"
-                        Alignment="ToolbarItemAlignment.Left"
-                        Text="New Year Wizard"
-                        Click="@(async() => await DoNewYearWizard())"
-                        IconCssClass="bi bi-magic" />
+                    <DxToolbarItem RenderStyle="ButtonRenderStyle.Info"
+                                   Alignment="ToolbarItemAlignment.Left"
+                                   Text="Creata/Edit New Year"
+                                   Click="@(async() => await CreateNewYear())"
+                                   IconCssClass="bi bi-magic" />
                 </CustomButtonContentAtStart>
             </GridToolbar>
         </ToolbarTemplate>
@@ -59,7 +58,9 @@ else
             <DxGridCommandColumnEx @ref="GridCommandColumn" Width="6rem" EditButtonVisible="true" DeleteButtonVisible="false" NewButtonVisible="false" />
             <DxGridDataColumn Width="6rem" Caption="Current?" FieldName="IsDefaultTerm" />
             <DxGridDataColumn Width="6rem" Caption="Final Allocation?" FieldName="IsClassAllocationFinalised" />
-            <DxGridDataColumn Caption="Year" FieldName="Year" DisplayFormat="{0:D}" Width="6rem" />
+            <DxGridDataColumn Caption="Year"
+                              GroupIndex="0" SortOrder="GridColumnSortOrder.Descending"
+                              FieldName="Year" DisplayFormat="{0:D}" Width="6rem" />
             <DxGridDataColumn Caption="Term" FieldName="TermNumber" DisplayFormat="Term-{0:D}" Width="6rem" />
             <DxGridDataColumn Caption="Term Start" FieldName="StartDate"
                               DisplayFormat="@constants.STD_DATE_FORMAT" />
@@ -171,7 +172,7 @@ else
                     }
                     else
                     {
-                        <div class="card text-center
+                        <div class="card text-center input-group-text
                                 @context.Label.TextCssClass
                                 @context.Label.BackgroundCssClass">
                             <b>@(context.Appointment.Subject)</b>
@@ -199,7 +200,7 @@ else
 <style>
     .grid-height {
         overflow: auto;
-        height: 50dvh;
+        height: 40dvh;
     }
 
     .appointment-height {
@@ -237,7 +238,7 @@ else
     private DxGridCommandColumnEx? GridCommandColumn;
     private DxFormLayoutItem? customValidations;
     MessageBox? messageBox;
-    NewYearWizard? newYearWizard;
+    CreateNewYear? newYearWizard;
     string? messageBoxWidth;
 
     internal IGrid? mainGrid { get; set; }
@@ -283,7 +284,7 @@ else
         }
     }
 
-    async Task DoNewYearWizard()
+    async Task CreateNewYear()
     {
         if (await newYearWizard.ShowAsync())
         {
@@ -426,7 +427,7 @@ else
                 if (term.EnrolmentStartDate < prevTerm.EnrolmentEndDate)
                 {
                     await messageBox.ShowOkOnlyAsync("Enrolment Period ambiguous",
-                                                                            $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
+                                                                                        $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
                                                 prior to last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
                                                 <p>The enrolment period is ambiguous which is not permitted.</p>");
                     return false;
@@ -434,7 +435,7 @@ else
                 if (term.EnrolmentStartDate >= prevTerm.EnrolmentEndDate.AddDays(1))
                 {
                     result = await messageBox.ShowAsync("Enrolment Period not continuous",
-                                                                        $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
+                                                                                    $@"<p>The <strong>Enrolment Start Date</strong> ({term.EnrolmentStartDate.ToShortDateString()})<br/>
                                             is later than last term's <strong>Enrolment End Date</strong> ({prevTerm.EnrolmentEndDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is not continuous and there will be a period where members
                                             are not permitted to enrol.</p><p>Do you wish to continue?</p>");
@@ -450,7 +451,7 @@ else
                 if (nextTerm.EnrolmentStartDate < term.EnrolmentEndDate.AddDays(-1))
                 {
                     await messageBox.ShowOkOnlyAsync("Enrolment Period ambiguous",
-                                                                        $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
+                                                                                    $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
                                             prior to next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is ambiguous which is not permitted.</p>");
                     return false;
@@ -458,7 +459,7 @@ else
                 if (nextTerm.EnrolmentStartDate >= term.EnrolmentEndDate.AddDays(1))
                 {
                     result = await messageBox.ShowAsync("Enrolment Period not continuous",
-                                                                            $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
+                                                                                        $@"<p>The <strong>Enrolment End Date</strong> ({term.EnrolmentEndDate.ToShortDateString()})<br/>
                                             is later than next term's <strong>Enrolment Start Date</strong> ({nextTerm.EnrolmentStartDate.ToShortDateString()}).</p>
                                             <p>The enrolment period is not continuous and there will be a period where members
                                             are not permitted to enrol.</p><p>Do you wish to continue?</p>");

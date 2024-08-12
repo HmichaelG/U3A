@@ -12,7 +12,7 @@
     <Items>
         @CustomButtonContentAtStart
         <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
-                       Visible = "@(LinkedGrid?.GetGroupCount() > 0)"
+                       Visible = "@(LinkedGrid?.GetGroupCount() > 0 && !HideGroupPanel)"
                        BeginGroup="true"
                        Alignment="ToolbarItemAlignment.Left">
             <Items>
@@ -110,7 +110,7 @@
             LinkedGrid.ShowGroupPanel = !HideGroupPanel;
             LinkedGrid.ShowSearchBox = !HideSearchBox;
             LinkedGrid.SelectAllCheckboxMode = GridSelectAllCheckboxMode.AllPages;
-            LinkedGrid.ColumnResizeMode = GridColumnResizeMode.ColumnsContainer;
+            LinkedGrid.ColumnResizeMode = GridColumnResizeMode.NextColumn;
             if (DisableVirtualScroll)
             {
                 LinkedGrid.PageSize = 30;
