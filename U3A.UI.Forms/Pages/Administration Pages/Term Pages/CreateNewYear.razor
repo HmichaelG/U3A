@@ -21,7 +21,7 @@
                     ShowFilterRow="false"
                     ShowAllRows="true"
                     KeyFieldName="ID"
-                    ValidationEnabled="true"
+                    ValidationEnabled="true" 
                     HighlightRowOnHover="true"
                     ColumnResizeMode="GridColumnResizeMode.NextColumn"
                     EditMode="GridEditMode.EditCell"
@@ -36,7 +36,7 @@
                                       DisplayFormat="@constants.STD_DATE_FORMAT">
                         <EditSettings>
                             <DxDateEditSettings MinDate="@(mondaysInYear.First())"
-                                                MaxDate="@(mondaysInYear.Last())"
+                                                MaxDate="@(mondaysInYear.Last())"                                                
                                                 CustomDisabledDate="@GetDisabledDates" />
                         </EditSettings>
                     </DxGridDataColumn>
