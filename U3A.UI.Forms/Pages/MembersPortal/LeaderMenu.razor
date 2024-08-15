@@ -149,6 +149,7 @@ else
                                     @if (!selectedLookupStudent.Person.IsPhoneSilent && !selectedLookupStudent.Person.SMSOptOut)
                                     {
                                         <DxButton CssClass="flex-grow-1"
+                                                  Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.Mobile))"
                                                   IconCssClass="bi bi-phone"
                                                   Text="SMS"
                                                   RenderStyle="@ButtonRenderStyle.Primary"
@@ -158,6 +159,7 @@ else
                                     @if (!selectedLookupStudent.Person.IsPhoneSilent)
                                     {
                                         <DxButton CssClass="flex-grow-1"
+                                                  Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.HomePhone))"
                                                   IconCssClass="bi bi-telephone"
                                                   Text="Home"
                                                   RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -167,6 +169,7 @@ else
                                     @if (!selectedLookupStudent.Person.IsPhoneSilent)
                                     {
                                         <DxButton CssClass="flex-grow-1"
+                                                  Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.Mobile))"
                                                   IconCssClass="bi bi-phone"
                                                   Text="Mobile"
                                                   RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -174,6 +177,7 @@ else
                                                   Click="() => OnPhone(selectedLookupStudent.Person.Mobile)" />
                                     }
                                     <DxButton CssClass="flex-grow-1"
+                                              Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.ICEPhone))"
                                               IconCssClass="bi bi-telephone"
                                               Text="ICE"
                                               RenderStyleMode="ButtonRenderStyleMode.Outline"
