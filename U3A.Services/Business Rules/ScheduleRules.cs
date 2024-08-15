@@ -342,7 +342,7 @@ namespace U3A.BusinessRules
                 catch (Exception ex)
                 {
                     await dbc.Database.RollbackTransactionAsync();
-                    throw new Exception("Error saving shcedule cache yo database", ex);
+                    throw new Exception("Error saving shcedule cache to database", ex);
                 }
 
                 //multi-campus
