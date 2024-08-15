@@ -83,14 +83,14 @@ foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
 // TenantDbContextFactory
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
-    _ = options.UseSqlServer(tenantConnectionString);
+    options.UseSqlServer(tenantConnectionString, providerOptions => providerOptions.EnableRetryOnFailure());
 }, ServiceLifetime.Scoped);
 
 // U3ADbContextFactory
-builder.Services.AddDbContext<U3ADbContext>(options => options.UseSqlServer());
+builder.Services.AddDbContext<U3ADbContext>(options => options.UseSqlServer(providerOptions => providerOptions.EnableRetryOnFailure()));
 builder.Services.AddDbContextFactory<U3ADbContext>(options =>
 {
-    _ = options.UseSqlServer();
+    options.UseSqlServer(providerOptions => providerOptions.EnableRetryOnFailure());
 }, ServiceLifetime.Scoped);
 
 // Get / Set local storage data
