@@ -44,6 +44,12 @@ namespace U3A.Model
         public string BackgroundCssClass { get; set; }
         public string TextCssClass { get; set; }
     }
+    public class StatusObject
+    {
+        public int Id { get; set; }
+        public string Caption { get; set; }
+        public string Color { get; set; }
+    }
 
     public class Resource
     {

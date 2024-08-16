@@ -114,14 +114,10 @@ namespace U3A.BusinessRules
             AutoEnrolments = new List<string>();
             List<Enrolment> enrolmentsToProcess;
             List<Person> CourseLeaders;
-            var peoplePreviouslyEnrolled = await dbc.Enrolment
+            var peoplePreviouslyEnrolled = await dbc.Enrolment.AsNoTracking()
                                         .Select(x => x.PersonID).Distinct()
                                         .ToListAsync();
-            foreach (var course in await dbc.Course
-                                            .Include(x => x.Classes)
-                                            .Where(x => x.Year == SelectedTerm.Year
-                                                         && x.AllowAutoEnrol)
-                                            .ToListAsync())
+            foreach (var course in await GetRankedCourses(dbc, SelectedTerm))
             {
                 CourseLeaders = new();
                 foreach (var c in course.Classes)
@@ -153,6 +149,8 @@ namespace U3A.BusinessRules
                                         enrolmentsToProcess,
                                         peoplePreviouslyEnrolled,
                                         ForceEmailQueue);
+                        await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
+                        await dbc.SaveChangesAsync();
                     }
                 }
                 else
@@ -182,14 +180,44 @@ namespace U3A.BusinessRules
                         }
                     }
                 }
-                await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
-                await dbc.SaveChangesAsync();
             }
             var term = await dbc.Term.FindAsync(SelectedTerm.ID);
             await SetClassAllocationDone(dbc, term, IsClassAllocationDone);
             await dbc.SaveChangesAsync();
         }
 
+        private static async Task<IEnumerable<Course>> GetRankedCourses(U3ADbContext dbc, Term term)
+        {
+            // rank courses by popularity
+            (double rank, int maxStudents, Guid courseID) key;
+            SortedList<(double, int,Guid), Course> rankedCourses = new();
+            var enrolments = await dbc.Enrolment.AsNoTracking().Where(e => e.TermID == term.ID).ToListAsync();
+            foreach (var course in await dbc.Course.AsNoTracking()
+                                            .Include(x => x.Classes)
+                                            .Where(x => x.Year == term.Year
+                                                         && x.AllowAutoEnrol)
+                                            .ToListAsync())
+            {
+                key = new()
+                {
+                    courseID = course.ID,
+                    maxStudents = course.MaximumStudents,
+                    rank = 0
+                };
+                if (course.MaximumStudents != 0)
+                {
+                    double classes = 1;
+                    if (course.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass)
+                    {
+                        classes = course.Classes.Count;
+                    }
+                    double requests = enrolments.Where(e => e.CourseID == course.ID).Count();
+                    key.rank = requests / ((double)course.MaximumStudents * classes);
+                }
+                rankedCourses.Add(key, course);
+            }
+            return rankedCourses.Values.Reverse();
+        }
         public static bool IsPersonFinancial(Person person, Term term)
         {
             var result = person.FinancialTo > term.Year
@@ -204,7 +232,7 @@ namespace U3A.BusinessRules
                                                         bool IsClassAllocationDone)
         {
             var today = DateTime.UtcNow.Date; ;
-            var settings = await dbc.SystemSettings
+            var settings = await dbc.SystemSettings.AsNoTracking()
                                     .OrderBy(x => x.ID)
                                     .FirstAsync();
             if (!IsRandomAllocationTerm(term, settings)) return;
@@ -228,11 +256,11 @@ namespace U3A.BusinessRules
             }
             foreach (var t in dbc.Term.Where(x => x.Year == term.Year))
             {
-                if (termArray.Contains(t.TermNumber))
+                if (termArray.Contains(t.TermNumber))   
                 {
                     t.IsClassAllocationFinalised = IsAllocationDone;
                     dbc.Update(t);
-                }
+                }   
             };
             // and for completeness...
             foreach (var t in dbc.Term.Where(x => x.Year < term.Year))
@@ -253,13 +281,13 @@ namespace U3A.BusinessRules
             if (course.EnforceOneStudentPerClass
                 && course.CourseParticipationTypeID == (int?)ParticipationType.DifferentParticipantsInEachClass)
             {
-                AlreadyEnrolledInCourse = await dbc.Enrolment.Where(x => x.CourseID == course.ID
+                AlreadyEnrolledInCourse = await dbc.Enrolment.AsNoTracking().Where(x => x.CourseID == course.ID
                                                                 && x.TermID == term.ID
                                                                 && !x.IsWaitlisted)
                                                             .Select(x => x.PersonID).ToListAsync();
             }
             // Set the enrolment method
-            var settings = await dbc.SystemSettings
+            var settings = await dbc.SystemSettings.AsNoTracking()
                                     .OrderBy(x => x.ID)
                                     .FirstAsync();
             if (string.IsNullOrWhiteSpace(settings.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
@@ -313,8 +341,7 @@ namespace U3A.BusinessRules
                 {
                     if (DoRandomEnrol)
                     {
-                        foreach (var e in enrolments
-                                            .OrderBy(x => x.Random)
+                        foreach (var e in (await GetRankedEnrolments(dbc, enrolments, term))
                                             .Where(x => x.IsWaitlisted
                                                         && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
@@ -344,6 +371,38 @@ namespace U3A.BusinessRules
                     if (dbc.Entry(e).State == EntityState.Unchanged) { dbc.Entry(e).State = EntityState.Modified; }
                 }
             }
+        }
+
+        private static async Task<List<Enrolment>> GetRankedEnrolments(U3ADbContext dbc, IEnumerable<Enrolment> enrolments, Term term)
+        {
+            (int courses, long random, Guid personID) key;
+            SortedList< (int, long, Guid),Enrolment > rankedEnrolments = new();
+            var people = enrolments.Select(x => x.PersonID).ToList();
+            var courseCounts = await dbc.Enrolment
+                                .Where(e => e.TermID == term.ID
+                                                && people.Contains(e.PersonID)
+                                                && !e.IsWaitlisted
+                                                )
+                                .GroupBy(g => new
+                                {
+                                    PersonID = g.PersonID,
+                                })
+                                .Select(g => new Tuple<Guid,int>(g.Key.PersonID, g.Count()))
+                                .ToListAsync();
+            foreach (var e in enrolments)
+            {
+                key = new()
+                {
+                    personID = e.PersonID,
+                    random = e.Random,
+                    courses = 0
+                };
+                var courseCount = courseCounts.Where(r => r.Item1 == e.PersonID).FirstOrDefault();
+                if (courseCount != null) { key.courses = courseCount.Item2; }
+                rankedEnrolments.Add(key,e);
+                
+            }
+            return rankedEnrolments.Values.ToList();
         }
 
         private static bool IsAlreadyEnrolledInCourse(Guid PersonID, Course course, List<Guid> enrolledPeopleID)
