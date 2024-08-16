@@ -43,6 +43,7 @@ else
                             SelectionMode="GridSelectionMode.Multiple"
                             AllowSelectRowByClick="true"
                             AutoExpandAllGroupRows="true"
+                            UnboundColumnData="OnUnboundColumnData"
                             @bind-SelectedDataItems="SelectedDataItems">
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid>
@@ -83,8 +84,9 @@ else
                             <DxGridDataColumn Caption="Email" FieldName="Person.Email" Width="12rem" />
                             <DxGridDataColumn Caption="Created" FieldName="Created"
                                               DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible="false" />
-                            <DxGridDataColumn Caption="Enrolled" FieldName="DateEnrolled"
-                                              DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
+                            <DxGridDataColumn Caption="Enrolled" FieldName="LocalDateEnrolled"
+                                              DisplayFormat="{0:dd-MMM-yy}" Width="6rem"
+                                              UnboundType="GridUnboundColumnType.DateTime" />
                             <DxGridDataColumn Caption="Dropped" FieldName="LocalDropoutDate"
                                               DisplayFormat="{0:dd-MMM-yy hh:mm tt}"
                                               UnboundType="GridUnboundColumnType.DateTime" />
@@ -158,6 +160,11 @@ else
         IsReady = true;
     }
 
+    private void OnUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        if (e.FieldName == "LocalDropoutDate") { e.Value = ((Dropout)e.DataItem).DropoutDate + dbc.UtcOffset; }
+        if (e.FieldName == "LocalDateEnrolled") { e.Value = ((Dropout)e.DataItem).DateEnrolled + dbc.UtcOffset; }
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)

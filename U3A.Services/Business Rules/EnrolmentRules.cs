@@ -110,7 +110,7 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<Dropout>> EditableDropoutsAsync(U3ADbContext dbc, Term SelectedTerm)
         {
-            return await dbc.Dropout
+            return await dbc.Dropout.IgnoreQueryFilters()
                                 .Include(x => x.Term)
                                 .Include(x => x.Course)
                                 .Include(x => x.Person)
