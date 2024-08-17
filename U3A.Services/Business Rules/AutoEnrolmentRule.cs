@@ -7,6 +7,7 @@ using System.Text;
 using Twilio.Rest.Trunking.V1;
 using U3A.Database;
 using U3A.Model;
+using Serilog;
 
 namespace U3A.BusinessRules
 {
@@ -117,8 +118,16 @@ namespace U3A.BusinessRules
             var peoplePreviouslyEnrolled = await dbc.Enrolment.AsNoTracking()
                                         .Select(x => x.PersonID).Distinct()
                                         .ToListAsync();
-            foreach (var course in await GetRankedCourses(dbc, SelectedTerm))
+            foreach (var kvp in (await GetRankedCourses(dbc, SelectedTerm)).Reverse())
             {
+                var key = kvp.Key;
+                var course = kvp.Value;
+                if (key.Item1 != double.MinValue)
+                {
+                    Log.Information("");
+                    Log.Information("Rank: {Rank}\tMaxStudents: {MaxStudents}\t{CourseName}", key.Item1.ToString("00000.00000000"), key.Item2.ToString("0000"), course.Name);
+                    Log.Information("");
+                }
                 CourseLeaders = new();
                 foreach (var c in course.Classes)
                 {
@@ -184,11 +193,14 @@ namespace U3A.BusinessRules
             var term = await dbc.Term.FindAsync(SelectedTerm.ID);
             await SetClassAllocationDone(dbc, term, IsClassAllocationDone);
             await dbc.SaveChangesAsync();
+            Log.Information("");
+            Log.Information("");
         }
 
-        private static async Task<IEnumerable<Course>> GetRankedCourses(U3ADbContext dbc, Term term)
+        private static async Task<SortedList<(double, int, Guid), Course>> GetRankedCourses(U3ADbContext dbc, Term term)
         {
             // rank courses by popularity
+            double MIN_VALUE = 0.00000001;
             (double rank, int maxStudents, Guid courseID) key;
             SortedList<(double, int,Guid), Course> rankedCourses = new();
             var enrolments = await dbc.Enrolment.AsNoTracking().Where(e => e.TermID == term.ID).ToListAsync();
@@ -202,7 +214,7 @@ namespace U3A.BusinessRules
                 {
                     courseID = course.ID,
                     maxStudents = course.MaximumStudents,
-                    rank = 0
+                    rank = double.MinValue
                 };
                 if (course.MaximumStudents != 0)
                 {
@@ -211,12 +223,31 @@ namespace U3A.BusinessRules
                     {
                         classes = course.Classes.Count;
                     }
-                    double requests = enrolments.Where(e => e.CourseID == course.ID).Count();
-                    key.rank = requests / ((double)course.MaximumStudents * classes);
+                    double max = (double)course.MaximumStudents * classes;
+                    double requests = enrolments.Where(e => e.CourseID == course.ID
+                                                            && e.TermID == term.ID).Count();
+                    // Calclate the rank. Set rank to MIN_VALUE if requests > 0 & <= max OR once only class
+                    // MIN_VALUE courses will be logged but will not be considered popular (constrained).
+                    if (requests > max) 
+                    { 
+                        key.rank = (requests / max) * requests;
+                        foreach (var c in course.Classes)
+                        {
+                            if (c.StartDate == null && c.OccurrenceID == (int)OccurrenceType.Weekly)
+                            {
+                                continue;
+                            }
+                            key.rank = MIN_VALUE; break;
+                        }
+                    }
+                    else if (requests > 0) 
+                    { 
+                        key.rank = MIN_VALUE; 
+                    }
                 }
                 rankedCourses.Add(key, course);
             }
-            return rankedCourses.Values.Reverse();
+            return rankedCourses;
         }
         public static bool IsPersonFinancial(Person person, Term term)
         {
@@ -305,12 +336,13 @@ namespace U3A.BusinessRules
             // If available places is less than waitlisted then enrol everyone.
             if (waitlisted <= course.MaximumStudents - enrolled)
             {
-                foreach (var e in enrolments.Where(x => x.IsWaitlisted
+                foreach (var e in enrolments.Where(x => x.IsWaitlisted && x.TermID == term.ID
                                 && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse)))
                 {
                     e.IsWaitlisted = false;
                     LogEnrolment(e);
                 }
+                Log.Information("All students enrolled because Wautlist: {Waitlist} is less than Maximum Students: {MazStudents}", waitlisted, course.MaximumStudents);
             }
             else
             {
@@ -322,6 +354,8 @@ namespace U3A.BusinessRules
                     if (percent > 0) { places = (int)(enrolments.Count * percent / 100); }
                     if (places > 0 && places <= course.MaximumStudents - enrolled)
                     {
+                        Log.Information("Processing New Student Allocations");
+                        Log.Information("----------------------------------");
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Random)
                                             .Where(x => x.IsWaitlisted
@@ -329,6 +363,7 @@ namespace U3A.BusinessRules
                                                             && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
+                            Log.Information("Joined: {Joined}\t{Student}",e.Person.DateJoined,e.Person.FullName);
                             LogEnrolment(e);
                             e.IsWaitlisted = false;
                         }
@@ -341,25 +376,47 @@ namespace U3A.BusinessRules
                 {
                     if (DoRandomEnrol)
                     {
-                        foreach (var e in (await GetRankedEnrolments(dbc, enrolments, term))
-                                            .Where(x => x.IsWaitlisted
-                                                        && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
+                        Log.Information("Processing Random Allocations");
+                        Log.Information("-----------------------------");
+                        var rankedEnrolments = await GetRankedEnrolments(dbc, enrolments, term);
+                        foreach (var kvp in rankedEnrolments
+                                            .Where(x => x.Value.IsWaitlisted
+                                                        && !IsAlreadyEnrolledInCourse(x.Value.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
+                            var e = kvp.Value;
+                            var key = kvp.Key;
+                            Log.Information("Class#: {classes}\tRandom: {random}\tEnrolled  \t{student}", key.Item1.ToString("000"), key.Item2.ToString("00000000"), e.Person.FullName);
                             LogEnrolment(e);
                             e.IsWaitlisted = false;
+                        }
+                        foreach (var kvp in rankedEnrolments
+                                            .Where(x => x.Value.IsWaitlisted))
+                        {
+                            var e = kvp.Value;
+                            var key = kvp.Key;
+                            Log.Information("Class#: {classes}\tRandom: {random}\tWaitlisted\t{student}", key.Item1.ToString("000"), key.Item2.ToString("00000000"), e.Person.FullName);
                         }
                     }
                     else
                     {
+                        Log.Information("Processing First-In-Wins Allocations");
+                        Log.Information("------------------------------------");
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Created)
                                             .Where(x => x.IsWaitlisted
                                                         && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
+                            Log.Information("Created: {created}\tEnrolled  \t{student}", e.Created.ToString(), e.Person.FullName);
                             LogEnrolment(e);
                             e.IsWaitlisted = false;
+                        }
+                        foreach (var e in enrolments
+                                            .OrderBy(x => x.Created)
+                                            .Where(x => x.IsWaitlisted))
+                        {
+                            Log.Information("Created: {created}\tWaitlisted\t{student}", e.Created.ToString(), e.Person.FullName);
                         }
                     }
                 }
@@ -373,7 +430,7 @@ namespace U3A.BusinessRules
             }
         }
 
-        private static async Task<List<Enrolment>> GetRankedEnrolments(U3ADbContext dbc, IEnumerable<Enrolment> enrolments, Term term)
+        private static async Task<SortedList<(int, long, Guid), Enrolment>> GetRankedEnrolments(U3ADbContext dbc, IEnumerable<Enrolment> enrolments, Term term)
         {
             (int courses, long random, Guid personID) key;
             SortedList< (int, long, Guid),Enrolment > rankedEnrolments = new();
@@ -402,7 +459,7 @@ namespace U3A.BusinessRules
                 rankedEnrolments.Add(key,e);
                 
             }
-            return rankedEnrolments.Values.ToList();
+            return rankedEnrolments;
         }
 
         private static bool IsAlreadyEnrolledInCourse(Guid PersonID, Course course, List<Guid> enrolledPeopleID)
