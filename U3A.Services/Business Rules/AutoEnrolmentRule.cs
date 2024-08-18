@@ -8,6 +8,7 @@ using Twilio.Rest.Trunking.V1;
 using U3A.Database;
 using U3A.Model;
 using Serilog;
+using System.Diagnostics.Eventing.Reader;
 
 namespace U3A.BusinessRules
 {
@@ -100,11 +101,15 @@ namespace U3A.BusinessRules
             return allocationDate.AddDays(constants.RANDOM_ALLOCATION_PREVIEW);
         }
 
+        const double COURSE_NOT_RANKED_VALUE = 0.00000002;
+        const double COURSE_RANK_NOT_REQD_VALUE = 0.00000001;
         public static async Task AutoEnrolParticipantsAsync(U3ADbContext dbc, Term SelectedTerm,
                               bool IsClassAllocationDone,
                               bool ForceEmailQueue,
                               DateTime? EmailDate = null)
         {
+            Log.Information("Auto-Enrolment Allocation log as at (UTC) {DateTime}", DateTime.UtcNow);
+            Log.Information("===============================================================");
             // Do part paid first
             await WaitListPartPaidMembers(dbc, SelectedTerm);
             await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
@@ -115,9 +120,6 @@ namespace U3A.BusinessRules
             AutoEnrolments = new List<string>();
             List<Enrolment> enrolmentsToProcess;
             List<Person> CourseLeaders;
-            var peoplePreviouslyEnrolled = await dbc.Enrolment.AsNoTracking()
-                                        .Select(x => x.PersonID).Distinct()
-                                        .ToListAsync();
             foreach (var kvp in (await GetRankedCourses(dbc, SelectedTerm)).Reverse())
             {
                 var key = kvp.Key;
@@ -125,9 +127,21 @@ namespace U3A.BusinessRules
                 if (key.Item1 != double.MinValue)
                 {
                     Log.Information("");
-                    Log.Information("Rank: {Rank}\tMaxStudents: {MaxStudents}\t{CourseName}", key.Item1.ToString("00000.00000000"), key.Item2.ToString("0000"), course.Name);
-                    Log.Information("");
+                    Log.Information("Rank: {Rank}\tMaxStudents: {MaxStudents}\t{CourseName}",
+                                       (key.Item1 == COURSE_NOT_RANKED_VALUE)
+                                            ? "Not Weekly" 
+                                            : (key.Item1 == COURSE_RANK_NOT_REQD_VALUE)
+                                                ? "Not Req'd"
+                                                : key.Item1.ToString("00000.00000000"), 
+                                        key.Item2.ToString("0000"), course.Name);
                 }
+
+                //A "new member" is one that has never been enrolled in a course
+                var peoplePreviouslyEnrolled = await dbc.Enrolment.AsNoTracking()
+                                            .Where(x => !x.IsWaitlisted)
+                                            .Select(x => x.PersonID)
+                                            .Distinct()
+                                            .ToListAsync();
                 CourseLeaders = new();
                 foreach (var c in course.Classes)
                 {
@@ -200,7 +214,6 @@ namespace U3A.BusinessRules
         private static async Task<SortedList<(double, int, Guid), Course>> GetRankedCourses(U3ADbContext dbc, Term term)
         {
             // rank courses by popularity
-            double MIN_VALUE = 0.00000001;
             (double rank, int maxStudents, Guid courseID) key;
             SortedList<(double, int,Guid), Course> rankedCourses = new();
             var enrolments = await dbc.Enrolment.AsNoTracking().Where(e => e.TermID == term.ID).ToListAsync();
@@ -237,12 +250,12 @@ namespace U3A.BusinessRules
                             {
                                 continue;
                             }
-                            key.rank = MIN_VALUE; break;
+                            key.rank = COURSE_NOT_RANKED_VALUE; break;
                         }
                     }
                     else if (requests > 0) 
                     { 
-                        key.rank = MIN_VALUE; 
+                        key.rank = COURSE_RANK_NOT_REQD_VALUE; 
                     }
                 }
                 rankedCourses.Add(key, course);
@@ -307,6 +320,7 @@ namespace U3A.BusinessRules
                                     List<Guid> PeoplePreviouslyEnrolled,
                                     bool ForceEmailQueue)
         {
+            int count = 0;
             var today = DateTime.UtcNow.Date;
             var AlreadyEnrolledInCourse = new List<Guid>();
             if (course.EnforceOneStudentPerClass
@@ -351,19 +365,20 @@ namespace U3A.BusinessRules
                 if (DoRandomEnrol)
                 {
                     decimal percent = settings.AutoEnrolNewParticipantPercent;
-                    if (percent > 0) { places = (int)(enrolments.Count * percent / 100); }
+                    if (percent > 0) { places = (int)(course.MaximumStudents * percent / 100); }
                     if (places > 0 && places <= course.MaximumStudents - enrolled)
                     {
                         Log.Information("Processing New Student Allocations");
                         Log.Information("----------------------------------");
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Random)
-                                            .Where(x => x.IsWaitlisted
+                                            .Where(x => x.IsWaitlisted && x.Person.DateJoined?.Year >= term.Year-1
                                                             && !PeoplePreviouslyEnrolled.Contains(x.PersonID)
                                                             && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
-                            Log.Information("Joined: {Joined}\t{Student}",e.Person.DateJoined,e.Person.FullName);
+                            count++;
+                            Log.Information("{count:00} Joined: {Joined:dd-MMM-yyy}\tRandom: {random:00000000}\tEnrolled  {Student}",count,e.Person.DateJoined,e.Random,e.Person.FullName);
                             LogEnrolment(e);
                             e.IsWaitlisted = false;
                         }
@@ -386,7 +401,8 @@ namespace U3A.BusinessRules
                         {
                             var e = kvp.Value;
                             var key = kvp.Key;
-                            Log.Information("Class#: {classes}\tRandom: {random}\tEnrolled  \t{student}", key.Item1.ToString("000"), key.Item2.ToString("00000000"), e.Person.FullName);
+                            count++;
+                            Log.Information("{count:00} Class#: {classes:000}\tRandom: {random:00000000}\tEnrolled  \t{student}",count, key.Item1, key.Item2, e.Person.FullName);
                             LogEnrolment(e);
                             e.IsWaitlisted = false;
                         }
@@ -395,7 +411,8 @@ namespace U3A.BusinessRules
                         {
                             var e = kvp.Value;
                             var key = kvp.Key;
-                            Log.Information("Class#: {classes}\tRandom: {random}\tWaitlisted\t{student}", key.Item1.ToString("000"), key.Item2.ToString("00000000"), e.Person.FullName);
+                            count++;
+                            Log.Information("{count:00} Class#: {classes:000}\tRandom: {random:00000000}\tWaitlisted\t{student}",count, key.Item1, key.Item2, e.Person.FullName);
                         }
                     }
                     else
@@ -408,7 +425,7 @@ namespace U3A.BusinessRules
                                                         && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
-                            Log.Information("Created: {created}\tEnrolled  \t{student}", e.Created.ToString(), e.Person.FullName);
+                            Log.Information("Created: {created:dd-MM-yyyy hh:mm:ss tt}\tEnrolled  \t{student}", e.Created, e.Person.FullName);
                             LogEnrolment(e);
                             e.IsWaitlisted = false;
                         }
@@ -416,7 +433,7 @@ namespace U3A.BusinessRules
                                             .OrderBy(x => x.Created)
                                             .Where(x => x.IsWaitlisted))
                         {
-                            Log.Information("Created: {created}\tWaitlisted\t{student}", e.Created.ToString(), e.Person.FullName);
+                            Log.Information("Created: {created:dd-MM-yyyy hh:mm:ss tt}\tWaitlisted\t{student}", e.Created, e.Person.FullName);
                         }
                     }
                 }
