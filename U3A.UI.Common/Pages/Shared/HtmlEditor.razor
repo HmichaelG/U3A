@@ -13,14 +13,14 @@
     <DxTabs style="width:100%">
         <DxTabPage Text="Editor">
             <DxHtmlEditor AllowSoftLineBreak="true"
-                TableResizeEnabled="true" 
-                @bind-Markup="@Markup" 
-                Width="@Width" Height="@Height" />
+                          TableResizeEnabled="true"
+                          @bind-Markup="@Markup"
+                          Width="@Width" Height="@Height" />
             <div class="text-muted"><small><b>Hint:</b> [Enter] = paragraph break; [SHIFT]+[Enter] = line break</small></div>
         </DxTabPage>
         <DxTabPage Text="Code">
             <DxMemo @bind-Text="@Markup"
-                    Rows="20" 
+                    Rows="20"
                     ReadOnly="@(!isCodeEditable)" />
             <DxButton Text="Edit" Click="OnEditClicked" />
             <div class="text-danger">@errorText</div>
@@ -86,6 +86,9 @@
         return result;
     }
 
+    const string DEFAULT_STYLE = @"p{margin: 0.3rem !important;}
+                                    body{font-family: &quot;Times New Roman&quot;; font-size: 12pt;}";
+
     static string AddStyleAndMinifyHtml(string html)
     {
         string result = string.Empty;
@@ -95,8 +98,9 @@
         var current = document.Head!.Children.Where(c => c is IHtmlStyleElement).FirstOrDefault();
         if (current == null)
         {
+            // and insert the new.
             IElement style = document.CreateElement("Style");
-            style.TextContent = "p{margin-bottom: 0.4rem !important;}";
+            style.TextContent = DEFAULT_STYLE;
             document.Head!.AppendChild(style);
         }
         result = document.Minify();
@@ -106,7 +110,7 @@
     async Task OnEditClicked()
     {
         isCodeEditable = await messageBox!.ShowAsync("Advanced Only",
-                            @"<p>Editing code requires advanced knowledge of HTML programming.
+                                    @"<p>Editing code requires advanced knowledge of HTML programming.
                 Errors in code may render unpredictable results or system errors.</p>
                 Do you wsih to continue?");
         StateHasChanged();
