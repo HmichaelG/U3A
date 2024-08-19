@@ -15,7 +15,8 @@
 else
 {
 
-    <div class="col col-12 p-2 m-auto">
+    <DxFormLayout>
+        <div class="col col-12 p-2 m-auto">
         <div class="row align-content-start">
             <ContextHelpTitle Title="Review Class Dropouts" HelpTopic="Review-Class-Dropouts.html" />
         </div>
@@ -32,7 +33,6 @@ else
                                      DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
         <Progress @ref="@ProgressBar" />
 
-        <DxFormLayout>
             <FullScreen>
                 <ContentTemplate>
                     <DxGrid Data="@Dropouts" @ref=@mainGrid
@@ -95,8 +95,8 @@ else
                     </DxGrid>
                 </ContentTemplate>
             </FullScreen>
-        </DxFormLayout>
-    </div>
+        </div>
+    </DxFormLayout>
 
 }
 
