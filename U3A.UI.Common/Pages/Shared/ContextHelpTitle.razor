@@ -1,7 +1,6 @@
 ﻿@using System.IO
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@implements IDisposable
 @inject IJSRuntime js
 
 @if (isReady)
@@ -120,8 +119,6 @@
     string? helpFile;
     string? standardWidth;
 
-    U3ADbContext? dbc { get; set; }
-
     SystemSettings? settings;
     bool isReady;
     string? inMaintenanceMessage = default;
@@ -129,33 +126,35 @@
 
     protected override async Task OnInitializedAsync()
     {
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        if (settings != null)
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            if (settings.InMaintenanceTill != null)
+            settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+            if (settings != null)
             {
-                inMaintenanceMessage = "Warning: You are in Member Portal Maintenance Mode";
-            }
-
-            var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
-            if (currentTerm != null)
-            {
-                if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
+                if (settings.InMaintenanceTill != null)
                 {
-                    var today = dbc.GetLocalTime().Date;
-                    DateTime allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
-                    int days = (int)(allocationDate - today).TotalDays;
-                    if (days > 0 && days < 8)
+                    inMaintenanceMessage = "Warning: You are in Member Portal Maintenance Mode";
+                }
+
+                var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
+                if (currentTerm != null)
+                {
+                    if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
                     {
-                        informationMessage = $"Reminder: Random Enrolment Allocation in {days} days: {allocationDate.ToString(constants.FULL_DAY_DATE_FORMAT)}.";
+                        var today = dbc.GetLocalTime().Date;
+                        DateTime allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
+                        int days = (int)(allocationDate - today).TotalDays;
+                        if (days > 0 && days < 8)
+                        {
+                            informationMessage = $"Reminder: Random Enrolment Allocation in {days} days: {allocationDate.ToString(constants.FULL_DAY_DATE_FORMAT)}.";
+                        }
                     }
                 }
-            }
 
-            if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
-            {
-                informationMessage = $"Reminder: Enrolment email blackout until {dbc.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
+                if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
+                {
+                    informationMessage = $"Reminder: Enrolment email blackout until {dbc.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
+                }
             }
         }
         isReady = true;
@@ -182,9 +181,5 @@
         standardWidth = windowWidth;
     }
 
-    public void Dispose()
-    {
-        dbc?.Dispose();
-    }
 
 }

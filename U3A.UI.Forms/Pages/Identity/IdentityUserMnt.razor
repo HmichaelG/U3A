@@ -69,22 +69,22 @@ else
                     CustomizeEditModel="Grid_CustomizeEditModel"
                     ValidationEnabled="true">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid >
+                    <GridToolbar LinkedGrid=@mainGrid>
                         <CustomButtonContent>
                             <DxToolbarItem Text="Create Domain Login"
-                                      Click="@OnCreateDomainLogin"
-                                      RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                      RenderStyle="ButtonRenderStyle.Primary" />
+                                           Click="@OnCreateDomainLogin"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Populate Logins"
-                                      Click="@OnPopulateLogins"
+                                           Click="@OnPopulateLogins"
                                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Set Email Confirmed"
-                                      Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
+                                           Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
                                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Reset Password"
-                                      Click="@OnResetPassword" Enabled="@AreItemsSelected()"
+                                           Click="@OnResetPassword" Enabled="@AreItemsSelected()"
                                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary" />
                         </CustomButtonContent>
