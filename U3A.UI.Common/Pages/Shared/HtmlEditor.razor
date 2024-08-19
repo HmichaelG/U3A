@@ -1,6 +1,7 @@
 ﻿@using System.Xml
 @using System.Text
 @using AngleSharp
+@using AngleSharp.Dom
 @using AngleSharp.Html
 @using AngleSharp.Html.Dom
 @using AngleSharp.Html.Parser
@@ -11,10 +12,11 @@
 
     <DxTabs style="width:100%">
         <DxTabPage Text="Editor">
-            <DxHtmlEditor 
+            <DxHtmlEditor AllowSoftLineBreak="true"
                 TableResizeEnabled="true" 
                 @bind-Markup="@Markup" 
                 Width="@Width" Height="@Height" />
+            <div class="text-muted"><small><b>Hint:</b> [Enter] = paragraph break; [SHIFT]+[Enter] = line break</small></div>
         </DxTabPage>
         <DxTabPage Text="Code">
             <DxMemo @bind-Text="@Markup"
@@ -35,7 +37,7 @@
         set
         {
             if (_markup == value) { return; }
-            _markup = (value == null) ? "" : MinifyHtml(value);
+            _markup = (value == null) ? "" : AddStyleAndMinifyHtml(value);
             MarkupChanged.InvokeAsync(_markup);
         }
     }
@@ -77,18 +79,26 @@
         if (document is null) return result;
         using (var writer = new StringWriter())
         {
-            document.ToHtml(writer, new PrettyMarkupFormatter());
+            var pf = new PrettyMarkupFormatter();
+            document.ToHtml(writer, pf);
             result = writer.ToString();
         }
         return result;
     }
 
-    static string MinifyHtml(string html)
+    static string AddStyleAndMinifyHtml(string html)
     {
         string result = string.Empty;
         if (string.IsNullOrWhiteSpace(html)) return result;
         var document = ParseHtml(html);
         if (document is null) return result;
+        var current = document.Head!.Children.Where(c => c is IHtmlStyleElement).FirstOrDefault();
+        if (current == null)
+        {
+            IElement style = document.CreateElement("Style");
+            style.TextContent = "p{margin-bottom: 0.4rem !important;}";
+            document.Head!.AppendChild(style);
+        }
         result = document.Minify();
         return result;
     }
