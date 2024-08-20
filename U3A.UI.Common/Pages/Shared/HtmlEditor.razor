@@ -86,31 +86,44 @@
         return result;
     }
 
-    const string DEFAULT_STYLE = @"p{margin: 0.3rem !important;}
-                                    body{font-family: &quot;Times New Roman&quot;; font-size: 12pt;}";
+    const string DEFAULT_STYLE = @"
+                /* The following styles are automatically appended */
+                p {
+                margin: 0.3rem !important;
+                }
+                body {
+                font-size: 12pt;
+                }
+";
 
     static string AddStyleAndMinifyHtml(string html)
     {
         string result = string.Empty;
         if (string.IsNullOrWhiteSpace(html)) return result;
-        var document = ParseHtml(html);
-        if (document is null) return result;
-        var current = document.Head!.Children.Where(c => c is IHtmlStyleElement).FirstOrDefault();
-        if (current == null)
+        using (var document = ParseHtml(html))
         {
-            // and insert the new.
+            if (document is null) return result;
+            foreach (var current in document.Head!.Children
+                            .Where(c => c is IHtmlStyleElement)
+                            .Reverse())
+            {
+                if (current != null)
+                {
+                    current.Remove();
+                }
+            }
             IElement style = document.CreateElement("Style");
             style.TextContent = DEFAULT_STYLE;
             document.Head!.AppendChild(style);
+            result = document.Minify();
         }
-        result = document.Minify();
         return result;
     }
 
     async Task OnEditClicked()
     {
         isCodeEditable = await messageBox!.ShowAsync("Advanced Only",
-                                    @"<p>Editing code requires advanced knowledge of HTML programming.
+                                            @"<p>Editing code requires advanced knowledge of HTML programming.
                 Errors in code may render unpredictable results or system errors.</p>
                 Do you wsih to continue?");
         StateHasChanged();
