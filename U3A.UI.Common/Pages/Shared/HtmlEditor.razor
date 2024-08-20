@@ -22,7 +22,7 @@
             <DxMemo @bind-Text="@Markup"
                     Rows="20"
                     ReadOnly="@(!isCodeEditable)" />
-            <DxButton Text="Edit" Click="OnEditClicked" />
+            <DxButton Text="Edit" Click="OnEditClicked" CssClass="mt-1" />
             <div class="text-danger">@errorText</div>
         </DxTabPage>
     </DxTabs>
@@ -123,7 +123,7 @@
     async Task OnEditClicked()
     {
         isCodeEditable = await messageBox!.ShowAsync("Advanced Only",
-                                            @"<p>Editing code requires advanced knowledge of HTML programming.
+                                            @"<p>Editing code requires knowledge of HTML programming.
                 Errors in code may render unpredictable results or system errors.</p>
                 Do you wsih to continue?");
         StateHasChanged();
