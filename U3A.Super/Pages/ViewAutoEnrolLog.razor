@@ -27,6 +27,19 @@
                             ValidationEnabled="true">
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@grid>
+                                <CustomButtonContent>
+                                    <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                                        <Template>
+                                            <div class="d-flex">
+                                                <div class="flex-grow-0 pt-1 pe-2 text-primary fw-bold">From:</div>
+                                                <DxDateEdit @bind-Date=@fromDate
+                                                            @bind-Date:after=GetData
+                                                            CssClass="flex-grow-1" />
+                                            </div>
+                                        </Template>
+                                    </DxToolbarItem>
+                                </CustomButtonContent>
+
                             </GridToolbar>
                         </ToolbarTemplate>
                         <Columns>
@@ -37,7 +50,15 @@
                                     <div>@(GetLocalTime((DateTime)context.Value)) </div>
                                 </CellDisplayTemplate>
                             </DxGridDataColumn>
-                            <DxGridDataColumn FieldName="Message" />
+                            <DxGridDataColumn FieldName="Message">
+                                <CellDisplayTemplate>
+                                    <div class="@(((string)context.Value).StartsWith("Rank:")
+                                                        ? "fw-bold text-info mt-2"
+                                                        : "")">
+                                        @context.Value
+                                    </div>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
                         </Columns>
                     </DxGrid>
                 </ContentTemplate>
@@ -57,11 +78,13 @@
     List<LogAutoEnrol>? logs { get; set; }
     DxGrid? grid;
     MessageBox? messageBox;
+    DateTime fromDate;
     bool isReady;
 
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
+        fromDate = GetLocalTime(DateTime.UtcNow).Date;
         await GetData();
         isReady = true;
     }
@@ -76,11 +99,13 @@
     {
         using (var dbc = await tenantDbfactory.CreateDbContextAsync())
         {
+            var utcDate = fromDate.Date - lt.UtcOffset;
             logs = await dbc.LogAutoEnrol
-                            .Where(x => !string.IsNullOrWhiteSpace(x.Message))
+                            .Where(x => x.TimeStamp > utcDate 
+                                            && x.TimeStamp < utcDate.AddHours(24)
+                                            && !string.IsNullOrWhiteSpace(x.Message))
                             .OrderByDescending(x => x.Tenant).ThenBy(x => x.TimeStamp)
                             .ToListAsync();
-           var p = logs[0].Instance;
         }
     }
 
