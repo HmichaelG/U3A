@@ -9,6 +9,11 @@ using U3A.Database;
 using U3A.Model;
 using Serilog;
 using System.Diagnostics.Eventing.Reader;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
+using System.Globalization;
+using Microsoft.Extensions.Logging;
+using Serilog.Context;
 
 namespace U3A.BusinessRules
 {
@@ -108,114 +113,121 @@ namespace U3A.BusinessRules
                               bool ForceEmailQueue,
                               DateTime? EmailDate = null)
         {
-            Log.Information("Auto-Enrolment Allocation log as at (UTC) {DateTime}", DateTime.UtcNow);
-            Log.Information("===============================================================");
-            // Do part paid first
-            await WaitListPartPaidMembers(dbc, SelectedTerm);
-            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
-            await dbc.SaveChangesAsync();
-
-            // and everybody else
-            var today = dbc.GetLocalTime().Date;
-            AutoEnrolments = new List<string>();
-            List<Enrolment> enrolmentsToProcess;
-            List<Person> CourseLeaders;
-            foreach (var kvp in (await GetRankedCourses(dbc, SelectedTerm)).Reverse())
+            
+            using (LogContext.PushProperty("AutoEnrolParticipants", DateTime.UtcNow))
+                using (LogContext.PushProperty("Tenant",dbc.TenantInfo.Identifier))
             {
-                var key = kvp.Key;
-                var course = kvp.Value;
-                if (key.Item1 != double.MinValue)
                 {
-                    Log.Information("");
-                    Log.Information("Rank: {Rank}\tMaxStudents: {MaxStudents}\t{CourseName}",
-                                       (key.Item1 == COURSE_NOT_RANKED_VALUE)
-                                            ? "Not Weekly" 
-                                            : (key.Item1 == COURSE_RANK_NOT_REQD_VALUE)
-                                                ? "Not Req'd"
-                                                : key.Item1.ToString("00000.00000000"), 
-                                        key.Item2.ToString("0000"), course.Name);
-                }
+                    Log.Information("Auto-Enrolment Allocation log as at (UTC) {DateTime}", DateTime.UtcNow);
+                    Log.Information("===============================================================");
+                    // Do part paid first
+                    await WaitListPartPaidMembers(dbc, SelectedTerm);
+                    await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
+                    await dbc.SaveChangesAsync();
 
-                //A "new member" is one that has never been enrolled in a course
-                var peoplePreviouslyEnrolled = await dbc.Enrolment.AsNoTracking()
-                                            .Where(x => !x.IsWaitlisted)
-                                            .Select(x => x.PersonID)
-                                            .Distinct()
-                                            .ToListAsync();
-                CourseLeaders = new();
-                foreach (var c in course.Classes)
-                {
-                    if (c.Leader != null && !CourseLeaders.Contains(c.Leader)) { CourseLeaders.Add(c.Leader); }
-                    if (c.Leader2 != null && !CourseLeaders.Contains(c.Leader2)) { CourseLeaders.Add(c.Leader2); }
-                    if (c.Leader3 != null && !CourseLeaders.Contains(c.Leader3)) { CourseLeaders.Add(c.Leader3); }
-                }
-                if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
-                {
-                    enrolmentsToProcess = await dbc.Enrolment
-                                                .Include(x => x.Course)
-                                                .Include(x => x.Term)
-                                                .Include(x => x.Person)
-                                                .Where(x => (x.TermID == SelectedTerm.ID ||
-                                                             (x.Course.AllowMultiCampsuFrom != null &&
-                                                             x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
-                                                                && x.CourseID == course.ID
-                                                                && x.Person.DateCeased == null
-                                                                && !CourseLeaders.Contains(x.Person))
-                                                .ToListAsync();
-
-                    enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
-                    if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
+                    // and everybody else
+                    var today = dbc.GetLocalTime().Date;
+                    AutoEnrolments = new List<string>();
+                    List<Enrolment> enrolmentsToProcess;
+                    List<Person> CourseLeaders;
+                    foreach (var kvp in (await GetRankedCourses(dbc, SelectedTerm)).Reverse())
                     {
-                        await ProcessEnrolments(dbc,
-                                        SelectedTerm,
-                                        course,
-                                        enrolmentsToProcess,
-                                        peoplePreviouslyEnrolled,
-                                        ForceEmailQueue);
-                        await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
-                        await dbc.SaveChangesAsync();
-                    }
-                }
-                else
-                {
-                    foreach (var courseClass in course.Classes)
-                    {
-                        enrolmentsToProcess = await dbc.Enrolment
-                                                    .Include(x => x.Course)
-                                                    .Include(x => x.Term)
-                                                    .Include(x => x.Person)
-                                                    .Where(x => x.TermID == SelectedTerm.ID
-                                                                    && x.ClassID == courseClass.ID
-                                                                    && x.Person.DateCeased == null
-                                                                    && !CourseLeaders.Contains(x.Person))
-                                                .ToListAsync();
-                        enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
-                        if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
+                        var key = kvp.Key;
+                        var course = kvp.Value;
+                        if (key.Item1 != double.MinValue)
                         {
-                            await ProcessEnrolments(dbc,
+                            Log.Information("");
+                            Log.Information("Rank: {Rank}\tMaxStudents: {MaxStudents}\t{CourseName}",
+                                               (key.Item1 == COURSE_NOT_RANKED_VALUE)
+                                                    ? "Not Weekly"
+                                                    : (key.Item1 == COURSE_RANK_NOT_REQD_VALUE)
+                                                        ? "Not Req'd"
+                                                        : key.Item1.ToString("00000.00000000"),
+                                                key.Item2.ToString("0000"), course.Name);
+                        }
+
+                        //A "new member" is one that has never been enrolled in a course
+                        var peoplePreviouslyEnrolled = await dbc.Enrolment.AsNoTracking()
+                                                    .Where(x => !x.IsWaitlisted)
+                                                    .Select(x => x.PersonID)
+                                                    .Distinct()
+                                                    .ToListAsync();
+                        CourseLeaders = new();
+                        foreach (var c in course.Classes)
+                        {
+                            if (c.Leader != null && !CourseLeaders.Contains(c.Leader)) { CourseLeaders.Add(c.Leader); }
+                            if (c.Leader2 != null && !CourseLeaders.Contains(c.Leader2)) { CourseLeaders.Add(c.Leader2); }
+                            if (c.Leader3 != null && !CourseLeaders.Contains(c.Leader3)) { CourseLeaders.Add(c.Leader3); }
+                        }
+                        if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+                        {
+                            enrolmentsToProcess = await dbc.Enrolment
+                                                        .Include(x => x.Course)
+                                                        .Include(x => x.Term)
+                                                        .Include(x => x.Person)
+                                                        .Where(x => (x.TermID == SelectedTerm.ID ||
+                                                                     (x.Course.AllowMultiCampsuFrom != null &&
+                                                                     x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
+                                                                        && x.CourseID == course.ID
+                                                                        && x.Person.DateCeased == null
+                                                                        && !CourseLeaders.Contains(x.Person))
+                                                        .ToListAsync();
+
+                            enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
+                            if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
+                            {
+                                await ProcessEnrolments(dbc,
                                                 SelectedTerm,
                                                 course,
                                                 enrolmentsToProcess,
                                                 peoplePreviouslyEnrolled,
                                                 ForceEmailQueue);
-                            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
-                            await dbc.SaveChangesAsync();
+                                await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
+                                await dbc.SaveChangesAsync();
+                            }
+                        }
+                        else
+                        {
+                            foreach (var courseClass in course.Classes)
+                            {
+                                enrolmentsToProcess = await dbc.Enrolment
+                                                            .Include(x => x.Course)
+                                                            .Include(x => x.Term)
+                                                            .Include(x => x.Person)
+                                                            .Where(x => x.TermID == SelectedTerm.ID
+                                                                            && x.ClassID == courseClass.ID
+                                                                            && x.Person.DateCeased == null
+                                                                            && !CourseLeaders.Contains(x.Person))
+                                                        .ToListAsync();
+                                enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
+                                if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
+                                {
+                                    await ProcessEnrolments(dbc,
+                                                        SelectedTerm,
+                                                        course,
+                                                        enrolmentsToProcess,
+                                                        peoplePreviouslyEnrolled,
+                                                        ForceEmailQueue);
+                                    await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
+                                    await dbc.SaveChangesAsync();
+                                }
+                            }
                         }
                     }
+                    var term = await dbc.Term.FindAsync(SelectedTerm.ID);
+                    await SetClassAllocationDone(dbc, term, IsClassAllocationDone);
+                    await dbc.SaveChangesAsync();
+                    Log.Information("");
+                    Log.Information("");
                 }
             }
-            var term = await dbc.Term.FindAsync(SelectedTerm.ID);
-            await SetClassAllocationDone(dbc, term, IsClassAllocationDone);
-            await dbc.SaveChangesAsync();
-            Log.Information("");
-            Log.Information("");
         }
 
         private static async Task<SortedList<(double, int, Guid), Course>> GetRankedCourses(U3ADbContext dbc, Term term)
         {
             // rank courses by popularity
             (double rank, int maxStudents, Guid courseID) key;
-            SortedList<(double, int,Guid), Course> rankedCourses = new();
+            SortedList<(double, int, Guid), Course> rankedCourses = new();
             var enrolments = await dbc.Enrolment.AsNoTracking().Where(e => e.TermID == term.ID).ToListAsync();
             foreach (var course in await dbc.Course.AsNoTracking()
                                             .Include(x => x.Classes)
@@ -241,8 +253,8 @@ namespace U3A.BusinessRules
                                                             && e.TermID == term.ID).Count();
                     // Calclate the rank. Set rank to MIN_VALUE if requests > 0 & <= max OR once only class
                     // MIN_VALUE courses will be logged but will not be considered popular (constrained).
-                    if (requests > max) 
-                    { 
+                    if (requests > max)
+                    {
                         key.rank = (requests / max) * requests;
                         foreach (var c in course.Classes)
                         {
@@ -253,9 +265,9 @@ namespace U3A.BusinessRules
                             key.rank = COURSE_NOT_RANKED_VALUE; break;
                         }
                     }
-                    else if (requests > 0) 
-                    { 
-                        key.rank = COURSE_RANK_NOT_REQD_VALUE; 
+                    else if (requests > 0)
+                    {
+                        key.rank = COURSE_RANK_NOT_REQD_VALUE;
                     }
                 }
                 rankedCourses.Add(key, course);
@@ -300,11 +312,11 @@ namespace U3A.BusinessRules
             }
             foreach (var t in dbc.Term.Where(x => x.Year == term.Year))
             {
-                if (termArray.Contains(t.TermNumber))   
+                if (termArray.Contains(t.TermNumber))
                 {
                     t.IsClassAllocationFinalised = IsAllocationDone;
                     dbc.Update(t);
-                }   
+                }
             };
             // and for completeness...
             foreach (var t in dbc.Term.Where(x => x.Year < term.Year))
@@ -372,13 +384,13 @@ namespace U3A.BusinessRules
                         Log.Information("----------------------------------");
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Random)
-                                            .Where(x => x.IsWaitlisted && x.Person.DateJoined?.Year >= term.Year-1
+                                            .Where(x => x.IsWaitlisted && x.Person.DateJoined?.Year >= term.Year - 1
                                                             && !PeoplePreviouslyEnrolled.Contains(x.PersonID)
                                                             && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
                         {
                             count++;
-                            Log.Information("{count:00} Joined: {Joined:dd-MMM-yyy}\tRandom: {random:00000000}\tEnrolled  {Student}",count,e.Person.DateJoined,e.Random,e.Person.FullName);
+                            Log.Information("{count:00} Joined: {Joined:dd-MMM-yyy}\tRandom: {random:00000000}\tEnrolled  {Student}", count, e.Person.DateJoined, e.Random, e.Person.FullName);
                             LogEnrolment(e);
                             e.IsWaitlisted = false;
                         }
@@ -402,7 +414,7 @@ namespace U3A.BusinessRules
                             var e = kvp.Value;
                             var key = kvp.Key;
                             count++;
-                            Log.Information("{count:00} Class#: {classes:000}\tRandom: {random:00000000}\tEnrolled  \t{student}",count, key.Item1, key.Item2, e.Person.FullName);
+                            Log.Information("{count:00} Class#: {classes:000}\tRandom: {random:00000000}\tEnrolled  \t{student}", count, key.Item1, key.Item2, e.Person.FullName);
                             LogEnrolment(e);
                             e.IsWaitlisted = false;
                         }
@@ -412,7 +424,7 @@ namespace U3A.BusinessRules
                             var e = kvp.Value;
                             var key = kvp.Key;
                             count++;
-                            Log.Information("{count:00} Class#: {classes:000}\tRandom: {random:00000000}\tWaitlisted\t{student}",count, key.Item1, key.Item2, e.Person.FullName);
+                            Log.Information("{count:00} Class#: {classes:000}\tRandom: {random:00000000}\tWaitlisted\t{student}", count, key.Item1, key.Item2, e.Person.FullName);
                         }
                     }
                     else
@@ -450,7 +462,7 @@ namespace U3A.BusinessRules
         private static async Task<SortedList<(int, long, Guid), Enrolment>> GetRankedEnrolments(U3ADbContext dbc, IEnumerable<Enrolment> enrolments, Term term)
         {
             (int courses, long random, Guid personID) key;
-            SortedList< (int, long, Guid),Enrolment > rankedEnrolments = new();
+            SortedList<(int, long, Guid), Enrolment> rankedEnrolments = new();
             var people = enrolments.Select(x => x.PersonID).ToList();
             var courseCounts = await dbc.Enrolment
                                 .Where(e => e.TermID == term.ID
@@ -461,7 +473,7 @@ namespace U3A.BusinessRules
                                 {
                                     PersonID = g.PersonID,
                                 })
-                                .Select(g => new Tuple<Guid,int>(g.Key.PersonID, g.Count()))
+                                .Select(g => new Tuple<Guid, int>(g.Key.PersonID, g.Count()))
                                 .ToListAsync();
             foreach (var e in enrolments)
             {
@@ -473,8 +485,8 @@ namespace U3A.BusinessRules
                 };
                 var courseCount = courseCounts.Where(r => r.Item1 == e.PersonID).FirstOrDefault();
                 if (courseCount != null) { key.courses = courseCount.Item2; }
-                rankedEnrolments.Add(key,e);
-                
+                rankedEnrolments.Add(key, e);
+
             }
             return rankedEnrolments;
         }

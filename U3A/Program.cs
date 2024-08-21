@@ -11,6 +11,8 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Exceptions;
+using Serilog.Filters;
+using Serilog.Formatting.Json;
 using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -56,6 +58,17 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", FatalLevelSwitch)
     .Enrich.FromLogContext()
     .Enrich.WithExceptionDetails()
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(Matching.WithProperty("AutoEnrolParticipants"))
+        .WriteTo.MSSqlServer(connectionString: tenantConnectionString,
+                                formatProvider: new CultureInfo("en-AU"),
+                                sinkOptions: new MSSqlServerSinkOptions
+                                {
+                                    TableName = "LogAutoEnrol"
+                                },
+                                    columnOptions: columnOptions
+                                )
+        )
     .WriteTo.Console(formatProvider: new CultureInfo("en-AU"))
     .WriteTo.MSSqlServer(connectionString: tenantConnectionString,
                             formatProvider: new CultureInfo("en-AU"),
