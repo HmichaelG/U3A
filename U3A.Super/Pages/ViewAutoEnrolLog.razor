@@ -1,0 +1,87 @@
+﻿@page "/ViewAutoEnrolLog"
+
+@using System.Web
+@using U3A.UI.Common.Pages.Shared
+
+@inject IDbContextFactory<TenantDbContext> tenantDbfactory
+@inject IJSRuntime js
+@inject NavigationManager navMan
+@inject LocalTime lt
+
+@attribute [Authorize]
+
+<PageTitle>View Auto Enrolment log</PageTitle>
+
+<MessageBox @ref="@messageBox" PopupWidth="50rem" />
+
+@if (isReady)
+{
+    <div class="w-100 px-4">
+        <h2>Auto Enrolment Log</h2>
+        <div class="pb-2 text-style">
+            <FullScreen DisplayOffset="10" HideToggle="true">
+                <ContentTemplate>
+                    <DxGrid @ref="grid" Data="@logs"
+                            KeyFieldName="Id"
+                            AutoExpandAllGroupRows="true"
+                            ValidationEnabled="true">
+                        <ToolbarTemplate>
+                            <GridToolbar LinkedGrid=@grid>
+                            </GridToolbar>
+                        </ToolbarTemplate>
+                        <Columns>
+                            <DxGridDataColumn Width="15rem" FieldName="Tenant" GroupIndex="0" />
+                            <DxGridDataColumn Width="15rem" FieldName="Instance" GroupIndex="1" />
+                            <DxGridDataColumn Width="15rem" Caption="Date" FieldName="TimeStamp">
+                                <CellDisplayTemplate>
+                                    <div>@(GetLocalTime((DateTime)context.Value)) </div>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                            <DxGridDataColumn FieldName="Message" />
+                        </Columns>
+                    </DxGrid>
+                </ContentTemplate>
+            </FullScreen>
+        </div>
+    </div>
+}
+
+<style>
+    .text-style {
+        font-size: 2rem;
+        font-family: "Courier New";
+    }
+</style>
+
+@code {
+    List<LogAutoEnrol>? logs { get; set; }
+    DxGrid? grid;
+    MessageBox? messageBox;
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        await GetData();
+        isReady = true;
+    }
+
+    DateTime GetLocalTime(DateTime value)
+    {
+        var result = value + lt.UtcOffset;
+        return result;
+    }
+
+    async Task GetData()
+    {
+        using (var dbc = await tenantDbfactory.CreateDbContextAsync())
+        {
+            logs = await dbc.LogAutoEnrol
+                            .Where(x => !string.IsNullOrWhiteSpace(x.Message))
+                            .OrderByDescending(x => x.Tenant).ThenBy(x => x.TimeStamp)
+                            .ToListAsync();
+           var p = logs[0].Instance;
+        }
+    }
+
+}
