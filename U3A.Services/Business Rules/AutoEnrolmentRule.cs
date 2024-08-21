@@ -14,6 +14,8 @@ using Serilog.Sinks.MSSqlServer;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using DevExpress.Utils;
 
 namespace U3A.BusinessRules
 {
@@ -128,8 +130,9 @@ namespace U3A.BusinessRules
                     // and everybody else
                     var today = dbc.GetLocalTime().Date;
                     AutoEnrolments = new List<string>();
-                    List<Enrolment> enrolmentsToProcess;
-                    List<Person> CourseLeaders;
+                    List<Enrolment> enrolmentsToProcess = new();
+                    List<Enrolment> waitlistNotFinancial = new();
+                    List<Person> CourseLeaders = new();
                     foreach (var kvp in (await GetRankedCourses(dbc, SelectedTerm)).Reverse())
                     {
                         int enrolledCount = 0;
@@ -174,6 +177,7 @@ namespace U3A.BusinessRules
                                                                         && !CourseLeaders.Contains(x.Person))
                                                         .ToListAsync();
 
+                            waitlistNotFinancial = enrolmentsToProcess.Where(x => x.IsWaitlisted && !IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                             enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                             if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                             {
@@ -200,6 +204,7 @@ namespace U3A.BusinessRules
                                                                             && x.Person.DateCeased == null
                                                                             && !CourseLeaders.Contains(x.Person))
                                                         .ToListAsync();
+                                waitlistNotFinancial = enrolmentsToProcess.Where(x => x.IsWaitlisted && !IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                                 enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                                 if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                                 {
@@ -216,7 +221,17 @@ namespace U3A.BusinessRules
                         }
                         if (enrolledCount == 0)
                         {
-                            Log.Information("There are no enrolments to process for this course.");
+                            var waitlist = enrolmentsToProcess.Count(e => e.IsWaitlisted);
+                            var notFinancial = waitlistNotFinancial.Count();
+                            Log.Information("No enrolments processed. {waitlist} remain waitlisted.",waitlist+notFinancial);
+                        }
+                        if (waitlistNotFinancial.Count > 0)
+                        {
+                            Log.Information("{waitlistNotFinancial} Not Financial enrolments remain waitlisted.", waitlistNotFinancial.Count);
+                            foreach (var e in waitlistNotFinancial)
+                            {
+                                Log.Information("Waitlisted\tFin-To: {FinTo}\t{Student}",e.Person.FinancialToBriefText,e.Person.FullName);
+                            }
                         }
                     }
                     var term = await dbc.Term.FindAsync(SelectedTerm.ID);
@@ -245,7 +260,10 @@ namespace U3A.BusinessRules
                     maxStudents = course.MaximumStudents,
                     rank = double.MinValue
                 };
-                if (course.MaximumStudents != 0)
+                int waitlisted = enrolments.Count(e => e.CourseID == course.ID
+                                                        && e.TermID == term.ID
+                                                        && e.IsWaitlisted);
+                if (course.MaximumStudents > 0 && waitlisted > 0)
                 {
                     double classes = 1;
                     if (course.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass)
@@ -253,8 +271,8 @@ namespace U3A.BusinessRules
                         classes = course.Classes.Count;
                     }
                     double max = (double)course.MaximumStudents * classes;
-                    double requests = enrolments.Where(e => e.CourseID == course.ID
-                                                            && e.TermID == term.ID).Count();
+                    double requests = enrolments.Count(e => e.CourseID == course.ID
+                                                            && e.TermID == term.ID);
                     // Calclate the rank. Set rank to MIN_VALUE if requests > 0 & <= max OR once only class
                     // MIN_VALUE courses will be logged but will not be considered popular (constrained).
                     if (requests > max)
@@ -274,7 +292,7 @@ namespace U3A.BusinessRules
                         key.rank = COURSE_RANK_NOT_REQD_VALUE;
                     }
                 }
-                rankedCourses.Add(key, course);
+                if (key.rank != double.MinValue) { rankedCourses.Add(key, course); }
             }
             return rankedCourses;
         }
@@ -366,13 +384,14 @@ namespace U3A.BusinessRules
             // If available places is less than waitlisted then enrol everyone.
             if (waitlisted <= course.MaximumStudents - enrolled)
             {
+                Log.Information("All students enrolled because Wautlist: {Waitlist} is less than Maximum Students: {MazStudents}", waitlisted, course.MaximumStudents);
                 foreach (var e in enrolments.Where(x => x.IsWaitlisted && x.TermID == term.ID
                                 && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse)))
                 {
                     e.IsWaitlisted = false;
+                    Log.Information("Enrolled:\t{student}", e.Person.FullName);
                     LogEnrolment(e);
                 }
-                Log.Information("All students enrolled because Wautlist: {Waitlist} is less than Maximum Students: {MazStudents}", waitlisted, course.MaximumStudents);
             }
             else
             {
