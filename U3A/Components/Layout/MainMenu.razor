@@ -184,7 +184,6 @@
                             }
 
                             <DxMenuItem Text="@((isVertical) ? "Theme & Settings" : "")" 
-                                        Enabled="@(!isRedirected)"
                                         IconCssClass="bi bi-palette" NavigateUrl="ThemeIntroduction">
                                 <Items>
                                     <DxMenuItem Text="Office White" />
@@ -199,7 +198,6 @@
                                 </Items>
                             </DxMenuItem>
                             <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")"
-                                        Enabled="@(!isRedirected)"
                                         IconCssClass="bi bi-shield" NavigateUrl="SecurityIntroduction">
                                 <Items>
                                     @if (IsTopMenu)
@@ -222,8 +220,7 @@
                                 <DxMenuItem Click="OnLogout" 
                                     oncontextmenu="return false"
                                     Text="Logout" 
-                                    IconCssClass="bi bi-door-open" 
-                                    Enabled="@(!isRedirected)" />
+                                    IconCssClass="bi bi-door-open" />
                             }
                         }
                     }
@@ -262,7 +259,6 @@
     bool isCourseAdminRole { get; set; }
     bool isReportViewRole { get; set; }
     bool isOfficeRole { get; set; }
-    bool isRedirected;
     string? userName { get; set; }
     string OrganisationName = string.Empty;
     ContextHelpTitle? help;
@@ -292,31 +288,6 @@
         navMan.LocationChanged += OnLocationChanged;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            ParseQueryString();
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    void ParseQueryString()
-    {
-        var colQueryString = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
-        if (colQueryString.Count > 0)
-        {
-            var page = colQueryString.GetValues("Page");
-            if (page != null && page.Count() > 0)
-            {
-                var path = page[0];
-                if (path != "/~/" && path != "~/")
-                {
-                    isRedirected = true;
-                }
-            }
-        }
-    }
 
     protected override void OnParametersSet()
     {
@@ -346,10 +317,10 @@
         }
     }
 
-    private async Task OnLogout()
+    private void OnLogout()
     {
         // forces a close of the menu when it is in mobile mode & expanded.
-        await js.InvokeVoidAsync("logout"); await InvokeAsync(StateHasChanged);
+        navMan.NavigateTo("javascript:document.getElementById('logout-form').submit();");
     }
 
 

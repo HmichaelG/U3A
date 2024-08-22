@@ -1,11 +1,14 @@
 using Blazored.LocalStorage;
 using DevExpress.Blazor.RichEdit.SpellCheck;
 using DevExpress.Drawing;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
 using Serilog.Core;
@@ -221,6 +224,21 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (BadHttpRequestException ex)
+    {
+        // Handle the exception
+        if (ex.InnerException is AntiforgeryValidationException)
+        {
+            context.Response.Redirect("/");
+        }
+    }
+});
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
