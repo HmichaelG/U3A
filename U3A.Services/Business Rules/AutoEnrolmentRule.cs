@@ -116,7 +116,7 @@ namespace U3A.BusinessRules
                               DateTime? EmailDate = null)
         {
 
-            using (LogContext.PushProperty("AutoEnrolParticipants", dbc.GetLocalTime().ToString("dd-MM-yyyy hh:mm:ss tt")))
+            using (LogContext.PushProperty("AutoEnrolParticipants", dbc.GetLocalTime().ToString("dd-MM-yyyy hh:mm tt")))
             using (LogContext.PushProperty("Tenant", dbc.TenantInfo.Identifier))
             {
                 {
