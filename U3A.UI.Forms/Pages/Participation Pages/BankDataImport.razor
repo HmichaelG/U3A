@@ -10,6 +10,7 @@
 @using System.IO
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Logging
+@using System.Text.RegularExpressions
 @inject ILogger<BankDataImport> Logger
 @inject NavigationManager NavigationManager
 
@@ -357,7 +358,7 @@ else
         return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
     }
 
-    async void FileUploaded()
+    async Task FileUploaded()
     {
         int currentRecord = 0;
         string response = string.Empty;
@@ -368,6 +369,16 @@ else
             TimeProcessed = dbc.GetLocalTime();
             var file = Path.Combine("uploads", fi.Name);
 
+            // Fix ampersand issue
+            string text = await File.ReadAllTextAsync(file);
+            // Regular expression to find & that are not part of predefined entities
+            string pattern = @"&(?!amp;|lt;|gt;|quot;|apos;)";
+            string replacement = "&amp;";
+            // Replace & with &amp; where it's not part of a predefined entity
+            string result = Regex.Replace(text, pattern, replacement); 
+            await File.WriteAllTextAsync(file, result);
+            
+            // and, parse...
             var parserSettings = new ParserSettings();
             parserSettings.CustomConverterCurrency = (x) => double.Parse(x);
             Extract extract = Parser.GenerateExtract(file, parserSettings);
