@@ -34,6 +34,14 @@ namespace U3A.Model
         [DefaultValue(" ")]
         public string? Description { get; set; }
 
+        [NotMapped]
+        public string DescriptionForXrRichText
+        {
+            get
+            {
+                return Description.Replace("<p><br><p>", "<p>");
+            }
+        }
         public bool IsOffScheduleActivity { get; set; }
 
         [DefaultValue(0)]
