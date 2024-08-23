@@ -35,18 +35,17 @@ else
                                   ButtonIconCssClass="bi bi-check2-circle"
                                   HelpTopic="2024-Version-History.html"
                                   ActivationStyle="@HelpActivationStyle.ButtonOnly" />
-                <ContextHelpTitle Title="help"
-                                  ButtonIconCssClass="bi bi-question"
+                <DxButton Text="Support"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          NavigateUrl="Public/Support"
+                          CssClass="ms-1"
+                          IconCssClass="bi bi-person" />
+                <ContextHelpTitle Title=""
                                   HelpTopic="Introduction.html"
                                   IncludeTableOfContents=true
                                   ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
-                <DxButton Text="Support"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          SizeMode="SizeMode.Large"
-                          NavigateUrl="Public/Support"
-                          CssClass="bi bi-person" />
             </div>
-            <DxTabs CssClass="vw-100" SizeMode="SizeMode.Small">
+            <DxTabs CssClass="vw-100">
                 <DxTabPage Text="Member Summary">
                         <GeneralSummaryChart />
                 </DxTabPage>
@@ -62,12 +61,12 @@ else
                 <DxTabPage Text="Attendance">
                     <AttendanceChart />
                 </DxTabPage>
-                <DxTabPage Text="Website">
+@*                 <DxTabPage Text="Website">
                     <div class="">
                         <iframe src="@homePage" class="shadow card p-1 iframe-style"></iframe>
                     </div>
                 </DxTabPage>
-                <DxTabPage Text="u3admin.org.au">
+ *@                <DxTabPage Text="u3admin.org.au">
                     <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-style"></iframe>
                 </DxTabPage>
             </DxTabs>

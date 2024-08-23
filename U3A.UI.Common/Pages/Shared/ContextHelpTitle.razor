@@ -11,51 +11,54 @@
             break;
         case HelpActivationStyle.ButtonOnly:
         case HelpActivationStyle.ButtonOnlyNoMessges:
-                @if (ActivationStyle == HelpActivationStyle.ButtonOnly)
+            @if (ActivationStyle == HelpActivationStyle.ButtonOnly)
+            {
+                if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
                 {
-                    if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
-                    {
                     <div class="mx-2 mt-2 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
-                    }
-                    if (!string.IsNullOrWhiteSpace(informationMessage))
+                }
+                if (!string.IsNullOrWhiteSpace(informationMessage))
+                {
                     {
-                        {
                         <div class="mx-2 mt-2 alert-style alert alert-info text-center">
-                                @informationMessage
-                            </div>
-                        }
+                            @informationMessage
+                        </div>
                     }
                 }
-                <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
-                          SizeMode=SizeMode.Large
-                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          CssClass="@ButtonCssClass"
-                          Click="ShowTopicAsync" Id="helpButton" />
+            }
+            <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline"
+                      RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly)
+                                            ?   ButtonRenderStyle.Primary
+                                            :   ButtonRenderStyle.None)"
+                      CssClass="@ButtonCssClass"
+                      Click="ShowTopicAsync" Id="helpButton" />
             break;
         case HelpActivationStyle.StandardButtonAndTitle:
         case HelpActivationStyle.ButtonAndTitleNoMessages:
             <PageTitle>@Title</PageTitle>
             <div class="d-flex">
                 <h3 class="@TitleCssClass">
-                    <DxButton IconCssClass="@ButtonIconCssClass" Text="Help" SizeMode=SizeMode.Small CssClass="@ButtonCssClass"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline" style="float: left; margin-right: 0.5rem;"
+                    <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                              RenderStyle="ButtonRenderStyle.None"
                               Click="ShowTopicAsync" Id="helpButton" />
                     @Title
                 </h3>
                 @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
                 {
-                if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
-                {
-                    <div class="flex-grow-1 mx-4 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
-                }
-                if (!string.IsNullOrWhiteSpace(informationMessage))
-                {
+                    if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
                     {
-                        <div class="flex-grow-1 mx-4 alert-style alert alert-info text-center">
-                            @informationMessage
-                        </div>
+                        <div class="flex-grow-1 mx-4 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
                     }
-                }
+                    if (!string.IsNullOrWhiteSpace(informationMessage))
+                    {
+                        {
+                            <div class="flex-grow-1 mx-4 alert-style alert alert-info text-center">
+                                @informationMessage
+                            </div>
+                        }
+                    }
                 }
             </div>
             break;
@@ -91,6 +94,11 @@
         padding-bottom: 0.25rem !important;
         margin-bottom: 0.5dvh !important;
     }
+
+    .help-btn {
+        color: cornflowerblue;
+        font-weight:900;
+    }
 </style>
 
 
@@ -107,9 +115,9 @@
     [Parameter]
     public string? ButtonCssClass { get; set; }
     [Parameter]
-    public string TitleCssClass { get; set; } = "flex-grow-0 align-items-center";
+    public string TitleCssClass { get; set; } = "flex-grow-0";
     [Parameter]
-    public string ButtonIconCssClass { get; set; } = "bi bi-question menu-icon";
+    public string ButtonIconCssClass { get; set; } = "h2 bi bi-question-circle-fill help-btn";
     [Parameter]
     public bool IncludeTableOfContents { get; set; } = false;
 
