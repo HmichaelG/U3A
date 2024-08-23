@@ -156,13 +156,12 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<Person>> SelectablePersonsIncludeUnfinancialAsync(U3ADbContext dbc)
         {
-            var people = dbc.Person
+            var people = await dbc.Person
                             .AsNoTracking()
-                            .AsEnumerable()
                             .Where(x => x.DateCeased == null)
                             .OrderBy(x => x.LastName)
                             .ThenBy(x => x.FirstName)
-                            .ThenBy(x => x.Email).ToList();
+                            .ThenBy(x => x.Email).ToListAsync();
             await ApplyGroupsAsync(dbc, people);
             return people;
         }
@@ -362,10 +361,10 @@ namespace U3A.BusinessRules
             if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
             if (term != null)
             {
-                foreach (var e in dbc.Enrolment
+                foreach (var e in await dbc.Enrolment
                                             .Include(x => x.Term)
                                             .Where(x => x.Term.Year == term.Year &&
-                                                    x.IsCourseClerk && !x.IsWaitlisted))
+                                                    x.IsCourseClerk && !x.IsWaitlisted).ToListAsync())
                 {
                     var p = people.Find(x => x.ID == e.PersonID);
                     if (p != null) p.IsCourseClerk = true;
