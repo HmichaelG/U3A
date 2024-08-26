@@ -60,38 +60,5 @@ namespace U3A.Services
             return result;
         }
     }
-    //public class IdentityEmailSenderOLD : IEmailSender
-    //{
-
-    //    IDbContextFactory<U3ADbContext> dbFactory;
-    //    public IdentityEmailSender(IDbContextFactory<U3ADbContext> contextFactory)
-    //    {
-    //        dbFactory = contextFactory;
-    //    }
-    //    public async Task SendEmailAsync(string email, string subject, string htmlMessage)
-    //    {
-    //        using (var dbc = await dbFactory.CreateDbContextAsync())
-    //        {
-    //            var settings = await dbc.SystemSettings
-    //                            .OrderBy(x => x.ID)
-    //                            .FirstOrDefaultAsync() ?? throw new ArgumentNullException(nameof(SystemSettings));
-    //            var sender = EmailFactory.GetIdentityEmailSender(dbc);
-    //            var result = await sender.SendEmailAsync(EmailType.Transactional,
-    //                                                   settings.SendEmailAddesss,
-    //                                                   settings.SendEmailDisplayName,
-    //                                                   email, email, subject, GetEmailText(settings, htmlMessage),
-    //                                                   htmlMessage);
-    //        }
-    //    }
-
-    //    private string GetEmailText(SystemSettings settings, string HtmLMessgae)
-    //    {
-    //        string result = $"<h3>{settings.U3AGroup}</h3><p>ABN: {settings.ABN}<br/>" +
-    //                            $"{settings.OfficeLocation}<br/>Phone: {settings.Phone}</p>" +
-    //                            $"<p>{HtmLMessgae}</p>";
-    //        return result;
-    //    }
-
-    //}
 
 }

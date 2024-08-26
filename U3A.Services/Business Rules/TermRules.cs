@@ -184,13 +184,6 @@ namespace U3A.BusinessRules
             if (termNo > 4) { termNo = 1; year++; }
             return await dbc.Term.FirstOrDefaultAsync(x => x.Year == year && x.TermNumber == termNo);
         }
-        public static Term? GetPreviousTerm(U3ADbContext dbc, int Year, int TermNumber)
-        {
-            int termNo = TermNumber - 1;
-            int year = Year;
-            if (termNo < 1) { termNo = 4; year--; }
-            return dbc.Term.FirstOrDefault(x => x.Year == year && x.TermNumber == termNo);
-        }
         public static DateTime StartOfWeek(this DateTime dt, DayOfWeek firstDayOfWeek)
         {
             int diff = (7 + (dt.DayOfWeek - firstDayOfWeek)) % 7;

@@ -161,7 +161,7 @@ else
         await ProgressBar.ShowAsync("Copying ... Please Wait", SelectedDataItems.Count);
         foreach (Course course in SelectedDataItems.Cast<Course>())
         {
-            var onfile = dbc.Course.Where(x => x.Year == newYear && x.Name == course.Name).FirstOrDefault();
+            var onfile = await dbc.Course.Where(x => x.Year == newYear && x.Name == course.Name).FirstOrDefaultAsync();
             if (onfile == null && course.Classes.Count > 0)
             {
                 newCourse = new Course();

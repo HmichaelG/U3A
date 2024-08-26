@@ -145,7 +145,7 @@ namespace U3A.BusinessRules
                                         .Include(x => x.Person)
                                         .Where(x => x.Term.Year == term.Year).ToListAsync();
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
-            var defaultTerm = dbc.Term.AsNoTracking().FirstOrDefault(x => x.IsDefaultTerm);
+            var defaultTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.IsDefaultTerm);
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
             Parallel.ForEach(classes, c =>
@@ -457,7 +457,7 @@ namespace U3A.BusinessRules
         public static async Task<List<Person>> GetPersonsInClassAsync(U3ADbContext dbc, Guid ClassID)
         {
             List<Person> result = new List<Person>();
-            var course = dbc.Class.Include(x => x.Course).Where(x => x.ID == ClassID).Select(x => x.Course).FirstOrDefault();
+            var course = await dbc.Class.Include(x => x.Course).Where(x => x.ID == ClassID).Select(x => x.Course).FirstOrDefaultAsync();
             if (course != null)
             {
                 if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)

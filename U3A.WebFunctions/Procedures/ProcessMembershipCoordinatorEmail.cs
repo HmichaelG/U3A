@@ -27,7 +27,7 @@ namespace U3A.WebFunctions.Procedures
                     var emailSender = EmailFactory.GetEmailSender(dbc);
                     string sendEmailAddress = "";
                     string sendEmailDisplayName = "";
-                    var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault() ?? throw new ArgumentNullException(nameof(SystemSettings));
+                    var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync() ?? throw new ArgumentNullException(nameof(SystemSettings));
                     if (settings != null)
                     {
                         sendEmailAddress = settings.SendEmailAddesss;
@@ -79,7 +79,7 @@ namespace U3A.WebFunctions.Procedures
             var msg = "";
             var now = await Common.GetNowAsync(dbc);
             var today = now.Date;
-            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault() ?? throw new ArgumentNullException(nameof(SystemSettings));
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync() ?? throw new ArgumentNullException(nameof(SystemSettings));
 
             //Random Allocation Day
 

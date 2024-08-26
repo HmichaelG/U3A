@@ -35,13 +35,13 @@ namespace U3A.Services
             TenantInfo tenantInfo = null;
             using (var dbc = TenantDbFactory.CreateDbContext())
             {
-                tenantInfo = dbc.TenantInfo.AsNoTracking()
-                    .FirstOrDefault(x => x.Identifier == identifirer);
+                tenantInfo = await dbc.TenantInfo.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Identifier == identifirer);
                 if (tenantInfo == null)
                 {
-                    tenantInfo = dbc.TenantInfo
+                    tenantInfo =await dbc.TenantInfo
                         .AsNoTracking()
-                        .FirstOrDefault(x => x.Identifier == "demo"); //finbuckle leftover
+                        .FirstOrDefaultAsync(x => x.Identifier == "demo"); //finbuckle leftover
                 }
             }
             return tenantInfo;

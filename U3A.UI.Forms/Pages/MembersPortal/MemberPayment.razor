@@ -403,7 +403,8 @@ else
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             var emailSender = EmailFactory.GetEmailSender(dbc);
-            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault() ?? throw new ArgumentNullException(nameof(SystemSettings));
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID)
+                            .FirstOrDefaultAsync() ?? throw new ArgumentNullException(nameof(SystemSettings));
             if (settings != null)
             {
                 sendEmailAddress = settings.SendEmailAddesss;

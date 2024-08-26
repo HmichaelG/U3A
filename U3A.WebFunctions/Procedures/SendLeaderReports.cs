@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -21,7 +22,7 @@ namespace U3A.WebFunctions.Procedures
                 var today = await Common.GetTodayAsync(dbc);
                 var selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
                 if (selectedTerm == null) { return; }
-                var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+                var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
                 if (settings != null)
                 {
                     reportFactory = new ProFormaReportFactory(tenant);

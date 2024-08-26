@@ -55,7 +55,7 @@ namespace U3A.BusinessRules
 
         private static async Task DoParticipantEnrolmentAsync(U3ADbContext dbc, Enrolment[] enrolments, DateTime? AsAt)
         {
-            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             var reportName = "Participant Enrolment";
             foreach (var e in enrolments)
             {

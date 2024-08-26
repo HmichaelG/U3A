@@ -40,7 +40,7 @@ namespace U3A.Services
         public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(U3ADbContext dbc, Person person)
         {
             var result = new List<MemberPaymentAvailable>();
-            var settings = dbc.SystemSettings.FirstOrDefault();
+            var settings = await dbc.SystemSettings.FirstOrDefaultAsync();
             if (settings.AllowedMemberFeePaymentTypes == MemberFeePaymentType.PerYearAndPerSemester)
             {
                 var term = await GetBillingTermAsync(dbc);
