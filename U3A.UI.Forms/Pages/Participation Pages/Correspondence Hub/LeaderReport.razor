@@ -123,9 +123,9 @@ else
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         dbcT = await TenantDbfactory.CreateDbContextAsync();
-        settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
-        currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
+        settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
         terms = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc);
+        currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
         selectedTerm = currentTerm;
         await SelectedTermChanged(selectedTerm);
         IsReady = true;
