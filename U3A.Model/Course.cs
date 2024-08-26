@@ -40,6 +40,7 @@ namespace U3A.Model
             get
             {
                 return Description.Replace("<p><br><p>", "<p>");
+                return Description.Replace("<br><br>", "<p>");
             }
         }
         public bool IsOffScheduleActivity { get; set; }
