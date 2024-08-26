@@ -129,7 +129,7 @@
 <!--ZOOMRESTART-->
 <p class="p_Normal"><span style="font-weight: bold;">Bank data import</span> is the process of importing bank cash receipt details and assigning those receipts to the members that paid them. Importantly, bank data import is only required for those members that paid their fees via their banking software, cash or cheque. <span style="text-decoration: underline;">It is not required for those members who paid their fees via the Eway online payments system</span>. Any receipts paid via Eway must be ignored in this procedure.</p>
 <h3 class="p_Heading3"><span class="f_Heading3">Before you begin</span></h3>
-<p class="p_Normal">To use this procedure you must have access to the U3A's banking software or be provided with a file by somebody that does. The file required is known as an <span style="font-weight: bold;">OFX file</span>, meaning an Open Financial Exchange file. It has a very specific file format and is supported by all major Australian financial institutions. </p>
+<p class="p_Normal">To use this procedure you must have access to the U3A's banking software or be provided with a file by somebody that does. The file required is known as an <span style="font-weight: bold;">OFX </span>or <span style="font-weight: bold;">QIF</span> file. These files a very specific file format and is supported by all major Australian financial institutions. </p>
 <p class="p_Normal">Normally, when you request this file you will be given the ability to enter a date range. We suggest the start date be one day after the last file import and the end date be no later than yesterday's date.</p>
 <p class="p_Normal" style="text-align: center; margin: 0 0 0 0;"><span style="font-weight: bold;">Important</span></p>
 <p class="p_Normal" style="text-align: center; margin: 0 0 0 0;"><span style="font-style: italic;">During data import, the software will attempt to match receipts to participants (members). This is done by extracting the member's name from the transaction's description. At best, this procedure is problematic. Therefore,</span></p>
@@ -144,7 +144,7 @@
 <p class="p_Normal" style="line-height: 1.38; margin: 1px 0 16px 0;">The other buttons available are...</p>
 <p class="p_Normal" style="text-indent: 0; line-height: 1.38; padding-left: 20px; margin: 1px 0 16px 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span><span style="font-weight: bold;">Apply Payments to Participant records</span>. When you are satisfied that all imported transactions are correctly assigned to participant records, click this button to apply the transactions and finalise the procedure.</p>
 <p class="p_Normal" style="text-indent: 0; line-height: 1.38; padding-left: 20px; margin: 1px 0 16px 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span><span style="font-weight: bold;">Show all bank transactions</span>. Normally, only receipt transactions are displayed. Click this button to show all transactions in the import file.</p>
-<p class="p_Normal" style="text-indent: 0; line-height: 1.38; padding-left: 20px; margin: 1px 0 16px 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span><span style="font-weight: bold;">Clear bank OFX file</span>. This option will delete the OFX file from the system. It is intended to be used if a mistake was made when importing the file. An incorrect date range, for example. The original OFX file will remain intact on your client PC. &nbsp;</p>
+<p class="p_Normal" style="text-indent: 0; line-height: 1.38; padding-left: 20px; margin: 1px 0 16px 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">3.</span><span style="font-weight: bold;">Clear bank import file</span>. This option will delete the OFX/QIF file from the system. It is intended to be used if a mistake was made when importing the file. An incorrect date range, for example. The original bank import file will remain intact on your client PC. &nbsp;</p>
 <p class="p_Normal" style="line-height: 1.38; margin: 1px 0 16px 0;">The <span style="font-weight: bold;">display grid </span>has the following columns...</p>
 <div style="text-align: left; text-indent: 0; line-height: 1.38; padding: 0 0 0 0; margin: 1px 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
 <thead>
@@ -163,7 +163,7 @@
 </td>
 <td style="vertical-align:top; width:185px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">No</p>
 </td>
-<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">A checkbox to indicate the receipt has already been processed by the system in a previous import. This will occur if your OFX file's date range overlaps with a previous import.</p>
+<td style="vertical-align:top; width:726px; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">A checkbox to indicate the receipt has already been processed by the system in a previous import. This will occur if your OFX/QIF file's date range overlaps with a previous import.</p>
 </td>
 </tr>
 <tr>
@@ -227,11 +227,12 @@
 </table>
 </div>
 <h3 class="p_Heading3"><span class="f_Heading3">How to import a file</span></h3>
-<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Using your U3A's banking software, download the OFX onto your PC. It will normally be placed in your <span style="font-style: italic;">Downloads</span> folder.</p>
+<p class="p_Normal"><span style="font-weight: bold;">Note:</span> Always choose the Australian file version if you are importing a QIF file and your banking software provides a choice of files.</p>
+<p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">1.</span>Using your U3A's banking software, download the OFX or QIF onto your PC. It will normally be placed in your <span style="font-style: italic;">Downloads</span> folder. </p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 20px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">2.</span>Using the <span style="font-weight: bold;">file upload dialogue</span>, import the file into the system. You can do this in one of two ways...</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">a.</span>Drag the file from your operating system's file manager (File Explorer, for example) and drop onto the <span style="font-weight: bold;">file upload dialogue</span>, or</p>
 <p class="p_Normal" style="text-indent: 0; padding-left: 40px; margin-left: 0;"><span class="f_Normal" style="display:inline-block;width:20px;margin-left:-20px">b.</span>Click the <span style="font-style: italic;">Select File</span> button to open a standard operating system file open dialogue, navigate to and select the file required.</p>
-<p class="p_Normal" style="margin: 0 0 16px 13px;">Once selected, the system will upload the OFX file onto the U3Admin server and process it. The results will be output into the <span style="font-weight: bold;">display grid.</span></p>
+<p class="p_Normal" style="margin: 0 0 16px 13px;">Once selected, the system will upload the OFX or QIF file onto the U3Admin server and process it. The results will be output into the <span style="font-weight: bold;">display grid.</span></p>
 <h3 class="p_Heading3"><span class="f_Heading3">Assigning Receipts</span></h3>
 <p class="p_Normal">The import process will make a &quot;best guess&quot; at assigning receipts to participants. The process is not perfect and quite often you will need to correct the automatic assignment. </p>
 <p class="p_Normal">Click the edit (pencil) button on the grid row you wish to change. Select the required member from the drop-down list on the <span style="font-style: italic;">Name </span>column. When you are satisfied that all is correct, click the Save (disk) icon on the grid row. Your changes are now saved. Repeat for all receipts to be assigned.</p>

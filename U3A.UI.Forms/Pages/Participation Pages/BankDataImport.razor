@@ -11,6 +11,9 @@
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Logging
 @using System.Text.RegularExpressions
+@using Hazzik.Qif
+@using Hazzik.Qif.Transactions
+
 @inject ILogger<BankDataImport> Logger
 @inject NavigationManager NavigationManager
 
@@ -37,7 +40,7 @@ else
         <div class="col col-lg-6">
             <div id="overviewDemoDropZone" class="card custom-drop-zone bg-light rounded-3 m-0" hidden="@(SelectedFilesCount > 0)">
                 <span class="bi bi-upload icon-size mb-3"></span>
-                <span>Drag and Drop <strong>OFX</strong> File Here</span><span class="m-1">or</span>
+                <span>Drag and Drop <b>OFX</b> or <b>QIF</b> File Here</span><span class="m-1">or</span>
                 <button id="overviewDemoSelectButton" class="btn border-primary btn-primary m-1">Select File</button>
             </div>
             <DxUpload Name="myFile" @ref="FileUploader"
@@ -45,7 +48,7 @@ else
                       ExternalDropZoneCssSelector="#overviewDemoDropZone"
                       ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
                       UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
-                      AllowedFileExtensions="@(new List<string> { ".ofx" })"
+                      AllowedFileExtensions="@(new List<string> { ".ofx",".qif" })"
                       FileUploaded="FileUploaded"
                       SelectedFilesChanged="SelectedFilesChanged"
                       AllowMultiFileUpload="false"
@@ -68,7 +71,7 @@ else
                 <DxButton Text="@ShowAllButtonText" CssClass="me-1 flex-grow-1"
                           Click="@ShowAllButtonClicked"
                           RenderStyle="ButtonRenderStyle.Primary" />
-                <DxButton Text="Clear Bank OFX File" CssClass="ms-1 flex-grow-1"
+                <DxButton Text="Clear Bank Import File" CssClass="ms-1 flex-grow-1"
                           Click="@ClearAllBankData"
                           RenderStyle="ButtonRenderStyle.Primary" />
             </div>
@@ -123,7 +126,7 @@ else
                                 var importData = (ReceiptDataImport)context.EditModel;
                             }
                             <PersonsComboBox People="@People" @bind-SelectedPerson="@currentPerson"
-                                            @bind-SelectedPerson:after="async() => await OnPersonChanged(currentPerson,importData)" />
+                                             @bind-SelectedPerson:after="async() => await OnPersonChanged(currentPerson,importData)" />
                         </CellEditTemplate>
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Amount" Width="10rem"
@@ -283,26 +286,30 @@ else
             }
             else
             {
-                receiptDateRangeMessage = $"Upload an OFX file starting {strStartDate} and ending no later than {strEndDate}";
+                receiptDateRangeMessage = $"Upload an OFX or QIF file starting {strStartDate} and ending no later than {strEndDate}";
             }
             hideReceiptDateRangeMessage = false;
             StateHasChanged();
         }
     }
 
-    async Task<bool> CheckBankFileDate(Extract extract)
+    async Task<bool> CheckBankFileDate(DateTime? firstImportDate, DateTime? lastImportDate)
     {
-        var result = (extract.InitialDate >= startDate && extract.InitialDate <= endDate) &&
-                        (extract.FinalDate >= startDate && extract.FinalDate <= endDate);
+        var result = false;
+        if (firstImportDate != null && lastImportDate != null)
+        {
+            result = (firstImportDate >= startDate && firstImportDate <= endDate) &&
+                            (lastImportDate >= startDate && lastImportDate <= endDate);
+        }
         if (!result)
         {
             var args = new MessageBoxArgs()
                 {
                     OKButtonText = "Yes, I'm Ok with that!",
-                    Caption = "Unexpected date range in Bank OFX file",
-                    Message = $"<div class='text-center alert alert-danger alert text-dark p-2'><p>The OFX Bank date range <strong>{extract.InitialDate.ToShortDateString()}</strong> to <strong>{extract.FinalDate.ToShortDateString()}</strong>.<br>" +
-                                                                                                                                                            $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
-                                                                                                                                                                "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
+                    Caption = "Unexpected date range in Bank import file",
+                    Message = $"<div class='text-center alert alert-danger alert text-dark p-2'><p>The Bank date range <strong>{firstImportDate?.ToShortDateString()}</strong> to <strong>{lastImportDate?.ToShortDateString()}</strong>.<br>" +
+                                                                                                                                                                        $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
+                                                                                                                                                                            "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
                 };
             result = await messageBox.ShowAsync(args);
             hideReceiptDateRangeMessage = true;
@@ -360,7 +367,7 @@ else
 
     async Task FileUploaded()
     {
-        int currentRecord = 0;
+        await ProgressBar.ShowSpinnerAsync("Processing ... Please Wait");
         string response = string.Empty;
         List<Guid> IdAlreadyUsed = new List<Guid>();
         foreach (var fi in UploadedFiles)
@@ -368,70 +375,18 @@ else
             FileProcessed = fi.Name;
             TimeProcessed = dbc.GetLocalTime();
             var file = Path.Combine("uploads", fi.Name);
-
-            // Fix ampersand issue
-            string text = await File.ReadAllTextAsync(file);
-            // Regular expression to find & that are not part of predefined entities
-            string pattern = @"&(?!amp;|lt;|gt;|quot;|apos;)";
-            string replacement = "&amp;";
-            // Replace & with &amp; where it's not part of a predefined entity
-            string result = Regex.Replace(text, pattern, replacement); 
-            await File.WriteAllTextAsync(file, result);
-            
-            // and, parse...
-            var parserSettings = new ParserSettings();
-            parserSettings.CustomConverterCurrency = (x) => double.Parse(x);
-            Extract extract = Parser.GenerateExtract(file, parserSettings);
-            //
-            if (!await CheckBankFileDate(extract)) return;
-            //
-            BankAccountDetails = $"Account {extract.BankAccount.AccountCode}: From {extract.InitialDate.ToLongDateString()} to {extract.FinalDate.ToLongDateString()}.";
-            var records = extract.Transactions.Count;
-            processStartTime = DateTime.UtcNow;
-            await ProgressBar.ShowAsync("Processing ... Please Wait", records);
-            foreach (Transaction trx in extract.Transactions)
+            string extension = Path.GetExtension(file);
+            switch (extension.ToLower())
             {
-                var receiptImport = new ReceiptDataImport()
-                    {
-                        Amount = (decimal)trx.TransactionValue,
-                        Date = trx.Date,
-                        Description = trx.Description,
-                        Identifier = trx.Id,
-                    };
-                if (trx.Type == "Debit") receiptImport.Amount *= -1;
-
-                receiptImport.IsOnFile = await BusinessRule.IsReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
-                // receipt is previously on file - set the person to that which was previously posted.
-                if (receiptImport.IsOnFile)
-                {
-                    var r = await BusinessRule.GetReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
-                    var person = await dbc.Person.FindAsync(r.PersonID);
-                    receiptImport.Person = person;
-                    receiptImport.FinancialTo = person.FinancialTo;
-                    receiptImport.FinancialToTerm = person.FinancialToTerm;
-                }
-                // Otherwise, parse the person from the imported description
-                else
-                {
-                    var people = await BusinessRule.ParseBankDescription(dbc, trx.Description);
-                    if (people.Count() == 1)
-                    {
-                        var thisPerson = people.First();
-                        if (await DoesReceiptMatchFee(thisPerson, receiptImport.Amount))
-                        {
-                            if (!IdAlreadyUsed.Contains(thisPerson.ID))
-                            {
-                                receiptImport.Person = thisPerson;
-                                await CalcculateFinancialTo(dbc, receiptImport, processStartTime);
-                                IdAlreadyUsed.Add(thisPerson.ID);
-                            }
-                        }
-                    }
-                }
-
-                await dbc.ReceiptDataImport.AddAsync(receiptImport);
-                currentRecord++;
-                await ProgressBar.SetValueAsync(currentRecord);
+                case ".ofx":
+                    await ParseOFXFile(file, IdAlreadyUsed);
+                    break;
+                case ".qif":
+                    await ParseQIFFile(file, IdAlreadyUsed);
+                    break;
+                default:
+                    await messageBox.ShowOkOnlyAsync("File type not supported.", $"files of type {extension} are not supported.");
+                    break;
             }
             await ProgressBar.ShowSpinnerAsync("Updating Database - Please Wait");
             await dbc.SaveChangesAsync();
@@ -444,6 +399,113 @@ else
     {importData.Where(x => x.Person != null).Count()} receipts have been matched to participants.";
         await messageBox.ShowOkOnlyAsync("File import complete", msg);
         StateHasChanged();
+    }
+
+    async Task ParseQIFFile(string file, List<Guid> IdAlreadyUsed)
+    {
+        int currentRecord = 0;
+
+        // Fix whitespace issue
+        string input = await File.ReadAllTextAsync(file);
+        string pattern = @"\s+$";
+        string replacement = "";
+        string result = Regex.Replace(input, pattern, replacement, RegexOptions.Multiline);
+        await File.WriteAllTextAsync(file, result);
+
+        // and, parse...
+        QifDocument qif = QifDocument.Load(File.OpenRead(file));
+        var firstDate = qif.BankTransactions.OrderBy(b => b.Date).FirstOrDefault()?.Date;
+        var lastDate = qif.BankTransactions.OrderByDescending(b => b.Date).FirstOrDefault()?.Date;
+        //
+        if (!await CheckBankFileDate(firstDate, lastDate)) return;
+        //
+        BankAccountDetails = $"From {firstDate?.ToLongDateString()} to {lastDate?.ToLongDateString()}.";
+        var records = qif.BankTransactions.Count;
+        processStartTime = DateTime.UtcNow;
+        foreach (BasicTransaction trx in qif.BankTransactions)
+        {
+           await ProcessReceiptData(trx.Amount, trx.Date, trx.Memo, trx.Category, IdAlreadyUsed);
+        }
+    }
+
+    async Task ParseOFXFile(string file, List<Guid> IdAlreadyUsed)
+    {
+        int currentRecord = 0;
+
+        // Fix ampersand issue
+        string text = await File.ReadAllTextAsync(file);
+        // Regular expression to find & that are not part of predefined entities
+        string pattern = @"&(?!amp;|lt;|gt;|quot;|apos;)";
+        string replacement = "&amp;";
+        // Replace & with &amp; where it's not part of a predefined entity
+        string result = Regex.Replace(text, pattern, replacement);
+        await File.WriteAllTextAsync(file, result);
+
+        // and, parse...
+        var parserSettings = new ParserSettings();
+        parserSettings.CustomConverterCurrency = (x) => double.Parse(x);
+        Extract extract = Parser.GenerateExtract(file, parserSettings);
+        //
+        if (!await CheckBankFileDate(extract.InitialDate, extract.FinalDate)) return;
+        //
+        BankAccountDetails = $"Account {extract.BankAccount.AccountCode}: From {extract.InitialDate.ToLongDateString()} to {extract.FinalDate.ToLongDateString()}.";
+        var records = extract.Transactions.Count;
+        processStartTime = DateTime.UtcNow;
+        foreach (Transaction trx in extract.Transactions)
+        {
+            await ProcessReceiptData((trx.Type == "Debit")
+                                            ? (decimal)trx.TransactionValue * -1
+                                            : (decimal)trx.TransactionValue,
+                                            trx.Date,
+                                            trx.Description,
+                                            trx.Id,
+                                            IdAlreadyUsed);
+        }
+    }
+
+    async Task ProcessReceiptData(decimal amount, 
+                        DateTime date, 
+                        string description, 
+                        string identifier,
+                        List<Guid> IdAlreadyUsed)
+    {
+        var receiptImport = new ReceiptDataImport()
+            {
+                Amount = amount,
+                Date = date,
+                Description = description,
+                Identifier = identifier,
+            };
+        receiptImport.IsOnFile = await BusinessRule.IsReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
+        if (receiptImport.IsOnFile)
+        {
+            // receipt is previously on file - set the person to that which was previously posted.
+            var r = await BusinessRule.GetReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
+            var person = await dbc.Person.FindAsync(r.PersonID);
+            receiptImport.Person = person;
+            receiptImport.FinancialTo = person.FinancialTo;
+            receiptImport.FinancialToTerm = person.FinancialToTerm;
+        }
+        else
+        {
+            // Otherwise, parse the person from the imported description
+            var people = await BusinessRule.ParseBankDescription(dbc, description);
+            if (people.Count() == 1)
+            {
+                var thisPerson = people.First();
+                if (await DoesReceiptMatchFee(thisPerson, receiptImport.Amount))
+                {
+                    if (!IdAlreadyUsed.Contains(thisPerson.ID))
+                    {
+                        receiptImport.Person = thisPerson;
+                        await CalcculateFinancialTo(dbc, receiptImport, processStartTime);
+                        IdAlreadyUsed.Add(thisPerson.ID);
+                    }
+                }
+            }
+        }
+
+        await dbc.ReceiptDataImport.AddAsync(receiptImport);
     }
 
     async Task CalcculateFinancialTo(U3ADbContext dbc, ReceiptDataImport importItem, DateTime startTime)
@@ -702,8 +764,6 @@ else
         }
         if (!e.Cancel)
         {
-            // dbc.Entry(e.DataItem).State = EntityState.Unchanged;
-            // dbc.Entry(e.DataItem).Reload();
             await ImportReceiptData();
         }
         isCancelling = false;
@@ -780,10 +840,9 @@ else
     </p>
     <p>Do you wish to continue?</p>"))
         {
-            dbc.ChangeTracker.AcceptAllChanges();
             dbc.RemoveRange(await dbc.ReceiptDataImport.ToListAsync());
             await dbc.SaveChangesAsync();
-            await ImportReceiptData();
+            importData.Clear();
         }
     }
 
