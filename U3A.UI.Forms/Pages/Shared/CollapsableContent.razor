@@ -2,8 +2,8 @@
 
 @if (!IsDismissed)
 {
-    <section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
-        <button class="btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
+    <section class="@($"{CssClass} alert-section {alertRender} text-center")" hidden="@isHidden">
+        <button class="dismis-button btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
         @ContentTemplate
         <div class="@($"strong {AlertTextRender}")">
             @(new MarkupString(AlertText))
@@ -18,7 +18,7 @@
         </div>
     </section>
     <div class="w-100 bg-primary muted" hidden="@(!isHidden || !ShowCollapseButton)">
-        <button class="btn btn-close" onclick="@onOpenButtonClick" />
+        <button class="dismis-button btn btn-close" onclick="@onOpenButtonClick" />
     </div>
 }
 
@@ -31,17 +31,14 @@
         --bs-bg-opacity: 0.1;
     }
 
-    section {
+    .alert-section {
         margin: auto;
     }
 
-    button {
+    .dismis-button {
         float: right;
     }
 
-    .dismiss-style {
-        float: right;
-    }
 
 </style>
 @code {
