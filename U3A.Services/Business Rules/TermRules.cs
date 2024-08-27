@@ -23,39 +23,71 @@ namespace U3A.BusinessRules
                             .ThenByDescending(x => x.TermNumber).ToList();
         }
 
-        public static async Task<Term?> CurrentTermAsync(U3ADbContext dbc)
-        {
-            return await dbc.Term.Where(x => x.IsDefaultTerm).FirstOrDefaultAsync();
-        }
-        public static Term? CurrentTerm(U3ADbContext dbc, DateTime today)
-        {
-            return dbc.Term.AsEnumerable().Where(x => today >= x.StartDate && today <= x.EndDate).FirstOrDefault();
-        }
-        public static Term? CurrentEnrolmentTermEx(U3ADbContext dbc)
-        {
-            var result = CurrentEnrolmentTerm(dbc);
-            var today = dbc.GetLocalTime().Date;
-            if (result == null) { result = CurrentTerm(dbc, today); }
-            if (result == null) { result = NextTerm(dbc, today); }
-            return result;
-        }
-
         public static Term? CurrentTerm(U3ADbContext dbc)
         {
             return dbc.Term.Where(x => x.IsDefaultTerm).FirstOrDefault();
         }
+        public static async Task<Term?> CurrentTermAsync(U3ADbContext dbc)
+        {
+            return await dbc.Term.Where(x => x.IsDefaultTerm).FirstOrDefaultAsync();
+        }
+        public static async Task<Term?> CurrentTermAsync(U3ADbContext dbc, DateTime today)
+        {
+            var terms = await dbc.Term
+                            .OrderBy(x => x.StartDate)
+                            .Where(x => today >= x.StartDate).ToListAsync();
+            return terms.Where(x => today <= x.EndDate).FirstOrDefault();
+        }
+
+        public static async Task<Term?> CurrentEnrolmentTermOrNextAsync(U3ADbContext dbc)
+        {
+            var result = await CurrentEnrolmentTermAsync(dbc);
+            var today = dbc.GetLocalTime().Date;
+            if (result == null) { result = await CurrentTermAsync(dbc, today); }
+            if (result == null) { result = await NextTermAsync(dbc, today); }
+            return result;
+        }
+
+        public static async Task<Term?> NextTermAsync(U3ADbContext dbc, DateTime today)
+        {
+            return await dbc.Term
+                .OrderBy(x => x.StartDate)
+                .FirstOrDefaultAsync(x => x.StartDate > today);
+        }
+
         public static Term? NextTerm(U3ADbContext dbc, DateTime today)
         {
             return dbc.Term
                 .OrderBy(x => x.StartDate)
-                .AsEnumerable()
                 .Where(x => x.StartDate > today).FirstOrDefault();
         }
+
+        public static async Task<Term?> CurrentEnrolmentTermAsync(U3ADbContext dbc)
+        {
+            var today = dbc.GetLocalTime().Date;
+            return (await dbc.Term.AsNoTracking()
+                        .OrderByDescending(x => x.Year)
+                        .ThenByDescending(x => x.TermNumber)
+                        .ToListAsync())
+                        .Where(x => today >= x.EnrolmentStartDate && today <= x.EnrolmentEndDate)
+                        .FirstOrDefault();
+        }
+        
         public static Term? CurrentEnrolmentTerm(U3ADbContext dbc)
         {
             var today = dbc.GetLocalTime().Date;
             return dbc.Term.AsNoTracking()
                         .OrderByDescending(x => x.Year).ThenByDescending(x => x.TermNumber).AsEnumerable()
+                        .Where(x => today >= x.EnrolmentStartDate && today <= x.EnrolmentEndDate)
+                        .FirstOrDefault();
+        }
+
+        public static async Task<Term?> CurrentEnrolmentTermAsync(U3ADbContext dbc, DateTime LocalNow)
+        {
+            var today = LocalNow.Date;
+            return (await dbc.Term
+                        .OrderByDescending(x => x.Year).ThenByDescending(x => x.TermNumber)
+                        .ToListAsync())
                         .Where(x => today >= x.EnrolmentStartDate && today <= x.EnrolmentEndDate)
                         .FirstOrDefault();
         }
@@ -99,7 +131,7 @@ namespace U3A.BusinessRules
 
         public static async Task<List<Term>> SelectableTermsInCurrentYearAsync(U3ADbContext dbc)
         {
-            var currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
+            var currentTerm = await BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
             return await SelectableTermsInCurrentYearAsync(dbc, currentTerm);
         }
         public static async Task<List<Term>> SelectableTermsInCurrentYearAsync(U3ADbContext dbc, Term CurrentTerm)
@@ -123,19 +155,10 @@ namespace U3A.BusinessRules
                 .OrderBy(x => x.Year).ThenBy(x => x.TermNumber)
                 .ToListAsync();
         }
-        public static List<Term> GetAllTermsInFuture(U3ADbContext dbc, Term CurrentTerm)
-        {
-            return dbc.Term.AsNoTracking().AsEnumerable()
-                .Where(x => x.Comparer >= CurrentTerm.Comparer)
-                .OrderBy(x => x.Year).ThenBy(x => x.TermNumber)
-                .ToList();
-        }
 
-        public static Term? FindTerm(U3ADbContext dbc, DateTime Date)
+        public static async Task<Term?> FindTermByDateAsync(U3ADbContext dbc, DateTime Date)
         {
-            return dbc.Term.AsNoTracking().AsEnumerable()
-                        .OrderByDescending(x => x.StartDate)
-                        .Where(x => x.StartDate <= Date).FirstOrDefault();
+            return await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.StartDate <= Date);
         }
         public static async Task<Term?> FindTermAsync(U3ADbContext dbc, DateTime Date)
         {

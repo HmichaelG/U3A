@@ -190,7 +190,7 @@ else
         service = new MemberFeeCalculationService();
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-        currentTerm = selectedTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
+        currentTerm = selectedTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
         IsSetSelectionEnrolledEnabled = true;
         courseComboEnabled = false;
         if (selectedTerm != null)

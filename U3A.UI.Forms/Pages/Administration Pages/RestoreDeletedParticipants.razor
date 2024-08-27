@@ -99,7 +99,7 @@ else
 
     async Task GetDataAsync()
     {
-        currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
+        currentTerm = await BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
         Participants = await BusinessRule.EditableDeletedPersonsAsync(dbc,currentTerm.Year);
     }
 

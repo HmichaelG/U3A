@@ -218,7 +218,7 @@ else
         {
             availablePayments = await feeService.GetAvailableMemberPaymentsAsync(dbc, loginState?.SelectedPerson);
             if (availablePayments.Count() > 0) selectedPaymentType = availablePayments.First();
-            term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
             settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         }
@@ -438,7 +438,7 @@ else
             {
                 IsProcessing = true;
                 InvokeAsync(StateHasChanged);
-                term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
                 await service.FinaliseEwayPyamentAsync(dbc, payment, term);
                 selectedPaymentType = null;

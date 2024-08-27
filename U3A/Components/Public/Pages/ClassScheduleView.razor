@@ -54,7 +54,7 @@ else
         dbc = await U3Adbfactory.CreateDbContextAsync();
         dbcT = await TenantDbfactory.CreateDbContextAsync();
         var today = DateTime.Today;
-        Term? term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        Term? term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
         if (term != null)
         {
             rpt = new ClassScheduleRpt();

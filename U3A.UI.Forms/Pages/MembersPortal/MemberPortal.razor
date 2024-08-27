@@ -153,7 +153,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
-        term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
         if (term == null)
         {
             term = await BusinessRule.CurrentTermAsync(dbc);

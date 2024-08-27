@@ -32,7 +32,7 @@ namespace U3A.WebFunctions.Procedures
                 if (string.IsNullOrWhiteSpace(settings!.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
 
                 //get the current enrolment term
-                var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
+                var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 if (currentTerm == null) return;
                 if (settings.AutoEnrolRemainderMethod.ToLower() == "random")
                 {

@@ -21,7 +21,7 @@ namespace U3A.BusinessRules
             var end = new DateTime(DateNow.Year, DateNow.Month, DateNow.Day, 23, 59, 59);
 
             // Find the term in which today's date falls.
-            var term = FindTerm(dbc, start);
+            var term = await FindTermByDateAsync(dbc, start);
             if (term == null) { return null; }
 
             // Get all classes for today
@@ -77,7 +77,7 @@ namespace U3A.BusinessRules
             var result = new List<MemberClassToday>();
 
             // Find the term in which today's date falls.
-            var term = FindTerm(dbc, DateNow.Date);
+            var term = await FindTermByDateAsync(dbc, DateNow.Date);
             if (term == null) { return null; }
 
             // Get the schedule storage for the current term

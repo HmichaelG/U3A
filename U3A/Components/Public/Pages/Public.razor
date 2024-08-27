@@ -255,7 +255,7 @@ else
                 {
                     // no ernolment term in force
                     var localTime = await lt.GetLocalTimeAsync();
-                    var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc, localTime);
+                    var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc, localTime);
                     if (currentTerm == null)
                     {
                         currentTerm = await BusinessRule.CurrentTermAsync(dbc);
@@ -280,7 +280,7 @@ else
                     if (openingTime != null)
                     {
                         isBeforeEnrolmentDay = true;
-                        var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                        var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                         var sOpeningTime = openingTime?.ToString("ddd dd-MMM-yy hh:mm tt");
                         lockoutMessage = $@"<strong>{term!.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.";
                     }

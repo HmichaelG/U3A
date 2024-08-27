@@ -125,7 +125,7 @@ else
         dbcT = await TenantDbfactory.CreateDbContextAsync();
         settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
         terms = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc);
-        currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
+        currentTerm = await BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
         selectedTerm = currentTerm;
         await SelectedTermChanged(selectedTerm);
         IsReady = true;

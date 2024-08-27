@@ -28,7 +28,7 @@ namespace U3A.BusinessRules
                     if (mcEnrolments.Any(x => x.IsWaitlisted))
                     {
                         var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-                        var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                        var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                         if (term != null)
                         {
                             var classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);

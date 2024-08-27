@@ -203,7 +203,7 @@ else
     {
         if (selectedPaymentStatus == null) { return; }
         await progressBar.ShowSmallSpinnerAsync();
-        var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
         if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
         if (term == null) { return; }
         var paymentService = new EwayPaymentService(dbc);

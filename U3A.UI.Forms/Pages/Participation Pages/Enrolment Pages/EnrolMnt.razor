@@ -323,7 +323,7 @@ else
         server.DocumentSentEvent += Server_DocumentSent;
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-        currentTerm = selectedTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
+        currentTerm = selectedTerm = await BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
         IsSetSelectionEnrolledEnabled = true;
         courseComboEnabled = false;
         if (selectedTerm != null)

@@ -361,7 +361,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 list.Add(enrollment.PersonID);
             }
             var people = await BusinessRule.SelectableFinancialPeopleAsync(dbc);
-            var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
             if (list.Count > 0)
             {

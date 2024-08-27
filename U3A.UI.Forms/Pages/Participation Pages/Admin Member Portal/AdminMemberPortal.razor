@@ -228,7 +228,7 @@ else
             {
                 isProcessing = true;
                 await InvokeAsync(StateHasChanged);
-                var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
                 foreach (var payment in (await BusinessRule.GetUnprocessedOnlinePayment(dbc)))
                 {

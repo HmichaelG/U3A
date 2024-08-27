@@ -817,7 +817,7 @@ namespace U3A.BusinessRules
         public static async Task<DateTime?> IsEnrolmentDayLockoutPeriod(U3ADbContext dbc, DateTime Today)
         {
             DateTime? result = null;
-            var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             if (term == null)
             {
                 term = await BusinessRule.CurrentTermAsync(dbc);

@@ -605,11 +605,11 @@ else
                 }
                 else
                 {
-                    term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                    term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 }
                 if (term == null)
                 {
-                    var currentTerm = BusinessRule.CurrentTerm(dbc);
+                    var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
                     if (dbc.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
                     {
                         SetUnavialable(currentTerm);

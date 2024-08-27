@@ -83,7 +83,7 @@ namespace U3A.WebFunctions.Procedures
 
             //Random Allocation Day
 
-            var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
+            var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             bool DoEnrolledButUnfinancial = false;
             if (currentTerm != null)
             {

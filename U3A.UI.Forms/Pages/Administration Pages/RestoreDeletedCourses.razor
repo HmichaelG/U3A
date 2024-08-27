@@ -96,7 +96,7 @@ else
 
     async Task GetDataAsync()
     {
-        currentTerm = BusinessRule.CurrentEnrolmentTermEx(dbc);
+        currentTerm =await  BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
         Courses = await BusinessRule.EditableDeletedCoursesAsync(dbc, currentTerm.Year);
     }
 

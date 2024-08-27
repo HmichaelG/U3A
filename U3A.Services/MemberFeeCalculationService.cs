@@ -218,7 +218,7 @@ namespace U3A.Services
         private async Task<Term> GetBillingTermAsync(U3ADbContext dbc)
         {
             Term result = null;
-            result = BusinessRule.CurrentEnrolmentTerm(dbc);
+            result = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             if (result == null)
             {
                 result = await BusinessRule.CurrentTermAsync(dbc);

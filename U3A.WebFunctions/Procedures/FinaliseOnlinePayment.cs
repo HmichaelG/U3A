@@ -15,7 +15,7 @@ namespace U3A.WebFunctions.Procedures
             using (var dbc = new U3ADbContext(tenant))
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-                var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+                var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
                 if (term == null) { return; }
                 var paymentService = new EwayPaymentService(dbc);

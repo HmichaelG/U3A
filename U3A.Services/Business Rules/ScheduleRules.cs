@@ -313,7 +313,7 @@ namespace U3A.BusinessRules
             List<MultiCampusSchedule> schedules = new List<MultiCampusSchedule>();
             List<MultiCampusSchedule> multiCampusSchedules = new List<MultiCampusSchedule>();
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-            var term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             if (term != null)
             {
                 var now = dbc.GetLocalTime().Date;

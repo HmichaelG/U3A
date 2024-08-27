@@ -357,7 +357,7 @@ namespace U3A.BusinessRules
 
         async static Task ApplyGroupsAsync(U3ADbContext dbc, List<Person> people)
         {
-            Term? term = BusinessRule.CurrentEnrolmentTerm(dbc);
+            Term? term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
             if (term != null)
             {

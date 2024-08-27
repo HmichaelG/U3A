@@ -71,7 +71,7 @@ else
         dbcT = await TenantDbfactory.CreateDbContextAsync();
         // wire up the data
         settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-        term = BusinessRule.CurrentEnrolmentTerm(dbc);
+        term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
         if (term != null)
         {
             classes = await BusinessRule.RestoreClassesFromMultiCampusScheduleAsync(dbc, dbcT, tenantService, term, settings);

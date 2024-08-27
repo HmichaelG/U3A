@@ -103,9 +103,9 @@ else {
                             .OrderBy(x => x.ID)
                             .FirstOrDefaultAsync();
                 var today = await localTime.GetLocalDateAsync();
-                selectedTerm = BusinessRule.CurrentTerm(dbContext, today);
-                if (selectedTerm == null) { selectedTerm = BusinessRule.CurrentEnrolmentTerm(dbContext); }
-                if (selectedTerm == null) { selectedTerm = BusinessRule.NextTerm(dbContext, today); }
+                selectedTerm = await BusinessRule.CurrentTermAsync(dbContext, today);
+                if (selectedTerm == null) { selectedTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbContext); }
+                if (selectedTerm == null) { selectedTerm = await BusinessRule.NextTermAsync(dbContext, today); }
                 terms = await BusinessRule.SelectableRelaxedTermsAsync(dbContext);
                 isLeader = await BusinessRule.IsLeaderOrClerk(dbContext, leader, selectedTerm);
                 if (!isLeader) {

@@ -115,7 +115,7 @@
         courseComboEnabled = false;
         quickMessage = new MarkupString(string.Empty);
         terms = await BusinessRule.SelectableRelaxedTermsAsync(mDbc);
-        selectedTerm = BusinessRule.CurrentEnrolmentTerm(mDbc);
+        selectedTerm = await BusinessRule.CurrentEnrolmentTermAsync(mDbc);
         if (selectedTerm != null) { await SelectedTermChanged(selectedTerm); }
     }
 

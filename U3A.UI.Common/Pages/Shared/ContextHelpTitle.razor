@@ -144,7 +144,7 @@
                     inMaintenanceMessage = "Warning: You are in Member Portal Maintenance Mode";
                 }
 
-                var currentTerm = BusinessRule.CurrentEnrolmentTerm(dbc);
+                var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 if (currentTerm != null)
                 {
                     if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
