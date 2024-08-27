@@ -20,37 +20,37 @@
 {
     <div class="page">
 
-            <CascadingValue Value=@openCircuits Name="OpenCircuits">
-                <CascadingValue Value="@loginState">
-                    <CascadingValue Value="@hasRole" Name="HasRole">
-                        @if (hasRole)
+        <CascadingValue Value=@openCircuits Name="OpenCircuits">
+            <CascadingValue Value="@loginState">
+                <CascadingValue Value="@hasRole" Name="HasRole">
+                    @if (hasRole)
+                    {
+                        if (useTopMenu.HasValue)
                         {
-                            if (useTopMenu.HasValue)
+                            if (useTopMenu.Value)
                             {
-                                if (useTopMenu.Value)
-                                {
-                                    <MainLayoutTopMenu Body="@Body" />
-                                }
-                                else
-                                {
-                                    <MainLayoutSideMenu Body="@Body" />
-                                }
+                                <MainLayoutTopMenu Body="@Body" />
+                            }
+                            else
+                            {
+                                <MainLayoutSideMenu Body="@Body" />
                             }
                         }
-                        else
-                        {
-                            <MainLayoutTopMenu Body="@Body" />
-                        }
+                    }
+                    else
+                    {
+                        <MainLayoutTopMenu Body="@Body" />
+                    }
 
-                        @* For logout *@
-                        <form id="logout-form" action="Account/Logout" @formname="logout" method="post">
-                            <AntiforgeryToken />
-                            <input type="hidden" name="ReturnUrl" value="~/" />
-                        </form>
+                    @* For logout *@
+                    <form id="logout-form" action="Account/Logout" @formname="logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="~/" />
+                    </form>
 
-                    </CascadingValue>
                 </CascadingValue>
             </CascadingValue>
+        </CascadingValue>
 
     </div>
 }
@@ -146,7 +146,7 @@
                 await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
             }
             catch { };
-            await ws.SetWorkstationDetail(js, localStorage);
+            await ws.SetWorkstationDetail(js, localStorage, hasRole);
             useTopMenu = ws.UseTopMenu;
             await InvokeAsync(StateHasChanged);
         }
@@ -160,7 +160,7 @@
         {
             navMan.NavigateTo("closed.html", true);
         }
-        catch (Exception e){};
+        catch (Exception e) { };
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)
