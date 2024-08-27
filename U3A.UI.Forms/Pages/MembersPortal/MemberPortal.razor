@@ -15,7 +15,6 @@
 
 @attribute [Authorize]
 
-<DxLayoutBreakpoint MinWidth="1200" @bind-IsActive="@IsSmallLayout" />
 
 @if (!IsReady)
 {
@@ -28,6 +27,7 @@ else
 
     <Progress @ref=@ProgressBar />
 
+    <div class="mt-4 col-12 mx-auto row">
     @switch (menuSelection)
     {
         case PortalMenuSelection.DoSelectLinkedMember:
@@ -112,6 +112,7 @@ else
             OnReturnToAdminPortal.InvokeAsync();
             break;
     }
+    </div>
 }
 <style>
     .report-viewer {
@@ -135,7 +136,6 @@ else
 
     bool IsReady;
     bool IsProcessing;
-    bool IsSmallLayout;
     bool IsNewLinkedMember;
     U3ADbContext? dbc;
     SystemSettings? settings;

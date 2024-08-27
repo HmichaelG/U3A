@@ -14,9 +14,9 @@ else
 {
 
     <MessageBox @ref="@messageBox" />
-    <DxFormLayout>
+    <DxFormLayout CssClass="mt-4">
         <div class=@((isOnBehalfOf)
-         ? "my-2"
+         ? ""
          : "col-12 col-md-8 mx-auto pb-2")>
             <div class="p-2 w-100 text-center text-info">
                 To add leave, click the <span class="text-success h6 bi bi-plus-lg"></span> button below.
@@ -26,7 +26,7 @@ else
                 click the <span class="text-danger h6 bi bi-trash"></span> to delete.
             </div>
             <DxGrid @ref="Grid" CustomizeElement="OnCustomizeElement"
-                    CssClass="grid-height px-2" id="myGrid"
+                    CssClass="grid-height" id="myGrid"
                     Data="DataSource"
                     PageSize="12"
                     KeyFieldName="ID"
@@ -98,7 +98,7 @@ else
     }
 
     .grid-height {
-        height: calc(100dvh - @(ws.UseTopMenu ? (LeaderCourse != null) ? "30rem" : "14rem" : (LeaderCourse != null) ? "28rem" : "12rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "34rem"  : "30rem"));
     }
 </style>
 

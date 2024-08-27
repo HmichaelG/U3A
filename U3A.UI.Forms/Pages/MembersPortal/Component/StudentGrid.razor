@@ -13,81 +13,82 @@
 }
 else
 {
-
-    <DxGrid @ref=@grid Data="@Enrolments" CssClass="grid-height" id="myGrid"
-            ShowAllRows="true"
-            ShowSearchBox=true
-            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-            KeyFieldName="ID"
-            ValidationEnabled="true"
-            SelectionMode="GridSelectionMode.Multiple"
-            AllowSelectRowByClick="false"
-            UnboundColumnData="Grid_CustomUnboundColumnData"
-            @bind-SelectedDataItems="SelectedDataItems">
-        <Columns>
-            <DxGridSelectionColumn Width="1rem" />
-            <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
-                              Visible="@(!IsManageEnrolmentsView)"
-                              UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
-                              Visible="@IsManageEnrolmentsView" />
-            <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag">
-                <CellDisplayTemplate>
-                    @{
-                        if (context.DataItem != null)
-                        {
-                            Enrolment e = (Enrolment)context.DataItem;
-                            var isCourseClerk = e.IsCourseClerk;
-                            var hasEmail = !e.Person.IsEmailSilent;
-                            var hasMobile = !e.Person.IsPhoneSilent && !e.Person.SMSOptOut;
-                            var namecss = "col-8 text-start ";
-                            var emailcss = (hasEmail) ? "col-2 bi-envelope" : "col-2";
-                            var mobilecss = (hasMobile) ? "col-2 bi-phone" : "col-2";
-                            var outerCss = "w-100";
-                            if (isCourseClerk) outerCss += " badge badge-size bg-success text-white";
-                            <div class="@outerCss">
-                                <div class="input-group">
-                                    <div class=@namecss>@context.Value</div>
-                                    <div class=@mobilecss></div>
-                                    <div class=@emailcss></div>
+    <div class="mt-3">
+        <DxGrid @ref=@grid Data="@Enrolments" CssClass="grid-height" id="myGrid"
+                ShowAllRows="true"
+                ShowSearchBox=true
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                KeyFieldName="ID"
+                ValidationEnabled="true"
+                SelectionMode="GridSelectionMode.Multiple"
+                AllowSelectRowByClick="false"
+                UnboundColumnData="Grid_CustomUnboundColumnData"
+                @bind-SelectedDataItems="SelectedDataItems">
+            <Columns>
+                <DxGridSelectionColumn Width="1rem" />
+                <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
+                                  Visible="@(!IsManageEnrolmentsView)"
+                                  UnboundType="GridUnboundColumnType.Integer" />
+                <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
+                                  Visible="@IsManageEnrolmentsView" />
+                <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag">
+                    <CellDisplayTemplate>
+                        @{
+                            if (context.DataItem != null)
+                            {
+                                Enrolment e = (Enrolment)context.DataItem;
+                                var isCourseClerk = e.IsCourseClerk;
+                                var hasEmail = !e.Person.IsEmailSilent;
+                                var hasMobile = !e.Person.IsPhoneSilent && !e.Person.SMSOptOut;
+                                var namecss = "col-8 text-start ";
+                                var emailcss = (hasEmail) ? "col-2 bi-envelope" : "col-2";
+                                var mobilecss = (hasMobile) ? "col-2 bi-phone" : "col-2";
+                                var outerCss = "w-100";
+                                if (isCourseClerk) outerCss += " badge badge-size bg-success text-white";
+                                <div class="@outerCss">
+                                    <div class="input-group">
+                                        <div class=@namecss>@context.Value</div>
+                                        <div class=@mobilecss></div>
+                                        <div class=@emailcss></div>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         }
-                    }
-                </CellDisplayTemplate>
-            </DxGridDataColumn>
-            <DxGridDataColumn Caption="NoSMS" FieldName="Person.SMSOptOut"
-                              Width="3rem">
-            </DxGridDataColumn>
-            <DxGridDataColumn Caption="Vax?" FieldName="Person.VaxCertificateViewed"
-                              Width="3rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
-            </DxGridDataColumn>
-            <DxGridDataColumn Caption="Enrolled"
-                              FieldName="DateEnrolled"
-                              Visible="!IsSmallLayout"
-                              Width="4rem" DisplayFormat="{0:dd/MM/yy}" />
-            <DxGridDataColumn Caption="Fin-To"
-                              FieldName="Person.FinancialToBriefText"
-                              Visible="!IsSmallLayout"
-                              Width="4rem" />
-            <DxGridDataColumn Caption="Mobile"
-                              Visible="!IsSmallLayout"
-                              FieldName="Person.MobileOrSilent"
-                              Width="6rem" />
-            <DxGridDataColumn Caption="Home"
-                              Visible="!IsSmallLayout"
-                              FieldName="Person.HomePhoneOrSilent"
-                              Width="6rem" />
-            <DxGridDataColumn Caption="Due" Width="3rem" FieldName="Due"
-                              Visible="@(!IsSmallLayout && AreFeesPayable)"
-                              DisplayFormat="c2"
-                              UnboundType="GridUnboundColumnType.Decimal" />
-        </Columns>
-    </DxGrid>
-    <p>
-        @(SelectedDataItemsCount().ToString("f0"))
-        students selected.
-    </p>
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn Caption="NoSMS" FieldName="Person.SMSOptOut"
+                                  Width="3rem">
+                </DxGridDataColumn>
+                <DxGridDataColumn Caption="Vax?" FieldName="Person.VaxCertificateViewed"
+                                  Width="3rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
+                </DxGridDataColumn>
+                <DxGridDataColumn Caption="Enrolled"
+                                  FieldName="DateEnrolled"
+                                  Visible="!IsSmallLayout"
+                                  Width="4rem" DisplayFormat="{0:dd/MM/yy}" />
+                <DxGridDataColumn Caption="Fin-To"
+                                  FieldName="Person.FinancialToBriefText"
+                                  Visible="!IsSmallLayout"
+                                  Width="4rem" />
+                <DxGridDataColumn Caption="Mobile"
+                                  Visible="!IsSmallLayout"
+                                  FieldName="Person.MobileOrSilent"
+                                  Width="6rem" />
+                <DxGridDataColumn Caption="Home"
+                                  Visible="!IsSmallLayout"
+                                  FieldName="Person.HomePhoneOrSilent"
+                                  Width="6rem" />
+                <DxGridDataColumn Caption="Due" Width="3rem" FieldName="Due"
+                                  Visible="@(!IsSmallLayout && AreFeesPayable)"
+                                  DisplayFormat="c2"
+                                  UnboundType="GridUnboundColumnType.Decimal" />
+            </Columns>
+        </DxGrid>
+        <p>
+            @(SelectedDataItemsCount().ToString("f0"))
+            students selected.
+        </p>
+    </div>
 }
 <style>
     .grid-height {
