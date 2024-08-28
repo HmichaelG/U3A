@@ -22,7 +22,10 @@ else
     <MessageBox @ref="@messageBox" />
 
     <CollapsableContent DismissKey="{1DEB1DEF-F91A-4228-B947-28020E9A9E16}"
-        AlertText="<p><strong>Fees Due</strong> includes all fees outstanding not just fees for the selected course. Click a member row to view their statement of account.</p>" />
+        AlertText="<p><strong>Fees Due</strong> includes all fees outstanding not just fees for the selected course. Click a member row to view their statement of account.</p>"
+                        OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+                        OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+
     <Progress @ref="@ProgressBar" />
 
     <DxFormLayout>
@@ -33,7 +36,7 @@ else
                                    @bind-SelectedTerm="@selectedTerm"
                                    @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
                 </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Course" ColSpanMd="12">
+                <DxFormLayoutItem Caption="Course" ColSpanMd="6">
                     <DxComboBox Data="@courses"
                                 Enabled="@courseComboEnabled"
                                 NullText="@courseComboNullText"
@@ -50,7 +53,7 @@ else
                                             Width="75%" />
                     </DxComboBox>
                 </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Class" ColSpanMd="12">
+                <DxFormLayoutItem Caption="Class" ColSpanMd="6">
                     <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
                                 TextFieldName="@nameof(Class.ClassSummary)"
                                 Value="@selectedClass"
@@ -65,7 +68,7 @@ else
             </DxTabs>
 
 
-            <FullScreen DisplayOffset="26">
+            <FullScreen @ref=@fullScreen DisplayOffset="@contentSize">
                 <ContentTemplate>
                     <DxGrid Data="@Enrolments" @ref=@mainGrid
                             ShowAllRows="true"
@@ -168,6 +171,9 @@ else
     private bool classComboEnabled;
     private string courseComboNullText = "Select the Course to enrol...";
     private bool courseComboEnabled;
+    int contentSize;
+    FullScreen? fullScreen;
+
 
     private DxComboBox<Class, Class?> ClassComboBox;
 
@@ -213,6 +219,12 @@ else
                 NavMan.NavigateTo("/");
             }
         }
+    }
+
+    void OnContentChange(bool IsDismissed)
+    {
+        contentSize = (IsDismissed) ? 17 : 24;
+        StateHasChanged();
     }
 
     async Task SelectedTermChanged(Term term)
