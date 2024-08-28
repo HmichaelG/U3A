@@ -12,13 +12,13 @@ namespace U3A.Model
 {
     public class WorkStation
     {
-        public bool UseTopMenu { get; private set; }
+        public bool UseTopMenu { get; set; }
         public string ID { get; private set; }
 
         const string WORKSTATION_ID = "WorkstationID";
         const string USE_TOP_MENU_KEY = "use-topmenu";
 
-        public async Task SetWorkstationDetail(IJSRuntime js, ILocalStorageService localStorage, bool HasRole)
+        public async Task SetWorkstationDetail(IJSRuntime js, ILocalStorageService localStorage)
         {
             //workstation ID
             var id = await localStorage.GetItemAsync<string>(WORKSTATION_ID);
@@ -30,11 +30,7 @@ namespace U3A.Model
             ID = id;
             // Use top menu
             UseTopMenu = false;
-            if (!HasRole)
-            {
-                UseTopMenu = true;
-            }
-            else if (await localStorage.ContainKeyAsync(USE_TOP_MENU_KEY))
+            if (await localStorage.ContainKeyAsync(USE_TOP_MENU_KEY))
             {
                 UseTopMenu = await localStorage.GetItemAsync<bool>(USE_TOP_MENU_KEY);
             }

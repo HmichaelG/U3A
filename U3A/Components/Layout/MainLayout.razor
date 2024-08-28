@@ -146,7 +146,7 @@
                 await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
             }
             catch { };
-            await ws.SetWorkstationDetail(js, localStorage, hasRole);
+            await ws.SetWorkstationDetail(js, localStorage);
             useTopMenu = ws.UseTopMenu;
             await InvokeAsync(StateHasChanged);
         }

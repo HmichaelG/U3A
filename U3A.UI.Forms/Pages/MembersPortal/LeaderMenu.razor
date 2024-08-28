@@ -26,7 +26,7 @@ else
 {
     @if (menuSelection != MenuOptions.RecordAttendance)
     {
-        <DxFormLayout CssClass="col col-12 col-md-8 mx-auto border pt-4 px-4 mb-1">
+        <DxFormLayout CssClass="col col-12 col-md-8 mx-auto border pt-3 px-4 mb-1">
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None">
                 <div class="card text-center alert alert-success text-dark w-100">
                     <span>@welcomeText</span>
@@ -47,225 +47,227 @@ else
                               Report="GetMemberBadgeReport()" />
             break;
         case MenuOptions.AddEditStudentLeave:
-            <DxFormLayout CssClass="col col-12">
-                    <DxFormLayoutGroup Caption="Add / Edit Student Leave" ColSpanMd="12">
-                        <DxFormLayoutItem Caption="Select" ColSpanLg="12">
-                            <DxComboBox Data="@Students"
-                                        AllowUserInput=true
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        SearchMode="ListSearchMode.AutoSearch"
-                                        ListRenderMode="ListRenderMode.Virtual"
-                                        TextFieldName="@nameof(Person.FullName)"
-                                        ValueChanged="@((Person student) => OnSelectedStudentChanged(student))"
-                                        Value="@selectedStudent">
-                                <DxListEditorColumn FieldName="@nameof(Person.LastName)"
-                                                    Caption="Last Name" />
-                                <DxListEditorColumn FieldName="@nameof(Person.FirstName)"
-                                                    Caption="First Name" />
-                            </DxComboBox>
-                        </DxFormLayoutItem>
-                    </DxFormLayoutGroup>
-                    @if (selectedStudent != null)
-                    {
-                        <MemberLeave ProcessOnBehalfOf="@selectedStudent"
-                                     LeaderCourse="@selectedCourse" />
-                    }
+            <DxFormLayout CssClass="col col-12 col-md-8 mx-auto">
+                <DxFormLayoutGroup Caption="Add / Edit Student Leave" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Select" ColSpanLg="12">
+                        <DxComboBox Data="@Students"
+                                    AllowUserInput=true
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    SearchMode="ListSearchMode.AutoSearch"
+                                    ListRenderMode="ListRenderMode.Virtual"
+                                    TextFieldName="@nameof(Person.FullName)"
+                                    ValueChanged="@((Person student) => OnSelectedStudentChanged(student))"
+                                    Value="@selectedStudent">
+                            <DxListEditorColumn FieldName="@nameof(Person.LastName)"
+                                                Caption="Last Name" />
+                            <DxListEditorColumn FieldName="@nameof(Person.FirstName)"
+                                                Caption="First Name" />
+                        </DxComboBox>
+                    </DxFormLayoutItem>
+                </DxFormLayoutGroup>
+                @if (selectedStudent != null)
+                {
+                    <MemberLeave IsAdminPortal="@IsAdminPortal" 
+                                 ProcessOnBehalfOf="@selectedStudent"
+                                 LeaderCourse="@selectedCourse" />
+                }
             </DxFormLayout>
             break;
         case MenuOptions.StudentLookup:
-            <DxFormLayout CssClass="col col-12">
-                    <DxFormLayoutGroup Caption="Student Lookup" ColSpanMd="12">
-                        <DxFormLayoutItem Caption="Select" ColSpanLg="12">
-                            <DxComboBox Data="@StudentsAndLeaders"
-                                        AllowUserInput=true
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        SearchMode="ListSearchMode.AutoSearch"
-                                        ListRenderMode="ListRenderMode.Virtual"
-                                        TextFieldName="@nameof(StudentDetails.FullName)"
-                                        ValueChanged="@((StudentDetails student) => OnSelectedStudentLookupChanged(student))"
-                                        Value="@selectedLookupStudent">
-                                <DxListEditorColumn FieldName="@nameof(StudentDetails.LastName)"
-                                                    Caption="Last Name" />
-                                <DxListEditorColumn FieldName="@nameof(StudentDetails.FirstName)"
-                                                    Caption="First Name" />
-                                <DxListEditorColumn FieldName="@nameof(StudentDetails.Status)"
-                                                    Caption="Status" />
-                            </DxComboBox>
-                            @if (selectedLookupStudent != null)
-                            {
-                                <table class="table mt-2">
-                                    <tbody>
-                                        @{
-                                            if (!string.IsNullOrWhiteSpace(selectedLookupStudent?.Person.HomePhone))
-                                            {
-                                                <tr class="d-flex">
-                                                    <td class="col-md-2"><strong>Home:</strong></td>
-                                                    <td class="col-md-10">@selectedLookupStudent.Person.HomePhoneOrSilent</td>
-                                                </tr>
-                                            }
-                                            if (!string.IsNullOrWhiteSpace(selectedLookupStudent?.Person.Mobile))
-                                            {
-                                                string mobile = selectedLookupStudent.Person.MobileOrSilent;
-                                                <tr class="d-flex">
-                                                    <td class="col-md-2"><strong>Mobile:</strong></td>
-                                                    <td class="col-md-10">@mobile</td>
-                                                </tr>
-                                            }
+            <DxFormLayout CssClass="col col-12 col-md-8 mx-auto">
+                <DxFormLayoutGroup Caption="Student Lookup" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Select" ColSpanLg="12">
+                        <DxComboBox Data="@StudentsAndLeaders"
+                                    AllowUserInput=true
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    SearchMode="ListSearchMode.AutoSearch"
+                                    ListRenderMode="ListRenderMode.Virtual"
+                                    TextFieldName="@nameof(StudentDetails.FullName)"
+                                    ValueChanged="@((StudentDetails student) => OnSelectedStudentLookupChanged(student))"
+                                    Value="@selectedLookupStudent">
+                            <DxListEditorColumn FieldName="@nameof(StudentDetails.LastName)"
+                                                Caption="Last Name" />
+                            <DxListEditorColumn FieldName="@nameof(StudentDetails.FirstName)"
+                                                Caption="First Name" />
+                            <DxListEditorColumn FieldName="@nameof(StudentDetails.Status)"
+                                                Caption="Status" />
+                        </DxComboBox>
+                        @if (selectedLookupStudent != null)
+                        {
+                            <table class="table mt-2">
+                                <tbody>
+                                    @{
+                                        if (!string.IsNullOrWhiteSpace(selectedLookupStudent?.Person.HomePhone))
+                                        {
+                                            <tr class="d-flex">
+                                                <td class="col-md-2"><strong>Home:</strong></td>
+                                                <td class="col-md-10">@selectedLookupStudent.Person.HomePhoneOrSilent</td>
+                                            </tr>
                                         }
-                                        <tr class="d-flex">
-                                            <td class="col-md-2"><strong>ICE Phone:</strong></td>
-                                            <td class="col-md-10">@selectedLookupStudent.Person.ICEPhone</td>
-                                        </tr>
-                                        <tr class="d-flex">
-                                            <td class="col-md-2"><strong>ICE Contact:</strong></td>
-                                            <td class="col-md-10">@selectedLookupStudent.Person.ICEContact</td>
-                                        </tr>
-                                        <tr class="d-flex">
-                                            <td class="col-md-2"><strong>Address:</strong></td>
-                                            <td class="col-md-10">@($"{selectedLookupStudent.Person.Address} {selectedLookupStudent.Person.City} {selectedLookupStudent.Person.State}")</td>
-                                        </tr>
-                                        <tr class="d-flex">
-                                            <td class="col-md-2"><strong>Email:</strong></td>
-                                            <td class="col-md-10">@selectedLookupStudent.Person.Email</td>
-                                        </tr>
-                                        <tr class="d-flex">
-                                            <td class="col-md-2"><strong>Course Clerk:</strong></td>
-                                            <td class="col-md-10">
-                                                @((selectedEnrolment.IsCourseClerk) ? "Yes" : "No")
-                                            </td>
-                                        </tr>
-                                        <tr class="d-flex">
-                                            <td class="col-md-2"><strong>Status:</strong></td>
-                                            <td class="col-md-10">
-                                                @selectedLookupStudent.Status
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div class="input-group mb-1">
-                                    @if (!selectedLookupStudent.Person.IsPhoneSilent && !selectedLookupStudent.Person.SMSOptOut)
-                                    {
-                                        <DxButton CssClass="flex-grow-1"
-                                                  Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.Mobile))"
-                                                  IconCssClass="bi bi-phone"
-                                                  Text="SMS"
-                                                  RenderStyle="@ButtonRenderStyle.Primary"
-                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                  Click="() => OnSMS(selectedLookupStudent.Person.Mobile)" />
+                                        if (!string.IsNullOrWhiteSpace(selectedLookupStudent?.Person.Mobile))
+                                        {
+                                            string mobile = selectedLookupStudent.Person.MobileOrSilent;
+                                            <tr class="d-flex">
+                                                <td class="col-md-2"><strong>Mobile:</strong></td>
+                                                <td class="col-md-10">@mobile</td>
+                                            </tr>
+                                        }
                                     }
-                                    @if (!selectedLookupStudent.Person.IsPhoneSilent)
-                                    {
-                                        <DxButton CssClass="flex-grow-1"
-                                                  Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.HomePhone))"
-                                                  IconCssClass="bi bi-telephone"
-                                                  Text="Home"
-                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                  RenderStyle="@ButtonRenderStyle.Primary"
-                                                  Click="() => OnPhone(selectedLookupStudent.Person.HomePhone)" />
-                                    }
-                                    @if (!selectedLookupStudent.Person.IsPhoneSilent)
-                                    {
-                                        <DxButton CssClass="flex-grow-1"
-                                                  Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.Mobile))"
-                                                  IconCssClass="bi bi-phone"
-                                                  Text="Mobile"
-                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                  RenderStyle="@ButtonRenderStyle.Primary"
-                                                  Click="() => OnPhone(selectedLookupStudent.Person.Mobile)" />
-                                    }
+                                    <tr class="d-flex">
+                                        <td class="col-md-2"><strong>ICE Phone:</strong></td>
+                                        <td class="col-md-10">@selectedLookupStudent.Person.ICEPhone</td>
+                                    </tr>
+                                    <tr class="d-flex">
+                                        <td class="col-md-2"><strong>ICE Contact:</strong></td>
+                                        <td class="col-md-10">@selectedLookupStudent.Person.ICEContact</td>
+                                    </tr>
+                                    <tr class="d-flex">
+                                        <td class="col-md-2"><strong>Address:</strong></td>
+                                        <td class="col-md-10">@($"{selectedLookupStudent.Person.Address} {selectedLookupStudent.Person.City} {selectedLookupStudent.Person.State}")</td>
+                                    </tr>
+                                    <tr class="d-flex">
+                                        <td class="col-md-2"><strong>Email:</strong></td>
+                                        <td class="col-md-10">@selectedLookupStudent.Person.Email</td>
+                                    </tr>
+                                    <tr class="d-flex">
+                                        <td class="col-md-2"><strong>Course Clerk:</strong></td>
+                                        <td class="col-md-10">
+                                            @((selectedEnrolment.IsCourseClerk) ? "Yes" : "No")
+                                        </td>
+                                    </tr>
+                                    <tr class="d-flex">
+                                        <td class="col-md-2"><strong>Status:</strong></td>
+                                        <td class="col-md-10">
+                                            @selectedLookupStudent.Status
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="input-group mb-1">
+                                @if (!selectedLookupStudent.Person.IsPhoneSilent && !selectedLookupStudent.Person.SMSOptOut)
+                                {
                                     <DxButton CssClass="flex-grow-1"
-                                              Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.ICEPhone))"
+                                              Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.Mobile))"
+                                              IconCssClass="bi bi-phone"
+                                              Text="SMS"
+                                              RenderStyle="@ButtonRenderStyle.Primary"
+                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                              Click="() => OnSMS(selectedLookupStudent.Person.Mobile)" />
+                                }
+                                @if (!selectedLookupStudent.Person.IsPhoneSilent)
+                                {
+                                    <DxButton CssClass="flex-grow-1"
+                                              Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.HomePhone))"
                                               IconCssClass="bi bi-telephone"
-                                              Text="ICE"
+                                              Text="Home"
                                               RenderStyleMode="ButtonRenderStyleMode.Outline"
                                               RenderStyle="@ButtonRenderStyle.Primary"
-                                              Click="() => OnPhone(selectedLookupStudent.Person.ICEPhone)" />
-                                </div>
-                            }
-                        </DxFormLayoutItem>
-                    </DxFormLayoutGroup>
+                                              Click="() => OnPhone(selectedLookupStudent.Person.HomePhone)" />
+                                }
+                                @if (!selectedLookupStudent.Person.IsPhoneSilent)
+                                {
+                                    <DxButton CssClass="flex-grow-1"
+                                              Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.Mobile))"
+                                              IconCssClass="bi bi-phone"
+                                              Text="Mobile"
+                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                              RenderStyle="@ButtonRenderStyle.Primary"
+                                              Click="() => OnPhone(selectedLookupStudent.Person.Mobile)" />
+                                }
+                                <DxButton CssClass="flex-grow-1"
+                                          Visible="@(!string.IsNullOrWhiteSpace(selectedLookupStudent.Person.ICEPhone))"
+                                          IconCssClass="bi bi-telephone"
+                                          Text="ICE"
+                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                          RenderStyle="@ButtonRenderStyle.Primary"
+                                          Click="() => OnPhone(selectedLookupStudent.Person.ICEPhone)" />
+                            </div>
+                        }
+                    </DxFormLayoutItem>
+                </DxFormLayoutGroup>
             </DxFormLayout>
             break;
 
         case MenuOptions.AssignCourseClerk:
-            <DxFormLayout CssClass="col col-12">
-                    <StudentGrid @ref="studentGrid"
-                                 Enrolments="EnrolmentsToSelectFrom"
-                                 Settings="settings" />
-                    <DxButton Text="Assign Course Clerk"
-                              IconCssClass="bi-person-badge menu-icon me-3 h2"
-                              CssClass="col-12 my-1"
-                              Click="@(e => OnAssignCourseClerk())"
-                              RenderStyle="ButtonRenderStyle.Primary"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline">
-                    </DxButton>
+            <DxFormLayout CssClass="px-4 col col-12 col-md-8 mx-auto">
+                <StudentGrid @ref="studentGrid"
+                             Enrolments="EnrolmentsToSelectFrom"
+                             Settings="settings" />
+                <DxButton Text="Assign Course Clerk"
+                          IconCssClass="bi-person-badge menu-icon me-3 h2"
+                          CssClass="col-12 my-1"
+                          Click="@(e => OnAssignCourseClerk())"
+                          RenderStyle="ButtonRenderStyle.Primary"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline">
+                </DxButton>
             </DxFormLayout>
             break;
 
         case MenuOptions.AttendanceHistory:
-            <DxFormLayout CssClass="col col-12 p-4">
-                    <AttendanceGrid SelectedClass="@selectedClass"
-                                    SelectedTerm="@selectedTerm" LocalTime="@localTime" />
+            <DxFormLayout CssClass="col col-12 col-md-8 mx-auto p-4">
+                <AttendanceGrid SelectedClass="@selectedClass"
+                                SelectedTerm="@selectedTerm" LocalTime="@localTime" />
             </DxFormLayout>
             break;
 
         case MenuOptions.ManageEnrolments:
-            <DxFormLayout CssClass="col col-12">
-                    <StudentGrid @ref="studentGrid"
-                                 Enrolments="EnrolmentsToSelectFrom"
-                                 Settings="settings" IsManageEnrolmentsView=true />
-                    <div class="input-group">
-                        <DxButton Text="Delete Selected"
-                                  IconCssClass="bi-person-dash menu-icon me-3 h2"
-                                  CssClass="flex-grow-1 mb-1"
-                                  Click="@(e => OnDeleteEnrolments())"
-                                  RenderStyle="ButtonRenderStyle.Danger"
-                                  RenderStyleMode="ButtonRenderStyleMode.Contained">
-                        </DxButton>
-                        <DxButton Text="Toggle WaitList"
-                                  IconCssClass="bi-toggle-on menu-icon me-3 h2"
-                                  CssClass="flex-grow-1 mb-1"
-                                  Click="@(e => OnToggleWaitlist())"
-                                  RenderStyle="ButtonRenderStyle.Warning"
-                                  RenderStyleMode="ButtonRenderStyleMode.Contained">
-                        </DxButton>
-                    </div>
+            <DxFormLayout CssClass="px-4 col col-12 col-md-8 mx-auto">
+                <StudentGrid @ref="studentGrid"
+                             Enrolments="EnrolmentsToSelectFrom"
+                             Settings="settings" IsManageEnrolmentsView=true />
+                <div class="input-group">
+                    <DxButton Text="Delete Selected"
+                              IconCssClass="bi-person-dash menu-icon me-3 h2"
+                              CssClass="flex-grow-1 mb-1"
+                              Click="@(e => OnDeleteEnrolments())"
+                              RenderStyle="ButtonRenderStyle.Danger"
+                              RenderStyleMode="ButtonRenderStyleMode.Contained">
+                    </DxButton>
+                    <DxButton Text="Toggle WaitList"
+                              IconCssClass="bi-toggle-on menu-icon me-3 h2"
+                              CssClass="flex-grow-1 mb-1"
+                              Click="@(e => OnToggleWaitlist())"
+                              RenderStyle="ButtonRenderStyle.Warning"
+                              RenderStyleMode="ButtonRenderStyleMode.Contained">
+                    </DxButton>
+                </div>
             </DxFormLayout>
             break;
 
         case MenuOptions.Communicate:
-            <DxFormLayout CssClass="col col-12">
-                    <StudentGrid @ref="studentGrid"
-                                 Enrolments="EnrolmentsToSelectFrom"
-                                 Settings="settings" />
-                    <div class="input-group">
-                        <DxButton Text="Email"
-                                  IconCssClass="bi-envelope menu-icon me-3 h2"
-                                  CssClass="flex-grow-1 mb-1"
-                                  Click="@(e => GetStudentEmailAddressList())"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="SMS"
-                                  IconCssClass="bi-phone menu-icon me-3 h2"
-                                  CssClass="flex-grow-1 mb-1"
-                                  Click="@(e => GetStudentSMSAddressList())"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Print member badges"
-                                  IconCssClass="bi-printer menu-icon me-3 h2"
-                                  CssClass="flex-grow-1 mb-1"
-                                  Click="@(e => GetMemberBadges())"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                    </div>
+            <DxFormLayout CssClass="px-4 col col-12 col-md-8 mx-auto">
+                <StudentGrid @ref="studentGrid"
+                             Enrolments="EnrolmentsToSelectFrom"
+                             Settings="settings" />
+                <div class="input-group">
+                    <DxButton Text="Email"
+                              IconCssClass="bi-envelope menu-icon me-3 h2"
+                              CssClass="flex-grow-1 mb-1"
+                              Click="@(e => GetStudentEmailAddressList())"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="SMS"
+                              IconCssClass="bi-phone menu-icon me-3 h2"
+                              CssClass="flex-grow-1 mb-1"
+                              Click="@(e => GetStudentSMSAddressList())"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Print badges"
+                              IconCssClass="bi-printer menu-icon me-3 h2"
+                              CssClass="flex-grow-1 mb-1"
+                              Click="@(e => GetMemberBadges())"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                </div>
             </DxFormLayout>
             break;
 
         case MenuOptions.ConfigureEmail:
-            <DxFormLayout CssClass="col col-12">
+            <DxFormLayout CssClass="mx-4 mt-4 col col-12 col-md-6 mx-auto">
+                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None">
                     <p>
                         <strong>Multiple recipient email delimiter</strong><br />
                         We need to delimit each address when sending email to multiple recipients.
@@ -274,31 +276,33 @@ else
                     <p>
                         The exception is Microsoft Outlook (Desktop version) which uses a semi-colon (;).
                     </p>
-                    <InputRadioGroup @bind-Value="@emailDelimiter">
-                        <div class="col-12 mt-3"><InputRadio Value="0" />I <strong>do not</strong> use Outlook (Desktop) on this device</div>
-                        <div class="col-12 mt-3"><InputRadio Value="1" />I <strong>do</strong> use Outlook (Desktop) on this device</div>
-                    </InputRadioGroup>
-                    <DxButton Text="Save Configuration"
-                              IconCssClass="bi bi-save menu-icon me-3 h2"
-                              CssClass="col-12 mt-3 mb-1"
-                              Click="@(e => OnSaveEmailDelimiter())"
-                              RenderStyle="ButtonRenderStyle.Primary"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline">
-                    </DxButton>
+                </DxFormLayoutGroup>
+                <InputRadioGroup @bind-Value="@emailDelimiter">
+                    <div class="col-12 mt-3"><InputRadio Value="0" />I <strong>do not</strong> use Outlook (Desktop) on this device</div>
+                    <div class="col-12 mt-3"><InputRadio Value="1" />I <strong>do</strong> use Outlook (Desktop) on this device</div>
+                </InputRadioGroup>
+                <DxButton Text="Save Configuration"
+                          IconCssClass="bi bi-save menu-icon me-3 h2"
+                          CssClass="col-12 mt-3 mb-1"
+                          Click="@(e => OnSaveEmailDelimiter())"
+                          RenderStyle="ButtonRenderStyle.Primary"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline">
+                </DxButton>
             </DxFormLayout>
             break;
 
         case MenuOptions.RecordAttendance:
-            <DxFormLayout CssClass="col col-12">
-                    <AttendClassMnt IsMemberPortal=true
-                                    SelectedTerm="selectedTerm"
-                                    SelectedCourse="selectedCourse"
-                                    SelectedClass="selectedClass" />
+            <DxFormLayout CssClass="col col-12 mx-auto border mt-1 px-4 pt-">
+                <AttendClassMnt IsAdminPortal="@IsAdminPortal"
+                                IsMemberPortal=true
+                                SelectedTerm="selectedTerm"
+                                SelectedCourse="selectedCourse"
+                                SelectedClass="selectedClass" />
             </DxFormLayout>
             break;
 
         case MenuOptions.CancelClass:
-            <DxFormLayout CssClass="col col-12">
+            <DxFormLayout CssClass="col col-12 col-md-8 mx-auto">
                 <DxFormLayoutGroup Caption="Cancel Class"
                                    ColSpanXs=12
                                    CssClass="mx-auto my-2 p-4 ">
@@ -324,7 +328,7 @@ else
             </DxFormLayout>
             break;
         case MenuOptions.LeaderReports:
-            <DxFormLayout CssClass="col col-12">
+            <DxFormLayout CssClass="col col-12 col-md-8 mx-auto">
                 <PortalLeaderReports selectedTerm="@termAndCourse?.selectedTerm"
                                      selectedClass="@termAndCourse?.selectedClass"
                                      selectedCourse="@termAndCourse?.selectedCourse" />
@@ -425,6 +429,9 @@ else
 
     [Parameter]
     public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+
+    [Parameter]
+    public bool IsAdminPortal { get; set; }
 
     int emailDelimiter;
     Term? selectedTerm { get; set; }

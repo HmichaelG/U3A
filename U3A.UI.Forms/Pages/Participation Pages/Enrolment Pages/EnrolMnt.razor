@@ -170,12 +170,23 @@ else
                 </FullScreen>
             </div>
             <div class="col-3  d-none d-lg-inline p-2">
-                <DxListBox Data="@CourseLeaders" @bind-Values="@leaders" CssClass="leader-height m-1">
-                    <DxListEditorColumn FieldName="@nameof(Person.FullName)"
-                                        Caption="Leader" Width="100%" />
-                </DxListBox>
-                <DxFormLayoutGroup Caption="Statistics">
-                    <div class="table px-2">
+                <DxFormLayoutGroup CssClass="leader-height my-1 border w-100" Decoration="FormLayoutGroupDecoration.None">
+                    <div class="px-2">
+                        <div class="pt-3 text-info"><b>Leaders</b></div>
+                        <div class="row">
+                            @if (CourseLeaders != null)
+                            {
+                                foreach (Person l in CourseLeaders)
+                                {
+                                    <span>@l.FullName</span>
+                                }
+                            }
+                        </div>
+                    </div>
+                </DxFormLayoutGroup>
+                <DxFormLayoutGroup CssClass="mt-1" Decoration="FormLayoutGroupDecoration.None">
+                    <div class="border px-2">
+                        <div class="pt-3 text-info"><b>Statistics</b></div>
                         <div class="row">
                             <div class="w-50">Min-Required</div>
                             <div class="w-50 text-end">@MinimumParticipants</div>
@@ -188,7 +199,8 @@ else
                         </div>
                     </div>
                 </DxFormLayoutGroup>
-                <DxFormLayoutGroup Caption="Filter">
+                <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
+                    <div class="pt-3 px-2 text-info"><b>Filter</b></div>
                     <InputRadioGroup ValueChanged="@((int s) => ShowEnrolledTypeChanged(s))"
                                      Value="@ShowEnrolmentType"
                                      ValueExpression="@( () => ShowEnrolmentType )">
@@ -197,31 +209,34 @@ else
                         <span class="col-11 mt-3"><InputRadio Value="2" class="col-2" />Show Waitlisted</span>
                     </InputRadioGroup>
                 </DxFormLayoutGroup>
-                <DxFormLayoutGroup Caption="Quick Actions">
-                    <DxButton Text="Quick Enrolment" CssClass="col col-12 mt-1"
-                              Id="QuickEnrolment"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@DoQuickEnrolmentAsync" />
-                    <DxButton Text="Set Selection: Enrolled" CssClass="col col-12 mt-1"
-                              Id="SetSelectionEnrolled" Enabled="@IsSetSelectionEnrolledEnabled"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionEnrolledAsync" />
-                    <DxButton Text="Set Selection: Waitlisted" CssClass="col col-12 mt-1"
-                              Id="SetSelectionWaitlisted"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionWaitListedAsync" />
-                    <DxButton Text="Transfer Selection" CssClass="col col-12 mt-1"
-                              Id="SetSelectionTransfer"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionTransferAsync" />
-                    <DxButton Text="Copy Selection" CssClass="col col-12 mt-1"
-                              Id="SetSelectionCopy"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionCopyAsync" />
-                    <DxButton Text="Delete Selection" CssClass="col col-12 mt-1"
-                              Id="DeleteSelection"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteSelection" />
+                <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
+                    <div class="pt-3 px-2 text-info"><b>Quick Actions</b></div>
+                    <div class="m-2">
+                        <DxButton Text="Quick Enrolment" CssClass="col col-12 mt-1"
+                                  Id="QuickEnrolment"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                  RenderStyle="ButtonRenderStyle.Primary" Click="@DoQuickEnrolmentAsync" />
+                        <DxButton Text="Set Selection: Enrolled" CssClass="col col-12 mt-1"
+                                  Id="SetSelectionEnrolled" Enabled="@IsSetSelectionEnrolledEnabled"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                  RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionEnrolledAsync" />
+                        <DxButton Text="Set Selection: Waitlisted" CssClass="col col-12 mt-1"
+                                  Id="SetSelectionWaitlisted"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                  RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionWaitListedAsync" />
+                        <DxButton Text="Transfer Selection" CssClass="col col-12 mt-1"
+                                  Id="SetSelectionTransfer"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                  RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionTransferAsync" />
+                        <DxButton Text="Copy Selection" CssClass="col col-12 mt-1"
+                                  Id="SetSelectionCopy"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                  RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionCopyAsync" />
+                        <DxButton Text="Delete Selection" CssClass="col col-12 mt-1"
+                                  Id="DeleteSelection"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                  RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteSelection" />
+                    </div>
                 </DxFormLayoutGroup>
             </div>
         </DxFormLayout>
@@ -230,7 +245,7 @@ else
 <style>
 
     .leader-height {
-        height: 11dvh;
+        min-height: 11dvh;
     }
 
 </style>
@@ -767,37 +782,37 @@ else
     {
         //dbc?.ChangeTracker?.Clear();
         var action = (IsCopy) ? "Copy" : "Transfer";
-            // Add transfers as new enrolments in the selected course.
+        // Add transfers as new enrolments in the selected course.
         int failures = 0;
-            foreach (var enrolment in SelectedDataItems.Cast<Enrolment>())
+        foreach (var enrolment in SelectedDataItems.Cast<Enrolment>())
+        {
+            if (await BusinessRule.DuplicateEnrolment(dbc,
+                                 enrolment.Person, transferOrCopyEnrolment.selectedTerm,
+                                 transferOrCopyEnrolment.selectedCourse, transferOrCopyEnrolment.selectedClass) == null)
             {
-                if (await BusinessRule.DuplicateEnrolment(dbc,
-                                     enrolment.Person, transferOrCopyEnrolment.selectedTerm,
-                                     transferOrCopyEnrolment.selectedCourse, transferOrCopyEnrolment.selectedClass) == null)
-                {
-                    var e = new Enrolment()
-                        {
-                            Created = DateTime.UtcNow
-                        };
-                    e.Person = await dbc.Person.FindAsync(enrolment.Person.ID);
-                    e.Term = await dbc.Term.FindAsync(transferOrCopyEnrolment.selectedTerm.ID);
-                    e.IsWaitlisted = (e.Term.Comparer <= selectedTerm.Comparer)
-                                            ? e.IsWaitlisted = enrolment.IsWaitlisted
-                                            : e.IsWaitlisted = true;
-                    e.Course = await dbc.Course.FindAsync(transferOrCopyEnrolment.selectedCourse.ID);
-                    if (transferOrCopyEnrolment.selectedClass != null)
+                var e = new Enrolment()
                     {
-                        e.Class = await dbc.Class.FindAsync(transferOrCopyEnrolment.selectedClass.ID);
-                    }
-                    await dbc.AddAsync<Enrolment>(e);
+                        Created = DateTime.UtcNow
+                    };
+                e.Person = await dbc.Person.FindAsync(enrolment.Person.ID);
+                e.Term = await dbc.Term.FindAsync(transferOrCopyEnrolment.selectedTerm.ID);
+                e.IsWaitlisted = (e.Term.Comparer <= selectedTerm.Comparer)
+                                        ? e.IsWaitlisted = enrolment.IsWaitlisted
+                                        : e.IsWaitlisted = true;
+                e.Course = await dbc.Course.FindAsync(transferOrCopyEnrolment.selectedCourse.ID);
+                if (transferOrCopyEnrolment.selectedClass != null)
+                {
+                    e.Class = await dbc.Class.FindAsync(transferOrCopyEnrolment.selectedClass.ID);
                 }
-                else { failures++; }
+                await dbc.AddAsync<Enrolment>(e);
             }
+            else { failures++; }
+        }
         int count = SelectedDataItems.Count() - failures;
-            // If transfer, delete the selected items
-            if (!IsCopy) dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
-            // and save...
-            await SaveChangesAsync();
+        // If transfer, delete the selected items
+        if (!IsCopy) dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
+        // and save...
+        await SaveChangesAsync();
         string msg = $"<p>{count} Enrolments processed successfully. &nbsp";
         if (failures > 0) { msg += $"{failures} failed because they were already enrolled."; }
         msg += "</p>";

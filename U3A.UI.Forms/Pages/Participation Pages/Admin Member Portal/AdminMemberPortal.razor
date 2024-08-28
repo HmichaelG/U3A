@@ -62,7 +62,11 @@ else
                         </CollapsableContent>
                         @if (isSelected)
                         {
-                            <MemberPortal OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
+                            <div class="mt-1 w-100">
+                            <MemberPortal
+                                IsAdminMemberPortal="true"
+                                OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
+                            </div>
                         }
                         else
                         {
@@ -117,7 +121,7 @@ else
                     <CourseSchedule IsPortal=true />
                 </DxTabPage>
                 <DxTabPage Text="Record Attendance">
-                    <AttendClassMnt />
+                    <AttendClassMnt IsAdminPortal="true" />
                 </DxTabPage>
                 <DxTabPage Text="Attendance Summary">
                     <CourseAttendanceSummary />

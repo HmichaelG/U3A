@@ -12,6 +12,7 @@
 @implements IDisposable
 @inject NavigationManager navMan
 @inject SignInManager<ApplicationUser> SignInMgr
+@inject WorkStation ws
 
 @attribute [Authorize]
 
@@ -27,7 +28,7 @@ else
 
     <Progress @ref=@ProgressBar />
 
-    <div class="mt-4 col-12 mx-auto row">
+    <div class="mt-1 col-12 mx-auto row">
     @switch (menuSelection)
     {
         case PortalMenuSelection.DoSelectLinkedMember:
@@ -86,7 +87,9 @@ else
             break;
 
         case PortalMenuSelection.DoShowLeaderMenu:
-            <LeaderMenu OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+            <LeaderMenu
+                IsAdminPortal="@IsAdminMemberPortal"
+                OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
             break;
 
         case PortalMenuSelection.DoWhatsOn:
@@ -131,6 +134,9 @@ else
 
     [Parameter]
     public EventCallback OnReturnToAdminPortal { get; set; }
+
+    [Parameter]
+    public bool IsAdminMemberPortal { get; set; } = false;
 
     Progress? ProgressBar { get; set; }
 
@@ -194,6 +200,7 @@ else
             }
             if (person == null) menuSelection = PortalMenuSelection.DoMemberMaintenance;
         }
+        if (!loginState.IsAdminOnBehalfOfMember) { ws.UseTopMenu = true; }
     }
 
     XtraReport GetMemberBadgeReport()

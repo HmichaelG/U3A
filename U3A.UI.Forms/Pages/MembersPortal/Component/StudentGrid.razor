@@ -14,7 +14,7 @@
 else
 {
     <div class="mt-3">
-        <DxGrid @ref=@grid Data="@Enrolments" CssClass="grid-height" id="myGrid"
+        <DxGrid @ref=@grid Data="@Enrolments" CssClass="student-grid-style" id="myGrid"
                 ShowAllRows="true"
                 ShowSearchBox=true
                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -91,8 +91,8 @@ else
     </div>
 }
 <style>
-    .grid-height {
-        height: calc(100dvh - @(ws.UseTopMenu ? "26rem" : "22rem"));
+    .student-grid-style {
+        height: calc(100dvh - @(ws.UseTopMenu ? "22rem" : "20rem"));
     }
 
     .badge-size {

@@ -17,7 +17,7 @@ else
     <DxFormLayout CssClass="mt-4">
         <div class=@((isOnBehalfOf)
          ? ""
-         : "col-12 col-md-8 mx-auto pb-2")>
+         : "col col-12 col-md-8 mx-auto pb-2")>
             <div class="p-2 w-100 text-center text-info">
                 To add leave, click the <span class="text-success h6 bi bi-plus-lg"></span> button below.
                 Enter a start date, return date and reason then click Save.
@@ -98,7 +98,7 @@ else
     }
 
     .grid-height {
-        height: calc(100dvh - @(ws.UseTopMenu ? "34rem"  : "30rem"));
+        height: calc(100dvh - @(SetGridHeightOffset()))
     }
 </style>
 
@@ -117,8 +117,13 @@ else
 
     [Parameter]
     public Person ProcessOnBehalfOf { get; set; }
+    
     [Parameter]
     public Course LeaderCourse { get; set; }
+    
+    [Parameter]
+    public bool IsAdminPortal { get; set; } = false;
+
     bool isOnBehalfOf;
 
     IGrid Grid { get; set; }
@@ -157,6 +162,25 @@ else
             await RefreshData();
             InvokeAsync(StateHasChanged);
         }
+    }
+
+    string SetGridHeightOffset()
+    {
+        int header = 0;
+        // add to Header for top menu height
+        if (ws.UseTopMenu) header = 4;
+        // add to Header for admin portal tab strip
+        if (IsAdminPortal) header += 3;
+        if (ProcessOnBehalfOf != null)
+        {
+            header += 26; 
+        }
+        else
+        {
+            header += 14;
+        }
+        string result = $"{header}rem";
+        return result;
     }
 
     bool isLoading;
