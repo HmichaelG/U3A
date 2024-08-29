@@ -31,7 +31,7 @@
     }
 
     .normalscreen {
-        height: calc(100dvh - @(ws.UseTopMenu ? $"{DisplayOffset + 4}rem" : $"{DisplayOffset}rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? $"{currentDisplayOffset + 4}rem" : $"{currentDisplayOffset}rem"));
         width: calc(100% + 1.5rem);
     }
 
@@ -39,13 +39,23 @@
 
 @code {
     [Parameter]
-    public RenderFragment ContentTemplate { get; set; } = default;
+    public RenderFragment? ContentTemplate { get; set; } = default;
     [Parameter]
     public bool HideToggle { get; set; } = false;
     [Parameter]
     public double DisplayOffset { get; set; } = 8;
+    [Parameter]
+    public double AlternateDisplayOffset { get; set; } = 10;
+
 
     bool isFullscreen = false;
+    double currentDisplayOffset;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        currentDisplayOffset = DisplayOffset;
+    }
 
     async Task OnClick()
     {
@@ -54,8 +64,11 @@
         await RefreshLayout(); 
     }
 
-    public async Task RefreshLayout()
+    public async Task RefreshLayout(bool UseAlternateDisplayOffset = false)
     {
+        currentDisplayOffset = UseAlternateDisplayOffset
+                                    ? AlternateDisplayOffset
+                                    : DisplayOffset;
         await InvokeAsync(StateHasChanged);
     }
 }
