@@ -17,7 +17,12 @@ else
 {
     <div class="w-100 px-2">
         <h4>Search Email</h4>
-        <DxFormLayoutGroup Caption="Participant Details" ColSpanMd="8">
+        <DxFormLayoutGroup Caption="Search Email" Expanded="@areDetailsExpanded"
+                           ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End" ColSpanMd="8"
+                           ExpandedChanged="@(async () => {areDetailsExpanded = !areDetailsExpanded;
+                                                           fullScreen.RefreshLayout(!areDetailsExpanded);
+                                                           })">
+<Items>
             <DxFormLayoutItem Caption="Search for participant" ColSpanLg="12">
                 <DxComboBox Data="@people"
                             AllowUserInput=true
@@ -66,38 +71,38 @@ else
                     </Buttons>
                 </DxDateEdit>
             </DxFormLayoutItem>
-
+            </Items>
         </DxFormLayoutGroup>
 
-    <FullScreen DisplayOffset="22">
-        <ContentTemplate>
-            <DxGrid Data=@messages @ref=@mainGrid
-                    AutoExpandAllGroupRows=false>
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid />
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-                    <DxGridDataColumn Caption="Stream" FieldName="Stream" />
-                    <DxGridDataColumn Caption="From" FieldName="From" />
-                    <DxGridDataColumn Caption="To" FieldName="To" Visible=@IsSearchByDateRange />
-                    <DxGridDataColumn Caption="Subject" FieldName="Subject" />
-                    <DxGridDataColumn Caption="Attachments" FieldName="Attachments" />
-                    <DxGridDataColumn Caption="Status" FieldName="Status" />
-                    <DxGridDataColumn Width="8rem" Caption="Details" FieldName="MessageID" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
-                        <CellDisplayTemplate>
-                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
-                                      RenderStyle="ButtonRenderStyle.Primary" Text="Details"
-                                      Click="() => OnDetailsClick((EmailMessage)context.DataItem)"></DxButton>
-                        </CellDisplayTemplate>
-                    </DxGridDataColumn>
-                </Columns>
-                <TotalSummary>
-                    <DxGridSummaryItem FieldName="Subject" FooterColumnName="Subject" SummaryType="GridSummaryItemType.Count" />
-                </TotalSummary>
-            </DxGrid>
-        </ContentTemplate>
-    </FullScreen>
+        <FullScreen @ref=@fullScreen DisplayOffset="22" AlternateDisplayOffset="13">
+            <ContentTemplate>
+                <DxGrid Data=@messages @ref=@mainGrid
+                        AutoExpandAllGroupRows=false>
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid />
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                        <DxGridDataColumn Caption="Stream" FieldName="Stream" />
+                        <DxGridDataColumn Caption="From" FieldName="From" />
+                        <DxGridDataColumn Caption="To" FieldName="To" Visible=@IsSearchByDateRange />
+                        <DxGridDataColumn Caption="Subject" FieldName="Subject" />
+                        <DxGridDataColumn Caption="Attachments" FieldName="Attachments" />
+                        <DxGridDataColumn Caption="Status" FieldName="Status" />
+                        <DxGridDataColumn Width="8rem" Caption="Details" FieldName="MessageID" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
+                            <CellDisplayTemplate>
+                                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                          RenderStyle="ButtonRenderStyle.Primary" Text="Details"
+                                          Click="() => OnDetailsClick((EmailMessage)context.DataItem)"></DxButton>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                    <TotalSummary>
+                        <DxGridSummaryItem FieldName="Subject" FooterColumnName="Subject" SummaryType="GridSummaryItemType.Count" />
+                    </TotalSummary>
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
     </div>
 
     <DxWindow @ref=@emailDetailsForm Width="60vw" Height="90vh"
@@ -165,6 +170,8 @@ else
     string emailAddress;
     string emailAddressValue;
     bool IsSearchByDateRange;
+    bool areDetailsExpanded = true;
+    FullScreen? fullScreen;
 
     IGrid? mainGrid { get; set; }
     IGrid? eventGrid { get; set; }

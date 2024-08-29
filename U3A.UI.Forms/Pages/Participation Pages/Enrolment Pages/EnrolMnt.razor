@@ -57,10 +57,12 @@ else
                 <div class="mx-2">
                     Register participants in courses and/or activities offered in the selected term.
                 </div>
-                <DxFormLayoutGroup Caption="Enrolment Details"
+                <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                                   ExpandedChanged="@(async () => await fullScreen.RefreshLayout())"
-                                   Expanded="true">
+                                   ExpandedChanged="@(async () => { 
+                                                                    areDetailsExpanded = !areDetailsExpanded;
+                                                                    fullScreen.RefreshLayout(!areDetailsExpanded);
+                                                                    })">
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms"
                                        @bind-SelectedTerm="@selectedTerm"
@@ -93,7 +95,7 @@ else
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
 
-                <FullScreen @ref="@fullScreen" DisplayOffset="18">
+                <FullScreen @ref="@fullScreen" DisplayOffset="19">
                     <ContentTemplate>
                         <DxGrid Data="@Enrolments" @ref=@mainGrid
                                 ShowAllRows="true"
@@ -169,33 +171,33 @@ else
                     </ContentTemplate>
                 </FullScreen>
             </div>
-            <div class="col-3  d-none d-lg-inline p-2">
-                <DxFormLayoutGroup CssClass="leader-height my-1 border w-100" Decoration="FormLayoutGroupDecoration.None">
-                    <div class="px-2">
-                        <div class="pt-3 text-info"><b>Leaders</b></div>
-                        <div class="row">
+            <div class="col-3  d-none d-lg-inline p-1">
+                <DxFormLayoutGroup BeginRow=true CssClass="leader-height border w-100" Decoration="FormLayoutGroupDecoration.None">
+                    <Items>
+                        <div class="mx-2 mt-3 mb-2">
+                            <div class="text-info"><b>Leaders</b></div>
                             @if (CourseLeaders != null)
                             {
                                 foreach (Person l in CourseLeaders)
                                 {
-                                    <span>@l.FullName</span>
+                                    <span class="ms-2">@l.FullName</span>
                                 }
                             }
                         </div>
-                    </div>
+                    </Items>
                 </DxFormLayoutGroup>
-                <DxFormLayoutGroup CssClass="mt-1" Decoration="FormLayoutGroupDecoration.None">
-                    <div class="border px-2">
-                        <div class="pt-3 text-info"><b>Statistics</b></div>
+                <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
+                        <div class="pt-3 mx-2 text-info"><b>Statistics</b></div>
+                    <div class="px-3">
                         <div class="row">
-                            <div class="w-50">Min-Required</div>
-                            <div class="w-50 text-end">@MinimumParticipants</div>
-                            <div class="w-50">Max-Available</div>
-                            <div class="w-50 text-end">@MaximumParticipants</div>
-                            <div class="w-50">Enrolled</div>
-                            <div class="w-50 text-end">@EnrolledParticipants</div>
-                            <div class="w-50">Waitlisted</div>
-                            <div class="w-50 text-end">@WaitlistedParticipants</div>
+                                <div class="w-75">Min-Required</div>
+                                <div class="w-25 text-end">@MinimumParticipants</div>
+                                <div class="w-75">Max-Available</div>
+                                <div class="w-25 text-end">@MaximumParticipants</div>
+                                <div class="w-75">Enrolled</div>
+                                <div class="w-25 text-end">@EnrolledParticipants</div>
+                                <div class="w-75">Waitlisted</div>
+                                <div class="w-25 text-end">@WaitlistedParticipants</div>
                         </div>
                     </div>
                 </DxFormLayoutGroup>
@@ -245,7 +247,8 @@ else
 <style>
 
     .leader-height {
-        min-height: 11dvh;
+        min-height: 3dvh;
+        height: auto;
     }
 
 </style>
@@ -255,6 +258,7 @@ else
     bool IsReady;
     int ShowEnrolmentType;
     SystemSettings? settings;
+    bool areDetailsExpanded = true;
 
     private List<Enrolment>? Enrolments { get; set; }
     Enrolment? thisEnrolment;

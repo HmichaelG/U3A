@@ -93,7 +93,10 @@ else
                               Click="@OnCommunicate"
                               RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" />
                 </div>
-                <DxFormLayoutGroup Caption="Attendance Details">
+                <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
+                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
+                                   ExpandedChanged="@(() => {areDetailsExpanded = !areDetailsExpanded;
+                                                             SetGridHeightOffset();})">
                     <DxFormLayoutItem Caption="Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms"
                                        @bind-SelectedTerm="@SelectedTerm"
@@ -400,6 +403,7 @@ else
 
     bool IsLargeLayout { get; set; }
     bool IsXtraLargeLayout { get; set; }
+    bool areDetailsExpanded = true;
 
     bool IsReady;
     int attendanceStatus;
@@ -531,10 +535,10 @@ else
         {
             if (IsLargeLayout || IsXtraLargeLayout) header += 10; else header += 14;
         }
-        else 
-        { 
+        else
+        {
             // the header when not in the Member Portal
-            header += 22; 
+            header += 22;
         }
         if (IsMemberPortal)
         {
@@ -544,7 +548,7 @@ else
         {
             if (IsLargeLayout || IsXtraLargeLayout) footer += 0; else footer += 8;
         }
-        string result = $"{header + footer}rem";
+        string result = $"{header + footer + ((areDetailsExpanded) ? 0 : -10)}rem";
         return result;
     }
 
@@ -614,7 +618,7 @@ else
         if (ClassDate.Date.Date > now.Date)
         {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                                                                                            @"The class date you have selected is in the future.<br/>
+                                                                                                                @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
@@ -652,7 +656,7 @@ else
         if (maxDate <= SelectedTerm.StartDate)
         {
             await messageBox.ShowOkOnlyAsync("Re-select term",
-                                                                @"Today's date is prior to the selected term's start date.<br/>
+                                                                    @"Today's date is prior to the selected term's start date.<br/>
                     Select a term with a start date prior to today.");
             return;
         }

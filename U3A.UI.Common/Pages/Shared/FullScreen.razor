@@ -6,7 +6,7 @@
     <DxButton Click="@OnClick" Visible="@(!HideToggle)"
               tooltip="Clcik to display full screen"
               CssClass="toggle-button"
-              IconCssClass="bi bi-arrows-fullscreen"             
+              IconCssClass="bi bi-arrows-fullscreen"
               RenderStyle="ButtonRenderStyle.Secondary" />
 </div>
 
@@ -16,12 +16,13 @@
         width: 1.5rem;
         top: 1px;
         right: 1px;
-        position:sticky; 
+        position: sticky;
         position: -webkit-sticky;
         opacity: 1;
     }
+
     .fullscreen {
-        z-index: 1049;                  /* dxPopup z-index = 1050 */
+        z-index: 1049; /* dxPopup z-index = 1050 */
         width: calc(100% + 1.5rem);
         height: 100dvh;
         top: 0px;
@@ -49,23 +50,25 @@
 
 
     bool isFullscreen = false;
+    bool isRefresh;
     double currentDisplayOffset;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
-        base.OnInitialized();
-        currentDisplayOffset = DisplayOffset;
+        base.OnParametersSet();
+        if (!isRefresh) currentDisplayOffset = DisplayOffset;
     }
 
     async Task OnClick()
     {
         await js.InvokeVoidAsync("toggleFullscreen");
         isFullscreen = !isFullscreen;
-        await RefreshLayout(); 
+        await RefreshLayout();
     }
 
     public async Task RefreshLayout(bool UseAlternateDisplayOffset = false)
     {
+        isRefresh = true;
         currentDisplayOffset = UseAlternateDisplayOffset
                                     ? AlternateDisplayOffset
                                     : DisplayOffset;
