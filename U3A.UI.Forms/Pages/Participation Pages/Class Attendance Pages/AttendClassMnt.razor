@@ -85,14 +85,9 @@ else
                 <div class="row align-content-start">
                     <ContextHelpTitle Title="Class Attendance" HelpTopic="Class-Attendance.html" />
                 </div>
-                <div class="input-group mx-2">
-                    <div class="flex-grow-1">
+                    <div class="rwo w-100 ms-4">
                         Mark the class attendance roll.
                     </div>
-                    <DxButton Text="Communicate"
-                              Click="@OnCommunicate"
-                              RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" />
-                </div>
                 <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
                                    ExpandedChanged="@(() => {areDetailsExpanded = !areDetailsExpanded;
@@ -144,7 +139,15 @@ else
                 <div class="border w-100">
                     <GridToolbar LinkedGrid=@mainGrid
                                  HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
-                                 HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)" />
+                                 HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
+                        <CustomButtonContent>
+                            <DxToolbarItem Text="Communicate"
+                                           Tooltip="Send email and/or SMS to students"
+                                      Click="@OnCommunicate"
+                                      RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" />
+                        </CustomButtonContent>
+
+                    </GridToolbar>
                 </div>
             }
 
@@ -245,8 +248,8 @@ else
         <div class="pt-3 pe-1 col col-3 d-none d-lg-inline">
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" CssClass="pt-2">
                 <div class="border">
-                    <div class="row px-2">
-                        <div class="pt-3 px-2 text-info"><b>Class Summary</b></div>
+                    <div class="pt-3 px-2 text-info"><b>Class Summary</b></div>
+                    <div class="row mx-2">
                         <div class="col-9">Min-Required</div>
                         <div class="col-3 text-end">@MinimumParticipants</div>
                         <div class="col-9">Max-Available</div>
@@ -265,11 +268,11 @@ else
                         <div class="col-9">Absent Without Apology</div>
                         <div class="col-3 text-end">@countAbsentWithoutApology</div>
                     </div>
+                    @if (!IsMemberPortal)
+                    {
+                        <DxButton Text="@ClassStatus" RenderStyle="@buttonRenderStyle" CssClass="mt-2 col-12" />
+                    }
                 </div>
-                @if (!IsMemberPortal)
-                {
-                    <DxButton Text="@ClassStatus" RenderStyle="@buttonRenderStyle" CssClass="col col-12" />
-                }
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
                                CssClass="mt-1 border" ColSpanSm="12">
@@ -618,7 +621,7 @@ else
         if (ClassDate.Date.Date > now.Date)
         {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                                                                                                @"The class date you have selected is in the future.<br/>
+                                                                                                                    @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
@@ -656,7 +659,7 @@ else
         if (maxDate <= SelectedTerm.StartDate)
         {
             await messageBox.ShowOkOnlyAsync("Re-select term",
-                                                                    @"Today's date is prior to the selected term's start date.<br/>
+                                                                        @"Today's date is prior to the selected term's start date.<br/>
                     Select a term with a start date prior to today.");
             return;
         }
