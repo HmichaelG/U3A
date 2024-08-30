@@ -29,6 +29,8 @@ using U3A.Database;
 using U3A.Model;
 using U3A.Services;
 
+//testing
+
 var builder = WebApplication.CreateBuilder(args);
 
 // **** Start local modifications ****
