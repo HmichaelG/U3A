@@ -50,7 +50,8 @@ namespace U3A.Model
         {
             AddRange(Enum.GetValues(typeof(CourseEditViewType))
                             .OfType<CourseEditViewType>()
-                            .Where(t => t != CourseEditViewType.Settings)
+                            .Where(t => t != CourseEditViewType.Settings
+                                                && t != CourseEditViewType.Description)
                             .Select(t => new CourseEditViewTypeWrapper()
                             {
                                 Type = t,
