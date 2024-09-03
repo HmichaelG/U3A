@@ -441,7 +441,7 @@ else
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
     {
         if (selection == PortalMenuSelection.PrintMemberBadge &&
-            loginState.SelectedPerson.FinancialTo < localTime.Year)
+            loginState.SelectedPerson?.FinancialTo < localTime.Year)
         {
             await messageBox.ShowOkOnlyAsync("Financial Members Only", "You must be a financial member to select this option.");
         }
