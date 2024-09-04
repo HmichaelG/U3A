@@ -158,7 +158,9 @@ namespace U3A.BusinessRules
 
         public static async Task<Term?> FindTermByDateAsync(U3ADbContext dbc, DateTime Date)
         {
-            return await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.StartDate <= Date);
+            return await dbc.Term.AsNoTracking()
+                        .OrderByDescending(x => x.StartDate)
+                        .FirstOrDefaultAsync(x => x.StartDate <= Date);
         }
         public static async Task<Term?> FindTermAsync(U3ADbContext dbc, DateTime Date)
         {
