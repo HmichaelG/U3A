@@ -67,13 +67,13 @@
                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
-                <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader" />
+                <PersonsComboBox ShowPersonSummary="true" People="@Persons" @bind-SelectedPerson="@editItem.Leader" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Leader 2" ColSpanMd="12">
-                <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader2" />
+                <PersonsComboBox ShowPersonSummary="true" People="@Persons" @bind-SelectedPerson="@editItem.Leader2" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Leader 3" ColSpanMd="12">
-                <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader3" />
+                <PersonsComboBox ShowPersonSummary="true" People="@Persons" @bind-SelectedPerson="@editItem.Leader3" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
                 <DxComboBox Data="Venues"
@@ -194,6 +194,7 @@
         if (!await IsDataOk(editModel, e.IsNew)) { e.Cancel = true; return; }
         // Re-query a data item from the store.
         var dataItem = e.IsNew ? new Class() : DbContext?.Class.Find(editModel.ID);
+        if (dataItem == null) { dataItem = new(); }
         // Assign changes from the edit model to the data item.
         editModel.CopyTo(dataItem);
         dataItem.Venue = DbContext.Venue.Find(editModel.Venue.ID);

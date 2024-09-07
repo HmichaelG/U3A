@@ -52,13 +52,13 @@
                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
-                            <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader" />
+                            <PersonsComboBox ShowPersonSummary="true" People="@Persons" @bind-SelectedPerson="@editItem.Leader" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Leader 2" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader2 != null)>
-                            <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader2" />
+                            <PersonsComboBox ShowPersonSummary="true" People="@Persons" @bind-SelectedPerson="@editItem.Leader2" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Leader 3" ColSpanMd="12" Visible=@(showFullDetail || editItem.Leader3 != null)>
-                            <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Leader3" />
+                            <PersonsComboBox ShowPersonSummary="true" People="@Persons" @bind-SelectedPerson="@editItem.Leader3" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
                             <DxComboBox Data="Venues"
@@ -143,7 +143,7 @@
     bool isRecurrenceReadonly;
 
     bool showFullDetail = false;
-    public bool isNewRecord { get; set; } = false;
+    public bool isNewRecord { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -153,11 +153,11 @@
             occurrence = DbContext.Occurrence.AsNoTracking().ToList();
             if (Course.Classes.Count <= 0)
             {
-                editItem = new Class();
-                if (Course.EditType == CourseEditViewType.Activity)
-                { editItem.Occurrence = occurrence.First(x => x.ID == (int)OccurrenceType.OnceOnly); }
-                else
-                { editItem.Occurrence = occurrence.First(x => x.ID == (int)OccurrenceType.Weekly); }
+                editItem = new Class();                
+                editItem.Occurrence = (Course.EditType == CourseEditViewType.Activity)
+                    ?   occurrence.First(x => x.ID == (int)OccurrenceType.OnceOnly)
+                    :   editItem.Occurrence = occurrence.First(x => x.ID == (int)OccurrenceType.Weekly);
+                Course.Classes.Add(editItem);
                 isNewRecord = true;
             }
             else

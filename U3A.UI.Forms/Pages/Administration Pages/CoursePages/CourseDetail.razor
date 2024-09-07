@@ -194,6 +194,7 @@ else
         }
         if (CourseViewType != CourseEditViewType.Settings &&
             CourseViewType != CourseEditViewType.Description) { Course.EditType = CourseViewType; }
+            StateHasChanged();
     }
 
 }

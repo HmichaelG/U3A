@@ -116,10 +116,10 @@ else
                         <DxGridDataColumn Caption="Type" FieldName="CourseType.ShortName" Width="6rem" />
                         <DxGridDataColumn Caption="Off Schedule?" FieldName="IsOffScheduleActivity" Width="7rem" />
                         <DxGridDataColumn Caption="Enrol In" FieldName="CourseParticipationType.ShortName" Width="5rem" />
-                        <DxGridDataColumn Caption="Addn-Info?" FieldName="Weblink" UnboundType="GridUnboundColumnType.Boolean" Width="6rem"/>
+                        <DxGridDataColumn Caption="Addn-Info?" FieldName="Weblink" UnboundType="GridUnboundColumnType.Boolean" Width="6rem" />
                         <DxGridDataColumn Caption="Reports To" FieldName="SendReportsTo" UnboundType="GridUnboundColumnType.String" Width="6rem" />
                         <DxGridDataColumn FieldName="ContactOrder" UnboundType="GridUnboundColumnType.String" Width="7rem" />
-                        <DxGridDataColumn Caption="Course Fee" FieldName="CourseFeePerYear" DisplayFormat="{0:c}" Width="6rem"/>
+                        <DxGridDataColumn Caption="Course Fee" FieldName="CourseFeePerYear" DisplayFormat="{0:c}" Width="6rem" />
                         <DxGridDataColumn Caption="Fee / Term" FieldName="CourseFeePerTerm" DisplayFormat="{0:c}" Width="6rem" />
                         <DxGridDataColumn Caption="Duration" FieldName="Duration" DisplayFormat="{0:n2}" Width="6rem" />
                         <DxGridDataColumn Caption="Required #" FieldName="RequiredStudents" DisplayFormat="{0:n0}" Width="6rem" />
@@ -192,43 +192,43 @@ else
 
 
 @code {
-    bool IsReady;
+        bool IsReady;
 
-    DxTabs? tabs;
-    Progress? progressBar;
-    List<CourseParticipationType> CourseParticipationTypes { get; set; }
-    List<Occurrence>? Occurrences { get; set; }
-    IEnumerable<Person> Persons { get; set; }
-    IEnumerable<Venue> Venues { get; set; }
-    IEnumerable<WeekDay> WeekDays { get; set; }
-    List<Course> Courses { get; set; }
-    List<CourseType> CourseTypes { get; set; }
-    SystemSettings settings { get; set; }
-    MessageBox? messageBox;
-    SelectCourseView? selectCourseView;
-    CourseEditViewType courseEditView;
-    YearComponent? yearComponent;
-    Term? currentTerm;
-    Term? previewTerm;
-    int Year;
-    bool anyEnrolmentsInYear;
-    DxWindow? previewWindow;
-    bool isPreviewOpen;
-    bool isPreviewReady = true;
+        DxTabs? tabs;
+        Progress? progressBar;
+        List<CourseParticipationType> CourseParticipationTypes { get; set; }
+        List<Occurrence>? Occurrences { get; set; }
+        IEnumerable<Person> Persons { get; set; }
+        IEnumerable<Venue> Venues { get; set; }
+        IEnumerable<WeekDay> WeekDays { get; set; }
+        List<Course> Courses { get; set; }
+        List<CourseType> CourseTypes { get; set; }
+        SystemSettings settings { get; set; }
+        MessageBox? messageBox;
+        SelectCourseView? selectCourseView;
+        CourseEditViewType courseEditView;
+        YearComponent? yearComponent;
+        Term? currentTerm;
+        Term? previewTerm;
+        int Year;
+        bool anyEnrolmentsInYear;
+        DxWindow? previewWindow;
+        bool isPreviewOpen;
+        bool isPreviewReady = true;
 
-    List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
-    List<CourseContactOrderWrapper> courseContactList = new CourseContactOrderList();
-    DxGridCommandColumn? GridCommandColumn;
+        List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
+        List<CourseContactOrderWrapper> courseContactList = new CourseContactOrderList();
+        DxGridCommandColumn? GridCommandColumn;
 
-    CourseDetail courseDetail { get; set; }
-    IGrid? mainGrid { get; set; }
-    GridToolbar? Toolbar;
+        CourseDetail courseDetail { get; set; }
+        IGrid? mainGrid { get; set; }
+        GridToolbar? Toolbar;
 
-    ErrorPopup? ErrorPopup { get; set; }
-    string ErrorHeader;
-    string ErrorMessage;
+        ErrorPopup? ErrorPopup { get; set; }
+        string ErrorHeader;
+        string ErrorMessage;
 
-    U3ADbContext dbc { get; set; }
+        U3ADbContext dbc { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -423,16 +423,9 @@ else
         {
             if (!await courseDetail.frmClassSimple.IsSaveRecordOkAsync()) { e.Cancel = true; return; }
             Class classEditModel = courseDetail.frmClassSimple.editItem;
-            Class classDataItem;
-            if (courseDetail.frmClassSimple.isNewRecord)
-            {
-                classDataItem = new();
-                editModel.Classes.Add(classDataItem);
-            }
-            else
-            {
-                classDataItem = await dbc.Class.FindAsync(editModel.Classes.First().ID);
-            }
+            if (!await IsClassDataOk(classEditModel)) { e.Cancel = true; return; }
+            Class classDataItem = await dbc.Class.FindAsync(editModel.Classes.First().ID);
+            if (classDataItem == null) { classDataItem = new(); }
             classEditModel.CopyTo(classDataItem);
             classDataItem.Occurrence = await dbc.Occurrence.FindAsync(classEditModel.Occurrence.ID);
             classDataItem.Venue = await dbc.Venue.FindAsync(classEditModel.Venue.ID);
@@ -487,6 +480,18 @@ else
                 await BusinessRule.ReassignClassScheduleValues(dbc, c);
             }
         }
+    }
+
+    async Task<bool> IsClassDataOk(Class editItem)
+    {
+        bool result = true;
+        if (editItem.Occurrence == null || editItem.Venue == null || editItem.OnDay == null)
+        {
+            var msg = @"Please ensure the class Occurence, On Day and Venue details are complete.";
+            await messageBox.ShowOkOnlyAsync("Class Details Incomplete", msg);
+            result = false;
+        }
+        return result;
     }
 
     async Task<bool> IsDataOk(Course editItem)

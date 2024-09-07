@@ -4,7 +4,9 @@
                 SearchMode="ListSearchMode.AutoSearch"
                 ListRenderMode="ListRenderMode.Virtual"
                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                TextFieldName="@nameof(Person.FullName)"
+                TextFieldName="@((ShowPersonSummary)
+                                ? nameof(Person.PersonSummary)
+                                : nameof(Person.FullName))"
                 @bind-Value="@SelectedPerson">
         <Columns>
             <DxListEditorColumn FieldName="@nameof(Person.FirstName)" Caption="First Name" Width="10rem" />
@@ -47,5 +49,7 @@
     public EventCallback<Person> OnProcessButtonClicked { get; set; }
     [Parameter]
     public EventCallback<Person> SelectedPersonChanged { get; set; }
+    [Parameter]
+    public bool ShowPersonSummary { get; set; }
 
 }
