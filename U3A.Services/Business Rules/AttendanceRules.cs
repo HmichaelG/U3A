@@ -265,7 +265,7 @@ namespace U3A.BusinessRules
                                                         TermStart = selectedTerm.StartDate
                                                     }).Distinct().ToListAsync();
 
-            // Calculate the date range for class schedule calculation ( tart & end)
+            // Calculate the date range for class schedule calculation ( start & end)
 
             // the last class date for term
             var lastAllowedClassDate = await BusinessRule.GetLastAllowedClassDateForTermAsync(dbc, selectedTerm);
@@ -284,7 +284,7 @@ namespace U3A.BusinessRules
                       where (a.CustomFields["Source"] != null
                                 && (int)a.LabelId != 9    // Cancelled/Postponed
                                 && selectedClass.ID == (a.CustomFields["Source"] as Class).ID)
-                      select new ClassDate() { TermStart = start, Date = a.Start }).ToList();
+                      select new ClassDate() { TermStart = selectedTerm.StartDate, Date = a.Start }).ToList();
 
             // merge what is already on file & sort
             result.AddRange(onFileDates);
