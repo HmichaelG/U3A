@@ -346,6 +346,7 @@ else
         dbc.ChangeTracker.Clear();
         Courses = await BusinessRule.EditableCoursesAsync(dbc, Year);
         FilterByTab();
+        InvokeAsync(StateHasChanged);
     }
 
     async Task Grid_EditStart(GridEditStartEventArgs e)
