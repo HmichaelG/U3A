@@ -112,6 +112,10 @@ namespace U3A.BusinessRules
             });
             List<Class> result = classes.Except(deletions).ToList();
 
+            Parallel.ForEach(result, c =>
+            {
+                AssignClassCounts(term, c);
+            });
 
             // Enrolments by other U3A into local courses
             var localEnrolments = await dbcT.MultiCampusEnrolment
@@ -150,72 +154,13 @@ namespace U3A.BusinessRules
                 }
             }
 
-
             // Other U3A Classes & Enrolemnts allowed by our U3A
-            if (tInfo.EnableMultiCampusExtension && settings.AllowMultiCampusExtensions && IsFinancial)
-            {
-                classes.Clear();
-                var tenantInfo = await dbcT.TenantInfo.ToListAsync();
-                var mcSchedule = await dbcT.MultiCampusSchedule
-                                    .AsNoTracking()
-                                    .Where(x => x.TenantIdentifier != tInfo.Identifier
-                                                && settings.MultiCampusU3AAllowed.Contains(x.TenantIdentifier))
-                                                .ToListAsync();
-                Parallel.ForEach(mcSchedule, async s =>
-                {
-                    var c = JsonSerializer.Deserialize<Class>(s.jsonClass.Unzip());
-                    c.TenantIdentifier = s.TenantIdentifier;
-                    var id = result.FirstOrDefault(x => x.ID == c.ID);
-                    if (id == null)
-                    {
-                        var mcTenant = tenantInfo.FirstOrDefault(x => x.Identifier == s.TenantIdentifier);
-                        if (mcTenant != null) { c.Course.OfferedBy = mcTenant.Name; }
-                        classes.Add(c);
-                    }
-                });
-
-                var mcEnrolments = await dbcT.MultiCampusEnrolment
-                                        .Where(x => x.TenantIdentifier != localTenant.Identifier
-                                                    && settings.MultiCampusU3AAllowed.Contains(x.TenantIdentifier))
-                                        .ToListAsync();
-                foreach (var mcE in mcEnrolments)
-                {
-                    MultiCampusPerson mcP = await dbcT.MultiCampusPerson.FirstOrDefaultAsync(x => x.ID == mcE.PersonID);
-                    MultiCampusTerm mcT = await dbcT.MultiCampusTerm.FirstOrDefaultAsync(x => x.ID == mcE.TermID);
-                    Class c;
-                    if (mcP != null && mcT != null)
-                    {
-                        if (mcE.ClassID == null)
-                        {
-                            c = classes.Where(x => x.CourseID == mcE.CourseID).FirstOrDefault();
-                        }
-                        else
-                        {
-                            c = classes.Where(x => x.ID == mcE.ClassID).FirstOrDefault();
-                        }
-                        if (c == null) { continue; }
-                        Enrolment e = GetEnrolmentFromMCEnrolment(mcE, mcP, c, mcT);
-                        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
-                        {
-                            foreach (var classToupdate in classes.Where(x => x.CourseID == c.Course.ID))
-                            {
-                                if (e.IsWaitlisted) { classToupdate.TotalWaitlistedStudents++; } else { classToupdate.TotalActiveStudents++; }
-                                classToupdate.Course.Enrolments.Add(e);
-                            }
-                        }
-                        else
-                        {
-                            if (e.IsWaitlisted) { c.TotalWaitlistedStudents++; } else { c.TotalActiveStudents++; }
-                            c.Enrolments.Add(e);
-                        }
-                    }
-                }
-                result.AddRange(classes);
-            }
-            Parallel.ForEach(result, c =>
-            {
-                AssignClassCounts(term, c);
-            });
+            result.AddRange(await RestoreClassesFromMultiCampusScheduleAsync(
+                                    dbc,
+                                    dbcT,
+                                    tenantService,
+                                    term,
+                                    settings));
 
             // sort & return the result
             return result.OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
