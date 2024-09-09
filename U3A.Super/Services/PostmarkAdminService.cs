@@ -110,7 +110,7 @@ namespace U3A.Super.Services
             var dnsResult = await dnsLookup.QueryAsync(domain.DKIMPendingHost, QueryType.TXT);
             if (dnsResult.Answers.Count == 0) { throw new Exception($"Unable to resolve hostname [{domain.DKIMPendingHost}]"); };
             var answer = dnsResult.Answers[0] as TxtRecord;
-            if (answer.Text.First() != domain.DKIMPendingTextValue) { throw new Exception($"Hostname [{domain.DKIMPendingHost}] of type TXT found but text values do not match."); };
+            if (answer!.Text.First() != domain.DKIMPendingTextValue) { throw new Exception($"Hostname [{domain.DKIMPendingHost}] of type TXT found but text values do not match."); };
             var result = await client.VerifyDomainDkim(domain.ID);
             return result;
         }
