@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 using U3A.WebFunctions.Procedures;
@@ -25,7 +26,7 @@ namespace U3A.WebFunctions
         [Function("DailyProcedures")]
         public async Task Run([TimerTrigger("0 0 17 * * *"      
 #if DEBUG
-            , RunOnStartup=true
+            //, RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
@@ -86,6 +87,18 @@ namespace U3A.WebFunctions
                 else
                 {
                     _logger.LogInformation($"Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
+                }
+            }
+
+            foreach (var tenant in tenants)
+            {
+                using (var dbc = new U3ADbContext(tenant))
+                {
+                        using (var dbcT = new TenantDbContext(cn!))
+                        {
+                            await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
+                        }
+                        _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
             }
 

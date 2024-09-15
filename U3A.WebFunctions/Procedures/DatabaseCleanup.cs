@@ -15,11 +15,11 @@ namespace U3A.WebFunctions.Procedures
                 try
                 {
                     _ = await dbc.Database.ExecuteSqlRawAsync(@"execute [dbo].[prcDbCleanup]");
-                    logger.LogInformation("Execute [dbo].[prcDbCleanup] completed.");
+                    logger.LogInformation($"[{tenant.Identifier}]: Execute [dbo].[prcDbCleanup] completed.");
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("Execute [dbo].[prcDbCleanup] failed: " + ex.Message);
+                    logger.LogError("[{tenant.Identifier}]: Execute [dbo].[prcDbCleanup] failed: " + ex.Message);
                 }
             }
         }

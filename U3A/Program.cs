@@ -204,6 +204,10 @@ if (!builder.Environment.IsDevelopment())
     _ = builder.Services.AddApplicationInsightsTelemetry(options =>
        options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 }
+builder.Services.AddStackExchangeRedisCache(option =>
+{
+    option.Configuration = builder.Configuration["CacheConnection"];
+});
 
 var app = builder.Build();
 app.UseRequestLocalization("en-AU");
