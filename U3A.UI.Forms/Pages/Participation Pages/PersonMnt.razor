@@ -4,11 +4,18 @@
 @using System.Diagnostics
 @using DevExpress.Data.Filtering;
 @using Microsoft.AspNetCore.Hosting
+@using Microsoft.AspNetCore.Identity
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.WebUtilities
+@using U3A.Data
 
 @inject NavigationManager NavMan
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IWebHostEnvironment environment
+@inject UserManager<ApplicationUser> UserManager
+
 
 @implements IDisposable
 
@@ -69,9 +76,9 @@
                         PopupEditFormHeaderText="Add/Edit Participant"
                         DataItemDeleting="Grid_DataItemDeleting">
                     <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid 
-                            SpreadsheetHeaderRows="2"
-                            ToolbarFilterClosed="@(OnToolbarFilterClosed)">
+                        <GridToolbar LinkedGrid=@mainGrid
+                                     SpreadsheetHeaderRows="2"
+                                     ToolbarFilterClosed="@(OnToolbarFilterClosed)">
                             <CustomButtonContent>
                                 <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
                                                BeginGroup=true
@@ -160,8 +167,9 @@
                             <DxFormLayoutItem ColSpanMd="12">
                                 <ValidationSummary />
                             </DxFormLayoutItem>
-                            <div class="w-100 m-2 text-danger">
-                                <strong>NB:</strong> Changing the Email address requires Member Portal re-registration.
+                            <div style="white-space:normal" class="m-2 w-100 alert alert-warning text-center" hidden="@(!isEmailEditing)">
+                                <strong>NB:</strong> The recommended way of changing an Email address is via <b>Manage Credentials</b> within the  Member Portal.
+                                <br />Changing an Email address using this procedure should be considered a measure of last resort as it bypasses important validation checks.
                             </div>
                             <DxFormLayoutGroup Caption="Personal" ColSpanMd="6">
                                 <DxFormLayoutItem Caption="Title" ColSpanMd="12">
@@ -206,7 +214,15 @@
                                     <DxSpinEdit @bind-Value="@editItem.Postcode" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Email" autocomplete="new-password" />
+                                    <DxTextBox @bind-Text="@editItem.Email" onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"
+                                               autocomplete="new-password"
+                                               ReadOnly="@(!isEmailEditing)">
+                                        <Buttons>
+                                            <DxEditorButton CssClass="text-warning"
+                                                            IconCssClass="bi bi-pencil"
+                                                            Click="@(() => {if (!isEmailEditing) isEmailEditing = true;})" />
+                                        </Buttons>
+                                    </DxTextBox>
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Home Phone" ColSpanMd="12">
                                     <DxTextBox @bind-Text="@editItem.HomePhone" autocomplete="new-password" />
@@ -316,6 +332,7 @@
     DocumentServer server;
     int emailsSent;
     bool isGridFilterSet;
+    bool isEmailEditing;
 
     MessageBox? messageBox { get; set; }
 
@@ -396,6 +413,10 @@
         // Assign changes from the edit model to the data item.
         if (dataItem != null)
         {
+            if (editModel.Email.Trim().ToLower() != dataItem.Email.Trim().ToLower())
+            {
+                if (!(await ChangeEmail(dataItem.Email, editModel.Email, editModel.PersonIdentity))) { e.Cancel = true; return; }
+            }
             editModel.CopyTo(dataItem);
             // Post changes to the database.
             if (e.IsNew) await dbc.AddAsync(dataItem);
@@ -413,6 +434,46 @@
                 }
             }
         }
+    }
+
+    async Task<bool> ChangeEmail(string originalEmail, string newEmail, string personIdentity)
+    {
+        var result = true;
+        IdentityResult callResult;
+        var hasher = new PasswordHasher<IdentityUser>();
+        var user = await UserManager.FindByEmailAsync(originalEmail);
+        if (user is null)
+        {
+            user = new ApplicationUser()
+                {
+                    Email = newEmail,
+                    UserName = newEmail,
+                    EmailConfirmed = true,
+                    PasswordHash = hasher.HashPassword(null, personIdentity)
+                };
+            callResult = await UserManager.CreateAsync(user);
+        }
+        else
+        {
+            user.UserName = newEmail;
+            user.Email = newEmail;
+            callResult = await UserManager.UpdateAsync(user);
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+            _ = await UserManager.ConfirmEmailAsync(user, token);
+        }
+        if (!callResult.Succeeded)
+        {
+            var msg = string.Empty;
+            foreach (var err in callResult.Errors)
+            {
+                msg += $"&nbsp;&nbsp;{err.Description}<br/>";
+            }
+            result = await messageBox.ShowAsync("Email change failed",
+                        $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
+                        <p>Are you sure you wish to continue?</p>");
+        }
+
+        return result;
     }
 
     async Task<bool> IsDataOK(Person person)
