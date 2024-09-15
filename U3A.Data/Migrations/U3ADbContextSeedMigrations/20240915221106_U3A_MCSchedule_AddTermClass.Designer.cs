@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 {
     [DbContext(typeof(U3ADbContextSeed))]
-    partial class U3ADbContextSeedModelSnapshot : ModelSnapshot
+    [Migration("20240915221106_U3A_MCSchedule_AddTermClass")]
+    partial class U3A_MCSchedule_AddTermClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1013,7 +1016,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.Property<string>("TenantIdentifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("TermId")
                         .HasColumnType("uniqueidentifier");
@@ -1037,9 +1040,6 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("TenantIdentifier", "TermId", "ClassID")
-                        .IsUnique();
 
                     b.ToTable("Schedule");
                 });

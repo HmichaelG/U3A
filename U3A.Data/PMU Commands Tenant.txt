@@ -1,8 +1,8 @@
-﻿update-database -cont TenantDbContext -project U3A.Database TdB_LogEvents
+﻿update-database -cont TenantDbContext -project U3A.Database TdB_MCSchedule_AddTermClass
 
-remove-migration -cont TenantDbContext -project U3A.Database -args TdB_LogAutoEnrol
+remove-migration -cont TenantDbContext -project U3A.Database -args TdB_MCSchedule_AddIndex
 
-add-migration -cont TenantDbContext -project U3A.Database TdB_LogAutoEnrol
+add-migration -cont TenantDbContext -project U3A.Database TdB_MCSchedule_AddIndex
 
 update-database -cont TenantDbContext -project U3A.Database
 

@@ -23,11 +23,11 @@ namespace U3A.BusinessRules
                                     TenantDbContext dbcT,
                                     TenantInfoService tenantService,
                                     Term term, SystemSettings settings,
-                                    bool exludeOffScheduleActivities)
+                                    bool excludeOffScheduleActivities)
         {
             Task<List<Class>> syncTask = Task.Run(async () =>
             {
-                return await RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, true);
+                return await RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, excludeOffScheduleActivities, true);
             });
             syncTask.Wait();
             return syncTask.Result;
@@ -36,7 +36,7 @@ namespace U3A.BusinessRules
                                                     TenantDbContext dbcT,
                                                     TenantInfoService tenantService,
                                                     Term term, SystemSettings settings,
-                                                    bool exludeOffScheduleActivities,
+                                                    bool excludeOffScheduleActivities,
                                                     bool IsFinancial)
         {
             var classes = new ConcurrentBag<Class>();
@@ -58,7 +58,7 @@ namespace U3A.BusinessRules
                                                 .AsNoTracking()
                                                 .Select(x => x.ID).ToListAsync());
             // Get Class updates since cache creation
-            foreach (var c in await GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities, firstSchedule.UpdatedOn))
+            foreach (var c in await GetClassDetailsAsync(dbc, term, settings, excludeOffScheduleActivities, firstSchedule.UpdatedOn))
             {
                 classes.Add(c);
             }
@@ -74,7 +74,7 @@ namespace U3A.BusinessRules
             Parallel.ForEach(schedule, s =>
             {
                 var c = JsonSerializer.Deserialize<Class>(s.jsonClass.Unzip());
-                if (!exludeOffScheduleActivities || !c.Course.IsOffScheduleActivity)
+                if (!excludeOffScheduleActivities || !c.Course.IsOffScheduleActivity)
                 {
                     c.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonClassEnrolments.Unzip());
                     c.Course.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonCourseEnrolments.Unzip());
@@ -265,12 +265,12 @@ namespace U3A.BusinessRules
                 var classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
                 foreach (var c in classes)
                 {
-                    schedules.Add(processClasses(c, settings, TenantIdentifier));
+                    schedules.Add(processClasses(c, term, settings, TenantIdentifier));
                     if (c.Course.AllowMultiCampsuFrom != null
                                 && now >= c.Course.AllowMultiCampsuFrom
                                 && !c.Course.IsOffScheduleActivity)
                     {
-                        multiCampusSchedules.Add(processClasses(c, settings, TenantIdentifier));
+                        multiCampusSchedules.Add(processClasses(c, term, settings, TenantIdentifier));
                     }
                 }
 
@@ -287,7 +287,7 @@ namespace U3A.BusinessRules
                 catch (Exception ex)
                 {
                     await dbc.Database.RollbackTransactionAsync();
-                    throw new Exception("Error saving shcedule cache to database", ex);
+                    throw new Exception("Error saving schedule cache to database", ex);
                 }
 
                 //multi-campus
@@ -439,7 +439,7 @@ namespace U3A.BusinessRules
             return mcp;
         }
 
-        private static MultiCampusSchedule processClasses(Class c, SystemSettings settings, string TenantIdentifier)
+        private static MultiCampusSchedule processClasses(Class c, Term t, SystemSettings settings, string TenantIdentifier)
         {
             var cls = JsonSerializer.Serialize<Class>(c).Zip();
             var classEnrolments = JsonSerializer.Serialize<IEnumerable<Enrolment>>(c.Enrolments).Zip();
@@ -447,6 +447,8 @@ namespace U3A.BusinessRules
             var s = new MultiCampusSchedule()
             {
                 TenantIdentifier = TenantIdentifier,
+                ClassID = c.ID,
+                TermId = t.ID,
                 jsonClass = cls,
                 jsonClassEnrolments = classEnrolments,
                 jsonCourseEnrolments = courseEnrolments,

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.TenantStoreDb
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240915221347_TdB_MCSchedule_AddTermClass")]
+    partial class TdB_MCSchedule_AddTermClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,7 +277,7 @@ namespace U3A.Database.Migrations.TenantStoreDb
 
                     b.Property<string>("TenantIdentifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("TermId")
                         .HasColumnType("uniqueidentifier");
@@ -298,9 +301,6 @@ namespace U3A.Database.Migrations.TenantStoreDb
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("TenantIdentifier", "TermId", "ClassID")
-                        .IsUnique();
 
                     b.ToTable("MultiCampusSchedule");
                 });

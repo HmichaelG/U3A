@@ -64,7 +64,7 @@ namespace U3A.UI.Reports
                 {
                     classes = BusinessRule.RestoreClassesFromSchedule(DbContext,
                                         TenantDbContext, TenantService,
-                                        term, settings, exludeOffScheduleActivities: true);
+                                        term, settings, excludeOffScheduleActivities: true);
                 }
                 else
                 {
