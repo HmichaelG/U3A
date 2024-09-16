@@ -58,11 +58,11 @@ namespace U3A.Database
             if (_httpContextAccessor.HttpContext == null) { return; }
             if (_httpContextAccessor.HttpContext.Request == null) { return; }
             if (_httpContextAccessor.HttpContext.Request.Host == null) { return; }
-            var identifirer = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);
+            var identifier = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);
             using (var dbc = _TenantDbFactory.CreateDbContext())
             {
                 TenantInfo = dbc.TenantInfo.AsNoTracking()
-                    .FirstOrDefault(x => x.Identifier == identifirer);
+                    .FirstOrDefault(x => x.Identifier == identifier);
                 if (TenantInfo == null)
                 {
                     TenantInfo = dbc.TenantInfo
