@@ -41,11 +41,11 @@ namespace U3A.BusinessRules
         {
             var classes = new ConcurrentBag<Class>();
             var localTenant = await tenantService.GetTenantInfoAsync();
-            // get the first recorded schedule
-            var firstSchedule = await dbc.Schedule.AsNoTracking()
-                                        .OrderBy(x => x.CreatedOn)
+            // get the last recorded schedule
+            var lastSchedule = await dbc.Schedule.AsNoTracking()
+                                        .OrderByDescending(x => x.UpdatedOn)
                                         .FirstOrDefaultAsync();
-            if (firstSchedule == null) { return new List<Class>(); }
+            if (lastSchedule == null) { return new List<Class>(); }
 
             TenantInfo tInfo = await tenantService.GetTenantInfoAsync();
             // Get all current Enrolment keys
@@ -58,18 +58,18 @@ namespace U3A.BusinessRules
                                                 .AsNoTracking()
                                                 .Select(x => x.ID).ToListAsync());
             // Get Class updates since cache creation
-            foreach (var c in await GetClassDetailsAsync(dbc, term, settings, excludeOffScheduleActivities, firstSchedule.UpdatedOn))
+            foreach (var c in await GetClassDetailsAsync(dbc, term, settings, excludeOffScheduleActivities, lastSchedule.UpdatedOn))
             {
                 classes.Add(c);
             }
             // Get the new enrolments
             var newEnrolments = await dbc.Enrolment.AsNoTracking()
                                 .Include(x => x.Term)
-                                .Where(x => x.Created > firstSchedule.CreatedOn).ToListAsync();
+                                .Where(x => x.Created > lastSchedule.UpdatedOn).ToListAsync();
             // get new dropouts
             var newDropouts = await dbc.Dropout.AsNoTracking()
                                 .Include(x => x.Term)
-                                .Where(x => x.DropoutDate > firstSchedule.CreatedOn).ToListAsync();
+                                .Where(x => x.DropoutDate > lastSchedule.UpdatedOn).ToListAsync();
             var schedule = await dbc.Schedule.AsNoTracking().ToListAsync();
             Parallel.ForEach(schedule, s =>
             {
@@ -140,10 +140,10 @@ namespace U3A.BusinessRules
                     Enrolment e = GetEnrolmentFromMCEnrolment(mcE, mcP, c, mcT);
                     if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
                     {
-                        foreach (var classToupdate in classes.Where(x => x.CourseID == c.Course.ID))
+                        foreach (var classToUpdate in classes.Where(x => x.CourseID == c.Course.ID))
                         {
-                            if (e.IsWaitlisted) { classToupdate.TotalWaitlistedStudents++; } else { classToupdate.TotalActiveStudents++; }
-                            classToupdate.Course.Enrolments.Add(e);
+                            if (e.IsWaitlisted) { classToUpdate.TotalWaitlistedStudents++; } else { classToUpdate.TotalActiveStudents++; }
+                            classToUpdate.Course.Enrolments.Add(e);
                         }
                     }
                     else
@@ -154,7 +154,7 @@ namespace U3A.BusinessRules
                 }
             }
 
-            // Other U3A Classes & Enrolemnts allowed by our U3A
+            // Other U3A Classes & Enrolments allowed by our U3A
             result.AddRange(await RestoreClassesFromMultiCampusScheduleAsync(
                                     dbc,
                                     dbcT,
@@ -176,7 +176,7 @@ namespace U3A.BusinessRules
             var localTenant = await tenantService.GetTenantInfoAsync();
             TenantInfo tInfo = await tenantService.GetTenantInfoAsync();
 
-            // Other U3A Classes & Enrolemnts allowed by our U3A
+            // Other U3A Classes & Enrolments allowed by our U3A
             if (tInfo.EnableMultiCampusExtension && settings.AllowMultiCampusExtensions)
             {
                 classes.Clear();
@@ -222,10 +222,10 @@ namespace U3A.BusinessRules
                         Enrolment e = GetEnrolmentFromMCEnrolment(mcE, mcP, c, mcT);
                         if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
                         {
-                            foreach (var classToupdate in classes.Where(x => x.CourseID == c.Course.ID))
+                            foreach (var classToUpdate in classes.Where(x => x.CourseID == c.Course.ID))
                             {
-                                if (e.IsWaitlisted) { classToupdate.TotalWaitlistedStudents++; } else { classToupdate.TotalActiveStudents++; }
-                                classToupdate.Course.Enrolments.Add(e);
+                                if (e.IsWaitlisted) { classToUpdate.TotalWaitlistedStudents++; } else { classToUpdate.TotalActiveStudents++; }
+                                classToUpdate.Course.Enrolments.Add(e);
                             }
                         }
                         else
@@ -286,7 +286,7 @@ namespace U3A.BusinessRules
                     // Multi-campus extensions must be enabled at the tenant & the client level
                     if (tInfo.EnableMultiCampusExtension && settings.AllowMultiCampusExtensions)
                     {
-                        await UpdateMultiCampusScheduleCache(dbcT, schedules, TenantIdentifier);
+                        await UpdateMultiCampusScheduleCache(dbcT, multiCampusSchedules, TenantIdentifier);
                         await dbcT.SaveChangesAsync();
                     }
                 }
