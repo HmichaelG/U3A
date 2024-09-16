@@ -97,7 +97,7 @@ namespace U3A.BusinessRules
         private static IQueryable<Class> GetSameParticipantClasses(U3ADbContext dbc,
                                                 Term term, bool ExludeOffScheduleActivities, DateTime? LastScheduleUpdate)
         {
-            return dbc.Class
+            return dbc.Class.AsNoTracking().AsSplitQuery()
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Course)
@@ -115,7 +115,7 @@ namespace U3A.BusinessRules
         private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc,
                                             Term term, bool ExludeOffScheduleActivities, DateTime? LastScheduleUpdate)
         {
-            return dbc.Class.AsNoTracking()
+            return dbc.Class.AsNoTracking().AsSplitQuery()
                             .Include(x => x.OnDay)
                             .Include(x => x.Course).ThenInclude(x => x.CourseType)
                             .Include(x => x.Leader)

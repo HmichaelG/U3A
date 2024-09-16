@@ -34,7 +34,7 @@ namespace U3A.Model
             }
         }
 
-        // The enrolment that caused Iselected = true
+        // The enrolment that caused IsSelected = true
         [NotMapped] public Enrolment? IsSelectedByEnrolment { get; set; }
 
         [NotMapped] public bool IsNotSelected { get { return !IsSelected; } }
@@ -75,6 +75,7 @@ namespace U3A.Model
                 if (OfferedTerm2) { result = $"{result} T2"; }
                 if (OfferedTerm3) { result = $"{result} T3"; }
                 if (OfferedTerm4) { result = $"{result} T4"; }
+                if (result == string.Empty) { result = "-Undefined"; }
                 if (Course != null) { result = $"{Course.Year}{result}"; }
                 return result.Trim();
             }
