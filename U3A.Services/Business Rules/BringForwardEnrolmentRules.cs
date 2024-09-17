@@ -226,8 +226,8 @@ namespace U3A.BusinessRules
             switch (targetTerm.TermNumber - sourceTerm.TermNumber)
             {
                 case 2: // term 3 & term 1, term 4 & term 2
-                    if (sourceTerm.TermNumber == 3 && !c.OfferedTerm2) result = true;
-                    if (sourceTerm.TermNumber == 4 && !c.OfferedTerm3) result = true;
+                    if (targetTerm.TermNumber == 3 && !c.OfferedTerm2) result = true;
+                    if (targetTerm.TermNumber == 4 && !c.OfferedTerm3) result = true;
                     break;
                 case 3: // term 4 and term 1 only
                     if (!c.OfferedTerm2 && !c.OfferedTerm3) result = true;
