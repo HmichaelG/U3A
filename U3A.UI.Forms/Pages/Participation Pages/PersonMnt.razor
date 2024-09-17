@@ -413,7 +413,11 @@
         // Assign changes from the edit model to the data item.
         if (dataItem != null)
         {
-            if (editModel.Email.Trim().ToLower() != dataItem.Email.Trim().ToLower())
+            if (e.IsNew)
+            {
+                if (!(await AddEmail(editModel.Email, editModel.PersonIdentity))) { e.Cancel = true; return; }
+            }
+            else if (editModel.Email.Trim().ToLower() != dataItem.Email.Trim().ToLower())
             {
                 if (!(await ChangeEmail(dataItem.Email, editModel.Email, editModel.PersonIdentity))) { e.Cancel = true; return; }
             }
@@ -434,6 +438,36 @@
                 }
             }
         }
+    }
+
+    async Task<bool> AddEmail(string email, string personIdentity)
+    {
+        var result = true;
+        var hasher = new PasswordHasher<IdentityUser>();
+        var user = await UserManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            user = new ApplicationUser()
+                {
+                    Email = email,
+                    UserName = email,
+                    EmailConfirmed = true,
+                    PasswordHash = hasher.HashPassword(null, personIdentity)
+                };
+            var callResult = await UserManager.CreateAsync(user);
+            if (!callResult.Succeeded)
+            {
+                var msg = string.Empty;
+                foreach (var err in callResult.Errors)
+                {
+                    msg += $"&nbsp;&nbsp;{err.Description}<br/>";
+                }
+                result = await messageBox.ShowAsync("Email change failed",
+                                $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
+                        <p>Are you sure you wish to continue?</p>");
+            }
+        }
+        return result;
     }
 
     async Task<bool> ChangeEmail(string originalEmail, string newEmail, string personIdentity)
@@ -469,7 +503,7 @@
                 msg += $"&nbsp;&nbsp;{err.Description}<br/>";
             }
             result = await messageBox.ShowAsync("Email change failed",
-                        $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
+                            $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
         }
 
