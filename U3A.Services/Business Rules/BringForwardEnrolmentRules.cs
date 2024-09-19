@@ -1,4 +1,5 @@
-﻿using DevExpress.DirectX.NativeInterop.Direct2D;
+﻿using DevExpress.Blazor.Internal;
+using DevExpress.DirectX.NativeInterop.Direct2D;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -96,6 +97,23 @@ namespace U3A.BusinessRules
                                     List<Enrolment> addedEnrolments,
                                     Term sourceTerm, Term targetTerm)
         {
+            Tuple<Guid, Guid, Guid?> dropoutKey;
+            (Guid, Guid?) enrolmentKey;
+            bool forceWaitlisted = false;
+            var dropouts = await dbc.Dropout.AsNoTracking()
+                             .Where(x => x.TermID == targetTerm.ID)
+                             .Select(x => new Tuple<Guid, Guid, Guid?>(x.PersonID, x.CourseID, x.ClassID))
+                             .ToListAsync();
+            var enrolmentCountAtStart = await dbc.Enrolment.AsNoTracking()
+                         .Where(x => x.TermID == targetTerm.ID && !x.IsWaitlisted)
+                           .GroupBy(x => new { x.CourseID, x.ClassID })
+                           .Select(x => new
+                           {
+                               Key = x.Key,
+                               Enrolled = x.Count()
+                           })
+                           .ToListAsync();
+
             var enrolments = await dbc.Enrolment
                             .Include(x => x.Term)
                             .Include(x => x.Class)
@@ -104,12 +122,22 @@ namespace U3A.BusinessRules
                             .Where(e => !e.IsDeleted && e.Term == sourceTerm
                                                     && e.Person.DateCeased == null
                                                     && e.Person.FinancialTo >= sourceTerm.Year)
+                            .OrderBy(x => x.CourseID).ThenBy(x => x.ClassID).ThenBy(x => x.DateEnrolled)
                             .ToListAsync();
             foreach (var e in enrolments)
             {
+                // do not re-enroll if in dropout list
+                dropoutKey = new Tuple<Guid, Guid, Guid?>(e.PersonID, e.CourseID, e.ClassID);
+                if (dropouts.Contains(dropoutKey)) { continue; }
+
+                // set force waitlist if current enrolments greater than maximum allowed.
+                enrolmentKey = new ( e.CourseID, e.ClassID );
+                var enrolledAtStart = enrolmentCountAtStart
+                                            .FirstOrDefault(x => x.Key.CourseID == e.CourseID
+                                             && x.Key.ClassID.GetValueOrDefault() == e.ClassID.GetValueOrDefault())?.Enrolled ?? 0;
                 if (ShouldBringForwardPrevTerm(dbc, sourceTerm, targetTerm, e.Class))
                 {
-                    await CreateEnrolment(dbc, addedEnrolments, e, targetTerm);
+                    await CreateEnrolment(dbc, enrolledAtStart, addedEnrolments, e, targetTerm);
                 }
                 else
                 {
@@ -117,11 +145,11 @@ namespace U3A.BusinessRules
                                         .Include(x => x.Classes)
                                         .Where(x => x.ID == e.Course.ID).ToListAsync())
                     {
-                        foreach (var clss in course.Classes)
+                        foreach (var c in course.Classes)
                         {
-                            if (ShouldBringForwardPrevTerm(dbc, sourceTerm, targetTerm, clss))
+                            if (ShouldBringForwardPrevTerm(dbc, sourceTerm, targetTerm, c))
                             {
-                                await CreateEnrolment(dbc, addedEnrolments, e, targetTerm);
+                                await CreateEnrolment(dbc, enrolledAtStart, addedEnrolments, e, targetTerm);
                                 break;  // we only need one new enrolment
                             }
                         }
@@ -131,6 +159,7 @@ namespace U3A.BusinessRules
         }
 
         static async Task CreateEnrolment(U3ADbContext dbc,
+                            int enrolledAtStart,
                             List<Enrolment> addedEnrolments,
                             Enrolment currentEnrolment,
                             Term? targetTerm)
@@ -152,6 +181,12 @@ namespace U3A.BusinessRules
             if (!await IsAlreadyEnrolled(dbc, newEnrolment)
                     && !IsNewlyEnrolled(newEnrolment, addedEnrolments))
             {
+                int totalEnrolments = enrolledAtStart +
+                        addedEnrolments.Where(x => x.CourseID ==  currentEnrolment.CourseID
+                                                    && x.ClassID.GetValueOrDefault() == currentEnrolment.ClassID.GetValueOrDefault()
+                                                    && !x.IsWaitlisted)
+                                       .Count();
+                if (totalEnrolments >= currentEnrolment.Course.MaximumStudents) { newEnrolment.IsWaitlisted = true; }
                 await dbc.Enrolment.AddAsync(newEnrolment);
                 addedEnrolments.Add(newEnrolment);
             }

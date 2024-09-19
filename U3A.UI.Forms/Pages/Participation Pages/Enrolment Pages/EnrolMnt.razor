@@ -393,14 +393,14 @@ else
     {
         if (selectedTerm.Comparer > currentTerm.Comparer && !isWaitlisted)
         {
-            await messageBox.ShowOkOnlyAsync("Enrol is not allowed",
+            await messageBox.ShowOkOnlyAsync("Enroll is not allowed",
                 "The enrolment status for future enrolments must remain Waitlisted.");
         }
         else
         {
             if (thisEnrolment.Person?.FinancialTo < currentTerm.Year && !isWaitlisted)
             {
-                await messageBox.ShowOkOnlyAsync("Enrol is not allowed",
+                await messageBox.ShowOkOnlyAsync("Enroll is not allowed",
                     "The enrolment status must remain Waitlisted because the student is unfinancial.");
             }
             else { thisEnrolment.IsWaitlisted = isWaitlisted; }
