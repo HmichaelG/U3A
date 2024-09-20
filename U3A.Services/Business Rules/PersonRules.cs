@@ -60,12 +60,11 @@ namespace U3A.BusinessRules
 
         public static async Task<List<Person>> SelectablePersonsAsync(U3ADbContext dbc, Term term)
         {
-            var people = dbc.Person.AsNoTracking()
-                            .AsEnumerable()
+            var people = await dbc.Person.AsNoTracking()
                             .Where(x => x.DateCeased == null)
                             .OrderBy(x => x.LastName)
                             .ThenBy(x => x.FirstName)
-                            .ThenBy(x => x.Email).ToList();
+                            .ThenBy(x => x.Email).ToListAsync();
             await ApplyGroupsAsync(dbc, people);
             return people.Where(x => x.FinancialTo >= term.Year - 1).ToList();
         }
