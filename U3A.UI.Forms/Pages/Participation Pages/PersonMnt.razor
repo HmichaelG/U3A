@@ -213,10 +213,10 @@
                                 <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
                                     <DxSpinEdit @bind-Value="@editItem.Postcode" autocomplete="new-password" />
                                 </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Email" onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"
+                                <DxFormLayoutItem Caption="Email" ColSpanMd="12" >
+                                    <DxTextBox @bind-Text="@editItem.Email" onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"                                               
                                                autocomplete="new-password"
-                                               ReadOnly="@(!isEmailEditing)">
+                                               ReadOnly="@(!isEmailEditing)" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
                                         <Buttons>
                                             <DxEditorButton CssClass="text-warning"
                                                             IconCssClass="bi bi-pencil"
@@ -417,7 +417,7 @@
             {
                 if (!(await AddEmail(editModel.Email, editModel.PersonIdentity))) { e.Cancel = true; return; }
             }
-            else if (editModel.Email.Trim().ToLower() != dataItem.Email.Trim().ToLower())
+            else if (editModel.Email?.Trim().ToLower() != dataItem.Email?.Trim().ToLower())
             {
                 if (!(await ChangeEmail(dataItem.Email, editModel.Email, editModel.PersonIdentity))) { e.Cancel = true; return; }
             }
@@ -443,6 +443,7 @@
     async Task<bool> AddEmail(string email, string personIdentity)
     {
         var result = true;
+        if (string.IsNullOrWhiteSpace(email)) { return true; }
         var hasher = new PasswordHasher<IdentityUser>();
         var user = await UserManager.FindByEmailAsync(email);
         if (user is null)
@@ -475,7 +476,8 @@
         var result = true;
         IdentityResult callResult;
         var hasher = new PasswordHasher<IdentityUser>();
-        var user = await UserManager.FindByEmailAsync(originalEmail);
+        ApplicationUser? user = null;
+        if (!string.IsNullOrWhiteSpace( originalEmail)) user = await UserManager.FindByEmailAsync(originalEmail);
         if (user is null)
         {
             user = new ApplicationUser()
@@ -489,11 +491,18 @@
         }
         else
         {
-            user.UserName = newEmail;
-            user.Email = newEmail;
-            callResult = await UserManager.UpdateAsync(user);
-            var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-            _ = await UserManager.ConfirmEmailAsync(user, token);
+            if (!string.IsNullOrWhiteSpace(newEmail))
+            {
+                user.UserName = newEmail;
+                user.Email = newEmail;
+                callResult = await UserManager.UpdateAsync(user);
+                var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+                _ = await UserManager.ConfirmEmailAsync(user, token);
+            }
+            else
+            {
+                callResult = await UserManager.DeleteAsync(user);
+            }
         }
         if (!callResult.Succeeded)
         {
