@@ -286,8 +286,23 @@ namespace U3A.BusinessRules
                     // Multi-campus extensions must be enabled at the tenant & the client level
                     if (tInfo.EnableMultiCampusExtension && settings.AllowMultiCampusExtensions)
                     {
-                        await UpdateMultiCampusScheduleCache(dbcT, multiCampusSchedules, TenantIdentifier);
-                        await dbcT.SaveChangesAsync();
+                        await dbcT.Database.BeginTransactionAsync();
+                        try
+                        {
+                            // Schedule cache
+                            await dbcT.MultiCampusSchedule.Where(x => x.TenantIdentifier == TenantIdentifier).ExecuteDeleteAsync();
+                            await dbcT.MultiCampusSchedule.AddRangeAsync(multiCampusSchedules);
+                            // Terms
+                            await UpdateTermCache(dbc, dbcT, TenantIdentifier);
+                            // members
+                            await UpdatePersonCache(dbc, dbcT, TenantIdentifier);
+                            await dbcT.SaveChangesAsync();
+                            await dbcT.Database.CommitTransactionAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            await dbcT.Database.RollbackTransactionAsync();                           
+                        }
                     }
                 }
             }
@@ -487,64 +502,6 @@ namespace U3A.BusinessRules
             dbc.RemoveRange(deleted);
             dbc.UpdateRange(updates);
         }
-
-        private static async Task UpdateMultiCampusScheduleCache(TenantDbContext dbcT,
-                                                IEnumerable<MultiCampusSchedule> NewSchedule,
-                                                string TenantIdentifier)
-        {
-            ConcurrentBag<MultiCampusSchedule> deleted = new();
-            ConcurrentBag<MultiCampusSchedule> additions = new();
-            ConcurrentBag<MultiCampusSchedule> updates = new();
-            var currentSchedule = await dbcT.MultiCampusSchedule.ToListAsync();
-            if (currentSchedule != null && currentSchedule.Count > 0)
-            {
-                Parallel.ForEach(currentSchedule, async s =>
-                {
-                    if (!NewSchedule.Any(x => x.TenantIdentifier == s.TenantIdentifier
-                                            && x.ClassID == s.ClassID
-                                            && x.TermId == s.TermId)) { deleted.Add(s); }
-                    else
-                    {
-                        var newValues = NewSchedule.FirstOrDefault(x => x.TenantIdentifier == s.TenantIdentifier
-                                                                    && x.ClassID == s.ClassID
-                                                                    && x.TermId == s.TermId);
-                        if (s.jsonClass != newValues.jsonClass
-                                 || s.jsonClassEnrolments != newValues.jsonClassEnrolments
-                                 || s.jsonCourseEnrolments != newValues.jsonCourseEnrolments)
-                        {
-                            s.jsonClass = newValues.jsonClass;
-                            s.jsonClassEnrolments = newValues.jsonClassEnrolments;
-                            s.jsonCourseEnrolments = newValues.jsonCourseEnrolments;
-                            updates.Add(s);
-                        }
-                    }
-                });
-            }
-            if (NewSchedule != null && NewSchedule.Count() > 0)
-            {
-                Parallel.ForEach(NewSchedule, async s =>
-                {
-                    if (!currentSchedule.Any(x => x.TenantIdentifier == s.TenantIdentifier
-                                                                    && x.ClassID == s.ClassID
-                                                                    && x.TermId == s.TermId))
-                    {
-                        var newSch = new MultiCampusSchedule()
-                        {
-                            jsonClass = s.jsonClass,
-                            jsonClassEnrolments = s.jsonClassEnrolments,
-                            jsonCourseEnrolments = s.jsonCourseEnrolments,
-                            TermId = s.TermId,
-                            ClassID = s.ClassID,
-                            TenantIdentifier = s.TenantIdentifier,
-                        };
-                        additions.Add(newSch);
-                    }
-                });
-            }
-            await dbcT.AddRangeAsync(additions);
-            dbcT.RemoveRange(deleted);
-            dbcT.UpdateRange(updates);
-        }
-
     }
+
 }

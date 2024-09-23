@@ -17,12 +17,12 @@ namespace U3A.Database
 
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDbContextFactory<TenantDbContext> _TenantDbFactory;
-        private readonly bool useCachedTenentInfo = false;
+        private readonly bool useCachedTenantInfo = false;
 
-        public U3ADbContext(TenantInfo tenantInfo)
+        public U3ADbContext(TenantInfo tenantInfo, bool UseCachedTenant = true)
         {
             TenantInfo = tenantInfo;
-            useCachedTenentInfo = true;
+            useCachedTenantInfo = UseCachedTenant;
         }
 
         [ActivatorUtilitiesConstructor] // force DI to use this constructor
@@ -51,7 +51,7 @@ namespace U3A.Database
 
         private void GetTenantInfo()
         {
-            if (useCachedTenentInfo) { return; }
+            if (useCachedTenantInfo) { return; }
             HostStrategy hs = new HostStrategy();
 
             if (_httpContextAccessor == null) { return; }

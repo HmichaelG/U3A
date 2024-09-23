@@ -78,7 +78,7 @@ namespace U3A.WebFunctions
             }
             foreach (var tenant in tenants)
             {
-                using (var dbc = new U3ADbContext(tenant))
+                using (var dbc = new U3ADbContext(tenant, UseCachedTenant: false))
                 {
                     dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                     var hour = (DateTime.Now + dbc.UtcOffset).Hour;

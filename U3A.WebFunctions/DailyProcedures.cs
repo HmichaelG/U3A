@@ -92,13 +92,15 @@ namespace U3A.WebFunctions
 
             foreach (var tenant in tenants)
             {
-                using (var dbc = new U3ADbContext(tenant))
+                using (var dbc = new U3ADbContext(tenant, UseCachedTenant: false))
                 {
-                        using (var dbcT = new TenantDbContext(cn!))
-                        {
-                            await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
-                        }
-                        _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
+                    utcOffset = await Common.GetUtcOffsetAsync(dbc);
+                    dbc.UtcOffset = utcOffset;
+                    using (var dbcT = new TenantDbContext(cn!))
+                    {
+                        await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
+                    }
+                    _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
             }
 
