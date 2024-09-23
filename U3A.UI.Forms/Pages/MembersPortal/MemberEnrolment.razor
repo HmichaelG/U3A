@@ -174,25 +174,25 @@ else
 
                                             @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
                                             {
-                                                <div class="col-small ps-1"><strong>Offered:</strong></div>
+                                                <div class="col-small ps-1"><strong>Offered</strong></div>
                                                 <div class="col-large">@c.OfferedSummary</div>
-                                                <div class="col-small ps-1"><strong>Type:</strong></div>
+                                                <div class="col-small ps-1"><strong>Type</strong></div>
                                                 <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
-                                                <div class="col-small ps-1"><strong>Class:</strong></div>
+                                                <div class="col-small ps-1"><strong>Class</strong></div>
                                                 <div class="col-large">@(GetClassDetails(c))</div>
                                                 @if (c.Course.ClassSummaries.Count <= 1)
                                                 {
-                                                    <div class="col-small ps-1"><strong>Venue:</strong></div>
+                                                    <div class="col-small ps-1"><strong>Venue</strong></div>
                                                     <div class="col-large">@HighlightSearchText(c.Venue?.Name)</div>
                                                     <div class="offset-small col-large">@c.Venue?.Address</div>
                                                 }
-                                                <div class="col-small px-1"><strong>Leader:</strong></div>
+                                                <div class="col-small px-1"><strong>Leader</strong></div>
                                                 <div class="col-large">@HighlightSearchText(c.PrimaryLeader)</div>
 
                                                 @if (c.CourseContacts.Count > 0)
                                                 {
                                                     var contact = c.SelectedCourseContact;
-                                                    <div class="col-small px-1"><strong>Contact:</strong></div>
+                                                    <div class="col-small px-1"><strong>Contact</strong></div>
                                                     var p = contact.Person;
                                                     <div class="col-large">
                                                         @($"({contact.ContactType}) {HighlightSearchText(p.FullNameWithPostNominals)}")
@@ -200,11 +200,11 @@ else
                                                     var phone = "";
                                                     if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.HomePhone))
                                                     {
-                                                        phone = $"Phone: {p.AdjustedHomePhone} ";
+                                                        phone = $"Ph: {p.AdjustedHomePhone} ";
                                                     }
                                                     if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.Mobile))
                                                     {
-                                                        phone += $"Mobile: {p.AdjustedMobile}";
+                                                        phone += $"Mob: {p.AdjustedMobile}";
                                                         if (p.SMSOptOut) phone += $" {constants.NO_SMS}";
                                                     }
                                                     <div class="offset-small col-large">@phone.Trim()</div>
@@ -394,7 +394,7 @@ else
         -webkit-flex: 0 0 auto;
         -ms-flex: 0 0 auto;
         flex: 0 0 auto;
-        width: 20%;
+        width: 22%;
     }
 
     .col-large {
@@ -402,11 +402,11 @@ else
         -webkit-flex: 0 0 auto;
         -ms-flex: 0 0 auto;
         flex: 0 0 auto;
-        width: 80%;
+        width: 78%;
     }
 
     .offset-small {
-        margin-left: 20%;
+        margin-left: 22%;
     }
 
     .watermark {
