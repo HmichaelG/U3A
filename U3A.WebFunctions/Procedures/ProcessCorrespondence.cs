@@ -183,6 +183,7 @@ namespace U3A.WebFunctions.Procedures
                             if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
                         }
                     }
+                    await BusinessRule.UpdateMultiCampusMailAsync(dbcT, mailItems);
                     _ = await dbc.SaveChangesAsync();
                     _ = await dbcT.SaveChangesAsync();
                     var postalCount = reportFactory.PostalReports.Count;
@@ -193,11 +194,9 @@ namespace U3A.WebFunctions.Procedures
                     }
                     // Delete expired records
                     dbc.RemoveRange(dbc.SendMail.AsEnumerable()
-                        .Where(x => !string.IsNullOrWhiteSpace(x.Status) &&
-                                        (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
+                        .Where(x => (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
                     dbcT.RemoveRange(dbcT.MultiCampusSendMail.AsEnumerable()
-                        .Where(x => !string.IsNullOrWhiteSpace(x.Status) &&
-                                        (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
+                        .Where(x => (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
                     var deleted = dbc.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
                     deleted += dbcT.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
                     if (deleted > 0)
