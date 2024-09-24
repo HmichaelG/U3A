@@ -77,12 +77,12 @@ namespace U3A.WebFunctions
                 isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                 if (isBackgroundProcessingEnabled)
                 {
+#if !DEBUG
                     await ProcessCorrespondence.Process(tenant, cn!, _logger, IsHourlyProcedure: false);
                     await SendLeaderReports.Process(tenant, _logger);
-#if !DEBUG
                     await ProcessMembershipCoordinatorEmail.Process(tenant, _logger);
-#endif
                     await ProcessQueuedDocuments.Process(tenant, _logger);
+#endif
                 }
                 else
                 {
