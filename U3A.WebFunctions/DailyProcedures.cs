@@ -92,7 +92,7 @@ namespace U3A.WebFunctions
 
             foreach (var tenant in tenants)
             {
-                using (var dbc = new U3ADbContext(tenant, UseCachedTenant: false))
+                using (var dbc = new U3ADbContext(tenant))
                 {
                     utcOffset = await Common.GetUtcOffsetAsync(dbc);
                     dbc.UtcOffset = utcOffset;

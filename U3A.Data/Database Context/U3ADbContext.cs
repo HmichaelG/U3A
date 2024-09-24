@@ -19,10 +19,10 @@ namespace U3A.Database
         private readonly IDbContextFactory<TenantDbContext> _TenantDbFactory;
         private readonly bool useCachedTenantInfo = false;
 
-        public U3ADbContext(TenantInfo tenantInfo, bool UseCachedTenant = true)
+        public U3ADbContext(TenantInfo tenantInfo)
         {
             TenantInfo = tenantInfo;
-            useCachedTenantInfo = UseCachedTenant;
+            useCachedTenantInfo = true;
         }
 
         [ActivatorUtilitiesConstructor] // force DI to use this constructor
