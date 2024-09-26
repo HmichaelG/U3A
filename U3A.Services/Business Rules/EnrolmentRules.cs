@@ -18,38 +18,33 @@ namespace U3A.BusinessRules
         public static async Task<List<Enrolment>> EditableEnrolmentsAsync(U3ADbContext dbc, Term SelectedTerm,
                               Course SelectedCourse, Class SelectedClass)
         {
+            List<Enrolment> enrolments = null;
             if (SelectedClass == null || SelectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
             {
-                return dbc.Enrolment
+                enrolments = await dbc.Enrolment
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
                                     .Where(x => x.CourseID == SelectedCourse.ID
                                                         && x.TermID == SelectedTerm.ID
-                                                        && x.Person.DateCeased == null)
-                                    .AsEnumerable()
-                                    .OrderBy(x => x.IsWaitlisted)
-                                                .ThenBy(x => x.WaitlistSort)
-                                                .ThenBy(x => x.Person.LastName)
-                                                .ThenBy(x => x.Person.FirstName)
-                                    .ToList();
+                                                        && x.Person.DateCeased == null).ToListAsync();
             }
             else
             {
-                return dbc.Enrolment
+                enrolments = await dbc.Enrolment
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
                                     .Where(x => x.ClassID == SelectedClass.ID
                                                     && x.TermID == SelectedTerm.ID
-                                                    && x.Person.DateCeased == null)
-                                    .AsEnumerable()
-                                    .OrderBy(x => x.IsWaitlisted)
+                                                    && x.Person.DateCeased == null).ToListAsync();
+            }
+            return enrolments.OrderBy(x => x.IsWaitlisted)
                                                 .ThenBy(x => x.WaitlistSort)
                                                 .ThenBy(x => x.Person.LastName)
                                                 .ThenBy(x => x.Person.FirstName)
                                     .ToList();
-            }
+
         }
 
         public static async Task<List<Enrolment>> GetEnrolmentIncludeLeadersAsync(U3ADbContext dbc,
