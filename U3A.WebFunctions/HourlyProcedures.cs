@@ -81,16 +81,11 @@ namespace U3A.WebFunctions
                 using (var dbc = new U3ADbContext(tenant))
                 {
                     dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-                    var hour = (DateTime.Now + dbc.UtcOffset).Hour;
-                    List<int> execHours = new() { 8, 12, 18 };
-                    if (execHours.Contains(hour))
+                    using (var dbcT = new TenantDbContext(cn!))
                     {
-                        using (var dbcT = new TenantDbContext(cn!))
-                        {
-                            await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
-                        }
-                        _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
+                        await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
                     }
+                    _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
             }
             _logger.LogInformation($"Hourly Procedures complete at: {DateTime.UtcNow} UTC");
