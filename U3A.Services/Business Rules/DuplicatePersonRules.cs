@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DevExpress.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Text;
@@ -199,7 +201,21 @@ namespace U3A.BusinessRules
             string cleanText = Regex.Replace(s, "[^0-9a-zA-Z]+", " ");
             List<string> tokens = cleanText.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
             tokens.AddRange(CamelCaseToTokens(tokens));
-            for (int i = 0; i < tokens.Count; i++) { tokens[i] = tokens[i].ToUpper(); }
+            List<string> additionalTokens = new();
+            // allow for O'Brien, O'Donnell etc
+            for (int i = 0; i < tokens.Count-1; i++)
+            {
+               var token = tokens[i];
+                if (token == "O")
+                {
+                    additionalTokens.Add($"O'{tokens[i + 1]}");
+                }
+                else if (token.StartsWithInvariantCultureIgnoreCase("O") && token.Length > 1)
+                {
+                    additionalTokens.Add($"O'{token.Substring(1)}");
+                }
+            }
+            tokens.AddRange(additionalTokens);
             return tokens.ToArray();
         }
 
@@ -209,7 +225,7 @@ namespace U3A.BusinessRules
             foreach (var token in tokens)
             {
                 if (token.ToUpper() == token || token.ToLower() == token) { continue; }
-                // Convert CamelCase to normal 
+                // add space if CamelCase
                 var normalText = Regex.Replace(token, "(\\B[A-Z])", " $1");
                 result.AddRange(normalText.Split(" ", StringSplitOptions.RemoveEmptyEntries));
             }
