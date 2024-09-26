@@ -209,14 +209,20 @@ namespace U3A.BusinessRules
         private static void AssignClassTerm(Class c, IEnumerable<Term> terms, Term term)
         {
             c.TermNumber = GetRequiredTerm(term.TermNumber, c);
-            Parallel.ForEach(c.Course.Enrolments, e =>
+            if (c.TermNumber != term.TermNumber)
             {
-                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-            });
-            Parallel.ForEach(c.Enrolments, e =>
-            {
-                e.Term = terms.FirstOrDefault(x => x.ID == e.TermID);
-            });
+                var thisTerm = terms.First(x => x.Year == term.Year && x.TermNumber == c.TermNumber);
+                Parallel.ForEach(c.Course.Enrolments, e =>
+                {
+                    e.TermID = thisTerm.ID;
+                    e.Term = thisTerm;
+                });
+                Parallel.ForEach(c.Enrolments, e =>
+                {
+                    e.TermID = thisTerm.ID;
+                    e.Term = thisTerm;
+                });
+            }
         }
         static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes, DateTime localTime)
         {
@@ -256,16 +262,16 @@ namespace U3A.BusinessRules
         }
         public static int GetRequiredTerm(int termNumber, Class c)
         {
-            int Result = termNumber - 1;
-            while (true)
+            int Result = termNumber;
+            while (Result > 0)
             {
-                Result++;
                 if (Result == 1 && c.OfferedTerm1) return Result;
                 if (Result == 2 && c.OfferedTerm2) return Result;
                 if (Result == 3 && c.OfferedTerm3) return Result;
                 if (Result == 4 && c.OfferedTerm4) return Result;
-                if (Result > 4) { return termNumber; }
+                Result--;
             }
+            return termNumber;
         }
         private static IEnumerable<Class> EnsureOneClassOnlyForSameParticipantsInEachClass(U3ADbContext dbc, IEnumerable<Class> classes)
         {
