@@ -19,8 +19,8 @@ namespace U3A.BusinessRules
 
             // removing the identifier stop matches against the group name (eastlakes, maitland etc)
             var info = dbc.TenantInfo;
-            var bankDescription = BankDescription.ToUpper();
-            bankDescription = bankDescription.Replace(info.Identifier.ToUpper(), String.Empty);
+            var bankDescription = BankDescription;
+            bankDescription = bankDescription.Replace(info.Identifier, String.Empty,StringComparison.InvariantCultureIgnoreCase);
 
             // split the description into space-delimited tokens
             var tokens = GetTokens(BankDescription);
@@ -31,14 +31,17 @@ namespace U3A.BusinessRules
             string tokenFirstInitial = "";
             foreach (var token in tokens)
             {
-                tokenLastName = (await dbc.Person.AnyAsync(x => x.LastName.ToUpper() == token)) ? token : "";
+                tokenLastName = (await dbc.Person.AnyAsync(x => x.LastName == token)) ? token : "";
                 if (tokenLastName != "") break;
             }
             if (tokenLastName != "")
             {
                 foreach (var token in tokens)
                 {
-                    if (token != tokenLastName) tokenFirstName = (await dbc.Person.AnyAsync(x => x.FirstName.ToUpper() == token)) ? token : "";
+                    if (token != tokenLastName)
+                    {
+                        tokenFirstName = (await dbc.Person.AnyAsync(x => x.FirstName == token)) ? token : "";
+                    }
                     if (tokenFirstName != "") break;
                 }
             }
@@ -46,30 +49,29 @@ namespace U3A.BusinessRules
             {
                 foreach (var token in tokens)
                 {
-                    if (tokenFirstName == "" && token != tokenLastName && token.Length == 1)
+                    if (tokenFirstName == "" && !string.Equals(token,tokenLastName,StringComparison.InvariantCultureIgnoreCase) && token.Length == 1)
+                    {
                         tokenFirstInitial =
-                            (await dbc.Person.AnyAsync(x => x.FirstName.Substring(0, 1).ToUpper() == token))
+                            (await dbc.Person.AnyAsync(x => x.FirstName.Substring(0, 1) == token))
                                 ? token.Substring(0, 1) : "";
+                    }
                     if (tokenFirstInitial != "") break;
                 }
             }
 
             if (tokenLastName != "" && tokenFirstName != "")
             {
-                people = await dbc.Person.Where(x => x.LastName.ToUpper() == tokenLastName &&
-                                            x.FirstName.ToUpper() == tokenFirstName).ToListAsync();
+                people = await dbc.Person.Where(x => x.LastName == tokenLastName &&
+                                            x.FirstName == tokenFirstName).ToListAsync();
             }
             if (tokenLastName != "" && tokenFirstInitial != "")
             {
-                int count = await dbc.Person.CountAsync(x => x.LastName.ToUpper() == tokenLastName &&
-                                            x.FirstName.Substring(0, 1).ToUpper() == tokenFirstInitial);
-                people = await dbc.Person.Where(x => x.LastName.ToUpper() == tokenLastName &&
-                                            x.FirstName.Substring(0, 1).ToUpper() == tokenFirstInitial).ToListAsync();
+                people = await dbc.Person.Where(x => x.LastName == tokenLastName &&
+                                            x.FirstName.Substring(0, 1) == tokenFirstInitial).ToListAsync();
             }
             if (people.Count <= 0 && tokenLastName != "")
             {
-                int count = await dbc.Person.CountAsync(x => x.LastName.ToUpper() == tokenLastName);
-                people = await dbc.Person.Where(x => x.LastName.ToUpper() == tokenLastName).ToListAsync();
+                people = await dbc.Person.Where(x => x.LastName == tokenLastName).ToListAsync();
             }
             return people;
         }
