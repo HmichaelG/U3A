@@ -424,7 +424,7 @@ else
         processStartTime = DateTime.UtcNow;
         foreach (BasicTransaction trx in qif.BankTransactions)
         {
-           await ProcessReceiptData(trx.Amount, trx.Date, trx.Memo, trx.Category, IdAlreadyUsed);
+            await ProcessReceiptData(trx.Amount, trx.Date, trx.Memo, trx.Category, IdAlreadyUsed);
         }
     }
 
@@ -432,34 +432,37 @@ else
     {
         int currentRecord = 0;
 
-        // Fix ampersand issue
-        string text = await File.ReadAllTextAsync(file);
-        // Regular expression to find & that are not part of predefined entities
-        string pattern = @"&(?!amp;|lt;|gt;|quot;|apos;)";
-        string replacement = "&amp;";
-        // Replace & with &amp; where it's not part of a predefined entity
-        string result = Regex.Replace(text, pattern, replacement);
-        await File.WriteAllTextAsync(file, result);
+        // // Fix ampersand issue
+        // string text = await File.ReadAllTextAsync(file);
+        // // Regular expression to find & that are not part of predefined entities
+        // string pattern = @"&(?!amp;|lt;|gt;|quot;|apos;)";
+        // string replacement = "&amp;";
+        // // Replace & with &amp; where it's not part of a predefined entity
+        // string result = Regex.Replace(text, pattern, replacement);
+        // await File.WriteAllTextAsync(file, result);
 
         // and, parse...
-        var parserSettings = new ParserSettings();
-        parserSettings.CustomConverterCurrency = (x) => double.Parse(x);
-        Extract extract = Parser.GenerateExtract(file, parserSettings);
-        //
-        if (!await CheckBankFileDate(extract.InitialDate, extract.FinalDate)) return;
-        //
-        BankAccountDetails = $"Account {extract.BankAccount.AccountCode}: From {extract.InitialDate.ToLongDateString()} to {extract.FinalDate.ToLongDateString()}.";
-        var records = extract.Transactions.Count;
-        processStartTime = DateTime.UtcNow;
-        foreach (Transaction trx in extract.Transactions)
+        var statements = OfxDocument.Load(file).GetStatements();
+        if (statements is null) { return; }
+        foreach (OfxBankStatement statement in statements)
         {
-            await ProcessReceiptData((trx.Type == "Debit")
-                                            ? (decimal)trx.TransactionValue * -1
-                                            : (decimal)trx.TransactionValue,
-                                            trx.Date,
-                                            trx.Description,
-                                            trx.Id,
-                                            IdAlreadyUsed);
+            //
+            var startDate = statement.TransactionList.StartDate.Date;
+            var endDate = statement.TransactionList.EndDate.Date;
+            if (!await CheckBankFileDate(startDate, endDate)) return;
+            
+            BankAccountDetails = $"Account {statement.Account.AccountNumber}: From {startDate.ToLongDateString()} to {endDate.ToLongDateString()}.";
+            processStartTime = DateTime.UtcNow;
+            foreach (var trx in statement.TransactionList.Transactions)
+            {
+                await ProcessReceiptData((trx.TxType == OfxTransactionType.DEBIT)
+                                                ? (decimal) -trx.Amount
+                                                : (decimal) trx.Amount,
+                                                trx.DatePosted.Date,
+                                                trx.Memo,
+                                                trx.ReferenceNumber,
+                                                IdAlreadyUsed);
+            }
         }
     }
 
