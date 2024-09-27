@@ -27,13 +27,13 @@
 
     int ValueNow { get; set; }
     int MaxValue { get; set; }
-    string Percent { get; set; }
+    string Percent { get; set; } = "";
     bool ShowHeader = true;
 
     DxPopup? ProgressBar;
 
-    string Caption { get; set; }
-    string PopupWidth;
+    string Caption { get; set; } = "";
+    string PopupWidth = "";
 
     public async Task ShowAsync(string Caption, int MaxValue) {
         IsProgressBar = true;
@@ -67,7 +67,7 @@
             ShowHeader = false;
             PopupVisible = true;
         });
-       InvokeAsync(StateHasChanged);
+       await InvokeAsync(StateHasChanged);
     }
 
     public async Task SetValueAsync(int ValueNow) {
@@ -84,7 +84,7 @@
         await Task.Run(() => {
             PopupVisible = false;
         });
-        Task.Delay(1000);
+        await Task.Delay(1000);
         StateHasChanged();
     }
 

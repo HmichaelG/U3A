@@ -70,30 +70,6 @@
     ErrorBoundary? errorBoundary;
     U3ADbContext? dbc { get; set; }
     string? messageText;
-    string? OrganisationName;
-
-    bool hasRole;
-
-    protected override async Task OnInitializedAsync()
-    {
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            OrganisationName = dbc.TenantInfo.Name;
-            var roles = dbc.Roles.ToList();
-            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            foreach (var r in roles)
-            {
-                if (authenticationState.User.IsInRole(r.Name!))
-                {
-                    hasRole = true;
-                    break;
-                }
-            }
-            var authEmail = authenticationState.User.Identity!.Name;
-            if (authEmail == constants.superAdmin) hasRole = true;
-        }
-        await base.OnInitializedAsync();
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

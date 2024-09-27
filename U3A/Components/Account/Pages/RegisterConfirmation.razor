@@ -16,23 +16,12 @@
 
 <StatusMessage Message="@statusMessage" />
 
-@if (emailConfirmationLink is not null)
-{
-    <p>
-        This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-        Normally this would be emailed: <a href="@emailConfirmationLink">Click here to confirm your account</a>
-    </p>
-}
-else
-{
     <p>We have sent an email with the subject <strong>U3A Member Portal email confirmation</strong>.<br/> 
         Click the link in that email to confirm your registration.</p>
     <p><strong>Hint</strong> Sometimes it will take a minute or two for your email to arrive.<br/>
         Don't forget to check your junk folder or the Other (non-Focused) folder in Outlook.</p>
-}
 
 @code {
-    private string? emailConfirmationLink;
     private string? statusMessage;
 
     [CascadingParameter]
@@ -51,21 +40,11 @@ else
             RedirectManager.RedirectTo("");
         }
 
-        var user = await UserManager.FindByEmailAsync(Email);
+        var user = await UserManager.FindByEmailAsync(Email!);
         if (user is null)
         {
             HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             statusMessage = "Error finding user for unspecified email";
         }
-        // else if (EmailSender is IdentityNoOpEmailSender)
-        // {
-        //     // Once you add a real email sender, you should remove this code that lets you confirm the account
-        //     var userId = await UserManager.GetUserIdAsync(user);
-        //     var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-        //     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        //     emailConfirmationLink = NavigationManager.GetUriWithQueryParameters(
-        //         NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
-        //         new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
-        // }
     }
 }

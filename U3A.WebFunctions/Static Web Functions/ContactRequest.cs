@@ -68,7 +68,7 @@ namespace U3A.WebFunctions
         {
             var postmarkKey = _config.GetValue<string>("PostmarkKey");
             var supportEmail = _config.GetValue<string>("SupportEmailAddress");
-            var emailSender = EmailFactory.GetEmailSender(postmarkKey, false);
+            var emailSender = EmailFactory.GetEmailSender(postmarkKey!, false);
             var table = BuildTable(name, email, phone, message, u3a);
             string HTMMessage = @$"
             <h3>Thank you for contacting U3Admin.org.au</h3>
@@ -81,7 +81,7 @@ namespace U3A.WebFunctions
             <p>Again, thank you for your interest in our software.</p>
             <p><strong>The U3Admin support Team</strong></p>
             ";
-            _ = await emailSender.SendEmailAsync(EmailType.Transactional,
+            _ = await emailSender!.SendEmailAsync(EmailType.Transactional,
                 "system@u3admin.org.au",
                 "U3Admin system support",
                 email,
@@ -96,7 +96,7 @@ namespace U3A.WebFunctions
             _ = await emailSender.SendEmailAsync(EmailType.Transactional,
                 "system@u3admin.org.au",
                 "U3Admin system support",
-                supportEmail,
+                supportEmail!,
                 string.Empty,
                 "HEADS UP!!! A U3Admin information request has been received",
                 HTMMessage,

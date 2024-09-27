@@ -120,7 +120,7 @@ namespace U3A.Super.Services
             var bouncePath = $"pm-bounces.{domain.Name}";
             var dnsResult = await dnsLookup.QueryAsync(bouncePath, QueryType.CNAME);
             if (dnsResult.Answers.Count == 0) { throw new Exception($"Unable to resolve hostname [{bouncePath}]"); };
-            string canonicalName = (dnsResult.Answers[0] as CNameRecord).CanonicalName;
+            string canonicalName = (dnsResult.Answers[0] as CNameRecord)!.CanonicalName;
             if (canonicalName.EndsWith(".")) { canonicalName = canonicalName.TrimEnd('.'); }
             if (canonicalName != domain.ReturnPathDomainCNAMEValue) { throw new Exception($"Hostname [{bouncePath}] of type CNAME found but values do not match."); };
             var result = await client.VerifyDomainReturnPath(domain.ID);

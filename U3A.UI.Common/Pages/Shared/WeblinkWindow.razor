@@ -41,32 +41,31 @@
 
 @code {
 
-    string WebLink { get; set; }
+    string? WebLink { get; set; }
 
     DxWindow? weblinkWindow;
     string windowHeight = "600px";
     string standardWidth = "80vw";
-    string windowWidth;
+    string windowWidth = "";
 
-    U3ADbContext dbc { get; set; }
-    SystemSettings? settings;
-    bool isReady;
+    U3ADbContext? dbc { get; set; }
 
     public async Task ShowTopicAsync(string WebLinkTopic, string WindowWidth)
     {
         windowWidth = WindowWidth;
         await ShowTopicAsync(WebLinkTopic);
     }
+
     public async Task ShowTopicAsync(string WebLinkTopic)
     {
-        if (weblinkWindow.Visible) { await weblinkWindow.CloseAsync(); }
+        if (weblinkWindow!.Visible) { await weblinkWindow.CloseAsync(); }
         else
         {
             WebLink = WebLinkTopic;
             if (string.IsNullOrWhiteSpace(windowWidth)) { windowWidth = standardWidth; }
             await weblinkWindow.ShowAsync();
         }
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
     }
 
     void OnClosed()

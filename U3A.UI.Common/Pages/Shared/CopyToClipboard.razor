@@ -27,7 +27,9 @@
 
 
 @code {
-    [Parameter] public string Text { get; set; }
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = "";
+
     bool IsOpen;
     string flyoutID = "ID" + Guid.NewGuid().ToString();
     System.Threading.Timer? timer;
@@ -37,7 +39,7 @@
     {
         await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", Text);
         IsOpen = true;
-        timer = new System.Threading.Timer(CloseFlyout, new System.Threading.AutoResetEvent(true), 1500, 1500);
+        timer = new System.Threading.Timer(CloseFlyout!, new System.Threading.AutoResetEvent(true), 1500, 1500);
     }
 
     async void CloseFlyout(object stateInfo)

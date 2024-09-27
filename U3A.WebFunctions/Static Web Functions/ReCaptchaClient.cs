@@ -26,8 +26,10 @@ namespace U3A.WebFunctions
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
 
-            response.WriteString((string?)reCaptchaSecret);
-
+            if (reCaptchaSecret != null)
+            {
+                response.WriteString((string)reCaptchaSecret);
+            }
             return response;
         }
     }
