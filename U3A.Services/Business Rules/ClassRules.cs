@@ -271,7 +271,7 @@ namespace U3A.BusinessRules
                 if (Result == 4 && c.OfferedTerm4) return Result;
                 Result--;
             }
-            return termNumber;
+            return Result;
         }
         private static IEnumerable<Class> EnsureOneClassOnlyForSameParticipantsInEachClass(U3ADbContext dbc, IEnumerable<Class> classes)
         {
@@ -585,6 +585,7 @@ namespace U3A.BusinessRules
                             Class Class, Term term, Term defaultTerm, IEnumerable<Term> allTerms = null)
         {
 
+            Class.TermNumber = GetRequiredTerm(term.TermNumber, Class);
             Log.Information("Processing {p0}...", Class.Course.Name);
             LogClassDetails(Class, term);
 
@@ -697,7 +698,7 @@ namespace U3A.BusinessRules
             Log.Information("    Start Date:         {p}", Class.StartDate);
             Log.Information("    Occurence:          {p}", (OccurrenceType)Class.OccurrenceID);
             Log.Information("    Recurence:          {p}", Class.Recurrence);
-            Log.Information("    Current Term:       {p}", term.Name);
+            Log.Information("    Class Term:         {p}", (Class.TermNumber > 0) ? $"Term-{Class.TermNumber}" : "Undefined");
             Log.Information("    Offered:            {p}", Class.OfferedSummary);
         }
 
