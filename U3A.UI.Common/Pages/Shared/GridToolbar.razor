@@ -4,15 +4,18 @@
 @using System.Collections
 @using System.Text.Json
 @using DevExpress.Blazor
+@using Blazored.LocalStorage
 
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager navMan
 
-<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" 
+<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained"
            CssClass="me-4"
            ItemClick="OnItemClick">
     <Items>
         @CustomButtonContentAtStart
         <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
-                       Visible = "@(LinkedGrid?.GetGroupCount() > 0 && !HideGroupPanel)"
+                       Visible="@(LinkedGrid?.GetGroupCount() > 0 && !HideGroupPanel)"
                        BeginGroup="true"
                        Alignment="ToolbarItemAlignment.Left">
             <Items>
@@ -59,12 +62,38 @@
                        CssClass="column-chooser-button"
                        Tooltip="Adjust column size to fit cell content">
         </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Choose" Text="Choose"
-                       BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right"
-                       CssClass="column-chooser-button"
-                       Tooltip="Customise column display">
-        </DxToolbarItem>
+        @if (LayoutKey == null)
+        {
+            <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Choose" Text="Choose"
+                           BeginGroup=true
+                           Alignment="ToolbarItemAlignment.Right"
+                           CssClass="column-chooser-button"
+                           Tooltip="Customise column display">
+            </DxToolbarItem>
+        }
+        else
+        {
+            <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Layout" Text="Layout"
+                           BeginGroup=true
+                           Alignment="ToolbarItemAlignment.Right"
+                           CssClass="column-chooser-button"
+                           Tooltip="Customise column layout">
+                <Items>
+                    <DxToolbarItem IconCssClass="bi bi-list-columns-reverse"
+                                   Name="Choose" Text="Choose fields"
+                                   Tooltip="Choose columns to display">
+                    </DxToolbarItem>
+                    <DxToolbarItem IconCssClass="bi bi-floppy"
+                                   Name="SaveLayout" Text="Save Layout"
+                                   Tooltip="Save the current layout">
+                    </DxToolbarItem>
+                    <DxToolbarItem IconCssClass="bi bi-arrow-counterclockwise"
+                                   Name="ResetLayout" Text="Reset Default Layout"
+                                   Tooltip="Reset column layout to its default">
+                    </DxToolbarItem>
+                </Items>
+            </DxToolbarItem>
+        }
         <DxToolbarItem IconCssClass="bi bi-funnel" Name="Filter" Text="Filter"
                        BeginGroup=true
                        Alignment="ToolbarItemAlignment.Right"
@@ -98,11 +127,26 @@
     [Parameter] public RenderFragment? CustomButtonContent { get; set; }
     [Parameter] public EventCallback ToolbarFilterClosed { get; set; }
     [Parameter] public int SpreadsheetHeaderRows { get; set; } = 1;
+    [Parameter] public string? LayoutKey { get; set; }
 
     internal bool IsToggleExpanded { get; set; } = false;
     internal string? ExpandCollapseText { get; set; }
+    GridPersistentLayout? layout;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnInitializedAsync()
+    {
+        if (LinkedGrid != null)
+        {
+            if (LayoutKey != null)
+            {
+                layout = await localStorage.GetItemAsync<GridPersistentLayout>(LayoutKey);
+                LinkedGrid.LoadLayout(layout);
+            }
+        }
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (LinkedGrid != null)
         {
@@ -131,7 +175,7 @@
             }
             LinkedGrid.EndUpdate();
         }
-        base.OnAfterRender(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task OnItemClick(ToolbarItemClickEventArgs e)
@@ -188,6 +232,13 @@
             case "Choose":
                 LinkedGrid.ShowColumnChooser(".column-chooser-button");
                 break;
+            case "SaveLayout":
+                await localStorage.SetItemAsync(LayoutKey!, LinkedGrid.SaveLayout());
+                break;
+            case "ResetLayout":
+                await localStorage.RemoveItemAsync(LayoutKey!);
+                navMan.NavigateTo(navMan.Uri, true);
+                break;
             case "ExportAll":
                 await ExcelExport(false);
                 break;
@@ -208,12 +259,11 @@
                 break;
         }
         LinkedGrid.EndUpdate();
-        StateHasChanged();
     }
 
     async Task ExcelExport(bool SelectedRowsOnly)
     {
-        foreach (var col in LinkedGrid.GetDataColumns())
+        foreach (var col in LinkedGrid!.GetDataColumns())
         {
             col.ExportEnabled = col.Visible;
             if (col.GroupIndex >= 0) col.ExportEnabled = true;
