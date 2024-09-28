@@ -38,32 +38,35 @@ namespace U3A.WebFunctions.Procedures
                 {
                     //Allocation is random
 
-                    allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
-                    if (BusinessRule.IsPreRandomAllocationDay(currentTerm, settings, today))
+                    if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
                     {
-                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
-                        return;
-                    }
-                    else
-                    {
-                        IsClassAllocationFinalised = currentTerm.IsClassAllocationFinalised;
-                        if (today == allocationDate)
+                        allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
+                        if (BusinessRule.IsPreRandomAllocationDay(currentTerm, settings, today))
                         {
-                            logger.LogInformation($"!!! [{dbc.TenantInfo.Identifier}]: Random Auto-Allocation Day !!!");
-                            var utcNow = DateTime.UtcNow;
-                            // emailDate will be 3 days from now less two hours to ensure it occurs.
-                            emailDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, 0, 0, 0) +
-                                            TimeSpan.FromHours((constants.RANDOM_ALLOCATION_PREVIEW * 24) - 2);
-                            // Set the enrolment period blackout end date
-                            settings.EnrolmentBlackoutEndsUTC = emailDate;
-                            // force all members to get a report
-                            forceEmailQueue = true;
-                            // set TRUE to force all leaders to get a report
-                            DailyProcedures.RandomAllocationExecuted[tenant.Identifier!] = true;
+                            logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
+                            return;
                         }
+                        else
+                        {
+                            IsClassAllocationFinalised = currentTerm.IsClassAllocationFinalised;
+                            if (today == allocationDate)
+                            {
+                                logger.LogInformation($"!!! [{dbc.TenantInfo.Identifier}]: Random Auto-Allocation Day !!!");
+                                var utcNow = DateTime.UtcNow;
+                                // emailDate will be 3 days from now less two hours to ensure it occurs.
+                                emailDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, 0, 0, 0) +
+                                                TimeSpan.FromHours((constants.RANDOM_ALLOCATION_PREVIEW * 24) - 2);
+                                // Set the enrolment period blackout end date
+                                settings.EnrolmentBlackoutEndsUTC = emailDate;
+                                // force all members to get a report
+                                forceEmailQueue = true;
+                                // set TRUE to force all leaders to get a report
+                                DailyProcedures.RandomAllocationExecuted[tenant.Identifier!] = true;
+                            }
 #if DEBUG
-                        forceEmailQueue = false;
+                            forceEmailQueue = false;
 #endif
+                        }
                     }
                 }
                 else
