@@ -76,7 +76,7 @@
                         PopupEditFormHeaderText="Add/Edit Participant"
                         DataItemDeleting="Grid_DataItemDeleting">
                     <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid
+                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="{CCDCC0AB-5B0D-40D5-BB06-7A21E3EDCAFA}"
                                      SpreadsheetHeaderRows="2"
                                      ToolbarFilterClosed="@(OnToolbarFilterClosed)">
                             <CustomButtonContent>
@@ -110,7 +110,7 @@
                                 <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" />
                             </Columns>
                         </DxGridBandColumn>
-                        <DxGridBandColumn Caption="Contact Detasil">
+                        <DxGridBandColumn Caption="Contact Detail">
                             <Columns>
                                 <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="15rem" />
                                 <DxGridDataColumn Caption="Domain" FieldName="Domain" Visible=false />
