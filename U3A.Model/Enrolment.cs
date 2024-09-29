@@ -14,7 +14,7 @@ namespace U3A.Model
     //  , [ClassID]
     //  , [PersonID])
     //WHERE isDeleted = 0
-    public class Enrolment : ISoftDelete
+    public class Enrolment : BaseEntity, ISoftDelete
     {
         public Enrolment() { Created = DateTime.UtcNow; }
 
