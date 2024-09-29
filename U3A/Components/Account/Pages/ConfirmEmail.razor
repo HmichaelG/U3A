@@ -41,16 +41,16 @@
             RedirectManager.RedirectTo("");
         }
 
-        var user = await UserManager.FindByIdAsync(UserId);
+        var user = await UserManager.FindByIdAsync(UserId!);
         if (user is null)
         {
             HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            statusMessage = $"Error loading user with ID {UserId}";
+            statusMessage = $"Error loading user with ID {UserId!}";
         }
         else
         {
             var originalEmail = user.Email;
-            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code!));
             var result = await UserManager.ConfirmEmailAsync(user, code);
             statusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
         }
