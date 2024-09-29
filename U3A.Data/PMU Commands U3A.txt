@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_MCSchedule_AddTermClass
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_MCSchedule_AddIndex
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_MCSchedule_AddIndex
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Enrolment_BaseEntity
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_MCSchedule_AddIndex
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Enrolment_BaseEntity
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
