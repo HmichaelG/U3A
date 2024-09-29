@@ -78,7 +78,7 @@ var pushTopicState = function(title, topic) {
 		}
 	if (typeof topic == "string" && typeof (history.replaceState) != "undefined") {
 		var thisUrl = document.location.href;
-			thisUrl = thisUrl.substring(0,thisUrl.lastIndexOf("/")+1);
+			thisUrl = thisUrl.substr(0,thisUrl.lastIndexOf("/")+1);
 			thisUrl = thisUrl + "index.html?" + topic;
 		var obj = { Title: title, Url: thisUrl }
 		history.replaceState(obj, obj.Title, obj.Url);

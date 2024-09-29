@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2023-06-19T08:27:51.912+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2024-09-29T11:58:58.594+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Grid</title>
   <body>
     <header>
@@ -43,7 +43,7 @@
     </table></para>
     <para styleclass="Normal">To rearrange or reorder columns, use the mouse to drag the column into the desired position, or</para>
     <para styleclass="Normal">Click <text style="font-style:italic;">Choose </text>on the <text style="font-style:italic;">Toolbar. </text>In the pop-up window, move the column headers using the drag bar on the right.</para>
-    <para styleclass="Heading3">Add/Remove Columns</para>
+    <para styleclass="Heading3">Add/Remove/Re-Order Columns</para>
     <para styleclass="Normal"><table styleclass="Default" rowcount="1" colcount="2">
       <tr style="vertical-align:top">
         <td style="width:215px;">
@@ -51,10 +51,19 @@
         </td>
         <td style="width:625px;">
           <para styleclass="Normal">On the toolbar, click <text style="font-style:italic;">Choose</text>.</para>
-          <para styleclass="Normal">In the pop-up windows tick or untick those columns you wish displayed or hidden.</para>
+          <para styleclass="Normal">In the pop-up window, tick or untick those columns you wish displayed or hidden.</para>
+          <para styleclass="Normal">You may also re-order columns by clicking the drag-handle to the right of the field and dragging up or down.</para>
         </td>
       </tr>
     </table></para>
+    <para styleclass="Heading3">Layout</para>
+    <para styleclass="Normal">The <text style="font-style:italic;">Layout </text>toolbar button may be displayed instead of the <text style="font-style:italic;">Choose</text> button. <text style="font-weight:bold;">Layout </text>provides the ability the choose the columns to be displayed and to save that display for later use. The option consists of three buttons.</para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:1px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal" style="margin-bottom:1px;"><text style="font-weight:bold;">Choose Fields</text>. This option will display the <text style="font-style:italic;">Column Chooser</text> window as described above.</li>
+      <li styleclass="Normal" style="margin-bottom:1px;"><text style="font-weight:bold;">Save Layout</text>. This button saves the chosen layout. All future grid displays will use the saved layout.</li>
+      <li styleclass="Normal" style="margin-bottom:1px;"><text style="font-weight:bold;">Reset Layout</text>. This button resets the grid layout to its default. The saved layout will be deleted.</li>
+    </list>
+    <para styleclass="Normal" style="margin-top:1px;"><text style="font-weight:bold;">Note:</text> The <text style="font-style:italic;">Layout</text> button requires additional programming to implement. It is only found on some grids such as <link displaytype="text" defaultstyle="true" type="topiclink" href="Add_Edit-Participants">Add/Edit Participants</link></para>
     <para styleclass="Heading3">Group Data</para>
     <para styleclass="Normal"><table styleclass="Default" rowcount="2" colcount="1">
       <tr style="vertical-align:top">
@@ -86,7 +95,7 @@
     <para styleclass="Normal">Click the <text style="font-style:italic;">Filter</text> button on the <text style="font-style:italic;">Toolbar</text> to display the filter panel. Two types of filtering will be available...</para>
     <para styleclass="Normal"><text style="font-weight:bold;">Column Header Filter</text></para>
     <para styleclass="Normal">Click the filter on any column header. This will display a filter pop-up showing all unique values within the column&apos;s rows. Select a data item by...</para>
-    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+    <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="margin-bottom:0px; font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal" style="margin-bottom:0px;">Tick the check box to the left of the column title to select that column, or</li>
       <li styleclass="Normal" style="margin-bottom:0px;">Use SHIFT-Click to select a range of values.</li>
     </list>
