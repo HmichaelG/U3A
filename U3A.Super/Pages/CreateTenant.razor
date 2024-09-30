@@ -333,7 +333,7 @@ else
         SetMessage($"Create/Update custom domain [{hostName}] in web application [{mySecrets.WEBAPP_NAME}]");
 
         var cert = await CreateOrUpdateAppCertificate(resourceGroup);
-        data.Thumbprint = cert.Thumbprint;
+        data.ThumbprintString = cert.ThumbprintString;
         data.SslState = HostNameBindingSslState.SniEnabled;
         _ = await hostNameBindings.CreateOrUpdateAsync(Azure.WaitUntil.Completed, hostName, data).ConfigureAwait(false);
         SetMessage($"Custom domain [{hostName}] bound to SSL Certificate [{cert.Name}]");

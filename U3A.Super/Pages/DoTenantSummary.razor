@@ -132,7 +132,6 @@
 </style>
 
 @code {
-    object? selectedDataItem;
     IReadOnlyList<object>? selectedItems;
     List<TenantInfo>? tenantInfo { get; set; }
     Dictionary<string, int?> financialMembers = new();
@@ -173,7 +172,7 @@
                     }
                     else Term1EnrolmentStart.Add(tenant.Id!, null);
                 }
-                catch (Exception e) { }
+                catch (Exception) { }
             }
         }
         IsReady = true;

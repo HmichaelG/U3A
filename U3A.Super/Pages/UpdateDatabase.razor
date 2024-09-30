@@ -64,21 +64,8 @@
 
     async Task ApplyFix(U3ADbContextSeed dbc)
     {
-        foreach (var ct in dbc.CourseType)
-        {
-            if (string.IsNullOrWhiteSpace(ct.Name)) continue;
-            if (!string.IsNullOrWhiteSpace(ct.ShortName)) continue;
-            if (ct.Name.Length <= 15)
-            {
-                ct.ShortName = ct.Name;
-            }
-            else
-            {
-                var splits = ct.Name.Split(new char[] { ' ', '/'});
-                ct.ShortName = splits[0];
-            }
-        }
-        await dbc.SaveChangesAsync();
+        await dbc.Database.ExecuteSqlRawAsync("UPDATE Enrolment SET CreatedOn = Created WHERE CreatedOn is null");
+        await dbc.Database.ExecuteSqlRawAsync("UPDATE Enrolment SET UpdatedOn = Created WHERE UpdatedOn is null");
     }
 
     void DoCancel() { NavMan.NavigateTo("/"); }
