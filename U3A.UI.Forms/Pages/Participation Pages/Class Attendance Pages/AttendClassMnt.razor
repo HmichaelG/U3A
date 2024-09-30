@@ -149,7 +149,7 @@ else
                     DataItemDeleting="Grid_DataItemDeleting"
                     EditModelSaving="Grid_EditModelSaving">
                     <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid Visible="false"
+                    <GridToolbar LinkedGrid=@mainGrid Visible="@(IsLargeLayout || IsXtraLargeLayout)" LayoutKey="{9C4F6177-3FAB-407A-A515-C1B30F04D836}"
                                  HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
                                  HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
                         <CustomButtonContent>
