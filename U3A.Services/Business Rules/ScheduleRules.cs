@@ -65,7 +65,7 @@ namespace U3A.BusinessRules
             // Get the new enrolments
             var newEnrolments = await dbc.Enrolment.AsNoTracking()
                                 .Include(x => x.Term)
-                                .Where(x => x.Created > lastSchedule.UpdatedOn).ToListAsync();
+                                .Where(x => x.UpdatedOn > lastSchedule.UpdatedOn).ToListAsync();
             // get new dropouts
             var newDropouts = await dbc.Dropout.AsNoTracking()
                                 .Include(x => x.Term)

@@ -567,7 +567,7 @@ namespace U3A.BusinessRules
             switch (termNumber)
             {
                 case 1:
-                    result = (Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4);
+                    result = Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4;
                     break;
                 case 2:
                     result = Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4;
@@ -614,22 +614,7 @@ namespace U3A.BusinessRules
             }
 
             // return True if term number is current or future
-            // && startDate/recurrence are null
-            switch (term.TermNumber)
-            {
-                case 1:
-                    result = Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4;
-                    break;
-                case 2:
-                    result = Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4;
-                    break;
-                case 3:
-                    result = Class.OfferedTerm3 || Class.OfferedTerm4;
-                    break;
-                case 4:
-                    result = Class.OfferedTerm4;
-                    break;
-            }
+            result = IsClassInRemainingYear(Class, term.TermNumber);
             if (result && startDate == null && recurrence == null)
             {
                 Console.BackgroundColor = ConsoleColor.Green;

@@ -143,6 +143,7 @@ namespace U3A.BusinessRules
             }
             return result;
         }
+
         public static async Task<bool> AnyEnrolmentsInYear(U3ADbContext dbc, Course course, int Year)
         {
             bool result = await dbc.Enrolment.AsNoTracking()
@@ -151,6 +152,16 @@ namespace U3A.BusinessRules
                                 .AnyAsync(x => x.CourseID == course.ID && x.Term.Year == Year);
             return result;
         }
+
+        public static async Task<bool> AnyEnrolmentsInYear(U3ADbContext dbc, Guid courseID)
+        {
+            bool result = await dbc.Enrolment.AsNoTracking()
+                                .Include(x => x.Course)
+                                .Include(x => x.Term)
+                                .AnyAsync(x => x.CourseID == courseID);
+            return result;
+        }
+
         public static List<Enrolment> SelectableEnrolments(U3ADbContext dbc, Term SelectedTerm)
         {
             var enrolments = dbc.Enrolment
