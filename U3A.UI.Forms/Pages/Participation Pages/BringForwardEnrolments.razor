@@ -19,7 +19,7 @@ else
     <div class="container-md py-2">
         <CollapsableContent DismissKey="{63BDF361-E40E-4B15-9A12-736AAF535B74}"
                         AlertText=@($@"<p><strong>Bring Forward Enrolments</strong> is now an automated procedure.<br />
-                      The next expected run date is on or before: {automationMsg}.</p>")
+                             {automationMsg}.</p>")
                           OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
         <div class="row">
             <div class="col col-md-2" />
@@ -121,11 +121,11 @@ else
                 if (DateTime.Today >= targetTerm.EnrolmentStartDate)
                 {
                     SetCurrentTerm = true;
-                    automationMsg = $"{targetTerm.StartDate.ToShortDateString()} (Start of Term {targetTerm.TermNumber}";
+                    automationMsg = $"Last Exexcuted: {targetTerm.EnrolmentStartDate.ToShortDateString()} (Start of Term {targetTerm.TermNumber} enrolment period.)";
                 }
                 else
                 {
-                    automationMsg = $"{targetTerm.EnrolmentStartDate.ToShortDateString()} (Start of Term {targetTerm.TermNumber} enrolment period";
+                    automationMsg = $"The next expected run date is on or before: {targetTerm.EnrolmentStartDate.ToShortDateString()} (Start of Term {targetTerm.TermNumber} enrolment period.)";
                 }
             }
         }
