@@ -189,11 +189,18 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
         {
             options.SignIn.RequireConfirmedAccount = true;
             options.User.RequireUniqueEmail = true;
+            options.Password.RequireDigit = false;
+            options.Password.RequiredLength = 10;
+            options.Password.RequiredUniqueChars = 6;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = false;
         })
+    .AddTop100000PasswordValidator<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<U3ADbContext>()
     .AddSignInManager()
-    .AddUserManager<UserManager<ApplicationUser>>()
+    .AddUserManager<UserManager<ApplicationUser>>()   
     .AddDefaultTokenProviders();
 
 
