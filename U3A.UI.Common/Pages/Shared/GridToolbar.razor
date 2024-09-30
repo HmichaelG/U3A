@@ -8,6 +8,9 @@
 
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject NavigationManager navMan
+@inject IToastNotificationService ToastService
+
+<DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
 
 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained"
            CssClass="me-4"
@@ -234,6 +237,14 @@
                 break;
             case "SaveLayout":
                 await localStorage.SetItemAsync(LayoutKey!, LinkedGrid.SaveLayout());
+                ToastService.ShowToast(new ToastOptions() 
+                { Title = "Layout Saved",
+                    Text = "Your grid layout has been saved.",
+                    ProviderName = "Result",
+                    ThemeMode = ToastThemeMode.Pastel,
+                    RenderStyle = ToastRenderStyle.Success,
+                    IconCssClass = "bi bi-check-circle"
+                    });
                 break;
             case "ResetLayout":
                 await localStorage.RemoveItemAsync(LayoutKey!);
