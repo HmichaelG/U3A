@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -49,6 +50,8 @@ builder.Services.Configure<DevExpress.Blazor.Configuration.GlobalOptions>(option
     options.SizeMode = DevExpress.Blazor.SizeMode.Small;
 });
 
+// Get / Set local storage data
+builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
