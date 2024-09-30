@@ -10,6 +10,7 @@
         ShowCancelButton = true;
         ShowOkButton = true;
         ShowNoButton = false;
+        LayoutKey = null;
     }
 
     public string Caption { get; set; }
@@ -20,5 +21,6 @@
     public bool ShowCancelButton { get; set; }
     public bool ShowOkButton { get; set; }
     public bool ShowNoButton { get; set; }
+    public string? LayoutKey { get; set; }
 }
 

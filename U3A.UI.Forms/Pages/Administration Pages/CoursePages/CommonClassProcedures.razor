@@ -3,112 +3,117 @@
 <MessageBox @ref="@messageBox" />
 
 @code {
-    MessageBox? messageBox;
+        MessageBox? messageBox;
 
-    internal async Task<bool> OnStartDateChanged(DateTime? newStartDate, Class editItem)
-    {
-        editItem.StartDate = newStartDate;
-        if (newStartDate.HasValue)
+        internal async Task<bool> OnStartDateChanged(DateTime? newStartDate, Class editItem)
         {
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            editItem.StartDate = newStartDate;
+            if (newStartDate.HasValue)
             {
-                editItem.OnDay = dbc.WeekDay.Find((int)newStartDate.Value.DayOfWeek);
-                Term term = await BusinessRule.FindTermAsync(dbc, newStartDate.Value);
-                if (term != null)
+                using (var dbc = await U3Adbfactory.CreateDbContextAsync())
                 {
-                    editItem.OfferedTerm1 = (term.TermNumber == 1);
-                    editItem.OfferedTerm2 = (term.TermNumber == 2);
-                    editItem.OfferedTerm3 = (term.TermNumber == 3);
-                    editItem.OfferedTerm4 = (term.TermNumber == 4);
+                    editItem.OnDay = dbc.WeekDay.Find((int)newStartDate.Value.DayOfWeek);
+                    Term term = await BusinessRule.FindTermAsync(dbc, newStartDate.Value);
+                    if (term != null)
+                    {
+                        editItem.OfferedTerm1 = (term.TermNumber == 1);
+                        editItem.OfferedTerm2 = (term.TermNumber == 2);
+                        editItem.OfferedTerm3 = (term.TermNumber == 3);
+                        editItem.OfferedTerm4 = (term.TermNumber == 4);
+                    }
                 }
             }
-        }
-        else
-        {
-            editItem.OfferedTerm1 = true;
-            editItem.OfferedTerm2 = true;
-            editItem.OfferedTerm3 = true;
-            editItem.OfferedTerm4 = true;
-        }
-        return newStartDate.HasValue;
-    }
-
-    public async Task<bool> IsDataOk(U3ADbContext DbContext, Class EditModel, bool IsNew)
-    {
-        var msg = string.Empty;
-        if (await BusinessRule.IsOutOfTermClass(DbContext, EditModel))
-        {
-            if (!await BusinessRule.IsOutOfTermClassOK(DbContext, EditModel))
+            else
             {
-                msg = @"<p>An Out of Term class must have an Occurrence of <strong>Once Only</strong> and Recurrence of <strong>nothing</strong>.</p>";
-                // set correct values
-                EditModel.OccurrenceID = (int)OccurrenceType.OnceOnly;
-                EditModel.Occurrence = DbContext?.Occurrence.First(x => x.ID == (int)OccurrenceType.OnceOnly);
-                EditModel.Recurrence = null;
+                editItem.OfferedTerm1 = true;
+                editItem.OfferedTerm2 = true;
+                editItem.OfferedTerm3 = true;
+                editItem.OfferedTerm4 = true;
             }
-            if (!await BusinessRule.IsOutOfTermClassTermOK(DbContext, EditModel))
+            return newStartDate.HasValue;
+        }
+
+        public async Task<bool> IsDataOk(U3ADbContext DbContext, Class EditModel, bool IsNew)
+        {
+            var msg = string.Empty;
+            if (await BusinessRule.IsOutOfTermClass(DbContext, EditModel))
             {
-                msg += @"<p>An Out of Term class must be offered in <strong>one</strong>
+                if (!await BusinessRule.IsOutOfTermClassOK(DbContext, EditModel))
+                {
+                    msg = @"<p>An Out of Term class must have an Occurrence of <strong>Once Only</strong> and Recurrence of <strong>nothing</strong>.</p>";
+                    // set correct values
+                    EditModel.OccurrenceID = (int)OccurrenceType.OnceOnly;
+                    EditModel.Occurrence = DbContext?.Occurrence.First(x => x.ID == (int)OccurrenceType.OnceOnly);
+                    EditModel.Recurrence = null;
+                }
+                if (!await BusinessRule.IsOutOfTermClassTermOK(DbContext, EditModel))
+                {
+                    msg += @"<p>An Out of Term class must be offered in <strong>one</strong>
                             term only being the term immediately preceding the Start Date.</p>";
+                }
+                if (msg != string.Empty)
+                {
+                    await messageBox.ShowOkOnlyAsync("Incorrect Out of Term configuration", msg);
+                    return false;
+                }
             }
-            if (msg != string.Empty)
+            else
             {
-                await messageBox.ShowOkOnlyAsync("Incorrect Out of Term configuration", msg);
-                return false;
+                await BusinessRule.AssignTermForOnceOnlyClass(DbContext, EditModel);
             }
-        }
-        else
-        {
-            await BusinessRule.AssignTermForOnceOnlyClass(DbContext, EditModel);
-        }
 
-        if (IsNew) return true;
+            if (IsNew) { return true; }
+            if (!await BusinessRule.AnyEnrolmentsInYear(DbContext, EditModel.CourseID)) { return true; }
 
-        var original = DbContext?.Class.AsNoTracking()
-                        .Include(x => x.OnDay)
-                        .Include(x => x.Occurrence)
-                        .FirstOrDefault(x => x.ID == EditModel.ID);
-        if (original != null &&
-            (
-                EditModel.StartTime != original.StartTime
-                    || EditModel.OnDay.ID != original.OnDay.ID
-                    || EditModel.Occurrence.ID != original.Occurrence.ID
-                    || EditModel.StartDate != original.StartDate
-                    || EditModel.Recurrence != original.Recurrence
-                    || EditModel.OfferedTerm1 != original.OfferedTerm1
-                    || EditModel.OfferedTerm2 != original.OfferedTerm2
-                    || EditModel.OfferedTerm3 != original.OfferedTerm3
-                    || EditModel.OfferedTerm4 != original.OfferedTerm4
-            ))
-        {
-            var today = DbContext.GetLocalTime().Date.ToString(constants.STD_DATETIME_FORMAT);
-            msg = $@"<p>Changing the class schedule will cause
+            var original = DbContext?.Class.AsNoTracking()
+                            .Include(x => x.OnDay)
+                            .Include(x => x.Occurrence)
+                            .FirstOrDefault(x => x.ID == EditModel.ID);
+            if (original != null &&
+                (
+                    EditModel.StartTime != original.StartTime
+                        || EditModel.OnDay.ID != original.OnDay.ID
+                        || EditModel.Occurrence.ID != original.Occurrence.ID
+                        || EditModel.StartDate != original.StartDate
+                        || EditModel.Recurrence != original.Recurrence
+                        || EditModel.OfferedTerm1 != original.OfferedTerm1
+                        || EditModel.OfferedTerm2 != original.OfferedTerm2
+                        || EditModel.OfferedTerm3 != original.OfferedTerm3
+                        || EditModel.OfferedTerm4 != original.OfferedTerm4
+                ))
+            {
+                var today = DbContext.GetLocalTime().Date.ToString(constants.STD_DATETIME_FORMAT);
+                msg = $@"<p>Changing the class schedule will cause
                         any <strong>future</strong> attendance records for this class to be deleted
                         and re-created with the new schedule details. Records previous to today ({today}) will remain as is.</p>
                         <p><strong>Hint:</strong> It will be less confusing if this change is made during term break.</p>
                         <p>Click Ok to continue?</p>";
-            if (!await messageBox.ShowAsync("Change to Class Schedule", msg))
+            if (!await messageBox.ShowAsync(new MessageBoxArgs() 
+                                            { LayoutKey = "{605E2C42-15CD-4E7F-9443-6FFBD58A88C7}",
+                                                Caption = "Change to Class Schedule",
+                                                Message = msg
+                                            }))
+                {
+                    EditModel.StartTime = original.StartTime;
+                    EditModel.OnDay = original.OnDay;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public bool IsNotUnscheduled(Class editItem, IEnumerable<WeekDay> weekday)
+        {
+            if (editItem == null) return true;
+            if (editItem.Occurrence == null) return true;
+            if ((OccurrenceType)editItem.Occurrence.ID == OccurrenceType.Unscheduled)
             {
-                EditModel.StartTime = original.StartTime;
-                EditModel.OnDay = original.OnDay;
+                editItem.OnDay = weekday.FirstOrDefault();
+                editItem.OnDayID = 0;
+                editItem.StartTime = DateTime.Parse("12 am");
                 return false;
             }
+            return true;
         }
-        return true;
-    }
-
-    public bool IsNotUnscheduled(Class editItem,IEnumerable<WeekDay> weekday)
-    {
-        if (editItem == null) return true;
-        if (editItem.Occurrence == null) return true;
-        if ((OccurrenceType)editItem.Occurrence.ID == OccurrenceType.Unscheduled)
-        {
-            editItem.OnDay = weekday.FirstOrDefault();
-            editItem.OnDayID = 0;
-            editItem.StartTime = DateTime.Parse("12 am");
-            return false;
-        }
-        return true;
-    }
 
 }
