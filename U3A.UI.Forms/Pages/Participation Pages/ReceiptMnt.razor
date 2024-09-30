@@ -59,7 +59,7 @@ else
                     EditMode="GridEditMode.PopupEditForm"
                     EditModelSaving="Grid_EditModelSaving">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid />
+                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{91092999-6C8B-4F8F-BC01-8A5F5FD28340}" />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridCommandColumnEx @ref="GridCommandColumn" Width="5rem" DeleteButtonVisible=true
@@ -69,8 +69,8 @@ else
                     <DxGridDataColumn Caption="Date" FieldName="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" />
                     <DxGridDataColumn Caption="Description" FieldName="Description" />
                     <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
-                    <DxGridDataColumn Caption="Financial-To" FieldName="Person.FinancialToText" />
-                    <DxGridDataColumn Caption="Amount" FieldName="Amount" DisplayFormat="{0:c2}" />
+                    <DxGridDataColumn Caption="Financial-To" FieldName="Person.FinancialToText" Width="8rem" TextAlignment="GridTextAlignment.Right" />
+                    <DxGridDataColumn Caption="Amount" FieldName="Amount" DisplayFormat="{0:c2}" Width="8rem" />
                     <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" Visible=false />
                     <DxGridDataColumn Caption="Updated By" FieldName="User" Visible=false />
                 </Columns>

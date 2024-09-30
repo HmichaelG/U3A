@@ -134,24 +134,6 @@ else
 
             @quickMessage
 
-            @if (IsLargeLayout || IsXtraLargeLayout)
-            {
-                <div class="border w-100">
-                    <GridToolbar LinkedGrid=@mainGrid
-                                 HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
-                                 HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
-                        <CustomButtonContent>
-                            <DxToolbarItem Text="Communicate"
-                                           Tooltip="Send email and/or SMS to students"
-                                      Click="@OnCommunicate"
-                                      RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" />
-                        </CustomButtonContent>
-
-                    </GridToolbar>
-                </div>
-            }
-
-
             <DxGrid Data="@ClassAttendance" @ref=@mainGrid id="myGrid"
                     ShowSearchBox=true
                     CustomizeElement="OnCustomizeElement"
@@ -166,6 +148,18 @@ else
                     EditMode="GridEditMode.PopupEditForm"
                     DataItemDeleting="Grid_DataItemDeleting"
                     EditModelSaving="Grid_EditModelSaving">
+                    <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid Visible="false"
+                                 HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
+                                 HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
+                        <CustomButtonContent>
+                            <DxToolbarItem Text="Communicate" Visible="@(IsLargeLayout || IsXtraLargeLayout)"
+                                           Tooltip="Send email and/or SMS to students"
+                                           Click="@OnCommunicate"
+                                           RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0 ms-2" />
+                        </CustomButtonContent>
+                    </GridToolbar>
+                    </ToolbarTemplate>
                 <Columns>
                     <DxGridSelectionColumn Width="1rem" />
                     <DxGridCommandColumnEx @ref="GridCommandColumn"
@@ -194,34 +188,19 @@ else
                         </CellDisplayTemplate>
                     </DxGridDataColumn>
 
-                    <DxGridDataColumn Caption="AdHoc?" FieldName="IsAdHoc" Width="5rem">
-                        <CellDisplayTemplate>
-                            <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
-                        </CellDisplayTemplate>
-                        <FilterRowCellTemplate>
-                            <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                        CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                        AllowIndeterminateStateByClick="true"
-                                        Alignment="CheckBoxContentAlignment.Center" />
-                        </FilterRowCellTemplate>
-                    </DxGridDataColumn>
+                    <DxGridDataColumn Caption="AdHoc?" FieldName="IsAdHoc" Width="5rem" />
                     <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
-                                      Width="5rem" Visible="@settings.RequireVaxCertificate">
-                        <CellDisplayTemplate>
-                            <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
-                        </CellDisplayTemplate>
-                        <FilterRowCellTemplate>
-                            <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                        CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                        AllowIndeterminateStateByClick="true"
-                                        Alignment="CheckBoxContentAlignment.Center" />
-                        </FilterRowCellTemplate>
-                    </DxGridDataColumn>
+                                      Width="5rem" Visible="@settings.RequireVaxCertificate" />
                     <DxGridDataColumn Caption="Attendance"
                                       FieldName="AttendClassStatus.Status"
                                       Width="10rem"
                                       Visible=@(IsLargerLayout()) />
                     <DxGridDataColumn Caption="Comment" FieldName="Comment" />
+                    <DxGridDataColumn Caption="Home" FieldName="Person.AdjustedHomePhone" Visible=false />
+                    <DxGridDataColumn Caption="Mobile" FieldName="Person.AdjustedMobile" Visible=false />
+                    <DxGridDataColumn Caption="Email" FieldName="Person.Email" Visible=false />
+                    <DxGridDataColumn Caption="ICE Phone" FieldName="Person.AdjustedICEPhone" Visible=false />
+                    <DxGridDataColumn Caption="ICE Contect" FieldName="Person.ICEContact" Visible=false />
                 </Columns>
 
                 <EditFormTemplate Context="EditFormContext">
@@ -268,10 +247,6 @@ else
                         <div class="col-9">Absent Without Apology</div>
                         <div class="col-3 text-end">@countAbsentWithoutApology</div>
                     </div>
-                    @if (!IsMemberPortal)
-                    {
-                        <DxButton Text="@ClassStatus" RenderStyle="@buttonRenderStyle" CssClass="mt-2 col-12" />
-                    }
                 </div>
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
