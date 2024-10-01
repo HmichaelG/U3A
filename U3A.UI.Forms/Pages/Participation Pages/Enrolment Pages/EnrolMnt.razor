@@ -1025,13 +1025,13 @@ else
     {
         if (mainGrid.IsEditing())
         {
-            var isConfirmed = await messageBox.ShowOkOnlyAsync("Changes Saved!",
-                "Your unsaved changes have been saved.");
-
-            if (!isConfirmed)
-            {
-                context.PreventNavigation();
-            }
+            await messageBox.ShowOkOnlyAsync("Changes Saved!",
+                "Your grid's unsaved edits have been saved.");
+            await  InvokeAsync( StateHasChanged);
+            // if (!isConfirmed)
+            // {
+            //     context.PreventNavigation();
+            // }
         }
     }
 
