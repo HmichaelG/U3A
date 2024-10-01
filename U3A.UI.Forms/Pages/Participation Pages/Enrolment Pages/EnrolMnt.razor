@@ -7,6 +7,7 @@
 @inject TenantInfoService tenantService
 @implements IDisposable
 
+@using Microsoft.AspNetCore.Components.Routing
 
 @attribute [Authorize]
 
@@ -16,6 +17,9 @@
 }
 else
 {
+    <NavigationLock ConfirmExternalNavigation="true"
+                    OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+
     <div class="this-page">
 
         <MessageBox @ref="@messageBox" />
@@ -59,7 +63,7 @@ else
                 </div>
                 <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                                   ExpandedChanged="@(async () => { 
+                                   ExpandedChanged="@(async () => {
                                                                     areDetailsExpanded = !areDetailsExpanded;
                                                                     fullScreen.RefreshLayout(!areDetailsExpanded);
                                                                     })">
@@ -188,17 +192,17 @@ else
                     </Items>
                 </DxFormLayoutGroup>
                 <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
-                        <div class="pt-3 mx-2 text-info"><b>Statistics</b></div>
+                    <div class="pt-3 mx-2 text-info"><b>Statistics</b></div>
                     <div class="px-3">
                         <div class="row">
-                                <div class="w-75">Min-Required</div>
-                                <div class="w-25 text-end">@MinimumParticipants</div>
-                                <div class="w-75">Max-Available</div>
-                                <div class="w-25 text-end">@MaximumParticipants</div>
-                                <div class="w-75">Enrolled</div>
-                                <div class="w-25 text-end">@EnrolledParticipants</div>
-                                <div class="w-75">Waitlisted</div>
-                                <div class="w-25 text-end">@WaitlistedParticipants</div>
+                            <div class="w-75">Min-Required</div>
+                            <div class="w-25 text-end">@MinimumParticipants</div>
+                            <div class="w-75">Max-Available</div>
+                            <div class="w-25 text-end">@MaximumParticipants</div>
+                            <div class="w-75">Enrolled</div>
+                            <div class="w-25 text-end">@EnrolledParticipants</div>
+                            <div class="w-75">Waitlisted</div>
+                            <div class="w-25 text-end">@WaitlistedParticipants</div>
                         </div>
                     </div>
                 </DxFormLayoutGroup>
@@ -1015,6 +1019,20 @@ else
     {
         documentsSent += e.DocumentsSent;
         await ProgressBar.SetValueAsync(documentsSent);
+    }
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (mainGrid.IsEditing())
+        {
+            var isConfirmed = await messageBox.ShowOkOnlyAsync("Changes Saved!",
+                "Your unsaved changes have been saved.");
+
+            if (!isConfirmed)
+            {
+                context.PreventNavigation();
+            }
+        }
     }
 
     public void Dispose()
