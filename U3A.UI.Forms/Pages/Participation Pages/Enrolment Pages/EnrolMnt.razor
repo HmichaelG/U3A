@@ -7,8 +7,6 @@
 @inject TenantInfoService tenantService
 @implements IDisposable
 
-@using Microsoft.AspNetCore.Components.Routing
-
 @attribute [Authorize]
 
 @if (!IsReady)
@@ -17,9 +15,6 @@
 }
 else
 {
-    <NavigationLock ConfirmExternalNavigation="true"
-                    OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
-
     <div class="this-page">
 
         <MessageBox @ref="@messageBox" />
@@ -1019,16 +1014,6 @@ else
     {
         documentsSent += e.DocumentsSent;
         await ProgressBar.SetValueAsync(documentsSent);
-    }
-
-    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
-    {
-        if (mainGrid.IsEditing())
-        {
-            await messageBox.ShowOkOnlyAsync("Changes Saved!",
-                "Your grid's unsaved edits have been saved.");
-            await  InvokeAsync( StateHasChanged);
-        }
     }
 
     public void Dispose()

@@ -5,12 +5,17 @@
 @using System.Text.Json
 @using DevExpress.Blazor
 @using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Routing
 
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject NavigationManager navMan
 @inject IToastNotificationService ToastService
 
 <DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
+<MessageBox @ref=messageBox />
+
+<NavigationLock ConfirmExternalNavigation="true"
+                OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" hidden="@(!Visible)"
            CssClass="me-4"
@@ -136,6 +141,7 @@
     internal bool IsToggleExpanded { get; set; } = false;
     internal string? ExpandCollapseText { get; set; }
     GridPersistentLayout? layout;
+    MessageBox? messageBox;
 
     protected override async Task OnInitializedAsync()
     {
@@ -180,6 +186,17 @@
             LinkedGrid.EndUpdate();
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (LinkedGrid!.IsEditing())
+        {
+            await LinkedGrid.SaveChangesAsync();
+            await messageBox!.ShowOkOnlyAsync("Changes Saved!",
+                "Your grid's unsaved edits have been saved.");
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     async Task OnItemClick(ToolbarItemClickEventArgs e)
