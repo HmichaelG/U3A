@@ -141,6 +141,7 @@
     internal bool IsToggleExpanded { get; set; } = false;
     internal string? ExpandCollapseText { get; set; }
     GridPersistentLayout? layout;
+    GridPersistentLayout? defaultLayout { get; set; }
     MessageBox? messageBox;
 
     protected override async Task OnInitializedAsync()
@@ -149,6 +150,7 @@
         {
             if (LayoutKey != null)
             {
+                defaultLayout = LinkedGrid.SaveLayout();
                 layout = await localStorage.GetItemAsync<GridPersistentLayout>(LayoutKey);
                 LinkedGrid.LoadLayout(layout);
             }
@@ -164,7 +166,7 @@
             LinkedGrid.ShowGroupPanel = !HideGroupPanel;
             LinkedGrid.ShowSearchBox = !HideSearchBox;
             LinkedGrid.SelectAllCheckboxMode = GridSelectAllCheckboxMode.AllPages;
-            LinkedGrid.ColumnResizeMode = GridColumnResizeMode.NextColumn;
+            LinkedGrid.ColumnResizeMode = GridColumnResizeMode.ColumnsContainer;
             if (DisableVirtualScroll)
             {
                 LinkedGrid.PageSize = 30;
@@ -190,9 +192,9 @@
 
     private async Task OnBeforeInternalNavigation(LocationChangingContext context)
     {
-        if (LinkedGrid!.IsEditing())
+        if (IsGridEditing())
         {
-            await LinkedGrid.SaveChangesAsync();
+            await LinkedGrid!.SaveChangesAsync();
             await messageBox!.ShowOkOnlyAsync("Changes Saved!",
                 "Your grid's unsaved edits have been saved.");
             await InvokeAsync(StateHasChanged);
@@ -263,7 +265,7 @@
                 await localStorage.SetItemAsync(LayoutKey!, LinkedGrid.SaveLayout());
                 ToastService.ShowToast(new ToastOptions() 
                 { Title = "Layout Saved",
-                    Text = "Your grid layout has been saved.",
+                    Text = "Your grid's layout has been saved.",
                     ProviderName = "Result",
                     ThemeMode = ToastThemeMode.Pastel,
                     RenderStyle = ToastRenderStyle.Success,
@@ -272,7 +274,16 @@
                 break;
             case "ResetLayout":
                 await localStorage.RemoveItemAsync(LayoutKey!);
-                navMan.NavigateTo(navMan.Uri, true);
+                LinkedGrid.LoadLayout(defaultLayout);
+                ToastService.ShowToast(new ToastOptions()
+                    {
+                        Title = "Reset Layout",
+                        Text = "The default layout is restored.",
+                        ProviderName = "Result",
+                        ThemeMode = ToastThemeMode.Pastel,
+                        RenderStyle = ToastRenderStyle.Success,
+                        IconCssClass = "bi bi-check-circle"
+                    });
                 break;
             case "ExportAll":
                 await ExcelExport(false);
