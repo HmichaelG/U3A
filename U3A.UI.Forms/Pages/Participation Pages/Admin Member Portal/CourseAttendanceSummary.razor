@@ -28,7 +28,7 @@
                     ShowSearchBox="false"
                     ShowAllRows="true">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid HideGroupPanel=true HideSearchBox=true />
+                    <GridToolbar LinkedGrid=@mainGrid HideGroupPanel=true HideSearchBox=true LayoutKey="{E8901A5E-387D-4D38-86FD-450C25924B5B}" />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridDataColumn Caption="Course" FieldName="Course" />
@@ -57,7 +57,7 @@
                     AllowSelectRowByClick=true
                     ShowAllRows="true">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@classGrid HideGroupPanel=true HideSearchBox=true />
+                    <GridToolbar LinkedGrid=@classGrid HideGroupPanel=true HideSearchBox=true LayoutKey="{44317751-C5CC-40D7-91BF-C777C5F9745A}" />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridDataColumn Caption="Date" FieldName="ClassDate" DisplayFormat="ddd, dd-MMM-yyyy" />
@@ -101,7 +101,7 @@
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         ValidationEnabled="true">
                     <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@attendanceGrid />
+                        <GridToolbar LinkedGrid=@attendanceGrid LayoutKey="{C32F58B3-404E-433E-8C64-E683BA54E50A}" />
                     </ToolbarTemplate>
                     <Columns>
                         <DxGridDataColumn Caption="Name"

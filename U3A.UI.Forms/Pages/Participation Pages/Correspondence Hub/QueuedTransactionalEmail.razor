@@ -56,7 +56,7 @@ else
                             ValidationEnabled="true"
                             SelectionMode="GridSelectionMode.Multiple">
                         <ToolbarTemplate>
-                            <GridToolbar LinkedGrid=@mainGrid>
+                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{5AC4F74E-C707-4297-8949-A64FB18C0819}">
                                 <CustomButtonContent>
                                     <DxToolbarItem Text="Preview" IconCssClass="bi bi-eyeglasses"
                                                    Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
