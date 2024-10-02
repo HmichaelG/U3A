@@ -14,7 +14,7 @@
 <DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
 <MessageBox @ref=messageBox />
 
-<NavigationLock ConfirmExternalNavigation="true"
+<NavigationLock ConfirmExternalNavigation="@(IsGridEditing())"
                 OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" hidden="@(!Visible)"
@@ -197,6 +197,12 @@
                 "Your grid's unsaved edits have been saved.");
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private bool IsGridEditing()
+    {
+        if (LinkedGrid == null) { return false; }
+        return LinkedGrid.IsEditing();
     }
 
     async Task OnItemClick(ToolbarItemClickEventArgs e)
