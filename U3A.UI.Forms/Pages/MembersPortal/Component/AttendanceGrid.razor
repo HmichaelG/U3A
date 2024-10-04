@@ -98,4 +98,10 @@ else {
         IsReady = true;
     }
 
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) { grid?.AutoFitColumnWidths(); }
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
 }

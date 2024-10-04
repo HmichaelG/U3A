@@ -2,11 +2,13 @@
 
 <MessageBox @ref="@messageBox" />
 <DxFormLayoutGroup Caption="Select Report" ColSpanMd="12">
-    @if (SingleReportOnly) {
+    @if (SingleReportOnly)
+    {
         <DxRadioGroup Items="@reports"
-        @bind-Value="@selectedReport" />
+                      @bind-Value="@selectedReport" />
     }
-    else {
+    else
+    {
         <DxFormLayoutItem Caption="@(reports[0])" ColSpanMd="12">
             <DxCheckBox @bind-Checked="@PrintLeaderReport" />
         </DxFormLayoutItem>
@@ -30,19 +32,17 @@
         </DxFormLayoutItem>
     }
 </DxFormLayoutGroup>
-@if (SingleReportOnly) {
-    <DxFormLayoutGroup Caption="Print Report" ColSpanMd="12">
-        <DxButton Text="Print Report" IconCssClass="bi bi-print menu-icon" CssClass="col col-11 mt-2 mx-auto"
-                  Enabled="@AreSelectionsMade"
-                  RenderStyle="ButtonRenderStyle.Primary" Click="@DoPrintAsync" />
-    </DxFormLayoutGroup>
+@if (SingleReportOnly)
+{
+    <DxButton Text="Print Report" IconCssClass="bi bi-print menu-icon" CssClass="col col-12"
+              Enabled="@AreSelectionsMade"
+              RenderStyle="ButtonRenderStyle.Primary" Click="@DoPrintAsync" />
 }
-else {
-    <DxFormLayoutGroup Caption="Create Queue" ColSpanMd="12">
-        <DxButton Text="Queue Report(s) for email" IconCssClass="bi bi-envelope menu-icon" CssClass="col col-11 mt-2 mx-auto"
-                  Enabled="@AreSelectionsMade"
-                  RenderStyle="ButtonRenderStyle.Primary" Click="@DoMailAsync" />
-    </DxFormLayoutGroup>
+else
+{
+    <DxButton Text="Queue Report(s) for email" IconCssClass="bi bi-envelope menu-icon" CssClass="col col-12"
+              Enabled="@AreSelectionsMade"
+              RenderStyle="ButtonRenderStyle.Primary" Click="@DoMailAsync" />
 }
 @code {
     [Parameter]
@@ -58,7 +58,10 @@ else {
     public bool PrintAttendanceAnalysis { get; set; }
     public bool PrintMemberBadges { get; set; }
     public bool PrintCSVFile { get; set; }
-    public bool RequireEnrolements {get {
+    public bool RequireEnrolements
+    {
+        get
+        {
             return PrintAttendanceRecord || PrintICEList || PrintClassList || PrintLeaderReport || PrintMemberBadges || PrintCSVFile;
         }
     }
@@ -75,10 +78,12 @@ else {
     [Parameter]
     public EventCallback<PortalMenuSelection> OnQueueReportsSelected { get; set; }
 
-    async void DoMailAsync() {
+    async void DoMailAsync()
+    {
         InvokeAsync(StateHasChanged); await OnQueueReportsSelected.InvokeAsync();
     }
-    async void DoPrintAsync() {
+    async void DoPrintAsync()
+    {
         PrintLeaderReport = false;
         PrintClassList = false;
         PrintICEList = false;
@@ -93,8 +98,9 @@ else {
         if (!PrintLeaderReport &&
              !PrintClassList &&
              !PrintICEList &&
-             !PrintAttendanceRecord && 
-             !PrintAttendanceAnalysis && !PrintMemberBadges) {
+             !PrintAttendanceRecord &&
+             !PrintAttendanceAnalysis && !PrintMemberBadges)
+        {
             await messageBox.ShowOkOnlyAsync("Select Report", "A report must be selected.");
         }
         else { InvokeAsync(StateHasChanged); await OnQueueReportsSelected.InvokeAsync(); }

@@ -31,32 +31,8 @@ else
                                   UnboundType="GridUnboundColumnType.Integer" />
                 <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
                                   Visible="@IsManageEnrolmentsView" />
-                <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag">
-                    <CellDisplayTemplate>
-                        @{
-                            if (context.DataItem != null)
-                            {
-                                Enrolment e = (Enrolment)context.DataItem;
-                                var isCourseClerk = e.IsCourseClerk;
-                                var hasEmail = !e.Person.IsEmailSilent;
-                                var hasMobile = !e.Person.IsPhoneSilent && !e.Person.SMSOptOut;
-                                var namecss = "col-8 text-start ";
-                                var emailcss = (hasEmail) ? "col-2 bi-envelope" : "col-2";
-                                var mobilecss = (hasMobile) ? "col-2 bi-phone" : "col-2";
-                                var outerCss = "w-100";
-                                if (isCourseClerk) outerCss += " badge badge-size bg-success text-white";
-                                <div class="@outerCss">
-                                    <div class="input-group">
-                                        <div class=@namecss>@context.Value</div>
-                                        <div class=@mobilecss></div>
-                                        <div class=@emailcss></div>
-                                    </div>
-                                </div>
-                            }
-                        }
-                    </CellDisplayTemplate>
-                </DxGridDataColumn>
-                <DxGridDataColumn Caption="NoSMS" FieldName="Person.SMSOptOut"
+                <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag" />
+                <DxGridDataColumn Caption="No-SMS" FieldName="Person.SMSOptOut"
                                   Width="3rem">
                 </DxGridDataColumn>
                 <DxGridDataColumn Caption="Vax?" FieldName="Person.VaxCertificateViewed"
@@ -145,6 +121,12 @@ else
         }
         IsReady = true;
         await base.OnInitializedAsync();
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) { grid.AutoFitColumnWidths(); }
+        return base.OnAfterRenderAsync(firstRender);
     }
 
     int SelectedDataItemsCount()
