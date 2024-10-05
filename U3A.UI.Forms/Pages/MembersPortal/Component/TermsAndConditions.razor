@@ -8,7 +8,7 @@
 @if (isReady) {
     <section class="card border-info alert-info w-100" hidden="@isHidden">
         <div class=@($"text-center p-2 {fontSizeCssClass}")>
-            <button class="btn-close" onclick="@onCloseButtonClick" />
+            <button class="btn-close float-right" onclick="@onCloseButtonClick" />
             <strong>Terms &amp; Conditions</strong><br />@introduction
         </div>
         <DxButton Text="Click to view our T & Cs" SizeMode="SizeMode.Small" CssClass="w-100" IconCssClass="bi bi-eyeglasses menu-icon"
@@ -57,7 +57,7 @@
         font-size: x-small !important;
     }
 
-    button {
+    .float-right {
         float: right;
     }
 </style>

@@ -24,13 +24,13 @@ else
     <MessageBox @ref=@messageBox />
     <div class="col col-12 col-md-10 col-lg-6 mt-2 mx-auto">
         <div class="text-center alert alert-success text-dark w-100">
-            <div class="w-100">@welcomeText</div>
+            <div class="w-100 pb-2">@welcomeText</div>
             <DxButton Text="Today's Schedule" Click="@SetupClassesToday"
                       RenderStyle="ButtonRenderStyle.Success" IconCssClass="bi bi-alarm"
                       Visible=@(classText == null) />
             <div class="w-100">@classText</div>
         </div>
-        <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="col col-12 col-lg-10 mx-auto" 
+        <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="col col-12 col-lg-10 mx-auto"
                      ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
 
             <Items>
