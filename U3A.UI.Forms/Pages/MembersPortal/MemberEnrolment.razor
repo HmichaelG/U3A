@@ -169,7 +169,7 @@ else
                                             </div>
 
                                             <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
-                                                    @(HighlightSearchText(c.Course.DescriptionForXrRichText))
+                                                    @(HighlightSearchText(c.Course.DescriptionForXrRichText,isHTMLtext: true))
                                             </div>
 
                                             @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
@@ -518,16 +518,18 @@ else
 
     List<Class> FilterClassByName()
     {
+        if (_filterText.Length < 2) return ResetFilter();
         if (dxTabs != null) { activeTabIndex = dxTabs.ActiveTabIndex = 0; }
         var result = Classes.FindAll(x => searchText(x).IndexOf(_filterText, StringComparison.CurrentCultureIgnoreCase) >= 0);
         return result;
     }
 
-    MarkupString HighlightSearchText(string searchText)
+    MarkupString HighlightSearchText(string searchText, bool isHTMLtext = false)
     {
         if (searchText == null) return new MarkupString(string.Empty);
-        if (string.IsNullOrWhiteSpace(_filterText)) return new MarkupString(searchText);
+        if (string.IsNullOrWhiteSpace(_filterText) || _filterText.Length < 2) return new MarkupString(searchText);
         var pattern = Regex.Escape(_filterText);
+        if (isHTMLtext) { pattern = $@"<[^>]*>|{pattern}"; }    // ignore HTML angle brackets
         Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
         MatchCollection matches = regex.Matches(searchText);
         foreach (Match match in matches.Reverse())
@@ -546,7 +548,7 @@ else
 
     string searchText(Class c)
     {
-        return $"{c.Course.ConversionID} {c.Course.Name} {c.Course.CourseType.Name} {c.Leader?.FullName} {c.Venue?.Name} {c.GuestLeader}";
+        return $"{c.Course.ConversionID} {c.Course.Name} {c.Course.CourseType.Name} {c.Leader?.FullName} {c.Venue?.Name} {c.GuestLeader} {c.OnDay.Day}";
     }
 
     List<Class> ResetFilter()
