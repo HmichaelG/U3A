@@ -6,31 +6,34 @@
 @using AngleSharp.Html.Dom
 @using AngleSharp.Html.Parser
 
-@if (isReady)
-{
-    <MessageBox @ref=@messageBox />
 
-    <DxTabs style="width:100%">
-        <DxTabPage Text="Editor">
-            <DxHtmlEditor AllowSoftLineBreak="true"
-                          TableResizeEnabled="true"
-                          MediaResizeEnabled="false"
-                          @bind-Markup="@Markup"
-                          Width="@Width" Height="@Height" />
-            <div class="pt-1"><small><b>Hint:</b> <span class=key-style>Enter</span> = paragraph break;
-                        <span class=key-style>SHIFT</span> +
-                        <span class=key-style>Enter</span> = line break.
-                        </small></div>
-        </DxTabPage>
-        <DxTabPage Text="Code">
-            <DxMemo @bind-Text="@Markup"
-                    Rows="20"
-                    ReadOnly="@(!isCodeEditable)" />
-            <DxButton Text="Edit" Click="OnEditClicked" CssClass="mt-1" />
-            <div class="text-danger">@errorText</div>
-        </DxTabPage>
-    </DxTabs>
-}
+
+<MessageBox @ref=@messageBox />
+
+<DxTabs style="width:100%">
+    <DxTabPage Text="Editor">
+        <DxHtmlEditor AllowSoftLineBreak="true"
+                      TableResizeEnabled="true"
+                      MediaResizeEnabled="false"
+                      Markup="@Markup" MarkupChanged="@OnMarkupChanged"
+                      Width="@Width" Height="@Height" />
+        <div class="pt-1">
+            <small>
+                <b>Hint:</b> <span class=key-style>Enter</span> = paragraph break;
+                <span class=key-style>SHIFT</span> +
+                <span class=key-style>Enter</span> = line break.
+            </small>
+        </div>
+    </DxTabPage>
+    <DxTabPage Text="Code" Click="() => {Markup = PrettyPrint(Markup); StateHasChanged();}">
+        <DxMemo @bind-Text="@Markup"
+                Rows="20"
+                ReadOnly="@(!isCodeEditable)" />
+        <DxButton Text="Edit" Click="OnEditClicked" CssClass="mt-1" />
+        <div class="text-danger">@errorText</div>
+    </DxTabPage>
+</DxTabs>
+
 <style>
     .key-style {
         color: cadetblue;
@@ -40,18 +43,9 @@
     }
 </style>
 @code {
-    string _markup = "";
-    [Parameter]
-    public string Markup
-    {
-        get { return PrettyPrint(_markup); }
-        set
-        {
-            if (_markup == value) { return; }
-            _markup = (value == null) ? "" : AddStyleAndMinifyHtml(value);
-            MarkupChanged.InvokeAsync(_markup);
-        }
-    }
+
+    [Parameter, EditorRequired]
+    public required string Markup { get; set; }
     [Parameter]
     public EventCallback<string> MarkupChanged { get; set; }
 
@@ -63,13 +57,13 @@
     MessageBox? messageBox;
     bool isCodeEditable;
     static string errorText = "";
-    bool isReady;
 
-    protected override void OnInitialized()
+    protected override Task OnInitializedAsync()
     {
-        base.OnInitialized();
-        isReady = true;
+        Markup = AddStyleAndMinifyHtml(Markup);
+        return base.OnInitializedAsync();
     }
+
     static IHtmlDocument? ParseHtml(string html)
     {
         IHtmlDocument result = null!;
@@ -82,7 +76,13 @@
         return result;
     }
 
-    static string PrettyPrint(string html)
+    async Task OnMarkupChanged(string newValue)
+    {
+        Markup = newValue;
+        await MarkupChanged.InvokeAsync(Markup);
+    }
+
+    public static string PrettyPrint(string html)
     {
         string result = string.Empty;
         if (string.IsNullOrWhiteSpace(html)) return result;
@@ -99,20 +99,18 @@
 
     const string DEFAULT_STYLE = @"
                 /* The following styles are automatically appended */
-                p {
-                margin: 0.5rem !important;
-                }
                 p:empty {
                     display: none;
                 }
 ";
 
-    static string AddStyleAndMinifyHtml(string html)
+    public static string AddStyleAndMinifyHtml(string html)
     {
         string result = string.Empty;
         if (string.IsNullOrWhiteSpace(html)) return result;
         using (var document = ParseHtml(html))
         {
+            // replace any STYLE with the default style
             if (document is null) return result;
             foreach (var current in document.Head!.Children
                             .Where(c => c is IHtmlStyleElement)
@@ -126,6 +124,23 @@
             IElement style = document.CreateElement("Style");
             style.TextContent = DEFAULT_STYLE;
             document.Head!.AppendChild(style);
+            // replace <p><br><p> sequence with <p>
+            if (document.Body!.ChildNodes.Count() > 3)
+            {
+                List<IElement> deletions = new();
+                for (int i = 1; i < document.Body!.ChildNodes.Count(); i++ )
+                {
+                    var current = document.Body!.Children[i];
+                    if (current.ChildElementCount == 1 && current.FirstElementChild is IHtmlBreakRowElement)
+                    {
+                        deletions.Add(current);
+                    }
+                }
+                foreach (var element in deletions)
+                {
+                    document.Body.RemoveElement(element);
+                }
+            }
             result = document.Minify();
         }
         return result;
@@ -134,10 +149,9 @@
     async Task OnEditClicked()
     {
         isCodeEditable = await messageBox!.ShowAsync("Advanced Only",
-                                            @"<p>Editing code requires knowledge of HTML programming.
+                                                        @"<p>Editing code requires knowledge of HTML programming.
                 Errors in code may render unpredictable results or system errors.</p>
                 Do you wish to continue?");
-        StateHasChanged();
     }
 
 }

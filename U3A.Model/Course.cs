@@ -35,12 +35,12 @@ namespace U3A.Model
         public string? Description { get; set; }
 
         [NotMapped]
-        public string DescriptionForXrRichText
+        public string DisplayDescription
         {
             get
             {
-                var result = Description.Replace("<p><br><p>", "<p>");
-                return result.Replace("<br><br>", "<p>");
+                var result = Description;
+                return result;
             }
         }
         public bool IsOffScheduleActivity { get; set; }

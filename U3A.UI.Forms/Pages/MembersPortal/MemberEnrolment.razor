@@ -169,7 +169,7 @@ else
                                             </div>
 
                                             <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
-                                                    @(HighlightSearchText(c.Course.DescriptionForXrRichText,isHTMLtext: true))
+                                                    @(HighlightSearchText(c.Course.DisplayDescription,isHTMLtext: true))
                                             </div>
 
                                             @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)

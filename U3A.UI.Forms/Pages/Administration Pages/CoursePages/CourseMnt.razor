@@ -192,43 +192,43 @@ else
 
 
 @code {
-        bool IsReady;
+    bool IsReady;
 
-        DxTabs? tabs;
-        Progress? progressBar;
-        List<CourseParticipationType> CourseParticipationTypes { get; set; }
-        List<Occurrence>? Occurrences { get; set; }
-        IEnumerable<Person> Persons { get; set; }
-        IEnumerable<Venue> Venues { get; set; }
-        IEnumerable<WeekDay> WeekDays { get; set; }
-        List<Course> Courses { get; set; }
-        List<CourseType> CourseTypes { get; set; }
-        SystemSettings settings { get; set; }
-        MessageBox? messageBox;
-        SelectCourseView? selectCourseView;
-        CourseEditViewType courseEditView;
-        YearComponent? yearComponent;
-        Term? currentTerm;
-        Term? previewTerm;
-        int Year;
-        bool anyEnrolmentsInYear;
-        DxWindow? previewWindow;
-        bool isPreviewOpen;
-        bool isPreviewReady = true;
+    DxTabs? tabs;
+    Progress? progressBar;
+    List<CourseParticipationType> CourseParticipationTypes { get; set; }
+    List<Occurrence>? Occurrences { get; set; }
+    IEnumerable<Person> Persons { get; set; }
+    IEnumerable<Venue> Venues { get; set; }
+    IEnumerable<WeekDay> WeekDays { get; set; }
+    List<Course> Courses { get; set; }
+    List<CourseType> CourseTypes { get; set; }
+    SystemSettings settings { get; set; }
+    MessageBox? messageBox;
+    SelectCourseView? selectCourseView;
+    CourseEditViewType courseEditView;
+    YearComponent? yearComponent;
+    Term? currentTerm;
+    Term? previewTerm;
+    int Year;
+    bool anyEnrolmentsInYear;
+    DxWindow? previewWindow;
+    bool isPreviewOpen;
+    bool isPreviewReady = true;
 
-        List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
-        List<CourseContactOrderWrapper> courseContactList = new CourseContactOrderList();
-        DxGridCommandColumn? GridCommandColumn;
+    List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
+    List<CourseContactOrderWrapper> courseContactList = new CourseContactOrderList();
+    DxGridCommandColumn? GridCommandColumn;
 
-        CourseDetail courseDetail { get; set; }
-        IGrid? mainGrid { get; set; }
-        GridToolbar? Toolbar;
+    CourseDetail courseDetail { get; set; }
+    IGrid? mainGrid { get; set; }
+    GridToolbar? Toolbar;
 
-        ErrorPopup? ErrorPopup { get; set; }
-        string ErrorHeader;
-        string ErrorMessage;
+    ErrorPopup? ErrorPopup { get; set; }
+    string ErrorHeader;
+    string ErrorMessage;
 
-        U3ADbContext dbc { get; set; }
+    U3ADbContext dbc { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -441,6 +441,7 @@ else
         if (dataItem != null)
         {
             editModel.CopyTo(dataItem);
+            dataItem.Description = HtmlEditor.AddStyleAndMinifyHtml(dataItem.Description);
             dataItem.CourseType = dbc.CourseType.Find(editModel.CourseType.ID);
             if (editModel.CourseParticipationType != null)
             {

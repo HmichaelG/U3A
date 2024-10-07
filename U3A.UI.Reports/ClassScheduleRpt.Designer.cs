@@ -508,7 +508,7 @@
             // 
             this.xrRichText1.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.xrRichText1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Html", "[Course].[DescriptionForXrRichText]")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Html", "[Course].[DisplayDescription]")});
             this.xrRichText1.Font = new DevExpress.Drawing.DXFont("Arial", 6F);
             this.xrRichText1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrRichText1.Name = "xrRichText1";
