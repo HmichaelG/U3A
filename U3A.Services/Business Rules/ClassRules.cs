@@ -211,17 +211,20 @@ namespace U3A.BusinessRules
             c.TermNumber = GetRequiredTerm(term.TermNumber, c);
             if (c.TermNumber != term.TermNumber)
             {
-                var thisTerm = terms.First(x => x.Year == term.Year && x.TermNumber == c.TermNumber);
-                Parallel.ForEach(c.Course.Enrolments, e =>
+                var thisTerm = terms.FirstOrDefault(x => x.Year == term.Year && x.TermNumber == c.TermNumber);
+                if (thisTerm != null)
                 {
-                    e.TermID = thisTerm.ID;
-                    e.Term = thisTerm;
-                });
-                Parallel.ForEach(c.Enrolments, e =>
-                {
-                    e.TermID = thisTerm.ID;
-                    e.Term = thisTerm;
-                });
+                    Parallel.ForEach(c.Course.Enrolments, e =>
+                    {
+                        e.TermID = thisTerm.ID;
+                        e.Term = thisTerm;
+                    });
+                    Parallel.ForEach(c.Enrolments, e =>
+                    {
+                        e.TermID = thisTerm.ID;
+                        e.Term = thisTerm;
+                    });
+                }
             }
         }
         static IEnumerable<Class> GetClassSummaries(IEnumerable<Class> classes, DateTime localTime)
