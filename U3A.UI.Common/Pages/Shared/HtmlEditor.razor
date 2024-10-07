@@ -60,7 +60,7 @@
 
     protected override Task OnInitializedAsync()
     {
-        Markup = AddStyleAndMinifyHtml(Markup);
+        Markup = AdjustAndMinifyHtml(Markup);
         return base.OnInitializedAsync();
     }
 
@@ -104,33 +104,41 @@
                 }
 ";
 
-    public static string AddStyleAndMinifyHtml(string html)
+    // public static string RemoveStyle(string html)
+    // {
+    //     string result = string.Empty;
+    //     if (string.IsNullOrWhiteSpace(html)) return result;
+    //     using (var document = ParseHtml(html))
+    //     {
+    //         // replace any STYLE with the default style
+    //         if (document is null) return result;
+    //         foreach (var current in document.Head!.Children
+    //                         .Where(c => c is IHtmlStyleElement)
+    //                         .Reverse())
+    //         {
+    //             if (current != null)
+    //             {
+    //                 current.Remove();
+    //             }
+    //         }
+    //         result = document.Minify();
+    //     }
+    //     return result;
+    // }
+
+    public static string AdjustAndMinifyHtml(string html)
     {
         string result = string.Empty;
         if (string.IsNullOrWhiteSpace(html)) return result;
         using (var document = ParseHtml(html))
         {
-            // replace any STYLE with the default style
-            if (document is null) return result;
-            foreach (var current in document.Head!.Children
-                            .Where(c => c is IHtmlStyleElement)
-                            .Reverse())
-            {
-                if (current != null)
-                {
-                    current.Remove();
-                }
-            }
-            IElement style = document.CreateElement("Style");
-            style.TextContent = DEFAULT_STYLE;
-            document.Head!.AppendChild(style);
             // replace <p><br><p> sequence with <p>
+            if (document is null) return result;
             if (document.Body!.ChildNodes.Count() > 3)
             {
                 List<IElement> deletions = new();
-                for (int i = 1; i < document.Body!.ChildNodes.Count(); i++ )
+                foreach (var current in document.Body!.Children)
                 {
-                    var current = document.Body!.Children[i];
                     if (current.ChildElementCount == 1 && current.FirstElementChild is IHtmlBreakRowElement)
                     {
                         deletions.Add(current);
@@ -141,6 +149,18 @@
                     document.Body.RemoveElement(element);
                 }
             }
+            result = document.Minify();
+        }
+        return result;
+    }
+
+    public static string MinifyHtml(string html)
+    {
+        string result = string.Empty;
+        if (string.IsNullOrWhiteSpace(html)) return result;
+        using (var document = ParseHtml(html))
+        {
+            if (document is null) return result;
             result = document.Minify();
         }
         return result;

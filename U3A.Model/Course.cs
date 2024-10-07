@@ -34,15 +34,8 @@ namespace U3A.Model
         [DefaultValue(" ")]
         public string? Description { get; set; }
 
-        [NotMapped]
-        public string DisplayDescription
-        {
-            get
-            {
-                var result = Description;
-                return result;
-            }
-        }
+        public string DisplayDescription { get; set; }
+
         public bool IsOffScheduleActivity { get; set; }
 
         [DefaultValue(0)]

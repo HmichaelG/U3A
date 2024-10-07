@@ -64,8 +64,12 @@
 
     async Task ApplyFix(U3ADbContextSeed dbc)
     {
-        await dbc.Database.ExecuteSqlRawAsync("UPDATE Enrolment SET CreatedOn = Created WHERE CreatedOn is null");
-        await dbc.Database.ExecuteSqlRawAsync("UPDATE Enrolment SET UpdatedOn = Created WHERE UpdatedOn is null");
+        foreach (var c in dbc.Course.ToArray())
+        {
+            //c.Description = HtmlEditor.RemoveStyle(c.Description!);
+            c.DisplayDescription = HtmlEditor.AdjustAndMinifyHtml(c.Description!);
+        }
+        await dbc.SaveChangesAsync();
     }
 
     void DoCancel() { NavMan.NavigateTo("/"); }
