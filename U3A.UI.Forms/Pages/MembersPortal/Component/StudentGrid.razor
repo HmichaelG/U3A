@@ -123,9 +123,14 @@ else
         await base.OnInitializedAsync();
     }
 
+    bool isAutoFitted = false;
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) { grid.AutoFitColumnWidths(); }
+        if (!isAutoFitted && grid != null)
+        {
+            grid.AutoFitColumnWidths();
+            isAutoFitted = true;
+        }
         return base.OnAfterRenderAsync(firstRender);
     }
 
