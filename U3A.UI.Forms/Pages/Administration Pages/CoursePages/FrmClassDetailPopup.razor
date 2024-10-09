@@ -167,6 +167,20 @@
         if (e.IsNew)
         {
             editModel.Occurrence = Occurrences.FirstOrDefault(x => x.ID == (int)OccurrenceType.Weekly);
+            var c = this.Course.Classes.OrderByDescending(x => x.CreatedOn).FirstOrDefault();
+            if (c != null)
+            {
+                editModel.GuestLeader = c.GuestLeader;
+                if (c.LeaderID != null) { editModel.Leader = Persons.FirstOrDefault(x => x.ID == c.LeaderID); }
+                if (c.Leader2ID != null) { editModel.Leader = Persons.FirstOrDefault(x => x.ID == c.Leader2ID); }
+                if (c.Leader3ID != null) { editModel.Leader = Persons.FirstOrDefault(x => x.ID == c.Leader3ID); }
+                if (c.VenueID != null) { editModel.Venue = Venues.FirstOrDefault(x => x.ID == c.VenueID); }
+                if (c.OccurrenceID != null) { editModel.Occurrence = Occurrences.FirstOrDefault(x => x.ID == c.OccurrenceID); }
+                editModel.OfferedTerm1 = c.OfferedTerm1;
+                editModel.OfferedTerm2 = c.OfferedTerm2;
+                editModel.OfferedTerm3 = c.OfferedTerm3;
+                editModel.OfferedTerm4 = c.OfferedTerm4;
+            }
         }
         IsOnDayReadOnly = (editModel.StartDate != null);
         isRecurrenceReadonly = (editModel.StartDate == null);
