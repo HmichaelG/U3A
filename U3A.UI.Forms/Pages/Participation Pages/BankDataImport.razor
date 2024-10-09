@@ -424,7 +424,10 @@ else
         processStartTime = DateTime.UtcNow;
         foreach (BasicTransaction trx in qif.BankTransactions)
         {
-            await ProcessReceiptData(trx.Amount, trx.Date, trx.Memo, trx.Category, IdAlreadyUsed);
+            var description = trx.Memo;
+            // CBA uses payee
+            if (string.IsNullOrWhiteSpace(description)) { description = trx.Payee; } 
+            await ProcessReceiptData(trx.Amount, trx.Date, description, trx.Category, IdAlreadyUsed);
         }
     }
 
