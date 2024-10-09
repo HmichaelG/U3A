@@ -32,7 +32,7 @@ else
                 <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
                                   Visible="@IsManageEnrolmentsView" />
                 <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag" />
-                <DxGridDataColumn Caption="No-SMS" FieldName="Person.SMSOptOut"
+                <DxGridDataColumn Caption="No-SMS" FieldName="Person.SMSOptOut" Visible="false"
                                   Width="3rem">
                 </DxGridDataColumn>
                 <DxGridDataColumn Caption="Vax?" FieldName="Person.VaxCertificateViewed"
