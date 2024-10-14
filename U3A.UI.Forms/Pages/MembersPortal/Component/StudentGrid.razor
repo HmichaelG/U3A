@@ -31,7 +31,23 @@ else
                                   UnboundType="GridUnboundColumnType.Integer" />
                 <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
                                   Visible="@IsManageEnrolmentsView" />
-                <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag" />
+                <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag">
+                    <CellDisplayTemplate>
+                        @{
+                            if (context.DataItem != null)
+                            {
+                                Enrolment e = (Enrolment)context.DataItem;
+                                var isCourseClerk = e.IsCourseClerk;
+                                var namecss = "col-8 text-start ";
+                                var outerCss = "w-100";
+                                if (isCourseClerk) outerCss += " badge badge-size bg-success text-white";
+                                <div class="@outerCss">
+                                    <div class=@namecss>@context.Value</div>
+                                </div>
+                            }
+                        }
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
                 <DxGridDataColumn Caption="No-SMS" FieldName="Person.SMSOptOut" Visible="false"
                                   Width="3rem">
                 </DxGridDataColumn>
