@@ -302,6 +302,15 @@ namespace U3A.Model
         {
             get
             {
+                return $"{ToTitleText(FirstName.Trim())} {ToTitleText(LastName.Trim())}"; 
+            }
+        }
+
+        [NotMapped]
+        public string FullNameWithTitle
+        {
+            get
+            {
                 string result;
                 if (Title == null) { result = $"{ToTitleText(FirstName.Trim())} {ToTitleText(LastName.Trim())}"; }
                 else
@@ -324,7 +333,7 @@ namespace U3A.Model
         {
             get
             {
-                string result = FullName;
+                string result = FullNameWithTitle;
                 if (PostNominals != null) { result = $"{result} {PostNominals}"; }
                 return result;
             }

@@ -148,7 +148,7 @@
             // tableCell10
             // 
             this.tableCell10.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Person].[FullName]")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Person].[FullNameAlpha]")});
             this.tableCell10.Name = "tableCell10";
             this.tableCell10.StyleName = "DetailData1";
             this.tableCell10.Weight = 0.24578907073703826D;
@@ -448,7 +448,7 @@
             this.objectDataSource1});
             this.DataSource = this.objectDataSource1;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
-            this.Margins = new DevExpress.Drawing.DXMargins(49, 50, 50, 50);
+            this.Margins = new DevExpress.Drawing.DXMargins(49F, 50F, 50F, 50F);
             this.PageHeight = 1169;
             this.PageWidth = 827;
             this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
@@ -458,7 +458,7 @@
             this.DetailData1,
             this.DetailData3_Odd,
             this.PageInfo});
-            this.Version = "22.1";
+            this.Version = "24.1";
             this.DataSourceDemanded += new System.EventHandler<System.EventArgs>(this.CeasedParticipantList_DataSourceDemanded);
             ((System.ComponentModel.ISupportInitialize)(this.table2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.table1)).EndInit();
