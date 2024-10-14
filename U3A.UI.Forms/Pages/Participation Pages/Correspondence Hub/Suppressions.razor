@@ -24,8 +24,8 @@ else
         <CollapsableContent DismissKey="{A97A94BF-577E-4F4C-A6D9-1762DEB15A78}"
                         AlertText=@($@"<p>A <strong>suppression</strong> is created when a participant unsubscribes, or an address hard bounces.<br/>
                         They are an essential part of maintaining good email reputation.<br/>
-                        You may delete a suppression once you are sure...<br/>
-                        the email address is valid, or the unsubscribe was accidental, the address is no longer associated with a participant, or the participant is unfinancial.</p>")
+                        You may reactivate a suppression once you are sure
+                        the email address is valid, or the unsubscribe was accidental.</p>")
                             OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
                             OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
