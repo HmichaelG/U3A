@@ -388,7 +388,13 @@ else
 
     async Task Grid_EditCanceling(GridEditCancelingEventArgs e)
     {
-        await GetData();
+        if (isBusy) { return; }
+        try
+        {
+            isBusy = true;
+            await GetData();
+        }
+        finally { isBusy = false; }
     }
 
     bool isBusy;

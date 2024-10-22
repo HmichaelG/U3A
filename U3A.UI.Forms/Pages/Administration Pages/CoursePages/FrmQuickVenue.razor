@@ -1,0 +1,84 @@
+﻿@namespace U3A.UI.Forms
+
+@using System.ComponentModel.DataAnnotations
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+<DxPopup Visible="@popupVisible" @ref="@popup"
+         CloseButtonClick="@NegativeButtonClicked"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="Add New Venue">
+    <BodyTemplate Context="PopupContext">
+        <DxFormLayout CssClass="m-2">
+            <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
+                <DxTextBox @bind-Text=@venue.Name autocomplete="new-password" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Address" ColSpanMd="12">
+                <DxTextBox @bind-Text=@venue.Address autocomplete="new-password" />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </BodyTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  Text="Ok"
+                  Click="@AffirmativeButtonClicked" />
+        <DxButton CssClass="popup-button"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="Cancel" Click="@NegativeButtonClicked" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    Venue venue;
+
+    [Parameter]
+    public Guid NewID { get; set; }
+
+    bool popupVisible { get; set; }
+    DxPopup? popup;
+
+    TaskCompletionSource<bool>? tcs;
+    ValidationSummary validator;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        venue = new Venue();
+    }
+
+    public Task<bool> ShowAsync()
+    {
+
+        popupVisible = true;
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
+            popupVisible = false;
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    async Task AffirmativeButtonClicked()
+    {
+        if (string.IsNullOrWhiteSpace(venue.Name)) return;
+        if (string.IsNullOrWhiteSpace(venue.Address)) return;
+        using (var dbc = U3Adbfactory.CreateDbContext())
+        {
+            await dbc.AddAsync(venue);
+            await dbc.SaveChangesAsync();
+        }
+        NewID = venue.ID;
+        popupVisible = false;
+        tcs?.SetResult(true);
+    }
+    void NegativeButtonClicked()
+    {
+        popupVisible = false;
+        tcs?.SetResult(false);
+    }
+
+}
