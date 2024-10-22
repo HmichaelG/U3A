@@ -12,9 +12,9 @@
         </div>
     </nav>
     <div align="center">
-        <div class="h2 u3a-group"><b>@settings?.U3AGroup</b></div>
-        <div class="h6 text-center">
-            @($"Phone: {settings?.Phone}")
+        <div class="h2 u3a-group text-info"><b>@settings?.U3AGroup</b></div>
+        <div class="h5 text-info text-center">
+            @(new MarkupString($"Phone: <b>{settings?.Phone}</b>"))
         </div>
     </div>
 </header>
@@ -28,7 +28,6 @@
     .u3a-group {
         display: block;
         margin-bottom: -0.1rem;
-        color:royalblue;
     }
 </style>
 
