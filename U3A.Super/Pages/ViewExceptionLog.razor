@@ -127,7 +127,7 @@
 
     async Task OnLogButtonClick(LogEvents log)
     {
-        await messageBox!.ShowOkOnlyAsync("Exception Details", log.Exception!);
+        navMan.NavigateTo($"ExceptionLogPage/{log.Id.ToString()}");
     }
 
     async Task GetData()
