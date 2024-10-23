@@ -1,0 +1,473 @@
+﻿@page "/ContactMnt"
+
+
+@using System.Diagnostics
+@using DevExpress.Data.Filtering;
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.AspNetCore.Identity
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.WebUtilities
+@using U3A.Data
+
+@inject NavigationManager NavMan
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IWebHostEnvironment environment
+@inject UserManager<ApplicationUser> UserManager
+
+
+@implements IDisposable
+
+@attribute [Authorize]
+
+<form autocomplete="off">
+    @if (!IsReady)
+    {
+        <LoadingIndicator />
+    }
+    else
+    {
+
+        <div class="row">
+            <ContextHelpTitle Title="Contacts" HelpTopic="Add_Edit-Participants.html" />
+        </div>
+        <div class="row">
+            <div class="d-none col-lg-11 d-lg-inline">
+                People associated with your U3A that are not Participants.
+            </div>
+        </div>
+
+
+        <MessageBox @ref="@messageBox" />
+        <Progress @ref="@ProgressBar" />
+        <DateFilter @ref=DateFilter />
+
+        <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
+                                     DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+
+        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+        <DxTabs @ref="@dxTabs" ActiveTabIndexChanged="() => StateHasChanged()">
+            <DxTabPage Text="Contacts" />
+            <DxTabPage Text="Contacts By Tag" />
+            <DxTabPage Text="Add/Edit Tags" />
+        </DxTabs>
+
+        <FullScreen>
+            <ContentTemplate>
+                @{
+                    var index = dxTabs?.ActiveTabIndex;
+                    switch (index)
+                    {
+                        case 0:
+                            <DxGrid Data="@contacts" @ref=@mainGrid
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    KeyFieldName="ID"
+                                    PopupEditFormCssClass="popup-width"
+                                    EditMode="GridEditMode.PopupEditForm"
+                                    CustomizeEditModel="Grid_CustomizeEditModel"
+                                    EditModelSaving="Grid_EditModelSaving"
+                                    PopupEditFormHeaderText="Add/Edit Contacts"
+                                    DataItemDeleting="Grid_DataItemDeleting">
+                                <ToolbarTemplate>
+                                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{CCDCC0AB-5B0D-40D5-BB06-7A21E3EDCAFA}"
+                                                 SpreadsheetHeaderRows="2">
+                                        <CustomButtonContent>
+                                            <DxToolbarItem IconCssClass="bi bi-arrow-clockwise" Name="Refresh" Text="Refresh"
+                                                           BeginGroup=true
+                                                           Click="@(async() => {await GetData();})"
+                                                           RenderStyle="ButtonRenderStyle.Primary"
+                                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                           Alignment="ToolbarItemAlignment.Right"
+                                                           Tooltip="Refresh grid after editing Tags">
+                                            </DxToolbarItem>
+                                            <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+                                                           BeginGroup=true
+                                                           Click=@OnCommunicate
+                                                           RenderStyle="ButtonRenderStyle.Primary"
+                                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                           Alignment="ToolbarItemAlignment.Right"
+                                                           Tooltip="Send email and/or SMS to Contacts">
+                                            </DxToolbarItem>
+                                        </CustomButtonContent>
+                                    </GridToolbar>
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                           Width="2rem" />
+                                    <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
+                                                           Width="6rem" />
+                                    <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                      Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
+                                    <DxGridBandColumn Caption="Address">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
+                                            <DxGridDataColumn Caption="City" FieldName="City" Width="9rem" />
+                                            <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
+                                            <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" Visible="false" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Contact Detail">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="15rem" />
+                                            <DxGridDataColumn Caption="Phone" FieldName="AdjustedHomePhone" Width="8rem" />
+                                            <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="8rem" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Emergency Contact" Visible="false">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=false />
+                                            <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=false />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
+                                                      DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
+                                    <DxGridDataColumn Caption="Tags" FieldName=@nameof(Contact.Tags) AllowGroup="false" AllowSort="false">
+                                        <CellDisplayTemplate>
+                                            @{
+                                                var contactTags = (IEnumerable<Tag>)context.Value;
+                                            }
+                                            <DxTagBox Data="@tags"
+                                                      TData="Tag" TValue="Tag"
+                                                      TextFieldName="Name" Values="@contactTags"
+                                                      KeyFieldName="Id"
+                                                      ReadOnly="true" />
+                                        </CellDisplayTemplate>
+                                    </DxGridDataColumn>
+                                </Columns>
+                                <GroupSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                       FieldName="ID" DisplayText="{0:n0}  Contacts"
+                                                       FooterColumnName="FullNameAlpha" />
+                                </GroupSummary>
+                                <TotalSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                       FieldName="ID" DisplayText="{0:n0}  Contacts"
+                                                       FooterColumnName="FullNameAlpha" />
+                                </TotalSummary>
+
+                                <EditFormTemplate Context="EditFormContext">
+                                    @{
+                                        var editItem = (Contact)EditFormContext.EditModel;
+                                    }
+                                    <DxFormLayout style="white-space:nowrap">
+                                        <DxFormLayoutItem ColSpanMd="12">
+                                            <ValidationSummary />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Tag(s)" ColSpanMd="12">
+                                            <DxTagBox Data="@tags"
+                                                      KeyFieldName="Id"
+                                                      TextFieldName="Name"
+                                                      TagsChanged="OnTagsChanged"
+                                                      NullText="(Optional) Tags to organise your contacts into groups. Each contact may have multiple tags."
+                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                      @bind-Values="@editItem.Tags">
+                                                <Columns>
+                                                    <DxListEditorColumn FieldName="@nameof(Tag.Name)" Caption="Name" />
+                                                    <DxListEditorColumn FieldName="@nameof(Tag.CanLead)" Caption="Can Lead?" />
+                                                    <DxListEditorColumn FieldName="@nameof(Tag.CanEnrol)" Caption="Can Enrol?" />
+                                                </Columns>
+                                            </DxTagBox>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutGroup Caption="Personal" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.FirstName" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.LastName" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Email" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.Email"
+                                                           autocomplete="new-password"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                </DxTextBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Mobile Phone" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.Mobile" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Home Phone" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.HomePhone" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
+
+                                        <DxFormLayoutGroup Caption="Other Details" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Title" ColSpanMd="12">
+                                                <DxComboBox TData="string" TValue="string"
+                                                            NullText="(Optional) Select or Enter Title"
+                                                            Data="@titles"
+                                                            @bind-Text="@editItem.Title"
+                                                            AllowUserInput="true" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12">
+                                                <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
+                                                           @bind-Text="@editItem.PostNominals" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
+                                                <DxComboBox Data="silentContactList"
+                                                            @bind-Value="@editItem.SilentContact"
+                                                            ValueFieldName="@nameof(SilentContactWrapper.Type)"
+                                                            TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Mail Preference" ColSpanMd="6">
+                                                <DxComboBox Data="@Communication" @bind-Value="@editItem.Communication" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
+                                                <DxCheckBox @bind-Checked="@editItem.SMSOptOut"
+                                                            Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
+                                        <DxFormLayoutGroup Caption="Address" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Street" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.Address" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="City" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.City" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="State" ColSpanMd="6">
+                                                <DxComboBox Data="@states" @bind-Value="@editItem.State" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
+                                                <DxSpinEdit @bind-Value="@editItem.Postcode" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
+                                        <DxFormLayoutGroup Caption="In Case of Emergency" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.ICEContact" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.ICEPhone" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
+
+                                    </DxFormLayout>
+                                </EditFormTemplate>
+                            </DxGrid>
+
+                            break;
+
+                        case 1:
+                            <p>hello world</p>
+                            break;
+                        case 2:
+                            <TagMont />
+                            break;
+                    }
+                }
+            </ContentTemplate>
+        </FullScreen>
+    }
+</form>
+
+<style>
+    .popup-width {
+        min-width: min(65rem, 100%);
+    }
+</style>
+
+
+@code {
+    [Parameter]
+    public string gridHeight { get; set; } = "800px";
+
+    bool IsReady;
+    IReadOnlyList<object> SelectedDataItems { get; set; }
+    DateTime selectedDate;
+    SystemSettings settings;
+    Communication Communication;
+    Term? firstTermNextYear;
+    PersonTitles titles = new PersonTitles();
+    List<SilentContactWrapper> silentContactList = new SilentContactList();
+
+    List<Contact> contacts { get; set; }
+    IEnumerable<Tag> tags { get; set; }
+
+    AUState states;
+    Gender gender;
+    List<Person> SendTo { get; set; }
+    List<DocumentTemplate> DocumentTemplates;
+    SelectDocumentTemplatePopup? selectDocumentTemplatePopup;
+    DateFilter DateFilter;
+    string DateJoinedTabCaption = "Date Joined";
+    string DateCeasedTabCaption = "Date Ceased";
+    string LastUpdateTabCaption = "Last Update";
+    DxTabs? dxTabs;
+
+    internal IGrid? mainGrid { get; set; }
+    internal ErrorPopup? ErrorPopup { get; set; }
+    internal GridToolbar? Toolbar;
+    internal Progress? ProgressBar;
+    internal string ErrorHeader;
+    internal string ErrorMessage;
+    U3ADbContext? dbc { get; set; }
+    DocumentServer server;
+    int emailsSent;
+    bool isGridFilterSet;
+    bool isEmailEditing;
+
+    MessageBox? messageBox { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        states = new AUState();
+        gender = new Gender();
+        Communication = new Communication();
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
+        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        server = new DocumentServer(dbc);
+        server.DocumentSentEvent += Server_DocumentSent;
+        await GetData();
+        IsReady = true;
+    }
+
+    async Task GetData()
+    {
+        dbc.ChangeTracker.Clear();
+        contacts = await BusinessRule.EditableContactAsync(dbc);
+        tags = await BusinessRule.SelectableTagAsync(dbc);
+    }
+
+    void OnTagsChanged(IEnumerable<string> newTags)
+    {
+        var t = newTags;
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            var editModel = (Contact)e.EditModel;
+            editModel.DateJoined = DateTime.Today;
+            editModel.State = dbc.TenantInfo.State;
+        }
+    }
+
+    bool isBusy;
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (isBusy) return;
+        isBusy = true;
+        try
+        {
+            await SaveRecord(e);
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (Contact)e.EditModel;
+        if (!await IsDataOK(editModel)) { e.Cancel = true; return; }
+        // Re-query a data item from the store.
+        var dataItem = e.IsNew ? new Contact() : dbc.Contact.Find(editModel.ID);
+        // Assign changes from the edit model to the data item.
+        if (dataItem != null)
+        {
+            editModel.CopyTo(dataItem);
+            dataItem.Tags = editModel.Tags.ToList();
+            // Post changes to the database.
+            if (e.IsNew) await dbc.AddAsync(dataItem);
+            if (await SaveChangesAsync())
+            {
+                // update the Grid.
+                if (e.IsNew)
+                {
+                    contacts.Insert(0, dataItem);
+                }
+                else
+                {
+                    int idx = contacts.FindIndex(x => x.ID == dataItem.ID);
+                    contacts[idx] = dataItem;
+                }
+            }
+        }
+    }
+
+
+    async Task<bool> IsDataOK(Contact Contact)
+    {
+        bool result = true;
+        if (contacts != null)
+        {
+            var dupHTML = await BusinessRule.GetDuplicateMarkupToContinue(dbc, Contact);
+            if (!string.IsNullOrWhiteSpace(dupHTML))
+            {
+                var args = new MessageBoxArgs();
+                args.Caption = "Duplicate Participant?";
+                args.Message = dupHTML;
+                args.OKButtonText = "Continue";
+                result = await messageBox.ShowAsync(args);
+            }
+        }
+        return result;
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        Contact Contact = (Contact)e.DataItem;
+        dbc.Remove(Contact);
+        await SaveChangesAsync();
+        await GetData();
+    }
+
+    async Task<bool> SaveChangesAsync()
+    {
+        bool result = false;
+        try
+        {
+            // Post changes to the database.
+            await dbc.SaveChangesAsync();
+            result = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHeader = "Save to database error";
+            ErrorMessage = Helpers.GetErrorMessage(ex);
+            await ErrorPopup.ShowPopupAsync();
+            dbc?.ChangeTracker?.Clear();
+        }
+        return result;
+    }
+
+    async Task OnCommunicate()
+    {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
+            return;
+        }
+        SendTo = SelectedDataItems.Cast<Person>().OrderBy(x => x.FullNameAlpha).ToList();
+        if (await selectDocumentTemplatePopup.ShowAsync())
+        {
+            emailsSent = 0;
+            await ProgressBar.ShowAsync("Sending ... Please Wait", SelectedDataItems.Count);
+            List<ExportData> exportData = await BusinessRule.GetExportDataAsync(dbc, SendTo);
+            bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;
+            await server.MailMerge(dbc, selectDocumentTemplatePopup.SelectedDocumentTemplate, exportData, overridePreference);
+            await ProgressBar.Close();
+            await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
+        }
+    }
+
+    async void Server_DocumentSent(object sender, DocumentSentEventArgs e)
+    {
+        emailsSent += e.DocumentsSent;
+        await ProgressBar.SetValueAsync(emailsSent);
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

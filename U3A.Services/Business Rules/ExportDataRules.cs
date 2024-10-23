@@ -11,8 +11,8 @@ namespace U3A.BusinessRules
         public static async Task<List<ExportData>> GetExportDataAsync(U3ADbContext dbc)
         {
             var exportData = from s in dbc.SystemSettings
-                             from p in dbc.Person
-                             where p.DateCeased == null
+                             from p in dbc.Person.IgnoreQueryFilters()
+                             where p.DateCeased == null && !p.IsDeleted
                              select new ExportData
                              {
                                  P_Key = p.ID,

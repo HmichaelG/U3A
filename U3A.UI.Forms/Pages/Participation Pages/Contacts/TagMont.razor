@@ -1,0 +1,148 @@
+﻿@page "/TagMnt"
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <MessageBox @ref="@messageBox" />
+
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@Tags" @ref=@mainGrid
+                    ValidationEnabled="true"
+                    EditMode="GridEditMode.EditCell"
+                    DataItemDeleting="Grid_DataItemDeleting"
+                    EditModelSaving="Grid_EditModelSaving">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{C538834A-C1D9-402A-A7FE-BF8B2E71747F}" />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem" 
+                        EditButtonVisible="true" DeleteButtonVisible="true" />
+                    <DxGridDataColumn Width="25rem" Caption="Name" FieldName="Name" />
+                    <DxGridDataColumn Caption="Can Lead?" FieldName="CanLead" />
+                    <DxGridDataColumn Caption="Can Enrol?" FieldName="CanEnrol" />
+                </Columns>
+
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
+}
+
+@code {
+
+    bool IsReady;
+    private List<Tag> Tags { get; set; }
+    private DxGridCommandColumnEx? GridCommandColumn;
+    MessageBox? messageBox;
+
+    internal IGrid? mainGrid { get; set; }
+    internal ErrorPopup? ErrorPopup { get; set; }
+    internal GridToolbar? Toolbar;
+    internal string ErrorHeader;
+    internal string ErrorMessage;
+    U3ADbContext dbc { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        await GetData();
+        IsReady = true;
+    }
+
+    async Task GetData()
+    {
+        Tags = await BusinessRule.SelectableTagAsync(dbc);
+    }
+
+    bool isBusy;
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (isBusy) return;
+        isBusy = true;
+        try
+        {
+            await SaveRecord(e);
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    async Task SaveRecord(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (Tag)e.EditModel;
+        if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
+        // Re-query a data item from the store.
+        var dataItem = e.IsNew ? new Tag() : dbc.Tag.Find(editModel.Id);
+        // Assign changes from the edit model to the data item.
+        if (dataItem != null)
+        {
+            editModel.CopyTo(dataItem);
+            try
+            {
+                // Post changes to the database.
+                if (e.IsNew) await dbc.AddAsync(dataItem);
+                await dbc.SaveChangesAsync();
+                // update the Grid.
+                if (e.IsNew)
+                {
+                    Tags.Insert(0, dataItem);
+                }
+                else
+                {
+                    int idx = Tags.FindIndex(x => x.Id == dataItem.Id);
+                    Tags[idx] = dataItem;
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHeader = "Save to database error";
+                ErrorMessage = Helpers.GetErrorMessage(ex);
+                await ErrorPopup.ShowPopupAsync();
+                dbc?.ChangeTracker?.Clear();
+                e.Cancel = true;
+            }
+        }
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        Tag tag = (Tag)e.DataItem;
+        dbc.Remove(tag);
+        await dbc.SaveChangesAsync();
+        await GetData();
+    }
+
+    async Task<bool> IsDataOk(Tag editItem)
+    {
+        bool result = true;
+        // var dup = await BusinessRule.DuplicateMarkUpAsync(dbc, editItem);
+        // if (!string.IsNullOrWhiteSpace(dup))
+        // {
+        //     await messageBox.ShowOkOnlyAsync("Duplicate Record", dup);
+        //     result = false;
+        // }
+        return result;
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

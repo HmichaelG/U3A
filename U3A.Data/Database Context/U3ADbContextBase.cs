@@ -34,6 +34,8 @@ namespace U3A.Database
         public DbSet<CourseType> CourseType { get; set; }
         public DbSet<Venue> Venue { get; set; }
         public DbSet<Person> Person { get; set; }
+        public DbSet<Contact> Contact { get; set; }
+        public DbSet<Tag> Tag { get; set; }
         public DbSet<PersonImport> PersonImport { get; set; }
         public DbSet<PersonImportError> PersonImportError { get; set; }
         public DbSet<Enrolment> Enrolment { get; set; }
@@ -243,7 +245,8 @@ namespace U3A.Database
             modelBuilder.Entity<Enrolment>()
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Person>()
-                .HasQueryFilter(x => x.IsDeleted == false);
+                .HasQueryFilter(x => x.IsDeleted == false 
+                                        && EF.Property<string>(x,"Discriminator") == "Person");
             modelBuilder.Entity<Enrolment>()
                     .HasIndex(x => new { x.TermID, x.CourseID, x.ClassID, x.PersonID })
                     .HasDatabaseName("idxUniqueEnrolments")

@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Enrolment_BaseEntity
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_Contact
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Enrolment_DisplayDescription
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Contact_Tag
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Enrolment_DisplayDescription
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Contact_Tag
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
