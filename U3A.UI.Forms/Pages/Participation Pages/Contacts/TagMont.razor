@@ -42,6 +42,8 @@ else
 }
 
 @code {
+    [Parameter]
+    public EventCallback TagListChanged { get; set; }
 
     bool IsReady;
     private List<Tag> Tags { get; set; }
@@ -98,6 +100,7 @@ else
                 // Post changes to the database.
                 if (e.IsNew) await dbc.AddAsync(dataItem);
                 await dbc.SaveChangesAsync();
+                await TagListChanged.InvokeAsync();
                 // update the Grid.
                 if (e.IsNew)
                 {
@@ -125,18 +128,19 @@ else
         Tag tag = (Tag)e.DataItem;
         dbc.Remove(tag);
         await dbc.SaveChangesAsync();
+        await TagListChanged.InvokeAsync();
         await GetData();
     }
 
     async Task<bool> IsDataOk(Tag editItem)
     {
         bool result = true;
-        // var dup = await BusinessRule.DuplicateMarkUpAsync(dbc, editItem);
-        // if (!string.IsNullOrWhiteSpace(dup))
-        // {
-        //     await messageBox.ShowOkOnlyAsync("Duplicate Record", dup);
-        //     result = false;
-        // }
+        var dup = await BusinessRule.DuplicateTagAsync(dbc, editItem);
+        if (dup is not null)
+        {
+            await messageBox.ShowOkOnlyAsync("Duplicate Record", $"The tag {dup.Name} is already in use.");
+            result = false;
+        }
         return result;
     }
 

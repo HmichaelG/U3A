@@ -1,12 +1,6 @@
-﻿using DevExpress.XtraRichEdit.Model;
-using Eway.Rapid.Abstractions.Response;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
-using Twilio.TwiML.Fax;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
@@ -29,9 +23,33 @@ public static partial class BusinessRule
     }
     public static async Task<List<Tag>> SelectableTagAsync(U3ADbContext dbc)
     {
-        var tags = dbc.Tag
-                        .OrderBy(x => x.Name).ToList();
+        var tags = await dbc.Tag
+                        .OrderBy(x => x.Name).ToListAsync();
         return tags;
     }
+    public static async Task<List<TaggedContact>> SelectableTaggedContactsAsync(U3ADbContext dbc)
+    {
+        var tags = await dbc.Tag.IgnoreQueryFilters()
+                        .Where(x => x.Contacts.Any(x => !x.IsDeleted))
+                        .Include(x => x.Contacts)
+                        .OrderBy(x => x.Name).ToListAsync();
+        List<TaggedContact> result = new();
+        foreach (var tag in tags)
+        {
+            foreach (var contact in tag.Contacts)
+            {
+                result.Add(new TaggedContact() { Tag = tag, Contact = contact });
+            }
+        }
+        return result;
+    }
+
+    public static async Task<Tag?> DuplicateTagAsync(U3ADbContext dbc, Tag tag)
+    {
+        return await dbc.Tag.AsNoTracking()
+                        .Where(x => x.Id != tag.Id &&
+                                    x.Name.Trim().ToUpper() == tag.Name.Trim().ToUpper()).FirstOrDefaultAsync();
+    }
+
 
 }

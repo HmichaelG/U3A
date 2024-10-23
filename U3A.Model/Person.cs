@@ -1,5 +1,4 @@
-﻿using DevExpress.XtraRichEdit.Forms;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -20,6 +19,12 @@ public class Contact : Person
 
     public IEnumerable<Tag> Tags { get; set; } = new List<Tag>() ;
 
+}
+
+public class TaggedContact
+{
+    public Tag Tag { get; set; }
+    public Contact Contact { get; set; }
 }
 
 [Index(nameof(DataImportTimestamp))]

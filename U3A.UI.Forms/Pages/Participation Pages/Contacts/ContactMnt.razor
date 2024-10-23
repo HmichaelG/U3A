@@ -71,17 +71,9 @@
                                     PopupEditFormHeaderText="Add/Edit Contacts"
                                     DataItemDeleting="Grid_DataItemDeleting">
                                 <ToolbarTemplate>
-                                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{CCDCC0AB-5B0D-40D5-BB06-7A21E3EDCAFA}"
+                                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{660EF721-D17F-4A69-B28E-46063DE0B0C2}"
                                                  SpreadsheetHeaderRows="2">
                                         <CustomButtonContent>
-                                            <DxToolbarItem IconCssClass="bi bi-arrow-clockwise" Name="Refresh" Text="Refresh"
-                                                           BeginGroup=true
-                                                           Click="@(async() => {await GetData();})"
-                                                           RenderStyle="ButtonRenderStyle.Primary"
-                                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                           Alignment="ToolbarItemAlignment.Right"
-                                                           Tooltip="Refresh grid after editing Tags">
-                                            </DxToolbarItem>
                                             <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
                                                            BeginGroup=true
                                                            Click=@OnCommunicate
@@ -122,7 +114,7 @@
                                         </Columns>
                                     </DxGridBandColumn>
                                     <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
-                                                      DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
+                                                      DisplayFormat="d/M/yy HH:mm" Visible="false" />
                                     <DxGridDataColumn Caption="Tags" FieldName=@nameof(Contact.Tags) AllowGroup="false" AllowSort="false">
                                         <CellDisplayTemplate>
                                             @{
@@ -248,10 +240,10 @@
                             break;
 
                         case 1:
-                            <p>hello world</p>
+                            <ContactByTag />
                             break;
                         case 2:
-                            <TagMont />
+                            <TagMont TagListChanged="async() => await GetData()" />
                             break;
                     }
                 }
@@ -289,9 +281,6 @@
     List<DocumentTemplate> DocumentTemplates;
     SelectDocumentTemplatePopup? selectDocumentTemplatePopup;
     DateFilter DateFilter;
-    string DateJoinedTabCaption = "Date Joined";
-    string DateCeasedTabCaption = "Date Ceased";
-    string LastUpdateTabCaption = "Last Update";
     DxTabs? dxTabs;
 
     internal IGrid? mainGrid { get; set; }

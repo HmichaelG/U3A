@@ -1,0 +1,69 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+<DxGrid Data="@taggedContacts" @ref=@mainGrid 
+        AutoExpandAllGroupRows="true"        
+        AllowSelectRowByClick="true"
+        SelectionMode=GridSelectionMode.Multiple
+        CssClass="W-100"
+        KeyFieldNames="@(new List<string>() {"Tag.Id","Contact.ID"})">
+    <ToolbarTemplate>
+        <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid LayoutKey="{F0CB0949-8C0B-4B82-9597-942DEEC72F3C}">
+        </GridToolbar>
+    </ToolbarTemplate>
+    <Columns>
+        <DxGridDataColumn Caption="Tag" FieldName="Tag.Name" GroupIndex="0" />
+        <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
+                               Width="2rem" />
+        <DxGridDataColumn Caption="Name" FieldName="Contact.FullNameAlpha" />
+        <DxGridBandColumn Caption="Address">
+            <Columns>
+                <DxGridDataColumn Caption="Street" FieldName="Contact.Address" Visible=true Width="12rem" />
+                <DxGridDataColumn Caption="City" FieldName="Contact.City" Width="9rem" />
+                <DxGridDataColumn Caption="State" FieldName="Contact.State" Visible=false />
+                <DxGridDataColumn Caption="P'code" FieldName="Contact.Postcode" DisplayFormat="{0:D}" Width="5rem" Visible="false" />
+            </Columns>
+        </DxGridBandColumn>
+        <DxGridBandColumn Caption="Contact Detail">
+            <Columns>
+                <DxGridDataColumn Caption="Email" FieldName="Contact.Email" Visible=true Width="15rem" />
+                <DxGridDataColumn Caption="Phone" FieldName="Contact.AdjustedHomePhone" Width="8rem" />
+                <DxGridDataColumn Caption="Mobile" FieldName="Contact.AdjustedMobile" Visible=true Width="8rem" />
+            </Columns>
+        </DxGridBandColumn>
+        <DxGridBandColumn Caption="Emergency Contact" Visible="false">
+            <Columns>
+                <DxGridDataColumn Caption="Contact" FieldName="Contact.ICEContact" Visible=false />
+                <DxGridDataColumn Caption="Phone" FieldName="Contact.ICEPhone" Visible=false />
+            </Columns>
+        </DxGridBandColumn>
+        <DxGridDataColumn Caption="Last Update" FieldName="Contact.UpdatedOn" Width="8rem"
+                          DisplayFormat="d/M/yy HH:mm" Visible="false" />
+    </Columns>
+
+    <GroupSummary>
+        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" 
+                           FieldName="Contact.Id" DisplayText="{0:n0} Contacts"
+                            />
+    </GroupSummary>
+    <TotalSummary>
+        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                           FieldName="Tag.Id" DisplayText="{0:n0} Tagged Contacts"
+                           FooterColumnName="Contact.FullNameAlpha" />
+    </TotalSummary>
+
+</DxGrid>
+
+@code {
+    IEnumerable<TaggedContact> taggedContacts;
+    IGrid? mainGrid;
+    GridToolbar? Toolbar;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            taggedContacts = await BusinessRule.SelectableTaggedContactsAsync(dbc);
+        }
+        await base.OnInitializedAsync();
+    }
+}
