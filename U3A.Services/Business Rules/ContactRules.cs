@@ -29,7 +29,7 @@ public static partial class BusinessRule
     }
     public static async Task<List<TaggedContact>> SelectableTaggedContactsAsync(U3ADbContext dbc)
     {
-        var contacts = await EditableContactAsync (dbc);
+        var contacts = await EditableContactAsync(dbc);
         var emprtyTag = new Tag() { Id = Guid.Empty, Name = " []" };
         List<TaggedContact> result = new();
         foreach (var contact in contacts)
@@ -41,7 +41,7 @@ public static partial class BusinessRule
                     result.Add(new TaggedContact() { Tag = tag, Contact = contact });
                 }
             }
-            else { result.Add(new TaggedContact() {Tag = emprtyTag, Contact = contact }); }
+            else { result.Add(new TaggedContact() { Tag = emprtyTag, Contact = contact }); }
         }
         return result;
     }
@@ -55,13 +55,29 @@ public static partial class BusinessRule
 
     public static async Task<List<Contact>> EditableDeletedContactsAsync(U3ADbContext dbc)
     {
-        var people = dbc.Contact.IgnoreQueryFilters()
+        var people = await dbc.Contact.IgnoreQueryFilters()
                         .Include(x => x.Enrolments)
                         .Where(x => x.IsDeleted)
                         .OrderBy(x => x.LastName)
                         .ThenBy(x => x.FirstName)
-                        .ThenBy(x => x.Email).ToList();
+                        .ThenBy(x => x.Email).ToListAsync();
         return people;
+    }
+    public static async Task<List<Person>> EnrollablePeopleAsync(U3ADbContext dbc, Term selectedTerm)
+    {
+        var people = await BusinessRule.SelectablePersonsAsync(dbc, selectedTerm);
+        var contacts = await dbc.Contact.IgnoreQueryFilters()
+                        .Include(x => x.Tags)
+                        .Where(x => !x.IsDeleted)
+                        .ToListAsync();
+        foreach (var c in contacts)
+        {
+            foreach (var t in c.Tags)
+            {
+                if (t.CanEnrol) { people.Add(c as Person); break; }
+            }
+        }
+        return people.OrderBy(x => x.FullNameAlphaKey).ToList();
     }
 
 }

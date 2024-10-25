@@ -302,8 +302,9 @@ public static partial class BusinessRule
         {
             BusinessRule.AssignClassCounts(term, c);
         }
-        var people = dbc.Person.Where(x => x.DateCeased == null).AsNoTracking().ToList();
-        var enrolments = dbc.Enrolment
+        var people = dbc.Person.IgnoreQueryFilters()
+                        .Where(x => !x.IsDeleted && x.DateCeased == null).AsNoTracking().ToList();
+        var enrolments = dbc.Enrolment.IgnoreQueryFilters()
             .Include(x => x.Term)
             .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
             .Include(x => x.Course).ThenInclude(x => x.Classes)
@@ -312,7 +313,7 @@ public static partial class BusinessRule
             .Include(x => x.Class).ThenInclude(x => x.OnDay)
             .Include(x => x.Class).ThenInclude(x => x.Leader)
             .Include(x => x.Class).ThenInclude(x => x.Occurrence)
-            .Where(x => x.TermID == TermID
+            .Where(x => !x.IsDeleted && x.TermID == TermID
                         && (WaitlistStatus == null || x.IsWaitlisted == WaitlistStatus))
                         .AsEnumerable().Where(x => IsCourseInTerm(x.Course, x.Term)).ToList();
         foreach (var person in people)

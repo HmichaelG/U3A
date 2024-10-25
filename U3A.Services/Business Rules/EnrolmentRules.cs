@@ -21,25 +21,25 @@ namespace U3A.BusinessRules
             List<Enrolment> enrolments = null;
             if (SelectedClass == null || SelectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
             {
-                enrolments = await dbc.Enrolment
+                enrolments = await dbc.Enrolment.IgnoreQueryFilters()
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => x.CourseID == SelectedCourse.ID
+                                    .Where(x => !x.IsDeleted && x.CourseID == SelectedCourse.ID
                                                         && x.TermID == SelectedTerm.ID
                                                         && x.Person.DateCeased == null).ToListAsync();
             }
             else
             {
-                enrolments = await dbc.Enrolment
+                enrolments = await dbc.Enrolment.IgnoreQueryFilters()
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => x.ClassID == SelectedClass.ID
+                                    .Where(x => !x.IsDeleted && x.ClassID == SelectedClass.ID
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null).ToListAsync();
             }
-            return enrolments.OrderBy(x => x.IsWaitlisted)
+            return enrolments.OrderBy(x => x.IsWaitlisted && !x.IsDeleted)
                                                 .ThenBy(x => x.WaitlistSort)
                                                 .ThenBy(x => x.Person.LastName)
                                                 .ThenBy(x => x.Person.FirstName)
@@ -164,12 +164,12 @@ namespace U3A.BusinessRules
 
         public static List<Enrolment> SelectableEnrolments(U3ADbContext dbc, Term SelectedTerm)
         {
-            var enrolments = dbc.Enrolment
+            var enrolments = dbc.Enrolment.IgnoreQueryFilters()
                                 .Include(x => x.Term)
                                 .Include(x => x.Course).ThenInclude(x => x.Classes)
                                 .Include(x => x.Class).ThenInclude(x => x.OnDay)
                                 .Include(x => x.Person)
-                                .Where(x => x.TermID == SelectedTerm.ID
+                                .Where(x => !x.Person.IsDeleted && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null)
                                 .OrderBy(x => x.IsWaitlisted)
                                             .ThenBy(x => x.Person.LastName)
@@ -197,11 +197,11 @@ namespace U3A.BusinessRules
         {
             if (SelectedClass == null || SelectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
             {
-                return dbc.Enrolment
+                return dbc.Enrolment.IgnoreQueryFilters()
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => x.CourseID == SelectedCourse.ID
+                                    .Where(x => !x.IsDeleted && x.CourseID == SelectedCourse.ID
                                                         && x.TermID == SelectedTerm.ID
                                                         && x.Person.DateCeased == null)
                                     .OrderBy(x => x.IsWaitlisted)
@@ -211,11 +211,11 @@ namespace U3A.BusinessRules
             }
             else
             {
-                return dbc.Enrolment
+                return dbc.Enrolment.IgnoreQueryFilters()
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => x.ClassID == SelectedClass.ID
+                                    .Where(x => !x.IsDeleted && x.ClassID == SelectedClass.ID
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null)
                                     .OrderBy(x => x.IsWaitlisted)

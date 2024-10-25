@@ -90,7 +90,7 @@ namespace U3A.BusinessRules
             var endDate = new DateTime(Year, 12, 31);
             var startDate = new DateTime(Year, 1, 1);
             // A class with valid attendance has at least 1 present
-            var validAttendance = (dbc.AttendClass.Include(x => x.Class)
+            var validAttendance = (dbc.AttendClass.IgnoreQueryFilters().Include(x => x.Class)
                 .Where(ac => ac.Date >= startDate && ac.Date <= endDate)
                 .ToList())
                 .GroupBy(ac => new { ac.ClassID, ac.Date.Date })
@@ -354,7 +354,7 @@ namespace U3A.BusinessRules
                                     Term SelectedTerm, Class SelectedClass, DateTime ClassDate)
         {
             return await GetAttendance(dbc, SelectedTerm)
-                            .Where(x => x.TermID == SelectedTerm.ID
+                            .Where(x => !x.Person.IsDeleted && x.TermID == SelectedTerm.ID
                                             && x.ClassID == SelectedClass.ID
                                             && x.Date == ClassDate)
                             .OrderBy(x => x.Person.LastName)
@@ -373,7 +373,7 @@ namespace U3A.BusinessRules
 
         public static IQueryable<AttendClass> GetAttendance(U3ADbContext dbc, Term SelectedTerm)
         {
-            return dbc.AttendClass
+            return dbc.AttendClass.IgnoreQueryFilters()
                             .Include(x => x.Term)
                             .Include(x => x.Class)
                             .Include(x => x.Class).ThenInclude(x => x.Venue)
@@ -388,7 +388,7 @@ namespace U3A.BusinessRules
         }
         public static IQueryable<AttendClass> GetAttendance(U3ADbContext dbc, IEnumerable<Guid> peopleID)
         {
-            return dbc.AttendClass
+            return dbc.AttendClass.IgnoreQueryFilters()
                             .Include(x => x.Term)
                             .Include(x => x.Class)
                             .Include(x => x.Class).ThenInclude(x => x.Venue)

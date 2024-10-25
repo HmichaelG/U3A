@@ -22,7 +22,7 @@ namespace U3A.UI.Reports
         string[] courseFilter = new string[] { };
         private void AttendanceAnalysis_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
-            //prmYear.Value = TimezoneAdjustment.GetLocalTime().Year;
+            prmYear.Value = DbContext.GetLocalTime().Year; 
         }
         private void AttendanceAnalysis_DataSourceDemanded(object sender, EventArgs e)
         {

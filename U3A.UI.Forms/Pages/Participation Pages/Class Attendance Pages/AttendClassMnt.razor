@@ -478,7 +478,7 @@ else
         QuickSelectionStatus = ClassAttendanceStatus.First();
         if (SelectedTerm != null)
         {
-            Persons = await BusinessRule.SelectablePersonsAsync(dbc, SelectedTerm);
+            Persons = await BusinessRule.EnrollablePeopleAsync(dbc, SelectedTerm);
             if (IsMemberPortal)
             {
                 await SetupClassDates();

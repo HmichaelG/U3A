@@ -166,7 +166,6 @@
             this.xrChart1.Legend.AlignmentHorizontal = DevExpress.XtraCharts.LegendAlignmentHorizontal.Center;
             this.xrChart1.Legend.AlignmentVertical = DevExpress.XtraCharts.LegendAlignmentVertical.BottomOutside;
             this.xrChart1.Legend.Direction = DevExpress.XtraCharts.LegendDirection.LeftToRight;
-            this.xrChart1.Legend.LegendID = -1;
             this.xrChart1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 76.04166F);
             this.xrChart1.Name = "xrChart1";
             series1.ArgumentDataMember = "WeekEnd";
@@ -331,7 +330,7 @@
             this.prmCourseID,
             this.prmCourseFilter,
             this.prmMinMonths});
-            this.Version = "23.2";
+            this.Version = "24.1";
             this.ParametersRequestBeforeShow += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.AttendanceAnalysis_ParametersRequestBeforeShow);
             this.DataSourceDemanded += new System.EventHandler<System.EventArgs>(this.AttendanceAnalysis_DataSourceDemanded);
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).EndInit();

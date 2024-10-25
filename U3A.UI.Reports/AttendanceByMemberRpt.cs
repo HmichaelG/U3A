@@ -37,7 +37,8 @@ namespace U3A.UI.Reports
                         .OrderByDescending(x => x.Date)
                         .Select(x => x.Date).FirstOrDefault();
                     objectDataSource2.DataSource = dbc.AttendClassStatus.ToList();
-                    objectDataSource3.DataSource = dbc.Person.ToList();
+                    objectDataSource3.DataSource = dbc.Person.IgnoreQueryFilters()
+                                                    .Where(x => !x.IsDeleted).ToList();
                 };
             });
             objectDataSource1.DataSource = data.ToList();

@@ -347,7 +347,7 @@ else
         courseComboEnabled = false;
         if (selectedTerm != null)
         {
-            Persons = await BusinessRule.SelectablePersonsAsync(dbc, selectedTerm);
+            Persons = await BusinessRule.EnrollablePeopleAsync(dbc, selectedTerm);
             await SelectedTermChanged(selectedTerm);
         }
         ShowEnrolledTypeChanged(0);
@@ -598,6 +598,11 @@ else
             {
                 editModel.CopyTo(dataItem);
                 dataItem.Person = dbc.Person.Find(editModel.Person.ID);
+                if (dataItem.Person == null) 
+                {
+                    dataItem.Person = dbc.Contact.IgnoreQueryFilters()
+                                        .FirstOrDefault(x => x.ID == editModel.Person.ID);
+                }
                 dataItem.Term = dbc.Term.Find(selectedTerm.ID);
                 dataItem.Course = dbc.Course.Find(selectedCourse.ID);
                 if (selectedClass != null) { dataItem.Class = dbc.Class.Find(selectedClass.ID); }

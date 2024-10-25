@@ -7,7 +7,8 @@
 @implements IDisposable
 
 
-<MessageBox @ref="@messageBox"
+<MessageBox @ref="@messageBox" />
+<MessageBox @ref="@inputBox"
             Caption="Attendance Analysis Parameters"
             AffirmativeButtonClicked=OnOkButtonClicked
             NegativeButtonClicked="OnCancelButtonClicked"
@@ -54,6 +55,7 @@
 
 @code {
     MessageBox? messageBox;
+    MessageBox? inputBox;
     XtraReportViewer? viewer;
     AttendanceAnalysis? report;
     bool isPopupVisible = true;
@@ -77,19 +79,25 @@
 
     async Task OnOkButtonClicked()
     {
-        isPopupVisible = false;
-        report = new()
-            {
-                DbContext = dbc,
-            };
-        report.Parameters["prmYear"].Value = ReportForYear;
         if ((CoursesToReport == null || CoursesToReport.Count() <= 0)
             &&
             (CourseTypesToReport == null || CourseTypesToReport.Count() > 0))
         { CoursesToReport = Courses; }
-        
-        report.Parameters["prmCourseFilter"].Value = CoursesToReport.Select(x => x.ID.ToString()).ToArray();
-        report.Parameters["prmMinMonths"].Value = MinimumMonthsToReport;
+        if (CourseTypesToReport != null && CoursesToReport.Count() <= 0)
+        {
+            await messageBox.ShowAsync("No Courses of this type", "The course type(s) has no courses in the current year.");
+        }
+        else
+        {
+            report = new()
+                {
+                    DbContext = dbc,
+                };
+            report.Parameters["prmYear"].Value = ReportForYear;
+            report.Parameters["prmCourseFilter"].Value = CoursesToReport.Select(x => x.ID.ToString()).ToArray();
+            report.Parameters["prmMinMonths"].Value = MinimumMonthsToReport;
+            isPopupVisible = false;
+        }
     }
 
     async Task OnReportForYearChanged(int newValue)
