@@ -166,7 +166,11 @@ else
     async Task GetData()
     {
         mainGrid?.ClearSelection();
-        SendMail = await dbc.SendMail.Include(x => x.Person).ToListAsync();
+        SendMail = await dbc.SendMail
+                            .IgnoreQueryFilters()
+                            .Include(x => x.Person)
+                            .Where(x => !x.Person.IsDeleted)
+                            .ToListAsync();
         SendMail.AddRange(await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant));
         SendMail = SendMail.OrderByDescending(x => x.CreatedOn).ToList();
     }
@@ -215,10 +219,10 @@ else
                     else sm.Status = "Receipt not found";
                     break;
                 case "Participant Enrolment":
-                    var enrolment = await dbc.Enrolment
+                    var enrolment = await dbc.Enrolment.IgnoreQueryFilters()
                                         .Include(x => x.Course)
                                         .Include(x => x.Person)
-                                        .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
+                                        .Where(x => !x.IsDeleted && x.ID == sm.RecordKey).FirstOrDefaultAsync();
                     if (enrolment == null)
                     {
                         enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT, sm.RecordKey, tenant);

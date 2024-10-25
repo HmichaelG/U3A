@@ -61,18 +61,18 @@ namespace U3A.BusinessRules
             if (testTerm == null) { return enrolments; }
             if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == testTerm.ID))
             {
-                enrolments = await dbc.Enrolment.AsNoTracking()
+                enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                                           .Include(x => x.Person)
                                           .Include(x => x.Course)
-                                          .Where(x => x.ClassID == thisClass.ID
+                                          .Where(x => !x.IsDeleted && x.ClassID == thisClass.ID
                                                     && x.TermID == testTerm.ID).ToListAsync();
             }
             else
             {
-                enrolments = await dbc.Enrolment.AsNoTracking()
+                enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                                             .Include(x => x.Person)
                                             .Include(x => x.Course)
-                                            .Where(x => x.CourseID == thisCourse.ID
+                                            .Where(x => !x.IsDeleted && x.CourseID == thisCourse.ID
                                                             && x.TermID == testTerm.ID).ToListAsync();
             };
             Enrolment? dummy;

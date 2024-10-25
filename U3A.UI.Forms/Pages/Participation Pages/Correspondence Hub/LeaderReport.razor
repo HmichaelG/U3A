@@ -189,17 +189,19 @@ else
         var enrolments = new List<Enrolment>();
         if (dbc.Enrolment.Any(x => x.ClassID == Class.ID && x.TermID == selectedTerm.ID))
         {
-            enrolments = dbc.Enrolment.Include(x => x.Person)
-                                      .Where(x => x.ClassID == Class.ID
-                                                && x.TermID == selectedTerm.ID).ToList();
+            enrolments = dbc.Enrolment.IgnoreQueryFilters()
+                                .Include(x => x.Person)
+                                .Where(x => !x.IsDeleted && x.ClassID == Class.ID
+                                            && x.TermID == selectedTerm.ID).ToList();
             enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
                                     await tenantService.GetTenantIdentifierAsync(), Course.ID, Class.ID));
         }
         else
         {
-            enrolments = dbc.Enrolment.Include(x => x.Person)
-                                        .Where(x => x.CourseID == Course.ID
-                                                        && x.TermID == selectedTerm.ID).ToList();
+            enrolments = dbc.Enrolment.IgnoreQueryFilters()
+                                .Include(x => x.Person)
+                                .Where(x => !x.IsDeleted && x.CourseID == Course.ID
+                                                && x.TermID == selectedTerm.ID).ToList();
             enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
                                     await tenantService.GetTenantIdentifierAsync(), Course.ID));
         };

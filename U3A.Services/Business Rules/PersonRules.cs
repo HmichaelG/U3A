@@ -54,7 +54,9 @@ public static partial class BusinessRule
 
     public static Person SelectPerson(U3ADbContext dbc, Guid ID)
     {
-        var person = dbc.Person.Find(ID) ?? throw new ArgumentNullException(nameof(Person));
+        var person = dbc.Person
+                        .IgnoreQueryFilters()
+                        .FirstOrDefault(x => x.ID == ID) ?? throw new ArgumentNullException(nameof(Person));
         ApplyGroups(dbc, person);
         return person;
     }
