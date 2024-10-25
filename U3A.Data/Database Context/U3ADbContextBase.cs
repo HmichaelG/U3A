@@ -245,7 +245,7 @@ namespace U3A.Database
             modelBuilder.Entity<Enrolment>()
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Person>()
-                .HasQueryFilter(x => x.IsDeleted == false 
+                .HasQueryFilter(x => x.IsDeleted == false
                                         && EF.Property<string>(x,"Discriminator") == "Person");
             modelBuilder.Entity<Enrolment>()
                     .HasIndex(x => new { x.TermID, x.CourseID, x.ClassID, x.PersonID })

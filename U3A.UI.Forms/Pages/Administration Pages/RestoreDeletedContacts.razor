@@ -1,0 +1,149 @@
+﻿@page "/RestoreDeletedContacts"
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
+
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <div class="row">
+        <ContextHelpTitle Title="Restore Deleted Contacts" HelpTopic="Restore-Deleted-Contacts.html"></ContextHelpTitle>
+    </div>
+    <div class="row">
+        <div class="col-11 d-none d-md-inline">
+            Restore Contacts previously deleted.
+        </div>
+
+    </div>
+    <br />
+
+    <MessageBox @ref="@messageBox" />
+
+    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+
+    <FullScreen>
+        <ContentTemplate>
+            <DxGrid Data="@contacts" @ref=@mainGrid
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    ShowFilterRow="false"
+                    ShowAllRows="true"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    @bind-SelectedDataItems=@SelectedDataItems
+                    SelectionMode="GridSelectionMode.Multiple"
+                    UnboundColumnData="Grid_CustomUnboundColumnData">
+                <ToolbarTemplate>
+                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{38693BD5-D0CB-4C85-9B52-F4D12E3F93EC}">
+                        <CustomButtonContent>
+                            <DxToolbarItem IconCssClass="bi bi-recycle" Text="Restore Contacts"
+                                           BeginGroup=true
+                                           Click=@OnRestore
+                                           Enabled="@(SelectedDataItems?.Count > 0)"
+                                           RenderStyle="ButtonRenderStyle.Primary"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           Alignment="ToolbarItemAlignment.Right"
+                                           Tooltip="Restore the selected Contacts">
+                            </DxToolbarItem>
+                        </CustomButtonContent>
+                    </GridToolbar>
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridSelectionColumn Caption="Select" />
+                    <DxGridDataColumn Caption="Name" FieldName="FullNameAlpha" />
+                    <DxGridDataColumn FieldName="Email" />
+                    <DxGridDataColumn FieldName="Address" />
+                    <DxGridDataColumn FieldName="City" />
+                    <DxGridDataColumn FieldName="Postcode" DisplayFormat="f0" Visible="false" />
+                    <DxGridDataColumn FieldName="Mobile" />
+                    <DxGridDataColumn FieldName="HomePhone" />
+                    <DxGridDataColumn Caption="Deleted At"
+                                      UnboundType="GridUnboundColumnType.String" FieldName="DeletedAsAt" />
+                    <DxGridDataColumn Caption="Deleted By" FieldName="User" />
+                </Columns>
+
+            </DxGrid>
+        </ContentTemplate>
+    </FullScreen>
+}
+
+@code {
+    bool IsReady;
+    private List<Contact> contacts { get; set; }
+    IReadOnlyList<object> SelectedDataItems { get; set; }
+    MessageBox? messageBox;
+
+    internal IGrid? mainGrid { get; set; }
+    internal ErrorPopup? ErrorPopup { get; set; }
+    internal GridToolbar? Toolbar;
+    internal string ErrorHeader;
+    internal string ErrorMessage;
+    Term currentTerm;
+    U3ADbContext dbc { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        await GetDataAsync();
+        IsReady = true;
+    }
+
+    async Task GetDataAsync()
+    {
+        contacts = await BusinessRule.EditableDeletedContactsAsync(dbc);
+    }
+
+    async Task OnRestore()
+    {
+        foreach (var Person in SelectedDataItems.Cast<Person>())
+        {
+            var PersonToRestore = await dbc.Person.FindAsync(Person.ID);
+            (PersonToRestore as ISoftDelete).Undo();
+            foreach (var r in PersonToRestore.Receipts)
+            {
+                (r as ISoftDelete).Undo();
+            }
+            foreach (var e in PersonToRestore.Enrolments)
+            {
+                (e as ISoftDelete).Undo();
+            }
+        }
+        var result = await dbc.SaveChangesAsync();
+        await messageBox.ShowOkOnlyAsync("Restore Contacts", "The selected Contact records have been restored.");
+        await GetDataAsync();
+    }
+
+    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        if (e.FieldName == "EnrolmentCount")
+        {
+            e.Value = (e.DataItem as Person).Enrolments.Count(x => !x.IsWaitlisted && x.TermID == currentTerm.ID);
+        }
+        if (e.FieldName == "WaitlistCount")
+        {
+            e.Value = (e.DataItem as Person).Enrolments.Count(x => x.IsWaitlisted && x.TermID == currentTerm.ID);
+        }
+        if (e.FieldName == "DeletedAsAt")
+        {
+            var deletedAt = (e.DataItem as Person).DeletedAt;
+            if (deletedAt != null)
+            {
+                e.Value = dbc.GetLocalTime(deletedAt.Value).ToString(constants.STD_DATETIME_FORMAT);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+}

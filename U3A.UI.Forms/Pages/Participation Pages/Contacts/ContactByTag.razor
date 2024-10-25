@@ -1,13 +1,31 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@implements IDisposable
 
-<DxGrid Data="@taggedContacts" @ref=@mainGrid 
-        AutoExpandAllGroupRows="true"        
+
+<MessageBox @ref="@messageBox" />
+<Progress @ref="@ProgressBar" />
+
+<SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
+                             DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+
+<DxGrid Data="@taggedContacts" @ref=@mainGrid
+        @bind-SelectedDataItems="@SelectedDataItems"
+        AutoExpandAllGroupRows="true"
         AllowSelectRowByClick="true"
         SelectionMode=GridSelectionMode.Multiple
-        CssClass="W-100"
         KeyFieldNames="@(new List<string>() {"Tag.Id","Contact.ID"})">
     <ToolbarTemplate>
         <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid LayoutKey="{F0CB0949-8C0B-4B82-9597-942DEEC72F3C}">
+            <CustomButtonContent>
+                <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+                               BeginGroup=true
+                               Click=@OnCommunicate
+                               RenderStyle="ButtonRenderStyle.Primary"
+                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                               Alignment="ToolbarItemAlignment.Right"
+                               Tooltip="Send email and/or SMS to Contacts">
+                </DxToolbarItem>
+            </CustomButtonContent>
         </GridToolbar>
     </ToolbarTemplate>
     <Columns>
@@ -27,7 +45,7 @@
             <Columns>
                 <DxGridDataColumn Caption="Email" FieldName="Contact.Email" Visible=true Width="15rem" />
                 <DxGridDataColumn Caption="Phone" FieldName="Contact.AdjustedHomePhone" Width="8rem" />
-                <DxGridDataColumn Caption="Mobile" FieldName="Contact.AdjustedMobile" Visible=true Width="8rem" />
+                <DxGridDataColumn Caption="Mobile" FieldName="Contact.AdjustedMobile" Width="8rem" />
             </Columns>
         </DxGridBandColumn>
         <DxGridBandColumn Caption="Emergency Contact" Visible="false">
@@ -41,9 +59,8 @@
     </Columns>
 
     <GroupSummary>
-        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" 
-                           FieldName="Contact.Id" DisplayText="{0:n0} Contacts"
-                            />
+        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                           FieldName="Contact.Id" DisplayText="{0:n0} Contacts" />
     </GroupSummary>
     <TotalSummary>
         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
@@ -54,16 +71,65 @@
 </DxGrid>
 
 @code {
+    IReadOnlyList<object> SelectedDataItems { get; set; }
     IEnumerable<TaggedContact> taggedContacts;
     IGrid? mainGrid;
     GridToolbar? Toolbar;
+    List<Person> SendTo { get; set; }
+
+    List<DocumentTemplate> DocumentTemplates;
+    SelectDocumentTemplatePopup? selectDocumentTemplatePopup;
+    Communication Communication;
+    DocumentServer server;
+    MessageBox? messageBox { get; set; }
+    Progress? ProgressBar;
+    int emailsSent;
+    U3ADbContext? dbc { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            taggedContacts = await BusinessRule.SelectableTaggedContactsAsync(dbc);
-        }
+        Communication = new Communication();
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        taggedContacts = await BusinessRule.SelectableTaggedContactsAsync(dbc);
+        DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
+        server = new DocumentServer(dbc);
+        server.DocumentSentEvent += Server_DocumentSent;
         await base.OnInitializedAsync();
+    }
+    async Task OnCommunicate()
+    {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
+            return;
+        }
+        SendTo = new();
+        foreach (var tc in SelectedDataItems.Cast<TaggedContact>())
+        {
+            var p = (Person)tc.Contact;
+            if (!SendTo.Contains(p)) { SendTo.Add(p); }
+        }
+        if (await selectDocumentTemplatePopup.ShowAsync())
+        {
+            emailsSent = 0;
+            await ProgressBar.ShowAsync("Sending ... Please Wait", SelectedDataItems.Count);
+            List<ExportData> exportData = await BusinessRule.GetExportDataAsync(dbc, SendTo);
+            bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;
+            await server.MailMerge(dbc, selectDocumentTemplatePopup.SelectedDocumentTemplate, exportData, overridePreference);
+            await ProgressBar.Close();
+            await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
+        }
+    }
+
+    async void Server_DocumentSent(object sender, DocumentSentEventArgs e)
+    {
+        emailsSent += e.DocumentsSent;
+        await ProgressBar.SetValueAsync(emailsSent);
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
     }
 }

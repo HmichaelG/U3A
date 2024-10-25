@@ -34,7 +34,7 @@
         </div>
         <div class="row">
             <div class="d-none col-lg-11 d-lg-inline">
-                People associated with your U3A that are not Participants.
+                People associated with your U3A that are <b>not</b> Participants.
             </div>
         </div>
 
@@ -63,6 +63,7 @@
                         case 0:
                             <DxGrid Data="@contacts" @ref=@mainGrid
                                     @bind-SelectedDataItems="@SelectedDataItems"
+                                    AllowSelectRowByClick=true
                                     KeyFieldName="ID"
                                     PopupEditFormCssClass="popup-width"
                                     EditMode="GridEditMode.PopupEditForm"
@@ -355,6 +356,7 @@
 
     async Task SaveRecord(GridEditModelSavingEventArgs e)
     {
+        mainGrid.ClearSelection();
         var editModel = (Contact)e.EditModel;
         if (!await IsDataOK(editModel)) { e.Cancel = true; return; }
         // Re-query a data item from the store.
@@ -403,6 +405,7 @@
 
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
+        mainGrid.ClearSelection();
         Contact Contact = (Contact)e.DataItem;
         dbc.Remove(Contact);
         await SaveChangesAsync();

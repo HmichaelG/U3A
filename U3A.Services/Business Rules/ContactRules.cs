@@ -29,17 +29,19 @@ public static partial class BusinessRule
     }
     public static async Task<List<TaggedContact>> SelectableTaggedContactsAsync(U3ADbContext dbc)
     {
-        var tags = await dbc.Tag.IgnoreQueryFilters()
-                        .Where(x => x.Contacts.Any(x => !x.IsDeleted))
-                        .Include(x => x.Contacts)
-                        .OrderBy(x => x.Name).ToListAsync();
+        var contacts = await EditableContactAsync (dbc);
+        var emprtyTag = new Tag() { Id = Guid.Empty, Name = " []" };
         List<TaggedContact> result = new();
-        foreach (var tag in tags)
+        foreach (var contact in contacts)
         {
-            foreach (var contact in tag.Contacts)
+            if (contact.Tags.Any())
             {
-                result.Add(new TaggedContact() { Tag = tag, Contact = contact });
+                foreach (var tag in contact.Tags)
+                {
+                    result.Add(new TaggedContact() { Tag = tag, Contact = contact });
+                }
             }
+            else { result.Add(new TaggedContact() {Tag = emprtyTag, Contact = contact }); }
         }
         return result;
     }
@@ -51,5 +53,15 @@ public static partial class BusinessRule
                                     x.Name.Trim().ToUpper() == tag.Name.Trim().ToUpper()).FirstOrDefaultAsync();
     }
 
+    public static async Task<List<Contact>> EditableDeletedContactsAsync(U3ADbContext dbc)
+    {
+        var people = dbc.Contact.IgnoreQueryFilters()
+                        .Include(x => x.Enrolments)
+                        .Where(x => x.IsDeleted)
+                        .OrderBy(x => x.LastName)
+                        .ThenBy(x => x.FirstName)
+                        .ThenBy(x => x.Email).ToList();
+        return people;
+    }
 
 }

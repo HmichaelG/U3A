@@ -44,7 +44,8 @@ public static partial class BusinessRule
         var people = dbc.Person.IgnoreQueryFilters()
                         .Include(x => x.Enrolments)
                         .Include(x => x.Receipts)
-                        .Where(x => x.IsDeleted && (x.FinancialTo >= CurrentYear - 1 || x.FinancialTo == constants.START_OF_TIME))
+                        .Where(x => x.IsDeleted && EF.Property<string>(x, "Discriminator") == "Person" &&
+                                        (x.FinancialTo >= CurrentYear - 1 || x.FinancialTo == constants.START_OF_TIME))
                         .OrderBy(x => x.LastName)
                         .ThenBy(x => x.FirstName)
                         .ThenBy(x => x.Email).ToList();
