@@ -26,10 +26,10 @@ namespace U3A.WebFunctions.Procedures
                     List<(Guid, Guid, Guid?)> onFile = new();
                     (Guid, Guid, Guid?) onFileKey;
                     var today = await Common.GetTodayAsync(dbc);
-                    var utcTime = DateTime.UtcNow;
-                    mailItems = await dbc.SendMail
+                    var utcTime = DateTime.UtcNow; 
+                    mailItems = await dbc.SendMail.IgnoreQueryFilters()
                                             .Include(x => x.Person)
-                                            .Where(x => string.IsNullOrWhiteSpace(x.Status)
+                                            .Where(x => !x.Person.IsDeleted && string.IsNullOrWhiteSpace(x.Status)
                                                     && utcTime >= x.CreatedOn).ToListAsync();
                     foreach (var sm in await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant.Identifier!))
                     {
@@ -54,10 +54,10 @@ namespace U3A.WebFunctions.Procedures
                                 else sm.Status = "Receipt not found";
                                 break;
                             case "Participant Enrolment":
-                                var enrolment = await dbc.Enrolment
+                                var enrolment = await dbc.Enrolment.IgnoreQueryFilters()
                                                     .Include(x => x.Course)
                                                     .Include(x => x.Person)
-                                                    .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
+                                                    .Where(x => !x.IsDeleted && x.ID == sm.RecordKey).FirstOrDefaultAsync();
                                 if (enrolment == null)
                                 {
                                     enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT, sm.RecordKey, tenant.Identifier!);
@@ -80,16 +80,18 @@ namespace U3A.WebFunctions.Procedures
                                 if (IsHourlyProcedure) { break; }
                                 string courseName = "";
                                 Course? course = null;
-                                var leader = await dbc.Person
-                                                    .Where(x => x.ID == sm.PersonID).FirstOrDefaultAsync();
+                                var leader = await dbc.Person.IgnoreQueryFilters()
+                                                    .Where(x => !x.IsDeleted && x.ID == sm.PersonID).FirstOrDefaultAsync();
                                 var enrolments = new List<Enrolment>();
                                 var todayID = (int)today.DayOfWeek;
                                 int classOnDayID = -1;
                                 if (dbc.Class.Any(x => x.ID == sm.RecordKey))
                                 {
-                                    enrolments = dbc.Enrolment.Where(x => x.ClassID == sm.RecordKey
-                                                                        && x.TermID == sm.TermID).ToList();
-                                    enrolments.AddRange(mcEnrolments.Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
+                                    enrolments = dbc.Enrolment.IgnoreQueryFilters()
+                                                        .Where(x => !x.IsDeleted && x.ClassID == sm.RecordKey
+                                                               && x.TermID == sm.TermID).ToList();
+                                    enrolments.AddRange(mcEnrolments
+                                                        .Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
                                     var Class = dbc.Class.Find(sm.RecordKey);
                                     course = dbc.Course.Find(Class!.CourseID);
                                     classOnDayID = Class.OnDayID;
@@ -99,7 +101,8 @@ namespace U3A.WebFunctions.Procedures
                                     course = dbc.Course.Find(sm.RecordKey);
                                     if (course != null)
                                     {
-                                        enrolments = dbc.Enrolment.Where(x => x.CourseID == course.ID
+                                        enrolments = dbc.Enrolment.IgnoreQueryFilters()
+                                                            .Where(x => !x.IsDeleted && x.CourseID == course.ID
                                                                               && x.TermID == sm.TermID).ToList();
                                         enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
                                                                               && x.TermID == sm.TermID));
@@ -174,7 +177,7 @@ namespace U3A.WebFunctions.Procedures
                     logger.LogInformation($"Processed {personEnrolments.Count} Participant Enrolment correspondence.");
                     foreach (var kvp in enrolmentResults)
                     {
-                        foreach (var sm in dbc.SendMail.Where(x => x.PersonID == kvp.Key))
+                        foreach (var sm in dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key))
                         {
                             if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
                         }

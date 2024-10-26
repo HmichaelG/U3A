@@ -324,7 +324,7 @@ else
         foreach (var kvp in enrolmentResults)
         {
             mailItems++;
-            foreach (var sm in dbc.SendMail.Where(x => x.PersonID == kvp.Key))
+            foreach (var sm in dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key))
             {
                 if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
             }

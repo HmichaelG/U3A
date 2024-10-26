@@ -16,9 +16,10 @@ namespace U3A.BusinessRules
     {
         public static async Task<int> CountOfTermEnrolments(U3ADbContext dbc, Term? targetTerm)
         {
-            return await dbc.Enrolment.Include(x => x.Person)
-                                .Where(enrolment => enrolment.Term == targetTerm &&
-                                                        enrolment.Person.DateCeased == null).CountAsync();
+            return await dbc.Enrolment.IgnoreQueryFilters()
+                                .Include(x => x.Person)
+                                .Where(e => !e.IsDeleted && e.Term == targetTerm &&
+                                                        e.Person.DateCeased == null).CountAsync();
         }
         public static async Task<Term?> GetNextTermInYear(U3ADbContext dbc, Term? sourceTerm)
         {
@@ -74,12 +75,12 @@ namespace U3A.BusinessRules
         static async Task WaitListPartPaidMembers(U3ADbContext dbc, Term targetTerm)
         {
             if (targetTerm.TermNumber < 3) { return; }
-            foreach (var e in dbc.Enrolment
+            foreach (var e in dbc.Enrolment.IgnoreQueryFilters()
                             .Include(x => x.Term)
                             .Include(x => x.Class)
                             .Include(x => x.Course)
                             .Include(x => x.Person)
-                            .Where(x => x.Term.Year == targetTerm.Year && x.Term.TermNumber >= targetTerm.TermNumber
+                            .Where(x => !x.IsDeleted && x.Term.Year == targetTerm.Year && x.Term.TermNumber >= targetTerm.TermNumber
                                                     && x.Person.DateCeased == null
                                                     && x.Person.FinancialTo <= targetTerm.Year
                                                     && (x.Person.FinancialToTerm != null
@@ -100,12 +101,12 @@ namespace U3A.BusinessRules
             Tuple<Guid, Guid, Guid?> dropoutKey;
             (Guid, Guid?) enrolmentKey;
             bool forceWaitlisted = false;
-            var dropouts = await dbc.Dropout.AsNoTracking()
-                             .Where(x => x.TermID == targetTerm.ID)
+            var dropouts = await dbc.Dropout.AsNoTracking().IgnoreQueryFilters()
+                             .Where(x => !x.Person.IsDeleted && x.TermID == targetTerm.ID)
                              .Select(x => new Tuple<Guid, Guid, Guid?>(x.PersonID, x.CourseID, x.ClassID))
                              .ToListAsync();
-            var enrolmentCountAtStart = await dbc.Enrolment.AsNoTracking()
-                         .Where(x => x.TermID == targetTerm.ID && !x.IsWaitlisted)
+            var enrolmentCountAtStart = await dbc.Enrolment.IgnoreQueryFilters() .AsNoTracking()
+                         .Where(x => !x.IsDeleted && x.TermID == targetTerm.ID && !x.IsWaitlisted)
                            .GroupBy(x => new { x.CourseID, x.ClassID })
                            .Select(x => new
                            {
@@ -114,7 +115,7 @@ namespace U3A.BusinessRules
                            })
                            .ToListAsync();
 
-            var enrolments = await dbc.Enrolment
+            var enrolments = await dbc.Enrolment.IgnoreQueryFilters()
                             .Include(x => x.Term)
                             .Include(x => x.Class)
                             .Include(x => x.Course)
@@ -170,7 +171,8 @@ namespace U3A.BusinessRules
             newEnrolment.TermID = targetTerm.ID;
             newEnrolment.Course = await dbc.Course.FindAsync(currentEnrolment.CourseID);
             if (newEnrolment.Course == null) return;
-            newEnrolment.Person = await dbc.Person.FindAsync(currentEnrolment.PersonID);
+            newEnrolment.Person = await dbc.Person.IgnoreQueryFilters()
+                                    .FirstOrDefaultAsync(x => !x.IsDeleted && x.ID == currentEnrolment.PersonID);
             if (newEnrolment.Person == null) return;
             if (currentEnrolment.Class != null)
             {
@@ -218,7 +220,8 @@ namespace U3A.BusinessRules
             bool result;
             if (e.ClassID == null)
             {
-                result = await dbc.Enrolment.AnyAsync(x => x.TermID == e.Term.ID &&
+                result = await dbc.Enrolment.IgnoreQueryFilters()
+                                            .AnyAsync(x => !x.IsDeleted && x.TermID == e.Term.ID &&
                                                 x.CourseID == e.Course.ID &&
                                                 x.ClassID == null &&
                                                 x.PersonID == e.Person.ID &&
@@ -226,7 +229,8 @@ namespace U3A.BusinessRules
             }
             else
             {
-                result = await dbc.Enrolment.AnyAsync(x => x.TermID == e.Term.ID &&
+                result = await dbc.Enrolment.IgnoreQueryFilters()
+                    .AnyAsync(x => x.TermID == e.Term.ID &&
                                 x.CourseID == e.Course.ID &&
                                 x.PersonID == e.Person.ID &&
                                 x.ClassID == e.Class.ID &&
