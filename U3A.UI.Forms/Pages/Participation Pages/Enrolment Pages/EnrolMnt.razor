@@ -597,12 +597,8 @@ else
             if (dataItem != null)
             {
                 editModel.CopyTo(dataItem);
-                dataItem.Person = dbc.Person.Find(editModel.Person.ID);
-                if (dataItem.Person == null) 
-                {
-                    dataItem.Person = dbc.Contact.IgnoreQueryFilters()
-                                        .FirstOrDefault(x => x.ID == editModel.Person.ID);
-                }
+                dataItem.Person = await dbc.Person.IgnoreQueryFilters()
+                                    .FirstAsync(x => !x.IsDeleted && x.ID == editModel.Person.ID);
                 dataItem.Term = dbc.Term.Find(selectedTerm.ID);
                 dataItem.Course = dbc.Course.Find(selectedCourse.ID);
                 if (selectedClass != null) { dataItem.Class = dbc.Class.Find(selectedClass.ID); }
@@ -803,7 +799,8 @@ else
                     {
                         Created = DateTime.UtcNow
                     };
-                e.Person = await dbc.Person.FindAsync(enrolment.Person.ID);
+                e.Person = await dbc.Person.IgnoreQueryFilters()
+                                    .FirstAsync(x => !x.IsDeleted && x.ID == enrolment.Person.ID);
                 e.Term = await dbc.Term.FindAsync(transferOrCopyEnrolment.selectedTerm.ID);
                 e.IsWaitlisted = (e.Term.Comparer <= selectedTerm.Comparer)
                                         ? e.IsWaitlisted = enrolment.IsWaitlisted
@@ -961,7 +958,8 @@ else
                             e.IsWaitlisted = quickEnrolment.IsWaitListed;
                         }
                         else { e.IsWaitlisted = true; }
-                        e.Person = await dbc.Person.FindAsync(person.ID);
+                        e.Person = await dbc.Person.IgnoreQueryFilters()
+                                        .FirstAsync(x => !x.IsDeleted && x.ID == person.ID);
                         e.Term = await dbc.Term.FindAsync(selectedTerm.ID);
                         e.Course = await dbc.Course.FindAsync(selectedCourse.ID);
                         if (selectedClass != null) { e.Class = await dbc.Class.FindAsync(selectedClass.ID); }
