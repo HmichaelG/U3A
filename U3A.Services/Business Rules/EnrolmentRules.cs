@@ -169,7 +169,7 @@ namespace U3A.BusinessRules
                                 .Include(x => x.Course).ThenInclude(x => x.Classes)
                                 .Include(x => x.Class).ThenInclude(x => x.OnDay)
                                 .Include(x => x.Person)
-                                .Where(x => !x.Person.IsDeleted && x.TermID == SelectedTerm.ID
+                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null)
                                 .OrderBy(x => x.IsWaitlisted)
                                             .ThenBy(x => x.Person.LastName)

@@ -15,7 +15,7 @@ namespace U3A.BusinessRules
     {
         public static async Task<List<Course>> EditableCoursesAsync(U3ADbContext dbc, int Year)
         {
-            var Courses = await dbc.Course
+            var Courses = await dbc.Course.IgnoreQueryFilters()
                         .Include(x => x.CourseType)
                         .Include(x => x.CourseParticipationType)
                         .Include(x => x.Classes).ThenInclude(x => x.Venue)
@@ -24,7 +24,7 @@ namespace U3A.BusinessRules
                         .Include(x => x.Classes).ThenInclude(x => x.Leader2)
                         .Include(x => x.Classes).ThenInclude(x => x.Leader3)
                         .Include(x => x.Classes).ThenInclude(x => x.Occurrence)
-                        .Where(x => x.Year == Year)
+                        .Where(x => !x.IsDeleted && x.Year == Year)
                         .OrderBy(x => x.Name)
                         .ToListAsync();
             foreach (var course in Courses)
@@ -57,7 +57,7 @@ namespace U3A.BusinessRules
 
         public static async Task<List<Course>> SelectableCoursesAsync(U3ADbContext dbc, int Year)
         {
-            var Courses = await dbc.Course
+            var Courses = await dbc.Course.IgnoreQueryFilters()
                         .Include(x => x.CourseType)
                         .Include(x => x.CourseParticipationType)
                         .Include(x => x.Classes).ThenInclude(x => x.Venue)
@@ -66,7 +66,7 @@ namespace U3A.BusinessRules
                         .Include(x => x.Classes).ThenInclude(x => x.Leader2)
                         .Include(x => x.Classes).ThenInclude(x => x.Leader3)
                         .Include(x => x.Classes).ThenInclude(x => x.Occurrence)
-                        .Where(x => x.Year == Year)
+                        .Where(x => !x.IsDeleted && x.Year == Year)
                         .OrderBy(x => x.Name)
                         .ToListAsync();
             foreach (var course in Courses)
@@ -75,39 +75,9 @@ namespace U3A.BusinessRules
             }
             return Courses;
         }
-        public static async Task<List<Course>> SelectableModifiedCourseAndClassesAsync(U3ADbContext dbc,
-                        DateTime DateModified)
-        {
-            DateTime start = DateModified.AddHours(-24);
-            DateTime end = DateModified;
-            var Courses = new List<Course>();
-            var classes = await dbc.Class
-                        .Include(x => x.Course)
-                        .Where(x => (x.CreatedOn >= start && x.CreatedOn < end) ||
-                                    (x.UpdatedOn >= start & x.UpdatedOn < end)).ToListAsync();
-            foreach (var c in classes)
-            {
-                var course = await dbc.Course
-                                .Include(x => x.Classes).ThenInclude(x => x.Venue)
-                                .Include(x => x.Classes).ThenInclude(x => x.OnDay)
-                                .Include(x => x.Classes).ThenInclude(x => x.Leader)
-                                .Include(x => x.Classes).ThenInclude(x => x.Leader2)
-                                .Include(x => x.Classes).ThenInclude(x => x.Leader3)
-                                .Include(x => x.Classes).ThenInclude(x => x.Occurrence)
-                                .FirstOrDefaultAsync(x => x.ID == c.CourseID);
-                if (course != null) Courses.Add(c.Course);
-            }
-            foreach (var crs in await dbc.Course
-                            .Where(x => (x.CreatedOn >= start && x.CreatedOn < end) ||
-                                        (x.UpdatedOn >= start & x.UpdatedOn < end)).ToListAsync())
-            {
-                if (!Courses.Any(x => x.ID == crs.ID)) Courses.Add(crs);
-            }
-            return Courses;
-        }
         public static List<Course> SelectableCourses(U3ADbContext dbc, Term term)
         {
-            var courses = dbc.Course.AsNoTracking()
+            var courses = dbc.Course.AsNoTracking().IgnoreQueryFilters()
                         .Include(x => x.CourseType)
                         .Include(x => x.Enrolments).ThenInclude(x => x.Person)
                         .Include(x => x.CourseParticipationType)
@@ -117,7 +87,7 @@ namespace U3A.BusinessRules
                         .Include(x => x.Classes).ThenInclude(x => x.Leader2)
                         .Include(x => x.Classes).ThenInclude(x => x.Leader3)
                         .Include(x => x.Classes).ThenInclude(x => x.Occurrence)
-                        .Where(x => x.Year == term.Year & x.Classes.Any())
+                        .Where(x => !x.IsDeleted && x.Year == term.Year & x.Classes.Any())
                         .OrderBy(x => x.Name)
                         .ToList();
             var termEnrolments = dbc.Enrolment.Where(x => x.TermID == term.ID).ToList();
@@ -170,9 +140,9 @@ namespace U3A.BusinessRules
         public static async Task<List<Course>> GetClassDetailsForClerk(U3ADbContext dbc, List<Course> CoursesInTerm, Person Student, Term term)
         {
             ConcurrentBag<Course> result = new();
-            var allCourses = await dbc.Course
+            var allCourses = await dbc.Course.IgnoreQueryFilters()
                                 .Include(c => c.Enrolments)
-                                .Where(c => c.Enrolments.Any(e => e.PersonID == Student.ID &&
+                                .Where(c => !c.IsDeleted && c.Enrolments.Any(e => !e.IsDeleted && e.PersonID == Student.ID &&
                                     e.TermID == term.ID &&
                                     e.IsCourseClerk && !e.IsWaitlisted)).ToListAsync();
             Parallel.ForEach(allCourses, x => {

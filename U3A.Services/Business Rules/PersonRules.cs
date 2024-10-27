@@ -171,8 +171,8 @@ public static partial class BusinessRule
     {
         var term = dbc.Term.Find(TermID);
         if (term == null) { return new List<Person> { }; }
-        var people = dbc.Person.AsNoTracking()
-                        .Where(x => x.DateCeased == null
+        var people = dbc.Person.AsNoTracking().IgnoreQueryFilters()
+                        .Where(x => !x.IsDeleted && x.DateCeased == null
                                 && (x.LeaderOf.Any() || x.Leader2Of.Any() || x.Leader3Of.Any())).ToList();
         foreach (var person in people)
         {

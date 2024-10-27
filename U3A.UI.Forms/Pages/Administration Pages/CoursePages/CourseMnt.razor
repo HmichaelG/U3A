@@ -243,7 +243,7 @@ else
         settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
         if (currentTerm != null)
         {
-            Persons = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+            Persons = await BusinessRule.LeadablePeopleAsync(dbc);
             var firstTermNextYear = await BusinessRule.FirstTermNextYearAsync(dbc, currentTerm.Year);
             if (firstTermNextYear != null && DateTime.Today >= firstTermNextYear.EnrolmentStartDate)
             {
@@ -435,9 +435,9 @@ else
             classDataItem.Occurrence = await dbc.Occurrence.FindAsync(classEditModel.Occurrence.ID);
             classDataItem.Venue = await dbc.Venue.FindAsync(classEditModel.Venue.ID);
             classDataItem.OnDay = await dbc.WeekDay.FindAsync(classEditModel.OnDay.ID);
-            if (classEditModel.Leader != null) { classDataItem.Leader = await dbc.Person.FindAsync(classEditModel.Leader.ID); }
-            if (classEditModel.Leader2 != null) { classDataItem.Leader2 = await dbc.Person.FindAsync(classEditModel.Leader2.ID); }
-            if (classEditModel.Leader3 != null) { classDataItem.Leader3 = await dbc.Person.FindAsync(classEditModel.Leader3.ID); }
+            if (classEditModel.Leader != null) { classDataItem.Leader = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == classEditModel.Leader.ID); }
+            if (classEditModel.Leader2 != null) { classDataItem.Leader2 = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == classEditModel.Leader2.ID); }
+            if (classEditModel.Leader2 != null) { classDataItem.Leader2 = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == classEditModel.Leader3.ID); }
         }
         if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
         // Re-query a data item from the store.
@@ -475,9 +475,9 @@ else
             c.Occurrence = await dbc.Occurrence.FindAsync(c.Occurrence.ID);
             c.Venue = await dbc.Venue.FindAsync(c.Venue.ID);
             c.OnDay = await dbc.WeekDay.FindAsync(c.OnDay.ID);
-            if (c.Leader != null) { c.Leader = await dbc.Person.FindAsync(c.Leader.ID); } else { c.LeaderID = null; }
-            if (c.Leader2 != null) { c.Leader2 = await dbc.Person.FindAsync(c.Leader2.ID); }
-            if (c.Leader3 != null) { c.Leader3 = await dbc.Person.FindAsync(c.Leader3.ID); }
+            if (c.Leader != null) { c.Leader = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == c.Leader.ID); } else { c.LeaderID = null; }
+            if (c.Leader2 != null) { c.Leader2 = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == c.Leader2.ID); } else { c.Leader2ID = null; }
+            if (c.Leader3 != null) { c.Leader3 = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == c.Leader3.ID); } else { c.Leader3ID = null; }
             if (dataItem.Classes.Where(x => x.ID == c.ID).Count() == 0)
             {
                 dataItem.Classes.Add(c);

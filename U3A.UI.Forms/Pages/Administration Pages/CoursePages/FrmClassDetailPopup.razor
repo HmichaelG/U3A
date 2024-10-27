@@ -171,9 +171,9 @@
             if (c != null)
             {
                 editModel.GuestLeader = c.GuestLeader;
-                if (c.LeaderID != null) { editModel.Leader = Persons.FirstOrDefault(x => x.ID == c.LeaderID); }
-                if (c.Leader2ID != null) { editModel.Leader = Persons.FirstOrDefault(x => x.ID == c.Leader2ID); }
-                if (c.Leader3ID != null) { editModel.Leader = Persons.FirstOrDefault(x => x.ID == c.Leader3ID); }
+                if (c.Leader != null) { editModel.Leader = Persons.FirstOrDefault(x => x.ID == c.LeaderID); }
+                if (c.Leader2 != null) { editModel.Leader2 = Persons.FirstOrDefault(x => x.ID == c.Leader2ID); }
+                if (c.Leader3 != null) { editModel.Leader3 = Persons.FirstOrDefault(x => x.ID == c.Leader3ID); }
                 if (c.VenueID != null) { editModel.Venue = Venues.FirstOrDefault(x => x.ID == c.VenueID); }
                 if (c.OccurrenceID != null) { editModel.Occurrence = Occurrences.FirstOrDefault(x => x.ID == c.OccurrenceID); }
                 editModel.OfferedTerm1 = c.OfferedTerm1;
@@ -222,9 +222,9 @@
         }
         dataItem.OnDayID = dataItem.OnDay.ID;
         dataItem.Occurrence = DbContext.Occurrence.Find(editModel.Occurrence.ID);
-        if (editModel.Leader != null) { dataItem.Leader = DbContext.Person.Find(editModel.Leader.ID); }
-        if (editModel.Leader2 != null) { dataItem.Leader2 = DbContext.Person.Find(editModel.Leader2.ID); }
-        if (editModel.Leader3 != null) { dataItem.Leader3 = DbContext.Person.Find(editModel.Leader3.ID); }
+        if (editModel.Leader != null) { dataItem.Leader = await DbContext.Person.IgnoreQueryFilters().FirstAsync(x => !x.IsDeleted && x.ID == editModel.Leader.ID); }
+        if (editModel.Leader2 != null) { dataItem.Leader2 = await DbContext.Person.IgnoreQueryFilters().FirstAsync(x => !x.IsDeleted && x.ID == editModel.Leader2.ID); }
+        if (editModel.Leader3 != null) { dataItem.Leader3 = await DbContext.Person.IgnoreQueryFilters().FirstAsync(x => !x.IsDeleted && x.ID == editModel.Leader3.ID); }
         var t = dataItem.StartTime;
         dataItem.StartTime = new DateTime(1, 1, 1, t.Hour, t.Minute, 0);
         // Post changes to the database.
