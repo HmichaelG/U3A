@@ -565,6 +565,7 @@ else
     async Task SaveRecord(GridEditModelSavingEventArgs e)
     {
         dbc?.ChangeTracker?.Clear();
+        Enrolment dataItem = null;
         var editModel = (Enrolment)e.EditModel;
         if (!await IsDataOk(editModel))
         {
@@ -592,7 +593,7 @@ else
         }
         else
         {
-            var dataItem = e.IsNew ? new Enrolment() : dbc.Enrolment.Find(editModel.ID);
+            dataItem = e.IsNew ? new Enrolment() : dbc.Enrolment.Find(editModel.ID);
             // Assign changes from the edit model to the data item.
             if (dataItem != null)
             {
@@ -613,6 +614,15 @@ else
             }
         }
         await SaveChangesAsync();
+        if (e.IsNew)
+        {
+            Enrolments.Insert(0, dataItem);
+        }
+        else
+        {
+            int idx = Enrolments.FindIndex(x => x.ID == dataItem.ID);
+            Enrolments[idx] = dataItem;
+        }
     }
 
 
@@ -646,6 +656,8 @@ else
             BusinessRule.DeleteEnrolment(dbc, enrolment);
         }
         await SaveChangesAsync();
+        int idx = Enrolments.FindIndex(x => x.ID == enrolment.ID);
+        Enrolments.RemoveAt(idx);
     }
 
     async Task<bool> SaveChangesAsync()
@@ -662,7 +674,7 @@ else
             await dbc.SaveChangesAsync();
             await dbcT.SaveChangesAsync();
             mainGrid.ClearSelection();
-            await SetupGrid();
+            // update the Grid.
             result = true;
         }
         catch (Exception ex)
@@ -819,6 +831,7 @@ else
         if (!IsCopy) dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
         // and save...
         await SaveChangesAsync();
+        await SetupGrid();
         string msg = $"<p>{count} Enrolments processed successfully. &nbsp";
         if (failures > 0) { msg += $"{failures} failed because they were already enrolled."; }
         msg += "</p>";
@@ -865,6 +878,7 @@ else
             }
         }
         await SaveChangesAsync();
+        await SetupGrid();
     }
 
     void ShowWaitlistFlyout(string FlyoutTarget)
@@ -928,6 +942,7 @@ else
             }
         }
         await SaveChangesAsync();
+        await SetupGrid();
     }
 
     async Task DoQuickEnrolmentAsync()
@@ -968,6 +983,7 @@ else
                     else { failures++; }
                 }
                 await SaveChangesAsync();
+                await SetupGrid();
                 if (failures != 0)
                 {
                     int count = quickEnrolment.SelectedPersons.Count() - failures;
