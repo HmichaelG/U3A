@@ -27,10 +27,6 @@ public class TaggedContact
     public Contact Contact { get; set; }
 }
 
-[Index(nameof(DataImportTimestamp))]
-[Index(nameof(ConversionID))]
-[Index(nameof(PersonID))]
-[Index(nameof(LastName), nameof(FirstName), nameof(Email))]
 public class Person : BaseEntity, ISoftDelete
 {
     static bool _allowEmptyStrings { get; set; }
