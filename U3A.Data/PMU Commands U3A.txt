@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_Contact
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Contact_Tag
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Contact_Tag
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Person_Remove_Unused_Index
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Contact_Tag
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Person_Remove_Unused_Index
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
