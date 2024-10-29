@@ -7,8 +7,9 @@
 @inject NavigationManager NavMan
 @inject IDbContextFactory<TenantDbContext> Tenantdbfactory
 @inject IConfiguration config
-
 @inject IJSRuntime js
+
+@using U3A.Data
 
 <div class="page-width">
     <h2 class="pb-2">Update Database Schema</h2>
@@ -54,6 +55,7 @@
             {
                 dbc.TenantInfo = tenant;
                 await dbc.Database.MigrateAsync();
+                await CreateSuperUser(dbc);
                 await ApplyFix(dbc);
                 result += $"<li>Database schema for [{tenant.Identifier}] has been updated</li>";
                 await InvokeAsync(StateHasChanged);
@@ -62,12 +64,56 @@
         msgComplete = "Schema Update Complete";
     }
 
+    async Task CreateSuperUser(U3ADbContextSeed dbc)
+    {
+        string SecurityAdminID = string.Empty;
+        foreach (var name in constants.nameOfRoles)
+        {
+            if (!await dbc.Roles.AnyAsync(x => x.Name == name))
+            {
+                IdentityRole role = new()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = name,
+                        NormalizedName = name.ToUpper(),
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    };
+                await dbc.Roles.AddAsync(role);
+            }
+        }
+
+        if (!await dbc.Users.AnyAsync(x => x.Email == constants.superAdmin))
+        {
+            ApplicationUser user = new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    Email = constants.superAdmin,
+                    EmailConfirmed = true,
+                    NormalizedEmail = constants.superAdmin.ToUpper(),
+                    NormalizedUserName = constants.superAdmin.ToUpper(),
+                    PasswordHash = "AQAAAAEAACcQAAAAEGO9hnvP8x8fJPlDhs2gGYMhl9koCigXL2PPHidC9luB5nbMxW8fCFahxG/ZCA1OSw==",
+                    UserName = constants.superAdmin,
+                };
+            await dbc.Users.AddAsync(user);
+            SecurityAdminID = (await dbc.Roles.FirstAsync(r => r.Name == constants.nameOfRoles[0])).Id;
+            IdentityUserRole<string> userRole = new()
+                {
+
+                    RoleId = SecurityAdminID,
+                    UserId = user.Id
+                };
+            await dbc.UserRoles.AddAsync(userRole);
+        }
+        await dbc.SaveChangesAsync();
+    }
+
     async Task ApplyFix(U3ADbContextSeed dbc)
     {
         foreach (var c in dbc.Course.ToArray())
         {
             //c.Description = HtmlEditor.RemoveStyle(c.Description!);
-            c.DisplayDescription = HtmlEditor.AdjustAndMinifyHtml(c.Description!);
+            //c.DisplayDescription = HtmlEditor.AdjustAndMinifyHtml(c.Description!);
         }
         await dbc.SaveChangesAsync();
     }
