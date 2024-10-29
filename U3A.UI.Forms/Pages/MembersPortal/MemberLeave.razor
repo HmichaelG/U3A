@@ -177,7 +177,7 @@ else
         }
         else
         {
-            header += 14;
+            header += (loginState.IsAdminOnBehalfOfMember) ? 12 : 8;
         }
         string result = $"{header}rem";
         return result;

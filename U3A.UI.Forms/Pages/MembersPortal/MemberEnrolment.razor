@@ -585,8 +585,8 @@ else
         await base.OnInitializedAsync();
 
         listHeight = IsReadOnly || IsEnrolmentWithdrawalView
-                        ? ws.UseTopMenu ? "70dvh;" : "75dvh;"
-                        : ws.UseTopMenu ? "60dvh;" : "65dvh;";
+                        ? ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "70dvh" : "75dvh;" : "75dvh;"
+                        : ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "60dvh" : "65dvh;" : "65dvh;";
 
         await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
 

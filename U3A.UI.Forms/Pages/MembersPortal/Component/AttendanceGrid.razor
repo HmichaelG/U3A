@@ -63,7 +63,7 @@ else {
 }
 <style>
     .grid-height {
-        height: calc(100dvh - @(ws.UseTopMenu ? "24rem" : "20rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "24rem" : "18rem" : "20rem"));
     }
 
 </style>
@@ -72,6 +72,8 @@ else {
 @code {
     bool IsReady;
 
+    [CascadingParameter]
+    public LoginState loginState { get; set; }
     [Parameter]
     public SystemSettings? Settings { get; set; }
     [Parameter]

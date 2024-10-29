@@ -101,44 +101,44 @@ else
                                             if (!string.IsNullOrWhiteSpace(selectedLookupStudent?.Person.HomePhone))
                                             {
                                                 <tr class="d-flex">
-                                                    <td class="col-md-2"><strong>Home:</strong></td>
-                                                    <td class="col-md-10">@selectedLookupStudent.Person.HomePhoneOrSilent</td>
+                                                    <td class="col-md-3"><strong>Home:</strong></td>
+                                                    <td class="col-md-9">@selectedLookupStudent.Person.HomePhoneOrSilent</td>
                                                 </tr>
                                             }
                                             if (!string.IsNullOrWhiteSpace(selectedLookupStudent?.Person.Mobile))
                                             {
                                                 string mobile = selectedLookupStudent.Person.MobileOrSilent;
                                                 <tr class="d-flex">
-                                                    <td class="col-md-2"><strong>Mobile:</strong></td>
-                                                    <td class="col-md-10">@mobile</td>
+                                                    <td class="col-md-3"><strong>Mobile:</strong></td>
+                                                    <td class="col-md-9">@mobile</td>
                                                 </tr>
                                             }
                                         }
                                         <tr class="d-flex">
-                                            <td class="col-md-2"><strong>ICE Phone:</strong></td>
-                                            <td class="col-md-10">@selectedLookupStudent.Person.ICEPhone</td>
+                                            <td class="col-md-3"><strong>ICE Phone:</strong></td>
+                                            <td class="col-md-9">@selectedLookupStudent.Person.ICEPhone</td>
                                         </tr>
                                         <tr class="d-flex">
-                                            <td class="col-md-2"><strong>ICE Contact:</strong></td>
-                                            <td class="col-md-10">@selectedLookupStudent.Person.ICEContact</td>
+                                            <td class="col-md-3"><strong>ICE Contact:</strong></td>
+                                            <td class="col-md-9">@selectedLookupStudent.Person.ICEContact</td>
                                         </tr>
                                         <tr class="d-flex">
-                                            <td class="col-md-2"><strong>Address:</strong></td>
-                                            <td class="col-md-10">@($"{selectedLookupStudent.Person.Address} {selectedLookupStudent.Person.City} {selectedLookupStudent.Person.State}")</td>
+                                            <td class="col-md-3"><strong>Address:</strong></td>
+                                            <td class="col-md-9">@($"{selectedLookupStudent.Person.Address} {selectedLookupStudent.Person.City} {selectedLookupStudent.Person.State}")</td>
                                         </tr>
                                         <tr class="d-flex">
-                                            <td class="col-md-2"><strong>Email:</strong></td>
-                                            <td class="col-md-10">@selectedLookupStudent.Person.Email</td>
+                                            <td class="col-md-3"><strong>Email:</strong></td>
+                                            <td class="col-md-9">@selectedLookupStudent.Person.Email</td>
                                         </tr>
                                         <tr class="d-flex">
-                                            <td class="col-md-2"><strong>Course Clerk:</strong></td>
-                                            <td class="col-md-10">
+                                            <td class="col-md-3"><strong>Course Clerk:</strong></td>
+                                            <td class="col-md-9">
                                                 @((selectedEnrolment.IsCourseClerk) ? "Yes" : "No")
                                             </td>
                                         </tr>
                                         <tr class="d-flex">
-                                            <td class="col-md-2"><strong>Status:</strong></td>
-                                            <td class="col-md-10">
+                                            <td class="col-md-3"><strong>Status:</strong></td>
+                                            <td class="col-md-9">
                                                 @selectedLookupStudent.Status
                                             </td>
                                         </tr>

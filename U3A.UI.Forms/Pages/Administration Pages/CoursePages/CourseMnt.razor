@@ -413,6 +413,7 @@ else
 
     async Task SaveRecord(GridEditModelSavingEventArgs e)
     {
+        dbc.ChangeTracker.Clear();
         var editModel = (Course)e.EditModel;
         if (courseDetail.CourseViewType == CourseEditViewType.Detail)
         {

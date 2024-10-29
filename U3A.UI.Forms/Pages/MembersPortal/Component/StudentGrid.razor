@@ -84,7 +84,7 @@ else
 }
 <style>
     .student-grid-style {
-        height: calc(100dvh - @(ws.UseTopMenu ? "22rem" : "20rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "22rem" : "20rem" : "20rem"));
     }
 
     .badge-size {
@@ -97,6 +97,8 @@ else
 @code {
     bool IsReady;
 
+    [CascadingParameter]
+    public LoginState loginState { get; set; }
     [Parameter]
     public SystemSettings? Settings { get; set; }
     [Parameter]

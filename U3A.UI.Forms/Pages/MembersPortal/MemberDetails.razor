@@ -21,7 +21,7 @@ else
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" />
 
-    <div class="col col-12 col-md-10 col-lg-8 mx-auto">
+    <div class="col col-12 col-md-10 col-lg-8 mx-auto mt-2">
         <EditForm Model="@person"
                   OnValidSubmit=@ValidFormSubmitted
                   Context="editContext">
@@ -193,7 +193,7 @@ else
         display: block;
         width: 100%;
         min-width: 1px;
-        height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "8rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "10rem" : "8rem" : "8rem"));
         overflow-y: auto;
         border-bottom: thin;
     }
