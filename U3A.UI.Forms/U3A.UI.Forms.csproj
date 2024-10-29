@@ -39,6 +39,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.10" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.10" />
+    <PackageReference Include="OfxNet" Version="1.7.0" />
     <PackageReference Include="Serilog" Version="4.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="7.0.2" />
@@ -73,10 +74,5 @@
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Remove="Pages\Shared\PersonsComboBox.razor" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="OfxNet">
-      <HintPath>..\..\BankingTools\src\OfxNet\bin\Release\net8.0\OfxNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>
