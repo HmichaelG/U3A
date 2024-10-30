@@ -135,6 +135,10 @@ namespace U3A.WebFunctions.Procedures
                             case "U3A Leaders Reports":
                                 if (IsHourlyProcedure && !sm.IsUserRequested) { break; }
                                 var thisClass = await dbc.Class.FindAsync(sm.RecordKey);
+                                if (thisClass == null) {
+                                    sm.Status = "Class not found - deleted!";
+                                    continue; 
+                                }
                                 course = await dbc.Course.FindAsync(thisClass!.CourseID);
                                 var thisTerm = await dbc.Term.FindAsync(sm.TermID);
                                 enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
