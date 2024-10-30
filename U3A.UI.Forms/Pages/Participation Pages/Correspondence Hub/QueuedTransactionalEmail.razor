@@ -278,6 +278,7 @@ else
                     break;
                 case "U3A Leaders Reports":
                     Class thisClass = await dbc.Class.FindAsync(sm.RecordKey);
+                    if (thisClass is null) { continue; }
                     course = await dbc.Course.FindAsync(thisClass.CourseID);
                     var thisTerm = await dbc.Term.FindAsync(sm.TermID);
                     enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);

@@ -91,7 +91,7 @@ namespace U3A.BusinessRules
             var startDate = new DateTime(Year, 1, 1);
             // A class with valid attendance has at least 1 present
             var validAttendance = (dbc.AttendClass.IgnoreQueryFilters().Include(x => x.Class)
-                .Where(ac => ac.Date >= startDate && ac.Date <= endDate)
+                .Where(ac => !ac.Class.IsDeleted && ac.Date >= startDate && ac.Date <= endDate)
                 .ToList())
                 .GroupBy(ac => new { ac.ClassID, ac.Date.Date })
                 .Select(g => new
