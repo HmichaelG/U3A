@@ -29,7 +29,9 @@ namespace U3A.BusinessRules
                         .ToListAsync();
             foreach (var course in Courses)
             {
-                course.Classes = course.Classes.OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
+                course.Classes = course.Classes
+                                    .Where(x => !x.IsDeleted)
+                                    .OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
             }
             return Courses;
         }

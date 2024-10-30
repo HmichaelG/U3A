@@ -413,7 +413,6 @@ else
 
     async Task SaveRecord(GridEditModelSavingEventArgs e)
     {
-        dbc.ChangeTracker.Clear();
         var editModel = (Course)e.EditModel;
         if (courseDetail.CourseViewType == CourseEditViewType.Detail)
         {
@@ -534,19 +533,19 @@ else
     async Task<bool> SaveChangesAsync()
     {
         bool result = false;
-        try
-        {
+        // try
+        // {
             // Post changes to the database.
             await dbc.SaveChangesAsync();
             result = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHeader = "Save to database error";
-            ErrorMessage = Helpers.GetErrorMessage(ex);
-            await ErrorPopup.ShowPopupAsync();
-            dbc?.ChangeTracker?.Clear();
-        }
+        // }
+        // catch (Exception ex)
+        // {
+        //     ErrorHeader = "Save to database error";
+        //     ErrorMessage = Helpers.GetErrorMessage(ex);
+        //     await ErrorPopup.ShowPopupAsync();
+        //     dbc?.ChangeTracker?.Clear();
+        // }
         return result;
     }
 

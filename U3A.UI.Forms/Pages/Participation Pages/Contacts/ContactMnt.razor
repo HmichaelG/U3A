@@ -433,6 +433,10 @@
             await dbc.SaveChangesAsync();
             result = true;
         }
+        catch (DbUpdateConcurrencyException)
+        {
+            dbc.ChangeTracker.Clear();
+        }
         catch (Exception ex)
         {
             ErrorHeader = "Save to database error";

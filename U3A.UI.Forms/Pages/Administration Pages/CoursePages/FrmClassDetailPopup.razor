@@ -247,13 +247,23 @@
 
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
-        await DbContext.SaveChangesAsync();
         Class classToDelete = (Class)e.DataItem;
         await BusinessRule.DeleteEnrolmentByClassID(DbContext, classToDelete.ID);
+        classToDelete = await DbContext.Class.FindAsync(classToDelete.ID);
         DbContext.Remove<Class>(classToDelete);
-        Course.Classes.Remove(classToDelete);
-        await DbContext.SaveChangesAsync();
-        grid.ClearSelection();
+        try
+        {
+            await DbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            DbContext.ChangeTracker.Clear();
+        }
+        finally
+        {
+            Course.Classes.Remove(classToDelete);
+            grid.ClearSelection();
+        }
     }
 
     async Task OnStartDateChanged(DateTime? newStartDate, Class editItem)
