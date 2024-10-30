@@ -942,6 +942,7 @@ else
             isListboxShowingSummary = true;
         }
         SetReviewButtonText();
+        ScrollListboxToTop();
     }
 
     async Task GetData()
@@ -961,6 +962,11 @@ else
             }
         }
         ListboxData = c.Distinct<Class>().ToList();
+    }
+
+    void ScrollListboxToTop()
+    {
+        listGrid?.MakeRowVisible(0);
     }
 
     bool showingWebLink { get; set; } = false;
@@ -1149,6 +1155,7 @@ else
     {
         activeTabIndex = e.TabIndex;
         filterText = null; // force a list reset
+        ScrollListboxToTop();
     }
 
     void SetReviewButtonText()
