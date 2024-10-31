@@ -480,8 +480,9 @@ else
 
     async Task DeleteReceipt(Receipt receipt)
     {
-        dbc.Remove(receipt);
-        await SaveChangesAsync();
+        //physically remove, override soft delete
+        await dbc.Database.ExecuteSqlAsync($"Delete Receipt where ID = {receipt.ID}");
+        dbc.ChangeTracker.Clear();
         await RefreshData();
     }
 

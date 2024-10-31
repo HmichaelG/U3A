@@ -146,7 +146,6 @@ else
                     AllowSelectRowByClick="true"
                     @bind-SelectedDataItems="SelectedDataItems"
                     EditMode="GridEditMode.PopupEditForm"
-                    DataItemDeleting="Grid_DataItemDeleting"
                     EditModelSaving="Grid_EditModelSaving">
                     <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid Visible="@(IsLargeLayout || IsXtraLargeLayout)" LayoutKey="{9C4F6177-3FAB-407A-A515-C1B30F04D836}"
@@ -710,14 +709,6 @@ else
         return result;
     }
 
-    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
-    {
-        dbc.Remove<AttendClass>((AttendClass)e.DataItem);
-        await SaveChangesAsync();
-        mainGrid.ClearSelection();
-        SetupGrid();
-    }
-
     async Task<bool> SaveChangesAsync()
     {
         bool result = false;
@@ -785,10 +776,12 @@ else
             count = SelectedDataItems.Count;
             foreach (var c in SelectedDataItems.Cast<AttendClass>())
             {
-                dbc.Remove(c);
+                //physically remove, override soft delete
+                await dbc.Database.ExecuteSqlAsync($"Delete Fee where ID = {c.ID}");
             }
             if (await SaveChangesAsync())
             {
+                dbc.ChangeTracker.Clear();
                 await messageBox.ShowOkOnlyAsync("Reset selecteion", "The selected attendance records have been reset.");
                 await GetClassAttendance();
             }

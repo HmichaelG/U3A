@@ -413,8 +413,9 @@ else
 
     async Task DeleteItem(CancelClass c)
     {
-        dbc?.Remove<CancelClass>(await dbc.CancelClass.FindAsync(c.ID));
-        await SaveChangesAsync();
+        //physically remove, override soft delete
+        await dbc.Database.ExecuteSqlAsync($"Delete CancelClass where ID = {c.ID}");
+        dbc.ChangeTracker.Clear();
         await GetCancellationsForTermAsync();
         await GetCancellationsAsync();
     }

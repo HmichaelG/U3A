@@ -213,9 +213,10 @@ else
 
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
-        Fee Fee = (Fee)e.DataItem;
-        dbc.Remove(Fee);
-        await SaveChangesAsync();
+        var fee = (Fee)e.DataItem;
+        //physically remove, override soft delete
+        await dbc.Database.ExecuteSqlAsync($"Delete Fee where ID = {fee.ID}" );
+        dbc.ChangeTracker.Clear();
         await RefreshData();
     }
 
