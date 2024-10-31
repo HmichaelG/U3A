@@ -113,9 +113,22 @@ else
             {
                 (r as ISoftDelete).Undo();
             }
-            foreach (var e in PersonToRestore.Enrolments)
+            foreach (var f in PersonToRestore.Fees)
             {
-                (e as ISoftDelete).Undo();
+                (f as ISoftDelete).Undo();
+            }
+            foreach (var e in PersonToRestore.Enrolments.OrderByDescending(e => e.DeletedAt))
+            {
+                var restoreItem = dbc.Enrolment.IgnoreQueryFilters()
+                                            .OrderByDescending(x => x.CreatedOn)
+                                            .FirstOrDefault(x => x.TermID == e.TermID
+                                            && x.CourseID == e.CourseID
+                                            && (x.ClassID == null || x.ClassID == e.ClassID)
+                                            && x.PersonID == e.PersonID);
+                if (restoreItem != null && restoreItem.IsDeleted)
+                {
+                    (restoreItem as ISoftDelete).Undo();
+                }
             }
         }
         var result = await dbc.SaveChangesAsync();
