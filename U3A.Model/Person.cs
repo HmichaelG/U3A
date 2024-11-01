@@ -106,7 +106,18 @@ public class Person : BaseEntity, ISoftDelete
 
     [Range(constants.START_OF_TIME, 9999)]
     [DefaultValue(constants.START_OF_TIME)]
-    public int FinancialTo { get; set; } = constants.START_OF_TIME;
+
+    int _FinancialTo = constants.START_OF_TIME;
+    public int FinancialTo { 
+        get {
+            int result = _FinancialTo;
+            if (this is Contact) result = 9999;
+            return result;
+        } 
+        set { 
+            _FinancialTo = value;
+        } 
+    }
     public int? FinancialToTerm { get; set; }
     [NotMapped]
     public string FinancialToText
