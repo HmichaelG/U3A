@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Contact_Tag
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_Remove_Unused_Index
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Person_Remove_Unused_Index
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Enrolment_CourseID_IsDeleted_idx
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Person_Remove_Unused_Index
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Enrolment_CourseID_IsDeleted_idx
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using DevExpress.Pdf.Native.BouncyCastle.Asn1.Ocsp;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +8,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
 using U3A.Data;
 using U3A.Model;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace U3A.Database
 {
@@ -251,7 +254,12 @@ namespace U3A.Database
                     .HasIndex(x => new { x.TermID, x.CourseID, x.ClassID, x.PersonID })
                     .HasDatabaseName("idxUniqueEnrolments")
                     .IsUnique(true)
-                    .HasFilter("IsDeleted = 0");
+            .HasFilter("IsDeleted = 0");
+            modelBuilder.Entity<Enrolment>()
+            .HasIndex(x => new { x.CourseID, x.IsDeleted })
+            .IncludeProperties(p => new { p.ClassID, p.Created, p.CreatedOn, p.DateEnrolled, p.DeletedAt, p.IsCourseClerk, p.IsWaitlisted, p.PersonID, p.TermID, p.UpdatedOn, p.User })
+                    .HasDatabaseName("idxCourseID_IsDeleted")
+                    .IsUnique(false);
             modelBuilder.Entity<Fee>()
                 .HasQueryFilter(x => x.Person.IsDeleted == false);
             modelBuilder.Entity<Leave>()
