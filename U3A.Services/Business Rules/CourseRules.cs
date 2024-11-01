@@ -79,7 +79,7 @@ namespace U3A.BusinessRules
         }
         public static List<Course> SelectableCourses(U3ADbContext dbc, Term term)
         {
-            var courses = dbc.Course.AsNoTracking().IgnoreQueryFilters()
+            var courses = dbc.Course.AsNoTracking().IgnoreQueryFilters().AsSplitQuery()
                         .Include(x => x.CourseType)
                         .Include(x => x.Enrolments).ThenInclude(x => x.Person)
                         .Include(x => x.CourseParticipationType)

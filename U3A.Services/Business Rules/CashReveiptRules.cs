@@ -9,9 +9,9 @@ namespace U3A.BusinessRules
     {
         public static List<Receipt> GetCashReceiptsByDate(U3ADbContext dbc, DateTime FromDate, DateTime ToDate)
         {
-            return dbc.Receipt
+            return dbc.Receipt.IgnoreQueryFilters()
                 .Include(x => x.Person)
-                .Where(x => x.Date >= FromDate && x.Date < ToDate && x.Amount != 0)
+                .Where(x => !x.IsDeleted && x.Date >= FromDate && x.Date < ToDate && x.Amount != 0)
                 .OrderBy(x => x.Date).ThenBy(x => x.Person.LastName).ThenBy(x => x.Person.FirstName)
                 .ToList();
 

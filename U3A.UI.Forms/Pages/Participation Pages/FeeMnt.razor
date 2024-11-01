@@ -99,7 +99,8 @@ else
                             <DxMaskedInput @bind-Value="@editItem.Amount" Mask="@NumericMask.Currency" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Include as Membershyp Fee?" ColSpanMd="12">
-                            <DxCheckBox @bind-Checked="@editItem.IsMembershipFee" />
+                            <DxCheckBox Enabled=@(!(editItem.Person is Contact)) 
+                                @bind-Checked="@editItem.IsMembershipFee" />
                         </DxFormLayoutItem>
                     </DxFormLayout>
                 </EditFormTemplate>
@@ -194,7 +195,15 @@ else
             if (dataItem != null)
             {
                 editModel.CopyTo(dataItem);
-                dataItem.Person = dbc.Person.Find(editModel.Person.ID);
+                if (editModel.Person is Contact)
+                {
+                    dataItem.Person = dbc.Contact.Find(editModel.Person.ID);
+                    dataItem.IsMembershipFee = false;
+                }
+                else
+                {
+                    dataItem.Person = dbc.Person.Find(editModel.Person.ID);
+                }
                 // Post changes to the database.
                 if (e.IsNew)
                 {
@@ -273,7 +282,7 @@ else
     async Task RefreshData()
     {
         ProcessingYear = yearComponent.Year;
-        if (Persons == null) Persons = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+        if (Persons == null) Persons = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
         Fees = await BusinessRule.EditableFeesForYearAsync(dbc, ProcessingYear);
         StateHasChanged();
     }

@@ -70,8 +70,9 @@ namespace U3A.Services
         }
         async Task<decimal> GetTotalOtherMembershipFees(U3ADbContext dbc, Person person, Term term)
         {
-            return await dbc.Fee.AsNoTracking()
-                                    .Where(x => x.PersonID == person.ID
+            return await dbc.Fee.AsNoTracking().IgnoreQueryFilters()
+                                    .Where(x => !x.Person.IsDeleted 
+                                            && x.PersonID == person.ID
                                             && x.IsMembershipFee
                                             && x.ProcessingYear == term.Year)
                                     .Select(x => x.Amount).SumAsync();
@@ -79,8 +80,9 @@ namespace U3A.Services
 
         async Task<decimal> GetTotalReceipts(U3ADbContext dbc, Person person, Term term)
         {
-            return await dbc.Receipt.AsNoTracking()
-                                .Where(x => x.PersonID == person.ID
+            return await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
+                                .Where(x => !x.Person.IsDeleted 
+                                    && x.PersonID == person.ID
                                     && x.ProcessingYear == term.Year)
                                 .Select(x => x.Amount).SumAsync();
         }
@@ -249,7 +251,9 @@ namespace U3A.Services
             if (term != null && !await IsComplimentaryMembership(dbc, person, term.Year))
             {
                 result = await CalculateMembershipFeeAsync(dbc, person.DateJoined.GetValueOrDefault(), term, person);
-                result += dbc.Fee.Where(x => x.PersonID == person.ID
+                result += dbc.Fee.IgnoreQueryFilters()
+                                            .Where(x => !x.Person.IsDeleted
+                                             && x.PersonID == person.ID
                                              && x.Amount != 0
                                              && x.IsMembershipFee
                                              && x.ProcessingYear == term.Year).Select(x => x.Amount).Sum();
@@ -260,6 +264,7 @@ namespace U3A.Services
 
         private async Task<decimal> CalculateMembershipFeeAsync(U3ADbContext dbc, DateTime DateJoined, Term term, Person person)
         {
+            if (person is Contact) { return 0; }
             decimal result = 0;
             bool foundTerm = false;
             var settings = await dbc.SystemSettings.FirstOrDefaultAsync();
@@ -325,8 +330,9 @@ namespace U3A.Services
 
         private async Task AddFeesAsync(U3ADbContext dbc, Person person, Term term)
         {
-            foreach (var r in await dbc.Fee.AsNoTracking()
-                                            .Where(x => x.PersonID == person.ID
+            foreach (var r in await dbc.Fee.IgnoreQueryFilters().AsNoTracking()
+                                            .Where(x => !x.Person.IsDeleted
+                                                    && x.PersonID == person.ID
                                                     && x.Amount != 0
                                                     && x.ProcessingYear == term.Year).ToArrayAsync())
             {
@@ -338,9 +344,10 @@ namespace U3A.Services
         }
         private async Task SubtractReceiptsAsync(U3ADbContext dbc, Person person, Term term)
         {
-            foreach (var r in await dbc.Receipt.AsNoTracking()
+            foreach (var r in await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
                                             .OrderBy(x => x.Date)
-                                            .Where(x => x.PersonID == person.ID
+                                            .Where(x => !x.IsDeleted 
+                                                && x.PersonID == person.ID
                                                 && x.Amount != 0
                                                 && x.ProcessingYear == term.Year).ToArrayAsync())
             {
@@ -366,11 +373,12 @@ namespace U3A.Services
             var courseFeeAdded = new List<Guid>();
             foreach (var t in terms.OrderBy(x => x.TermNumber))
             {
-                foreach (var e in await dbc.Enrolment.AsNoTracking()
+                foreach (var e in await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                                     .Include(x => x.Course).ThenInclude(x => x.Classes)
                                     .Include(x => x.Class)
                                     .Include(x => x.Term)
-                                    .Where(x => x.PersonID == person.ID
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                                && x.PersonID == person.ID
                                                 && x.TermID == t.ID
                                                 && !x.IsWaitlisted).ToArrayAsync())
                 {

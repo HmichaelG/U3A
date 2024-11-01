@@ -385,7 +385,14 @@ else
             if (dataItem != null)
             {
                 editModel.CopyTo(dataItem);
-                dataItem.Person = dbc.Person.Find(editModel.Person.ID);
+                if (editModel.Person is Contact)
+                {
+                    dataItem.Person = await dbc.Contact.FindAsync(editModel.Person.ID);
+                }
+                else
+                {
+                    dataItem.Person = await dbc.Person.FindAsync(editModel.Person.ID);
+                }
                 // Post changes to the database.
                 if (e.IsNew)
                 {
@@ -455,26 +462,36 @@ else
     async Task DoDeleteConfirmation(Object dataItem)
     {
         var receipt = (Receipt)dataItem;
-        MessageBoxArgs args = new MessageBoxArgs()
-            {
-                Caption = $"Reset {receipt.Person.FullName}'s Financial Status?",
-                OKButtonText = "Yes and also delete",
-                NoButtonText = "No, but delete anyway",
-                Message = $"Reset {receipt.Person.FullName}'s Financial To year to {ProcessingYear - 1}?",
-                ShowNoButton = true
-            };
-        _ = await messageBox.ShowAsync(args);
-        switch (messageBox.MessageBoxResult)
+        if (receipt.Person is Contact)
         {
-            case MessageBoxDialogResult.OkButtonClicked:
-                await BusinessRule.ResetPersonDetailsForDeletedReceipt(dbc, receipt, ProcessingYear);
+            if (await messageBox.ShowAsync("Delete Receipt?","Are you sure?"))
+            {
                 await DeleteReceipt(receipt);
-                break;
-            case MessageBoxDialogResult.NoButtonClicked:
-                await DeleteReceipt(receipt);
-                break;
-            case MessageBoxDialogResult.CancelButtonClicked:
-                break;
+            }
+        }
+        else
+        {
+            MessageBoxArgs args = new MessageBoxArgs()
+                {
+                    Caption = $"Reset {receipt.Person.FullName}'s Financial Status?",
+                    OKButtonText = "Yes and also delete",
+                    NoButtonText = "No, but delete anyway",
+                    Message = $"Reset {receipt.Person.FullName}'s Financial To year to {ProcessingYear - 1}?",
+                    ShowNoButton = true
+                };
+            _ = await messageBox.ShowAsync(args);
+            switch (messageBox.MessageBoxResult)
+            {
+                case MessageBoxDialogResult.OkButtonClicked:
+                    await BusinessRule.ResetPersonDetailsForDeletedReceipt(dbc, receipt, ProcessingYear);
+                    await DeleteReceipt(receipt);
+                    break;
+                case MessageBoxDialogResult.NoButtonClicked:
+                    await DeleteReceipt(receipt);
+                    break;
+                case MessageBoxDialogResult.CancelButtonClicked:
+                    break;
+            }
         }
     }
 
@@ -526,7 +543,7 @@ else
             }
             else { ProcessingYear = DateTime.UtcNow.Year; }
         }
-        Persons = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+        Persons = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
         Receipts = await BusinessRule.EditableReceiptsForYearAsync(dbc, ProcessingYear);
     }
 

@@ -255,7 +255,7 @@ else
         IsReady = false;
         dbc = await U3Adbfactory.CreateDbContextAsync();
         service = new MemberFeeCalculationService();
-        People = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+        People = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         await SetupAndCheckLastReceiptDateAsync(settings);
         states = new AUState();
@@ -453,7 +453,7 @@ else
             var startDate = statement.TransactionList.StartDate.Date;
             var endDate = statement.TransactionList.EndDate.Date;
             if (!await CheckBankFileDate(startDate, endDate)) return;
-            
+
             BankAccountDetails = $"Account {statement.Account.AccountNumber}: From {startDate.ToLongDateString()} to {endDate.ToLongDateString()}.";
             processStartTime = DateTime.UtcNow;
             foreach (var trx in statement.TransactionList.Transactions)
@@ -488,9 +488,16 @@ else
             // receipt is previously on file - set the person to that which was previously posted.
             var r = await BusinessRule.GetReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
             var person = await dbc.Person.FindAsync(r.PersonID);
-            receiptImport.Person = person;
-            receiptImport.FinancialTo = person.FinancialTo;
-            receiptImport.FinancialToTerm = person.FinancialToTerm;
+            if (person == null)
+            {
+                person = await dbc.Contact.FindAsync(r.PersonID);
+            }
+            if (person != null)
+            {
+                receiptImport.Person = person;
+                receiptImport.FinancialTo = person.FinancialTo;
+                receiptImport.FinancialToTerm = person.FinancialToTerm;
+            }
         }
         else
         {
@@ -602,6 +609,10 @@ else
                 if (prevReceipt.PersonID != importItem.PersonID)
                 {
                     var p = await dbc.Person.FindAsync(prevReceipt.PersonID);
+                    if (p == null)
+                    {
+                        p = await dbc.Contact.FindAsync(prevReceipt.PersonID);
+                    }
                     var minMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, p);
                     if (prevReceipt.Amount >= minMembershipFee)
                     {

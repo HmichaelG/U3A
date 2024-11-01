@@ -96,4 +96,18 @@ public static partial class BusinessRule
         return people.OrderBy(x => x.FullNameAlphaKey).ToList();
     }
 
+    public static async Task<List<Person>> SelectablePeopleIncludeUnfinancialAsync(U3ADbContext dbc)
+    {
+        var people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+        var contacts = await dbc.Contact.IgnoreQueryFilters()
+                        .Include(x => x.Tags)
+                        .Where(x => !x.IsDeleted)
+                        .ToListAsync();
+        foreach (var c in contacts)
+        {
+                people.Add(c as Person); break; 
+        }
+        return people.OrderBy(x => x.FullNameAlphaKey).ToList();
+    }
+
 }

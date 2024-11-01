@@ -79,21 +79,23 @@ namespace U3A.BusinessRules
         public static async Task<bool> IsReceiptOnFileAsync(U3ADbContext dbc,
                                         DateTime Date, String Description, DateTime StartTime)
         {
-            return dbc.Receipt.Any(x => x.Date == Date &&
+            return dbc.Receipt.IgnoreQueryFilters().Any(x => !x.IsDeleted && x.Date == Date &&
                                         x.Description == Description &&
                                         x.CreatedOn < StartTime);
         }
         public static async Task<Receipt?> GetReceiptOnFileAsync(U3ADbContext dbc,
                                         DateTime Date, String Description, DateTime StartTime)
         {
-            return await dbc.Receipt.FirstOrDefaultAsync(x => x.Date == Date &&
+            return await dbc.Receipt.IgnoreQueryFilters()
+                                        .FirstOrDefaultAsync(x => !x.IsDeleted && x.Date == Date &&
                                         x.Description == Description &&
                                         x.CreatedOn < StartTime);
         }
         public static async Task DeleteReceiptOnFileAsync(U3ADbContext dbc,
                                             DateTime Date, String Description, DateTime StartTime)
         {
-            dbc.RemoveRange(await dbc.Receipt.Where(x => x.Date == Date &&
+            dbc.RemoveRange(await dbc.Receipt.IgnoreQueryFilters()
+                                        .Where(x => !x.IsDeleted && x.Date == Date &&
                                         x.Description == Description &&
                                         x.CreatedOn < StartTime).ToArrayAsync());
         }

@@ -13,22 +13,22 @@ namespace U3A.BusinessRules
     {
         public static async Task<List<Receipt>> EditableReceiptsForYearAsync(U3ADbContext dbc, int ProcessingYear)
         {
-            return await dbc.Receipt
+            return await dbc.Receipt.IgnoreQueryFilters()
                             .Include(x => x.Person)
                             .OrderBy(x => x.Person.LastName)
                             .ThenBy(x => x.Person.FirstName)
                             .ThenBy(x => x.Date)
-                            .Where(x => x.Amount != 0 && x.ProcessingYear == ProcessingYear)
+                            .Where(x => !x.IsDeleted && x.Amount != 0 && x.ProcessingYear == ProcessingYear)
                             .ToListAsync();
         }
         public static async Task<List<Fee>> EditableFeesForYearAsync(U3ADbContext dbc, int ProcessingYear)
         {
-            return await dbc.Fee
+            return await dbc.Fee.IgnoreQueryFilters()
                             .Include(x => x.Person)
                             .OrderBy(x => x.Person.LastName)
                             .ThenBy(x => x.Person.FirstName)
                             .ThenBy(x => x.Date)
-                            .Where(x => x.ProcessingYear == ProcessingYear)
+                            .Where(x => !x.Person.IsDeleted && x.ProcessingYear == ProcessingYear)
                             .ToListAsync();
         }
 
@@ -45,15 +45,23 @@ namespace U3A.BusinessRules
         public static async Task SetPersonDetailsForNewReceipt(U3ADbContext dbc, Receipt ReceiptToCreate)
         {
             var person = ReceiptToCreate.Person;
-            if (person.FinancialTo < ReceiptToCreate.ProcessingYear)
+            if (person is Contact)
             {
-                person.PreviousFinancialTo = person.FinancialTo;
-                person.FinancialTo = ReceiptToCreate.ProcessingYear;
                 ReceiptToCreate.DateJoined = person.DateJoined.Value;
+                ReceiptToCreate.FinancialTo = person.FinancialTo;
             }
-            if (person.DateJoined == null) person.DateJoined = dbc.GetLocalTime().Date;
-            ReceiptToCreate.FinancialTo = ReceiptToCreate.ProcessingYear;
-            dbc.Update(person);
+            else
+            {
+                if (person.FinancialTo < ReceiptToCreate.ProcessingYear)
+                {
+                    person.PreviousFinancialTo = person.FinancialTo;
+                    person.FinancialTo = ReceiptToCreate.ProcessingYear;
+                    ReceiptToCreate.DateJoined = person.DateJoined.Value;
+                }
+                if (person.DateJoined == null) person.DateJoined = dbc.GetLocalTime().Date;
+                ReceiptToCreate.FinancialTo = ReceiptToCreate.ProcessingYear;
+                dbc.Update(person);
+            }
         }
 
         public static async Task SetPersonDetailsForEditedReceipt(U3ADbContext dbc, Receipt OriginalReceipt, Receipt EditedReceipt)
