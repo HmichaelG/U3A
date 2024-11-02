@@ -143,7 +143,8 @@ namespace U3A.BusinessRules
             var enrolments = await dbc.Enrolment.IgnoreQueryFilters()
                                         .Include(x => x.Term)
                                         .Include(x => x.Person)
-                                        .Where(x => !x.IsDeleted && x.Term.Year == term.Year).ToListAsync();
+                                        .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                                    && x.Term.Year == term.Year).ToListAsync();
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.IsDefaultTerm);
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)

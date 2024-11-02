@@ -17,6 +17,8 @@ namespace U3A.BusinessRules
         public static List<EnrolmentDetail> GetEnrolmentDetail(U3ADbContext dbc, Enrolment enrolment)
         {
             var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+            var people = dbc.Person.IgnoreQueryFilters()
+                            .Where(x => !x.IsDeleted && x.DateCeased == null).ToList();
             var result = new List<EnrolmentDetail>();
             EnrolmentDetail ed;
             var p = enrolment.Person
@@ -31,7 +33,7 @@ namespace U3A.BusinessRules
             if (enrolment.ClassID != null)
             {
                 classes.Add(dbc.Class
-                                .Include(c => c.Enrolments).ThenInclude(e => e.Person)
+                                .Include(c => c.Enrolments)
                                 .Include(x => x.Leader)
                                 .Include(x => x.Leader2)
                                 .Include(x => x.Leader3)
@@ -45,18 +47,22 @@ namespace U3A.BusinessRules
                                 .Include(x => x.Leader)
                                 .Include(x => x.Leader2)
                                 .Include(x => x.Leader3)
-                                .Include(x => x.Course).ThenInclude(c => c.Enrolments).ThenInclude(e => e.Person)
+                                .Include(x => x.Course).ThenInclude(c => c.Enrolments)
                                 .Include(x => x.Occurrence)
                                 .Where(x => x.CourseID == cr.ID).ToList());
             }
             foreach (Class c in classes)
             {
+                foreach (var e in c.Enrolments)
+                {
+                    e.Person = people.FirstOrDefault(x => x.ID == e.PersonID);
+                }
+                c.Enrolments = c.Enrolments.Where(x => x.Person != null).ToList();
                 BusinessRule.AssignClassContacts(c, t, settings);
             }
-            var termEnrolments = dbc.Enrolment.AsNoTracking().Where(x => x.TermID == t.ID);
             foreach (var c in classes)
             {
-                SetCourseParticipationDetails(dbc, c, termEnrolments);
+                SetCourseParticipationDetails(dbc, c, c.Enrolments);
                 var od = dbc.WeekDay.Find(c.OnDayID);
                 var v = dbc.Venue.Find(c.VenueID);
                 var l = dbc.Person.Find(c.LeaderID);

@@ -151,8 +151,10 @@ namespace U3A.BusinessRules
             {
                 foreach (var e in clerkEnrolments)
                 {
-                    var person = dbc.Person.Find(e.PersonID);
-                    if (person.Communication == "Email") result.Add(person);
+                    var person = await dbc.Person
+                                    .IgnoreQueryFilters()
+                                    .FirstOrDefaultAsync(p => p.ID == e.PersonID);
+                    if (person != null && person.Communication == "Email") result.Add(person);
                 }
             }
             return result;
