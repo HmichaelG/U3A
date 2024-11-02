@@ -96,6 +96,15 @@ public static partial class BusinessRule
         return people.OrderBy(x => x.FullNameAlphaKey).ToList();
     }
 
+
+    public static List<Person> SelectablePeopleIncludeUnfinancial(U3ADbContext dbc)
+    {
+        var result = Task.Run(() =>
+        {
+            return SelectablePeopleIncludeUnfinancialAsync(dbc);
+        }).Result;
+        return result;
+    }
     public static async Task<List<Person>> SelectablePeopleIncludeUnfinancialAsync(U3ADbContext dbc)
     {
         var people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);

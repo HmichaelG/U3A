@@ -25,7 +25,8 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => !x.IsDeleted && x.CourseID == SelectedCourse.ID
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                                        && x.CourseID == SelectedCourse.ID
                                                         && x.TermID == SelectedTerm.ID
                                                         && x.Person.DateCeased == null).ToListAsync();
             }
@@ -35,7 +36,8 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => !x.IsDeleted && x.ClassID == SelectedClass.ID
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted
+                                                    && x.ClassID == SelectedClass.ID
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null).ToListAsync();
             }
@@ -64,7 +66,8 @@ namespace U3A.BusinessRules
                 enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                                           .Include(x => x.Person)
                                           .Include(x => x.Course)
-                                          .Where(x => !x.IsDeleted && x.ClassID == thisClass.ID
+                                          .Where(x => !x.IsDeleted && !x.Person.IsDeleted
+                                                    && x.ClassID == thisClass.ID
                                                     && x.TermID == testTerm.ID).ToListAsync();
             }
             else
@@ -72,7 +75,8 @@ namespace U3A.BusinessRules
                 enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                                             .Include(x => x.Person)
                                             .Include(x => x.Course)
-                                            .Where(x => !x.IsDeleted && x.CourseID == thisCourse.ID
+                                            .Where(x => !x.IsDeleted && x.Person.IsDeleted
+                                                            && x.CourseID == thisCourse.ID
                                                             && x.TermID == testTerm.ID).ToListAsync();
             };
             Enrolment? dummy;
@@ -109,7 +113,7 @@ namespace U3A.BusinessRules
                                 .Include(x => x.Term)
                                 .Include(x => x.Course)
                                 .Include(x => x.Person)
-                                .Where(x => x.TermID == SelectedTerm.ID)
+                                .Where(x => !x.Person.IsDeleted && x.TermID == SelectedTerm.ID)
                                 .OrderBy(x => x.IsWaitlisted)
                                             .ThenBy(x => x.Person.LastName)
                                             .ThenBy(x => x.Person.FirstName)
@@ -169,7 +173,8 @@ namespace U3A.BusinessRules
                                 .Include(x => x.Course).ThenInclude(x => x.Classes)
                                 .Include(x => x.Class).ThenInclude(x => x.OnDay)
                                 .Include(x => x.Person)
-                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted && x.TermID == SelectedTerm.ID
+                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                                    && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null)
                                 .OrderBy(x => x.IsWaitlisted)
                                             .ThenBy(x => x.Person.LastName)
@@ -198,7 +203,7 @@ namespace U3A.BusinessRules
             List<Enrolment> result;
             if (SelectedClass == null || SelectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
             {
-                result = dbc.Enrolment.IgnoreQueryFilters().AsSplitQuery()
+                result = dbc.Enrolment.IgnoreQueryFilters()
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
@@ -218,7 +223,7 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                     && x.ClassID == SelectedClass.ID
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null)
@@ -256,42 +261,6 @@ namespace U3A.BusinessRules
                                                 .ThenBy(x => x.Person.FirstName)
                                     .ToListAsync();
             }
-        }
-
-        public static async Task<List<Enrolment>> GetPersonEnrolments(U3ADbContext dbc,
-                                    List<Person> people,
-                                    Term term)
-        {
-            var peopleID = new List<Guid>();
-            foreach (var p in people) peopleID.Add(p.ID);
-            var enrolments = await dbc.Enrolment
-                                .Include(x => x.Term)
-                                .Include(x => x.Course).ThenInclude(x => x.CourseType)
-                                .Include(x => x.Course).ThenInclude(x => x.Classes).ThenInclude(x => x.Leader)
-                                .Include(x => x.Course).ThenInclude(x => x.Classes).ThenInclude(x => x.Occurrence)
-                                .Include(x => x.Course).ThenInclude(x => x.Classes).ThenInclude(x => x.OnDay)
-                                .Include(x => x.Course).ThenInclude(x => x.Classes).ThenInclude(x => x.Venue)
-                                .Include(x => x.Person)
-                                .Include(x => x.Class)
-                                .Where(x => peopleID.Contains(x.PersonID)
-                                                && x.Person.DateCeased == null
-                                                && x.Person.FinancialTo >= term.Year
-                                                && x.TermID == term.ID && x.Class == null)
-                                .ToListAsync();
-            enrolments.AddRange(await dbc.Enrolment
-                                .Include(x => x.Term)
-                                .Include(x => x.Person)
-                                .Include(x => x.Class)
-                                .Include(x => x.Class).ThenInclude(x => x.Leader)
-                                .Include(x => x.Class).ThenInclude(x => x.Occurrence)
-                                .Include(x => x.Class).ThenInclude(x => x.OnDay)
-                                .Include(x => x.Class).ThenInclude(x => x.Venue)
-                                .Where(x => peopleID.Contains(x.PersonID)
-                                                    && x.Person.DateCeased == null
-                                                    && x.Person.FinancialTo >= term.Year
-                                                    && x.TermID == term.ID && x.Class != null)
-                                .ToListAsync());
-            return enrolments;
         }
 
 
