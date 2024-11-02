@@ -75,7 +75,7 @@ namespace U3A.BusinessRules
                 enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                                             .Include(x => x.Person)
                                             .Include(x => x.Course)
-                                            .Where(x => !x.IsDeleted && x.Person.IsDeleted
+                                            .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                             && x.CourseID == thisCourse.ID
                                                             && x.TermID == testTerm.ID).ToListAsync();
             };

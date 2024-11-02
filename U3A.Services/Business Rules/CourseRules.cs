@@ -109,7 +109,8 @@ namespace U3A.BusinessRules
             var courses = new List<Course>();
             bool isCourseLeader;
             foreach (var course in coursesInTerm)
-            {
+            {           
+                course.Classes = course.Classes.Where(x => !x.IsDeleted).ToList();
                 foreach (var c in course.Classes)
                 {
                     isCourseLeader = false;
