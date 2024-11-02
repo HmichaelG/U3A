@@ -195,13 +195,16 @@ namespace U3A.BusinessRules
         public static List<Enrolment> SelectableEnrolmentsByClass(U3ADbContext dbc, Class SelectedClass, Term SelectedTerm,
                               Course SelectedCourse)
         {
+            List<Enrolment> result;
             if (SelectedClass == null || SelectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
             {
-                return dbc.Enrolment.IgnoreQueryFilters()
+                result = dbc.Enrolment.IgnoreQueryFilters().AsSplitQuery()
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => !x.IsDeleted && x.CourseID == SelectedCourse.ID
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                                        && x.ClassID == null
+                                                        && x.CourseID == SelectedCourse.ID
                                                         && x.TermID == SelectedTerm.ID
                                                         && x.Person.DateCeased == null)
                                     .OrderBy(x => x.IsWaitlisted)
@@ -211,11 +214,12 @@ namespace U3A.BusinessRules
             }
             else
             {
-                return dbc.Enrolment.IgnoreQueryFilters()
+                result = dbc.Enrolment.IgnoreQueryFilters()
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => !x.IsDeleted && x.ClassID == SelectedClass.ID
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                                    && x.ClassID == SelectedClass.ID
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null)
                                     .OrderBy(x => x.IsWaitlisted)
@@ -223,6 +227,7 @@ namespace U3A.BusinessRules
                                                 .ThenBy(x => x.Person.FirstName)
                                     .ToList();
             }
+            return result;
         }
         public static async Task<List<Dropout>> SelectableDropoutsByClassAsync(U3ADbContext dbc, Term SelectedTerm, Course SelectedCourse,
                                                                     Class SelectedClass)

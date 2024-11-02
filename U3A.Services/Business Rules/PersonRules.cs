@@ -176,7 +176,7 @@ public static partial class BusinessRule
                                 && (x.LeaderOf.Any() || x.Leader2Of.Any() || x.Leader3Of.Any())).ToList();
         foreach (var person in people)
         {
-            person.LeaderOf = dbc.Class
+            person.LeaderOf = dbc.Class.IgnoreQueryFilters()
                         .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
                         .Include(x => x.Course).ThenInclude(x => x.Classes)
                         .Include(x => x.Venue)
@@ -185,14 +185,14 @@ public static partial class BusinessRule
                         .Include(x => x.Leader2)
                         .Include(x => x.Leader3)
                         .Include(x => x.Occurrence)
-                        .Where(x => (x.LeaderID == person.ID || x.Leader2ID == person.ID || x.Leader3ID == person.ID) &&
+                        .Where(x => !x.IsDeleted && (x.LeaderID == person.ID || x.Leader2ID == person.ID || x.Leader3ID == person.ID) &&
                                         x.Course.Year == term.Year)
                                         .AsEnumerable()
                                         .Where(x => IsClassInTerm(x, term.TermNumber))
                         .AsEnumerable().Where(x => IsCourseInTerm(x.Course, term)).ToList();
             foreach (var c in person.LeaderOf)
             {
-                c.Enrolments.AddRange(BusinessRule.SelectableEnrolmentsByClass(dbc, c, term, c.Course));
+                c.Enrolments = BusinessRule.SelectableEnrolmentsByClass(dbc, c, term, c.Course);
             }
         }
         return people.Where(x => x.LeaderOf.Any()).ToList();

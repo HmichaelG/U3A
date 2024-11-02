@@ -165,6 +165,7 @@ else
                                                    FooterColumnName="FeesDue" />
                             </GroupSummary>
                             <TotalSummary>
+                                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
                                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FeesDue" ValueDisplayFormat="{0:c2}" />
                             </TotalSummary>
                         </DxGrid>
