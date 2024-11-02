@@ -7,7 +7,7 @@ namespace U3A.Model
 {
     [Index(nameof(ProcessingYear))]
     [Index(nameof(Date), nameof(Description))]
-    public class Fee : BaseEntity
+    public class Fee : BaseEntity, ISoftDelete
     {
         public Guid ID { get; set; }
         [Required]
@@ -24,5 +24,7 @@ namespace U3A.Model
         public Person Person { get; set; }
         [Comment("If true, will be included in the calculation of member Financial To")]
         public bool IsMembershipFee { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

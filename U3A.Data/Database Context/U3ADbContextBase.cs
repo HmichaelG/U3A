@@ -179,6 +179,11 @@ namespace U3A.Database
                             receipt.IsDeleted = true;
                             receipt.DeletedAt = utcNow;
                         }
+                        foreach (var fee in Fee.Where(x => x.PersonID == deletePerson.ID))
+                        {
+                            fee.IsDeleted = true;
+                            fee.DeletedAt = utcNow;
+                        }
                     }
                 }
                 // for entities that inherit from BaseEntity,

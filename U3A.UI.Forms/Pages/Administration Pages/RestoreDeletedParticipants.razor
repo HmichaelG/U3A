@@ -117,6 +117,8 @@ else
             {
                 (f as ISoftDelete).Undo();
             }
+            // Its possible there are multiple deletes of the same enrolment.
+            // Only delete the first.
             foreach (var e in PersonToRestore.Enrolments.OrderByDescending(e => e.DeletedAt))
             {
                 var restoreItem = dbc.Enrolment.IgnoreQueryFilters()
