@@ -111,10 +111,11 @@ public static partial class BusinessRule
         var contacts = await dbc.Contact.IgnoreQueryFilters()
                         .Include(x => x.Tags)
                         .Where(x => !x.IsDeleted)
+                        .OrderBy(x => x.LastName)
                         .ToListAsync();
         foreach (var c in contacts)
         {
-                people.Add(c as Person); break; 
+                people.Add(c as Person);
         }
         return people.OrderBy(x => x.FullNameAlphaKey).ToList();
     }

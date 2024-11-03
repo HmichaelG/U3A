@@ -69,6 +69,7 @@
                 <DxGrid Data="@Persons" @ref=@mainGrid
                         @bind-SelectedDataItems="@SelectedDataItems"
                         KeyFieldName="ID"
+                        VirtualScrollingEnabled="true"
                         PopupEditFormCssClass="popup-width"
                         EditMode="GridEditMode.PopupEditForm"
                         CustomizeEditModel="Grid_CustomizeEditModel"

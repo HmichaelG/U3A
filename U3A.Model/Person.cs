@@ -46,7 +46,7 @@ public class Person : BaseEntity, ISoftDelete
     }
 
     [Key]
-    public Guid ID { get; set; }
+    public Guid ID { get; set; } = default;
 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int PersonID { get; set; }

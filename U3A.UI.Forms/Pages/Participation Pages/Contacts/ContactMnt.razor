@@ -4,7 +4,6 @@
 @using System.Diagnostics
 @using DevExpress.Data.Filtering;
 @using Microsoft.AspNetCore.Hosting
-@using Microsoft.AspNetCore.Identity
 @using System.Text
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.WebUtilities
@@ -14,7 +13,7 @@
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IWebHostEnvironment environment
-@inject UserManager<ApplicationUser> UserManager
+
 
 
 @implements IDisposable
@@ -204,10 +203,7 @@
                                                             TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
                                                 </DxComboBox>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Mail Preference" ColSpanMd="6">
-                                                <DxComboBox Data="@Communication" @bind-Value="@editItem.Communication" autocomplete="new-password" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@editItem.SMSOptOut"
                                                             Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
                                             </DxFormLayoutItem>
@@ -262,6 +258,8 @@
 
 
 @code {
+    [CascadingParameter]
+    LoginState loginState { get; set; }
     [Parameter]
     public string gridHeight { get; set; } = "800px";
 
@@ -418,9 +416,12 @@
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
     {
         mainGrid.ClearSelection();
-        Contact Contact = (Contact)e.DataItem;
-        dbc.Remove(Contact);
-        await SaveChangesAsync();
+        Person Contact = e.DataItem as Person;
+        string sql = 
+        $@"Update Person
+            set [IsDeleted] = 1, [DeletedAt] = getdate() , [User] = '{loginState.LoginEmail}'
+            where ID = '{Contact.ID.ToString()}'";
+        await dbc.Database.ExecuteSqlRawAsync(sql);
         await GetData();
     }
 
