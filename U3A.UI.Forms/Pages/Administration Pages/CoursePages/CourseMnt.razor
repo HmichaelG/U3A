@@ -437,7 +437,7 @@ else
             classDataItem.OnDay = await dbc.WeekDay.FindAsync(classEditModel.OnDay.ID);
             if (classEditModel.Leader != null) { classDataItem.Leader = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == classEditModel.Leader.ID); }
             if (classEditModel.Leader2 != null) { classDataItem.Leader2 = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == classEditModel.Leader2.ID); }
-            if (classEditModel.Leader2 != null) { classDataItem.Leader2 = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == classEditModel.Leader3.ID); }
+            if (classEditModel.Leader3 != null) { classDataItem.Leader3 = await dbc.Person.IgnoreQueryFilters().FirstAsync(x => x.ID == classEditModel.Leader3.ID); }
         }
         if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
         // Re-query a data item from the store.

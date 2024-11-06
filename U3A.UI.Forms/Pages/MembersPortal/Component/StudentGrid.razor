@@ -173,5 +173,11 @@ else
         }
     }
 
-    public void ClearSelections() { grid.ClearSelection(); }
+    public void ClearSelections() 
+    { 
+        if (grid != null)  
+        {
+            grid.ClearSelection(); 
+        }
+    }
 }
