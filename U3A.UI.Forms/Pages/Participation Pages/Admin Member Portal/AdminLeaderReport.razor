@@ -20,80 +20,80 @@
 
 @if (!IsReady)
 {
-    <LoadingIndicator />
+        <LoadingIndicator />
 }
 else
 {
     if (showPDF)
     {
-        <div class="row w-100 bg-secondary">
-            <PdfViewer DocumentContent="@pdfContent" OnCloseButtonClick="@(() => showPDF = false)" />
-        </div>
+                <div class="row w-100 bg-secondary">
+                    <PdfViewer DocumentContent="@pdfContent" OnCloseButtonClick="@(() => showPDF = false)" />
+                </div>
     }
     else
     {
-        <div class="p-2">
-            <h3>Print Leader Report</h3>
-            <CollapsableContent DismissKey="{674F95B8-8507-40BB-9813-C7253886F15D}"
-                AlertText=@(@"<p>Creating a PDF report places a heavy burden on the server.<br />
+                <div class="p-2">
+                    <h3>Print Leader Report</h3>
+                    <CollapsableContent DismissKey="{674F95B8-8507-40BB-9813-C7253886F15D}"
+                        AlertText=@(@"<p>Creating a PDF report places a heavy burden on the server.<br />
                         Please be a good digital citizen and use judiciously.</p>")
-                                OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+                                        OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
 
-            <DxFormLayout>
-                <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
-                    <TermsComboBox Terms="@terms"
-                                   @bind-SelectedTerm="@selectedTerm"
-                                   @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
-                </DxFormLayoutItem>
-            </DxFormLayout>
-            <br />
+                    <DxFormLayout>
+                        <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
+                            <TermsComboBox Terms="@terms"
+                                           @bind-SelectedTerm="@selectedTerm"
+                                           @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+                        </DxFormLayoutItem>
+                    </DxFormLayout>
+                    <br />
 
-            <MessageBox @ref="@messageBox" />
-            <Progress @ref="@progressBar" />
-            <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+                    <MessageBox @ref="@messageBox" />
+                    <Progress @ref="@progressBar" />
+                    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-            <DxFormLayout>
-                <div class="col-10 px-4">
-                    <FullScreen DisplayOffset="18">
-                        <ContentTemplate>
-                            <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
-                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                    ShowFilterRow="false"
-                                    ShowAllRows="true"
-                                    KeyFieldName="ID"
-                                    SelectionMode="GridSelectionMode.Single"
-                                    UnboundColumnData="Grid_CustomUnboundColumnData"
-                                    SelectedDataItemChanged="OnSelectedDataItemChanged"
-                                    @bind-SelectedDataItems="SelectedDataItems"
-                                    ValidationEnabled="true">
-                                <ToolbarTemplate>
-                                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{979A2CA7-3C24-4B42-B906-D973E48C906C}" />
-                                </ToolbarTemplate>
-                                <Columns>
-                                    <DxGridSelectionColumn Width="2rem" />
-                                    <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
-                                    <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
-                                    <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
-                                    <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
-                                    <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
-                                    <DxGridDataColumn Caption="Send To" FieldName="Recipient"
-                                                      UnboundType="GridUnboundColumnType.String" Width="10rem" />
-                                </Columns>
-                                <TotalSummary>
-                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
-                                </TotalSummary>
+                    <DxFormLayout>
+                        <div class="col-10 px-4">
+                            <FullScreen DisplayOffset="18">
+                                <ContentTemplate>
+                                    <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+                                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                            ShowFilterRow="false"
+                                            ShowAllRows="true"
+                                            KeyFieldName="ID"
+                                            SelectionMode="GridSelectionMode.Single"
+                                            UnboundColumnData="Grid_CustomUnboundColumnData"
+                                            SelectedDataItemChanged="OnSelectedDataItemChanged"
+                                            @bind-SelectedDataItems="SelectedDataItems"
+                                            ValidationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{979A2CA7-3C24-4B42-B906-D973E48C906C}" />
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="2rem" />
+                                            <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
+                                            <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
+                                            <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
+                                            <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
+                                            <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
+                                            <DxGridDataColumn Caption="Send To" FieldName="Recipient"
+                                                              UnboundType="GridUnboundColumnType.String" Width="10rem" />
+                                        </Columns>
+                                        <TotalSummary>
+                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
+                                        </TotalSummary>
 
-                            </DxGrid>
-                        </ContentTemplate>
-                    </FullScreen>
+                                    </DxGrid>
+                                </ContentTemplate>
+                            </FullScreen>
+                        </div>
+                        <div class="col col-2">
+                            <SelectLeaderReports @ref=@rptSelect SingleReportOnly=true
+                                                 AreSelectionsMade="@AreSelectionsMade"
+                                                 OnQueueReportsSelected="OnQueueReportsSelected" />
+                        </div>
+                    </DxFormLayout>
                 </div>
-                <div class="col col-2">
-                    <SelectLeaderReports @ref=@rptSelect SingleReportOnly=true
-                                         AreSelectionsMade="@AreSelectionsMade"
-                                         OnQueueReportsSelected="OnQueueReportsSelected" />
-                </div>
-            </DxFormLayout>
-        </div>
     }
 }
 <style>
@@ -102,7 +102,7 @@ else
     }
 
     .viewer-height {
-        @* height: calc(100vh - 5rem) !important; *@
+    @* height: calc(100vh - 5rem) !important; *@
     }
 
 </style>
@@ -157,7 +157,10 @@ else
         selectedTerm = term;
         Classes = (await BusinessRule.GetClassDetailsAsync(dbc, selectedTerm, settings))
                         .OrderBy(x => x.Course.Name).ThenBy(x => x.OnDayID).ToList();
-        reportRecipients = await BusinessRule.GetLeaderReportRecipientsByClass(dbc, settings, currentTerm, Classes);
+        if (Classes != null)
+        {
+            reportRecipients = await BusinessRule.GetLeaderReportRecipientsByClass(dbc, settings, currentTerm, Classes);
+        }
     }
 
     void OnSelectedDataItemChanged()
@@ -226,7 +229,7 @@ else
             result = false;
             msg += "The course has no enrolments in the current term";
         }
-        if (enrolmentReqd && e.Count() ==  e.Count(x => x.IsWaitlisted || x.isLeader))
+        if (enrolmentReqd && e.Count() == e.Count(x => x.IsWaitlisted || x.isLeader))
         {
             result = false;
             msg += "All participants in the current term are waitlisted.";
