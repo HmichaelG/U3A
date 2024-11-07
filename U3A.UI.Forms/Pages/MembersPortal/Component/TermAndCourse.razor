@@ -146,11 +146,14 @@ else {
 
     async Task SelectedTermChanged(Term term) {
         selectedTerm = term;
+        selectedCourse = null;
+        selectedClass = null;
         await GetLeadersCourses();
     }
 
     async Task SelectedCourseChanged(Course course) {
         selectedCourse = course;
+        selectedClass = null;
         await SetupClasses();
     }
 

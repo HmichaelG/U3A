@@ -209,28 +209,19 @@ namespace U3A.BusinessRules
         public static async Task<List<Course>> SelectableCoursesByTermAsync(U3ADbContext dbc, int Year, int TermNumber)
         {
             var courses = await SelectableCoursesAsync(dbc, Year);
-            switch (TermNumber)
+            courses = (from course in courses
+                       where course.Classes.Any(c => c.OfferedTerm1 && TermNumber == 1 ||
+                                                c.OfferedTerm2 && TermNumber == 2 ||
+                                                c.OfferedTerm3 && TermNumber == 3 ||
+                                                c.OfferedTerm4 && TermNumber == 4) select course).ToList();
+            foreach (var course in courses)
             {
-                case 1:
-                    courses = (from p in courses
-                               where p.Classes.Any(c => c.OfferedTerm1 == true)
-                               select p).ToList();
-                    break;
-                case 2:
-                    courses = (from p in courses
-                               where p.Classes.Any(c => c.OfferedTerm2 == true)
-                               select p).ToList();
-                    break;
-                case 3:
-                    courses = (from p in courses
-                               where p.Classes.Any(c => c.OfferedTerm3 == true)
-                               select p).ToList();
-                    break;
-                case 4:
-                    courses = (from p in courses
-                               where p.Classes.Any(c => c.OfferedTerm4 == true)
-                               select p).ToList();
-                    break;
+                course.Classes = (from c in course.Classes
+                                 where (c.OfferedTerm1 && TermNumber == 1) ||
+                                 (c.OfferedTerm2 && TermNumber == 2) ||
+                                 (c.OfferedTerm3 && TermNumber == 3) ||
+                                 (c.OfferedTerm4 && TermNumber == 4) select c).ToList();
+
             }
             return courses;
         }
