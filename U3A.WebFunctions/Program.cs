@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using U3A.WebFunctions;
 using Microsoft.Extensions.Configuration;
+using DevExpress.Drawing;
 
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
@@ -31,7 +32,13 @@ var columnOptions = new SeriSQL.ColumnOptions
         new SeriSQL.SqlColumn
                 { ColumnName = "LogEvent", PropertyName = "LogEvent", DataType = SqlDbType.NVarChar, DataLength = 64 },
     }
-}; 
+};
+
+DevExpress.Drawing.Internal.DXDrawingEngine.ForceSkia();
+foreach (var file in Directory.GetFiles(@"fonts"))
+{
+    DXFontRepository.Instance.AddFont(file);
+}
 
 
 var host = new HostBuilder()
