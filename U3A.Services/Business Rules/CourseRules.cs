@@ -59,7 +59,7 @@ namespace U3A.BusinessRules
 
         public static async Task<List<Course>> SelectableCoursesAsync(U3ADbContext dbc, int Year)
         {
-            var Courses = await dbc.Course.IgnoreQueryFilters()
+            var Courses = await dbc.Course.IgnoreQueryFilters().AsNoTracking()
                         .Include(x => x.CourseType)
                         .Include(x => x.CourseParticipationType)
                         .Include(x => x.Classes).ThenInclude(x => x.Venue)
@@ -73,7 +73,10 @@ namespace U3A.BusinessRules
                         .ToListAsync();
             foreach (var course in Courses)
             {
-                course.Classes = course.Classes.OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
+                if (course.Classes.Count > 1)
+                {
+                    course.Classes = course.Classes.OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
+                }
             }
             return Courses;
         }
@@ -210,10 +213,10 @@ namespace U3A.BusinessRules
         {
             var courses = await SelectableCoursesAsync(dbc, Year);
             courses = (from course in courses
-                       where course.Classes.Any(c => c.OfferedTerm1 && TermNumber == 1 ||
-                                                c.OfferedTerm2 && TermNumber == 2 ||
-                                                c.OfferedTerm3 && TermNumber == 3 ||
-                                                c.OfferedTerm4 && TermNumber == 4) select course).ToList();
+                       where course.Classes.Any(c => (c.OfferedTerm1 && TermNumber == 1) ||
+                                                (c.OfferedTerm2 && TermNumber == 2) ||
+                                                (c.OfferedTerm3 && TermNumber == 3) ||
+                                                (c.OfferedTerm4 && TermNumber == 4)) select course).ToList();
             foreach (var course in courses)
             {
                 course.Classes = (from c in course.Classes
