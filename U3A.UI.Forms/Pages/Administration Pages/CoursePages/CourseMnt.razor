@@ -446,7 +446,6 @@ else
         if (dataItem != null)
         {
             editModel.CopyTo(dataItem);
-            dataItem.Description = HtmlEditor.MinifyHtml(dataItem.Description);
             dataItem.DisplayDescription = HtmlEditor.AdjustAndMinifyHtml(dataItem.Description);
             dataItem.CourseType = dbc.CourseType.Find(editModel.CourseType.ID);
             if (editModel.CourseParticipationType != null)

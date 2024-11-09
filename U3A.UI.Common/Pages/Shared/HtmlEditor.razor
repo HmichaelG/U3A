@@ -25,8 +25,11 @@
             </small>
         </div>
     </DxTabPage>
-    <DxTabPage Text="Code" Click="() => {Markup = PrettyPrint(Markup); StateHasChanged();}">
-        <DxMemo @bind-Text="@Markup"
+    <DxTabPage Text="Code" Click="() => {Markup = PrettyPrint(Markup); 
+                                            isCodeEditable=false; 
+                                            StateHasChanged();}">
+        <DxMemo @bind-Text="@Markup" @bind-Text:after=@OnEditorTextChanged
+                BindValueMode="BindValueMode.OnLostFocus"
                 Rows="20"
                 ReadOnly="@(!isCodeEditable)" />
         <DxButton Text="Edit" Click="OnEditClicked" CssClass="mt-1" />
@@ -82,6 +85,12 @@
         await MarkupChanged.InvokeAsync(Markup);
     }
 
+    async Task OnEditorTextChanged()
+    {
+        await MarkupChanged.InvokeAsync(Markup);        
+    }
+
+
     public static string PrettyPrint(string html)
     {
         string result = string.Empty;
@@ -120,18 +129,6 @@
                     document.Body.RemoveElement(element);
                 }
             }
-            result = document.Minify();
-        }
-        return result;
-    }
-
-    public static string MinifyHtml(string html)
-    {
-        string result = string.Empty;
-        if (string.IsNullOrWhiteSpace(html)) return result;
-        using (var document = ParseHtml(html))
-        {
-            if (document is null) return result;
             result = document.Minify();
         }
         return result;
