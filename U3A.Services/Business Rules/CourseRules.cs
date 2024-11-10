@@ -152,7 +152,11 @@ namespace U3A.BusinessRules
                                     e.TermID == term.ID &&
                                     e.IsCourseClerk && !e.IsWaitlisted)).ToListAsync();
             Parallel.ForEach(allCourses, x => {
-                if (CoursesInTerm.Contains(x)) { result.Add(x); }
+                if (CoursesInTerm.Contains(x)) { 
+                    var course = CoursesInTerm.Find(c => c.ID == x.ID);
+                    x.Classes = course.Classes;
+                    result.Add(x); 
+                }
             });
             return result.ToList();
         }

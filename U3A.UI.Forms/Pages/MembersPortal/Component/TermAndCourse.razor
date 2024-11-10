@@ -180,15 +180,20 @@ else {
         if (selectedClass == null || !classes.Contains(selectedClass)) {
             selectedClass = classes?.FirstOrDefault();
         }
-        if (classes?.Count <= 1) {
-            classComboEnabled = false;
-            classComboNullText = selectedClass.ClassDetailWithoutVenue;
+        if (selectedClass != null)
+        {
+            if (classes?.Count <= 1)
+            {
+                classComboEnabled = false;
+                classComboNullText = selectedClass.ClassDetailWithoutVenue;
+            }
+            else
+            {
+                classComboEnabled = true;
+                classComboNullText = null;
+            }
+            await GetEnrolments();
         }
-        else {
-            classComboEnabled = true;
-            classComboNullText = null;
-        }
-        await GetEnrolments();
     }
 
     async Task GetEnrolments() {
