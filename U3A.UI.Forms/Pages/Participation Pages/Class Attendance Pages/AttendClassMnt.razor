@@ -504,11 +504,11 @@ else
 
     async Task SetGridHeight()
     {
-        var offset = (IsLargerLayout()) ? 15 : 0.4;
+        var offset = (IsLargerLayout()) ? (IsAdminPortal || IsMemberPortal) ? 70 : 15 : 0.4;
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
         if (newHeight != gridHeight) 
         { 
-            gridHeight = newHeight; InvokeAsync(StateHasChanged); 
+            gridHeight = newHeight; await InvokeAsync(StateHasChanged); 
         }
     }
 
