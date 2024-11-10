@@ -90,8 +90,9 @@ else
                     </div>
                 <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                                   ExpandedChanged="@(() => {areDetailsExpanded = !areDetailsExpanded;
-                                                             SetGridHeightOffset();})">
+                                   ExpandedChanged="@(async () => {areDetailsExpanded = !areDetailsExpanded;
+                                                                await SetGridHeight();
+                                                            })">
                     <DxFormLayoutItem Caption="Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms"
                                        @bind-SelectedTerm="@SelectedTerm"
@@ -351,7 +352,7 @@ else
     }
 
     .grid-height {
-        height: calc(100dvh - @(SetGridHeightOffset()))
+        height: @gridHeight;
     }
 
     .removeWrapping {
@@ -498,35 +499,23 @@ else
         {
             now = dbc.GetLocalTime();
         }
+        await SetGridHeight();
     }
 
-    string SetGridHeightOffset()
+    async Task SetGridHeight()
     {
-        int header = 0;
-        int footer = 0;
-        // add to Header for top menu height
-        if (ws.UseTopMenu) header = 4;
-        // add to Header for admin portal tab strip
-        if (IsAdminPortal) header += 3;
-        if (IsMemberPortal)
-        {
-            if (IsLargeLayout || IsXtraLargeLayout) header += 10; else header += 14;
+        var offset = (IsLargerLayout()) ? 15 : 0.4;
+        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
+        if (newHeight != gridHeight) 
+        { 
+            gridHeight = newHeight; InvokeAsync(StateHasChanged); 
         }
-        else
-        {
-            // the header when not in the Member Portal
-            header += 22;
-        }
-        if (IsMemberPortal)
-        {
-            if (IsLargeLayout || IsXtraLargeLayout) footer += 3; else footer += 8;
-        }
-        else
-        {
-            if (IsLargeLayout || IsXtraLargeLayout) footer += 0; else footer += 8;
-        }
-        string result = $"{header + footer + ((areDetailsExpanded) ? 0 : -10)}rem";
-        return result;
+    }
+
+    private int Convert(string Height)
+    {
+        string s = Height.Replace("px", "");
+        return int.Parse(s);
     }
 
     async Task SelectedTermChanged(Term term)
