@@ -2,6 +2,7 @@ using Azure.Identity;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using U3A.Database;
