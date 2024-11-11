@@ -31,6 +31,8 @@ using U3A.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 // **** Start local modifications ****
 
 builder.Services.AddScoped<LocalTime>();
@@ -105,6 +107,7 @@ builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 
 // U3ADbContextFactory
 builder.Services.AddDbContext<U3ADbContext>(options => options.UseSqlServer(providerOptions => providerOptions.EnableRetryOnFailure()));
+
 builder.Services.AddDbContextFactory<U3ADbContext>(options =>
 {
     options.UseSqlServer(providerOptions => providerOptions.EnableRetryOnFailure());
@@ -217,6 +220,8 @@ builder.Services.AddStackExchangeRedisCache(option =>
 });
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 app.UseRequestLocalization("en-AU");
 
 // Configure the HTTP request pipeline.

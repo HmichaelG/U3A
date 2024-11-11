@@ -60,9 +60,10 @@ namespace U3A.BusinessRules
                 c.Enrolments = c.Enrolments.Where(x => x.Person != null).ToList();
                 BusinessRule.AssignClassContacts(c, t, settings);
             }
+            var termEnrolments = dbc.Enrolment.AsNoTracking().Where(x => x.TermID == t.ID);
             foreach (var c in classes)
             {
-                SetCourseParticipationDetails(dbc, c, c.Enrolments);
+                SetCourseParticipationDetails(dbc, c, termEnrolments);
                 var od = dbc.WeekDay.Find(c.OnDayID);
                 var v = dbc.Venue.Find(c.VenueID);
                 var l = dbc.Person.Find(c.LeaderID);
