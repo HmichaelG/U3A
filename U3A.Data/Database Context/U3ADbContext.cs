@@ -40,11 +40,14 @@ namespace U3A.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            //optionsBuilder.EnableSensitiveDataLogging(true);
+            //optionsBuilder.EnableDetailedErrors();
+            //optionsBuilder.LogTo(Serilog.Log.Information, Microsoft.Extensions.Logging.LogLevel.Information);
+
             GetTenantInfo();
             if (TenantInfo != null)
             {
                 // Use the connection string to connect to the per-tenant database.
-                optionsBuilder.EnableSensitiveDataLogging(true);
                 optionsBuilder.UseSqlServer(TenantInfo.ConnectionString);
             }
         }
