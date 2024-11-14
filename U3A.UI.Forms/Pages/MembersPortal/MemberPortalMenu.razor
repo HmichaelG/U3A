@@ -14,11 +14,7 @@
 
 @attribute [Authorize]
 
-@if (!IsReady)
-{
-    <LoadingIndicator />
-}
-else
+@if (IsReady)
 {
     <Progress @ref=@progress />
     <MessageBox @ref=@messageBox />
@@ -279,7 +275,7 @@ else
             height: 0.33rem;
         }
 
-        */
+    
     </style>
 }
 @code {
@@ -310,7 +306,6 @@ else
     MessageBox? messageBox;
     string? SuccessMsg = null;
     Progress? progress;
-    private string? currentUrl;
     DateTime localTime;
 
     protected override async Task OnInitializedAsync()
@@ -322,15 +317,7 @@ else
             settings = await dbc.SystemSettings.AsNoTracking().OrderBy(x => x.ID).FirstOrDefaultAsync();
         }
         await SetupTitle();
-        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        NavigationManager.LocationChanged += OnLocationChanged;
         IsReady = true;
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
-        StateHasChanged();
     }
 
     async Task SetupTitle()
@@ -450,6 +437,5 @@ else
 
     public void Dispose()
     {
-        NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }

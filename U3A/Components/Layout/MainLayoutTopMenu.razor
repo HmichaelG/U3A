@@ -13,88 +13,89 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject LocalTime lt
 
+@if (isReady)
+{
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+                        @bind-IsActive="@IsXtraSmallLayout" />
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
+                        @bind-IsActive="@IsSmallLayout" />
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.Medium"
+                        @bind-IsActive="@IsMediumLayout" />
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
+                        @bind-IsActive="@IsLargeLayout" />
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
+                        @bind-IsActive="@IsXtraLargeLayout" />
 
-<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-                    @bind-IsActive="@IsXtraSmallLayout" />
-<DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
-                    @bind-IsActive="@IsSmallLayout" />
-<DxLayoutBreakpoint DeviceSize="DeviceSize.Medium"
-                    @bind-IsActive="@IsMediumLayout" />
-<DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
-                    @bind-IsActive="@IsLargeLayout" />
-<DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
-                    @bind-IsActive="@IsXtraLargeLayout" />
-
-<DxGridLayout CssClass="">
-    <Rows>
-        <DxGridLayoutRow Areas="Left-Blank header Right-Blank" Height="auto" />
-        <DxGridLayoutRow Areas="Left-Blank content Right-Blank" />
-    </Rows>
-    <Columns>
-        @{
-            if (IsXtraLargeLayout)
-            {
-                <DxGridLayoutColumn Width="10%" />
-                <DxGridLayoutColumn Width="80%" />
-                <DxGridLayoutColumn Width="10%" />
-            }
-            else
-            {
-                <DxGridLayoutColumn Width="0%" />
-                <DxGridLayoutColumn Width="100%" />
-                <DxGridLayoutColumn Width="0%" />
-            }
-        }
-    </Columns>
-    <Items>
-        <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none vh-100">
-        </DxGridLayoutItem>
-        <DxGridLayoutItem Area="header" CssClass="py-1">
-            <Template>
-                @if (hasRole)
+    <DxGridLayout CssClass="">
+        <Rows>
+            <DxGridLayoutRow Areas="Left-Blank header Right-Blank" Height="auto" />
+            <DxGridLayoutRow Areas="Left-Blank content Right-Blank" />
+        </Rows>
+        <Columns>
+            @{
+                if (IsXtraLargeLayout)
                 {
-                    <div class="fixed-top">
-                        <MainMenu />
-                    </div>
+                    <DxGridLayoutColumn Width="10%" />
+                    <DxGridLayoutColumn Width="80%" />
+                    <DxGridLayoutColumn Width="10%" />
                 }
                 else
                 {
-                    <PortalHeader NoU3AGroup=true />
+                    <DxGridLayoutColumn Width="0%" />
+                    <DxGridLayoutColumn Width="100%" />
+                    <DxGridLayoutColumn Width="0%" />
                 }
-            </Template>
-        </DxGridLayoutItem>
-        <DxGridLayoutItem Area="content" CssClass="main">
-            <Template>
-                <ErrorBoundary @ref="@errorBoundary">
-                    <ChildContent>
-                        <div class="@((hasRole) ? "content-padding" : "" )">
-                            @if (!string.IsNullOrWhiteSpace(messageText))
-                            {
-                                <div class="alert alert-danger text-danger text-center mx-auto">
-                                    @(new MarkupString(messageText))
-                                </div>
-                            }
-                            @Body
+            }
+        </Columns>
+        <Items>
+            <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none vh-100">
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="header" CssClass="py-1">
+                <Template>
+                    @if (hasRole)
+                    {
+                        <div class="fixed-top">
+                            <MainMenu />
                         </div>
-                    </ChildContent>
-                    <ErrorContent>
-                        <p class="u3admin-error-boundary mt-5">
-                            @if (constants.IS_DEVELOPMENT)
-                            {
-                                <div class="w-50">@context.ToString()</div>
-                            }
-                            Oops! Something went wrong. An unexpected error has occurred.<br />
-                            When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(lt.GetLocalTimeAsync()) Local ).
-                            <button class="btn btn-warning" @onclick="ResetError">Reset</button>
-                        </p>
-                    </ErrorContent>
-                </ErrorBoundary>
-            </Template>
-        </DxGridLayoutItem>
-        <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none vh-100" />
-    </Items>
-</DxGridLayout>
-
+                    }
+                    else
+                    {
+                        <PortalHeader NoU3AGroup=true />
+                    }
+                </Template>
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="content" CssClass="main">
+                <Template>
+                    <ErrorBoundary @ref="@errorBoundary">
+                        <ChildContent>
+                            <div class="@((hasRole) ? "content-padding" : "" )">
+                                @if (!string.IsNullOrWhiteSpace(messageText))
+                                {
+                                    <div class="alert alert-danger text-danger text-center mx-auto">
+                                        @(new MarkupString(messageText))
+                                    </div>
+                                }
+                                @Body
+                            </div>
+                        </ChildContent>
+                        <ErrorContent>
+                            <p class="u3admin-error-boundary mt-5">
+                                @if (constants.IS_DEVELOPMENT)
+                                {
+                                    <div class="w-50">@context.ToString()</div>
+                                }
+                                Oops! Something went wrong. An unexpected error has occurred.<br />
+                                When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(lt.GetLocalTimeAsync()) Local ).
+                                <button class="btn btn-warning" @onclick="ResetError">Reset</button>
+                            </p>
+                        </ErrorContent>
+                    </ErrorBoundary>
+                </Template>
+            </DxGridLayoutItem>
+            <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none vh-100" />
+        </Items>
+    </DxGridLayout>
+}
 
 <style>
     .content-padding {
@@ -117,7 +118,7 @@
     bool IsXtraLargeLayout { get; set; }
     U3ADbContext? dbc { get; set; }
     string? messageText;
-
+    bool isReady;
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,8 +137,7 @@
             var authEmail = authenticationState.User.Identity!.Name;
             if (authEmail == constants.superAdmin) hasRole = true;
         }
-        NavigationManager.LocationChanged += OnLocationChanged;
-        await base.OnInitializedAsync();
+        isReady = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -158,17 +158,8 @@
         NavigationManager.NavigateTo("/", true);
     }
 
-    void OnLocationChanged(object? sender, LocationChangedEventArgs args)
-    {
-        if (IsMediumLayout)
-        {
-            InvokeAsync(StateHasChanged).SafeFireAndForget();
-        }
-    }
-
     public void Dispose()
     {
-        NavigationManager.LocationChanged -= OnLocationChanged;
         dbc?.Dispose();
     }
 
