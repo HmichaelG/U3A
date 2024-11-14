@@ -34,7 +34,7 @@
 
     <ImportMap />
 
-    <HeadOutlet @rendermode="@RenderModeForPage" />
+    <HeadOutlet @rendermode="@PageRenderMode" />
 
     <style type="text/css">
         .disableSelect {
@@ -73,7 +73,7 @@
 
 
 
-    <Routes @rendermode="@RenderModeForPage" />
+    <Routes @rendermode="@PageRenderMode" />
 
     <script src=@Assets["_framework/blazor.web.js"]></script>
     <script type="text/javascript" src=@Assets["/js/qr.js"]></script>
@@ -88,7 +88,7 @@
     private HttpContext HttpContext { get; set; } = default!;
 
     private string AppendVersion(string path) => FileVersionProvider.AddFileVersionToPath("/", path);
-    private IComponentRenderMode? RenderModeForPage =>
+    private IComponentRenderMode? PageRenderMode =>
             HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
 
 }

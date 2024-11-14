@@ -4,22 +4,22 @@
 @inject LocalTime localTime
 
 <CascadingAuthenticationState>
-<Router AppAssembly="@typeof(Program).Assembly"
+    <Router AppAssembly="@typeof(Program).Assembly"
             AdditionalAssemblies="new[] {typeof(U3A.UI.Common.About).Assembly,
                                             typeof(U3A.UI.Forms.About).Assembly,
                                             typeof(U3A.UI.Reports.About).Assembly}">
-    <Found Context="routeData">
+        <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)">
-            <NotAuthorized>
-                <RedirectToLogin />
-            </NotAuthorized>
-        </AuthorizeRouteView>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-</Router>
+                <NotAuthorized>
+                    <RedirectToLogin />
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+    </Router>
 </CascadingAuthenticationState>
 
-@code{
+@code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
