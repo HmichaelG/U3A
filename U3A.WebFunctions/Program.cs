@@ -42,7 +42,7 @@ foreach (var file in Directory.GetFiles(@"fonts"))
 
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults()
+    .ConfigureFunctionsWebApplication()
      .ConfigureLogging((hostingContext, logging) =>
      {
          Log.Logger = new LoggerConfiguration()
