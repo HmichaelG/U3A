@@ -173,13 +173,12 @@ builder.Services.AddRazorComponents(options =>
     options.DetailedErrors = builder.Environment.IsDevelopment())
     .AddInteractiveServerComponents();
 
-builder.Services.AddAuthorization();
+builder.Services.AddScoped<WorkStation>();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
-builder.Services.AddScoped<WorkStation>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -205,7 +204,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<U3ADbContext>()
     .AddSignInManager()
-    .AddUserManager<UserManager<ApplicationUser>>()   
+    .AddUserManager<UserManager<ApplicationUser>>()
     .AddDefaultTokenProviders();
 
 
@@ -219,7 +218,7 @@ if (!builder.Environment.IsDevelopment())
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.MinimumSameSitePolicy = SameSiteMode.Lax;
 });
 
 var app = builder.Build();
@@ -242,21 +241,6 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
-app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (BadHttpRequestException ex)
-    {
-        // Handle the exception
-        if (ex.InnerException is AntiforgeryValidationException)
-        {
-            context.Response.Redirect("/");
-        }
-    }
-});
 
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();

@@ -20,7 +20,6 @@
 }
 else
 {
-
     <MessageBox @ref="@messageBox" />
     <DxFormLayout CssClass="px-2">
         @if (!hasRole)
@@ -61,12 +60,7 @@ else
                 <DxTabPage Text="Attendance">
                     <AttendanceChart />
                 </DxTabPage>
-@*                 <DxTabPage Text="Website">
-                    <div class="">
-                        <iframe src="@homePage" class="shadow card p-1 iframe-style"></iframe>
-                    </div>
-                </DxTabPage>
- *@                <DxTabPage Text="u3admin.org.au">
+                <DxTabPage Text="u3admin.org.au">
                     <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-style"></iframe>
                 </DxTabPage>
             </DxTabs>

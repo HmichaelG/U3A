@@ -32,6 +32,8 @@
     <link rel="stylesheet" href="css/site.css" />
     <link href="U3A.styles.css" rel="stylesheet" />
 
+    <ImportMap />
+
     <HeadOutlet @rendermode="@RenderModeForPage" />
 
     <style type="text/css">
@@ -45,7 +47,7 @@
 </head>
 
 <body>
-    
+
     <script type="text/javascript" src="/js/MyFunctions.js"></script>
     <script type="text/javascript" src="/js/reCaptchaV2.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
@@ -86,8 +88,7 @@
     private HttpContext HttpContext { get; set; } = default!;
 
     private string AppendVersion(string path) => FileVersionProvider.AddFileVersionToPath("/", path);
-    private IComponentRenderMode? RenderModeForPage => HttpContext.Request.Path.StartsWithSegments("/Account")
-        ? null
-        : InteractiveServer;
+    private IComponentRenderMode? RenderModeForPage =>
+            HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
 
 }
