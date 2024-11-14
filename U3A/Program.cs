@@ -254,7 +254,7 @@ app.MapAdditionalIdentityEndpoints();
 
 app.MapControllers();
 
-app.MapFallbackToFile("/closed.html");
+app.MapFallbackToFile("/fallback.html");
 
 app.Run();
 
