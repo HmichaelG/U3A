@@ -29,6 +29,8 @@ using U3A.Data;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
+using Azure.Identity;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -218,7 +220,7 @@ if (!builder.Environment.IsDevelopment())
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    options.MinimumSameSitePolicy = SameSiteMode.Lax;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
 var app = builder.Build();
@@ -239,7 +241,9 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+app.MapStaticAssets();
+//app.UseStaticFiles();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
@@ -250,4 +254,7 @@ app.MapAdditionalIdentityEndpoints();
 
 app.MapControllers();
 
+app.MapFallbackToFile("/closed.html");
+
 app.Run();
+
