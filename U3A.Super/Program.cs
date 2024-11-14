@@ -10,7 +10,6 @@ using U3A.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
 builder.Services.AddScoped<LocalTime>();
 
 var MultiTenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
@@ -67,7 +66,6 @@ builder.Services.AddScoped<WorkStation>();
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
 app.UseRequestLocalization("en-AU");
 
 // Configure the HTTP request pipeline.

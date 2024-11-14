@@ -13,6 +13,7 @@
 @inject UrlEncoder UrlEncoder
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<EnableAuthenticator> Logger
+@inject NavigationManager navMan
 
 <PageTitle>Configure authenticator app</PageTitle>
 
@@ -59,7 +60,7 @@ else
                         <ValidationMessage For="() => Input.Code" class="text-danger" />
                         <div class="row p-2">
                             <button type="submit" class="w-50 btn btn-primary">Verify</button>
-                            <a type="button" href="~/" class="w-50 btn btn-secondary">Cancel</a>
+                            <a type="button" href="@navMan.BaseUri" class="w-50 btn btn-secondary">Cancel</a>
                         </div>
                     </div>
                 </EditForm>

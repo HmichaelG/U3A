@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.FileProviders;
@@ -30,8 +31,6 @@ using U3A.Model;
 using U3A.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddServiceDefaults();
 
 // **** Start local modifications ****
 
@@ -160,7 +159,10 @@ builder.Services.Configure<reCAPTCHAVerificationOptions>(o =>
 builder.Services.AddTransient<ReCaptchaV2API>();
 builder.Services.AddHttpClient();
 
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages().AddRazorPagesOptions(o =>
+{
+    o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
+});
 
 constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
 
@@ -214,14 +216,14 @@ if (!builder.Environment.IsDevelopment())
     _ = builder.Services.AddApplicationInsightsTelemetry(options =>
        options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 }
-builder.Services.AddStackExchangeRedisCache(option =>
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    option.Configuration = builder.Configuration["CacheConnection"];
+    options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
 app.UseRequestLocalization("en-AU");
 
 // Configure the HTTP request pipeline.
@@ -257,13 +259,11 @@ app.Use(async (context, next) =>
 });
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+   .AddInteractiveServerRenderMode();
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 
 app.MapControllers();
 
-//Error 404 fallback
-app.MapFallbackToFile("/fallback.html");
 app.Run();

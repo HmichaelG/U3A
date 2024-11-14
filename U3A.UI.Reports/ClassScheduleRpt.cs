@@ -4,7 +4,6 @@ using DevExpress.ReportServer.ServiceModel.DataContracts;
 using DevExpress.XtraPrinting.BarCode;
 using DevExpress.XtraReports.UI;
 using Microsoft.AspNetCore.Components;
-using PdfSharpCore.Drawing.BarCodes;
 using System;
 using System.Collections;
 using System.ComponentModel;

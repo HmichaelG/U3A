@@ -77,6 +77,7 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <PackageReference Include="PDFsharp" Version="6.1.1" />
     <PackageReference Include="Serilog" Version="4.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
@@ -85,7 +86,6 @@
   <ItemGroup>
     <ProjectReference Include="..\U3A.Data\U3A.Database.csproj" />
     <ProjectReference Include="..\U3A.Model\U3A.Model.csproj" />
-    <ProjectReference Include="..\U3A.ServiceDefaults\U3A.ServiceDefaults.csproj" />
     <ProjectReference Include="..\U3A.Services\U3A.Services.csproj" />
     <ProjectReference Include="..\U3A.UI.Reports\U3A.UI.Reports.csproj" />
   </ItemGroup>

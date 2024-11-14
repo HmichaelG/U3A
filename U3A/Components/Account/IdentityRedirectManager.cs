@@ -18,6 +18,7 @@ namespace U3A.Components.Account
         public void RedirectTo(string? uri)
         {
             uri ??= "";
+            if (uri == "~/") { uri = ""; }
 
             // Prevent open redirects.
             if (!Uri.IsWellFormedUriString(uri, UriKind.Relative))
