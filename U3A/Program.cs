@@ -245,6 +245,21 @@ app.MapStaticAssets();
 //app.UseStaticFiles();
 
 app.UseAntiforgery();
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (BadHttpRequestException ex)
+    {
+        // Handle the exception
+        if (ex.InnerException is AntiforgeryValidationException)
+        {
+            context.Response.Redirect("/");
+        }
+    }
+});
 
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
