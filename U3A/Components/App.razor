@@ -24,15 +24,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href=@Assets["/favicon/favicon-32x32.png"]>
     <link rel="icon" type="image/png" sizes="16x16" href=@Assets["/favicon/favicon-16x16.png"]>
     <link rel="icon" type="image/ico" href=@Assets["/favicon/favicon.ico"]>
-    <link rel="manifest" href=@Assets["/favicon/site.webmanifest"]>
-
-    <script src=@Assets["https://cdn.userway.org/widget.js"] data-account="8ya325ia7z"></script>
-
-    @DxResourceManager.RegisterScripts()
     <link rel="stylesheet" href=@Assets["css/site.css"] />
     <link href=@Assets["U3A.styles.css"] rel="stylesheet" />
+    <link rel="manifest" href=@Assets["/favicon/site.webmanifest"]>
 
     <ImportMap />
+
+    @DxResourceManager.RegisterScripts()
+    <script src=@Assets["https://cdn.userway.org/widget.js"] data-account="8ya325ia7z"></script>
 
     <HeadOutlet @rendermode="@PageRenderMode" />
 
