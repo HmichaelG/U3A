@@ -25,7 +25,7 @@ else
 {
 
     <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-                                 DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+    DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
     <Progress @ref="@ProgressBar" />
 
     <MessageBox @ref="@messageBox" />
@@ -35,19 +35,19 @@ else
 
     <AdHocAttendanceMnt @ref="adHocAttendanceMnt" AvailablePersons=Persons IsLargerLayout=@(IsLargerLayout()) />
     <NewDateDialog @ref="@newDateDialog"
-                   NewDateTime="@newClassDate"
-                   MaxDateTime="@maxDate"
-                   MinDateTime="@SelectedTerm.StartDate" />
+    NewDateTime="@newClassDate"
+    MaxDateTime="@maxDate"
+    MinDateTime="@SelectedTerm.StartDate" />
 
     <DxFlyout @bind-IsOpen=IsFlyoutOpen
-              PositionTarget="@FlyoutTargetID"
-              Position="FlyoutPosition.Left"
-              FitToRestriction=false
-              CloseMode="FlyoutCloseMode.Close"
-              HeaderVisible="true"
-              HeaderText="@HeaderContent"
-              Width="max(25vw, 250px)"
-              PreventCloseOnPositionTargetClick="false">
+    PositionTarget="@FlyoutTargetID"
+    Position="FlyoutPosition.Left"
+    FitToRestriction=false
+    CloseMode="FlyoutCloseMode.Close"
+    HeaderVisible="true"
+    HeaderText="@HeaderContent"
+    Width="max(25vw, 250px)"
+    PreventCloseOnPositionTargetClick="false">
         <BodyTemplate>
             <div class="card">
                 <div class="card-body">
@@ -67,15 +67,15 @@ else
                 <div class="input-group my-2">
                     <div class="flex-grow-1">Class Date</div>
                     <DxComboBox @ref="@DateComboBox" Data="@ClassDates" CssClass="flex-grow-4"
-                                AllowUserInput=false
-                                Enabled="@dateComboEnabled"
-                                NullText="@dateComboNullText"
-                                TextFieldName="@nameof(ClassDate.ClassDateName)"
-                                Value="@selectedDate"
-                                ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))">
+                    AllowUserInput=false
+                    Enabled="@dateComboEnabled"
+                    NullText="@dateComboNullText"
+                    TextFieldName="@nameof(ClassDate.ClassDateName)"
+                    Value="@selectedDate"
+                    ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))">
                         <Buttons>
                             <DxEditorButton Tooltip="Add an un-schedulled class"
-                                            IconCssClass="bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
+                            IconCssClass="bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
                         </Buttons>
                     </DxComboBox>
                 </div>
@@ -85,48 +85,48 @@ else
                 <div class="row align-content-start">
                     <ContextHelpTitle Title="Class Attendance" HelpTopic="Class-Attendance.html" />
                 </div>
-                    <div class="rwo w-100 ms-4">
-                        Mark the class attendance roll.
-                    </div>
+                <div class="rwo w-100 ms-4">
+                    Mark the class attendance roll.
+                </div>
                 <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
-                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                                   ExpandedChanged="@(async () => {areDetailsExpanded = !areDetailsExpanded;
+                ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
+                ExpandedChanged="@(async () => {areDetailsExpanded = !areDetailsExpanded;
                                                                 await SetGridHeight();
                                                             })">
                     <DxFormLayoutItem Caption="Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms"
-                                       @bind-SelectedTerm="@SelectedTerm"
-                                       @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(SelectedTerm)) />
+                        @bind-SelectedTerm="@SelectedTerm"
+                        @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(SelectedTerm)) />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Course" ColSpanMd="12">
                         <DxComboBox Data="@courses"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    Enabled="@courseComboEnabled"
-                                    NullText="@courseComboNullText"
-                                    SearchMode="ListSearchMode.AutoSearch"
-                                    ListRenderMode="ListRenderMode.Virtual"
-                                    TextFieldName="@nameof(Course.Name)"
-                                    Value="@SelectedCourse"
-                                    ValueChanged="@((Course course) => SelectedCourseChanged(course))">
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                        Enabled="@courseComboEnabled"
+                        NullText="@courseComboNullText"
+                        SearchMode="ListSearchMode.AutoSearch"
+                        ListRenderMode="ListRenderMode.Virtual"
+                        TextFieldName="@nameof(Course.Name)"
+                        Value="@SelectedCourse"
+                        ValueChanged="@((Course course) => SelectedCourseChanged(course))">
                         </DxComboBox>
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Class" ColSpanMd="8">
                         <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
-                                    AllowUserInput=false
-                                    TextFieldName="@nameof(Class.ClassSummary)"
-                                    Value="@SelectedClass"
-                                    ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
+                        AllowUserInput=false
+                        TextFieldName="@nameof(Class.ClassSummary)"
+                        Value="@SelectedClass"
+                        ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Class Date" ColSpanMd="4">
                         <DxComboBox @ref="@DateComboBox" Data="@ClassDates"
-                                    Enabled="@dateComboEnabled"
-                                    NullText="@dateComboNullText"
-                                    TextFieldName="@nameof(ClassDate.ClassDateName)"
-                                    Value="@selectedDate"
-                                    ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))">
+                        Enabled="@dateComboEnabled"
+                        NullText="@dateComboNullText"
+                        TextFieldName="@nameof(ClassDate.ClassDateName)"
+                        Value="@selectedDate"
+                        ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))">
                             <Buttons>
                                 <DxEditorButton Tooltip="Add an un-schedulled class"
-                                                IconCssClass="bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
+                                IconCssClass="bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
                             </Buttons>
                         </DxComboBox>
                     </DxFormLayoutItem>
@@ -136,37 +136,37 @@ else
             @quickMessage
 
             <DxGrid Data="@ClassAttendance" @ref=@mainGrid id="myGrid"
-                    ShowSearchBox=true
-                    CustomizeElement="OnCustomizeElement"
-                    CssClass="grid-height"
-                    ShowAllRows="true"
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    KeyFieldName="ID"
-                    ValidationEnabled="true"
-                    SelectionMode="GridSelectionMode.Multiple"
-                    AllowSelectRowByClick="true"
-                    @bind-SelectedDataItems="SelectedDataItems"
-                    EditMode="GridEditMode.PopupEditForm"
-                    EditModelSaving="Grid_EditModelSaving">
-                    <ToolbarTemplate>
+            ShowSearchBox=true
+            CustomizeElement="OnCustomizeElement"
+            CssClass="grid-height"
+            ShowAllRows="true"
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            KeyFieldName="ID"
+            ValidationEnabled="true"
+            SelectionMode="GridSelectionMode.Multiple"
+            AllowSelectRowByClick="true"
+            @bind-SelectedDataItems="SelectedDataItems"
+            EditMode="GridEditMode.PopupEditForm"
+            EditModelSaving="Grid_EditModelSaving">
+                <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid Visible="@(IsLargeLayout || IsXtraLargeLayout)" LayoutKey="{9C4F6177-3FAB-407A-A515-C1B30F04D836}"
-                                 HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
-                                 HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
+                    HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
+                    HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
                         <CustomButtonContent>
                             <DxToolbarItem Text="Communicate" Visible="@(IsLargeLayout || IsXtraLargeLayout)"
-                                           Tooltip="Send email and/or SMS to students"
-                                           Click="@OnCommunicate"
-                                           RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0 ms-2" />
+                            Tooltip="Send email and/or SMS to students"
+                            Click="@OnCommunicate"
+                            RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0 ms-2" />
                         </CustomButtonContent>
                     </GridToolbar>
-                    </ToolbarTemplate>
+                </ToolbarTemplate>
                 <Columns>
                     <DxGridSelectionColumn Width="1rem" />
                     <DxGridCommandColumnEx @ref="GridCommandColumn"
-                                           EditButtonVisible="true" NewButtonVisible="false" DeleteButtonVisible="false" />
+                    EditButtonVisible="true" NewButtonVisible="false" DeleteButtonVisible="false" />
                     <DxGridDataColumn Caption="Name"
-                                      FieldName="Person.FullName"
-                                      Width="12rem">
+                    FieldName="Person.FullName"
+                    Width="12rem">
                         <CellDisplayTemplate>
                             @{
                                 var status = (AttendClassStatusType)((AttendClass)context.DataItem).AttendClassStatusID;
@@ -190,11 +190,11 @@ else
 
                     <DxGridDataColumn Caption="AdHoc?" FieldName="IsAdHoc" Width="5rem" />
                     <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
-                                      Width="5rem" Visible="@settings.RequireVaxCertificate" />
+                    Width="5rem" Visible="@settings.RequireVaxCertificate" />
                     <DxGridDataColumn Caption="Attendance"
-                                      FieldName="AttendClassStatus.Status"
-                                      Width="10rem"
-                                      Visible=@(IsLargerLayout()) />
+                    FieldName="AttendClassStatus.Status"
+                    Width="10rem"
+                    Visible=@(IsLargerLayout()) />
                     <DxGridDataColumn Caption="Comment" FieldName="Comment" />
                     <DxGridDataColumn Caption="Home" FieldName="Person.AdjustedHomePhone" Visible=false />
                     <DxGridDataColumn Caption="Mobile" FieldName="Person.AdjustedMobile" Visible=false />
@@ -213,8 +213,8 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Class Attendance" ColSpanMd="12">
                             <DxComboBox Data="ClassAttendanceStatus"
-                                        @bind-Value="@editItem.AttendClassStatus"
-                                        TextFieldName="@nameof(AttendClassStatus.Status)">
+                            @bind-Value="@editItem.AttendClassStatus"
+                            TextFieldName="@nameof(AttendClassStatus.Status)">
                             </DxComboBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
@@ -250,12 +250,12 @@ else
                 </div>
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
-                               CssClass="mt-1 border" ColSpanSm="12">
+            CssClass="mt-1 border" ColSpanSm="12">
                 <div class="pt-4 px-2 text-info"><b>Quick RollCall</b></div>
                 <DxFormLayoutItem Caption="Attendance?" ColSpanSm="12">
                     <DxComboBox Data="ClassAttendanceStatus"
-                                @bind-Value="QuickSelectionStatus"
-                                TextFieldName="@nameof(AttendClassStatus.Status)">
+                    @bind-Value="QuickSelectionStatus"
+                    TextFieldName="@nameof(AttendClassStatus.Status)">
                     </DxComboBox>
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Comment" ColSpanSm="12">
@@ -263,30 +263,30 @@ else
                 </DxFormLayoutItem>
                 <div class="m-2">
                     <DxButton Text="Set Selection" CssClass="col-12 mt-1"
-                              Id="SetSelectionStatus"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionStatusAsync" />
+                    Id="SetSelectionStatus"
+                    RenderStyleMode="ButtonRenderStyleMode.Outline"
+                    RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionStatusAsync" />
                     <DxButton Text="Apply Student Leave" CssClass="col-12 mt-1"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
+                    RenderStyleMode="ButtonRenderStyleMode.Outline"
+                    RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
                     <DxButton Text="Reset Selection" CssClass="col-12 mt-1"
-                              Id="ResetSelection"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@OnResetSelection" />
+                    Id="ResetSelection"
+                    RenderStyleMode="ButtonRenderStyleMode.Outline"
+                    RenderStyle="ButtonRenderStyle.Primary" Click="@OnResetSelection" />
                 </div>
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
-                               CssClass="mt-1 border">
+            CssClass="mt-1 border">
                 <div class="pt-3 px-2 text-info"><b>Ad Hoc Attendees</b></div>
                 <div class="m-2">
                     <DxButton Text="Add Ad Hoc Attendee(s)" CssClass="col-12 mt-1"
-                              Id="AddAdHocAttendee"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
+                    Id="AddAdHocAttendee"
+                    RenderStyleMode="ButtonRenderStyleMode.Outline"
+                    RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
                     <DxButton Text="Delete Ad Hoc Attendee(s)" CssClass="col-12 mt-1"
-                              Id="DeleteAdHocAttendee"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
+                    Id="DeleteAdHocAttendee"
+                    RenderStyleMode="ButtonRenderStyleMode.Outline"
+                    RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
                 </div>
             </DxFormLayoutGroup>
         </div>
@@ -315,32 +315,32 @@ else
                     <div class="flex-grow-1">Comment</div>
                     <div class="flex-grow-4">
                         <DxTextBox @bind-Text="QuickAttendanceComment"
-                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                     </div>
                 </div>
                 <div class="input-group">
                     <DxButton Text="Set Selected" CssClass="flex-grow-1"
-                              Id="SetSelected"
-                              IconCssClass="bi bi-mortarboard menu-icon"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="SetSmallScreenSelectionStatusAsync" />
+                    Id="SetSelected"
+                    IconCssClass="bi bi-mortarboard menu-icon"
+                    RenderStyleMode="ButtonRenderStyleMode.Outline"
+                    RenderStyle="ButtonRenderStyle.Primary" Click="SetSmallScreenSelectionStatusAsync" />
                 </div>
             </div>
             <div class="input-group px-2">
                 <DxButton Text="+ Ad Hoc" CssClass="flex-grow-1"
-                          Id="AddAdHoc"
-                          IconCssClass="bi bi-person-add menu-icon"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
+                Id="AddAdHoc"
+                IconCssClass="bi bi-person-add menu-icon"
+                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
                 <DxButton Text="- Ad Hoc" CssClass="flex-grow-1"
-                          Id="DeleteAdHoc"
-                          IconCssClass="bi bi-person-dash menu-icon"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
+                Id="DeleteAdHoc"
+                IconCssClass="bi bi-person-dash menu-icon"
+                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
                 <DxButton Text="Apply Leave" CssClass="flex-grow-1"
-                          IconCssClass="bi bi-airplane menu-icon"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
+                IconCssClass="bi bi-airplane menu-icon"
+                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
             </div>
         }
     </DxFormLayout>
@@ -348,17 +348,17 @@ else
 }
 <style>
     .bg-muted {
-        --bs-bg-opacity: 0.1;
+    --bs-bg-opacity: 0.1;
     }
 
     .grid-height {
-        height: @gridHeight;
+    height: @gridHeight;
     }
 
     .removeWrapping {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     }
 
 </style>
@@ -504,7 +504,16 @@ else
 
     async Task SetGridHeight()
     {
-        var offset = (IsLargerLayout()) ? (IsAdminPortal || IsMemberPortal) ? 70 : 15 : 0.4;
+        double offset = 15; // !IsAdminPortal && !IsMemberPortal
+        if (IsLargerLayout())
+        {
+            if (IsAdminPortal) { offset = (ws.UseTopMenu) ? 10 : 25; }
+            if (IsMemberPortal) { offset = 70; }
+        }
+        else
+        {
+            offset = 0.4;
+        }
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
         if (newHeight != gridHeight) 
         { 

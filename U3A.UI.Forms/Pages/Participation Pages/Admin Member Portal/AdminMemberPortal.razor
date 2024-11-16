@@ -21,37 +21,76 @@ else
     <CascadingValue Value="@LoginState">
 
         <MessageBox @ref="@messageBox" />
-        <MessageBox @ref="@messageBox" />
 
-        <DxLoadingPanel @bind-Visible="isProcessing"
-                        IsContentBlocked="true"
-                        ApplyBackgroundShading="true"
-                        IndicatorAreaVisible="false"
-                        Text="Processing Eway receipts...">
-            <DxTabs RenderMode="TabsRenderMode.OnDemand" CssClass="tabs-style">
-                <DxTabPage Text="Process On Behalf Of">
-                    <DxDrawer @bind-IsOpen="@isDrawerOpen"
-                              CssClass="drawer-style"
-                              Mode="DrawerMode.Shrink"
-                              Position="DrawerPosition.Right"
-                              PanelWidth="20rem">
-                        <TargetContent>
+        <DxToolbar style="border-bottom:solid; border-color:whitesmoke;">
+            <Items>
+                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.ProcessOnBehalfOf)"
+                RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
+                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                Text="Process member" IconCssClass="bi bi-person" />
+                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
+                RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
+                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                Text="What's On Today'" IconCssClass="bi bi-clock" />
+                <DxToolbarItem RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
+                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                Text="Attendance" IconCssClass="bi bi-person-check">
+                    <Items>
+                        <DxToolbarItem Click="@(() => buttonClick = buttonClicks.RecordAttendance)"
+                        RenderStyle="ButtonRenderStyle.Secondary"
+                        RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                        Text="Record Attendance" IconCssClass="bi bi-emoji-smile" />
+                        <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceNotRecorded)"
+                        RenderStyle="ButtonRenderStyle.Secondary"
+                        RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                        Text="Attendance Not Recorded" IconCssClass="bi bi-emoji-angry" />
+                        <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceSummary)"
+                        RenderStyle="ButtonRenderStyle.Secondary"
+                        RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                        Text="Attendance Summary" IconCssClass="bi bi-columns" />
+                        <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceAnalyisis)"
+                        RenderStyle="ButtonRenderStyle.Secondary"
+                        RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                        Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
+                    </Items>
+                </DxToolbarItem>
+                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
+                RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
+                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                Text="Leader Report" IconCssClass="bi bi-printer" />
+                <DxToolbarItem Click="@(() => isDrawerOpen = !isDrawerOpen)"
+                RenderStyle="ButtonRenderStyle.Light" CssClass="mb-1"
+                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                Text="Calendar" IconCssClass="bi bi-calendar"
+                Alignment="ToolbarItemAlignment.Right" />
+            </Items>
+        </DxToolbar>
+        <DxDrawer @bind-IsOpen="@isDrawerOpen"
+        CssClass="drawer-style"
+        Mode="DrawerMode.Shrink"
+        Position="DrawerPosition.Right"
+        PanelWidth="20rem">
+            <TargetContent>
+                <DxLoadingPanel @bind-Visible="isProcessing"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Processing Eway receipts...">
+                    @switch (buttonClick)
+                    {
+                        case buttonClicks.ProcessOnBehalfOf:
                             <DxFormLayout CssClass="my-2">
-                                <div class="calendar-button-style">
-                                    <DxButton Text="Calendar"
-                                              IconCssClass="bi bi-calendar"
-                                              RenderStyleMode="ButtonRenderStyleMode.Text"
-                                              Click="@(() => isDrawerOpen=true)" />
-                                </div>
                                 <CollapsableContent AlertType="none" CssClass="w-100"
-                                                    ShowCollapseButton=false
-                                                    OnContentExpanded="@(async() => await OnClearSelection())"
-                                                    @ref=@collapsableContent>
+                                ShowCollapseButton=false
+                                OnContentExpanded="@(async() => await OnClearSelection())"
+                                @ref=@collapsableContent>
                                     <ContentTemplate>
                                         <div class="@((isDrawerOpen) ? formWidthCalendarOpen : formWidthCalendarClosed)">
                                             <div class="h3 text-center">Member Portal (Administration)</div>
                                             <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
-                                            <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" ColSpanMd="12" Context="groupContext">
+                                            <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals" 
+                                                                Visible="@(!isAccordianShowingMemberDetails)"
+                                                                ColSpanMd="12" Context="groupContext">
                                                 <HeaderContentTemplate>
                                                     <div class="d-flex input-group">
                                                         <div class="text-start flex-grow-1">
@@ -65,8 +104,8 @@ else
                                                 <Items>
                                                     <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
                                                         <PersonsComboBox People="@people" @bind-SelectedPerson="@selectedPerson"
-                                                                         ShowProcessButton="true"
-                                                                         OnProcessButtonClicked="async(Person value) => {
+                                                        ShowProcessButton="true"
+                                                        OnProcessButtonClicked="async(Person value) => {
                                                                                                     selectedPerson = value;
                                                                                                     await OnProcess();}" />
                                                     </DxFormLayoutItem>
@@ -79,30 +118,32 @@ else
                                 {
                                     <div class="mt-1 w-100">
                                         <MemberPortal IsAdminMemberPortal="true"
-                                                      OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
+                                        OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
                                     </div>
                                 }
                                 else
                                 {
                                     <div class="@((isDrawerOpen) ? formWidthCalendarOpen : formWidthCalendarClosed)">
                                         <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
-                                                     ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
+                                        ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
                                             <Items>
-                                                <DxAccordionItem Text="Received Today" Expanded="true" Context="receiptContext">
+                                                <DxAccordionItem Text="Received Today"
+                                                                 Expanded="true"
+                                                Context="receiptContext">
                                                     <ContentTemplate>
                                                         <div class="m-2">
                                                             <DxGrid Data="@RecevivedToday" CssClass="member-grid-height"
-                                                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                                                    UnboundColumnData="Grid_UnboundColumnData"
-                                                                    TextWrapEnabled="false"
-                                                                    ShowFilterRow="false"
-                                                                    ShowAllRows="true"
-                                                                    KeyFieldName="ID">
+                                                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                                            UnboundColumnData="Grid_UnboundColumnData"
+                                                            TextWrapEnabled="false"
+                                                            ShowFilterRow="false"
+                                                            ShowAllRows="true"
+                                                            KeyFieldName="ID">
                                                                 <Columns>
                                                                     <DxGridDataColumn Width="5rem" Caption="Time"
-                                                                                      FieldName="CreatedTime"
-                                                                                      DisplayFormat="hh:mm tt"
-                                                                                      UnboundType="GridUnboundColumnType.DateTime" />
+                                                                    FieldName="CreatedTime"
+                                                                    DisplayFormat="hh:mm tt"
+                                                                    UnboundType="GridUnboundColumnType.DateTime" />
                                                                     <DxGridDataColumn Width="10rem" Caption="Name" FieldName="Person.FullName" />
                                                                     <DxGridDataColumn Width="12rem" Caption="Description" FieldName="Description" />
                                                                     <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
@@ -111,15 +152,17 @@ else
                                                                 </Columns>
                                                                 <TotalSummary>
                                                                     <DxGridSummaryItem FieldName="Amount"
-                                                                                       SummaryType="GridSummaryItemType.Sum"
-                                                                                       FooterColumnName="Amount"
-                                                                                       ValueDisplayFormat="c2" />
+                                                                    SummaryType="GridSummaryItemType.Sum"
+                                                                    FooterColumnName="Amount"
+                                                                    ValueDisplayFormat="c2" />
                                                                 </TotalSummary>
                                                             </DxGrid>
                                                         </div>
                                                     </ContentTemplate>
                                                 </DxAccordionItem>
-                                                <DxAccordionItem Text="Add/Edit Member Details" Expanded="false" Context="memberContext">
+                                                <DxAccordionItem Text="Add/Edit Member Details" 
+                                                                    ExpandedChanged="@((bool expanded) => isAccordianShowingMemberDetails = expanded)"
+                                                Expanded="false" Context="memberContext">
                                                     <ContentTemplate>
                                                         <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
                                                         <div class="mx-2"><PersonMnt IsEmbedded="true" /></div>
@@ -130,64 +173,57 @@ else
                                     </div>
                                 }
                             </DxFormLayout>
-                        </TargetContent>
-                        <HeaderTemplate>
-                            <div class="calendar-button-style m-0 p-0">
-                                <DxButton Text="Exit"
-                                          IconCssClass="bi bi-calendar"
-                                          RenderStyleMode="ButtonRenderStyleMode.Text"
-                                          Click="@(() => isDrawerOpen=false)" />
-                            </div>
-                        </HeaderTemplate>
-                        <BodyTemplate>
-                            <ClassCalendar DisplayOffset="@((ws.UseTopMenu) ? 10 : 8)" />
-                        </BodyTemplate>
-                    </DxDrawer>
-                </DxTabPage>
-                <DxTabPage Text="What's on today?">
-                    <CourseSchedule IsPortal=true />
-                </DxTabPage>
-                <DxTabPage Text="Record Attendance">
-                    <AttendClassMnt />
-                </DxTabPage>
-                <DxTabPage Text="Attendance Summary">
-                    <CourseAttendanceSummary />
-                </DxTabPage>
-                <DxTabPage Text="Attendance Not Recorded">
-                    <AttendanceNotRecordedSummary />
-                </DxTabPage>
-                <DxTabPage Text="Attendance Analysis">
-                    <AttendanceAnalysis />
-                </DxTabPage>
-                <DxTabPage Text="Leader Report" TabIconCssClass="bi bi-printer">
-                    <AdminLeaderReport />
-                </DxTabPage>
-            </DxTabs>
-        </DxLoadingPanel>
+                            break;
+
+                        case buttonClicks.WhatsOnToday:
+                            <CourseSchedule IsPortal=true />
+                            break;
+
+                        case buttonClicks.RecordAttendance:
+                            <AttendClassMnt IsAdminPortal="true" />
+                            break;
+
+                        case buttonClicks.AttendanceNotRecorded:
+                            <AttendanceNotRecordedSummary />
+                            break;
+
+                        case buttonClicks.AttendanceSummary:
+                            <CourseAttendanceSummary />
+                            break;
+
+                        case buttonClicks.AttendanceAnalyisis:
+                            <AttendanceAnalysis />
+                            break;
+
+                        case buttonClicks.AdminLeaderReport:
+                            <AdminLeaderReport />
+                            break;
+                    }
+
+                </DxLoadingPanel>
+            </TargetContent>
+            <BodyTemplate>
+                <ClassCalendar DisplayOffset="@((ws.UseTopMenu) ? 6.7 : 4.7)" />
+            </BodyTemplate>
+        </DxDrawer>
     </CascadingValue>
 }
 <style>
 
     .member-selection-width {
-        width: 98%;
-    }
-
-    .calendar-button-style {
-        position: absolute;
-        top: 0;
-        right: 0;
+    width: 98%;
     }
 
     .member-grid-height {
-        height: 40dvh;
+    height: 40dvh;
     }
 
     .drawer-style {
-        height: calc(100dvh - @((ws.UseTopMenu) ? "6rem" : "4rem") );
+    height: calc(100dvh - @((ws.UseTopMenu) ? "6rem" : "3.25rem") );
     }
 
     .tabs-style {
-        width: 98%;
+    width: 98%;
     }
 
 </style>
@@ -202,8 +238,10 @@ else
     bool IsReady;
     bool isSelected = false;
     bool isProcessing;
+    bool isAccordianShowingMemberDetails { get; set; }
     static bool isDrawerOpen = false;
     string drawerHeightAdjustment;
+    buttonClicks buttonClick = buttonClicks.ProcessOnBehalfOf;
 
     MessageBox? messageBox;
     U3ADbContext dbc { get; set; }
@@ -215,6 +253,17 @@ else
     CollapsableContent? collapsableContent;
     string formWidthCalendarOpen = "col col-12 mt-1 mx-auto";
     string formWidthCalendarClosed = "col col-12 px-lg-0 col-lg-10 col-xl-8 mt-1 px-1 mx-auto";
+
+    enum buttonClicks
+    {
+        ProcessOnBehalfOf,
+        WhatsOnToday,
+        RecordAttendance,
+        AttendanceNotRecorded,
+        AttendanceSummary,
+        AttendanceAnalyisis,
+        AdminLeaderReport,
+    }
 
     protected override async Task OnInitializedAsync()
     {

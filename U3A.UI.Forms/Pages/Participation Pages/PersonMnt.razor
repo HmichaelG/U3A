@@ -64,7 +64,7 @@
             </DxTabs>
         </div>
 
-        <FullScreen>
+        <FullScreen DisplayOffset="@((IsEmbedded) ? 15 : 8)">
             <ContentTemplate>
                 <DxGrid Data="@Persons" @ref=@mainGrid
                         @bind-SelectedDataItems="@SelectedDataItems"
