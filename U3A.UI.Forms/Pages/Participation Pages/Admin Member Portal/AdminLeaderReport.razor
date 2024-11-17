@@ -37,7 +37,8 @@ else
                     <CollapsableContent DismissKey="{674F95B8-8507-40BB-9813-C7253886F15D}"
                         AlertText=@(@"<p>Creating a PDF report places a heavy burden on the server.<br />
                         Please be a good digital citizen and use judiciously.</p>")
-                                        OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+                                OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+                                OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
 
                     <DxFormLayout>
                         <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
@@ -54,8 +55,8 @@ else
 
                     <DxFormLayout>
                         <div class="col-10 px-4">
-                            <FullScreen DisplayOffset="18">
-                                <ContentTemplate>
+                    <FullScreen @ref=@fullScreen DisplayOffset="@contentSize">
+                        <ContentTemplate>
                                     <DxGrid Data="@Classes" @ref=@mainGrid CssClass="grid-height" id="myGrid"
                                             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                                             ShowFilterRow="false"
@@ -96,20 +97,14 @@ else
                 </div>
     }
 }
-<style>
-    .grid-height {
-        height: calc(100dvh - @(ws.UseTopMenu ? "19rem" : "15rem"));
-    }
 
-    .viewer-height {
-    @* height: calc(100vh - 5rem) !important; *@
-    }
-
-</style>
 
 
 @code {
     bool IsReady;
+    FullScreen? fullScreen;
+    int contentSize;
+
 
     List<Class> Classes { get; set; } = new List<Class>();
     List<Term> terms { get; set; }
@@ -250,6 +245,12 @@ else
             var recipient = reportRecipients.Where(x => x.Class.ID == Class.ID).OrderBy(x => x.SortOrder).FirstOrDefault();
             e.Value = recipient?.Person.FullName;
         }
+    }
+
+    void OnContentChange(bool IsDismissed)
+    {
+        contentSize = (IsDismissed) ? 9 : 16;
+        StateHasChanged();
     }
 
     public void Dispose()

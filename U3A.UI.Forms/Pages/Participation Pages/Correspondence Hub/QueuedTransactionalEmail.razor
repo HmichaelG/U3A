@@ -102,14 +102,15 @@ else
 </style>
 
 @code {
-    int contentSize;
     bool IsReady;
     private List<SendMail> SendMail { get; set; }
     IReadOnlyList<object>? SelectedDataItems { get; set; }
     ProFormaReportFactory reportFactory;
     MessageBox? messageBox;
     string? messageBoxWidth;
+
     FullScreen? fullScreen;
+    int contentSize;
 
     IGrid? mainGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }
