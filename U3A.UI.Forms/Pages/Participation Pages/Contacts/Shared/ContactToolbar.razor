@@ -1,0 +1,67 @@
+﻿
+@namespace U3A.UI.Contact.Shared
+
+<GridToolbar LinkedGrid=@LinkedGrid LayoutKey="@LayoutKey"
+            SpreadsheetHeaderRows="2">
+    <CustomButtonContent>
+        <DxToolbarItem BeginGroup="true" Text="Tag Options"
+                       IconCssClass="bi bi-bookmark"
+                       Alignment="ToolbarItemAlignment.Right"
+                       RenderStyle="ButtonRenderStyle.Info"
+                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained" >
+            <Items>
+                <DxToolbarItem IconCssClass="bi bi-bookmark-plus" Name="AddTags"
+                               Text="Add Tags to Contacts"
+                               Click=@OnAddTagsClicked
+                               Tooltip="Add tags to the selected Contacts">
+                </DxToolbarItem>
+                <DxToolbarItem IconCssClass="bi bi-bookmark-dash" Name="RemoveTags"
+                               Text="Remove Tags from Contacts"
+                               Click=@OnRemoveTagsClicked
+                               Tooltip="Remove tags from the selected Contacts">
+                </DxToolbarItem>
+                <DxToolbarItem IconCssClass="bi bi-bookmark-check" 
+                               Name="SelectByTags"
+                               Text="Select Contacts By Tag"
+                               BeginGroup=true
+                               Click=@OnSelectByTagClicked
+                               Tooltip="Select Contacts by their assigned tag">
+                </DxToolbarItem>
+            </Items>
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-trash" Name="Delete" Text="Delete"
+                       BeginGroup=true
+                       Click=@OnDeleteClicked
+                       RenderStyle="ButtonRenderStyle.Danger"
+                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                       Alignment="ToolbarItemAlignment.Right"
+                       Tooltip="Delete the selected Contacts">
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+                       BeginGroup=true
+                       Click=@OnCommunicateClicked
+                       RenderStyle="ButtonRenderStyle.Primary"
+                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                       Alignment="ToolbarItemAlignment.Right"
+                       Tooltip="Send email and/or SMS to Contacts">
+        </DxToolbarItem>
+    </CustomButtonContent>
+</GridToolbar>
+
+@code {
+    [Parameter, EditorRequired]
+    public IGrid LinkedGrid { get; set; }
+    [Parameter, EditorRequired]
+    public string LayoutKey { get; set; }
+
+    [Parameter]
+    public EventCallback OnCommunicateClicked { get; set; }
+    [Parameter]
+    public EventCallback OnDeleteClicked { get; set; }
+    [Parameter]
+    public EventCallback OnAddTagsClicked { get; set; }
+    [Parameter]
+    public EventCallback OnRemoveTagsClicked { get; set; }
+    [Parameter]
+    public EventCallback OnSelectByTagClicked { get; set; }
+}
