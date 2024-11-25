@@ -98,7 +98,7 @@ else
                         <DxFormLayoutItem Caption="Amount" ColSpanMd="12">
                             <DxMaskedInput @bind-Value="@editItem.Amount" Mask="@NumericMask.Currency" />
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Include as Membershyp Fee?" ColSpanMd="12">
+                        <DxFormLayoutItem Caption="Include as Membership Fee?" ColSpanMd="12">
                             <DxCheckBox Enabled=@(!(editItem.Person is Contact)) 
                                 @bind-Checked="@editItem.IsMembershipFee" />
                         </DxFormLayoutItem>

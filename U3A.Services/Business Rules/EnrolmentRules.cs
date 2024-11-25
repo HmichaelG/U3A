@@ -698,9 +698,9 @@ namespace U3A.BusinessRules
                 {
                     //future term
                     thisYear = term.Year;
-                    thisTermNo = c.TermNumber;
                     isFutureTerm = true;
-                    thisTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.Year == term.Year && x.TermNumber == thisTermNo);
+                    thisTerm = await BusinessRule.FindTermByDateAsync(dbc,c.StartDate.Value);
+                    thisTermNo = thisTerm.TermNumber;
                 }
                 var course = await dbc.Course.FindAsync(c.CourseID);
                 if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)

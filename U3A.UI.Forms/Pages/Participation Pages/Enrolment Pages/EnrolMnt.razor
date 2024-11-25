@@ -21,24 +21,24 @@ else
         <TransferOrCopyEnrolment @ref="@transferOrCopyEnrolment" />
 
         <QuickEnrolment @ref="quickEnrolment"
-                        AvailablePersons=Persons
-                        IsWaitListEnabled=@((selectedTerm?.Comparer <= currentTerm?.Comparer)) />
+        AvailablePersons=Persons
+        IsWaitListEnabled=@((selectedTerm?.Comparer <= currentTerm?.Comparer)) />
 
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
         <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-                                     DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+        DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
         <Progress @ref="@ProgressBar" />
 
         <DxFlyout @bind-IsOpen=IsFlyoutOpen
-                  PositionTarget="@FlyoutTargetID"
-                  Position="FlyoutPosition.Left"
-                  FitToRestriction=false
-                  CloseMode="FlyoutCloseMode.Close"
-                  HeaderVisible="true"
-                  HeaderText="@HeaderContent"
-                  Width="max(25vw, 250px)"
-                  PreventCloseOnPositionTargetClick="false">
+        PositionTarget="@FlyoutTargetID"
+        Position="FlyoutPosition.Left"
+        FitToRestriction=false
+        CloseMode="FlyoutCloseMode.Close"
+        HeaderVisible="true"
+        HeaderText="@HeaderContent"
+        Width="max(25vw, 250px)"
+        PreventCloseOnPositionTargetClick="false">
             <BodyTemplate>
                 <div class="card">
                     <div class="card-body">
@@ -57,69 +57,69 @@ else
                     Register participants in courses and/or activities offered in the selected term.
                 </div>
                 <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
-                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                                   ExpandedChanged="@(async () => {
+                ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
+                ExpandedChanged="@(async () => {
                                                                     areDetailsExpanded = !areDetailsExpanded;
                                                                     fullScreen.RefreshLayout(!areDetailsExpanded);
                                                                     })">
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms"
-                                       @bind-SelectedTerm="@selectedTerm"
-                                       @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+                        @bind-SelectedTerm="@selectedTerm"
+                        @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Course To Enrol" ColSpanMd="12">
                         <DxComboBox Data="@courses"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    Enabled="@courseComboEnabled"
-                                    NullText="@courseComboNullText"
-                                    SearchMode="ListSearchMode.AutoSearch"
-                                    ListRenderMode="ListRenderMode.Virtual"
-                                    TextFieldName="@nameof(Course.Name)"
-                                    Value="@selectedCourse"
-                                    ValueChanged="@((Course course) => SelectedCourseChanged(course))">
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                        Enabled="@courseComboEnabled"
+                        NullText="@courseComboNullText"
+                        SearchMode="ListSearchMode.AutoSearch"
+                        ListRenderMode="ListRenderMode.Virtual"
+                        TextFieldName="@nameof(Course.Name)"
+                        Value="@selectedCourse"
+                        ValueChanged="@((Course course) => SelectedCourseChanged(course))">
                             <DxListEditorColumn FieldName="@nameof(Course.ConversionID)"
-                                                Caption="No"
-                                                Width="25%" />
+                            Caption="No"
+                            Width="25%" />
                             <DxListEditorColumn FieldName="@nameof(Course.Name)"
-                                                Caption="Course"
-                                                Width="75%" />
+                            Caption="Course"
+                            Width="75%" />
                         </DxComboBox>
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Class To Enrol" ColSpanMd="12">
                         <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
-                                    AllowUserInput=false
-                                    TextFieldName="@nameof(Class.ClassSummary)"
-                                    Value="@selectedClass"
-                                    ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
+                        AllowUserInput=false
+                        TextFieldName="@nameof(Class.ClassSummary)"
+                        Value="@selectedClass"
+                        ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
 
                 <FullScreen @ref="@fullScreen" DisplayOffset="19">
                     <ContentTemplate>
                         <DxGrid Data="@Enrolments" @ref=@mainGrid
-                                ShowAllRows="true"
-                                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                KeyFieldName="ID"
-                                ValidationEnabled="true"
-                                SelectionMode="GridSelectionMode.Multiple"
-                                UnboundColumnData="Grid_CustomUnboundColumnData"
-                                AllowSelectRowByClick="true"
-                                @bind-SelectedDataItems="SelectedDataItems"
-                                EditMode="GridEditMode.EditCell"
-                                KeyboardNavigationEnabled=true
-                                CustomizeEditModel="Grid_CustomizeEditModel"
-                                DataItemDeleting="Grid_DataItemDeleting"
-                                EditModelSaving="Grid_EditModelSaving">
+                        ShowAllRows="true"
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        KeyFieldName="ID"
+                        ValidationEnabled="true"
+                        SelectionMode="GridSelectionMode.Multiple"
+                        UnboundColumnData="Grid_CustomUnboundColumnData"
+                        AllowSelectRowByClick="true"
+                        @bind-SelectedDataItems="SelectedDataItems"
+                        EditMode="GridEditMode.EditCell"
+                        KeyboardNavigationEnabled=true
+                        CustomizeEditModel="Grid_CustomizeEditModel"
+                        DataItemDeleting="Grid_DataItemDeleting"
+                        EditModelSaving="Grid_EditModelSaving">
                             <ToolbarTemplate>
                                 <GridToolbar LinkedGrid=@mainGrid LayoutKey="{95A32121-B773-4562-A285-00E3B9378590}">
                                     <CustomButtonContent>
                                         <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                                                       BeginGroup=true
-                                                       Click=@OnCommunicate
-                                                       RenderStyle="ButtonRenderStyle.Primary"
-                                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                       Alignment="ToolbarItemAlignment.Right"
-                                                       Tooltip="Send email and/or SMS to participants">
+                                        BeginGroup=true
+                                        Click=@OnCommunicate
+                                        RenderStyle="ButtonRenderStyle.Primary"
+                                        RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                        Alignment="ToolbarItemAlignment.Right"
+                                        Tooltip="Send email and/or SMS to participants">
                                         </DxToolbarItem>
                                     </CustomButtonContent>
                                 </GridToolbar>
@@ -127,7 +127,7 @@ else
                             <Columns>
                                 <DxGridSelectionColumn Width="2rem" />
                                 <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem" NewButtonVisible="@(selectedCourse is not null)"
-                                                       EditButtonVisible="true" DeleteButtonVisible="true" />
+                                EditButtonVisible="true" DeleteButtonVisible="true" />
                                 <DxGridDataColumn Caption="Name" FieldName="Person.FullName" MinWidth="250">
                                     <CellEditTemplate>
                                         @{
@@ -139,30 +139,30 @@ else
                                 <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />
                                 <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
                                 <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
-                                                  Width="5rem" Visible="@settings.RequireVaxCertificate" />
+                                Width="5rem" Visible="@settings.RequireVaxCertificate" />
                                 <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialToBriefText" Width="4rem" />
                                 <DxGridDataColumn ReadOnly=true
-                                                  Visible=@(selectedCourse?.AllowMultiCampsuFrom != null)
-                                                  Caption="Visitor?"
-                                                  FieldName="Person.IsMultiCampusVisitor" />
+                                Visible=@(selectedCourse?.AllowMultiCampsuFrom != null)
+                                Caption="Visitor?"
+                                FieldName="Person.IsMultiCampusVisitor" />
                                 <DxGridDataColumn ReadOnly=true Caption="City" FieldName="Person.City" Visible=false />
                                 <DxGridDataColumn ReadOnly=true Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
                                 <DxGridDataColumn ReadOnly=true Caption="Email" FieldName="Person.Email" />
                                 <DxGridDataColumn ReadOnly=true Caption="Enrolled" FieldName="DateEnrolled"
-                                                  DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
+                                DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
                                 <DxGridDataColumn ReadOnly=true Caption="Joined" FieldName="Person.DateJoined"
-                                                  DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible=false />
+                                DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible=false />
                                 <DxGridDataColumn ReadOnly=true Caption="Created" FieldName="Created"
-                                                  DisplayFormat="{0:dd-MMM-yy HH:mm:ss}" Width="8rem" Visible="false" />
+                                DisplayFormat="{0:dd-MMM-yy HH:mm:ss}" Width="8rem" Visible="false" />
                                 <DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
                                 <DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
-                                                  Visible=@(selectedCourse?.CourseFeePerTerm > 0 || selectedCourse?.CourseFeePerYear > 0 )
-                                                  UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
+                                Visible=@(selectedCourse?.CourseFeePerTerm > 0 || selectedCourse?.CourseFeePerYear > 0 )
+                                UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
                             </Columns>
                             <GroupSummary>
                                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
-                                                   FieldName="FeesDue" ValueDisplayFormat="{0:c2}"
-                                                   FooterColumnName="FeesDue" />
+                                FieldName="FeesDue" ValueDisplayFormat="{0:c2}"
+                                FooterColumnName="FeesDue" />
                             </GroupSummary>
                             <TotalSummary>
                                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
@@ -205,8 +205,8 @@ else
                 <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
                     <div class="pt-3 px-2 text-info"><b>Filter</b></div>
                     <InputRadioGroup ValueChanged="@((int s) => ShowEnrolledTypeChanged(s))"
-                                     Value="@ShowEnrolmentType"
-                                     ValueExpression="@( () => ShowEnrolmentType )">
+                    Value="@ShowEnrolmentType"
+                    ValueExpression="@( () => ShowEnrolmentType )">
                         <span class="col-11 mt-3"><InputRadio Value="0" class="col-2" />Show All</span>
                         <span class="col-11 mt-3"><InputRadio Value="1" class="col-2" />Show Enrolled</span>
                         <span class="col-11 mt-3"><InputRadio Value="2" class="col-2" />Show Waitlisted</span>
@@ -216,29 +216,29 @@ else
                     <div class="pt-3 px-2 text-info"><b>Quick Actions</b></div>
                     <div class="m-2">
                         <DxButton Text="Quick Enrolment" CssClass="col col-12 mt-1"
-                                  Id="QuickEnrolment"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                  RenderStyle="ButtonRenderStyle.Primary" Click="@DoQuickEnrolmentAsync" />
+                        Id="QuickEnrolment"
+                        RenderStyleMode="ButtonRenderStyleMode.Outline"
+                        RenderStyle="ButtonRenderStyle.Primary" Click="@DoQuickEnrolmentAsync" />
                         <DxButton Text="Set Selection: Enrolled" CssClass="col col-12 mt-1"
-                                  Id="SetSelectionEnrolled" Enabled="@IsSetSelectionEnrolledEnabled"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                  RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionEnrolledAsync" />
+                        Id="SetSelectionEnrolled" Enabled="@IsSetSelectionEnrolledEnabled"
+                        RenderStyleMode="ButtonRenderStyleMode.Outline"
+                        RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionEnrolledAsync" />
                         <DxButton Text="Set Selection: Waitlisted" CssClass="col col-12 mt-1"
-                                  Id="SetSelectionWaitlisted"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                  RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionWaitListedAsync" />
+                        Id="SetSelectionWaitlisted"
+                        RenderStyleMode="ButtonRenderStyleMode.Outline"
+                        RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionWaitListedAsync" />
                         <DxButton Text="Transfer Selection" CssClass="col col-12 mt-1"
-                                  Id="SetSelectionTransfer"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                  RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionTransferAsync" />
+                        Id="SetSelectionTransfer"
+                        RenderStyleMode="ButtonRenderStyleMode.Outline"
+                        RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionTransferAsync" />
                         <DxButton Text="Copy Selection" CssClass="col col-12 mt-1"
-                                  Id="SetSelectionCopy"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                  RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionCopyAsync" />
+                        Id="SetSelectionCopy"
+                        RenderStyleMode="ButtonRenderStyleMode.Outline"
+                        RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionCopyAsync" />
                         <DxButton Text="Delete Selection" CssClass="col col-12 mt-1"
-                                  Id="DeleteSelection"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                  RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteSelection" />
+                        Id="DeleteSelection"
+                        RenderStyleMode="ButtonRenderStyleMode.Outline"
+                        RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteSelection" />
                     </div>
                 </DxFormLayoutGroup>
             </div>
@@ -248,8 +248,8 @@ else
 <style>
 
     .leader-height {
-        min-height: 3dvh;
-        height: auto;
+    min-height: 3dvh;
+    height: auto;
     }
 
 </style>
@@ -681,7 +681,7 @@ else
         catch (Exception ex)
         {
             ErrorHeader = "Save to database error";
-            ErrorMessage = Helpers.GetErrorMessage(ex);
+            ErrorMessage = ex.ToString(); // Helpers.GetErrorMessage(ex);
             await ErrorPopup.ShowPopupAsync();
             dbc?.ChangeTracker?.Clear();
             dbcT?.ChangeTracker?.Clear();

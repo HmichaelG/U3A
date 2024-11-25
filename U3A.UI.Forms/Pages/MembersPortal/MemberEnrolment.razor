@@ -52,19 +52,19 @@ else
         <div class="list-detail mx-auto" hidden=@(isListboxShowingSummary || IsReadOnly)>
             <div class="d-flex">
                 <DxTextBox @ref=@filterTextBox
-                           CssClass="filter-text-box me-2 flex-grow-1"
-                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                           Text="@filterText"
-                           TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
-                           BindValueMode="BindValueMode.OnInput"
-                           InputDelay="500"
-                           NullText="Search">
+                CssClass="filter-text-box me-2 flex-grow-1"
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                Text="@filterText"
+                TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
+                BindValueMode="BindValueMode.OnInput"
+                InputDelay="500"
+                NullText="Search">
                 </DxTextBox>
                 <DxComboBox Data="@ReportStyleList" CssClass="combo-list-box"
-                            Value="@reportStyle"
-                            ValueChanged="@((ReportStyle style) => OnReportStyleChanged(style))"
-                            TextFieldName="@nameof(ReportStyleWrapper.ListText)"
-                            ValueFieldName="@nameof(ReportStyleWrapper.Type)" />
+                Value="@reportStyle"
+                ValueChanged="@((ReportStyle style) => OnReportStyleChanged(style))"
+                TextFieldName="@nameof(ReportStyleWrapper.ListText)"
+                ValueFieldName="@nameof(ReportStyleWrapper.Type)" />
             </div>
             <DxTabs @ref="dxTabs" TabClick="@OnTabClick" CssClass="">
                 <DxTabPage Text="All" />
@@ -77,14 +77,14 @@ else
             </DxTabs>
         </div>
         <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
-                KeyFieldName="ID"
-                ShowAllRows=true
-                VirtualScrollingEnabled=true
-                AllowSelectRowByClick=false
-                AllowGroup=false
-                AllowSort=false
-                PagerVisible=false
-                CssClass="mt-1 listbox-scroll">
+        KeyFieldName="ID"
+        ShowAllRows=true
+        VirtualScrollingEnabled=true
+        AllowSelectRowByClick=false
+        AllowGroup=false
+        AllowSort=false
+        PagerVisible=false
+        CssClass="mt-1 listbox-scroll">
             <Columns>
                 <DxGridDataColumn Width="100%">
                     <HeaderCaptionTemplate>
@@ -93,9 +93,9 @@ else
                             {
                                 <div class="flex-grow-1" />
                                 <DxButton @ref=@listboxViewButton Text="@ListboxViewButtonText"
-                                          SizeMode="SizeMode.Small"
-                                          RenderStyle="ButtonRenderStyle.Primary"
-                                          Click="ToggleListboxViewButton" CssClass="flex-grow-0" />
+                                SizeMode="SizeMode.Small"
+                                RenderStyle="ButtonRenderStyle.Primary"
+                                Click="ToggleListboxViewButton" CssClass="flex-grow-0" />
                             }
                         </div>
                     </HeaderCaptionTemplate>
@@ -110,18 +110,18 @@ else
                                         @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
-                                            (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                            ? $" | {c.Course.OfferedBy}" : "")
-                                                )
+                                                    (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                    ? $" | {c.Course.OfferedBy}" : "")
+                                                        )
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
                                     {
                                         <DxButton Text="@GetBriefStatus(c)" CssClass="flex-grow-0"
-                                                  SizeMode="SizeMode.Small"
-                                                  IconCssClass="@($"bi {selectButtonIcon}")"
-                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                  Click="@(async () => await SelectedDataItemChanged(c))" />
+                                        SizeMode="SizeMode.Small"
+                                        IconCssClass="@($"bi {selectButtonIcon}")"
+                                        RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                        Click="@(async () => await SelectedDataItemChanged(c))" />
                                     }
                                 </div>
                             }
@@ -145,10 +145,10 @@ else
                                                 else
                                                 {
                                                     <DxButton Text="@GetStatus(c)"
-                                                              SizeMode="SizeMode.Large"
-                                                              IconCssClass="@($"bi {selectButtonIcon}")"
-                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                              Click="@(async () => await SelectedDataItemChanged(c))" />
+                                                    SizeMode="SizeMode.Large"
+                                                    IconCssClass="@($"bi {selectButtonIcon}")"
+                                                    RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                    Click="@(async () => await SelectedDataItemChanged(c))" />
                                                 }
                                             </div>
                                             @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
@@ -218,57 +218,57 @@ else
                                                             @if (c.Venue.CanMapAddress)
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                          IconCssClass="bi bi-globe"
-                                                                          Text="Map"
-                                                                          RenderStyle="@ButtonRenderStyle.Primary"
-                                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                                          Click="() => c.ShowMap = !c.ShowMap" />
+                                                                IconCssClass="bi bi-globe"
+                                                                Text="Map"
+                                                                RenderStyle="@ButtonRenderStyle.Primary"
+                                                                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                Click="() => c.ShowMap = !c.ShowMap" />
                                                             }
                                                             @if (!p.IsEmailSilent && !string.IsNullOrWhiteSpace(p.Email))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                          IconCssClass="bi bi-envelope"
-                                                                          Text="Email"
-                                                                          RenderStyle="@ButtonRenderStyle.Primary"
-                                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                                          Click="() => OnEmail(c.Course.Name, p.Email)" />
+                                                                IconCssClass="bi bi-envelope"
+                                                                Text="Email"
+                                                                RenderStyle="@ButtonRenderStyle.Primary"
+                                                                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                Click="() => OnEmail(c.Course.Name, p.Email)" />
                                                             }
                                                             @if (!p.IsPhoneSilent && !p.SMSOptOut && !string.IsNullOrWhiteSpace(p.Mobile))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                          IconCssClass="bi bi-phone"
-                                                                          Text="SMS"
-                                                                          RenderStyle="@ButtonRenderStyle.Primary"
-                                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                                          Click="() => OnSMS(p.Mobile)" />
+                                                                IconCssClass="bi bi-phone"
+                                                                Text="SMS"
+                                                                RenderStyle="@ButtonRenderStyle.Primary"
+                                                                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                Click="() => OnSMS(p.Mobile)" />
                                                             }
                                                             @if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.HomePhone))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                          IconCssClass="bi bi-telephone"
-                                                                          Text="Home"
-                                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                                          RenderStyle="@ButtonRenderStyle.Primary"
-                                                                          Click="() => OnPhone(p.HomePhone)" />
+                                                                IconCssClass="bi bi-telephone"
+                                                                Text="Home"
+                                                                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                RenderStyle="@ButtonRenderStyle.Primary"
+                                                                Click="() => OnPhone(p.HomePhone)" />
                                                             }
                                                             @if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.Mobile))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                          IconCssClass="bi bi-phone"
-                                                                          Text="Mobile"
-                                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                                          RenderStyle="@ButtonRenderStyle.Primary"
-                                                                          Click="() => OnPhone(p.Mobile)" />
+                                                                IconCssClass="bi bi-phone"
+                                                                Text="Mobile"
+                                                                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                RenderStyle="@ButtonRenderStyle.Primary"
+                                                                Click="() => OnPhone(p.Mobile)" />
                                                             }
                                                             @if (c.CourseContacts.Count > 1)
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                          IconCssClass="bi bi-arrow-right"
-                                                                          IconPosition="ButtonIconPosition.AfterText"
-                                                                          Text="Contact"
-                                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                                          RenderStyle="@ButtonRenderStyle.Primary"
-                                                                          Click="async() => await GetNextCourseContact(c)" />
+                                                                IconCssClass="bi bi-arrow-right"
+                                                                IconPosition="ButtonIconPosition.AfterText"
+                                                                Text="Contact"
+                                                                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                RenderStyle="@ButtonRenderStyle.Primary"
+                                                                Click="async() => await GetNextCourseContact(c)" />
                                                             }
                                                         </div>
                                                     </div>
@@ -291,21 +291,21 @@ else
                                             </div>
 
                                             <DxButton CssClass="w-100 mb-1" IconCssClass="bi bi-globe2"
-                                                      Visible=@(!string.IsNullOrWhiteSpace(c.Course.AdditionalInformationURL))
-                                                      Text="Additional Information" RenderStyle="@ButtonRenderStyle.Primary"
-                                                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                      Click="async () => await OnAddnInfoURLClick(c)" />
+                                            Visible=@(!string.IsNullOrWhiteSpace(c.Course.AdditionalInformationURL))
+                                            Text="Additional Information" RenderStyle="@ButtonRenderStyle.Primary"
+                                            RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                            Click="async () => await OnAddnInfoURLClick(c)" />
                                             <div class="px-2 pt-2 w-100" hidden="@(!IsReadOnly || !c.ShowMap)">
                                                 @if (c.Venue.CanMapAddress)
                                                 {
                                                     var link = $"https://www.google.com/maps/embed/v1/place?key={googleMapAPIKey}&q={HttpUtility.UrlEncode($"{c.Venue?.Name} {c.Venue?.Address}")}";
                                                     <iframe width="100%"
-                                                            height="250rem"
-                                                            style="border:thin"
-                                                            loading="lazy"
-                                                            allowfullscreen
-                                                            referrerpolicy="no-referrer-when-downgrade"
-                                                            src="@link" />
+                                                    height="250rem"
+                                                    style="border:thin"
+                                                    loading="lazy"
+                                                    allowfullscreen
+                                                    referrerpolicy="no-referrer-when-downgrade"
+                                                    src="@link" />
                                                 }
                                                 else
                                                 {
@@ -321,7 +321,7 @@ else
                                                 if (message != null)
                                                 {
                                                     <div class="watermark"
-                                                         hidden="@(isListboxShowingSummary)">
+                                                    hidden="@(isListboxShowingSummary)">
                                                         @message
                                                     </div>
                                                 }
@@ -343,81 +343,81 @@ else
 
             <div class="input-group">
                 <DxButton CssClass="flex-grow-1"
-                          Visible=@(!IsPreview)
-                          IconCssClass="bi-door-open"
-                          Text="Return to menu"
-                          RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
+                Visible=@(!IsPreview)
+                IconCssClass="bi-door-open"
+                Text="Return to menu"
+                RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
             </div>
         </div>
     </div>
 }
 <style>
     .filter-text-box {
-        margin: auto;
-        background: url(images/search.svg) no-repeat scroll 5px 5px;
-        padding-left: 30px;
+    margin: auto;
+    background: url(images/search.svg) no-repeat scroll 5px 5px;
+    padding-left: 30px;
     }
 
     .combo-list-box {
-        margin: auto;
-        background: url(images/list-ul.svg) no-repeat scroll 5px 5px;
-        padding-left: 30px;
+    margin: auto;
+    background: url(images/list-ul.svg) no-repeat scroll 5px 5px;
+    padding-left: 30px;
     }
 
     .selected-box {
-        width: 100%;
-        position: relative;
-        border: 1px solid transparent;
-        border-radius: 0.25rem;
+    width: 100%;
+    position: relative;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
     }
 
     .weblink-button {
-        width: 80%;
-        margin: auto
+    width: 80%;
+    margin: auto
     }
 
     .highlight {
-        background-color: yellow !important;
+    background-color: yellow !important;
     }
 
     .listbox-scroll {
-        height: @listHeight;
+    height: @listHeight;
     }
 
     .list-detail {
-        width: 98%;
-        margin: auto;
+    width: 98%;
+    margin: auto;
     }
 
     .col-small {
-        -webkit-box-flex: 0;
-        -webkit-flex: 0 0 auto;
-        -ms-flex: 0 0 auto;
-        flex: 0 0 auto;
-        width: 22%;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    width: 22%;
     }
 
     .col-large {
-        -webkit-box-flex: 0;
-        -webkit-flex: 0 0 auto;
-        -ms-flex: 0 0 auto;
-        flex: 0 0 auto;
-        width: 78%;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    width: 78%;
     }
 
     .offset-small {
-        margin-left: 22%;
+    margin-left: 22%;
     }
 
     .watermark {
-        width: 100%;
-        text-align: center;
-        font-size: 2rem;
-        font-weight: 500;
-        opacity: 0.4;
-        color: magenta;
-        position: absolute;
-        bottom: 10%;
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 500;
+    opacity: 0.4;
+    color: magenta;
+    position: absolute;
+    bottom: 10%;
     }
 </style>
 @code {
@@ -1085,6 +1085,7 @@ else
                 {
                     ErrorHeader = "Save to database error";
                     ErrorMessage = Helpers.GetErrorMessage(ex);
+                    StateHasChanged();
                     await ErrorPopup.ShowPopupAsync();
                 }
                 finally
