@@ -132,7 +132,8 @@ namespace U3A.UI.Reports
             {
                 List<(Guid CourseID, Guid? ClassID)> onFile = new();
                 List<Term> terms = new();
-                var currentTerm = BusinessRule.CurrentTerm(dbc);
+                var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+                if (currentTerm == null) { currentTerm = await BusinessRule.CurrentTermAsync(dbc); }
                 if (currentTerm != null)
                 {
                     terms = await dbc.Term.Where(x => x.Year == currentTerm.Year).ToListAsync();
