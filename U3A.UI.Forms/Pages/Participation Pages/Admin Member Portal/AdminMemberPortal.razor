@@ -1,7 +1,7 @@
 ﻿@page "/AdminMemberPortal"
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@inject NavigationManager NavigationManager
+@inject NavigationManager navMan
 @inject IJSRuntime js
 @inject WorkStation ws
 
@@ -24,7 +24,7 @@ else
 
         <DxToolbar style="border-bottom:solid; border-color:whitesmoke;">
             <Items>
-                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.ProcessOnBehalfOf)"
+                <DxToolbarItem Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
                                RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                Text="Process Member" IconCssClass="bi bi-person" />
