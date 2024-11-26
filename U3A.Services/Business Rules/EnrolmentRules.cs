@@ -699,7 +699,7 @@ namespace U3A.BusinessRules
                     //future term
                     thisYear = term.Year;
                     isFutureTerm = true;
-                    thisTerm = await BusinessRule.FindTermByDateAsync(dbc,c.StartDate.Value);
+                    thisTerm = BusinessRule.FindFutureClassTermFromDate(dbc,c,term.Year,dbc.GetLocalDate());
                     thisTermNo = thisTerm.TermNumber;
                 }
                 var course = await dbc.Course.FindAsync(c.CourseID);

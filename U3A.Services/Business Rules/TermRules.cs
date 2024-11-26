@@ -162,6 +162,27 @@ namespace U3A.BusinessRules
                         .OrderByDescending(x => x.StartDate)
                         .FirstOrDefaultAsync(x => x.StartDate <= Date);
         }
+        public static Term FindFutureClassTermFromDate(U3ADbContext dbc, Class thisClass, int Year, DateTime FromDate)
+        {
+            Term result = null;
+            var terms = dbc.Term.AsNoTracking().AsEnumerable()
+                        .OrderByDescending(x => x.StartDate)
+                        .Where(x => x.Year == Year && x.StartDate >= FromDate).ToList();
+            foreach (var term in terms)
+            {
+                if (IsClassInTerm(thisClass, term.TermNumber))
+                {
+                    result = term;
+                    break;
+                }
+            }
+            if (result == null)
+            {
+                throw new Exception("Cannot find future term for class.");
+            }
+            return result;
+        }
+
         public static async Task<Term?> FindTermAsync(U3ADbContext dbc, DateTime Date)
         {
             return await dbc.Term.AsNoTracking()
