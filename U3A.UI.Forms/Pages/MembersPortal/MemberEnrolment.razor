@@ -585,9 +585,9 @@ else
         await base.OnInitializedAsync();
 
         var listHeightValue = 0;
-        if (ws.UseTopMenu) listHeightValue = 4;
+        if (ws.UseTopMenu) listHeightValue = 8;
         if (loginState.IsAdminOnBehalfOfMember) listHeightValue += 8;
-        listHeightValue += (IsReadOnly || IsEnrolmentWithdrawalView) ? 4 : 8; 
+        listHeightValue += (IsReadOnly || IsEnrolmentWithdrawalView) ? 3 : 7; 
         listHeight = $"{listHeightValue}rem";
 
         await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
