@@ -110,9 +110,9 @@ else
                                         @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
-                                                    (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                                    ? $" | {c.Course.OfferedBy}" : "")
-                                                        )
+                                                                        (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                                        ? $" | {c.Course.OfferedBy}" : "")
+                                                                            )
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
@@ -381,7 +381,7 @@ else
     }
 
     .listbox-scroll {
-    height: @listHeight;
+    height: calc(100dvh - @listHeight);
     }
 
     .list-detail {
@@ -584,9 +584,11 @@ else
     {
         await base.OnInitializedAsync();
 
-        listHeight = IsReadOnly || IsEnrolmentWithdrawalView
-                        ? ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "70dvh" : "75dvh;" : "75dvh;"
-                        : ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "60dvh" : "65dvh;" : "65dvh;";
+        var listHeightValue = 0;
+        if (ws.UseTopMenu) listHeightValue = 4;
+        if (loginState.IsAdminOnBehalfOfMember) listHeightValue += 8;
+        listHeightValue += (IsReadOnly || IsEnrolmentWithdrawalView) ? 4 : 8; 
+        listHeight = $"{listHeightValue}rem";
 
         await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
 
