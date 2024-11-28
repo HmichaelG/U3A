@@ -101,14 +101,14 @@ else
 
                     <DxButton Text="@((isOnlinePaymentEnabled) ? "Pay by Secure Online Payment" : "Online Payment is not currently available" )"
                               Enabled="@isOnlinePaymentEnabled"
-                              IconCssClass="bi-credit-card menu-icon me-3 h2"
+                              IconCssClass="bi-credit-card me-1"
                               CssClass="col-12 my-1"
                               Click="@(e => OnPayOnline(e))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Pay by Direct Bank Payment"
-                              IconCssClass="bi-bank menu-icon me-3 h2"
+                              IconCssClass="bi-bank me-1"
                               CssClass="col-12 my-1"
                               Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberPaymentDirectDebit))"
                               RenderStyle="ButtonRenderStyle.Primary"
@@ -153,7 +153,7 @@ else
                         </div>
                     </DxFormLayoutGroup>
                     <DxButton Text="Changed your mind? Let's pay online"
-                              IconCssClass="bi-emoji-smile menu-icon me-3 h2"
+                              IconCssClass="bi-emoji-smile me-1"
                               CssClass="col-12 my-1"
                               Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberPaymentPreamble))"
                               RenderStyle="ButtonRenderStyle.Primary"
@@ -163,7 +163,7 @@ else
             }
 
             <DxButton Text="Return to menu"
-                      IconCssClass="bi-door-closed menu-icon me-3 h2"
+                      IconCssClass="bi-door-closed me-1"
                       CssClass="col-12 my-1"
                       Click="@(e => OnCancel())"
                       RenderStyle="ButtonRenderStyle.Primary"
