@@ -775,7 +775,7 @@ else
             foreach (var c in SelectedDataItems.Cast<AttendClass>())
             {
                 //physically remove, override soft delete
-                await dbc.Database.ExecuteSqlAsync($"Delete Fee where ID = {c.ID}");
+                await dbc.Database.ExecuteSqlAsync($"Delete AttendClass where ID = {c.ID}");
             }
             if (await SaveChangesAsync())
             {
