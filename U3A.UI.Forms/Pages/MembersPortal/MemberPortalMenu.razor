@@ -14,7 +14,11 @@
 
 @attribute [Authorize]
 
-@if (IsReady)
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
 {
     <Progress @ref=@progress />
     <MessageBox @ref=@messageBox />
