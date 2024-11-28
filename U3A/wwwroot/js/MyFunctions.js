@@ -88,8 +88,10 @@ function appleOSversion() {
     else { return [999, 99, 99]; }
 }
 
-window.onload = function () {
-    setTheme();
+document.onreadystatechange = function (e) { 
+    if (document.readyState === 'complete') {
+        setTheme();
+    }
 }
 
 function setTheme() {
