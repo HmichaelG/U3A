@@ -293,13 +293,15 @@ else
                 break;
 
             case MenuOptions.RecordAttendance:
-                <DxFormLayout CssClass="col col-12 mx-auto border mt-1 px-4 pt-">
-                    <AttendClassMnt IsAdminPortal="@IsAdminPortal"
-                                    IsMemberPortal=true
-                                    SelectedTerm="selectedTerm"
-                                    SelectedCourse="selectedCourse"
-                                    SelectedClass="selectedClass" />
-                </DxFormLayout>
+                <div style="width=99%; overflow:auto;">
+                    <DxFormLayout CssClass="col col-12 mx-auto mt-4 px-4 pt-">
+                        <AttendClassMnt IsAdminPortal="@IsAdminPortal"
+                                        IsMemberPortal=true
+                                        SelectedTerm="selectedTerm"
+                                        SelectedCourse="selectedCourse"
+                                        SelectedClass="selectedClass" />
+                    </DxFormLayout>
+                </div>
                 break;
 
             case MenuOptions.CancelClass:
@@ -416,7 +418,7 @@ else
                 </DxFormLayout>
                 break;
         }
-        <div class="d-flex col col-12 col-md-7 mx-auto">
+        <div class="row col col-12 col-md-7 mx-auto">
             <DxButton Text="Return to menu" id="exitButton"
                       IconCssClass="bi-door-closed me-1"
                       CssClass="col-12 col-lg-8 mb-1 mx-auto"
