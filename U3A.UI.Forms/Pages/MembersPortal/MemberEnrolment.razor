@@ -585,8 +585,8 @@ else
         await base.OnInitializedAsync();
 
         var listHeightValue = 0;
-        if (ws.UseTopMenu) listHeightValue = 8;
-        if (loginState.IsAdminOnBehalfOfMember) listHeightValue += 8;
+        if (ws.UseTopMenu) listHeightValue = 4;
+        listHeightValue += (loginState.IsAdminOnBehalfOfMember) ? 8 : 4;
         listHeightValue += (IsReadOnly || IsEnrolmentWithdrawalView) ? 3 : 7; 
         listHeight = $"{listHeightValue}rem";
 

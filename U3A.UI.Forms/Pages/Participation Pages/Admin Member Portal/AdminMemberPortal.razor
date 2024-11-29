@@ -68,7 +68,7 @@ else
         <DxDrawer @bind-IsOpen="@isDrawerOpen"
                   CssClass="drawer-style"
                   Mode="DrawerMode.Shrink"
-                  Position="DrawerPosition.Right"
+                  Position="DrawerPosition.Right"                 
                   PanelWidth="20rem">
             <TargetContent>
                 <DxLoadingPanel @bind-Visible="isProcessing"
@@ -109,15 +109,7 @@ else
                                 </div>
                                 @if (isSelected)
                                 {
-                                    <style>
-                                        .member-portal-style {
-                                            height: 100dvh;
-                                            overflow-y: auto;
-                                            width: 99%;
-                                            margin-top: 0.25rem;
-                                        }
-                                    </style>
-                                    <div class="member-portal-style">
+                                    <div class="w-100">
                                         <MemberPortal IsAdminMemberPortal="true"
                                                       OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
                                     </div>
