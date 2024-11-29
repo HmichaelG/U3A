@@ -15,9 +15,8 @@
 <div class="page">
     <DxGridLayout CssClass="page-layout">
         <Rows>
-            <DxGridLayoutRow Areas="navigation header" Height="auto"></DxGridLayoutRow>
-            <DxGridLayoutRow Areas="navigation content"></DxGridLayoutRow>
-            <DxGridLayoutRow Areas="navigation footer" Height="auto"></DxGridLayoutRow>
+            <DxGridLayoutRow Areas="navigation header" Height="auto" />
+            <DxGridLayoutRow Areas="navigation content" />
         </Rows>
         <Columns>
             <DxGridLayoutColumn Width="auto" />
@@ -25,7 +24,6 @@
         </Columns>
         <Items>
             <DxGridLayoutItem Area="header" CssClass="vw-100 d-print-none" />
-            <DxGridLayoutItem Area="footer" CssClass="vw-100 d-print-none" />
             <DxGridLayoutItem Area="navigation" CssClass="layout-sidebar d-print-none">
                 <Template>
                     <SideBar />
