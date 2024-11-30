@@ -294,11 +294,11 @@ else
 
             case MenuOptions.RecordAttendance:
                 <DxFormLayout CssClass="col col-12 mx-auto mt-4 px-4 pt-">
-                        <AttendClassMnt IsAdminPortal="@IsAdminPortal"
-                                        IsMemberPortal=true
-                                        SelectedTerm="selectedTerm"
-                                        SelectedCourse="selectedCourse"
-                                        SelectedClass="selectedClass" />
+                    <AttendClassMnt IsAdminPortal="@IsAdminPortal"
+                                    IsMemberPortal=true
+                                    SelectedTerm="selectedTerm"
+                                    SelectedCourse="selectedCourse"
+                                    SelectedClass="selectedClass" />
                 </DxFormLayout>
                 break;
 
@@ -336,84 +336,78 @@ else
                 </DxFormLayout>
                 break;
             default:
-                <DxFormLayout CssClass="col col-12 col-md-10 col-lg-8 mt-4 mx-auto">
-                    <DxFormLayoutGroup ColSpanMd="6" CssClass="xx-1 border-0"
-                                       Decoration="FormLayoutGroupDecoration.None">
-                        <DxButton Text="Lookup Student / ICE Details"
-                                  IconCssClass="bi bi-search me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.StudentLookup))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Assign Course Clerk" Visible="@(settings.AllowLeaderToChangeAssignClerk)"
-                                  IconCssClass="bi bi-person-badge me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.AssignCourseClerk))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Manage Enrolments" Visible="@(settings.AllowLeaderToChangeEnrolment)"
-                                  IconCssClass="bi bi-person-rolodex me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.ManageEnrolments))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Add/Edit Student Leave"
-                                  IconCssClass="bi bi-airplane me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.AddEditStudentLeave))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Email or SMS Students | Member Badges"
-                                  IconCssClass="bi bi-broadcast-pin me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.Communicate))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                    </DxFormLayoutGroup>
-                    <DxFormLayoutGroup ColSpanMd="6" CssClass="px-1 border-0"
-                                       Decoration="FormLayoutGroupDecoration.None">
-                        <DxButton Text="Record Attendance"
-                                  IconCssClass="bi bi-person-check me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.RecordAttendance))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Attendance History"
-                                  IconCssClass="bi bi-clock-history me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.AttendanceHistory))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Cancel Class"
-                                  IconCssClass="bi bi-emoji-frown me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.CancelClass))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Leader Reports"
-                                  IconCssClass="bi bi-envelope-paper me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.LeaderReports))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                        <DxButton Text="Configure Email"
-                                  IconCssClass="bi bi-gear me-1"
-                                  CssClass="col-12 mb-1 mx-auto"
-                                  Click="@(e => OnMenuSelected(MenuOptions.ConfigureEmail))"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                    </DxFormLayoutGroup>
-                </DxFormLayout>
+                <div class="row col col-12 col-md-7 mx-auto">
+                    <DxButton Text="Lookup Student / ICE Details"
+                              IconCssClass="bi bi-search me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.StudentLookup))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Assign Course Clerk" Visible="@(settings.AllowLeaderToChangeAssignClerk)"
+                              IconCssClass="bi bi-person-badge me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.AssignCourseClerk))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Manage Enrolments" Visible="@(settings.AllowLeaderToChangeEnrolment)"
+                              IconCssClass="bi bi-person-rolodex me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.ManageEnrolments))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Add/Edit Student Leave"
+                              IconCssClass="bi bi-airplane me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.AddEditStudentLeave))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Email or SMS Students | Member Badges"
+                              IconCssClass="bi bi-broadcast-pin me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.Communicate))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Record Attendance"
+                              IconCssClass="bi bi-person-check me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.RecordAttendance))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Attendance History"
+                              IconCssClass="bi bi-clock-history me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.AttendanceHistory))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Cancel Class"
+                              IconCssClass="bi bi-emoji-frown me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.CancelClass))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Leader Reports"
+                              IconCssClass="bi bi-envelope-paper me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.LeaderReports))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                    <DxButton Text="Configure Email"
+                              IconCssClass="bi bi-gear me-1"
+                              CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                              Click="@(e => OnMenuSelected(MenuOptions.ConfigureEmail))"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                    </DxButton>
+                </div>
                 break;
         }
         <div class="row col col-12 col-md-7 mx-auto">
