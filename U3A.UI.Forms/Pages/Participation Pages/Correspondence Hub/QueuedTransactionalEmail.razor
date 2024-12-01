@@ -33,12 +33,12 @@ else
     {
         <div class="px-2">
             <CollapsableContent DismissKey="{D46A020E-E4C2-4A3A-A684-80EE7B36AE34}"
-                        AlertText=@($@"<p><strong>Transactional email</strong> queued and processed overnight.<br />
+            AlertText=@($@"<p><strong>Transactional email</strong> queued and processed overnight.<br />
                         Cash Receipts and Enrolments are sent daily, Leader Reports are sent within 48 hours of the next class.<br/>
                         Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.<br />
                         Processed correspondence is deleted after 30 days</p>.")
-                                OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
-                                OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+            OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+            OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
             <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
             <Progress @ref="@ProgressBar" />
@@ -48,40 +48,40 @@ else
             <FullScreen @ref=@fullScreen DisplayOffset="@contentSize">
                 <ContentTemplate>
                     <DxGrid Data="@SendMail" @ref=@mainGrid
-                            @bind-SelectedDataItems="@SelectedDataItems"
-                            UnboundColumnData="Grid_CustomUnboundColumnData"
-                            ShowFilterRow="false"
-                            ShowAllRows="false"
-                            KeyFieldName="ID"
-                            ValidationEnabled="true"
-                            SelectionMode="GridSelectionMode.Multiple">
+                    @bind-SelectedDataItems="@SelectedDataItems"
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    ShowFilterRow="false"
+                    ShowAllRows="false"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    SelectionMode="GridSelectionMode.Multiple">
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid LayoutKey="{5AC4F74E-C707-4297-8949-A64FB18C0819}">
                                 <CustomButtonContent>
                                     <DxToolbarItem Text="Preview" IconCssClass="bi bi-eyeglasses"
-                                                   Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                                   Tooltip="Preview the email to be sent to selected participants."
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   RenderStyle="ButtonRenderStyle.Primary" />
+                                    Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                    Tooltip="Preview the email to be sent to selected participants."
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
                                     <DxToolbarItem Text="Send Mail" IconCssClass="bi bi-envelope"
-                                                   Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                                   Tooltip="Send email to selected participants, now."
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   RenderStyle="ButtonRenderStyle.Primary" />
+                                    Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                    Tooltip="Send email to selected participants, now."
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
                                     <DxToolbarItem Text="Delete" IconCssClass="bi bi-trash"
-                                                   Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                                   Tooltip="Delete the selected email."
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   RenderStyle="ButtonRenderStyle.Primary" />
+                                    Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                    Tooltip="Delete the selected email."
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
                                 </CustomButtonContent>
                             </GridToolbar>
                         </ToolbarTemplate>
                         <Columns>
                             <DxGridSelectionColumn Width="2rem" />
                             <DxGridDataColumn Width="10rem" Caption="Email On/After"
-                                              UnboundType=GridUnboundColumnType.DateTime
-                                              FieldName="CreatedOnLocal"
-                                              DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                            UnboundType=GridUnboundColumnType.DateTime
+                            FieldName="CreatedOnLocal"
+                            DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
                             <DxGridDataColumn Width="12rem" Caption="Document" FieldName="DocumentName" />
                             <DxGridDataColumn Width="12rem" Caption="Send To" FieldName="Person.FullName" />
                             <DxGridDataColumn Width="6rem" Caption="Send Via" FieldName="Person.SendTransactionalEmailVia" />
@@ -97,7 +97,7 @@ else
 }
 <style>
     .viewer-height {
-        height: 10rem !important;
+    height: 10rem !important;
     }
 </style>
 
@@ -128,6 +128,7 @@ else
     string tenant;
     SystemSettings? settings;
     Byte[] pdfContent;
+    bool isProcessing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -178,12 +179,22 @@ else
 
     async Task OnPreview()
     {
-        await CreateMail(true);
+        await CreateRequestedMailSafely(true);
     }
-
     async Task OnCreateMail()
     {
-        await CreateMail(false);
+        await CreateRequestedMailSafely(false);
+    }
+
+    async Task CreateRequestedMailSafely(bool IsPreview)
+    {
+        if (isProcessing) return;
+        try
+        {
+            isProcessing = true;
+            await CreateMail(IsPreview);
+        }
+        finally { isProcessing = false; }
     }
 
     async Task CreateMail(bool IsPreview)
