@@ -89,6 +89,7 @@ namespace U3A.UI.Reports
                 var list = new List<ReceiptDetail>();
                 list.Add(detail);
                 cashReceiptProForma.DataSource = list;
+                cashReceiptProForma.CreateDocument();
                 string pdfFilename = GetTempPdfFile();
                 cashReceiptProForma.ExportToPdf(pdfFilename);
                 if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
@@ -150,6 +151,7 @@ namespace U3A.UI.Reports
                                     if (ds.Name.ToLower() == "objectdatasource2") { ds.DataSource = terms; }
                                 }
                             }
+                            participantEnrolmentProForma.CreateDocument();
                             string pdf = GetTempPdfFile();
                             participantEnrolmentProForma.ExportToPdf(pdf);
                             personsFiles.Add(pdf);
@@ -358,6 +360,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             {
                 people = people.Where(x => list.Contains(x.ID)).ToList();
                 report.SetParameters(people, settings, term);
+                report.CreateDocument();
                 pdfFilename = GetTempPdfFile();
                 report.ExportToPdf(pdfFilename);
             }
@@ -369,6 +372,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
         {
             report.DbContext = dbc;
             report.Parameters["prmCourseID"].Value = CourseID;
+            report.CreateDocument();
             string pdfFilename = GetTempPdfFile();
             report.ExportToPdf(pdfFilename);
             return pdfFilename;
@@ -413,6 +417,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 else
                     ds.DataSource = enrolmentDetails;
             }
+            report.CreateDocument();
             string pdfFilename = GetTempPdfFile();
             report.ExportToPdf(pdfFilename);
             return pdfFilename;
