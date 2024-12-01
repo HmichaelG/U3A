@@ -13,6 +13,10 @@
     background-color: var(--dxbl-btn-color);
 }
 
+::deep .content {
+    overflow: hidden;
+}
+
 ::deep .back-button:hover .icon-back {
     background-color: var(--dxbl-btn-hover-color);
 }
@@ -24,8 +28,8 @@
 }
 
 
-/*@media (max-width: 768px) {
+@media (max-width: 768px) {
     ::deep .layout-sidebar {
         grid-area: header / header / header / header !important;
     }
-}*/
+}

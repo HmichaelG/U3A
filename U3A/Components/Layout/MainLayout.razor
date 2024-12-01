@@ -140,12 +140,12 @@
         {
 
             //Set timeout
-            // dotNetObjectReference = DotNetObjectReference.Create(this);
-            // try
-            // {
-            //     await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
-            // }
-            // catch { };
+            dotNetObjectReference = DotNetObjectReference.Create(this);
+            try
+            {
+                await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
+            }
+            catch { };
             await ws.SetWorkstationDetail(js, localStorage);
             useTopMenu = ws.UseTopMenu;
             await InvokeAsync(StateHasChanged);
@@ -153,15 +153,15 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    // [JSInvokable]
-    // public void OnTimeout()
-    // {
-    //     try
-    //     {
-    //         navMan.NavigateTo("closed.html", true);
-    //     }
-    //     finally { };
-    // }
+    [JSInvokable]
+    public void OnTimeout()
+    {
+        try
+        {
+            navMan.NavigateTo("closed.html", true);
+        }
+        finally { };
+    }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)
     {
