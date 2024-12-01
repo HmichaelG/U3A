@@ -248,7 +248,8 @@ KeyFieldNames="@(new List<string>() {"Tag.Id","Contact.ID"})">
             await ShowNoSelectionDialog();
             return;
         }
-        SendTo = SelectedDataItems.Cast<Person>().OrderBy(x => x.FullNameAlpha).ToList();
+        var taggedContacts = SelectedDataItems.Cast<TaggedContact>().OrderBy(x => x.Contact.FullNameAlpha).ToList();
+        SendTo = taggedContacts.Select(x => x.Contact as Person).ToList();
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             emailsSent = 0;
