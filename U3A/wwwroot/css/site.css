@@ -1,9 +1,7 @@
 
 html, body {
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
+    height: auto;
+    overflow: auto;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -98,7 +96,6 @@ h1:focus {
     font-size: calc(1rem + 1vw);
     font-weight: 300;
     line-height: 1.2;
-
 }
 
 @media (min-width: 1200px) {
@@ -110,27 +107,35 @@ h1:focus {
 .flex-grow-1 {
     flex-grow: 1;
 }
+
 .flex-grow-2 {
     flex-grow: 2;
 }
+
 .flex-grow-3 {
     flex-grow: 3;
 }
+
 .flex-grow-4 {
     flex-grow: 4;
 }
+
 .flex-grow-5 {
     flex-grow: 5;
 }
+
 .flex-grow-6 {
     flex-grow: 6;
 }
+
 .flex-grow-7 {
     flex-grow: 7;
 }
+
 .flex-grow-8 {
     flex-grow: 8;
 }
+
 .flex-grow-9 {
     flex-grow: 9;
 }
