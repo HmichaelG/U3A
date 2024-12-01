@@ -4,10 +4,20 @@
 
 <h3>Exception Log</h3>
 
+<table class="w-75">
+    <tr>
+        <td>@log?.TimeStamp.ToLongDateString()</td>
+        <td>@log?.TimeStamp.ToLongTimeString()</td>
+        <td>@log?.Tenant</td>
+        <td>@log?.User</td>
+    </tr>
+</table>
+
 <pre>@log?.Exception</pre>
 
 <style>
     pre {
+        margin-top: 0.5rem;
         font-size: 12px;
         height: 80%;
     }
