@@ -104,6 +104,16 @@ namespace U3A.Services
             }
             return result;
         }
+        public async Task<decimal> CalculateFeeAsync(IDbContextFactory<U3ADbContext> U3Adbfactory,
+                                        Person person, Term term, int? CalclateForTerm = null)
+        {
+            var result = decimal.Zero;
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                if (term != null) { result = await CalculateFeeAsync(dbc, person, term, CalclateForTerm); }
+            }
+            return result;
+        }
 
         public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc,
                                         Person person, Term term, int? CalclateForTerm = null)

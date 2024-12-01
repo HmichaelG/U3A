@@ -515,7 +515,7 @@ else
         {
             if (!feesDue.ContainsKey(e.PersonID))
             {
-                feesDue.Add(e.PersonID, await service.CalculateFeeAsync(dbc, e.Person, currentTerm));
+                feesDue.Add(e.PersonID, await service.CalculateFeeAsync(dbc, e.Person, selectedTerm));
             }
         }
         await InvokeAsync(StateHasChanged);

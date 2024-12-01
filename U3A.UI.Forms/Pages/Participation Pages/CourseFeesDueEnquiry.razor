@@ -353,7 +353,7 @@ else
         foreach (var e in Enrolments)
         {
             var person = e.Person;
-            var due = await service.CalculateFeeAsync(U3Adbfactory, person);
+            var due = await service.CalculateFeeAsync(U3Adbfactory, person,selectedTerm);
             FeeDue.Add(person.ID, due);
         }
     }
@@ -397,7 +397,7 @@ else
         if (enrolment != null)
         {
             selectedPerson = enrolment.Person;
-            totalFees = await service.CalculateFeeAsync(U3Adbfactory, selectedPerson);
+            totalFees = await service.CalculateFeeAsync(U3Adbfactory, selectedPerson,selectedTerm);
             memberFees = service.GetMemberFees(selectedPerson.ID);
             InvokeAsync(StateHasChanged);
         }
