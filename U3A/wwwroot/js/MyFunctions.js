@@ -88,12 +88,15 @@ function appleOSversion() {
     else { return [999, 99, 99]; }
 }
 
-document.onreadystatechange = function (e) { 
-    if (document.readyState === 'complete') {
-        setTheme();
-    }
-}
+//document.onreadystatechange = function (e) { 
+//    if (document.readyState === 'complete') {
+//        setTheme();
+//    }
+//}
 
+//window.onload = function () {
+//    setTheme();
+//}
 function setTheme() {
     // If we pass a theme in a query string then save it to localStorage
     var qs = getQueryStrings();
@@ -101,8 +104,9 @@ function setTheme() {
     if (theme) {
         localStorage.setItem("theme", theme);
     }
-    // set the default
-    var href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css';
+    var link = document.getElementById("theme");
+    var href = link.href;
+    if (href == null) { href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css'; }
     // load from localStorage & replace the default
     var theme = localStorage.getItem('theme');
     if (theme) {
@@ -110,7 +114,6 @@ function setTheme() {
         theme = theme.replace('"', '',);
         href = href.replace('office-white', theme);
     }
-    var link = document.getElementById("theme");
     if (link) {
         link.href = href;
     }

@@ -11,10 +11,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
     <base href="/" />
 
-    @* <link id="theme" rel="stylesheet" /> *@
-    <link id="theme" href=@Assets[@AppendVersion("_content/DevExpress.Blazor.Themes/office-white.bs5.min.css")] rel="stylesheet" />
-    <link href=@Assets[@AppendVersion("_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.css")] rel="stylesheet" />
-    <link href=@Assets[@AppendVersion("_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css")] rel="stylesheet" />
+    <link id="theme" href=@AppendVersion("_content/DevExpress.Blazor.Themes/office-white.bs5.min.css") rel="stylesheet" />
+    <link href=@AppendVersion("_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.css") rel="stylesheet" />
+    <link href=@AppendVersion("_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css") rel="stylesheet" />
 
     <link rel="stylesheet" href="@Assets["https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"]">
 
@@ -32,6 +31,7 @@
     <ImportMap />
 
     @DxResourceManager.RegisterScripts()
+    
     <script src=@Assets["https://cdn.userway.org/widget.js"] data-account="8ya325ia7z"></script>
 
     <HeadOutlet @rendermode="@PageRenderMode" />
