@@ -59,16 +59,7 @@ namespace U3A.UI.Reports
             List<Class> classes = new();
             if (term != null)
             {
-                if ((int)prmIntendedUse.Value == 0)
-                {
-                    classes = BusinessRule.RestoreClassesFromSchedule(DbContext,
-                                        TenantDbContext, TenantService,
-                                        term, settings, excludeOffScheduleActivities: true);
-                }
-                else
-                {
-                    classes = BusinessRule.GetClassDetails(DbContext, term, settings, ExludeOffScheduleActivities: false);
-                }
+                classes = BusinessRule.GetClassDetails(DbContext, term, settings, ExludeOffScheduleActivities: false);
             }
             foreach (var c in classes)
             {
@@ -151,6 +142,7 @@ namespace U3A.UI.Reports
         private void tableCellOnDay_BeforePrint(object sender, CancelEventArgs e)
         {
             Class c = (Class)GetCurrentRow();
+            if (c == null) { return; }
             if ((OccurrenceType)c.OccurrenceID == OccurrenceType.Unscheduled)
             {
                 tableCellOnDay.Text = "Unscheduled (Varies)";
@@ -165,12 +157,14 @@ namespace U3A.UI.Reports
         private void xrVenueRow_BeforePrint(object sender, CancelEventArgs e)
         {
             Class c = (Class)GetCurrentRow();
+            if (c == null) { return; }
             xrVenueRow.Visible = (c.Course.ClassSummaries.Count <= 1) ? true : false;
         }
 
         private void xrRichText1_BeforePrint(object sender, CancelEventArgs e)
         {
             Class c = (Class)GetCurrentRow();
+            if (c == null) { return; }
             xrRichText1.Html = c.Course.Description.Replace("<p><br><p>", "<p>");
         }
     }
