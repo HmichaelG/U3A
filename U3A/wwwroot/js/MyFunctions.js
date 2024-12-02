@@ -88,15 +88,15 @@ function appleOSversion() {
     else { return [999, 99, 99]; }
 }
 
-//document.onreadystatechange = function (e) { 
-//    if (document.readyState === 'complete') {
-//        setTheme();
-//    }
-//}
+document.onreadystatechange = function (e) { 
+    if (document.readyState === 'complete') {
+        setTheme();
+    }
+}
 
-//window.onload = function () {
-//    setTheme();
-//}
+window.onload = function () {
+    setTheme();
+}
 function setTheme() {
     // If we pass a theme in a query string then save it to localStorage
     var qs = getQueryStrings();
