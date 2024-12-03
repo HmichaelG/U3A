@@ -33,6 +33,10 @@ using Azure.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
+// Add services to the container.
+builder.Services.AddRazorComponents(options =>
+    options.DetailedErrors = builder.Environment.IsDevelopment())
+    .AddInteractiveServerComponents();
 
 // **** Start local modifications ****
 
@@ -168,14 +172,10 @@ builder.Services.AddRazorPages().AddRazorPagesOptions(o =>
 
 constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
 
+builder.Services.AddScoped<WorkStation>();
+
 //**** End local modifications ****
 
-// Add services to the container.
-builder.Services.AddRazorComponents(options =>
-    options.DetailedErrors = builder.Environment.IsDevelopment())
-    .AddInteractiveServerComponents();
-
-builder.Services.AddScoped<WorkStation>();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
