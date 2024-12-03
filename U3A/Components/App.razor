@@ -29,30 +29,14 @@
     <link rel="manifest" href=@Assets["/favicon/site.webmanifest"]>
 
     <ImportMap />
-
-    @DxResourceManager.RegisterScripts()
     
     <script src=@Assets["https://cdn.userway.org/widget.js"] data-account="8ya325ia7z"></script>
 
-    <HeadOutlet @rendermode="@PageRenderMode" />
-
-  @*   <style>
-        #cover {
-            position: fixed;
-            height: 100%;
-            width: 100%;
-            top: 0;
-            left: 0;
-            background-color: whitesmoke;
-            z-index: 9998;
-        }
-    </style> *@
+    <HeadOutlet />
 
 </head>
 
 <body>
-
-    @* <div id="cover"></div> *@
 
     <Routes @rendermode="@PageRenderMode" />
 
