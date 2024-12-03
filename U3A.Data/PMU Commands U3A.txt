@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_Remove_Unused_Index
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Fee_ISoftDelete
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Fee_ISoftDelete
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_prcDbCleanup_20241203
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_U3A_Fee_ISoftDelete
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_prcDbCleanup_20241203
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

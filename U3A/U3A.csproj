@@ -22,6 +22,7 @@
   <ItemGroup>
     <None Remove="resources\en_AU.aff" />
     <None Remove="resources\en_AU.dic" />
+    <None Remove="resources\prcDbCleanup.sql" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\en_AU.aff" />
@@ -71,6 +72,11 @@
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\Public\Pages\fallback.razor" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\prcDbCleanup.sql">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\lib\jquery\dist\" />
