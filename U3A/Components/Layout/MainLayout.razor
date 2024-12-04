@@ -16,9 +16,13 @@
 @inject WorkStation ws
 @implements IDisposable
 
+
+
 @if (isReady && Body != null)
 {
-    <div class="page">
+    @if (RendererInfo.IsInteractive)
+    {
+        <div class="page">
 
         <CascadingValue Value=@openCircuits Name="OpenCircuits">
             <CascadingValue Value="@loginState">
@@ -53,6 +57,11 @@
         </CascadingValue>
 
     </div>
+    }
+    else
+    {
+        <NotInteractive />
+    }
 }
 
 
