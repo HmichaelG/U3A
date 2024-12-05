@@ -213,7 +213,6 @@ else
     {
         IsProcessing = true;
         feeService = new MemberFeeCalculationService();
-        CalculateFeeAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             availablePayments = await feeService.GetAvailableMemberPaymentsAsync(dbc, loginState?.SelectedPerson);
@@ -222,6 +221,7 @@ else
             if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
             settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         }
+        await CalculateFeeAsync();
         Title = settings?.U3AGroup;
         menuSelection = PortalMenuSelection.DoMemberPaymentPreamble;
         var tInfo = await tenantService.GetTenantInfoAsync();
@@ -314,7 +314,7 @@ else
 
     async Task<decimal> CalculateFeeAsync()
     {
-        decimal result = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson);
+        decimal result = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson,term);
         feeAsString = GetFeeAsString(result);
         return result;
     }
