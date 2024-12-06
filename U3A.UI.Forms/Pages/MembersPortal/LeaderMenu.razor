@@ -538,6 +538,7 @@ else
         if (firstRender)
         {
             localTime = new LocalTime(js);
+            isApple = await js.InvokeAsync<bool>("IsApple");
         }
         await js.InvokeVoidAsync("setFocus", "exitButton");
         focusRequired = false;
@@ -825,7 +826,6 @@ else
         if (!await AreEnrolmentsSelected()) return;
         if (studentGrid == null) return;
         if (studentGrid.SelectedDataItems == null) return;
-        isApple = await js.InvokeAsync<bool>("IsApple");
         var smsto = $"sms:";
         if (isApple)
         {
