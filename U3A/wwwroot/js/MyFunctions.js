@@ -1,5 +1,10 @@
 ﻿
 // Full screen / normal screen functions
+
+function IsApple() {
+    return (/iP(hone|od|ad)/.test(navigator.platform));
+}
+
 function toggleFullscreen() {
     var e = document.getElementById('fullscreen-element');
     if (e != null) {
