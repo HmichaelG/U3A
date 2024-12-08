@@ -314,7 +314,7 @@ namespace U3A.BusinessRules
             ConcurrentBag<MultiCampusTerm> deleted = new();
             ConcurrentBag<MultiCampusTerm> additions = new();
             ConcurrentBag<MultiCampusTerm> updates = new();
-            var Terms = await BusinessRule.GetAllTermsInCurrentYearAsync(dbc);
+            var Terms = await dbc.Term.ToListAsync();
             var mcTerms = await dbcT.MultiCampusTerm
                                 .Where(x => x.TenantIdentifier == TenantIdentifier)
                                 .ToListAsync();
