@@ -616,7 +616,7 @@ else
                     var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
                     if (dbc.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
                     {
-                        SetUnavialable(currentTerm);
+                        SetUnavailable(currentTerm);
                     }
                     else
                     {
@@ -625,7 +625,7 @@ else
                         if (nextTerm != null)
                         {
                             term = currentTerm = nextTerm;
-                            SetUnavialable(nextTerm);
+                            SetUnavailable(nextTerm);
                         }
                     }
                 }
@@ -674,7 +674,7 @@ else
         await OneReadyStatusChanged.InvokeAsync(true); // enable external user input
     }
 
-    void SetUnavialable(Term? term)
+    void SetUnavailable(Term? term)
     {
         if (term != null)
         {
@@ -741,10 +741,10 @@ else
 
     async Task OnEmail(string courseName, string email)
     {
-        string mailto = $"mailto:?subject=U3A Course: {courseName}&To={email}";
+        string mailTo = $"mailto:?subject=U3A Course: {courseName}&To={email}";
         try
         {
-            NavMan.NavigateTo(mailto, true);
+            NavMan.NavigateTo(mailTo, true);
         }
         catch (Exception ex)
         {
@@ -757,10 +757,10 @@ else
     async Task OnSMS(string mobile)
     {
         var phone = HttpUtility.UrlEncode(mobile.Trim().Replace(" ", ""));
-        string smsto = $"sms:{phone}";
+        string smsTo = $"sms:{phone}";
         try
         {
-            NavMan.NavigateTo(smsto, true);
+            NavMan.NavigateTo(smsTo, true);
         }
         catch (Exception ex)
         {
