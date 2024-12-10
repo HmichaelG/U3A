@@ -2,7 +2,7 @@
 
 <DxPopup Visible="@PopupVisible" @ref="@messageBox" Width="@PopupWidth"
          ApplyBackgroundShading="true"         
-         CloseButtonClick="@OnNegativeButtonClicked"
+         Closed="@OnNegativeButtonClicked"
          CloseOnEscape="false"
          CloseOnOutsideClick="false"
          ShowFooter="true"
@@ -181,14 +181,12 @@
     {
         MessageBoxResult = MessageBoxDialogResult.CancelButtonClicked;
         PopupVisible = false;
-        tcs?.TrySetResult(false);
         await NegativeButtonClicked.InvokeAsync();
     }
     void OnNoButtonClicked()
     {
         MessageBoxResult = MessageBoxDialogResult.NoButtonClicked;
         PopupVisible = false;
-        tcs?.TrySetResult(false);
     }
 
     public async Task Close()
