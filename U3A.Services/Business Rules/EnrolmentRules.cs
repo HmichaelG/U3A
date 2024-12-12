@@ -25,7 +25,7 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                         && x.CourseID == SelectedCourse.ID
                                                         && x.TermID == SelectedTerm.ID
                                                         && x.Person.DateCeased == null).ToListAsync();
@@ -173,7 +173,7 @@ namespace U3A.BusinessRules
                                 .Include(x => x.Course).ThenInclude(x => x.Classes)
                                 .Include(x => x.Class).ThenInclude(x => x.OnDay)
                                 .Include(x => x.Person)
-                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null)
                                 .OrderBy(x => x.IsWaitlisted)
@@ -207,7 +207,7 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
-                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                         && x.ClassID == null
                                                         && x.CourseID == SelectedCourse.ID
                                                         && x.TermID == SelectedTerm.ID
@@ -545,24 +545,19 @@ namespace U3A.BusinessRules
             var deletions = await dbc.Enrolment
                         .Include(x => x.Class)
                         .Where(x => x.ClassID == ClassID).ToArrayAsync();
-            foreach (var d in deletions) { DeleteEnrolment(dbc, d); }
+            foreach (var d in deletions) { await DeleteEnrolmentAsync(dbc, d); }
         }
-        public static void DeleteEnrolment(U3ADbContext dbc, Enrolment enrolment)
+        public static async Task DeleteEnrolmentAsync(U3ADbContext dbc, Enrolment enrolment)
         {
             // delete the enrolments
-            var query = dbc.Enrolment
-                        .Include(x => x.Term)
-                        .Where(x => x.CourseID == enrolment.CourseID
-                                    && (x.ClassID == null || x.ClassID == enrolment.ClassID)
-                                    && x.PersonID == enrolment.PersonID).AsEnumerable()
-                                    .Where(x => x.Term.Year >= enrolment.Term.Year).ToList();
-            dbc.RemoveRange(query);
+            var query = await dbc.Enrolment.FindAsync(enrolment.ID);
+            dbc.Remove(query);
             // delete future attendance records
-            var query2 = dbc.AttendClass
+            var query2 = await dbc.AttendClass
                         .Where(x => x.ClassID == enrolment.ClassID
-                                    && x.PersonID == enrolment.PersonID).AsEnumerable()
-                                    .Where(x => x.Date >= dbc.GetLocalTime()).ToList();
-            dbc.RemoveRange(query2);
+                                    && x.PersonID == enrolment.PersonID)
+                                    .Where(x => x.Date >= dbc.GetLocalTime()).ToListAsync();
+            if (query != null) { dbc.RemoveRange(query2); }
         }
 
         public static async Task DeleteEnrolmentsRescinded(U3ADbContext dbc,
@@ -613,21 +608,25 @@ namespace U3A.BusinessRules
                     var deletion = await dbc.Enrolment
                                         .Include(x => x.Term)
                                         .Where(x =>
+                                            x.CourseID == c.CourseID &&
                                             x.PersonID == person.ID &&
-                                            x.Term.Year == term.Year &&
-                                            x.CourseID == c.CourseID).FirstOrDefaultAsync();
-                    if (deletion != null) { DeleteEnrolment(dbc, deletion); }
+                                            (x.Term.Year == term.Year ||
+                                                c.StartDate != null && c.OccurrenceID == (int)OccurrenceType.OnceOnly))
+                                            .FirstOrDefaultAsync();
+                    if (deletion != null) { await DeleteEnrolmentAsync(dbc, deletion); }
                 }
                 else
                 {
                     var deletion = await dbc.Enrolment
                                     .Include(x => x.Term)
                                     .Where(x =>
-                                        x.PersonID == person.ID &&
-                                        x.Term.Year == term.Year &&
                                         x.CourseID == c.CourseID &&
-                                        x.ClassID == c.ID).FirstOrDefaultAsync();
-                    if (deletion != null) { DeleteEnrolment(dbc, deletion); }
+                                        x.ClassID == c.ID &&
+                                        x.PersonID == person.ID &&
+                                            (x.Term.Year == term.Year ||
+                                                c.StartDate != null && c.OccurrenceID == (int)OccurrenceType.OnceOnly))
+                                        .FirstOrDefaultAsync();
+                    if (deletion != null) { await DeleteEnrolmentAsync(dbc, deletion); }
                 }
             }
         }
@@ -640,108 +639,109 @@ namespace U3A.BusinessRules
         /// <param name="person"></param>
         /// <param name="term"></param>
         /// <returns></returns>
-        public static async Task<List<Enrolment>> AddEnrolmentRequests(U3ADbContext dbc,
+        public static async Task<Enrolment> AddEnrolmentRequestAsync(U3ADbContext dbc,
                                             TenantDbContext dbT,
-                                            IEnumerable<Class> RequestedClasses,
+                                            Class RequestedClass,
                                             Person person,
                                             Term term, Term prevTerm)
         {
-            List<Enrolment> result = new();
-            List<Class> thisCampus = new();
-            List<Class> multiCampus = new();
-            foreach (var c in RequestedClasses)
+            Enrolment result = default;
+            Class thisCampus = new();
+            Class multiCampus = new();
+            Term thisTerm = term;
+            Term thisPrevTerm = prevTerm;
+            Class c = RequestedClass;
+            if (c.StartDate != null && c.OccurrenceID == (int)OccurrenceType.OnceOnly)
             {
-                if (await dbc.Class.AnyAsync(x => x.ID == c.ID))
-                {
-                    thisCampus.Add(c);
-                }
-                else
-                {
-                    multiCampus.Add(c);
-                }
+                var year = c.Course.Year;
+                var termNo = 0;
+                if (c.OfferedTerm4) termNo = 4;
+                if (c.OfferedTerm3) termNo = 3;
+                if (c.OfferedTerm2) termNo = 2;
+                if (c.OfferedTerm1) termNo = 1;
+                thisTerm = thisPrevTerm = dbc.Term.Where(x => x.Year == year && x.TermNumber == termNo).FirstOrDefault();
+                c.TermNumber = termNo;
             }
-            if (thisCampus.Count > 0)
+            if (await dbc.Class.AnyAsync(x => x.ID == c.ID))
             {
-                result = await AddEnrolmentRequests(dbc, thisCampus, person, term, prevTerm);
+                result = await AddEnrolmentRequests(dbc, c, person, term, prevTerm);
             }
-            if (multiCampus.Count > 0)
+            else
             {
-                result.AddRange(await AddMultiCampusEnrolmentRequests(dbT, multiCampus, person, term, prevTerm));
+                result = await AddMultiCampusEnrolmentRequests(dbT, c, person, term, prevTerm);
             }
             return result;
         }
-        private static async Task<List<Enrolment>> AddEnrolmentRequests(U3ADbContext dbc,
-                                            IEnumerable<Class> RequestedClasses,
+        private static async Task<Enrolment> AddEnrolmentRequests(U3ADbContext dbc,
+                                            Class RequestedClass,
                                             Person person,
                                             Term term, Term prevTerm)
         {
-            var result = new List<Enrolment>();
-            foreach (var c in RequestedClasses)
+            Enrolment result = default;
+            var c = RequestedClass;
+            bool isFutureTerm = false;
+            int thisYear;
+            int thisTermNo;
+            Term thisTerm = term;
+            if (c.TermNumber == term.TermNumber)
             {
-                bool isFutureTerm = false;
-                int thisYear;
-                int thisTermNo;
-                Term thisTerm = term;
-                if (c.TermNumber == term.TermNumber)
+                //current term
+                thisYear = term.Year;
+                thisTermNo = term.TermNumber;
+            }
+            else if (c.TermNumber == prevTerm.TermNumber)
+            {
+                //last term
+                thisYear = prevTerm.Year;
+                thisTermNo = prevTerm.TermNumber;
+            }
+            else
+            {
+                //future term
+                thisYear = term.Year;
+                isFutureTerm = true;
+                thisTerm = BusinessRule.FindFutureClassTermFromDate(dbc, c, term.Year, dbc.GetLocalDate());
+                thisTermNo = thisTerm.TermNumber;
+            }
+            var course = await dbc.Course.FindAsync(c.CourseID);
+            if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
+            {
+                if (!await dbc.Enrolment.AnyAsync(x =>
+                                    x.PersonID == person.ID &&
+                                    x.Term.Year == thisYear && x.Term.TermNumber == thisTermNo &&
+                                    x.CourseID == c.CourseID))
                 {
-                    //current term
-                    thisYear = term.Year;
-                    thisTermNo = term.TermNumber;
-                }
-                else if (c.TermNumber == prevTerm.TermNumber)
-                {
-                    //last term
-                    thisYear = prevTerm.Year;
-                    thisTermNo = prevTerm.TermNumber;
-                }
-                else
-                {
-                    //future term
-                    thisYear = term.Year;
-                    isFutureTerm = true;
-                    thisTerm = BusinessRule.FindFutureClassTermFromDate(dbc,c,term.Year,dbc.GetLocalDate());
-                    thisTermNo = thisTerm.TermNumber;
-                }
-                var course = await dbc.Course.FindAsync(c.CourseID);
-                if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
-                {
-                    if (!await dbc.Enrolment.AnyAsync(x =>
-                                        x.PersonID == person.ID &&
-                                        x.Term.Year == thisYear && x.Term.TermNumber == thisTermNo &&
-                                        x.CourseID == c.CourseID))
+                    var e = new Enrolment()
                     {
-                        var e = new Enrolment()
-                        {
-                            IsWaitlisted = true
-                        };
-                        e.Person = await dbc.Person.FindAsync(person.ID);
-                        e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
-                        e.Course = await dbc.Course.FindAsync(c.Course.ID);
-                        result.Add(e);
-                        c.Course.Enrolments.Add(e);
-                        await dbc.AddAsync<Enrolment>(e);
-                    }
+                        IsWaitlisted = true
+                    };
+                    e.Person = await dbc.Person.FindAsync(person.ID);
+                    e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
+                    e.Course = await dbc.Course.FindAsync(c.Course.ID);
+                    result = e;
+                    c.Course.Enrolments.Add(e);
+                    await dbc.AddAsync<Enrolment>(e);
                 }
-                else
+            }
+            else
+            {
+                if (!await dbc.Enrolment.AnyAsync(x =>
+                                    x.PersonID == person.ID &&
+                                    x.Term.Year == thisYear && x.Term.TermNumber == thisTermNo &&
+                                    x.CourseID == c.CourseID &&
+                                    x.ClassID == c.ID))
                 {
-                    if (!await dbc.Enrolment.AnyAsync(x =>
-                                        x.PersonID == person.ID &&
-                                        x.Term.Year == thisYear && x.Term.TermNumber == thisTermNo &&
-                                        x.CourseID == c.CourseID &&
-                                        x.ClassID == c.ID))
+                    var e = new Enrolment()
                     {
-                        var e = new Enrolment()
-                        {
-                            IsWaitlisted = true
-                        };
-                        e.Person = await dbc.Person.FindAsync(person.ID);
-                        e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
-                        e.Course = await dbc.Course.FindAsync(c.Course.ID);
-                        e.Class = await dbc.Class.FindAsync(c.ID);
-                        result.Add(e);
-                        c.Course.Enrolments.Add(e);
-                        await dbc.AddAsync<Enrolment>(e);
-                    }
+                        IsWaitlisted = true
+                    };
+                    e.Person = await dbc.Person.FindAsync(person.ID);
+                    e.Term = await dbc.Term.FirstOrDefaultAsync(x => x.Year == thisYear && x.TermNumber == thisTermNo);
+                    e.Course = await dbc.Course.FindAsync(c.Course.ID);
+                    e.Class = await dbc.Class.FindAsync(c.ID);
+                    result = e;
+                    c.Course.Enrolments.Add(e);
+                    await dbc.AddAsync<Enrolment>(e);
                 }
             }
             return result;
@@ -761,18 +761,16 @@ namespace U3A.BusinessRules
         }
 
         public static async Task<string> GetEnrolmentStatusMarkup(U3ADbContext dbc,
-                IEnumerable<Enrolment> enrolments, Term term, SystemSettings settings)
+                Enrolment enrolment, Term term, SystemSettings settings)
         {
             var localTime = dbc.GetLocalTime();
             var result = new StringBuilder();
-            if (enrolments.Count() > 0)
+            if (enrolment != null)
             {
+                var e = enrolment;
                 createEnrolmentSummaryTable(result, "Course Requested");
-                foreach (var e in enrolments)
-                {
-                    var status = GetEnrolmentStatus(e, term, settings, localTime);
-                    result.AppendLine($"<tr><td>{e.Course.Name}</td><td>{status}</td></tr>");
-                }
+                var status = GetEnrolmentStatus(e, term, settings, localTime);
+                result.AppendLine($"<tr><td>{e.Course.Name}</td><td>{status}</td></tr>");
                 result.AppendLine("</tbody></table>");
                 var processMsg = "Pending allocations are processed hourly";
                 if (IsEnrolmentBlackoutPeriod(settings))

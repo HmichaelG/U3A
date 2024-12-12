@@ -110,9 +110,9 @@ else
                                         @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
-                                                                        (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                                                        ? $" | {c.Course.OfferedBy}" : "")
-                                                                            )
+                                                    (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                    ? $" | {c.Course.OfferedBy}" : "")
+                                                        )
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
@@ -381,7 +381,7 @@ else
     }
 
     .listbox-scroll {
-    height: calc(100dvh - @listHeight);
+    height: calc(100dvh - @listHeight );
     }
 
     .list-detail {
@@ -421,12 +421,6 @@ else
     }
 </style>
 @code {
-    const string EXPERIMENTAL_TEXT = $@"<div class='alert alert-warning text-dark text-center'><h5>This class is Experimental</h5>
-                        You have requested enrolment in a class that is currently experimental.<br/>
-                        This means the class has features that are new and are still undergoing full implementation.
-                        While you are encouraged to participate in this class, you should be aware that implementation
-                        and the feature-set may change. Thank you for your participation!
-                        </div>";
 
     [CascadingParameter]
     LoginState loginState { get; set; }
@@ -587,7 +581,7 @@ else
         var listHeightValue = 0;
         if (ws.UseTopMenu) listHeightValue = 4;
         listHeightValue += (loginState.IsAdminOnBehalfOfMember) ? 9 : 4;
-        listHeightValue += (IsReadOnly || IsEnrolmentWithdrawalView) ? 3 : 7; 
+        listHeightValue += (IsReadOnly || IsEnrolmentWithdrawalView) ? 3 : 7;
         listHeight = $"{listHeightValue}rem";
 
         await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
@@ -1023,10 +1017,8 @@ else
         {
             // process enrolment request
             var caption = "Request enrolment";
-            var experimentalMsg = (string.IsNullOrWhiteSpace(selectedClass.Course.OfferedBy))
-                    ? "" : EXPERIMENTAL_TEXT;
             var message = $"<p>Enrolment in the class, <strong>{selectedClass.Course.Name}</strong> will be requested.</p>" +
-                        WaitlistWarning() + experimentalMsg +
+                        WaitlistWarning() +
                        "<p>Do you wish to continue?</p>";
             bool result = true;
             if (reportStyle == ReportStyle.Detail)
@@ -1063,25 +1055,34 @@ else
                     isWorking = true;
                     // Post changes to the database.
                     dbc.ChangeTracker.Clear();
+                    if (deletedClasses.Count > 0)
+                    {
+                        await BusinessRule.DeleteEnrolmentsRescinded(dbc, dbcT, deletedClasses, loginState.SelectedPerson, term, prevTerm);
+                        await dbc.SaveChangesAsync();
+                        await dbcT.SaveChangesAsync();
+                        RemoveDeletedFromMaster();
+                    }
                     var acceptableClasses = await GetAcceptableClasses();
-                    await BusinessRule.DeleteEnrolmentsRescinded(dbc, dbcT, deletedClasses, loginState.SelectedPerson, term, prevTerm);
-                    var addedEnrolments = await BusinessRule.AddEnrolmentRequests(dbc, dbcT, acceptableClasses, loginState.SelectedPerson, term, prevTerm);
-                    await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
-                    await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, Classes, settings);
-                    await dbc.SaveChangesAsync();
-                    await dbcT.SaveChangesAsync();
-                    RemoveDeletedFromMaster();
+                    Enrolment addedEnrolment = default;
+                    if (acceptableClasses.Count > 0)
+                    {
+                        addedEnrolment = await BusinessRule.AddEnrolmentRequestAsync(dbc, dbcT, acceptableClasses[0], loginState.SelectedPerson, term, prevTerm);
+                        await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
+                        await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, Classes, settings);
+                        await dbc.SaveChangesAsync();
+                        await dbcT.SaveChangesAsync();
+                    }
                     selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
                     foreach (var c in selectedClasses)
                     {
                         BusinessRule.AssignClassCounts(term, c);
                     }
-                    if (addedEnrolments.Count() > 0)
+                    if (addedEnrolment != null)
                     {
-                        await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolments, term, settings));
+                        await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolment, term, settings));
                     }
-                    StateHasChanged();
                     isDirty = false;
+                    StateHasChanged();
                 }
                 catch (Exception ex)
                 {

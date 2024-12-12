@@ -86,6 +86,8 @@
                 <DxDateEdit T="DateTime?" Date="@editItem.StartDate" DateExpression="@(() => editItem.StartDate)"
                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                             NullText="Start Date of class. Only if not the Start of Term"
+                            MinDate="@(new DateTime(Course!.Year,1,1))"
+                            MaxDate="@(new DateTime(Course!.Year,12,31))"
                             DateChanged="@((DateTime? newValue) => OnStartDateChanged(newValue, editItem))" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12">
