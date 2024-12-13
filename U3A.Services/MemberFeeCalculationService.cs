@@ -104,9 +104,19 @@ namespace U3A.Services
             }
             return result;
         }
+        public async Task<decimal> CalculateFeeAsync(IDbContextFactory<U3ADbContext> U3Adbfactory,
+                                        Person person, Term term, int? CalculateForTerm = null)
+        {
+            var result = decimal.Zero;
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                if (term != null) { result = await CalculateFeeAsync(dbc, person, term, CalculateForTerm); }
+            }
+            return result;
+        }
 
         public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc,
-                                        Person person, Term term, int? CalclateForTerm = null)
+                                        Person person, Term term, int? CalculateForTerm = null)
         {
             var result = decimal.Zero;
             BillingTerm = term;
@@ -157,7 +167,7 @@ namespace U3A.Services
                         var fee = PersonWithFinancialStatus.MembershipFees;
                         if (fee != 0)
                         {
-                            if (CalclateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalclateForTerm, 2); }
+                            if (CalculateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalculateForTerm, 2); }
                             AddFee(person.ID,
                                 MemberFeeSortOrder.MemberFee, null, $"{term.Year} membership fee", fee);
                         }
@@ -451,14 +461,13 @@ namespace U3A.Services
             var terms = await dbc.Term.AsNoTracking()
                                 .Where(x => x.Year == term.Year && x.TermNumber <= term.TermNumber).ToArrayAsync();
             var courseFeeAdded = new List<Guid>();
-            var classesLead = dbc.Class
+            var classesLead = await dbc.Class
                                     .Include(x => x.Course)
                                     .Where(x =>
-                                            (x.Course.Year == term.Year && (x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee) ||
-                                            (x.Course.CourseFeePerYear > 0 && x.Course.LeadersPayYearFee)) &&
+                                            x.Course.Year == term.Year && (x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee &&
                                             (x.LeaderID == person.ID ||
                                             x.Leader2ID == person.ID ||
-                                            x.Leader3ID == person.ID));
+                                            x.Leader3ID == person.ID))).ToListAsync();
             foreach (var c in classesLead)
             {
                 //Fees per year

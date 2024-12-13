@@ -22,12 +22,12 @@
                 <h5>Use your email address to log in</h5>
                 <hr />
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                     <label for="email" class="form-label">Email</label>
                     <ValidationMessage For="() => Input.Email" class="text-danger" />
                 </div>
                 <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
                     <label for="password" class="form-label">Password</label>
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
@@ -39,9 +39,9 @@
                 </div>
                 <div>
                     <DxButton Text="Login" CssClass="w-100 my-2"
-                        SizeMode="SizeMode.Large"
-                        SubmitFormOnClick=true 
-                        RenderStyle="ButtonRenderStyle.Primary" />
+                    SizeMode="SizeMode.Large"
+                    SubmitFormOnClick=true 
+                    RenderStyle="ButtonRenderStyle.Primary" />
                 </div>
                 <div>
                     <p>
@@ -57,7 +57,7 @@
             </EditForm>
         </section>
     </div>
-@*     <div class="col-md-6 col-md-offset-2">
+    @*     <div class="col-md-6 col-md-offset-2">
         <section>
             <h3>Use another service to log in.</h3>
             <hr />

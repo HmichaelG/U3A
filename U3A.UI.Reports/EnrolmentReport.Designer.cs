@@ -119,7 +119,7 @@
             // 
             // objectDataSource2
             // 
-            this.objectDataSource2.DataSource = typeof(global::U3A.Model.Term);
+            this.objectDataSource2.DataSourceType = null;
             this.objectDataSource2.Name = "objectDataSource2";
             // 
             // TopMargin
@@ -587,7 +587,7 @@
             this.xrTableCell11.StyleName = "DetailCaption1";
             this.xrTableCell11.StylePriority.UseBorders = false;
             this.xrTableCell11.Text = "Name";
-            this.xrTableCell11.Weight = 0.40437138363890857D;
+            this.xrTableCell11.Weight = 0.36169577270684039D;
             // 
             // xrTableCell22
             // 
@@ -597,7 +597,7 @@
             this.xrTableCell22.StyleName = "DetailCaption1";
             this.xrTableCell22.StylePriority.UseBorders = false;
             this.xrTableCell22.Text = "Mobile";
-            this.xrTableCell22.Weight = 0.24237257827274383D;
+            this.xrTableCell22.Weight = 0.21679339345355939D;
             // 
             // xrTableCell23
             // 
@@ -607,7 +607,7 @@
             this.xrTableCell23.StyleName = "DetailCaption1";
             this.xrTableCell23.StylePriority.UseBorders = false;
             this.xrTableCell23.Text = "Email";
-            this.xrTableCell23.Weight = 0.64533120752495343D;
+            this.xrTableCell23.Weight = 0.713586003276206D;
             // 
             // xrTableCell19
             // 
@@ -1068,7 +1068,7 @@
             // 
             // objectDataSource1
             // 
-            this.objectDataSource1.DataSource = typeof(global::U3A.Model.Enrolment);
+            this.objectDataSource1.DataSourceType = null;
             this.objectDataSource1.Name = "objectDataSource1";
             // 
             // clcTotalStudents
@@ -1178,7 +1178,7 @@
             this.DetailCaption1,
             this.DetailData1,
             this.PageInfo});
-            this.Version = "23.2";
+            this.Version = "24.1";
             this.ParametersRequestBeforeShow += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.CourseList_ParametersRequestBeforeShow);
             this.ParametersRequestSubmit += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.CourseList_ParametersRequestSubmit);
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).EndInit();

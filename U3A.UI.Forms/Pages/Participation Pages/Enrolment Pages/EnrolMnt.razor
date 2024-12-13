@@ -515,7 +515,7 @@ else
         {
             if (!feesDue.ContainsKey(e.PersonID))
             {
-                feesDue.Add(e.PersonID, await service.CalculateFeeAsync(dbc, e.Person, currentTerm));
+                feesDue.Add(e.PersonID, await service.CalculateFeeAsync(dbc, e.Person, selectedTerm));
             }
         }
         await InvokeAsync(StateHasChanged);
@@ -654,7 +654,7 @@ else
         }
         else
         {
-            BusinessRule.DeleteEnrolment(dbc, enrolment);
+            await BusinessRule.DeleteEnrolmentAsync(dbc, enrolment);
         }
         await SaveChangesAsync();
         int idx = Enrolments.FindIndex(x => x.ID == enrolment.ID);
@@ -681,7 +681,7 @@ else
         catch (Exception ex)
         {
             ErrorHeader = "Save to database error";
-            ErrorMessage = Helpers.GetErrorMessage(ex);
+            ErrorMessage = ex.ToString(); // Helpers.GetErrorMessage(ex);
             await ErrorPopup.ShowPopupAsync();
             dbc?.ChangeTracker?.Clear();
             dbcT?.ChangeTracker?.Clear();

@@ -5,48 +5,54 @@
     @if (SingleReportOnly)
     {
         <DxRadioGroup Items="@reports"
-                      @bind-Value="@selectedReport" />
+        @bind-Value="@selectedReport" />
     }
     else
     {
-        <DxFormLayoutItem Caption="@(reports[0])" ColSpanMd="12">
-            <DxCheckBox @bind-Checked="@PrintLeaderReport" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Class Contact List" ColSpanMd="12">
-            <DxCheckBox @bind-Checked="@PrintClassList" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="In Case of Emergency List" ColSpanMd="12">
-            <DxCheckBox @bind-Checked="@PrintICEList" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Attendance Record" ColSpanMd="12">
-            <DxCheckBox @bind-Checked="@PrintAttendanceRecord" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Attendance Analysis" ColSpanMd="12">
-            <DxCheckBox @bind-Checked="@PrintAttendanceAnalysis" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Member Badges" ColSpanMd="12">
-            <DxCheckBox @bind-Checked="@PrintMemberBadges" />
-        </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Class CSV file" ColSpanMd="12">
-            <DxCheckBox @bind-Checked="@PrintCSVFile" />
-        </DxFormLayoutItem>
+        <div class="col @($"col-{ColSpan}")">
+            <DxFormLayoutItem Caption="@(reports[0])" ColSpanMd="12">
+                <DxCheckBox @bind-Checked="@PrintLeaderReport" Alignment="CheckBoxContentAlignment.Right" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Class Contact List" ColSpanMd="12">
+                <DxCheckBox @bind-Checked="@PrintClassList" Alignment="CheckBoxContentAlignment.Right" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="In Case of Emergency List" ColSpanMd="12">
+                <DxCheckBox @bind-Checked="@PrintICEList" Alignment="CheckBoxContentAlignment.Right" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Attendance Record" ColSpanMd="12">
+                <DxCheckBox @bind-Checked="@PrintAttendanceRecord" Alignment="CheckBoxContentAlignment.Right" />
+            </DxFormLayoutItem>
+        </div>
+        <div class="col @($"col-{ColSpan}")">
+            <DxFormLayoutItem Caption="Attendance Analysis" ColSpanMd="12">
+                <DxCheckBox @bind-Checked="@PrintAttendanceAnalysis" Alignment="CheckBoxContentAlignment.Right" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Member Badges" ColSpanMd="12">
+                <DxCheckBox @bind-Checked="@PrintMemberBadges" Alignment="CheckBoxContentAlignment.Right" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Class CSV file" ColSpanMd="12">
+                <DxCheckBox @bind-Checked="@PrintCSVFile" Alignment="CheckBoxContentAlignment.Right" />
+            </DxFormLayoutItem>
+        </div>
     }
 </DxFormLayoutGroup>
 @if (SingleReportOnly)
 {
     <DxButton Text="Print Report" IconCssClass="bi bi-print menu-icon" CssClass="col col-12"
-              Enabled="@AreSelectionsMade"
-              RenderStyle="ButtonRenderStyle.Primary" Click="@DoPrintAsync" />
+    Enabled="@AreSelectionsMade"
+    RenderStyle="ButtonRenderStyle.Primary" Click="@DoPrintAsync" />
 }
 else
 {
     <DxButton Text="Queue Report(s) for email" IconCssClass="bi bi-envelope menu-icon" CssClass="col col-12"
-              Enabled="@AreSelectionsMade"
-              RenderStyle="ButtonRenderStyle.Primary" Click="@DoMailAsync" />
+    Enabled="@AreSelectionsMade"
+    RenderStyle="ButtonRenderStyle.Primary" Click="@DoMailAsync" />
 }
 @code {
     [Parameter]
     public bool SingleReportOnly { get; set; }
+    [Parameter]
+    public int ColSpan { get; set; } = 12;
 
     [Parameter, EditorRequired]
     public bool AreSelectionsMade { get; set; }

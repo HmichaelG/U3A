@@ -190,13 +190,13 @@ else
                 break;
 
             case MenuOptions.AssignCourseClerk:
-                <DxFormLayout CssClass="px-4 col col-12 col-md-8 col-lg-7 mx-auto">
+                <DxFormLayout CssClass="px-4 col col-12 col-md-10 mx-auto">
                     <StudentGrid @ref="studentGrid"
                                  Enrolments="EnrolmentsToSelectFrom"
                                  Settings="settings" />
                     <DxButton Text="Assign Course Clerk"
-                              IconCssClass="bi-person-badge menu-icon me-3 h2"
-                              CssClass="col-12 my-1"
+                              IconCssClass="bi-person-badge me-1"
+                              CssClass="d-flex col-6 mx-auto my-1"
                               Click="@(e => OnAssignCourseClerk())"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
@@ -205,27 +205,27 @@ else
                 break;
 
             case MenuOptions.AttendanceHistory:
-                <DxFormLayout CssClass="col col-12 col-md-8 col-lg-6 mx-auto p-4">
+                <DxFormLayout CssClass="col col-12 col-md-10 mx-auto p-4">
                     <AttendanceGrid SelectedClass="@selectedClass"
                                     SelectedTerm="@selectedTerm" LocalTime="@localTime" />
                 </DxFormLayout>
                 break;
 
             case MenuOptions.ManageEnrolments:
-                <DxFormLayout CssClass="px-4 col col-12 col-md-8 col-lg-7 mx-auto">
+                <DxFormLayout CssClass="px-4 col col-12 col-md-10 mx-auto">
                     <StudentGrid @ref="studentGrid"
                                  Enrolments="EnrolmentsToSelectFrom"
                                  Settings="settings" IsManageEnrolmentsView=true />
                     <div class="input-group">
                         <DxButton Text="Delete Selected"
-                                  IconCssClass="bi-person-dash menu-icon me-3 h2"
+                                  IconCssClass="bi-person-dash me-1"
                                   CssClass="flex-grow-1 mb-1"
                                   Click="@(e => OnDeleteEnrolments())"
                                   RenderStyle="ButtonRenderStyle.Danger"
                                   RenderStyleMode="ButtonRenderStyleMode.Contained">
                         </DxButton>
                         <DxButton Text="Toggle WaitList"
-                                  IconCssClass="bi-toggle-on menu-icon me-3 h2"
+                                  IconCssClass="bi-toggle-on me-1"
                                   CssClass="flex-grow-1 mb-1"
                                   Click="@(e => OnToggleWaitlist())"
                                   RenderStyle="ButtonRenderStyle.Warning"
@@ -236,27 +236,27 @@ else
                 break;
 
             case MenuOptions.Communicate:
-                <DxFormLayout CssClass="px-4 col col-12 col-md-8 col-lg-7 mx-auto">
+                <DxFormLayout CssClass="px-4 col col-12 col-md-10 mx-auto">
                     <StudentGrid @ref="studentGrid"
                                  Enrolments="EnrolmentsToSelectFrom"
                                  Settings="settings" />
                     <div class="input-group">
                         <DxButton Text="Email"
-                                  IconCssClass="bi-envelope menu-icon me-3 h2"
+                                  IconCssClass="bi-envelope me-1"
                                   CssClass="flex-grow-1 mb-1"
                                   Click="@(e => GetStudentEmailAddressList())"
                                   RenderStyle="ButtonRenderStyle.Primary"
                                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                         </DxButton>
                         <DxButton Text="SMS"
-                                  IconCssClass="bi-phone menu-icon me-3 h2"
+                                  IconCssClass="bi-phone me-1"
                                   CssClass="flex-grow-1 mb-1"
                                   Click="@(e => GetStudentSMSAddressList())"
                                   RenderStyle="ButtonRenderStyle.Primary"
                                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                         </DxButton>
                         <DxButton Text="Print badges"
-                                  IconCssClass="bi-printer menu-icon me-3 h2"
+                                  IconCssClass="bi-printer me-1"
                                   CssClass="flex-grow-1 mb-1"
                                   Click="@(e => GetMemberBadges())"
                                   RenderStyle="ButtonRenderStyle.Primary"
@@ -283,7 +283,7 @@ else
                         <div class="col-12 mt-3"><InputRadio Value="1" />I <strong>do</strong> use Outlook (Desktop) on this device</div>
                     </InputRadioGroup>
                     <DxButton Text="Save Configuration"
-                              IconCssClass="bi bi-save menu-icon me-3 h2"
+                              IconCssClass="bi bi-save me-1"
                               CssClass="col-12 mt-3 mb-1"
                               Click="@(e => OnSaveEmailDelimiter())"
                               RenderStyle="ButtonRenderStyle.Primary"
@@ -293,7 +293,7 @@ else
                 break;
 
             case MenuOptions.RecordAttendance:
-                <DxFormLayout CssClass="col col-12 mx-auto border mt-1 px-4 pt-">
+                <DxFormLayout CssClass="col col-12 mx-auto mt-4 px-4 pt-">
                     <AttendClassMnt IsAdminPortal="@IsAdminPortal"
                                     IsMemberPortal=true
                                     SelectedTerm="selectedTerm"
@@ -338,70 +338,70 @@ else
             default:
                 <div class="row col col-12 col-md-7 mx-auto">
                     <DxButton Text="Lookup Student / ICE Details"
-                              IconCssClass="bi bi-search menu-icon me-3 h2"
+                              IconCssClass="bi bi-search me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.StudentLookup))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Assign Course Clerk" Visible="@(settings.AllowLeaderToChangeAssignClerk)"
-                              IconCssClass="bi bi-person-badge menu-icon me-3 h2"
+                              IconCssClass="bi bi-person-badge me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.AssignCourseClerk))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Manage Enrolments" Visible="@(settings.AllowLeaderToChangeEnrolment)"
-                              IconCssClass="bi bi-person-rolodex menu-icon me-3 h2"
+                              IconCssClass="bi bi-person-rolodex me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.ManageEnrolments))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Add/Edit Student Leave"
-                              IconCssClass="bi bi-airplane menu-icon me-3 h2"
+                              IconCssClass="bi bi-airplane me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.AddEditStudentLeave))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Email or SMS Students | Member Badges"
-                              IconCssClass="bi bi-broadcast-pin menu-icon me-3 h2"
+                              IconCssClass="bi bi-broadcast-pin me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.Communicate))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Record Attendance"
-                              IconCssClass="bi bi-person-check menu-icon me-3 h2"
+                              IconCssClass="bi bi-person-check me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.RecordAttendance))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Attendance History"
-                              IconCssClass="bi bi-clock-history menu-icon me-3 h2"
+                              IconCssClass="bi bi-clock-history me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.AttendanceHistory))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Cancel Class"
-                              IconCssClass="bi bi-emoji-frown menu-icon me-3 h2"
+                              IconCssClass="bi bi-emoji-frown me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.CancelClass))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Leader Reports"
-                              IconCssClass="bi bi-envelope-paper menu-icon me-3 h2"
+                              IconCssClass="bi bi-envelope-paper me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.LeaderReports))"
                               RenderStyle="ButtonRenderStyle.Primary"
                               RenderStyleMode="ButtonRenderStyleMode.Outline">
                     </DxButton>
                     <DxButton Text="Configure Email"
-                              IconCssClass="bi bi-gear menu-icon me-3 h2"
+                              IconCssClass="bi bi-gear me-1"
                               CssClass="col-12 col-lg-8 mb-1 mx-auto"
                               Click="@(e => OnMenuSelected(MenuOptions.ConfigureEmail))"
                               RenderStyle="ButtonRenderStyle.Primary"
@@ -412,7 +412,7 @@ else
         }
         <div class="row col col-12 col-md-7 mx-auto">
             <DxButton Text="Return to menu" id="exitButton"
-                      IconCssClass="bi-door-closed menu-icon me-3 h2"
+                      IconCssClass="bi-door-closed me-1"
                       CssClass="col-12 col-lg-8 mb-1 mx-auto"
                       Click="@(e => OnCancel())"
                       RenderStyle="ButtonRenderStyle.Primary"
@@ -538,6 +538,7 @@ else
         if (firstRender)
         {
             localTime = new LocalTime(js);
+            isApple = await js.InvokeAsync<bool>("IsApple");
         }
         await js.InvokeVoidAsync("setFocus", "exitButton");
         focusRequired = false;
@@ -825,7 +826,6 @@ else
         if (!await AreEnrolmentsSelected()) return;
         if (studentGrid == null) return;
         if (studentGrid.SelectedDataItems == null) return;
-        isApple = await js.InvokeAsync<bool>("IsApple");
         var smsto = $"sms:";
         if (isApple)
         {

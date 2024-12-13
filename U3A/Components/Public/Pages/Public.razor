@@ -8,12 +8,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components
 
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
 @inject LocalTime lt
+
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
                     @bind-IsActive="@IsXtraSmallLayout" />
@@ -32,26 +34,9 @@
 }
 else
 {
-    <div class="webkit-prefix">
-        @if ((AppleOSversion?[0] <= 12))
-        {
-            <div class="card text-center p-4 alert-danger text-dark">
-                <h3>Apple OS: Safari version: @AppleOSversion?[0].@AppleOSversion?[1].@AppleOSversion?[2] </h3>
-                <p>
-                    We're sorry. <strong>Member Portal</strong> is a new web application that requires
-                    a modern browser. Your Safari browser is less than the minimum supported version of 13.1.0
-                    and therefore cannot be used.
-                </p>
-                <p>
-                    Unlike other operating systems (Windows, Android, Linux, Unix etc), Apple does not provide browser updates for older devices.
-                    You will therefore need to use another device/PC to access our portal.
-                </p>
-                <p>However, you can access our Class Schedule but with reduced functionality.</p>
-                <button type="button" class="mb-4" @onclick="@OnReportClick">Click to view Class Schedule</button>
-                <button type="button" class="mb-4" @onclick="@OnClose">Return to website</button>
-            </div>
-        }
-        <DxGridLayout CssClass="pageBackColor">
+    @if (RendererInfo.IsInteractive)
+    {
+        <DxGridLayout>
             <Rows>
                 @if (IsXtraSmallLayout || IsSmallLayout)
                 {
@@ -198,7 +183,11 @@ else
             </Items>
         </DxGridLayout>
 
-    </div>
+    }
+    else
+    {
+        <NotInteractive />
+    }
 }
 <style>
     .box-height {
@@ -221,7 +210,6 @@ else
     bool isBeforeEnrolmentDay = false;
     bool isNoEnrolmentTermAvailable = false;
     string lockoutMessage = string.Empty;
-    int[]? AppleOSversion;
     bool isReady;
 
     ErrorBoundary? errorBoundary;
@@ -247,43 +235,38 @@ else
     {
         if (firstRender)
         {
-            if (js != null)
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                // Apple version check
-                AppleOSversion = await js.InvokeAsync<int[]>("appleOSversion");
-                using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+                // no ernolment term in force
+                var localTime = await lt.GetLocalTimeAsync();
+                var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc, localTime);
+                if (currentTerm == null)
                 {
-                    // no ernolment term in force
-                    var localTime = await lt.GetLocalTimeAsync();
-                    var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc, localTime);
-                    if (currentTerm == null)
+                    currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+                    if (localTime < currentTerm!.EnrolmentStartDate)
                     {
-                        currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-                        if (localTime < currentTerm!.EnrolmentStartDate)
+                        await SetUnavailableMessage(currentTerm);
+                    }
+                    else
+                    {
+                        var nextTerm = await BusinessRule.GetNextTermAsync(dbc, currentTerm);
+                        if (nextTerm != null)
                         {
-                            await SetUnavailableMessage(currentTerm);
-                        }
-                        else
-                        {
-                            var nextTerm = await BusinessRule.GetNextTermAsync(dbc, currentTerm);
-                            if (nextTerm != null)
+                            if (localTime.Date > currentTerm.EndDate)
                             {
-                                if (localTime.Date > currentTerm.EndDate)
-                                {
-                                    await SetUnavailableMessage(nextTerm);
-                                }
+                                await SetUnavailableMessage(nextTerm);
                             }
                         }
                     }
-                    // Enrolment day lockout
-                    var openingTime = await BusinessRule.IsEnrolmentDayLockoutPeriod(dbc, await lt.GetLocalDateAsync());
-                    if (openingTime != null)
-                    {
-                        isBeforeEnrolmentDay = true;
-                        var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
-                        var sOpeningTime = openingTime?.ToString("ddd dd-MMM-yy hh:mm tt");
-                        lockoutMessage = $@"<strong>{term!.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.";
-                    }
+                }
+                // Enrolment day lockout
+                var openingTime = await BusinessRule.IsEnrolmentDayLockoutPeriod(dbc, await lt.GetLocalDateAsync());
+                if (openingTime != null)
+                {
+                    isBeforeEnrolmentDay = true;
+                    var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+                    var sOpeningTime = openingTime?.ToString("ddd dd-MMM-yy hh:mm tt");
+                    lockoutMessage = $@"<strong>{term!.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.";
                 }
             }
         }

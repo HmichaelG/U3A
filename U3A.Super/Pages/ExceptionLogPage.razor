@@ -1,13 +1,36 @@
 ﻿@page "/ExceptionLogPage/{id}"
 
 @inject IDbContextFactory<TenantDbContext> tenantDbfactory
+@inject LocalTime lt
 
-<h3>Exception Log</h3>
 
-<pre>@log?.Exception</pre>
+@if (isReady)
+{
+    <h3>Exception Log</h3>
+
+    <table class="w-75">
+        <thead>
+            <tr>
+                <td>Date</td>
+                <td>Time</td>
+                <td>Tenant</td>
+                <td>User</td>
+            </tr>
+        </thead>
+        <tr>
+            <td>@localTime.ToLongDateString()</td>
+            <td>@localTime.ToLongTimeString()</td>
+            <td>@log?.Tenant</td>
+            <td>@log?.User</td>
+        </tr>
+    </table>
+
+    <pre>@log?.Exception</pre>
+}
 
 <style>
     pre {
+        margin-top: 0.5rem;
         font-size: 12px;
         height: 80%;
     }
@@ -17,7 +40,9 @@
     [Parameter]
     public string id { get; set; }
 
+    DateTime localTime;
     LogEvents? log;
+    bool isReady;
 
     protected override async Task OnInitializedAsync()
     {
@@ -27,8 +52,13 @@
             {
                 int key = int.Parse(id);
                 log = await dbc.LogEvents.FindAsync(key);
+                if (log != null)
+                {
+                    localTime = await lt.GetLocalTimeAsync(log.TimeStamp);
+                }
             }
         }
+        isReady = true;
         await base.OnInitializedAsync();
     }
 }

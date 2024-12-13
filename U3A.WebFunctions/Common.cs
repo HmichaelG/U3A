@@ -64,7 +64,7 @@ namespace U3A.WebFunctions
                             rdr.Close();
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         var eID = new EventId(10000);
                     }

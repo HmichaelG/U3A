@@ -29,8 +29,14 @@ using U3A.Data;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
+using Azure.Identity;
+
 
 var builder = WebApplication.CreateBuilder(args);
+// Add services to the container.
+builder.Services.AddRazorComponents(options =>
+    options.DetailedErrors = builder.Environment.IsDevelopment())
+    .AddInteractiveServerComponents();
 
 // **** Start local modifications ****
 
@@ -101,15 +107,15 @@ foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
 // TenantDbContextFactory
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {
-    options.UseSqlServer(tenantConnectionString, providerOptions => providerOptions.EnableRetryOnFailure());
+    options.UseSqlServer(tenantConnectionString);
 }, ServiceLifetime.Scoped);
 
 // U3ADbContextFactory
-builder.Services.AddDbContext<U3ADbContext>(options => options.UseSqlServer(providerOptions => providerOptions.EnableRetryOnFailure()));
+builder.Services.AddDbContext<U3ADbContext>();
 
 builder.Services.AddDbContextFactory<U3ADbContext>(options =>
 {
-    options.UseSqlServer(providerOptions => providerOptions.EnableRetryOnFailure());
+    options.UseSqlServer();
 }, ServiceLifetime.Scoped);
 
 // Get / Set local storage data
@@ -166,20 +172,15 @@ builder.Services.AddRazorPages().AddRazorPagesOptions(o =>
 
 constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
 
+builder.Services.AddScoped<WorkStation>();
+
 //**** End local modifications ****
 
-// Add services to the container.
-builder.Services.AddRazorComponents(options =>
-    options.DetailedErrors = builder.Environment.IsDevelopment())
-    .AddInteractiveServerComponents();
-
-builder.Services.AddAuthorization();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
-builder.Services.AddScoped<WorkStation>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -205,7 +206,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<U3ADbContext>()
     .AddSignInManager()
-    .AddUserManager<UserManager<ApplicationUser>>()   
+    .AddUserManager<UserManager<ApplicationUser>>()
     .AddDefaultTokenProviders();
 
 
@@ -240,7 +241,9 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+app.MapStaticAssets();
+//app.UseStaticFiles();
+
 app.UseAntiforgery();
 app.Use(async (context, next) =>
 {
@@ -266,4 +269,7 @@ app.MapAdditionalIdentityEndpoints();
 
 app.MapControllers();
 
+app.MapFallbackToFile("/fallback.html");
+
 app.Run();
+

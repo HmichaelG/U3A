@@ -1,45 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-U3A-1fe615b5-a026-4c5d-8e8e-7d353ab11b61</UserSecretsId>
-	  <Version>2024.11.8.0000</Version>
-	  <ApplicationInsightsResourceId>/subscriptions/c6a46b11-c209-428d-9386-3d7f92c9525f/resourceGroups/U3A-linux_group/providers/microsoft.insights/components/U3A-linux</ApplicationInsightsResourceId>
-	  <PublishAot>False</PublishAot>
-	  <SignAssembly>False</SignAssembly>
+    <Version>2024.12.13.0000</Version>
+    <ApplicationInsightsResourceId>/subscriptions/c6a46b11-c209-428d-9386-3d7f92c9525f/resourceGroups/U3A-linux_group/providers/microsoft.insights/components/U3A-linux</ApplicationInsightsResourceId>
+    <PublishAot>False</PublishAot>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="uploads\**" />
     <Content Remove="uploads\**" />
     <EmbeddedResource Remove="uploads\**" />
     <None Remove="uploads\**" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Remove="Components\Private\Pages\Reports.razor" />
     <Content Remove="Components\Public\Pages\ReCAPTCHA.razor" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="resources\en_AU.aff" />
     <None Remove="resources\en_AU.dic" />
+    <None Remove="resources\prcDbCleanup.sql" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="resources\en_AU.aff" />
     <EmbeddedResource Include="resources\en_AU.dic" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="Components\Public\Shared\ReCAPTCHA.razor" />
     <None Include="wwwroot\favicon\site.webmanifest" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="8.2.2" />
+    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.2" />
     <PackageReference Include="Azure.Identity" Version="1.13.1" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
@@ -52,20 +46,19 @@
     <PackageReference Include="DevExpress.Drawing" Version="24.1.7" />
     <PackageReference Include="DevExpress.Drawing.Skia" Version="24.1.7" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Serilog" Version="4.1.0" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.1.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\U3A.Data\U3A.Database.csproj" />
     <ProjectReference Include="..\U3A.Model\U3A.Model.csproj" />
@@ -74,21 +67,22 @@
     <ProjectReference Include="..\U3A.UI.Forms\U3A.UI.Forms.csproj" />
     <ProjectReference Include="..\U3A.UI.Reports\U3A.UI.Reports.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <UpToDateCheckInput Remove="Components\Public\Pages\fallback.razor" />
   </ItemGroup>
-
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\Public\Pages\fallback.razor" />
   </ItemGroup>
-
+  <ItemGroup>
+    <EmbeddedResource Include="resources\prcDbCleanup.sql">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\lib\jquery\dist\" />
+    <Folder Include="wwwroot\Temp\" />
   </ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="XCOPY &quot;$(SolutionDir)\U3A\wwwroot\help&quot; &quot;$(TargetDir)\wwwroot\help\&quot; /S /Y" />
-	</Target>
-
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="XCOPY &quot;$(SolutionDir)\U3A\wwwroot\help&quot; &quot;$(TargetDir)\wwwroot\help\&quot; /S /Y" />
+  </Target>
 </Project>

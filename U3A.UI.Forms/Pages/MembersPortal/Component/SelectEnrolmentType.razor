@@ -1,10 +1,7 @@
 ﻿@namespace U3A.UI.Forms
 
-<DxPopup Visible="@PopupVisible" @ref="@messageBox" Width="@PopupWidth"
-         ApplyBackgroundShading="true"
-         CloseButtonClick="@NegativeButtonClicked"
+<DxWindow Visible="@PopupVisible" @ref="@messageBox" Width="@PopupWidth"
          CloseOnEscape="false"
-         CloseOnOutsideClick="false"
          ShowFooter="true"
          HeaderText="Select Student Group">
     <BodyContentTemplate Context="PopupContext">
@@ -24,7 +21,7 @@
                   Text="Cancel"
                   Click="@NegativeButtonClicked" />
     </FooterContentTemplate>
-</DxPopup>
+</DxWindow>
 
 @code {
     [Parameter]
@@ -32,9 +29,9 @@
     [Parameter]
     public bool PopupVisible { get; set; }
     [Parameter]
-    public string PopupWidth { get; set; }
+    public string PopupWidth { get; set; } = "20rem";
 
-    DxPopup? messageBox;
+    DxWindow? messageBox;
 
     string mOKButtonText { get; set; }
 

@@ -1,5 +1,4 @@
-﻿
-@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject WorkStation ws
 @implements IDisposable
 
@@ -12,8 +11,8 @@
     <DxFormLayout CssClass="col col-12">
         <DxFormLayoutItem Caption="Attendance Term" ColSpanMd="6">
             <TermsComboBox SelectedTerm="@SelectedTerm"
-                          Terms="@terms" ShowProcessButton="true"
-                          OnProcessButtonClicked="(Term value) => {SelectedTerm = value; OnProcess();}" />
+                           Terms="@terms" ShowProcessButton="true"
+                           OnProcessButtonClicked="(Term value) => {SelectedTerm = value; OnProcess();}" />
         </DxFormLayoutItem>
         <DxFormLayoutItem Caption="Show week by week totals" ColSpanMd="2">
             <DxCheckBox Checked=@isWeekByWeekTotalsDisplayed
@@ -37,57 +36,60 @@
             </DxTagBox>
         </DxFormLayoutItem>
 
-        <DxTabs @ref=tabs TabClick="OnTabClick" CssClass="w-100">
+        <DxTabs @ref=tabs TabClick="OnTabClick" CssClass="col col-12">
             <DxTabPage Text="Course Type" />
             <DxTabPage Text="Venue" />
             <DxTabPage Text="Course" />
         </DxTabs>
 
-        <DxPivotGrid @ref=pivotGrid Data="@pivotData"
-                     CssClass="pivot-height"
-                     ShowFieldHeaders="false">
-            @{
-                switch (selectedIndex)
-                {
-                    case 1:
-                        <DxPivotGridField Field="@nameof(AttendClass.VenueName)" Area="PivotGridFieldArea.Row" Caption="Venue" />
-                        <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
-                        break;
-                    case 2:
-                        <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
-                        <DxPivotGridField Field="@nameof(AttendClass.PersonName)" Area="PivotGridFieldArea.Row" Caption="Student" />
-                        break;
-                    default:
-                        <DxPivotGridField Field="@nameof(AttendClass.CourseTypeName)" Area="PivotGridFieldArea.Row" Caption="Course Type" />
-                        <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
-                        break;
+        <FullScreen DisplayOffset="12">
+            <ContentTemplate>
+                <DxPivotGrid @ref=pivotGrid Data="@pivotData" CssClass="col col-12"
+                             ShowFieldHeaders="false">
+                    @{
+                        switch (selectedIndex)
+                        {
+                            case 1:
+                                <DxPivotGridField Field="@nameof(AttendClass.VenueName)" Area="PivotGridFieldArea.Row" Caption="Venue" />
+                                <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
+                                break;
+                            case 2:
+                                <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
+                                <DxPivotGridField Field="@nameof(AttendClass.PersonName)" Area="PivotGridFieldArea.Row" Caption="Student" />
+                                break;
+                            default:
+                                <DxPivotGridField Field="@nameof(AttendClass.CourseTypeName)" Area="PivotGridFieldArea.Row" Caption="Course Type" />
+                                <DxPivotGridField Field="@nameof(AttendClass.CourseName)" Area="PivotGridFieldArea.Row" Caption="Course" />
+                                break;
 
-                }
-            }
-            @if (isWeekByWeekTotalsDisplayed)
-            {
-                <DxPivotGridField Field="@nameof(AttendClass.WeekEndDate)" Area="PivotGridFieldArea.Column" Caption="Wk Ending">
-                    <HeaderTemplate>@(string.Format("{0:dd-MMM-yy}", context))</HeaderTemplate>
-                </DxPivotGridField>
-            }
-            <DxPivotGridField Field="@nameof(AttendClass.Actual)" Caption="Act" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
-            @if (!hideExpectedAnalysis)
-            {
-                <DxPivotGridField Field="@nameof(AttendClass.Expected)" Caption="Exp" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
-                <DxPivotGridField Field="@nameof(AttendClass.Difference)" Caption="+/-" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum">
-                    <DataTemplate>
-                        <div class="@((decimal?)context >= 0 ? "fw-bolder text-success" : "fw-bolder text-danger")">
-                            @context
-                        </div>
-                    </DataTemplate>
-                </DxPivotGridField>
-            }
-        </DxPivotGrid>
+                        }
+                    }
+                    @if (isWeekByWeekTotalsDisplayed)
+                    {
+                        <DxPivotGridField Field="@nameof(AttendClass.WeekEndDate)" Area="PivotGridFieldArea.Column" Caption="Wk Ending">
+                            <HeaderTemplate>@(string.Format("{0:dd-MMM-yy}", context))</HeaderTemplate>
+                        </DxPivotGridField>
+                    }
+                    <DxPivotGridField Field="@nameof(AttendClass.Actual)" Caption="Act" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
+                    @if (!hideExpectedAnalysis)
+                    {
+                        <DxPivotGridField Field="@nameof(AttendClass.Expected)" Caption="Exp" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum" />
+                        <DxPivotGridField Field="@nameof(AttendClass.Difference)" Caption="+/-" Area="PivotGridFieldArea.Data" SummaryType="PivotGridSummaryType.Sum">
+                            <DataTemplate>
+                                <div class="@((decimal?)context >= 0 ? "fw-bolder text-success" : "fw-bolder text-danger")">
+                                    @context
+                                </div>
+                            </DataTemplate>
+                        </DxPivotGridField>
+                    }
+                </DxPivotGrid>
+            </ContentTemplate>
+        </FullScreen>
     </DxFormLayout>
 }
 <style>
     .pivot-height {
-        height: calc(100dvh - @(ws.UseTopMenu ? "17rem" : "15rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "17rem" : "15rem") );
     }
 </style>
 

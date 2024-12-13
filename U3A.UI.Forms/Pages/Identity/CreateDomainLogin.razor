@@ -10,7 +10,7 @@
 
 <MessageBox @ref="@msgBox" />
 <DxPopup Visible="@popupVisible" @ref="@popup"
-         CloseButtonClick="@NegativeButtonClicked"
+         Closed="@NegativeButtonClicked"
          CloseOnEscape="false"
          CloseOnOutsideClick="false"
          ShowFooter="true"
@@ -19,7 +19,7 @@
         <DxFormLayout CssClass="m-2">
             <div class="m-2">
                 A domain-level login is one not usually associated with a Participant.<br />
-                It is most often used to grant a group of users common access to the administraive portal.
+                It is most often used to grant a group of users common access to the administrative portal.
                 For example, @GetExampleEmail().
             </div>
             <DxFormLayoutItem Caption="Login" ColSpanSm="6">
@@ -165,7 +165,6 @@
     }
     void NegativeButtonClicked() {
         popupVisible = false;
-        tcs?.SetResult(false);
     }
 
 }

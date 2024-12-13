@@ -1,37 +1,56 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
 
+@using U3A.UI.Contact.Shared
+
 
 <MessageBox @ref="@messageBox" />
 <Progress @ref="@ProgressBar" />
 
+<MessageBox @ref=@tagSelectionMessageBox>
+    <TextTemplate>
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="Select Tag(s)" ColSpanMd="12">
+                <DxTagBox Data="@tags"
+                KeyFieldName="Id"
+                TextFieldName="Name"
+                NullText="Click to select..."
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                @bind-Values="@selectedTags">
+                    <Columns>
+                        <DxListEditorColumn FieldName="@nameof(Tag.Name)" Caption="Name" />
+                        <DxListEditorColumn FieldName="@nameof(Tag.CanLead)" Caption="Can Lead?" />
+                        <DxListEditorColumn FieldName="@nameof(Tag.CanEnrol)" Caption="Can Enrol?" />
+                    </Columns>
+                </DxTagBox>
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </TextTemplate>
+</MessageBox>
+
+
 <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-                             DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
 
 <DxGrid Data="@taggedContacts" @ref=@mainGrid
-        @bind-SelectedDataItems="@SelectedDataItems"
-        AutoExpandAllGroupRows="true"
-        AllowSelectRowByClick="true"
-        SelectionMode=GridSelectionMode.Multiple
-        KeyFieldNames="@(new List<string>() {"Tag.Id","Contact.ID"})">
+@bind-SelectedDataItems="@SelectedDataItems"
+AutoExpandAllGroupRows="true"
+AllowSelectRowByClick="true"
+SelectionMode=GridSelectionMode.Multiple
+KeyFieldNames="@(new List<string>() {"Tag.Id","Contact.ID"})">
     <ToolbarTemplate>
-        <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid LayoutKey="{F0CB0949-8C0B-4B82-9597-942DEEC72F3C}">
-            <CustomButtonContent>
-                <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                               BeginGroup=true
-                               Click=@OnCommunicate
-                               RenderStyle="ButtonRenderStyle.Primary"
-                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                               Alignment="ToolbarItemAlignment.Right"
-                               Tooltip="Send email and/or SMS to Contacts">
-                </DxToolbarItem>
-            </CustomButtonContent>
-        </GridToolbar>
+        <ContactToolbar LinkedGrid=@mainGrid
+        LayoutKey="{F0CB0949-8C0B-4B82-9597-942DEEC72F3C}"
+        OnCommunicateClicked="OnCommunicate"
+        OnDeleteClicked="@OnDelete"
+        OnAddTagsClicked="@OnAddTag"
+        OnRemoveTagsClicked="@OnRemoveTag"
+        OnSelectByTagClicked="@OnSelectByTag" />
     </ToolbarTemplate>
     <Columns>
         <DxGridDataColumn Caption="Tag" FieldName="Tag.Name" GroupIndex="0" />
         <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
-                               Width="2rem" />
+        Width="2rem" />
         <DxGridDataColumn Caption="Name" FieldName="Contact.FullNameAlpha" />
         <DxGridBandColumn Caption="Address">
             <Columns>
@@ -55,26 +74,30 @@
             </Columns>
         </DxGridBandColumn>
         <DxGridDataColumn Caption="Last Update" FieldName="Contact.UpdatedOn" Width="8rem"
-                          DisplayFormat="d/M/yy HH:mm" Visible="false" />
+        DisplayFormat="d/M/yy HH:mm" Visible="false" />
     </Columns>
 
     <GroupSummary>
         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                           FieldName="Contact.Id" DisplayText="{0:n0} Contacts" />
+        FieldName="Contact.Id" DisplayText="{0:n0} Contacts" />
     </GroupSummary>
     <TotalSummary>
         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                           FieldName="Tag.Id" DisplayText="{0:n0} Tagged Contacts"
-                           FooterColumnName="Contact.FullNameAlpha" />
+        FieldName="Tag.Id" DisplayText="{0:n0} Tagged Contacts"
+        FooterColumnName="Contact.FullNameAlpha" />
     </TotalSummary>
 
 </DxGrid>
 
 @code {
+    [CascadingParameter]
+    LoginState loginState { get; set; }
+
     IReadOnlyList<object> SelectedDataItems { get; set; }
     IEnumerable<TaggedContact> taggedContacts;
+    IEnumerable<Tag> tags { get; set; }
+
     IGrid? mainGrid;
-    GridToolbar? Toolbar;
     List<Person> SendTo { get; set; }
 
     List<DocumentTemplate> DocumentTemplates;
@@ -85,31 +108,148 @@
     Progress? ProgressBar;
     int emailsSent;
     U3ADbContext? dbc { get; set; }
+    MessageBox tagSelectionMessageBox;
+    IEnumerable<Tag> selectedTags;
 
 
     protected override async Task OnInitializedAsync()
     {
         Communication = new Communication();
         dbc = await U3Adbfactory.CreateDbContextAsync();
-        taggedContacts = await BusinessRule.SelectableTaggedContactsAsync(dbc);
+        await GetData();
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         server = new DocumentServer(dbc);
         server.DocumentSentEvent += Server_DocumentSent;
         await base.OnInitializedAsync();
     }
+
+    async Task GetData()
+    {
+        tags = await BusinessRule.SelectableTagAsync(dbc);
+        taggedContacts = await BusinessRule.SelectableTaggedContactsAsync(dbc);
+    }
+
+    async Task OnDelete()
+    {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await ShowNoSelectionDialog();
+            return;
+        }
+        string contactsToDelete = "";
+        foreach (var item in SelectedDataItems)
+        {
+            var tc = item as TaggedContact;
+            if (tc != null) { contactsToDelete += $"'{tc.Contact.ID.ToString()}',"; }
+        }
+        contactsToDelete = contactsToDelete.TrimEnd(',');
+        string sql =
+                $@"Update Person
+            set [IsDeleted] = 1, [DeletedAt] = getdate() , [User] = '{loginState.LoginEmail}'
+            where ID IN ({contactsToDelete})";
+        var count = await dbc.Database.ExecuteSqlRawAsync(sql);
+        await GetData();
+        await messageBox.ShowOkOnlyAsync("Deletion Complete", $"{count} contacts have been deleted.");
+    }
+
+
+    async Task OnSelectByTag()
+    {
+        if (await tagSelectionMessageBox.ShowAsync("Select required Tags", ""))
+        {
+            if (selectedTags != null)
+            {
+                foreach (var tc in taggedContacts)
+                {
+                    foreach (var tag in selectedTags)
+                    {
+                        if (tc.Tag.Id == tag.Id)
+                        {
+                            mainGrid.SelectDataItem(tc, true);
+                            break;
+                        }
+                    }
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+    async Task OnAddTag()
+    {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await ShowNoSelectionDialog();
+            return;
+        }
+        if (await tagSelectionMessageBox.ShowAsync("Select Tags to add", ""))
+        {
+            if (selectedTags != null)
+            {
+                foreach (var item in SelectedDataItems)
+                {
+                    var tc = (item as TaggedContact);
+                    var contact = await dbc.Contact.FindAsync(tc.Contact.ID);
+                    var contactTags = contact.Tags.ToList();
+                    foreach (var tag in selectedTags)
+                    {
+                        if (!contact.Tags.Contains(tag))
+                        {
+                            contactTags.Add(tag);
+                        }
+                    }
+                    contact.Tags = contactTags;
+                }
+                await dbc.SaveChangesAsync();
+                await GetData();
+            }
+        }
+    }
+
+    async Task OnRemoveTag()
+    {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await ShowNoSelectionDialog();
+            return;
+        }
+        if (await tagSelectionMessageBox.ShowAsync("Select Tags to remove", ""))
+        {
+            if (selectedTags != null)
+            {
+                foreach (var item in SelectedDataItems)
+                {
+                    var tc = (item as TaggedContact);
+                    var contact = await dbc.Contact.FindAsync(tc.Contact.ID);
+                    var contactTags = contact.Tags.ToList();
+                    foreach (var tag in selectedTags)
+                    {
+                        if (contact.Tags.Contains(tag))
+                        {
+                            contactTags.Remove(tag);
+                        }
+                    }
+                    contact.Tags = contactTags;
+                }
+                await dbc.SaveChangesAsync();
+                selectedTags = null;
+                await GetData();
+            }
+        }
+    }
+
+    async Task ShowNoSelectionDialog() =>
+               await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to use this option.");
+
     async Task OnCommunicate()
     {
         if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
         {
-            await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
+            await ShowNoSelectionDialog();
             return;
         }
-        SendTo = new();
-        foreach (var tc in SelectedDataItems.Cast<TaggedContact>())
-        {
-            var p = (Person)tc.Contact;
-            if (!SendTo.Contains(p)) { SendTo.Add(p); }
-        }
+        var taggedContacts = SelectedDataItems.Cast<TaggedContact>().OrderBy(x => x.Contact.FullNameAlpha).ToList();
+        SendTo = taggedContacts.Select(x => x.Contact as Person).ToList();
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             emailsSent = 0;
@@ -132,4 +272,5 @@
     {
         dbc?.Dispose();
     }
+
 }

@@ -58,10 +58,10 @@ else
     </DxFlyout>
 
     <DxFormLayout CssClass="w-100">
-        <div class="col col-12 col-lg-9 p-2">
+        <div class="col col-12 col-lg-9 px-2">
             @if (IsMemberPortal)
             {
-                <div class="pt-4 text-center col-12">
+                <div class="text-center col-12">
                     @(new MarkupString($"{SelectedTerm?.Name} {SelectedCourse?.Name}<br/>{SelectedClass?.ClassSummary}"))
                 </div>
                 <div class="input-group my-2">
@@ -85,9 +85,9 @@ else
                 <div class="row align-content-start">
                     <ContextHelpTitle Title="Class Attendance" HelpTopic="Class-Attendance.html" />
                 </div>
-                    <div class="rwo w-100 ms-4">
-                        Mark the class attendance roll.
-                    </div>
+                <div class="rwo w-100 ms-4">
+                    Mark the class attendance roll.
+                </div>
                 <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
                                    ExpandedChanged="@(async () => {areDetailsExpanded = !areDetailsExpanded;
@@ -148,7 +148,7 @@ else
                     @bind-SelectedDataItems="SelectedDataItems"
                     EditMode="GridEditMode.PopupEditForm"
                     EditModelSaving="Grid_EditModelSaving">
-                    <ToolbarTemplate>
+                <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid Visible="@(IsLargeLayout || IsXtraLargeLayout)" LayoutKey="{9C4F6177-3FAB-407A-A515-C1B30F04D836}"
                                  HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
                                  HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
@@ -159,7 +159,7 @@ else
                                            RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0 ms-2" />
                         </CustomButtonContent>
                     </GridToolbar>
-                    </ToolbarTemplate>
+                </ToolbarTemplate>
                 <Columns>
                     <DxGridSelectionColumn Width="1rem" />
                     <DxGridCommandColumnEx @ref="GridCommandColumn"
@@ -244,7 +244,7 @@ else
                         <div class="col-3 text-end">@countAdHoc</div>
                         <div class="col-9">Absent With Apology</div>
                         <div class="col-3 text-end">@countAbsentWithApology</div>
-                        <div class="col-9">Absent Without Apology</div>
+                        <div class="col-9">Absent W/out Apology</div>
                         <div class="col-3 text-end">@countAbsentWithoutApology</div>
                     </div>
                 </div>
@@ -504,11 +504,20 @@ else
 
     async Task SetGridHeight()
     {
-        var offset = (IsLargerLayout()) ? (IsAdminPortal || IsMemberPortal) ? 70 : 15 : 0.4;
+        double offset = 15; // !IsAdminPortal && !IsMemberPortal
+        if (IsLargerLayout())
+        {
+            if (IsAdminPortal) { offset = (ws.UseTopMenu) ? 10 : 25; }
+            if (IsMemberPortal) { offset = 70; }
+        }
+        else
+        {
+            offset = 0.4;
+        }
         var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
-        if (newHeight != gridHeight) 
-        { 
-            gridHeight = newHeight; await InvokeAsync(StateHasChanged); 
+        if (newHeight != gridHeight)
+        {
+            gridHeight = newHeight; await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -584,7 +593,7 @@ else
         if (ClassDate.Date.Date > now.Date)
         {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                                                                                                    @"The class date you have selected is in the future.<br/>
+                                                                                                                        @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
@@ -622,7 +631,7 @@ else
         if (maxDate <= SelectedTerm.StartDate)
         {
             await messageBox.ShowOkOnlyAsync("Re-select term",
-                                                                        @"Today's date is prior to the selected term's start date.<br/>
+                                                                            @"Today's date is prior to the selected term's start date.<br/>
                     Select a term with a start date prior to today.");
             return;
         }
@@ -766,7 +775,7 @@ else
             foreach (var c in SelectedDataItems.Cast<AttendClass>())
             {
                 //physically remove, override soft delete
-                await dbc.Database.ExecuteSqlAsync($"Delete Fee where ID = {c.ID}");
+                await dbc.Database.ExecuteSqlAsync($"Delete AttendClass where ID = {c.ID}");
             }
             if (await SaveChangesAsync())
             {

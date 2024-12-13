@@ -43,7 +43,7 @@ else
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
         <DxFormLayout>
-            <div class="col-10 px-4">
+            <div class="col-9 px-4">
                 <FullScreen DisplayOffset="@contentSize">
                     <ContentTemplate>
                         <DxGrid Data="@Classes" @ref=@mainGrid
@@ -81,7 +81,7 @@ else
                     </ContentTemplate>
                 </FullScreen>
             </div>
-            <div class="col col-2 mt-3">
+            <div class="col col-3">
                 <SelectLeaderReports @ref=@rptSelect SingleReportOnly=false
                                      AreSelectionsMade="@AreSelectionsMade"
                                      OnQueueReportsSelected="OnQueueReportsSelected" />

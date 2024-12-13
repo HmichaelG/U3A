@@ -25,16 +25,10 @@ namespace U3A.WebFunctions
         [Function("HourlyProcedures")]
         public async Task Run([TimerTrigger("0 0 22-23,0-11 * * *"      
 #if DEBUG
-           // , RunOnStartup=true
+            , RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
-
-            // Get the fonts
-            foreach (var file in System.IO.Directory.GetFiles(@"fonts"))
-            {
-                DXFontRepository.Instance.AddFont(file);
-            }
 
             //Retrieve the tenants
             var tenants = new List<TenantInfo>();

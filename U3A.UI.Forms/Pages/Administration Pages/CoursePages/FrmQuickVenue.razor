@@ -5,7 +5,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <DxPopup Visible="@popupVisible" @ref="@popup"
-         CloseButtonClick="@NegativeButtonClicked"
+         Closed="@NegativeButtonClicked"
          CloseOnEscape="false"
          CloseOnOutsideClick="false"
          ShowFooter="true"

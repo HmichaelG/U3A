@@ -23,6 +23,28 @@ namespace U3A.BusinessRules
                             .ThenByDescending(x => x.TermNumber).ToList();
         }
 
+        public static async Task<string> IsInMemberPortalMaintenanceModeTillAsync(U3ADbContext dbc)
+        {
+            string result = string.Empty;
+            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+            if (settings != null)
+            {
+                if (settings.InMaintenanceTill == null)
+                {
+                    var term = await CurrentEnrolmentTermAsync(dbc);
+                    if (term == null)
+                    {
+                        var nextTerm = await NextTermAsync(dbc,dbc.GetLocalTime());
+                        result = (nextTerm == null) ? "To Be Advised" : nextTerm.EnrolmentStartDate.ToLongDateString();
+                    }
+                }
+                else
+                {
+                    result = settings.InMaintenanceTill.Value.ToString("F");
+                }
+            }
+            return result;
+        }
         public static Term? CurrentTerm(U3ADbContext dbc)
         {
             return dbc.Term.Where(x => x.IsDefaultTerm).FirstOrDefault();
@@ -162,6 +184,27 @@ namespace U3A.BusinessRules
                         .OrderByDescending(x => x.StartDate)
                         .FirstOrDefaultAsync(x => x.StartDate <= Date);
         }
+        public static Term FindFutureClassTermFromDate(U3ADbContext dbc, Class thisClass, int Year, DateTime FromDate)
+        {
+            Term result = null;
+            var terms = dbc.Term.AsNoTracking().AsEnumerable()
+                        .OrderByDescending(x => x.StartDate)
+                        .Where(x => x.Year == Year && x.StartDate >= FromDate).ToList();
+            foreach (var term in terms)
+            {
+                if (IsClassInTerm(thisClass, term.TermNumber))
+                {
+                    result = term;
+                    break;
+                }
+            }
+            if (result == null)
+            {
+                throw new Exception("Cannot find future term for class.");
+            }
+            return result;
+        }
+
         public static async Task<Term?> FindTermAsync(U3ADbContext dbc, DateTime Date)
         {
             return await dbc.Term.AsNoTracking()

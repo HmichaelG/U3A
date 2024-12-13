@@ -10,16 +10,17 @@
 <MessageBox @ref="@messageBox" />
 <Progress @ref="@ProgressBar" />
 
-<div class="mx-4 my-1 card p-2">
-    <h5>Leader Reports</h5>
-    <div class="card alert-info text-dark text-center p-2">
-        <strong>Private Information</strong>
-        Leader reports contain the private contact details of members. Please use &amp; dispose of responsibly in
-        accordance with privacy law &amp; regulations in your State.
-    </div>
-    <SelectLeaderReports @ref=@rptSelect
-                         AreSelectionsMade="@true"
-                         OnQueueReportsSelected="OnQueueReportsSelected" />
+<div class="mx-4 my-1">
+    <DxFormLayoutGroup Caption="Leader Reports" ColSpanXs="12">
+        <div class="alert alert-info text-dark text-center m-1 p-2">
+            <strong>Private Information</strong><br/>
+            Leader reports contain the private contact details of members. Please use &amp; dispose of responsibly in
+            accordance with privacy law &amp; regulations in your State.
+        </div>
+        <SelectLeaderReports @ref=@rptSelect ColSpan="6"
+                             AreSelectionsMade="@true"
+                             OnQueueReportsSelected="OnQueueReportsSelected" />
+    </DxFormLayoutGroup>
 </div>
 
 @code {
@@ -63,7 +64,7 @@
                                               .Where(x => x.ClassID == selectedClass.ID
                                                         && x.TermID == selectedTerm.ID).ToList();
                     enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
-                                            await tenantService.GetTenantIdentifierAsync(), 
+                                            await tenantService.GetTenantIdentifierAsync(),
                                                         selectedCourse.ID, selectedClass.ID));
                 }
                 else

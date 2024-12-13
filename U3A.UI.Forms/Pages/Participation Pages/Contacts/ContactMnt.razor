@@ -8,13 +8,12 @@
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.WebUtilities
 @using U3A.Data
+@using U3A.UI.Contact.Shared
 
 @inject NavigationManager NavMan
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IWebHostEnvironment environment
-
-
 
 @implements IDisposable
 
@@ -37,6 +36,26 @@
             </div>
         </div>
 
+        <MessageBox @ref=@tagSelectionMessageBox>
+            <TextTemplate>
+                <DxFormLayout>
+                    <DxFormLayoutItem Caption="Select Tag(s)" ColSpanMd="12">
+                        <DxTagBox Data="@tags"
+                                  KeyFieldName="Id"
+                                  TextFieldName="Name"
+                                  NullText="Click to select..."
+                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                  @bind-Values="@selectedTags">
+                            <Columns>
+                                <DxListEditorColumn FieldName="@nameof(Tag.Name)" Caption="Name" />
+                                <DxListEditorColumn FieldName="@nameof(Tag.CanLead)" Caption="Can Lead?" />
+                                <DxListEditorColumn FieldName="@nameof(Tag.CanEnrol)" Caption="Can Enrol?" />
+                            </Columns>
+                        </DxTagBox>
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </TextTemplate>
+        </MessageBox>
 
         <MessageBox @ref="@messageBox" />
         <Progress @ref="@ProgressBar" />
@@ -63,7 +82,7 @@
                             <DxGrid Data="@contacts" @ref=@mainGrid
                                     @bind-SelectedDataItems="@SelectedDataItems"
                                     UnboundColumnData="OnUnboundColumnData"
-                                    AllowSelectRowByClick=true
+                                    AllowSelectRowByClick="false"
                                     KeyFieldName="ID"
                                     PopupEditFormCssClass="popup-width"
                                     EditMode="GridEditMode.PopupEditForm"
@@ -72,62 +91,57 @@
                                     PopupEditFormHeaderText="Add/Edit Contacts"
                                     DataItemDeleting="Grid_DataItemDeleting">
                                 <ToolbarTemplate>
-                                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{660EF721-D17F-4A69-B28E-46063DE0B0C2}"
-                                                 SpreadsheetHeaderRows="2">
-                                        <CustomButtonContent>
-                                            <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                                                           BeginGroup=true
-                                                           Click=@OnCommunicate
-                                                           RenderStyle="ButtonRenderStyle.Primary"
-                                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                           Alignment="ToolbarItemAlignment.Right"
-                                                           Tooltip="Send email and/or SMS to Contacts">
-                                            </DxToolbarItem>
-                                        </CustomButtonContent>
-                                    </GridToolbar>
+                                    <ContactToolbar LinkedGrid=@mainGrid
+                                                    LayoutKey="{660EF721-D17F-4A69-B28E-46063DE0B0C2}"
+                                                    OnCommunicateClicked="@OnCommunicate"
+                                                    OnDeleteClicked="@OnDelete"
+                                                    OnAddTagsClicked="@OnAddTag"
+                                                    OnRemoveTagsClicked="@OnRemoveTag"
+                                                    OnSelectByTagClicked="@OnSelectByTag">
+                                    </ContactToolbar>
                                 </ToolbarTemplate>
                                 <Columns>
-                                    <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
-                                                           Width="2rem" />
-                                    <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
-                                                           Width="6rem" />
-                                    <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
-                                                      Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
-                                    <DxGridBandColumn Caption="Address">
-                                        <Columns>
-                                            <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
-                                            <DxGridDataColumn Caption="City" FieldName="City" Width="9rem" />
-                                            <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
-                                            <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" Visible="false" />
-                                        </Columns>
-                                    </DxGridBandColumn>
-                                    <DxGridBandColumn Caption="Contact Detail">
-                                        <Columns>
-                                            <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="15rem" />
-                                            <DxGridDataColumn Caption="Phone" FieldName="AdjustedHomePhone" Width="8rem" />
-                                            <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="8rem" />
-                                        </Columns>
-                                    </DxGridBandColumn>
-                                    <DxGridBandColumn Caption="Emergency Contact" Visible="false">
-                                        <Columns>
-                                            <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=false />
-                                            <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=false />
-                                        </Columns>
-                                    </DxGridBandColumn>
-                                    <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
-                                                      DisplayFormat="d/M/yy HH:mm" Visible="false" />
-                                    <DxGridDataColumn Caption="Tags" FieldName="UnboundTags" AllowGroup="false"
-                                                      UnboundType="GridUnboundColumnType.String">
-                                        <CellDisplayTemplate>
-                                            @{
-                                                var contactTags = context.Value.ToString().Split(";\t");
-                                            }
-                                            <DxTagBox Data="@tagNames"
-                                                      TData="string" TValue="string"
-                                                      Values="@contactTags"
-                                                      ReadOnly="true" />
-                                        </CellDisplayTemplate>
-                                    </DxGridDataColumn>
+                                        <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                               Width="2rem" />
+                                        <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
+                                                               Width="6rem" />
+                                        <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                          Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
+                                        <DxGridBandColumn Caption="Address">
+                                            <Columns>
+                                                <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
+                                                <DxGridDataColumn Caption="City" FieldName="City" Width="9rem" />
+                                                <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
+                                                <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" Visible="false" />
+                                            </Columns>
+                                        </DxGridBandColumn>
+                                        <DxGridBandColumn Caption="Contact Detail">
+                                            <Columns>
+                                                <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="15rem" />
+                                                <DxGridDataColumn Caption="Phone" FieldName="AdjustedHomePhone" Width="8rem" />
+                                                <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="8rem" />
+                                            </Columns>
+                                        </DxGridBandColumn>
+                                        <DxGridBandColumn Caption="Emergency Contact" Visible="false">
+                                            <Columns>
+                                                <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=false />
+                                                <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=false />
+                                            </Columns>
+                                        </DxGridBandColumn>
+                                        <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
+                                                          DisplayFormat="d/M/yy HH:mm" Visible="false" />
+                                        <DxGridDataColumn Caption="Tags" FieldName="UnboundTags" AllowGroup="false" MInWidth="400"
+                                                          UnboundType="GridUnboundColumnType.String">
+                                            <CellDisplayTemplate>
+                                                @{
+                                                    var contactTags = context.Value.ToString().Split(";\t");
+                                                }
+                                                <DxTagBox Data="@tagNames"
+                                                          TData="string" TValue="string"
+                                                          Values="@contactTags"
+                                                          ReadOnly="true" />
+                                            </CellDisplayTemplate>
+                                        </DxGridDataColumn>
                                 </Columns>
                                 <GroupSummary>
                                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
@@ -152,7 +166,6 @@
                                             <DxTagBox Data="@tags"
                                                       KeyFieldName="Id"
                                                       TextFieldName="Name"
-                                                      TagsChanged="OnTagsChanged"
                                                       NullText="(Optional) Tags to organise your contacts into groups. Each contact may have multiple tags."
                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                       @bind-Values="@editItem.Tags">
@@ -283,6 +296,8 @@
     SelectDocumentTemplatePopup? selectDocumentTemplatePopup;
     DateFilter DateFilter;
     DxTabs? dxTabs;
+    MessageBox tagSelectionMessageBox;
+    IEnumerable<Tag> selectedTags;
 
     internal IGrid? mainGrid { get; set; }
     internal ErrorPopup? ErrorPopup { get; set; }
@@ -332,11 +347,6 @@
             var tags = (IEnumerable<Tag>)e.GetRowValue("Tags");
             e.Value = string.Join(";\t", tags.Select(x => x.Name).ToArray());
         }
-    }
-
-    void OnTagsChanged(IEnumerable<string> newTags)
-    {
-        var t = newTags;
     }
 
     void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
@@ -417,8 +427,8 @@
     {
         mainGrid.ClearSelection();
         Person Contact = e.DataItem as Person;
-        string sql = 
-        $@"Update Person
+        string sql =
+                                                    $@"Update Person
             set [IsDeleted] = 1, [DeletedAt] = getdate() , [User] = '{loginState.LoginEmail}'
             where ID = '{Contact.ID.ToString()}'";
         await dbc.Database.ExecuteSqlRawAsync(sql);
@@ -448,11 +458,122 @@
         return result;
     }
 
+    async Task OnDelete()
+    {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await ShowNoSelectionDialog();
+            return;
+        }
+        string contactsToDelete = "";
+        foreach (var item in SelectedDataItems)
+        {
+            var contact = item as Contact;
+            if (contact != null) { contactsToDelete += $"'{contact.ID.ToString()}',"; }
+        }
+        contactsToDelete = contactsToDelete.TrimEnd(',');
+        string sql =
+            $@"Update Person
+            set [IsDeleted] = 1, [DeletedAt] = getdate() , [User] = '{loginState.LoginEmail}'
+            where ID IN ({contactsToDelete})";
+        var count = await dbc.Database.ExecuteSqlRawAsync(sql);
+        await GetData();
+        await messageBox.ShowOkOnlyAsync("Deletion Complete", $"{count} contacts have been deleted.");
+    }
+
+    async Task OnSelectByTag()
+    {
+        if (await tagSelectionMessageBox.ShowAsync("Select required Tags", ""))
+        {
+            if (selectedTags != null)
+            {
+                foreach (var contact in contacts)
+                {
+                    foreach (var tag in selectedTags)
+                    {
+                        if (contact.Tags.Contains(tag))
+                        {
+                            mainGrid.SelectDataItem(contact, true);
+                            break;
+                        }
+                    }
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+    async Task OnAddTag()
+    {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await ShowNoSelectionDialog();
+            return;
+        }
+        if (await tagSelectionMessageBox.ShowAsync("Select Tags to add", ""))
+        {
+            if (selectedTags != null)
+            {
+                foreach (var item in SelectedDataItems)
+                {
+                    var id = (item as Contact).ID;
+                    var contact = await dbc.Contact.FindAsync(id);
+                    var contactTags = contact.Tags.ToList();
+                    foreach (var tag in selectedTags)
+                    {
+                        if (!contact.Tags.Contains(tag))
+                        {
+                            contactTags.Add(tag);
+                        }
+                    }
+                    contact.Tags = contactTags;
+                }
+                await dbc.SaveChangesAsync();
+                StateHasChanged();
+            }
+        }
+    }
+
+    async Task OnRemoveTag()
+    {
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await ShowNoSelectionDialog();
+            return;
+        }
+        if (await tagSelectionMessageBox.ShowAsync("Select Tags to remove", ""))
+        {
+            if (selectedTags != null)
+            {
+                foreach (var item in SelectedDataItems)
+                {
+                    var id = (item as Contact).ID;
+                    var contact = await dbc.Contact.FindAsync(id);
+                    var contactTags = contact.Tags.ToList();
+                    foreach (var tag in selectedTags)
+                    {
+                        if (contact.Tags.Contains(tag))
+                        {
+                            contactTags.Remove(tag);
+                        }
+                    }
+                    contact.Tags = contactTags;
+                }
+                await dbc.SaveChangesAsync();
+                StateHasChanged();
+                selectedTags = null;
+            }
+        }
+    }
+
+    async Task ShowNoSelectionDialog() =>
+               await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to use this option.");
+
     async Task OnCommunicate()
     {
         if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
         {
-            await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
+            await ShowNoSelectionDialog();
             return;
         }
         SendTo = SelectedDataItems.Cast<Person>().OrderBy(x => x.FullNameAlpha).ToList();

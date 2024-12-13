@@ -42,34 +42,40 @@ namespace U3A.BusinessRules
         {
             ConcurrentBag<Enrolment> result = new();
             var mcEnrolment = await dbcT.MultiCampusEnrolment.Where(x => x.TenantIdentifier == Tenant).ToListAsync();
-            if (CourseID != null && ClassID == null)
+            if (mcEnrolment != null && mcEnrolment.Count > 0)
             {
-                mcEnrolment = mcEnrolment.Where(x => x.CourseID == CourseID && x.ClassID == null).ToList();
-            }
-            if (CourseID != null && ClassID != null)
-            {
-                mcEnrolment = mcEnrolment
-                                .Where(x => x.CourseID == CourseID
-                                            && x.ClassID == ClassID).ToList();
-            }
-            foreach (var e in mcEnrolment)
-            {
-                var mcTerm = await dbcT.MultiCampusTerm.FindAsync(e.TermID);
-                var mcPerson = await dbcT.MultiCampusPerson.FindAsync(e.PersonID);
-                if (mcPerson != null)
+                if (CourseID != null && ClassID == null)
                 {
-                    if (e.ClassID == null)
+                    mcEnrolment = mcEnrolment.Where(x => x.CourseID == CourseID && x.ClassID == null).ToList();
+                }
+                if (CourseID != null && ClassID != null)
+                {
+                    mcEnrolment = mcEnrolment
+                                    .Where(x => x.CourseID == CourseID
+                                                && x.ClassID == ClassID).ToList();
+                }
+                foreach (var e in mcEnrolment)
+                {
+                    var mcTerm = await dbcT.MultiCampusTerm.FindAsync(e.TermID);
+                    if (mcTerm != null)
                     {
-                        var classes = await dbc.Class.Where(x => x.CourseID == e.CourseID).ToListAsync();
-                        foreach (var c in classes)
+                        var mcPerson = await dbcT.MultiCampusPerson.FindAsync(e.PersonID);
+                        if (mcPerson != null)
                         {
-                            result.Add(BusinessRule.GetEnrolmentFromMCEnrolment(e, mcPerson, c, mcTerm));
+                            if (e.ClassID == null)
+                            {
+                                var classes = await dbc.Class.Where(x => x.CourseID == e.CourseID).ToListAsync();
+                                foreach (var c in classes)
+                                {
+                                    result.Add(BusinessRule.GetEnrolmentFromMCEnrolment(e, mcPerson, c, mcTerm));
+                                }
+                            }
+                            else
+                            {
+                                var c = await dbc.Class.FindAsync(e.ClassID);
+                                result.Add(BusinessRule.GetEnrolmentFromMCEnrolment(e, mcPerson, c, mcTerm));
+                            }
                         }
-                    }
-                    else
-                    {
-                        var c = await dbc.Class.FindAsync(e.ClassID);
-                        result.Add(BusinessRule.GetEnrolmentFromMCEnrolment(e, mcPerson, c, mcTerm));
                     }
                 }
             }
@@ -139,90 +145,88 @@ namespace U3A.BusinessRules
         /// Add enrolments requested by a member
         /// </summary>
         /// <param name="dbT"></param>
-        /// <param name="RequestedClasses"></param>
+        /// <param name="RequestedClass"></param>
         /// <param name="person"></param>
         /// <param name="term"></param>
         /// <returns></returns>
-        public static async Task<List<Enrolment>> AddMultiCampusEnrolmentRequests(TenantDbContext dbT,
-                                            IEnumerable<Class> RequestedClasses,
+        public static async Task<Enrolment> AddMultiCampusEnrolmentRequests(TenantDbContext dbT,
+                                            Class RequestedClass,
                                             Person person,
                                             Term term, Term prevTerm)
         {
-            var result = new List<Enrolment>();
+            Enrolment result = default;
             bool isFutureTerm = false;
             int thisYear;
             int thisTermNo;
             MultiCampusTerm thisTerm;
-            foreach (var c in RequestedClasses)
+            var c = RequestedClass;
+            if (c.TermNumber == term.TermNumber)
             {
-                if (c.TermNumber == term.TermNumber)
+                //current term
+                thisYear = term.Year;
+                thisTermNo = term.TermNumber;
+            }
+            else if (c.TermNumber == prevTerm.TermNumber)
+            {
+                //last term
+                thisYear = prevTerm.Year;
+                thisTermNo = prevTerm.TermNumber;
+            }
+            else
+            {
+                //future term
+                thisYear = term.Year;
+                thisTermNo = c.TermNumber;
+                isFutureTerm = true;
+            }
+            thisTerm = await dbT.MultiCampusTerm
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(x => x.TenantIdentifier == c.TenantIdentifier
+                                                        && x.Year == term.Year
+                                                        && x.TermNumber == thisTermNo);
+            var course = c.Course;
+            if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
+            {
+                if (!await dbT.MultiCampusEnrolment.AnyAsync(x =>
+                                    x.PersonID == person.ID &&
+                                    x.TermID == thisTerm.ID &&
+                                    x.CourseID == c.CourseID))
                 {
-                    //current term
-                    thisYear = term.Year;
-                    thisTermNo = term.TermNumber;
-                }
-                else if (c.TermNumber == prevTerm.TermNumber)
-                {
-                    //last term
-                    thisYear = prevTerm.Year;
-                    thisTermNo = prevTerm.TermNumber;
-                }
-                else
-                {
-                    //future term
-                    thisYear = term.Year;
-                    thisTermNo = c.TermNumber;
-                    isFutureTerm = true;
-                }
-                thisTerm = await dbT.MultiCampusTerm
-                                .AsNoTracking()
-                                .FirstOrDefaultAsync(x => x.TenantIdentifier == c.TenantIdentifier
-                                                            && x.Year == term.Year
-                                                            && x.TermNumber == thisTermNo);
-                var course = c.Course;
-                if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
-                {
-                    if (!await dbT.MultiCampusEnrolment.AnyAsync(x =>
-                                        x.PersonID == person.ID &&
-                                        x.TermID == thisTerm.ID &&
-                                        x.CourseID == c.CourseID))
+                    var mcE = new MultiCampusEnrolment()
                     {
-                        var mcE = new MultiCampusEnrolment()
-                        {
-                            IsWaitlisted = true,
-                            TenantIdentifier = c.TenantIdentifier,
-                            PersonID = person.ID,
-                            TermID = thisTerm.ID,
-                            CourseID = c.Course.ID
-                        };
-                        var e = GetEnrolmentFromMCEnrolment(mcE, person, thisTerm, c);
-                        result.Add(e);
-                        c.Course.Enrolments.Add(e);
-                        await dbT.AddAsync<MultiCampusEnrolment>(mcE);
-                    }
+                        IsWaitlisted = true,
+                        TenantIdentifier = c.TenantIdentifier,
+                        PersonID = person.ID,
+                        TermID = thisTerm.ID,
+                        CourseID = c.Course.ID
+                    };
+                    var e = GetEnrolmentFromMCEnrolment(mcE, person, thisTerm, c);
+                    result = e;
+                    c.Course.Enrolments.Add(e);
+                    await dbT.AddAsync<MultiCampusEnrolment>(mcE);
                 }
-                else
+            }
+            else
+            {
+                if (!await dbT.MultiCampusEnrolment.AnyAsync(x =>
+                                    x.PersonID == person.ID &&
+                                    x.TermID == thisTerm.ID &&
+                                    x.CourseID == c.CourseID &&
+                                    x.ClassID == c.ID))
                 {
-                    if (!await dbT.MultiCampusEnrolment.AnyAsync(x =>
-                                        x.PersonID == person.ID &&
-                                        x.TermID == thisTerm.ID &&
-                                        x.CourseID == c.CourseID &&
-                                        x.ClassID == c.ID))
+                    var mcE = new MultiCampusEnrolment()
                     {
-                        var mcE = new MultiCampusEnrolment()
-                        {
-                            TenantIdentifier = c.TenantIdentifier,
-                            IsWaitlisted = true,
-                            PersonID = person.ID,
-                            TermID = thisTerm.ID,
-                            CourseID = c.Course.ID,
-                            ClassID = c.ID
-                        };
-                        var e = GetEnrolmentFromMCEnrolment(mcE, person, thisTerm, c);
-                        result.Add(e);
-                        c.Course.Enrolments.Add(e);
-                        await dbT.AddAsync<MultiCampusEnrolment>(mcE);
-                    }
+                        TenantIdentifier = c.TenantIdentifier,
+                        IsWaitlisted = true,
+                        PersonID = person.ID,
+                        TermID = thisTerm.ID,
+                        CourseID = c.Course.ID,
+                        ClassID = c.ID
+                    };
+                    var e = GetEnrolmentFromMCEnrolment(mcE, person, thisTerm, c);
+                    result = e;
+                    c.Course.Enrolments.Add(e);
+                    await dbT.AddAsync<MultiCampusEnrolment>(mcE);
                 }
             }
             return result;

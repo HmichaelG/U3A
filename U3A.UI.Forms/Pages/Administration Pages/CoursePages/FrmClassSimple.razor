@@ -18,8 +18,8 @@
                         </div>
                         <div class="flex-grow-0">
                             <DxCheckBox CssClass="align-content-end" tabindex="-1"
-                                        @bind-Checked=@showFullDetail
-                                        LabelPosition="LabelPosition.Left">Show Detail</DxCheckBox>
+                            @bind-Checked=@showFullDetail
+                            LabelPosition="LabelPosition.Left">Show Detail</DxCheckBox>
                         </div>
                     </div>
                 </HeaderContentTemplate>
@@ -29,27 +29,27 @@
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Offered:" ColSpanMd="3" />
                     <DxFormLayoutItem Caption="Term-1" ColSpanMd="2"
-                                      CssClass="border border-primary me-2">
+                    CssClass="border border-primary me-2">
                         <DxCheckBox @bind-Checked="editItem.OfferedTerm1" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Term-2" ColSpanMd="2"
-                                      CssClass="border border-primary me-2">
+                    CssClass="border border-primary me-2">
                         <DxCheckBox @bind-Checked="editItem.OfferedTerm2" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Term-3" ColSpanMd="2"
-                                      CssClass="border border-primary me-2">
+                    CssClass="border border-primary me-2">
                         <DxCheckBox @bind-Checked="editItem.OfferedTerm3" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Term-4" ColSpanMd="2"
-                                      CssClass="border border-primary">
+                    CssClass="border border-primary">
                         <DxCheckBox @bind-Checked="editItem.OfferedTerm4" />
                     </DxFormLayoutItem>
 
                     <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="8">
                         <DxFormLayoutItem Caption="Guest Leader" ColSpanMd="12" Visible=@(showFullDetail || IsActivityView || editItem.GuestLeader !=null)>
                             <DxTextBox @bind-Text="editItem.GuestLeader"
-                                       NullText="A non-member presenter, leader or speaker"
-                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                            NullText="A non-member presenter, leader or speaker"
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Leader 1" ColSpanMd="12">
                             <PersonsComboBox ShowPersonSummary="true" People="@Persons" @bind-SelectedPerson="@editItem.Leader" />
@@ -62,9 +62,9 @@
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
                             <DxComboBox Data="Venues"
-                                        SearchMode="ListSearchMode.AutoSearch"
-                                        @bind-Value="editItem.Venue"
-                                        TextFieldName="@nameof(Venue.Name)">
+                            SearchMode="ListSearchMode.AutoSearch"
+                            @bind-Value="editItem.Venue"
+                            TextFieldName="@nameof(Venue.Name)">
                             </DxComboBox>
                         </DxFormLayoutItem>
                     </DxFormLayoutGroup>
@@ -72,31 +72,33 @@
                     <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="4">
                         <DxFormLayoutItem Caption="Start Date" ColSpanMd="12" Visible=@(showFullDetail || IsActivityView || editItem.StartDate != null)>
                             <DxDateEdit T="DateTime?" Date="@editItem.StartDate" DateExpression="@(() => editItem.StartDate)"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Start Date of class. Only if not the Start of Term"
-                                        DateChanged="@((DateTime? newValue) => OnStartDateChanged(newValue, editItem))" />
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            MinDate="@(new DateTime(Course!.Year,1,1))"
+                            MaxDate="@(new DateTime(Course!.Year,12,31))"
+                            NullText="Start Date of class. Only if not the Start of Term"
+                            DateChanged="@((DateTime? newValue) => OnStartDateChanged(newValue, editItem))" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Recurrence" ColSpanMd="12" Visible=@(showFullDetail || editItem.Recurrence != null)>
                             <DxSpinEdit @bind-Value="editItem.Recurrence" MinValue="1" MaxValue="52"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="The number of times the class recurs. Requires Start Date." />
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            NullText="The number of times the class recurs. Requires Start Date." />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Occurrence" ColSpanMd="12" Visible=true>
                             <DxComboBox Data="occurrence"
-                                        @bind-Value="editItem.Occurrence"
-                                        TextFieldName="@nameof(Occurrence.Name)">
+                            @bind-Value="editItem.Occurrence"
+                            TextFieldName="@nameof(Occurrence.Name)">
                             </DxComboBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="On Day" ColSpanMd="12" >
                             <DxComboBox Data="WeekDays" Enabled="@commonClassProcedures.IsNotUnscheduled(editItem,WeekDays)"
-                                        SearchMode="ListSearchMode.AutoSearch"
-                                        @bind-Value="editItem.OnDay"
-                                        TextFieldName="@nameof(WeekDay.Day)" ReadOnly="@IsOnDayReadOnly">
+                            SearchMode="ListSearchMode.AutoSearch"
+                            @bind-Value="editItem.OnDay"
+                            TextFieldName="@nameof(WeekDay.Day)" ReadOnly="@IsOnDayReadOnly">
                             </DxComboBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Start Time" ColSpanMd="12">
                             <DxTimeEdit DisplayFormat="t" @bind-Time="editItem.StartTime" 
-                                Enabled="@commonClassProcedures.IsNotUnscheduled(editItem,WeekDays)" />
+                            Enabled="@commonClassProcedures.IsNotUnscheduled(editItem,WeekDays)" />
                         </DxFormLayoutItem>
                     </DxFormLayoutGroup>
                 </Items>
@@ -106,7 +108,7 @@
 }
 <style>
     .classPopup-width {
-        min-width: 40rem;
+    min-width: 40rem;
     }
 
 </style>

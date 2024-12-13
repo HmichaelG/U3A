@@ -17,7 +17,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -409,8 +409,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.Property<string>("User")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("VenueID")
-                        .IsRequired()
+                    b.Property<Guid>("VenueID")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ID");
@@ -471,7 +470,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.Property<DateTime?>("AllowMultiCampsuFrom")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ClassSummaries")
+                    b.PrimitiveCollection<string>("ClassSummaries")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasComment("Ignore dB values. Used for JSON only");
@@ -501,8 +500,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.Property<int?>("CourseParticipationTypeID")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("CourseTypeID")
-                        .IsRequired()
+                    b.Property<Guid>("CourseTypeID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreatedOn")
@@ -1814,8 +1812,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                     b.Property<bool>("IncludeMembershipFeeInComplimentary")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastCashReceiptDate")
-                        .IsRequired()
+                    b.Property<DateTime>("LastCashReceiptDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("LeaderMaxComplimentaryCourses")
@@ -1864,7 +1861,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                         .HasColumnType("decimal(18,2)")
                         .HasComment("Term 4 Year Membership Fee");
 
-                    b.Property<string>("MultiCampusU3AAllowed")
+                    b.PrimitiveCollection<string>("MultiCampusU3AAllowed")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

@@ -39,19 +39,19 @@ else
     <FullScreen DisplayOffset="10">
         <ContentTemplate>
             <DxGrid Data="@Courses" @ref=@mainGrid
-                    AutoCollapseDetailRow="true"
-                    @bind-SelectedDataItems="@SelectedDataItems"
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    ShowFilterRow="false"
-                    ShowAllRows="false"
-                    KeyFieldName="ID"
-                    PageSize="100"
-                    PageSizeSelectorVisible="true"
-                    PageSizeSelectorItems="@(new int[] {10,15, 20, 40,60,80, 100, 200,400 })"
-                    PageSizeSelectorAllRowsItemVisible="true"
-                    PagerSwitchToInputBoxButtonCount="10"
-                    PagerVisibleNumericButtonCount="10"
-                    PagerVisible="true">
+            AutoCollapseDetailRow="true"
+            @bind-SelectedDataItems="@SelectedDataItems"
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            ShowFilterRow="false"
+            ShowAllRows="false"
+            KeyFieldName="ID"
+            PageSize="100"
+            PageSizeSelectorVisible="true"
+            PageSizeSelectorItems="@(new int[] {10,15, 20, 40,60,80, 100, 200,400 })"
+            PageSizeSelectorAllRowsItemVisible="true"
+            PagerSwitchToInputBoxButtonCount="10"
+            PagerVisibleNumericButtonCount="10"
+            PagerVisible="true">
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid LayoutKey="{76B1A4D3-159B-44F3-8D09-5231349F8334}" />
                 </ToolbarTemplate>
@@ -77,7 +77,7 @@ else
 }
 <style>
     .popup-width {
-        min-width: 55rem;
+    min-width: 55rem;
     }
 </style>
 
@@ -176,7 +176,8 @@ else
                         newClass.Venue = dbc.Venue.Find(c.VenueID);
                         if (c.StartDate.HasValue)
                         {
-                            newClass.OnDay = dbc.WeekDay.Find((int)c.StartDate.Value.DayOfWeek);
+                            newClass.StartDate = c.StartDate.Value.AddYears(1);
+                            newClass.OnDay = dbc.WeekDay.Find((int)newClass.StartDate.Value.DayOfWeek);
                         }
                         else
                         {

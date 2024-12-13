@@ -26,6 +26,8 @@ else
                         OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
                         OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
+    <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
+                                 DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
     <Progress @ref="@ProgressBar" />
 
     <DxFormLayout>
@@ -74,6 +76,8 @@ else
                             ShowAllRows="true"
                             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                             KeyFieldName="ID"
+                            SelectionMode="GridSelectionMode.Multiple"
+                            @bind-SelectedDataItems="SelectedDataItems"
                             ValidationEnabled="true"
                             UnboundColumnData="Grid_CustomUnboundColumnData"
                             CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
@@ -82,9 +86,21 @@ else
                             FocusedRowChanged="OnFocusedRowChanged"
                             AllowSelectRowByClick="true">
                         <ToolbarTemplate>
-                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{6ABCA6AF-CA53-43EE-8974-71F06823B10A}" />
+                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{6ABCA6AF-CA53-43EE-8974-71F06823B10A}" >
+                                                                    <CustomButtonContent>
+                                        <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+                                        BeginGroup=true
+                                        Click=@OnCommunicate
+                                        RenderStyle="ButtonRenderStyle.Primary"
+                                        RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                        Alignment="ToolbarItemAlignment.Right"
+                                        Tooltip="Send email and/or SMS to participants">
+                                        </DxToolbarItem>
+                                    </CustomButtonContent>
+                            </GridToolbar>
                         </ToolbarTemplate>
                         <Columns>
+                            <DxGridSelectionColumn Width="2rem" />
                             <DxGridDataColumn Caption="Name" FieldName="Person.FullName" />
                             <DxGridDataColumn Caption="Leader/Clerk?" FieldName="IsCourseClerk" Width="6rem" />
                             <DxGridDataColumn Caption="Fin-To" FieldName="Person.FinancialToBriefText" Width="4rem" TextAlignment="GridTextAlignment.Right" />
@@ -174,6 +190,14 @@ else
     int contentSize;
     FullScreen? fullScreen;
 
+    IReadOnlyList<object> SelectedDataItems { get; set; }
+    Communication Communication;
+    private List<Person> SendTo { get; set; }
+    private List<DocumentTemplate> DocumentTemplates;
+    private SelectDocumentTemplatePopup selectDocumentTemplatePopup;
+    DocumentServer server;
+    int documentsSent;
+
 
     private DxComboBox<Class, Class?> ClassComboBox;
 
@@ -194,6 +218,10 @@ else
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         service = new MemberFeeCalculationService();
+        Communication = new Communication();
+        DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
+        server = new DocumentServer(dbc);
+        server.DocumentSentEvent += Server_DocumentSent;
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         currentTerm = selectedTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
@@ -353,7 +381,7 @@ else
         foreach (var e in Enrolments)
         {
             var person = e.Person;
-            var due = await service.CalculateFeeAsync(U3Adbfactory, person);
+            var due = await service.CalculateFeeAsync(U3Adbfactory, person,selectedTerm);
             FeeDue.Add(person.ID, due);
         }
     }
@@ -397,7 +425,7 @@ else
         if (enrolment != null)
         {
             selectedPerson = enrolment.Person;
-            totalFees = await service.CalculateFeeAsync(U3Adbfactory, selectedPerson);
+            totalFees = await service.CalculateFeeAsync(U3Adbfactory, selectedPerson,selectedTerm);
             memberFees = service.GetMemberFees(selectedPerson.ID);
             InvokeAsync(StateHasChanged);
         }
@@ -417,6 +445,37 @@ else
             e.DisplayText = string.Format("{0:c2}", e.Value);
         if (e.FieldName == "Person.FullName")
             e.DisplayText = string.Format("{0:N0} members", e.Value);
+    }
+
+    async Task OnCommunicate()
+    {
+
+        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        {
+            await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
+            return;
+        }
+        SendTo = new List<Person>();
+        foreach (var e in SelectedDataItems.Cast<Enrolment>().ToList())
+        {
+            SendTo.Add(e.Person);
+        };
+        if (await selectDocumentTemplatePopup.ShowAsync())
+        {
+            documentsSent = 0;
+            await ProgressBar.ShowAsync("Sending ... Please Wait", SelectedDataItems.Count);
+            List<ExportData> exportData = await BusinessRule.GetExportDataAsync(dbc, SendTo);
+            bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;
+            await server.MailMerge(dbc, selectDocumentTemplatePopup.SelectedDocumentTemplate, exportData, overridePreference);
+            await ProgressBar.Close();
+            await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
+        }
+    }
+
+    async void Server_DocumentSent(object sender, DocumentSentEventArgs e)
+    {
+        documentsSent += e.DocumentsSent;
+        await ProgressBar.SetValueAsync(documentsSent);
     }
 
     public void Dispose()

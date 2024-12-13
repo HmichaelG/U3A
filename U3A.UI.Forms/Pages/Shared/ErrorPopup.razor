@@ -12,7 +12,6 @@
     </DxPopup>
 
 @code {
-    //[Parameter, EditorRequired]
     public bool Visible { get; set; } = false;
     [Parameter, EditorRequired]
     public string? PopupMessage { get; set; } = null;
@@ -23,8 +22,8 @@
 
     public async Task ShowPopupAsync()
     {
-        await Popup.ShowAsync();
         StateHasChanged();
+        Visible = true;
     }
 
 }

@@ -52,7 +52,8 @@ namespace U3A.BusinessRules
             var enrolmentKeys = await dbc.Enrolment
                                                 .AsNoTracking()
                                                 .Include(x => x.Term)
-                                                .Where(x => x.Term.Year == term.Year)
+                                                .Where(x => x.Term.Year == term.Year || 
+                                                        (x.Term.Year == term.Year-1 && x.Term.TermNumber == 4))
                                                 .Select(x => x.ID).ToListAsync();
             enrolmentKeys.AddRange(await dbcT.MultiCampusEnrolment
                                                 .AsNoTracking()
@@ -104,7 +105,9 @@ namespace U3A.BusinessRules
             var liveKeys = await dbc.Class
                             .AsNoTracking()
                             .Include(x => x.Course)
-                            .Where(x => x.Course.Year == term.Year).Select(x => x.ID).ToListAsync();
+                            .Where(x => (x.Course.Year == term.Year || 
+                                                x.StartDate != null && x.StartDate >= dbc.GetLocalDate()))
+                            .Select(x => x.ID).ToListAsync();
             var deletions = new List<Class>();
             Parallel.ForEach(classes, c =>
             {
@@ -314,7 +317,7 @@ namespace U3A.BusinessRules
             ConcurrentBag<MultiCampusTerm> deleted = new();
             ConcurrentBag<MultiCampusTerm> additions = new();
             ConcurrentBag<MultiCampusTerm> updates = new();
-            var Terms = await BusinessRule.GetAllTermsInCurrentYearAsync(dbc);
+            var Terms = await dbc.Term.ToListAsync();
             var mcTerms = await dbcT.MultiCampusTerm
                                 .Where(x => x.TenantIdentifier == TenantIdentifier)
                                 .ToListAsync();

@@ -1,5 +1,10 @@
 ﻿
 // Full screen / normal screen functions
+
+function IsApple() {
+    return (/iP(hone|od|ad)/.test(navigator.platform));
+}
+
 function toggleFullscreen() {
     var e = document.getElementById('fullscreen-element');
     if (e != null) {
@@ -18,10 +23,10 @@ function refreshNormalscreen() {
 }
 
 window.getWindowDimensions = function () {
-        return {
-            width: window.innerWidth,
-            height: window.innerHeight
-        };
+    return {
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
 };
 
 function getLocalStorage(key) {
@@ -70,28 +75,25 @@ function GetLocalStorage(key) {
     return window.localStorage.getItem(key);
 }
 
-function IsApple() {
-    return (/iP(hone|od|ad)/.test(navigator.platform));
-}
-
-function IsMobile() {
-    return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(navigator.userAgent);
-}
-
-
-function appleOSversion() {
-    if (IsApple()) {
-        // supports iOS 2.0 and later: <http://bit.ly/TJjs1V>
-        var v = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);
-        return [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || 0, 10)];
+document.onreadystatechange = function (e) {
+    if (document.readyState === 'complete') {
+        setTheme();
     }
-    else { return [999, 99, 99]; }
 }
 
 window.onload = function () {
     setTheme();
+    displayNonInteractive();
 }
 
+function displayNonInteractive() {
+    setTimeout(function () {
+        let element = document.getElementById("notInteractive");
+        if (element != null) {
+            element.style.display = "block";
+        }
+    }, 1000);
+};
 function setTheme() {
     // If we pass a theme in a query string then save it to localStorage
     var qs = getQueryStrings();
@@ -99,8 +101,9 @@ function setTheme() {
     if (theme) {
         localStorage.setItem("theme", theme);
     }
-    // set the default
-    var href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css';
+    var link = document.getElementById("theme");
+    var href = link.href;
+    if (href == null) { href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css'; }
     // load from localStorage & replace the default
     var theme = localStorage.getItem('theme');
     if (theme) {
@@ -108,7 +111,6 @@ function setTheme() {
         theme = theme.replace('"', '',);
         href = href.replace('office-white', theme);
     }
-    var link = document.getElementById("theme");
     if (link) {
         link.href = href;
     }

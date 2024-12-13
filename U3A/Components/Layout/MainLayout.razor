@@ -16,9 +16,13 @@
 @inject WorkStation ws
 @implements IDisposable
 
+
+
 @if (isReady && Body != null)
 {
-    <div class="page">
+    @if (RendererInfo.IsInteractive)
+    {
+        <div class="page">
 
         <CascadingValue Value=@openCircuits Name="OpenCircuits">
             <CascadingValue Value="@loginState">
@@ -53,6 +57,11 @@
         </CascadingValue>
 
     </div>
+    }
+    else
+    {
+        <NotInteractive />
+    }
 }
 
 
@@ -78,37 +87,39 @@
 
         var hasSecurityAdmin = false;
         // Ensure all roles are created
-        foreach (string n in constants.nameOfRoles)
+        if (RoleManager != null)
         {
-            if (await RoleManager.FindByNameAsync(n) == null)
+            foreach (string n in constants.nameOfRoles)
             {
-                await RoleManager.CreateAsync(new IdentityRole() { Name = n });
+                if (await RoleManager.FindByNameAsync(n) == null)
+                {
+                    await RoleManager.CreateAsync(new IdentityRole() { Name = n });
+                }
+            }
+            // Do we have a user in the security admin role
+            var role = await dbc.Roles.AsNoTracking().Where(x => x.Name == constants.nameOfRoles[0]).FirstAsync(); //super admin
+            hasSecurityAdmin = await dbc.UserRoles.AsNoTracking().AnyAsync(r => r.RoleId == role.Id);
+            if (!hasSecurityAdmin)
+            {
+                //a hasher to hash the password before seeding the user to the db
+                var hasher = new PasswordHasher<IdentityUser>();
+                // Get the security admin or create if not exists
+                var sAdmin = await UserManager.FindByEmailAsync(constants.superAdmin);
+                if (sAdmin == null)
+                {
+                    sAdmin = new ApplicationUser()
+                        {
+                            Email = constants.superAdmin,
+                            UserName = constants.superAdmin,
+                            EmailConfirmed = true,
+                        };
+                    sAdmin.PasswordHash = hasher.HashPassword(sAdmin, "U3A Rocks!!");
+                    await UserManager.CreateAsync(sAdmin);
+                }
+                // Add security admin permission
+                await UserManager.AddToRoleAsync(sAdmin, constants.nameOfRoles[0]);
             }
         }
-        // Do we have a user in the security admin role
-        var role = await dbc.Roles.AsNoTracking().Where(x => x.Name == constants.nameOfRoles[0]).FirstAsync(); //super admin
-        hasSecurityAdmin = await dbc.UserRoles.AsNoTracking().AnyAsync(r => r.RoleId == role.Id);
-        if (!hasSecurityAdmin)
-        {
-            //a hasher to hash the password before seeding the user to the db
-            var hasher = new PasswordHasher<IdentityUser>();
-            // Get the security admin or create if not exists
-            var sAdmin = await UserManager.FindByEmailAsync(constants.superAdmin);
-            if (sAdmin == null)
-            {
-                sAdmin = new ApplicationUser()
-                    {
-                        Email = constants.superAdmin,
-                        UserName = constants.superAdmin,
-                        EmailConfirmed = true,
-                    };
-                sAdmin.PasswordHash = hasher.HashPassword(sAdmin, "U3A Rocks!!");
-                await UserManager.CreateAsync(sAdmin);
-            }
-            // Add security admin permission
-            await UserManager.AddToRoleAsync(sAdmin, constants.nameOfRoles[0]);
-        }
-
         var roles = dbc.Roles;
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         foreach (var r in roles)
@@ -138,29 +149,11 @@
     {
         if (firstRender)
         {
-
-            //Set timeout
-            dotNetObjectReference = DotNetObjectReference.Create(this);
-            try
-            {
-                await js.InvokeVoidAsync("blazorTimeout.init", dotNetObjectReference);
-            }
-            catch { };
             await ws.SetWorkstationDetail(js, localStorage);
             useTopMenu = ws.UseTopMenu;
             await InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    [JSInvokable]
-    public void OnTimeout()
-    {
-        try
-        {
-            navMan.NavigateTo("closed.html", true);
-        }
-        finally { };
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)

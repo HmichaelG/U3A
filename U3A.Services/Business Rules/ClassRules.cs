@@ -106,7 +106,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.Leader3)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
-                            .Where(x => !x.IsDeleted && x.Course.Year == term.Year
+                            .Where(x => !x.IsDeleted && (x.Course.Year == term.Year || (x.StartDate != null && x.StartDate >= dbc.GetLocalDate()))
                                             && (LastScheduleUpdate == null || x.UpdatedOn > LastScheduleUpdate.Value)
                                             && x.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses
                                             && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities
@@ -123,7 +123,7 @@ namespace U3A.BusinessRules
                             .Include(x => x.Leader3)
                             .Include(x => x.Occurrence)
                             .Include(x => x.Venue)
-                            .Where(x => !x.IsDeleted && x.Course.Year == term.Year
+                            .Where(x => !x.IsDeleted && (x.Course.Year == term.Year || (x.StartDate != null && x.StartDate >= dbc.GetLocalDate()))
                                         && (LastScheduleUpdate == null || x.UpdatedOn > LastScheduleUpdate.Value)
                                         && x.Course.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass
                                         && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities
@@ -144,7 +144,8 @@ namespace U3A.BusinessRules
                                         .Include(x => x.Term)
                                         .Include(x => x.Person)
                                         .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
-                                                    && x.Term.Year == term.Year).ToListAsync();
+                                                    && (x.Term.Year == term.Year ||
+                                                        x.Term.Year == term.Year-1 && x.Term.TermNumber == 4)).ToListAsync();
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.IsDefaultTerm);
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
@@ -212,7 +213,15 @@ namespace U3A.BusinessRules
             c.TermNumber = GetRequiredTerm(term.TermNumber, c);
             if (c.TermNumber != term.TermNumber)
             {
-                var thisTerm = terms.FirstOrDefault(x => x.Year == term.Year && x.TermNumber == c.TermNumber);
+                Term thisTerm;
+                if (c.StartDate != null && c.OccurrenceID == (int)OccurrenceType.OnceOnly)
+                {
+                    thisTerm = AssignTermForOnceOnlyClass(c, terms, term);
+                }
+                else
+                {
+                    thisTerm = terms.FirstOrDefault(x => x.Year == term.Year && x.TermNumber == c.TermNumber);
+                }
                 if (thisTerm != null)
                 {
                     Parallel.ForEach(c.Course.Enrolments, e =>
@@ -491,23 +500,33 @@ namespace U3A.BusinessRules
         public static int GetNextTermOffered(Class Class, int TermNumber)
         {
             int result = 0;
-            // Find the 1st term >= the current term
-            for (int i = TermNumber; i <= 4; i++)
+            if (Class.StartDate != null && Class.OccurrenceID == (int)OccurrenceType.OnceOnly)
             {
-                if (i == 1 && Class.OfferedTerm1) { result = i; break; }
-                if (i == 2 && Class.OfferedTerm2) { result = i; break; }
-                if (i == 3 && Class.OfferedTerm3) { result = i; break; }
-                if (i == 4 && Class.OfferedTerm4) { result = i; break; }
+                if (Class.OfferedTerm4) { result = 4; }
+                if (Class.OfferedTerm3) { result = 3; }
+                if (Class.OfferedTerm2) { result = 2; }
+                if (Class.OfferedTerm1) { result = 1; }
             }
-            if (result == 0)
+            else
             {
-                // Find the 1st term <= the current term
-                for (int i = TermNumber; i > 0; i--)
+                // Find the 1st term >= the current term
+                for (int i = TermNumber; i <= 4; i++)
                 {
-                    if (i == 4 && Class.OfferedTerm4) { result = i; break; }
-                    if (i == 3 && Class.OfferedTerm3) { result = i; break; }
-                    if (i == 2 && Class.OfferedTerm2) { result = i; break; }
                     if (i == 1 && Class.OfferedTerm1) { result = i; break; }
+                    if (i == 2 && Class.OfferedTerm2) { result = i; break; }
+                    if (i == 3 && Class.OfferedTerm3) { result = i; break; }
+                    if (i == 4 && Class.OfferedTerm4) { result = i; break; }
+                }
+                if (result == 0)
+                {
+                    // Find the 1st term <= the current term
+                    for (int i = TermNumber; i > 0; i--)
+                    {
+                        if (i == 4 && Class.OfferedTerm4) { result = i; break; }
+                        if (i == 3 && Class.OfferedTerm3) { result = i; break; }
+                        if (i == 2 && Class.OfferedTerm2) { result = i; break; }
+                        if (i == 1 && Class.OfferedTerm1) { result = i; break; }
+                    }
                 }
             }
             return result;
@@ -693,18 +712,28 @@ namespace U3A.BusinessRules
 
         public static async Task AssignTermForOnceOnlyClass(U3ADbContext dbc, Class c)
         {
-            if (c.StartDate == null) { return; }
-            if (c.OccurrenceID != (int)OccurrenceType.OnceOnly) { return; }
-            Term reqdTerm = default;
             var terms = await dbc.Term.OrderByDescending(x => x.Year).ThenByDescending(x => x.TermNumber).ToListAsync();
-            foreach (var t in terms)
+            AssignTermForOnceOnlyClass(c, terms);
+        }
+
+        public static Term? AssignTermForOnceOnlyClass( 
+                                                Class c, 
+                                                IEnumerable<Term>? terms, 
+                                                Term currentTerm = default )
+        {
+            Term reqdTerm = default;
+            if (c.StartDate == null) { return currentTerm; }
+            if (c.OccurrenceID != (int)OccurrenceType.OnceOnly) { return currentTerm; }
+            foreach (var t in terms.OrderBy(x => x.Year).ThenBy(x => x.TermNumber)) 
             {
-                if (c.StartDate >= t.StartDate && c.StartDate <= t.EndDate)
+                if ((c.StartDate >= t.StartDate && c.StartDate <= t.EndDate) ||
+                        (c.StartDate.Value.Year == t.Year && t.TermNumber == 4))
                 {
                     reqdTerm = t;
                     break;
                 }
             }
+            if (reqdTerm == null) { return reqdTerm = currentTerm; }
             if (reqdTerm != null)
             {
                 c.OfferedTerm1 = c.OfferedTerm2 = c.OfferedTerm3 = c.OfferedTerm4 = false;
@@ -716,6 +745,7 @@ namespace U3A.BusinessRules
                     case 4: c.OfferedTerm4 = true; break;
                 }
             }
+            return reqdTerm;
         }
 
         public async static Task<bool> IsOutOfTermClassOK(U3ADbContext dbc, Class c)

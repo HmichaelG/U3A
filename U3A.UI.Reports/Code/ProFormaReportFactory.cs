@@ -38,7 +38,6 @@ namespace U3A.UI.Reports
         public CustomReportStorageWebExtension ReportStorage { get; set; }
 
         IEmailService emailSender;
-        PdfExportOptions options;
         bool isPreview;
         bool isAzureFunction;
         public string SendEmailAddress { get; set; }
@@ -60,10 +59,6 @@ namespace U3A.UI.Reports
                 sendEmailDisplayName = settings.SendEmailDisplayName;
             }
             emailSender = EmailFactory.GetEmailSender(dbc);
-            options = new PdfExportOptions()
-            {
-                ImageQuality = PdfJpegImageQuality.Lowest,
-            };
             PostalReports = new List<string>();
         }
 
@@ -82,10 +77,6 @@ namespace U3A.UI.Reports
                 sendEmailDisplayName = settings.SendEmailDisplayName;
             }
             emailSender = EmailFactory.GetEmailSender(dbc);
-            options = new PdfExportOptions()
-            {
-                ImageQuality = PdfJpegImageQuality.Lowest,
-            };
             PostalReports = new List<string>();
         }
 
@@ -98,8 +89,9 @@ namespace U3A.UI.Reports
                 var list = new List<ReceiptDetail>();
                 list.Add(detail);
                 cashReceiptProForma.DataSource = list;
+                cashReceiptProForma.CreateDocument();
                 string pdfFilename = GetTempPdfFile();
-                cashReceiptProForma.ExportToPdf(pdfFilename, options);
+                cashReceiptProForma.ExportToPdf(pdfFilename);
                 if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
                 {
                     return await emailSender.SendEmailAsync(EmailType.Transactional,
@@ -160,8 +152,9 @@ namespace U3A.UI.Reports
                                     if (ds.Name.ToLower() == "objectdatasource2") { ds.DataSource = terms; }
                                 }
                             }
+                            participantEnrolmentProForma.CreateDocument();
                             string pdf = GetTempPdfFile();
-                            participantEnrolmentProForma.ExportToPdf(pdf, options);
+                            participantEnrolmentProForma.ExportToPdf(pdf);
                             personsFiles.Add(pdf);
                         }
                     }
@@ -368,8 +361,9 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             {
                 people = people.Where(x => list.Contains(x.ID)).ToList();
                 report.SetParameters(people, settings, term);
+                report.CreateDocument();
                 pdfFilename = GetTempPdfFile();
-                report.ExportToPdf(pdfFilename, options);
+                report.ExportToPdf(pdfFilename);
             }
             return pdfFilename;
         }
@@ -379,8 +373,9 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
         {
             report.DbContext = dbc;
             report.Parameters["prmCourseID"].Value = CourseID;
+            report.CreateDocument();
             string pdfFilename = GetTempPdfFile();
-            report.ExportToPdf(pdfFilename, options);
+            report.ExportToPdf(pdfFilename);
             return pdfFilename;
         }
         async Task<string> CreateLeaderReportAsync(XtraReport report,
@@ -423,8 +418,9 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 else
                     ds.DataSource = enrolmentDetails;
             }
+            report.CreateDocument();
             string pdfFilename = GetTempPdfFile();
-            report.ExportToPdf(pdfFilename, options);
+            report.ExportToPdf(pdfFilename);
             return pdfFilename;
         }
 
