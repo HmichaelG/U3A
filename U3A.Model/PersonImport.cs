@@ -1,6 +1,4 @@
-﻿using DevExpress.ClipboardSource.SpreadsheetML;
-using DevExpress.Pdf.Native.BouncyCastle.Asn1.Ocsp;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -16,50 +16,48 @@
 @inject WorkStation ws
 @implements IDisposable
 
-<h1>@isInteractive</h1>
+@if (isInteractive)
+{
+    <div class="page">
 
-    @if (isInteractive)
-    {
-        <div class="page">
-
-            <CascadingValue Value=@openCircuits Name="OpenCircuits">
-                <CascadingValue Value="@loginState">
-                    <CascadingValue Value="@hasRole" Name="HasRole">
-                        @if (hasRole)
+        <CascadingValue Value=@openCircuits Name="OpenCircuits">
+            <CascadingValue Value="@loginState">
+                <CascadingValue Value="@hasRole" Name="HasRole">
+                    @if (hasRole)
+                    {
+                        if (useTopMenu.HasValue)
                         {
-                            if (useTopMenu.HasValue)
+                            if (useTopMenu.Value)
                             {
-                                if (useTopMenu.Value)
-                                {
-                                    <MainLayoutTopMenu Body="@Body" />
-                                }
-                                else
-                                {
-                                    <MainLayoutSideMenu Body="@Body" />
-                                }
+                                <MainLayoutTopMenu Body="@Body" />
+                            }
+                            else
+                            {
+                                <MainLayoutSideMenu Body="@Body" />
                             }
                         }
-                        else
-                        {
-                            <MainLayoutTopMenu Body="@Body" />
-                        }
+                    }
+                    else
+                    {
+                        <MainLayoutTopMenu Body="@Body" />
+                    }
 
-                        @* For logout *@
-                        <form id="logout-form" action="Account/Logout" @formname="logout" method="post">
-                            <AntiforgeryToken />
-                            <input type="hidden" name="ReturnUrl" value="" />
-                        </form>
+                    @* For logout *@
+                    <form id="logout-form" action="Account/Logout" @formname="logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="" />
+                    </form>
 
-                    </CascadingValue>
                 </CascadingValue>
             </CascadingValue>
+        </CascadingValue>
 
-        </div>
-    }
-    else
-    {
-        <NotInteractive />
-    }
+    </div>
+}
+else
+{
+    <NotInteractive />
+}
 
 
 
