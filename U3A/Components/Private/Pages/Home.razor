@@ -119,7 +119,7 @@ else
 
     async Task ParseQueryString()
     {
-        // Top prioriy: handle cancelled online payments
+        // Top priority: handle cancelled online payments
         var colQueryString = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
         if (colQueryString.Count > 1)
         {
