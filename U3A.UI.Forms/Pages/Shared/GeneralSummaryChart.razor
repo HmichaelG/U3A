@@ -3,230 +3,232 @@
 
 @if (IsReady)
 {
-    <DxToolbar CssClass="my-1 d-print-none" SizeMode="SizeMode.Small">
-        <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
-                       Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                       IconCssClass="bi bi-filetype-png">
-            <Items>
-                <DxToolbarItem Text=@($"Export {titleMembersByGender}")
-                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                               Click=@(async () => await chartMemberSummary.ExportAsync(titleMembersByGender,ChartExportFormat.Png,100))
-                               IconCssClass="bi bi-filetype-png" />
-                <DxToolbarItem Text=@($"Export {titleNetGainOrLoss}")
-                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                               Click=@(async () => await chartNetGainOrLoss.ExportAsync(titleNetGainOrLoss,ChartExportFormat.Png,150))
-                               IconCssClass="bi bi-filetype-png" />
-                <DxToolbarItem Text=@($"Export {titleLengthOfMship}")
-                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                               Click=@(async () => await chartLengthOfMship.ExportAsync(titleLengthOfMship,ChartExportFormat.Png,100))
-                               IconCssClass="bi bi-filetype-png" />
-                <DxToolbarItem Text=@($"Export {titleEnrolments}")
-                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                               Click=@(async () => await chartEnrolments.ExportAsync(titleEnrolments,ChartExportFormat.Png,100))
-                               IconCssClass="bi bi-filetype-png" />
-                <DxToolbarItem Text=@($"Export {titleWaitlist}")
-                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                               Click=@(async () => await chartWiatlist.ExportAsync(titleWaitlist,ChartExportFormat.Png,100))
-                               IconCssClass="bi bi-filetype-png" />
-                <DxToolbarItem Text=@($"Export {titleMembersAge}")
-                               Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                               Click=@(async () => await chartMemberAge.ExportAsync(titleMembersAge,ChartExportFormat.Png,100))
-                               IconCssClass="bi bi-filetype-png" />
-            </Items>
-        </DxToolbarItem>
-    </DxToolbar>
-<div class="row">
-        <DxPieChart Data="@memberData" CssClass="col-lg-4" @ref=@chartMemberSummary
-                    InnerDiameter="0.5"
-                    LabelOverlap="PieChartLabelOverlap.Hide"
-                    CustomizeSeriesPoint="CustomizeGenderSeriesPoint"
-                    T="MemberSummary">
-            <DxChartTitle Text=@titleMembersByGender />
-            <DxPieChartSeries T="MemberSummary"
-                              TArgument="string"
-                              TValue="int"
-                              ValueField="si => si.Count"
-                              ArgumentField="si => si.Group"
-                              SummaryMethod="Enumerable.Sum">
-                <DxChartSeriesLabel Visible="true"
-                                    Position="RelativePosition.Inside"
-                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
-            </DxPieChartSeries>
-            <DxChartTooltip Enabled="true"
-                            Position="RelativePosition.Outside">
-                <div style="margin: 0.75rem">
-                    <div class="fw-bold">@context.Point.Argument</div>
-                    <div>
-                        @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+    <div class="w-100">
+        <DxToolbar CssClass="my-1 d-print-none" SizeMode="SizeMode.Small">
+            <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
+                           Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                           IconCssClass="bi bi-filetype-png">
+                <Items>
+                    <DxToolbarItem Text=@($"Export {titleMembersByGender}")
+                                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                                   Click=@(async () => await chartMemberSummary.ExportAsync(titleMembersByGender,ChartExportFormat.Png,100))
+                                   IconCssClass="bi bi-filetype-png" />
+                    <DxToolbarItem Text=@($"Export {titleNetGainOrLoss}")
+                                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                                   Click=@(async () => await chartNetGainOrLoss.ExportAsync(titleNetGainOrLoss,ChartExportFormat.Png,150))
+                                   IconCssClass="bi bi-filetype-png" />
+                    <DxToolbarItem Text=@($"Export {titleLengthOfMship}")
+                                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                                   Click=@(async () => await chartLengthOfMship.ExportAsync(titleLengthOfMship,ChartExportFormat.Png,100))
+                                   IconCssClass="bi bi-filetype-png" />
+                    <DxToolbarItem Text=@($"Export {titleEnrolments}")
+                                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                                   Click=@(async () => await chartEnrolments.ExportAsync(titleEnrolments,ChartExportFormat.Png,100))
+                                   IconCssClass="bi bi-filetype-png" />
+                    <DxToolbarItem Text=@($"Export {titleWaitlist}")
+                                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                                   Click=@(async () => await chartWiatlist.ExportAsync(titleWaitlist,ChartExportFormat.Png,100))
+                                   IconCssClass="bi bi-filetype-png" />
+                    <DxToolbarItem Text=@($"Export {titleMembersAge}")
+                                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                                   Click=@(async () => await chartMemberAge.ExportAsync(titleMembersAge,ChartExportFormat.Png,100))
+                                   IconCssClass="bi bi-filetype-png" />
+                </Items>
+            </DxToolbarItem>
+        </DxToolbar>
+        <div class="row">
+            <DxPieChart Data="@memberData" CssClass="col col-lg-4" @ref=@chartMemberSummary
+                        InnerDiameter="0.5"
+                        LabelOverlap="PieChartLabelOverlap.Hide"
+                        CustomizeSeriesPoint="CustomizeGenderSeriesPoint"
+                        T="MemberSummary">
+                <DxChartTitle Text=@titleMembersByGender />
+                <DxPieChartSeries T="MemberSummary"
+                                  TArgument="string"
+                                  TValue="int"
+                                  ValueField="si => si.Count"
+                                  ArgumentField="si => si.Group"
+                                  SummaryMethod="Enumerable.Sum">
+                    <DxChartSeriesLabel Visible="true"
+                                        Position="RelativePosition.Inside"
+                                        ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
+                </DxPieChartSeries>
+                <DxChartTooltip Enabled="true"
+                                Position="RelativePosition.Outside">
+                    <div style="margin: 0.75rem">
+                        <div class="fw-bold">@context.Point.Argument</div>
+                        <div>
+                            @(
+                                $"{context.Point.Value:#,0.}"
+                                )
+                        </div>
                     </div>
-                </div>
-            </DxChartTooltip>
-            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
-                           VerticalAlignment="VerticalEdge.Top"
-                           Position="RelativePosition.Outside"
-                           Orientation="Orientation.Vertical" />
-        </DxPieChart>
+                </DxChartTooltip>
+                <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                               VerticalAlignment="VerticalEdge.Top"
+                               Position="RelativePosition.Outside"
+                               Orientation="Orientation.Vertical" />
+            </DxPieChart>
 
-        <DxChart Data="attritionData" CssClass="col-lg-4" @ref=@chartNetGainOrLoss
-                 T="MemberSummary"
-                 CustomizeSeriesPoint="CustomizeAttritionSeriesPoint"
-                 LabelOverlap="ChartLabelOverlap.Hide">
-            <DxChartTitle Text=@($"{term?.Year}: Net Gain / Loss") />
-            <DxChartCommonSeries NameField="@((MemberSummary t) => t.Year)"
-                                 ArgumentField="@(s => s.Group)"
-                                 ValueField="@(s => s.Count)"
-                                 SummaryMethod="Enumerable.Sum"
-                                 SeriesType="ChartSeriesType.Bar">
-                <SeriesTemplate Context="settings">
-                    <DxChartBarSeries Settings="@settings">
-                        <DxChartSeriesLabel Visible=true Position="RelativePosition.Inside" />
-                    </DxChartBarSeries>
-                </SeriesTemplate>
-            </DxChartCommonSeries>
-            <DxChartLegend Position="RelativePosition.Outside" Visible=false
-                           HorizontalAlignment="HorizontalAlignment.Right" />
-            <DxChartTooltip Enabled="true" Position="RelativePosition.Outside">
-                <div class="m-2">
-                    <div>
-                        @context.Point.Argument: @string.Format("{0:#0}", (int)context.Point.Value)
+            <DxChart Data="attritionData" CssClass="col col-lg-4" @ref=@chartNetGainOrLoss
+                     T="MemberSummary"
+                     CustomizeSeriesPoint="CustomizeAttritionSeriesPoint"
+                     LabelOverlap="ChartLabelOverlap.Hide">
+                <DxChartTitle Text=@($"{term?.Year}: Net Gain / Loss") />
+                <DxChartCommonSeries NameField="@((MemberSummary t) => t.Year)"
+                                     ArgumentField="@(s => s.Group)"
+                                     ValueField="@(s => s.Count)"
+                                     SummaryMethod="Enumerable.Sum"
+                                     SeriesType="ChartSeriesType.Bar">
+                    <SeriesTemplate Context="settings">
+                        <DxChartBarSeries Settings="@settings">
+                            <DxChartSeriesLabel Visible=true Position="RelativePosition.Inside" />
+                        </DxChartBarSeries>
+                    </SeriesTemplate>
+                </DxChartCommonSeries>
+                <DxChartLegend Position="RelativePosition.Outside" Visible=false
+                               HorizontalAlignment="HorizontalAlignment.Right" />
+                <DxChartTooltip Enabled="true" Position="RelativePosition.Outside">
+                    <div class="m-2">
+                        <div>
+                            @context.Point.Argument: @string.Format("{0:#0}", (int)context.Point.Value)
+                        </div>
                     </div>
-                </div>
-            </DxChartTooltip>
-        </DxChart>
+                </DxChartTooltip>
+            </DxChart>
 
-        <DxPieChart Data="@membershipLengthData" CssClass="col-lg-4" @ref=@chartLengthOfMship
-                    InnerDiameter="0.5"
-                    Palette="@memberLengthTheme"
-                    LabelOverlap="PieChartLabelOverlap.Hide"
-                    T="MemberSummary">
-            <DxChartTitle Text=@titleLengthOfMship />
-            <DxPieChartSeries T="MemberSummary"
-                              TArgument="string"
-                              TValue="int"
-                              ValueField="si => si.Count"
-                              ArgumentField="si => si.Group"
-                              SummaryMethod="Enumerable.Sum">
-                <DxChartSeriesLabel Visible="true"
-                                    Position="RelativePosition.Inside"
-                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
-            </DxPieChartSeries>
-            <DxChartTooltip Enabled="true"
-                            Position="RelativePosition.Outside">
-                <div style="margin: 0.75rem">
-                    <div class="fw-bold">@context.Point.Argument</div>
-                    <div>
-                        @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+            <DxPieChart Data="@membershipLengthData" CssClass="col col-lg-4" @ref=@chartLengthOfMship
+                        InnerDiameter="0.5"
+                        Palette="@memberLengthTheme"
+                        LabelOverlap="PieChartLabelOverlap.Hide"
+                        T="MemberSummary">
+                <DxChartTitle Text=@titleLengthOfMship />
+                <DxPieChartSeries T="MemberSummary"
+                                  TArgument="string"
+                                  TValue="int"
+                                  ValueField="si => si.Count"
+                                  ArgumentField="si => si.Group"
+                                  SummaryMethod="Enumerable.Sum">
+                    <DxChartSeriesLabel Visible="true"
+                                        Position="RelativePosition.Inside"
+                                        ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
+                </DxPieChartSeries>
+                <DxChartTooltip Enabled="true"
+                                Position="RelativePosition.Outside">
+                    <div style="margin: 0.75rem">
+                        <div class="fw-bold">@context.Point.Argument</div>
+                        <div>
+                            @(
+                                $"{context.Point.Value:#,0.}"
+                                )
+                        </div>
                     </div>
-                </div>
-            </DxChartTooltip>
-            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
-                           VerticalAlignment="VerticalEdge.Top"
-                           Position="RelativePosition.Outside"
-                           Orientation="Orientation.Vertical" />
-        </DxPieChart>
-    </div>
-    <div class="row mt-2">
-        <DxPieChart Data="@enrolmentData" CssClass="col-lg-4" @ref=@chartEnrolments
-                    InnerDiameter="0.5"
-                    LabelOverlap="PieChartLabelOverlap.Hide"
-                    Palette="@enrolmentTheme"
-                    T="MemberSummary">
-            <DxChartTitle Text=@($"{term?.Name}: Enrolment") />
-            <DxPieChartSeries T="MemberSummary"
-                              TArgument="string"
-                              TValue="int"
-                              ValueField="si => si.Count"
-                              ArgumentField="si => si.Group"
-                              SummaryMethod="Enumerable.Sum">
-                <DxChartSeriesLabel Visible="true"
-                                    Position="RelativePosition.Inside"
-                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
-            </DxPieChartSeries>
-            <DxChartTooltip Enabled="true"
-                            Position="RelativePosition.Inside">
-                <div style="margin: 0.75rem">
-                    <div class="fw-bold">@context.Point.Argument</div>
-                    <div>
-                        @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+                </DxChartTooltip>
+                <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                               VerticalAlignment="VerticalEdge.Top"
+                               Position="RelativePosition.Outside"
+                               Orientation="Orientation.Vertical" />
+            </DxPieChart>
+        </div>
+        <div class="row mt-2">
+            <DxPieChart Data="@enrolmentData" CssClass="col col-lg-4" @ref=@chartEnrolments
+                        InnerDiameter="0.5"
+                        LabelOverlap="PieChartLabelOverlap.Hide"
+                        Palette="@enrolmentTheme"
+                        T="MemberSummary">
+                <DxChartTitle Text=@($"{term?.Name}: Enrolment") />
+                <DxPieChartSeries T="MemberSummary"
+                                  TArgument="string"
+                                  TValue="int"
+                                  ValueField="si => si.Count"
+                                  ArgumentField="si => si.Group"
+                                  SummaryMethod="Enumerable.Sum">
+                    <DxChartSeriesLabel Visible="true"
+                                        Position="RelativePosition.Inside"
+                                        ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
+                </DxPieChartSeries>
+                <DxChartTooltip Enabled="true"
+                                Position="RelativePosition.Inside">
+                    <div style="margin: 0.75rem">
+                        <div class="fw-bold">@context.Point.Argument</div>
+                        <div>
+                            @(
+                                $"{context.Point.Value:#,0.}"
+                                )
+                        </div>
                     </div>
-                </div>
-            </DxChartTooltip>
-            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
-                           VerticalAlignment="VerticalEdge.Top"
-                           Position="RelativePosition.Outside"
-                           Orientation="Orientation.Vertical" />
-        </DxPieChart>
+                </DxChartTooltip>
+                <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                               VerticalAlignment="VerticalEdge.Top"
+                               Position="RelativePosition.Outside"
+                               Orientation="Orientation.Vertical" />
+            </DxPieChart>
 
-        <DxPieChart Data="@waitlistData" CssClass="col-lg-4" @ref=@chartWiatlist
-                    InnerDiameter="0.5"
-                    LabelOverlap="PieChartLabelOverlap.Hide"
-                    Palette="@waitlistTheme"
-                    T="MemberSummary">
-            <DxChartTitle Text=@($"{term?.Name}: Waitlist") />
-            <DxPieChartSeries T="MemberSummary"
-                              TArgument="string"
-                              TValue="int"
-                              ValueField="si => si.Count"
-                              ArgumentField="si => si.Group"
-                              SummaryMethod="Enumerable.Sum">
-                <DxChartSeriesLabel Visible="true"
-                                    Position="RelativePosition.Inside"
-                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
-            </DxPieChartSeries>
-            <DxChartTooltip Enabled="true"
-                            Position="RelativePosition.Outside">
-                <div style="margin: 0.75rem">
-                    <div class="fw-bold">@context.Point.Argument</div>
-                    <div>
-                        @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+            <DxPieChart Data="@waitlistData" CssClass="col col-lg-4" @ref=@chartWiatlist
+                        InnerDiameter="0.5"
+                        LabelOverlap="PieChartLabelOverlap.Hide"
+                        Palette="@waitlistTheme"
+                        T="MemberSummary">
+                <DxChartTitle Text=@($"{term?.Name}: Waitlist") />
+                <DxPieChartSeries T="MemberSummary"
+                                  TArgument="string"
+                                  TValue="int"
+                                  ValueField="si => si.Count"
+                                  ArgumentField="si => si.Group"
+                                  SummaryMethod="Enumerable.Sum">
+                    <DxChartSeriesLabel Visible="true"
+                                        Position="RelativePosition.Inside"
+                                        ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
+                </DxPieChartSeries>
+                <DxChartTooltip Enabled="true"
+                                Position="RelativePosition.Outside">
+                    <div style="margin: 0.75rem">
+                        <div class="fw-bold">@context.Point.Argument</div>
+                        <div>
+                            @(
+                                $"{context.Point.Value:#,0.}"
+                                )
+                        </div>
                     </div>
-                </div>
-            </DxChartTooltip>
-            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
-                           VerticalAlignment="VerticalEdge.Top"
-                           Position="RelativePosition.Outside"
-                           Orientation="Orientation.Vertical" />
-        </DxPieChart>
-    <DxPieChart Data="@membershipDOBData" CssClass="col-lg-4" @ref=@chartMemberAge
-                    InnerDiameter="0.5"
-                    Palette="@memberLengthTheme"
-                    LabelOverlap="PieChartLabelOverlap.Hide"
-                    T="MemberSummary">
-            <DxChartTitle Text=@titleMembersAge />
-            <DxPieChartSeries T="MemberSummary"
-                              TArgument="string"
-                              TValue="int"
-                              ValueField="si => si.Count"
-                              ArgumentField="si => si.Group"
-                              SummaryMethod="Enumerable.Sum">
-                <DxChartSeriesLabel Visible="true"
-                                    Position="RelativePosition.Inside"
-                                    ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
-            </DxPieChartSeries>
-            <DxChartTooltip Enabled="true"
-                            Position="RelativePosition.Outside">
-                <div style="margin: 0.75rem">
-                    <div class="fw-bold">@context.Point.Argument</div>
-                    <div>
-                        @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+                </DxChartTooltip>
+                <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                               VerticalAlignment="VerticalEdge.Top"
+                               Position="RelativePosition.Outside"
+                               Orientation="Orientation.Vertical" />
+            </DxPieChart>
+            <DxPieChart Data="@membershipDOBData" CssClass="col col-lg-4" @ref=@chartMemberAge
+                        InnerDiameter="0.5"
+                        Palette="@memberLengthTheme"
+                        LabelOverlap="PieChartLabelOverlap.Hide"
+                        T="MemberSummary">
+                <DxChartTitle Text=@titleMembersAge />
+                <DxPieChartSeries T="MemberSummary"
+                                  TArgument="string"
+                                  TValue="int"
+                                  ValueField="si => si.Count"
+                                  ArgumentField="si => si.Group"
+                                  SummaryMethod="Enumerable.Sum">
+                    <DxChartSeriesLabel Visible="true"
+                                        Position="RelativePosition.Inside"
+                                        ValueFormat='ChartElementFormat.FromLdmlString("#0")' />
+                </DxPieChartSeries>
+                <DxChartTooltip Enabled="true"
+                                Position="RelativePosition.Outside">
+                    <div style="margin: 0.75rem">
+                        <div class="fw-bold">@context.Point.Argument</div>
+                        <div>
+                            @(
+                                $"{context.Point.Value:#,0.}"
+                                )
+                        </div>
                     </div>
-                </div>
-            </DxChartTooltip>
-            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
-                           VerticalAlignment="VerticalEdge.Top"
-                           Position="RelativePosition.Outside"
-                           Orientation="Orientation.Vertical" />
-        </DxPieChart>
+                </DxChartTooltip>
+                <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                               VerticalAlignment="VerticalEdge.Top"
+                               Position="RelativePosition.Outside"
+                               Orientation="Orientation.Vertical" />
+            </DxPieChart>
+        </div>
     </div>
 }
 
