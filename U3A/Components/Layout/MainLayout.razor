@@ -16,53 +16,50 @@
 @inject WorkStation ws
 @implements IDisposable
 
+<h1>@isInteractive</h1>
 
-
-@if (isReady && Body != null)
-{
-    @if (RendererInfo.IsInteractive)
+    @if (isInteractive)
     {
         <div class="page">
 
-        <CascadingValue Value=@openCircuits Name="OpenCircuits">
-            <CascadingValue Value="@loginState">
-                <CascadingValue Value="@hasRole" Name="HasRole">
-                    @if (hasRole)
-                    {
-                        if (useTopMenu.HasValue)
+            <CascadingValue Value=@openCircuits Name="OpenCircuits">
+                <CascadingValue Value="@loginState">
+                    <CascadingValue Value="@hasRole" Name="HasRole">
+                        @if (hasRole)
                         {
-                            if (useTopMenu.Value)
+                            if (useTopMenu.HasValue)
                             {
-                                <MainLayoutTopMenu Body="@Body" />
-                            }
-                            else
-                            {
-                                <MainLayoutSideMenu Body="@Body" />
+                                if (useTopMenu.Value)
+                                {
+                                    <MainLayoutTopMenu Body="@Body" />
+                                }
+                                else
+                                {
+                                    <MainLayoutSideMenu Body="@Body" />
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        <MainLayoutTopMenu Body="@Body" />
-                    }
+                        else
+                        {
+                            <MainLayoutTopMenu Body="@Body" />
+                        }
 
-                    @* For logout *@
-                    <form id="logout-form" action="Account/Logout" @formname="logout" method="post">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="" />
-                    </form>
+                        @* For logout *@
+                        <form id="logout-form" action="Account/Logout" @formname="logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="" />
+                        </form>
 
+                    </CascadingValue>
                 </CascadingValue>
             </CascadingValue>
-        </CascadingValue>
 
-    </div>
+        </div>
     }
     else
     {
         <NotInteractive />
     }
-}
 
 
 
@@ -78,6 +75,7 @@
     U3ADbContext? dbc { get; set; }
     bool isReady = false;
     string? currentUrl;
+    bool isInteractive;
 
     private DotNetObjectReference<MainLayout>? dotNetObjectReference;
 
@@ -149,6 +147,7 @@
     {
         if (firstRender)
         {
+            isInteractive = RendererInfo.IsInteractive;
             await ws.SetWorkstationDetail(js, localStorage);
             useTopMenu = ws.UseTopMenu;
             await InvokeAsync(StateHasChanged);
