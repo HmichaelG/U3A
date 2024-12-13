@@ -23,6 +23,28 @@ namespace U3A.BusinessRules
                             .ThenByDescending(x => x.TermNumber).ToList();
         }
 
+        public static async Task<string> IsInMemberPortalMaintenanceModeTillAsync(U3ADbContext dbc)
+        {
+            string result = string.Empty;
+            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+            if (settings != null)
+            {
+                if (settings.InMaintenanceTill == null)
+                {
+                    var term = await CurrentEnrolmentTermAsync(dbc);
+                    if (term == null)
+                    {
+                        var nextTerm = await NextTermAsync(dbc,dbc.GetLocalTime());
+                        result = (nextTerm == null) ? "To Be Advised" : nextTerm.EnrolmentStartDate.ToLongDateString();
+                    }
+                }
+                else
+                {
+                    result = settings.InMaintenanceTill.Value.ToString("F");
+                }
+            }
+            return result;
+        }
         public static Term? CurrentTerm(U3ADbContext dbc)
         {
             return dbc.Term.Where(x => x.IsDefaultTerm).FirstOrDefault();

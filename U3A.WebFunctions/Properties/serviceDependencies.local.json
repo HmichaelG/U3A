@@ -4,10 +4,25 @@
       "type": "appInsights.sdk"
     },
     "storage1": {
-      "secretStore": null,
+      "secretStore": "LocalSecretsFile",
       "resourceId": null,
       "type": "storage.emulator",
       "connectionId": "AzureWebJobsStorage"
+    },
+    "storage2": {
+      "containerPorts": "10000:10000,10001:10001,10002:10002",
+      "secretStore": "LocalSecretsFile",
+      "containerName": "azurite",
+      "containerImage": "mcr.microsoft.com/azure-storage/azurite",
+      "type": "storage.container",
+      "connectionId": "StorageConnection",
+      "dynamicId": null
+    },
+    "secrets1": {
+      "secretStore": null,
+      "resourceId": null,
+      "type": "secrets.user",
+      "connectionId": null
     }
   }
 }

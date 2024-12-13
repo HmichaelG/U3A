@@ -7,8 +7,6 @@
 		<Nullable>enable</Nullable>
 		<ReadyToRun>true</ReadyToRun>
 		<UserSecretsId>1d7e1c2d-ac3b-40dc-8e35-3a2e8f674597</UserSecretsId>
-		<DockerFastModeProjectMountDirectory>/home/site/wwwroot</DockerFastModeProjectMountDirectory>
-		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<PublishAot>False</PublishAot>
 	</PropertyGroup>
 	<ItemGroup>
@@ -65,17 +63,24 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="AsyncAwaitBestPractices" Version="8.0.0" />
+		<PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
 		<PackageReference Include="Azure.Identity" Version="1.13.1" />
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
+		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.20.1" />
+		<PackageReference Include="Azure.Storage.Queues" Version="12.20.1" />
 		<PackageReference Include="DevExpress.Drawing" Version="24.1.7" />
 		<PackageReference Include="DevExpress.Drawing.Skia" Version="24.1.7" />
 		<PackageReference Include="DevExpress.Pdf.SkiaRenderer" Version="24.1.7" />
 		<PackageReference Include="HttpMultipartParser" Version="8.4.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
+		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs" Version="6.6.0" />
+		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage.Queues" Version="5.5.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.23.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.18.1" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.6" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
 		<PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
 		<PackageReference Include="PDFsharp" Version="6.1.1" />

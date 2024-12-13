@@ -17,23 +17,6 @@ using DevExpress.Drawing;
 
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
-
-var builder = WebApplication.CreateBuilder(args);
-string? tenantConnectionString = builder.Configuration.GetConnectionString(Common.TENANT_CN_CONFIG);
-
-var columnOptions = new SeriSQL.ColumnOptions
-{
-    AdditionalColumns = new Collection<SeriSQL.SqlColumn>
-    {
-        new SeriSQL.SqlColumn
-                { ColumnName = "Tenant", PropertyName = "Tenant", DataType = SqlDbType.NVarChar, DataLength = 64 },
-        new SeriSQL.SqlColumn
-                { ColumnName = "User", PropertyName = "User", DataType = SqlDbType.NVarChar, DataLength = 64 },
-        new SeriSQL.SqlColumn
-                { ColumnName = "LogEvent", PropertyName = "LogEvent", DataType = SqlDbType.NVarChar, DataLength = 64 },
-    }
-};
-
 DevExpress.Drawing.Internal.DXDrawingEngine.ForceSkia();
 foreach (var file in Directory.GetFiles(@"fonts"))
 {
@@ -43,26 +26,7 @@ foreach (var file in Directory.GetFiles(@"fonts"))
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
-     .ConfigureLogging((hostingContext, logging) =>
-     {
-         Log.Logger = new LoggerConfiguration()
-             .Enrich.FromLogContext()
-             .Enrich.WithExceptionDetails()
-             .WriteTo.Logger(lc => lc
-                 .Filter.ByIncludingOnly(Matching.WithProperty("AutoEnrolParticipants"))
-                 .WriteTo.MSSqlServer(connectionString: tenantConnectionString,
-                                         formatProvider: new CultureInfo("en-AU"),
-                                         sinkOptions: new SeriSQL.MSSqlServerSinkOptions
-                                         {
-                                             TableName = "LogAutoEnrol"
-                                         },
-                                             columnOptions: columnOptions
-                                         )
-                 )
-             .CreateLogger();
-
-         logging.AddSerilog(Log.Logger, true);
-     })
     .Build();
+
 host.Run();
 

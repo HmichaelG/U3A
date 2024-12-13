@@ -30,12 +30,6 @@ namespace U3A.WebFunctions
             )] TimerInfo myTimer)
         {
 
-            // Get the fonts
-            foreach (var file in System.IO.Directory.GetFiles(@"fonts"))
-            {
-                DXFontRepository.Instance.AddFont(file);
-            }
-
             //Retrieve the tenants
             var tenants = new List<TenantInfo>();
             var cn = _config.GetConnectionString(Common.TENANT_CN_CONFIG);
