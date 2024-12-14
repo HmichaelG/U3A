@@ -236,7 +236,7 @@ else
         {
             originalReceipt = default;
             editModel.ProcessingYear = ProcessingYear;
-            editModel.Date = DateTime.Today;
+            editModel.Date = dbc.GetLocalDate();
             editModel.Description = "Membership Fees";
             editModel.EmailCashReceipt = true;
             setFinancialTo = true;
