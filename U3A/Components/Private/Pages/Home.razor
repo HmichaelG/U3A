@@ -31,22 +31,22 @@ else
             <div class="input-group mt-2 d-print-none">
                 <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
-                                  ButtonIconCssClass="bi bi-check2-circle"
-                                  HelpTopic="2024-Version-History.html"
-                                  ActivationStyle="@HelpActivationStyle.ButtonOnly" />
+                ButtonIconCssClass="bi bi-check2-circle"
+                HelpTopic="2024-Version-History.html"
+                ActivationStyle="@HelpActivationStyle.ButtonOnly" />
                 <DxButton Text="Support"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          NavigateUrl="Public/Support"
-                          CssClass="ms-1"
-                          IconCssClass="bi bi-person" />
+                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                NavigateUrl="Public/Support"
+                CssClass="ms-1"
+                IconCssClass="bi bi-person" />
                 <ContextHelpTitle Title=""
-                                  HelpTopic="Introduction.html"
-                                  IncludeTableOfContents=true
-                                  ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                HelpTopic="Introduction.html"
+                IncludeTableOfContents=true
+                ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
             </div>
             <DxTabs CssClass="vw-100">
                 <DxTabPage Text="Member Summary">
-                        <GeneralSummaryChart />
+                    <GeneralSummaryChart />
                 </DxTabPage>
                 <DxTabPage Text="Cash Receipts">
                     <ReceiptSummaryChart />
@@ -76,11 +76,11 @@ else
 <style>
 
     .iframe-style {
-        width: 85vw;
-        min-height: 40dvh;
-        height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem"));
-        border-style: none;
-        padding-bottom: 5px;
+    width: 85vw;
+    min-height: 40dvh;
+    height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem"));
+    border-style: none;
+    padding-bottom: 5px;
     }
 
 </style>
@@ -108,13 +108,10 @@ else
         await base.OnInitializedAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
-        {
-            await ParseQueryString();
-        }
-        await base.OnAfterRenderAsync(firstRender);
+        await base.OnParametersSetAsync();
+        await ParseQueryString();
     }
 
     async Task ParseQueryString()

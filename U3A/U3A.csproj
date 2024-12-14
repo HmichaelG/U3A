@@ -38,13 +38,13 @@
     <PackageReference Include="Azure.Identity" Version="1.13.1" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="CommonPasswordsValidator" Version="1.5.0" />
-    <PackageReference Include="DevExpress.Blazor" Version="24.1.7" />
-    <PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="24.1.7" />
-    <PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="24.1.7" />
-    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="24.1.7" />
-    <PackageReference Include="DevExpress.Blazor.Themes" Version="24.1.7" />
-    <PackageReference Include="DevExpress.Drawing" Version="24.1.7" />
-    <PackageReference Include="DevExpress.Drawing.Skia" Version="24.1.7" />
+    <PackageReference Include="DevExpress.Blazor" Version="24.2.3" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="24.2.3" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="24.2.3" />
+    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="24.2.3" />
+    <PackageReference Include="DevExpress.Blazor.Themes" Version="24.2.3" />
+    <PackageReference Include="DevExpress.Drawing" Version="24.2.3" />
+    <PackageReference Include="DevExpress.Drawing.Skia" Version="24.2.3" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
@@ -66,12 +66,6 @@
     <ProjectReference Include="..\U3A.UI.Common\U3A.UI.Common.csproj" />
     <ProjectReference Include="..\U3A.UI.Forms\U3A.UI.Forms.csproj" />
     <ProjectReference Include="..\U3A.UI.Reports\U3A.UI.Reports.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Components\Public\Pages\fallback.razor" />
-  </ItemGroup>
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Components\Public\Pages\fallback.razor" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\prcDbCleanup.sql">

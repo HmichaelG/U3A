@@ -1,5 +1,4 @@
-﻿using DevExpress.Blazor.Internal;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
