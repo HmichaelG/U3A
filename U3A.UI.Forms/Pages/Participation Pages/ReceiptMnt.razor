@@ -40,48 +40,48 @@ else
     <FullScreen DisplayOffset="13">
         <ContentTemplate>
             <DxGrid Data="@Receipts" @ref=@mainGrid
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
-                    ShowFilterRow="false"
-                    ShowAllRows="false"
-                    KeyFieldName="ID"
-                    PageSize="30"
-                    PageSizeSelectorVisible="true"
-                    PageSizeSelectorItems="@(new int[] {10, 20,30, 40,60,80, 100, 200,400 })"
-                    PageSizeSelectorAllRowsItemVisible="true"
-                    PagerSwitchToInputBoxButtonCount="10"
-                    PagerVisibleNumericButtonCount="10"
-                    PagerVisible="true"
-                    PopupEditFormCssClass="popup-width"
-                    PopupEditFormHeaderText="Add/Edit Receipt"
-                    ValidationEnabled="true"
-                    CustomizeEditModel="OnCustomizeEditModel"
-                    EditMode="GridEditMode.PopupEditForm"
-                    EditModelSaving="Grid_EditModelSaving">
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
+            ShowFilterRow="false"
+            ShowAllRows="false"
+            KeyFieldName="ID"
+            PageSize="30"
+            PageSizeSelectorVisible="true"
+            PageSizeSelectorItems="@(new int[] {10, 20,30, 40,60,80, 100, 200,400 })"
+            PageSizeSelectorAllRowsItemVisible="true"
+            PagerSwitchToInputBoxButtonCount="10"
+            PagerVisibleNumericButtonCount="10"
+            PagerVisible="true"
+            PopupEditFormCssClass="popup-width"
+            PopupEditFormHeaderText="Add/Edit Receipt"
+            ValidationEnabled="true"
+            CustomizeEditModel="OnCustomizeEditModel"
+            EditMode="GridEditMode.PopupEditForm"
+            EditModelSaving="Grid_EditModelSaving">
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid LayoutKey="{91092999-6C8B-4F8F-BC01-8A5F5FD28340}" />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridCommandColumnEx @ref="GridCommandColumn" Width="5rem" DeleteButtonVisible=true
-                                           EditButtonVisible="true" OnDeleteButtonClick="(DataItem) => DoDeleteConfirmation(DataItem)" />
-                    <DxGridDataColumn Caption="First Name" FieldName="Person.FirstName" Width="10rem" />
-                    <DxGridDataColumn Caption="Last Name" FieldName="Person.LastName" Width="10rem" />
+                    EditButtonVisible="true" OnDeleteButtonClick="(DataItem) => DoDeleteConfirmation(DataItem)" />
+                    <DxGridDataColumn Caption="Name" FieldName="Person.FullNameAlpha" Width="15rem" />
                     <DxGridDataColumn Caption="Date" FieldName="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" />
                     <DxGridDataColumn Caption="Description" FieldName="Description" />
                     <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
-                    <DxGridDataColumn Caption="Financial-To" FieldName="Person.FinancialToText" Width="8rem" TextAlignment="GridTextAlignment.Right" />
+                    <DxGridDataColumn Caption="Receipt Fin-To" FieldName="FinancialToText" Width="8rem" TextAlignment="GridTextAlignment.Right" />
+                    <DxGridDataColumn Caption="Current Fin-To" FieldName="Person.FinancialToText" Width="8rem" TextAlignment="GridTextAlignment.Right" />
                     <DxGridDataColumn Caption="Amount" FieldName="Amount" DisplayFormat="{0:c2}" Width="8rem" />
                     <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" Visible=false />
                     <DxGridDataColumn Caption="Updated By" FieldName="User" Visible=false />
                 </Columns>
                 <GroupSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                       FieldName="ID" DisplayText="{0:n0} Receipts"
-                                       FooterColumnName="Identifier" />
+                    FieldName="ID" DisplayText="{0:n0} Receipts"
+                    FooterColumnName="Identifier" />
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
-                                       DisplayText="{0:c2}"
-                                       FieldName="Amount"
-                                       FooterColumnName="Amount" />
+                    DisplayText="{0:c2}"
+                    FieldName="Amount"
+                    FooterColumnName="Amount" />
                 </GroupSummary>
                 <TotalSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0} Receipts" FieldName="ID" FooterColumnName="Identifier" />
@@ -100,13 +100,13 @@ else
                             <div class="flex-grow-1" />
                             <div class="flex-grow-0 me-2">
                                 <DxCheckBox @bind-Checked="@editItem.EmailCashReceipt"
-                                            LabelPosition="LabelPosition.Left">Email receipt to member?</DxCheckBox>
+                                LabelPosition="LabelPosition.Left">Email receipt to member?</DxCheckBox>
                             </div>
                         </div>
                         <DxFormLayoutGroup Caption="Participant's Receipt Details">
                             <DxFormLayoutItem Caption="Received From" ColSpanMd="12">
-                            <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person"
-                                                 @bind-SelectedPerson:after="async() => OnPersonOrAmountChanged(editItem)" />
+                                <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person"
+                                @bind-SelectedPerson:after="async() => OnPersonOrAmountChanged(editItem)" />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Current Financial To" ColSpanMd="12" Visible="@(editItem.Person != null)">
                                 <div class="border p-1">@editItem?.Person?.FinancialToText</div>
@@ -123,20 +123,20 @@ else
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Amount" ColSpanMd="12">
                                 <DxMaskedInput @bind-Value="@editItem.Amount"
-                                               @bind-Value:after=@(() => OnPersonOrAmountChanged(editItem))
-                                               Mask="@NumericMask.Currency" />
+                                @bind-Value:after=@(() => OnPersonOrAmountChanged(editItem))
+                                Mask="@NumericMask.Currency" />
                             </DxFormLayoutItem>
                         </DxFormLayoutGroup>
                         <DxFormLayoutGroup Caption="Participant's Financial Status"
-                                           Visible=@(showFinancialToOptionsAsSet != null)>
+                        Visible=@(showFinancialToOptionsAsSet != null)>
                             @if (showFinancialToOptionsAsSet == true)
                             {
                                 if (allowPartPayments)
                                 {
                                     <DxFormLayoutItem Caption=@("Financial Status") ColSpanMd="12">
                                         <DxRadioGroup Items="@allowedFinancialTo" CssClass="w-100 px-2"
-                                                      TextFieldName="@nameof(FinToValue.Name)"
-                                                      @bind-Value=@selectedFinancialTo>
+                                        TextFieldName="@nameof(FinToValue.Name)"
+                                        @bind-Value=@selectedFinancialTo>
                                         </DxRadioGroup>
                                     </DxFormLayoutItem>
                                 }
@@ -153,8 +153,8 @@ else
                                 {
                                     <DxFormLayoutItem Caption=@("Financial Status") ColSpanMd="12">
                                         <DxRadioGroup Items="@allowedFinancialTo" CssClass="w-100 px-2"
-                                                      TextFieldName="@nameof(FinToValue.Name)"
-                                                      @bind-Value=@selectedFinancialTo />
+                                        TextFieldName="@nameof(FinToValue.Name)"
+                                        @bind-Value=@selectedFinancialTo />
                                     </DxFormLayoutItem>
                                 }
                                 else
@@ -172,9 +172,9 @@ else
     </FullScreen>
 
 }<style>
-     .popup-width {
-         min-width: 45rem;
-     }
+    .popup-width {
+    min-width: 45rem;
+    }
 </style>
 
 @code {
@@ -479,7 +479,7 @@ else
                     Message = $"Reset {receipt.Person.FullName}'s Financial To year to {ProcessingYear - 1}?",
                     ShowNoButton = true
                 };
-            _ = await messageBox.ShowAsync(args);
+            var result = await messageBox.ShowAsync(args);
             switch (messageBox.MessageBoxResult)
             {
                 case MessageBoxDialogResult.OkButtonClicked:
@@ -543,9 +543,9 @@ else
             }
             else { ProcessingYear = DateTime.UtcNow.Year; }
         }
-        Persons = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
-        Receipts = await BusinessRule.EditableReceiptsForYearAsync(dbc, ProcessingYear);
-    }
+            Persons = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
+            Receipts = await BusinessRule.EditableReceiptsForYearAsync(dbc, ProcessingYear);
+        }
 
     public void Dispose()
     {
