@@ -29,6 +29,20 @@ namespace U3A.Model
         public Person Person { get; set; }
         public int FinancialTo { get; set; }
         public int? TermPaid { get; set; }
+
+        [NotMapped]
+        public string FinancialToText
+        {
+            get
+            {
+                string result = (FinancialTo > constants.START_OF_TIME) ? FinancialTo.ToString("F0") : "";
+                if (TermPaid != null) { result = $"{result} Term {TermPaid}"; }
+                if (FinancialTo == constants.START_OF_TIME) { result = "Pending"; }
+                if (this is Contact) { result = "External"; }
+                return result;
+            }
+        }
+
         public DateTime DateJoined { get; set; }
 
         [NotMapped]
