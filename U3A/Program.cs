@@ -274,7 +274,7 @@ app.MapAdditionalIdentityEndpoints();
 
 app.MapControllers();
 
-//app.MapFallbackToFile("/fallback.html");
+app.MapFallbackToFile("/fallback.html");
 
 app.Run();
 
