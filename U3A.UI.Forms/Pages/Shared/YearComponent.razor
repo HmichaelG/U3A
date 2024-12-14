@@ -36,6 +36,15 @@
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await OnYearChangedEvent.InvokeAsync(Year);
+        }
+    }
+
 
     async Task OnChangeClick() {
         if (Year == currentTerm.Year ) { Year++; } else { Year--; }
