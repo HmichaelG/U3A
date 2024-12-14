@@ -222,6 +222,10 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.MinimumSameSitePolicy = SameSiteMode.None;
 });
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.Expiration = TimeSpan.FromSeconds(0);
+});
 
 var app = builder.Build();
 
@@ -244,7 +248,7 @@ app.UseHttpsRedirection();
 app.MapStaticAssets();
 //app.UseStaticFiles();
 
-app.UseAntiforgery();
+//app.UseAntiforgery();
 app.Use(async (context, next) =>
 {
     try
@@ -262,6 +266,7 @@ app.Use(async (context, next) =>
 });
 
 app.MapRazorComponents<App>()
+   .DisableAntiforgery()
    .AddInteractiveServerRenderMode();
 
 // Add additional endpoints required by the Identity /Account Razor components.
@@ -269,7 +274,7 @@ app.MapAdditionalIdentityEndpoints();
 
 app.MapControllers();
 
-app.MapFallbackToFile("/fallback.html");
+//app.MapFallbackToFile("/fallback.html");
 
 app.Run();
 

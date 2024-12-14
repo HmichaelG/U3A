@@ -36,6 +36,13 @@
 
 <body>
 
+    @* For logout *@
+    <form id="logout-form" action="Account/Logout" @formname="logout" method="post">
+        <AntiforgeryToken />
+        <input type="hidden" name="ReturnUrl" value="" />
+    </form>
+
+
     <Routes @rendermode="@PageRenderMode" />
 
     <script src=@Assets["_framework/blazor.web.js"]></script>
