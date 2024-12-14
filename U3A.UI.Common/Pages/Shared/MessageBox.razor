@@ -87,6 +87,8 @@
     public EventCallback AffirmativeButtonClicked { get; set; }
     [Parameter]
     public EventCallback NegativeButtonClicked { get; set; }
+    [Parameter]
+    public EventCallback NoButtonClicked { get; set; }
 
     public MessageBoxDialogResult MessageBoxResult { get; set; }
 
@@ -182,11 +184,15 @@
         MessageBoxResult = MessageBoxDialogResult.CancelButtonClicked;
         PopupVisible = false;
         await NegativeButtonClicked.InvokeAsync();
+        tcs?.TrySetResult(false);
     }
-    void OnNoButtonClicked()
+
+    async Task OnNoButtonClicked()
     {
         MessageBoxResult = MessageBoxDialogResult.NoButtonClicked;
         PopupVisible = false;
+        await NoButtonClicked.InvokeAsync();
+        tcs?.TrySetResult(false);
     }
 
     public async Task Close()
