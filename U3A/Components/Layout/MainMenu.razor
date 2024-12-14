@@ -134,8 +134,8 @@
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole | isOfficeRole)
                             {
                                 <DxMenuItem Text="Portal (Admin)"
-                                    IconCssClass="bi bi-people" 
-                                    NavigateUrl="AdminMemberPortal" />
+                                            IconCssClass="bi bi-people"
+                                            NavigateUrl="AdminMemberPortal" />
                             }
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole)
@@ -185,7 +185,7 @@
                                 </DxMenuItem>
                             }
 
-                            <DxMenuItem Text="@((isVertical) ? "Theme & Settings" : "")" 
+                            <DxMenuItem Text="@((isVertical) ? "Theme & Settings" : "")"
                                         IconCssClass="bi bi-palette" NavigateUrl="ThemeIntroduction">
                                 <Items>
                                     <DxMenuItem Text="Office White" />
@@ -204,10 +204,9 @@
                                 <Items>
                                     @if (IsTopMenu)
                                     {
-                                        <DxMenuItem Click="OnLogout" 
-                                            oncontextmenu="return false"
-                                            Text="Logout" 
-                                            IconCssClass="bi bi-door-open" />
+                                        <DxMenuItem NavigateUrl="Account/Login"
+                                                    Text="Logout"
+                                                    IconCssClass="bi bi-door-open" />
                                     }
                                     <DxMenuItem Text="Change Email Address" IconCssClass="bi bi-shield"
                                                 Click="@(() => OnChangeCredential("Email"))" />
@@ -219,10 +218,9 @@
                             </DxMenuItem>
                             @if (!IsTopMenu)
                             {
-                                <DxMenuItem Click="OnLogout" 
-                                    NavigateUrl="Account/Login"
-                                    Text="Logout" 
-                                    IconCssClass="bi bi-door-open" />
+                                <DxMenuItem NavigateUrl="Account/Login"
+                                            Text="Logout"
+                                            IconCssClass="bi bi-door-open" />
                             }
                         }
                     }
@@ -319,13 +317,6 @@
         }
     }
 
-    private void OnLogout()
-    {
-        // forces a close of the menu when it is in mobile mode & expanded.
-        navMan.NavigateTo("javascript:document.getElementById('logout-form').submit();");
-    }
-
-
     async Task ShowHelp()
     {
         await help!.ShowTopicAsync();
@@ -346,7 +337,7 @@
     async Task OnResetDefaults()
     {
         if (await messageBox!.ShowAsync("Reset Factory Defaults",
-                    @"<p>
+                        @"<p>
             This procedure will reset your application to factory defaults
             by deleting all customisations stored on your local device.
         </p>
