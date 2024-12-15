@@ -11,6 +11,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject LocalTime lt
+@inject WorkStation ws
 
 <div class="page overflow-auto">
     <DxGridLayout CssClass="page-layout">
@@ -26,7 +27,7 @@
         <Items>
             <DxGridLayoutItem Area="header" CssClass="vw-100 d-print-none" />
             <DxGridLayoutItem Area="footer" CssClass="vw-100 d-print-none" />
-            <DxGridLayoutItem Area="navigation" CssClass="layout-sidebar d-print-none">
+            <DxGridLayoutItem Area="navigation" CssClass="@((ws.theme.StartsWith("fluent")) ? "d-print-none" : "d-print-none layout-sidebar")">
                 <Template>
                     <SideBar />
                 </Template>

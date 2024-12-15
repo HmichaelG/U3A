@@ -4,36 +4,36 @@
 <div id="fullscreen-element" class="d-flex normalscreen">
     @ContentTemplate
     <DxButton Click="@OnClick" Visible="@(!HideToggle)"
-    tooltip="Clcik to display full screen"
-    CssClass="toggle-button"
-    IconCssClass="bi bi-arrows-fullscreen"
-    RenderStyle="ButtonRenderStyle.Secondary" />
+              tooltip="Click to display full screen"
+              CssClass="toggle-button"
+              IconCssClass="bi bi-arrows-fullscreen"
+              RenderStyle="ButtonRenderStyle.Secondary" />
 </div>
 
 <style>
     .toggle-button {
-    height: 1.5rem;
-    width: 1.5rem;
-    top: 1px;
-    right: 1px;
-    position: sticky;
-    position: -webkit-sticky;
-    opacity: 1;
+        z-index: 1049; /* dxPopup z-index = 1050 */
+        height: 1.5rem;
+        width: 1.5rem;
+        top: @((ws.UseTopMenu) ? "3rem" : "0px");
+        right: 0px;
+        position: absolute;
+        opacity: 1;
     }
 
     .fullscreen {
-    z-index: 1049; /* dxPopup z-index = 1050 */
-    width: calc(100% + 1.5rem);
-    height: 100dvh;
-    top: 0px;
-    left: 0px;
-    position: absolute;
-    opacity: 1;
+        z-index: 1048; 
+        width: 100%;
+        padding-right: 1rem;
+        height: 100dvh;
+        top: 0px;
+        left: 0px;
+        position: absolute;
+        opacity: 1;
     }
 
     .normalscreen {
-    height: calc(100dvh - @(ws.UseTopMenu ? $"{currentDisplayOffset + 4}rem" : $"{currentDisplayOffset}rem"));
-    width: calc(100% + 1.5rem);
+        height: calc(100dvh - @(ws.UseTopMenu ? $"{currentDisplayOffset + 4}rem" : $"{currentDisplayOffset}rem") );
     }
 
 </style>

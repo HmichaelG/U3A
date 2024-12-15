@@ -28,97 +28,99 @@ else
 
     <Progress @ref=@ProgressBar />
 
-    <div class="mt-1 col col-12 mx-auto row">
-        @switch (menuSelection)
-        {
-            case PortalMenuSelection.DoSelectLinkedMember:
-                <GetLinkedPerson @ref=@getLinkedPerson OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+        <div class="mt-1 col col-12 mx-auto row">
+    <DxFormLayout SizeMode="SizeMode.Medium">
+            @switch (menuSelection)
+            {
+                case PortalMenuSelection.DoSelectLinkedMember:
+                    <GetLinkedPerson @ref=@getLinkedPerson OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.ShowMenu:
-                <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
-                CurrentTerm="term" ShowEnrolmentSubMneu=false />
-                break;
-            case PortalMenuSelection.DoShowEnrolmentSubmenu:
-                <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
-                CurrentTerm="term" ShowEnrolmentSubMneu=true />
-                break;
-            case PortalMenuSelection.DoMemberMaintenance:
-                <MemberDetails IsNewLinkedMember=false OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.ShowMenu:
+                    <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
+                                      CurrentTerm="term" ShowEnrolmentSubMneu=false />
+                    break;
+                case PortalMenuSelection.DoShowEnrolmentSubmenu:
+                    <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
+                                      CurrentTerm="term" ShowEnrolmentSubMneu=true />
+                    break;
+                case PortalMenuSelection.DoMemberMaintenance:
+                    <MemberDetails IsNewLinkedMember=false OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoLinkNewMember:
-                <MemberDetails IsNewLinkedMember=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoLinkNewMember:
+                    <MemberDetails IsNewLinkedMember=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoLinkExistingMember:
-                <LinkExistingMember OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoLinkExistingMember:
+                    <LinkExistingMember OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoUnlinkMember:
-                <UnlinkMember OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoUnlinkMember:
+                    <UnlinkMember OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoMemberPayment:
-                <MemberPayment @ref=@memberPayment OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoMemberPayment:
+                    <MemberPayment @ref=@memberPayment OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoMemberLeave:
-                <MemberLeave OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoMemberLeave:
+                    <MemberLeave OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoSignInSignOut:
-                <MemberSignInSignOut OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoSignInSignOut:
+                    <MemberSignInSignOut OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoRequestMemberEnrolment:
-                <MemberEnrolment IsEnrolmentRequestView=true
-                QRClassID=QRClassID
-                OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoRequestMemberEnrolment:
+                    <MemberEnrolment IsEnrolmentRequestView=true
+                                     QRClassID=QRClassID
+                                     OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoWithdrawMemberEnrolment:
-                <MemberEnrolment IsEnrolmentWithdrawalView=true
-                OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoWithdrawMemberEnrolment:
+                    <MemberEnrolment IsEnrolmentWithdrawalView=true
+                                     OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoViewMemberEnrolment:
-                <MemberEnrolment IsReadOnly=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoViewMemberEnrolment:
+                    <MemberEnrolment IsReadOnly=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoShowLeaderMenu:
-                <LeaderMenu IsAdminPortal="@IsAdminMemberPortal"
-                OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
-                break;
+                case PortalMenuSelection.DoShowLeaderMenu:
+                    <LeaderMenu IsAdminPortal="@IsAdminMemberPortal"
+                                OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    break;
 
-            case PortalMenuSelection.DoWhatsOn:
-                <CourseSchedule IsPortal=true />
-                break;
+                case PortalMenuSelection.DoWhatsOn:
+                    <CourseSchedule IsPortal=true />
+                    break;
 
-            case PortalMenuSelection.PrintMemberBadge:
-                <div class="row w-100">
-                    <PdfViewer Report="@(GetMemberBadgeReport())"
-                    DisplayHeightOffset="10"
-                    OnCloseButtonClick="@(() => menuSelection = PortalMenuSelection.ShowMenu)" />
-                    <DxButton Text="Return to menu"
-                    IconCssClass="bi-door-closed menu-icon me-3 h2"
-                    CssClass="mx-auto col-6 mt-4"
-                    Click="@OnReportComplete"
-                    RenderStyle="ButtonRenderStyle.Primary"
-                    RenderStyleMode="ButtonRenderStyleMode.Outline">
-                    </DxButton>
-                </div>
-                menuSelection = PortalMenuSelection.ShowMenu;
-                break;
-            case PortalMenuSelection.DoReturnToAdminPortal:
-                OnReturnToAdminPortal.InvokeAsync();
-                break;
-        }
+                case PortalMenuSelection.PrintMemberBadge:
+                    <div class="row w-100">
+                        <PdfViewer Report="@(GetMemberBadgeReport())"
+                                   DisplayHeightOffset="10"
+                                   OnCloseButtonClick="@(() => menuSelection = PortalMenuSelection.ShowMenu)" />
+                        <DxButton Text="Return to menu"
+                                  IconCssClass="bi-door-closed menu-icon me-3 h2"
+                                  CssClass="mx-auto col-6 mt-4"
+                                  Click="@OnReportComplete"
+                                  RenderStyle="ButtonRenderStyle.Primary"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                        </DxButton>
+                    </div>
+                    menuSelection = PortalMenuSelection.ShowMenu;
+                    break;
+                case PortalMenuSelection.DoReturnToAdminPortal:
+                    OnReturnToAdminPortal.InvokeAsync();
+                    break;
+            }
+        </DxFormLayout>
     </div>
 }
 <style>
     .report-viewer {
-    height: calc(100dvh - 12rem);
+        height: calc(100dvh - 12rem);
     }
 </style>
 
