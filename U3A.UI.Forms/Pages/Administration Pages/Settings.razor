@@ -1,0 +1,107 @@
+﻿@page "/Settings"
+
+@inject IJSRuntime js
+@inject WorkStation ws
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+@attribute [Authorize]
+
+@if (!IsReady) {
+    <LoadingIndicator />
+}
+else {
+
+    <div class="container h-100">
+        <div class="row  align-content-start">
+            <ContextHelpTitle Title="Workstation Settings" HelpTopic="Workstation-Settings.html" />
+        </div>
+        <div class="row mb-4">
+            <div class="d-none d-md-inline">
+                System Settings to coustomise your device.
+            </div>
+
+        </div>
+
+        <EditForm Model="@ws" OnValidSubmit=@ValidFormSubmitted Context="editContext">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <DxFormLayout>
+                <DxFormLayoutItem Caption="Menu Style" ColSpanMd="12">
+                    <DxRadioGroup Items="@menuTypes"
+                    TextFieldName="@nameof(MenuType.Title)"
+                    ValueFieldName="@nameof(MenuType.Key)"
+                    @bind-Value="@ws!.UseTopMenu" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Theme" ColSpanMd="12">
+                    <DxRadioGroup Items="@themes"
+                    TextFieldName="@nameof(Theme.Title)"
+                    ValueFieldName="@nameof(Theme.Key)"
+                    @bind-Value="@ws.theme" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Font Size" ColSpanMd="12">
+                    <DxRadioGroup Items="@fontSizes"
+                    TextFieldName="@nameof(FontSize.Title)"
+                    ValueFieldName="@nameof(FontSize.Key)"
+                    @bind-Value="@ws.SizeMode" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem ColSpanMd="12">
+                    <Template>
+                        <DxButton SubmitFormOnClick="true" Text="Apply & Restart App" RenderStyle="@ButtonRenderStyle.Primary" CssClass="me-4" />
+                        <DxButton SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
+                    </Template>
+                </DxFormLayoutItem>
+
+            </DxFormLayout>
+        </EditForm>
+    </div>
+}
+@code {
+    bool IsReady = false;
+    public struct MenuType
+    {
+        public bool Key;
+        public string Title;
+    }
+    public struct Theme
+    {
+        public string Key;
+        public string Title;
+    }
+    public struct FontSize
+    {
+        public int Key;
+        public string Title;
+    }
+    IEnumerable<MenuType> menuTypes = new[] { new MenuType() { Key = false, Title = "Use Sidebar" }, new MenuType() { Key = true, Title = "Use Top Menu" } };
+    IEnumerable<Theme> themes = new[] 
+        { 
+            new Theme() { Key = "office-white", Title = "Office White" },
+            new Theme() { Key = "blazing-berry", Title = "Blazing Berry" },
+            new Theme() { Key = "blazing-dark", Title = "Blazing Dark" },
+            new Theme() { Key = "purple", Title = "Purple" },
+        };
+    IEnumerable<FontSize> fontSizes = new[]
+        {
+            new FontSize() { Key = 0, Title = "Small" },
+            new FontSize() { Key = 1, Title = "Medium" },
+            new FontSize() { Key = 2, Title = "Large" },
+        };
+    string selectedTheme;
+
+    protected override async Task OnInitializedAsync() {
+        IsReady = true;
+    }
+
+    async void ValidFormSubmitted(EditContext editContext) {
+        await ws.SetWorkstationDetail(localStorage);
+        NavigationManager.NavigateTo("/",true);
+    }
+
+    void Close() {
+        NavigationManager.NavigateTo("/");
+    }
+
+
+}

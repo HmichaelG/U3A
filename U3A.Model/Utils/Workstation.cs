@@ -14,11 +14,16 @@ namespace U3A.Model
     {
         public bool UseTopMenu { get; set; }
         public string ID { get; private set; }
+        public int SizeMode { get; set; }
+
+        public string theme;
 
         const string WORKSTATION_ID = "WorkstationID";
         const string USE_TOP_MENU_KEY = "use-topmenu";
+        const string SIZE_MODE = "size-mode";
+        const string THEME = "theme";
 
-        public async Task SetWorkstationDetail(IJSRuntime js, ILocalStorageService localStorage)
+        public async Task GetWorkstationDetail(ILocalStorageService localStorage)
         {
             //workstation ID
             var id = await localStorage.GetItemAsync<string>(WORKSTATION_ID);
@@ -34,6 +39,28 @@ namespace U3A.Model
             {
                 UseTopMenu = await localStorage.GetItemAsync<bool>(USE_TOP_MENU_KEY);
             }
+            // size mode
+            SizeMode = 0;
+            if (await localStorage.ContainKeyAsync(SIZE_MODE))
+            {
+                SizeMode = await localStorage.GetItemAsync<int>(SIZE_MODE);
+            }
+            // theme
+            theme = "blazing-berry";
+            if (await localStorage.ContainKeyAsync(THEME))
+            {
+                theme = await localStorage.GetItemAsync<string>(THEME);
+            }
+
+        }
+        public async Task SetWorkstationDetail(ILocalStorageService localStorage)
+        {
+            // Use top menu
+            await localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu);
+            // size mode
+            await localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode);
+            // theme
+            await localStorage.SetItemAsync<String>(THEME, theme);
         }
     }
 }

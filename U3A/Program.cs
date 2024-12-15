@@ -96,7 +96,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog(Log.Logger);
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
-DevExpress.Drawing.Internal.DXDrawingEngine.ForceSkia();
+DevExpress.Drawing.Settings.DrawingEngine = DrawingEngine.Default;
 
 foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
 {
@@ -153,9 +153,9 @@ builder.Services.AddDevExpressServerSideBlazorReportViewer();
 builder.Services.AddDevExpressBlazor(options =>
 {
     options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
-    options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
+builder.Services.AddDevExpressServerSideBlazorPdfViewer();
 
 builder.Services.Configure<reCAPTCHAVerificationOptions>(o =>
 {
@@ -246,24 +246,6 @@ else
 app.UseHttpsRedirection();
 
 app.MapStaticAssets();
-//app.UseStaticFiles();
-
-//app.UseAntiforgery();
-app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (BadHttpRequestException ex)
-    {
-        // Handle the exception
-        if (ex.InnerException is AntiforgeryValidationException)
-        {
-            context.Response.Redirect("/");
-        }
-    }
-});
 
 app.MapRazorComponents<App>()
    .DisableAntiforgery()

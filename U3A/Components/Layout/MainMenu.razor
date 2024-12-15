@@ -23,11 +23,10 @@
                 ? "card shadow-sm w-100"
                 : "sidebar")">
         <div class="d-print-none">
-            <DxMenu ItemClick="OnItemClick" CssClass="menu-item menu"
+            <DxMenu CssClass="menu-item menu"
                     DropDownActionMode="MenuDropDownActionMode.Click"
                     ItemsPosition="ItemPosition.End"
                     Orientation="@((IsTopMenu) ? Orientation.Horizontal : Orientation.Vertical)"
-                    SizeMode="@((IsTopMenu) ? SizeMode.Small : SizeMode.Medium)"
                     CollapseItemsToHamburgerMenu="@true">
                 <TitleTemplate>
                     @if (IsTopMenu)
@@ -185,16 +184,10 @@
                                 </DxMenuItem>
                             }
 
-                            <DxMenuItem Text="@((isVertical) ? "Theme & Settings" : "")"
-                                        IconCssClass="bi bi-palette" NavigateUrl="ThemeIntroduction">
+                            <DxMenuItem Text="@((isVertical) ? "Settings" : "")"
+                                        IconCssClass="bi bi-palette" NavigateUrl="ThemeIntroduction" >
                                 <Items>
-                                    <DxMenuItem Text="Office White" />
-                                    <DxMenuItem Text="Blazing Berry" />
-                                    <DxMenuItem Text="Blazing Dark" />
-                                    <DxMenuItem Text="Purple" />
-                                    <DxMenuItem BeginGroup=true
-                                                Text="Switch Menu Position"
-                                                Click="OnSwitchMenu" />
+                                    <DxMenuItem Text="Theme & Settings" NavigateUrl="Settings" />
                                     <DxMenuItem Text="Reset Factory Defaults"
                                                 Click="OnResetDefaults" />
                                 </Items>
@@ -299,22 +292,6 @@
     {
         currentUrl = navMan.ToBaseRelativePath(e.Location);
         StateHasChanged();
-    }
-
-    string[] themes = new string[] { "office white", "blazing berry", "blazing dark", "purple" };
-
-    void OnItemClick(MenuItemClickEventArgs e)
-    {
-        var name = e.ItemInfo.Text;
-        if (!string.IsNullOrWhiteSpace(name))
-        {
-            if (themes.Contains(name.ToLower()))
-            {
-                var theme = name.ToLower().Replace(" ", "-");
-                localStorage.SetItemAsync("theme", theme).SafeFireAndForget();
-                navMan.NavigateTo("/", true);
-            }
-        }
     }
 
     async Task ShowHelp()

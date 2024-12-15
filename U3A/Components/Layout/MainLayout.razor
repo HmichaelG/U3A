@@ -17,41 +17,40 @@
 @implements IDisposable
 
 @if (isInteractive)
-    {
-        <div class="page">
+{
+    <DxFormLayout CssClass="page px-3 mx-auto" SizeMode="@sizeMode" >
 
-            <CascadingValue Value=@openCircuits Name="OpenCircuits">
-                <CascadingValue Value="@loginState">
-                    <CascadingValue Value="@hasRole" Name="HasRole">
-                        @if (hasRole)
+        <CascadingValue Value=@openCircuits Name="OpenCircuits">
+            <CascadingValue Value="@loginState">
+                <CascadingValue Value="@hasRole" Name="HasRole">
+                    @if (hasRole)
+                    {
+                        if (useTopMenu.HasValue)
                         {
-                            if (useTopMenu.HasValue)
+                            if (useTopMenu.Value)
                             {
-                                if (useTopMenu.Value)
-                                {
-                                    <MainLayoutTopMenu Body="@Body" />
-                                }
-                                else
-                                {
-                                    <MainLayoutSideMenu Body="@Body" />
-                                }
+                                <MainLayoutTopMenu Body="@Body" />
+                            }
+                            else
+                            {
+                                <MainLayoutSideMenu Body="@Body" />
                             }
                         }
-                        else
-                        {
-                            <MainLayoutTopMenu Body="@Body" />
-                        }
-
-                    </CascadingValue>
+                    }
+                    else
+                    {
+                        <MainLayoutTopMenu Body="@Body" />
+                    }
                 </CascadingValue>
             </CascadingValue>
+        </CascadingValue>
 
-        </div>
-    }
-    else
-    {
-        <NotInteractive />
-    }
+    </DxFormLayout>
+}
+else
+{
+    <NotInteractive />
+}
 
 
 @code {
@@ -67,6 +66,7 @@
     bool isReady = false;
     string? currentUrl;
     bool isInteractive;
+    SizeMode sizeMode;
 
     private DotNetObjectReference<MainLayout>? dotNetObjectReference;
 
@@ -139,8 +139,20 @@
         if (firstRender)
         {
             isInteractive = RendererInfo.IsInteractive;
-            await ws.SetWorkstationDetail(js, localStorage);
+            await ws.GetWorkstationDetail(localStorage);
             useTopMenu = ws.UseTopMenu;
+            switch (ws.SizeMode)
+            {
+                case 1:
+                    sizeMode = SizeMode.Medium;
+                    break;
+                case 2:
+                    sizeMode = SizeMode.Large;
+                    break;
+                default:
+                    sizeMode = SizeMode.Small;
+                    break;
+            }
             await InvokeAsync(StateHasChanged);
         }
         await base.OnAfterRenderAsync(firstRender);

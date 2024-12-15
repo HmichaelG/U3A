@@ -10,7 +10,7 @@
     protected override void OnInitialized() {
         base.OnInitialized();
         MyGrid = (IGrid) this.Parent;
-        Width = (EditButtonVisible && DeleteButtonVisible) ? "5rem" : "2rem";
+        Width = (EditButtonVisible && DeleteButtonVisible) ? "6rem" : "3rem";
         HeaderTemplate = context =>
 @<text>
         @if (NewButtonVisible) {
