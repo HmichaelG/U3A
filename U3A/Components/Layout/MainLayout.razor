@@ -18,7 +18,7 @@
 
 @if (isInteractive)
 {
-    <div class="container-fluid">
+    <div class="container-main">
         <DxFormLayout SizeMode="@sizeMode">
 
             <CascadingValue Value=@openCircuits Name="OpenCircuits">
@@ -52,6 +52,15 @@ else
 {
     <NotInteractive />
 }
+<style>
+    .container-main {
+        width: 100%;
+        padding-right: var(--bs-gutter-x, 0.50rem);
+        padding-left: var(--bs-gutter-x, 0.50rem);
+        margin-right: auto;
+        margin-left: auto;
+    }
+</style>
 
 @code {
 
