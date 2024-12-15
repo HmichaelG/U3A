@@ -254,7 +254,7 @@ else
         else
         {
             // Otherwise, we are unfinancial
-            person.FinancialTo = ProcessingYear - 1; // Good enaough if prev financialTo is null
+            person.FinancialTo = ProcessingYear - 1; // Good enough if prev financialTo is null
             if (person.PreviousFinancialTo != null)
             {
                 if (person.PreviousFinancialTo.HasValue && person.PreviousFinancialTo < ProcessingYear)
