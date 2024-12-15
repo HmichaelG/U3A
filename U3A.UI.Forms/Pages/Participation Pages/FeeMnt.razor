@@ -38,24 +38,24 @@ else
     <FullScreen DisplayOffset="11">
         <ContentTemplate>
             <DxGrid Data="@Fees" @ref=@mainGrid
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
-                    ShowFilterRow="false"
-                    ShowAllRows="true"
-                    KeyFieldName="ID"
-                    PopupEditFormCssClass="popup-width"
-                    PopupEditFormHeaderText="Add/Edit Fee"
-                    ValidationEnabled="true"
-                    CustomizeEditModel="OnCustomizeEditModel"
-                    EditMode="GridEditMode.PopupEditForm"
-                    DataItemDeleting="Grid_DataItemDeleting"
-                    EditModelSaving="Grid_EditModelSaving">
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
+            ShowFilterRow="false"
+            ShowAllRows="true"
+            KeyFieldName="ID"
+            PopupEditFormCssClass="popup-width"
+            PopupEditFormHeaderText="Add/Edit Fee"
+            ValidationEnabled="true"
+            CustomizeEditModel="OnCustomizeEditModel"
+            EditMode="GridEditMode.PopupEditForm"
+            DataItemDeleting="Grid_DataItemDeleting"
+            EditModelSaving="Grid_EditModelSaving">
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid LayoutKey="{53913C79-CAEA-445F-B529-84E036E140F8}" />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridCommandColumnEx @ref="GridCommandColumn" Width="10rem"
-                                           EditButtonVisible="true" DeleteButtonVisible="true" />
+                    EditButtonVisible="true" DeleteButtonVisible="true" />
                     <DxGridDataColumn Caption="First Name" FieldName="Person.FirstName" Width="10rem" />
                     <DxGridDataColumn Caption="Last Name" FieldName="Person.LastName" Width="10rem" />
                     <DxGridDataColumn Caption="Date" FieldName="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" />
@@ -65,12 +65,12 @@ else
                 </Columns>
                 <GroupSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                       FieldName="Description" DisplayText="{0:n0} Fees"
-                                       FooterColumnName="IsMembershipFee" />
+                    FieldName="Description" DisplayText="{0:n0} Fees"
+                    FooterColumnName="IsMembershipFee" />
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
-                                       DisplayText="{0:c2}"
-                                       FieldName="Amount"
-                                       FooterColumnName="Amount" />
+                    DisplayText="{0:c2}"
+                    FieldName="Amount"
+                    FooterColumnName="Amount" />
                 </GroupSummary>
                 <TotalSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0} Fees" FieldName="Description" FooterColumnName="IsMembershipFee" />
@@ -100,7 +100,7 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Include as Membership Fee?" ColSpanMd="12">
                             <DxCheckBox Enabled=@(!(editItem.Person is Contact)) 
-                                @bind-Checked="@editItem.IsMembershipFee" />
+                            @bind-Checked="@editItem.IsMembershipFee" />
                         </DxFormLayoutItem>
                     </DxFormLayout>
                 </EditFormTemplate>
@@ -109,9 +109,9 @@ else
     </FullScreen>
 
 }<style>
-     .popup-width {
-         min-width: 40rem;
-     }
+    .popup-width {
+    min-width: 40rem;
+    }
 </style>
 
 @code {
@@ -140,6 +140,7 @@ else
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         settings = dbc.SystemSettings.FirstOrDefault();
+        await RefreshData();
         service = new MemberFeeCalculationService();
         IsReady = true;
     }
@@ -156,15 +157,6 @@ else
             originalFee = null;
         }
         else originalFee = editModel;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await RefreshData();
-        }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     bool isBusy;
@@ -281,6 +273,7 @@ else
 
     async Task RefreshData()
     {
+        if (yearComponent == null) { return; }
         ProcessingYear = yearComponent.Year;
         if (Persons == null) Persons = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
         Fees = await BusinessRule.EditableFeesForYearAsync(dbc, ProcessingYear);
