@@ -18,40 +18,40 @@
 
 @if (isInteractive)
 {
-    <DxFormLayout CssClass="page px-3 mx-auto" SizeMode="@sizeMode" >
+    <div class="container-fluid">
+        <DxFormLayout SizeMode="@sizeMode">
 
-        <CascadingValue Value=@openCircuits Name="OpenCircuits">
-            <CascadingValue Value="@loginState">
-                <CascadingValue Value="@hasRole" Name="HasRole">
-                    @if (hasRole)
-                    {
-                        if (useTopMenu.HasValue)
+            <CascadingValue Value=@openCircuits Name="OpenCircuits">
+                <CascadingValue Value="@loginState">
+                    <CascadingValue Value="@hasRole" Name="HasRole">
+                        @if (hasRole)
                         {
-                            if (useTopMenu.Value)
+                            if (useTopMenu.HasValue)
                             {
-                                <MainLayoutTopMenu Body="@Body" />
-                            }
-                            else
-                            {
-                                <MainLayoutSideMenu Body="@Body" />
+                                if (useTopMenu.Value)
+                                {
+                                    <MainLayoutTopMenu Body="@Body" />
+                                }
+                                else
+                                {
+                                    <MainLayoutSideMenu Body="@Body" />
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        <MainLayoutTopMenu Body="@Body" />
-                    }
+                        else
+                        {
+                            <MainLayoutTopMenu Body="@Body" />
+                        }
+                    </CascadingValue>
                 </CascadingValue>
             </CascadingValue>
-        </CascadingValue>
-
-    </DxFormLayout>
+        </DxFormLayout>
+    </div>
 }
 else
 {
     <NotInteractive />
 }
-
 
 @code {
 
