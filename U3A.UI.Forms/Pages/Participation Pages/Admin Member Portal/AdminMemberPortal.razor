@@ -26,14 +26,14 @@ else
         <DxToolbar style="border-bottom:solid; border-color:whitesmoke;">
             <Items>
                 <DxToolbarItem Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
-                               RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
+                               CssClass="me-1 mb-1"
                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                Text="Process Member" IconCssClass="bi bi-person" />
                 <DxToolbarItem Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
-                               RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
+                               CssClass="me-1 mb-1"
                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                Text="What's On Today" IconCssClass="bi bi-clock" />
-                <DxToolbarItem RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
+                <DxToolbarItem CssClass="me-1 mb-1"
                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                Text="Attendance" IconCssClass="bi bi-person-check">
                     <Items>
