@@ -38,7 +38,7 @@
         </DxToolbar>
             <div class="row">
                 <div class="col">
-                    <DxPieChart Data="@memberData" CssClass="p-2" @ref=@chartMemberSummary
+                    <DxPieChart Data="@memberData" @ref=@chartMemberSummary
                                 InnerDiameter="0.5"
                                 LabelOverlap="PieChartLabelOverlap.Hide"
                                 CustomizeSeriesPoint="CustomizeGenderSeriesPoint"
@@ -72,7 +72,7 @@
                     </DxPieChart>
                 </div>
                 <div class="col">
-                    <DxChart Data="attritionData" CssClass="p-2" @ref=@chartNetGainOrLoss
+                    <DxChart Data="attritionData" @ref=@chartNetGainOrLoss
                              T="MemberSummary"
                              CustomizeSeriesPoint="CustomizeAttritionSeriesPoint"
                              LabelOverlap="ChartLabelOverlap.Hide">
@@ -100,7 +100,7 @@
                     </DxChart>
                 </div>
                 <div class="col">
-                    <DxPieChart Data="@membershipLengthData" CssClass="p-2" @ref=@chartLengthOfMship
+                    <DxPieChart Data="@membershipLengthData" @ref=@chartLengthOfMship
                                 InnerDiameter="0.5"
                                 Palette="@memberLengthTheme"
                                 LabelOverlap="PieChartLabelOverlap.Hide"
@@ -135,9 +135,9 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row pt-2">
                 <div class="col">
-                    <DxPieChart Data="@enrolmentData" CssClass="p-2" @ref=@chartEnrolments
+                    <DxPieChart Data="@enrolmentData" @ref=@chartEnrolments
                                 InnerDiameter="0.5"
                                 LabelOverlap="PieChartLabelOverlap.Hide"
                                 Palette="@enrolmentTheme"
@@ -171,7 +171,7 @@
                     </DxPieChart>
                 </div>
                 <div class="col">
-                    <DxPieChart Data="@waitlistData" CssClass="p-2" @ref=@chartWiatlist
+                    <DxPieChart Data="@waitlistData" @ref=@chartWiatlist
                                 InnerDiameter="0.5"
                                 LabelOverlap="PieChartLabelOverlap.Hide"
                                 Palette="@waitlistTheme"
@@ -206,7 +206,7 @@
                 </div>
 
                 <div class="col">
-                    <DxPieChart Data="@membershipDOBData" CssClass="p-2" @ref=@chartMemberAge
+                    <DxPieChart Data="@membershipDOBData" @ref=@chartMemberAge
                                 InnerDiameter="0.5"
                                 Palette="@memberLengthTheme"
                                 LabelOverlap="PieChartLabelOverlap.Hide"
