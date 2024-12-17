@@ -1,4 +1,5 @@
-﻿
+﻿@inject WorkStation ws
+
 <div id="minimiseButton" class="p-1 minimise-button-container bg-primary">
     <DxButton Click="OnToggleMinimised" Visible=@IsMinimised
               CssClass="m-auto"
@@ -23,7 +24,7 @@
                 <Template>
                     <span class="minimise-button-container">
                         <DxButton Click="OnToggleMinimised"
-                                  CssClass="menu-item"
+                                  CssClass="@((ws.theme.StartsWith("fluent")) ? "fluent-menu-item" : "menu-item")"
                                   IconCssClass="bi bi-arrow-left-circle"
                                   SizeMode="SizeMode.Large"
                                   RenderStyleMode="ButtonRenderStyleMode.Text" />

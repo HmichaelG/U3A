@@ -27,8 +27,8 @@
         <Items>
             <DxGridLayoutItem Area="header" CssClass="vw-100 d-print-none" />
             <DxGridLayoutItem Area="footer" CssClass="vw-100 d-print-none" />
-            <DxGridLayoutItem Area="navigation" 
-                CssClass="@((ws.theme.StartsWith("fluent")) ? "d-print-none" : "d-print-none layout-sidebar")">
+            <DxGridLayoutItem Area="navigation"
+                              CssClass="@((ws.theme.StartsWith("fluent")) ? "d-print-none fluent-layout-sidebar" : "d-print-none layout-sidebar")">
                 <Template>
                     <SideBar />
                 </Template>

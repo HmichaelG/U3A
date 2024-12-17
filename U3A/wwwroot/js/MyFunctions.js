@@ -105,10 +105,14 @@ function setTheme() {
     var href = link.href;
     if (href == null) { href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css'; }
     // load from localStorage & replace the default
-    var theme = localStorage.getItem('theme');
+    theme = localStorage.getItem('theme');
     if (theme) {
         theme = theme.replace('"', '',);
         theme = theme.replace('"', '',);
+        // whenfluent theme is working correctly
+        //if (theme.startsWith("fluent")) {
+        //    theme = 'window.matchMedia('(prefers-color-scheme: dark)').matches ? 'fluent-dark' : 'fluent-light'
+        //}
         href = href.replace('office-white', theme);
     }
     if (link) {

@@ -23,7 +23,7 @@
                 ? "card shadow-sm w-100"
                 : "sidebar")">
         <div class="d-print-none">
-            <DxMenu CssClass="menu-item menu"
+            <DxMenu CssClass="@((ws.theme.StartsWith("fluent")) ? "fluent-menu-item menu" : "menu-item menu")"
                     DropDownActionMode="MenuDropDownActionMode.Click"
                     ItemsPosition="ItemPosition.End"
                     Orientation="@((IsTopMenu) ? Orientation.Horizontal : Orientation.Vertical)"
