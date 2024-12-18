@@ -40,11 +40,7 @@
     }
 
 ::deep .menu-item {
-    color: var(--bs-white);
-}
-
-::deep .fluent-menu-item {
-    color: var(--bsbl-menu-item-color)
+    color: var(--bsbl-menu-item-color);
 }
 
 ::deep .icon {
@@ -74,37 +70,6 @@
     }
 }
 
-::deep .weather-icon {
-    background-image: url("images/weather.svg");
-}
-
-::deep .counter-icon {
-    background-image: url("images/counter.svg");
-}
-
-::deep .docs-icon {
-    mask-image: url("images/doc.svg");
-    -webkit-mask-image: url("images/doc.svg");
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    background-color: var(--dxbl-btn-color);
-}
-
-::deep .demos-icon {
-    mask-image: url("images/demos.svg");
-    -webkit-mask-image: url("images/demos.svg");
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    background-color: var(--dxbl-btn-color);
-}
-
-::deep .footer-button:hover .demos-icon {
-    background-color: var(--dxbl-btn-hover-color);
-}
-
-::deep .footer-button:hover .docs-icon {
-    background-color: var(--dxbl-btn-hover-color);
-}
 
 
 ::deep .footer {
@@ -145,7 +110,7 @@
         }
 
             #sidebar.expanded ::deep .sidebar-header {
-                border-bottom: 1px solid var(--bs-white);
+                border-bottom: 1px solid;
             }
 
             #sidebar.expanded .menu-button {
