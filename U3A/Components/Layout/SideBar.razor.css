@@ -42,9 +42,10 @@
 ::deep .menu-item {
     color: var(--bs-white);
 }
+
 ::deep .fluent-menu-item {
     color: var(--bsbl-menu-item-color)
-} 
+}
 
 ::deep .icon {
     width: 1rem;
@@ -56,6 +57,21 @@
 
 ::deep .home-icon {
     background-image: url("images/home.svg");
+}
+
+@media (max-width: 768px) {
+    ::deep .img-bg {
+        display: none;
+    }
+}
+@media (min-width: 768px) {
+    ::deep .img-bg {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 14.5rem;
+        height: 50%;
+    }
 }
 
 ::deep .weather-icon {
