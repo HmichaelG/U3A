@@ -109,10 +109,11 @@ function setTheme() {
     if (theme) {
         theme = theme.replace('"', '',);
         theme = theme.replace('"', '',);
+        if (theme.startsWith("fluent")) {
+            theme = theme.replace('.bs5', '',);
         // whenfluent theme is working correctly
-        //if (theme.startsWith("fluent")) {
         //    theme = 'window.matchMedia('(prefers-color-scheme: dark)').matches ? 'fluent-dark' : 'fluent-light'
-        //}
+        }
         href = href.replace('office-white', theme);
     }
     if (link) {

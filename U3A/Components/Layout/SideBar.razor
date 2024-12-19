@@ -1,11 +1,12 @@
 ﻿@inject WorkStation ws
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <div id="minimiseButton" class="p-1 minimise-button-container bg-primary">
     <DxButton Click="OnToggleMinimised" Visible=@IsMinimised
-              CssClass="m-auto"
-              IconCssClass="bi-arrow-right-circle"
-              SizeMode="SizeMode.Large"
-              RenderStyle="ButtonRenderStyle.Primary" />
+    CssClass="m-auto"
+    IconCssClass="bi-arrow-right-circle"
+    SizeMode="SizeMode.Large"
+    RenderStyle="ButtonRenderStyle.Primary" />
 </div>
 
 <div id="sidebar" class="@(IsMinimised ? "d-none": "")">
@@ -24,15 +25,24 @@
                 <Template>
                     <span class="minimise-button-container">
                         <DxButton Click="OnToggleMinimised"
-                                  CssClass="menu-item"
-                                  IconCssClass="bi bi-arrow-left-circle"
-                                  SizeMode="SizeMode.Large"
-                                  RenderStyleMode="ButtonRenderStyleMode.Text" />
+                        CssClass="menu-item"
+                        IconCssClass="bi bi-arrow-left-circle"
+                        SizeMode="SizeMode.Large"
+                        RenderStyleMode="ButtonRenderStyleMode.Text" />
                     </span>
                     <img src="images/U3ALogo.png" />
-                    <svg class="img-bg" alt="flowers" >
-                        <use href="images/vectors.svg#flowerLight"></use>
-                    </svg>
+                    @if (isXmas)
+                    {
+                        <svg class="img-bg-xmas" alt="xmas" >
+                            <use href="images/vectors.svg#xmas"></use>
+                        </svg>
+                    }
+                    else
+                    {
+                        <svg class="img-bg-flower" alt="flower">
+                            <use href="images/vectors.svg#flowerLight"></use>
+                        </svg>
+                    }
 
                 </Template>
             </DxGridLayoutItem>
@@ -52,10 +62,26 @@
 
 @code {
     public bool IsMinimised { get; set; } = false;
+    bool isXmas = false;
 
     void OnToggleMinimised()
     {
         IsMinimised = !IsMinimised;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            using (var dbc = U3Adbfactory.CreateDbContext())
+            {
+                var today = dbc.GetLocalDate();
+                var xmas = new DateTime(today.Year, 12, 25);
+                if (today > xmas.AddDays(-7) && today <= xmas) { isXmas = true; }
+                StateHasChanged();
+            }
+        }
     }
 
 }

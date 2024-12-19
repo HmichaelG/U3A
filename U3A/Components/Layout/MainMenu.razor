@@ -43,11 +43,11 @@
                         if (isAuthenticated)
                         {
 
-                            <DxMenuItem Text="@((isVertical) ? "Home" : "")" IconCssClass="bi bi-house" NavigateUrl="./" />
+                            <DxMenuItem Text="@((isVertical) ? "Home" : "")" IconCssClass="menu-icon bi bi-house" NavigateUrl="./" />
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
-                                <DxMenuItem Text="Admin" IconCssClass="bi bi-gear" NavigateUrl="AdminIntroduction">
+                                <DxMenuItem Text="Admin" IconCssClass="menu-icon bi bi-gear" NavigateUrl="AdminIntroduction">
                                     <Items>
                                         @if (constants.IS_DEBUG)
                                         {
@@ -73,14 +73,14 @@
                                                 <DxMenuItem Text="Restore Deleted Contacts" NavigateUrl="RestoreDeletedContacts" />
                                             </Items>
                                         </DxMenuItem>
-                                        <DxMenuItem BeginGroup Text="Setup an Office PC" IconCssClass="bi bi-display" NavigateUrl="/OfficePC.html" />
+                                        <DxMenuItem BeginGroup Text="Setup an Office PC" IconCssClass="menu-icon bi bi-display" NavigateUrl="/OfficePC.html" />
                                     </Items>
                                 </DxMenuItem>
                             }
 
                             if (isSystemAdminRole | isCourseAdminRole)
                             {
-                                <DxMenuItem Text="Course" IconCssClass="bi bi-menu-button-fill" NavigateUrl="CourseIntroduction">
+                                <DxMenuItem Text="Course" IconCssClass="menu-icon bi bi-person-workspace" NavigateUrl="CourseIntroduction">
                                     <Items>
                                         <DxMenuItem Text="Enter/Exit Maintenance Mode" NavigateUrl="EnterExitMaintenance" />
                                         <DxMenuItem Text="Add/Edit Course Types" NavigateUrl="CourseTypeMnt" />
@@ -100,7 +100,7 @@
 
                             if (isSystemAdminRole | isClericalRole)
                             {
-                                <DxMenuItem Text="Participation" IconCssClass="bi bi-menu-button" NavigateUrl="ParticipationIntroduction">
+                                <DxMenuItem Text="Participation" IconCssClass="menu-icon bi bi-people" NavigateUrl="ParticipationIntroduction">
                                     <Items>
                                         <DxMenuItem Text="Fees &amp; Receipting" NavigateUrl="CashIntroduction">
                                             <Items>
@@ -133,13 +133,13 @@
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole | isOfficeRole)
                             {
                                 <DxMenuItem Text="Portal (Admin)"
-                                            IconCssClass="bi bi-people"
+                                            IconCssClass="menu-icon bi bi-window-desktop"
                                             NavigateUrl="AdminMemberPortal" />
                             }
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole)
                             {
-                                <DxMenuItem Text="Reports" IconCssClass="bi bi-printer" NavigateUrl="ReportsIntroduction">
+                                <DxMenuItem Text="Reports" IconCssClass="menu-icon bi bi-printer" NavigateUrl="ReportsIntroduction">
                                     <Items>
                                         <DxMenuItem Text="Listings">
                                             <Items>
@@ -185,7 +185,7 @@
                             }
 
                             <DxMenuItem Text="@((isVertical) ? "Settings" : "")"
-                                        IconCssClass="bi bi-palette" NavigateUrl="ThemeIntroduction" >
+                                        IconCssClass="menu-icon bi bi-palette" NavigateUrl="ThemeIntroduction" >
                                 <Items>
                                     <DxMenuItem Text="Theme & Settings" NavigateUrl="Settings" />
                                     <DxMenuItem Text="Reset Factory Defaults"
@@ -193,19 +193,19 @@
                                 </Items>
                             </DxMenuItem>
                             <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")"
-                                        IconCssClass="bi bi-shield" NavigateUrl="SecurityIntroduction">
+                                        IconCssClass="menu-icon bi bi-shield" NavigateUrl="SecurityIntroduction">
                                 <Items>
                                     @if (IsTopMenu)
                                     {
                                         <DxMenuItem NavigateUrl="Account/Login"
                                                     Text="Logout"
-                                                    IconCssClass="bi bi-door-open" />
+                                                    IconCssClass="menu-icon bi bi-door-open" />
                                     }
-                                    <DxMenuItem Text="Change Email Address" IconCssClass="bi bi-shield"
+                                    <DxMenuItem Text="Change Email Address" IconCssClass="menu-icon bi bi-shield"
                                                 Click="@(() => OnChangeCredential("Email"))" />
-                                    <DxMenuItem Text="Change Your Password" IconCssClass="bi bi-shield"
+                                    <DxMenuItem Text="Change Your Password" IconCssClass="menu-icon bi bi-shield"
                                                 Click="@(() => OnChangeCredential("ChangePassword"))" />
-                                    <DxMenuItem Text="Two-Factor Authentication" IconCssClass="bi bi-shield"
+                                    <DxMenuItem Text="Two-Factor Authentication" IconCssClass="menu-icon bi bi-shield"
                                                 Click="@(() => OnChangeCredential("TwoFactorAuthentication"))" />
                                 </Items>
                             </DxMenuItem>
@@ -213,7 +213,7 @@
                             {
                                 <DxMenuItem NavigateUrl="Account/Login"
                                             Text="Logout"
-                                            IconCssClass="bi bi-door-open" />
+                                            IconCssClass="menu-icon bi bi-door-open" />
                             }
                         }
                     }

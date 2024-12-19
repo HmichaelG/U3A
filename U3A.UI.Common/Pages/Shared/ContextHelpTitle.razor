@@ -38,13 +38,13 @@
         case HelpActivationStyle.ButtonAndTitleNoMessages:
             <PageTitle>@Title</PageTitle>
             <div class="d-flex">
-                <h3 class="@TitleCssClass">
+                <h1 class="@TitleCssClass title-color h3">
                     <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
                     RenderStyleMode="ButtonRenderStyleMode.Outline"
                     RenderStyle="ButtonRenderStyle.None"
                     Click="ShowTopicAsync" Id="helpButton" />
                     @Title
-                </h3>
+                </h1>
                 @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
                 {
                     if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
@@ -98,6 +98,9 @@
     .help-btn {
     color: cornflowerblue;
     font-weight:900;
+    }
+    .title-color {
+        color: var(--bs-primary);
     }
 </style>
 

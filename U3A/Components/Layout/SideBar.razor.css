@@ -61,13 +61,21 @@
     }
 }
 @media (min-width: 768px) {
-    ::deep .img-bg {
+    ::deep .img-bg-flower, 
+        .img-bg-xmas {
         position: fixed;
         left: 0;
         bottom: 0;
-        width: 14.5rem;
-        height: 50%;
+        width: 14.75rem;
     }
+
+    ::deep .img-bg-flower {
+        height: 50%
+    }
+    ::deep .img-bg-xmas {
+        height: 35%
+    }
+
 }
 
 
