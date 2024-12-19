@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-U3A-1fe615b5-a026-4c5d-8e8e-7d353ab11b61</UserSecretsId>
-    <Version>2024.12.15.0000</Version>
+    <Version>2024.12.20.0000</Version>
     <ApplicationInsightsResourceId>/subscriptions/c6a46b11-c209-428d-9386-3d7f92c9525f/resourceGroups/U3A-linux_group/providers/microsoft.insights/components/U3A-linux</ApplicationInsightsResourceId>
     <PublishAot>False</PublishAot>
     <SignAssembly>False</SignAssembly>
@@ -75,6 +75,12 @@
   <ItemGroup>
     <Folder Include="wwwroot\lib\jquery\dist\" />
     <Folder Include="wwwroot\Temp\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="wwwroot\images\menu-dark.svg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="XCOPY &quot;$(SolutionDir)\U3A\wwwroot\help&quot; &quot;$(TargetDir)\wwwroot\help\&quot; /S /Y" />

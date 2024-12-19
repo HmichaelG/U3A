@@ -107,25 +107,25 @@
                                                                Width="6rem" />
                                         <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
                                                           Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
-                                        <DxGridBandColumn Caption="Address">
+                                        <DxGridBandColumn Caption="Address" Visible="false">
                                             <Columns>
                                                 <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
-                                                <DxGridDataColumn Caption="City" FieldName="City" Width="9rem" />
+                                                <DxGridDataColumn Caption="City" FieldName="City" Width="8rem" />
                                                 <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
                                                 <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" Visible="false" />
                                             </Columns>
                                         </DxGridBandColumn>
                                         <DxGridBandColumn Caption="Contact Detail">
                                             <Columns>
-                                                <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="15rem" />
-                                                <DxGridDataColumn Caption="Phone" FieldName="AdjustedHomePhone" Width="8rem" />
-                                                <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="8rem" />
+                                                <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="12rem" />
+                                                <DxGridDataColumn Caption="Phone" FieldName="AdjustedHomePhone" Width="5rem" />
+                                                <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="5rem" />
                                             </Columns>
                                         </DxGridBandColumn>
-                                        <DxGridBandColumn Caption="Emergency Contact" Visible="false">
+                                        <DxGridBandColumn Caption="Emergency Contact">
                                             <Columns>
-                                                <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=false />
-                                                <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=false />
+                                                <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Width="12rem" />
+                                                <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Width="5rem" />
                                             </Columns>
                                         </DxGridBandColumn>
                                         <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
@@ -136,7 +136,7 @@
                                                 @{
                                                     var contactTags = context.Value.ToString().Split(";\t");
                                                 }
-                                                <DxTagBox Data="@tagNames"
+                                            <DxTagBox Data="@contactTags"
                                                           TData="string" TValue="string"
                                                           Values="@contactTags"
                                                           ReadOnly="true" />

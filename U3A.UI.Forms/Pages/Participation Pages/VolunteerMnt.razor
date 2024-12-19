@@ -76,7 +76,11 @@ else
                 <Columns>
                     <DxGridSelectionColumn Width="2rem" />
                     <DxGridCommandColumnEx Visible=@((string.IsNullOrWhiteSpace(selectedActivity)) ? false : true) />
-                    <DxGridDataColumn Caption="Volunteer" FieldName="Person.FullName" Width="35rem" />
+                    <DxGridDataColumn Caption="Volunteer" FieldName="Person.FullName" Width="15rem" />
+                    <DxGridDataColumn Caption="Home" FieldName="Person.AdjustedHome" Width="5rem" />
+                    <DxGridDataColumn Caption="Mobile" FieldName="Person.AdjustedMobile" Width="5rem" />
+                    <DxGridDataColumn Caption="ICE Name" FieldName="Person.ICEContact" Width="15rem" />
+                    <DxGridDataColumn Caption="ICE Phone" FieldName="Person.ICEPhone" Width="15rem" />
                     <DxGridDataColumn Caption="Comment" FieldName="Comment" />
                 </Columns>
 
@@ -138,7 +142,7 @@ else
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
-        Persons = await BusinessRule.EditablePersonAsync(dbc);
+        Persons = await BusinessRule.AllPeopleIncludingContactsAsync(dbc);
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         if (settings != null && !string.IsNullOrWhiteSpace(settings.VolunteerActivities))
@@ -183,7 +187,10 @@ else
     }
     async Task RefreshData()
     {
-        Volunteers = await dbc.Volunteer.Where(x => x.Activity == selectedActivity).ToListAsync();
+        Volunteers = await dbc.Volunteer
+                            .Include(x => x.Person)
+                            .IgnoreQueryFilters()
+                            .Where(x => x.Activity == selectedActivity).ToListAsync();
         StateHasChanged();
     }
 

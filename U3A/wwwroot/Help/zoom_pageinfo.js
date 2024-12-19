@@ -76,7 +76,7 @@ pageinfo = [[0,0,0,0,null],
 	[0,0,0,0,null],
 	[0,0,0,0,null]];
 pagedata = [ ["./2023-version-history.html","2023 Version History","version 2023.12 Add/Edit Receipts Added the ability to set/reset the participant&#39;s Financial Year. Please refer to Add/Edit Receipts for details. ...",""],
-["./2024-version-history.html","2024 Version History","Version 2024.12.15 System Updated DevExpress components to version 24.2.3 The default font size has changed from Medium to Small in the administra...",""],
+["./2024-version-history.html","2024 Version History","Version 2024.12.20 Add/Edit Contacts Fixed an issue that caused tags to be hidden on the grid. Display ICE details by default on the grid. Add/Edi...",""],
 ["./add_edit-committee.html","Participation Menu &#62; Add/Edit Committee","This procedure allows you to assign a Committee position to a participant.",""],
 ["./add_edit-contacts.html","Participation Menu &#62; Add/Edit Contacts","A contact can be any person associated with your U3A but is not a participant. Think of the list of contacts as your U3A&#39;s virtual Teledex.",""],
 ["./add_edit-course-types.html","Course Menu &#62; Add/Edit Course Types","A Course Type categorizes Courses &#38; Activities into groups. Common Course Types might include...",""],

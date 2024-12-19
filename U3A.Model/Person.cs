@@ -72,6 +72,14 @@ public class Person : BaseEntity, ISoftDelete
     [RequiredIfPerson]
     [MaxLength(50)]
     public string City { get; set; } = string.Empty;
+    public string CityProperCase
+    {
+        get
+        {
+            return $"{ToTitleText(City)}";
+        }
+    }
+
     [RequiredIfPerson]
     [MaxLength(3)]
     public string State { get; set; } = string.Empty;
