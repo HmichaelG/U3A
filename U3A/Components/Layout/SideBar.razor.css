@@ -56,13 +56,15 @@
 }
 
 @media (max-width: 768px) {
-    ::deep .img-bg {
+    ::deep .img-bg-flower,
+    .img-bg-xmas {
         display: none;
     }
 }
+
 @media (min-width: 768px) {
-    ::deep .img-bg-flower, 
-        .img-bg-xmas {
+    ::deep .img-bg-flower,
+    .img-bg-xmas {
         position: fixed;
         left: 0;
         bottom: 0;
@@ -72,10 +74,10 @@
     ::deep .img-bg-flower {
         height: 50%
     }
+
     ::deep .img-bg-xmas {
         height: 35%
     }
-
 }
 
 

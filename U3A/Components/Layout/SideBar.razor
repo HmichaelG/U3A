@@ -1,12 +1,13 @@
 ﻿@inject WorkStation ws
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-<div id="minimiseButton" class="p-1 minimise-button-container bg-primary">
+<div id="minimiseButton" class="p-1 minimise-button-container">
     <DxButton Click="OnToggleMinimised" Visible=@IsMinimised
-    CssClass="m-auto"
-    IconCssClass="bi-arrow-right-circle"
-    SizeMode="SizeMode.Large"
-    RenderStyle="ButtonRenderStyle.Primary" />
+              CssClass="menu-item mt-3"
+              IconCssClass="bi-arrow-right-circle"
+              SizeMode="SizeMode.Large"
+              RenderStyleMode="ButtonRenderStyleMode.Text"
+              RenderStyle="ButtonRenderStyle.Secondary" />
 </div>
 
 <div id="sidebar" class="@(IsMinimised ? "d-none": "")">
@@ -25,15 +26,16 @@
                 <Template>
                     <span class="minimise-button-container">
                         <DxButton Click="OnToggleMinimised"
-                        CssClass="menu-item"
-                        IconCssClass="bi bi-arrow-left-circle"
-                        SizeMode="SizeMode.Large"
-                        RenderStyleMode="ButtonRenderStyleMode.Text" />
+                                  CssClass="menu-item"
+                                  IconCssClass="bi bi-arrow-left-circle"
+                                  SizeMode="SizeMode.Large"
+                                  RenderStyle="ButtonRenderStyle.Secondary"
+                                  RenderStyleMode="ButtonRenderStyleMode.Text" />
                     </span>
                     <img src="images/U3ALogo.png" />
                     @if (isXmas)
                     {
-                        <svg class="img-bg-xmas" alt="xmas" >
+                        <svg class="img-bg-xmas" alt="xmas">
                             <use href="images/vectors.svg#xmas"></use>
                         </svg>
                     }
