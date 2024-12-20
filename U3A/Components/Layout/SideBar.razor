@@ -26,13 +26,12 @@
                 <Template>
                     <span class="minimise-button-container">
                         <DxButton Click="OnToggleMinimised"
-                                  CssClass="menu-item"
                                   IconCssClass="bi bi-arrow-left-circle"
                                   SizeMode="SizeMode.Large"
-                                  RenderStyle="ButtonRenderStyle.Secondary"
                                   RenderStyleMode="ButtonRenderStyleMode.Text" />
+                        <img src="images/U3ALogo.png" />
+                        <div class="h5 title-sidebar">@OrganisationName</div>
                     </span>
-                    <img src="images/U3ALogo.png" />
                     @if (isXmas)
                     {
                         <svg class="img-bg-xmas" alt="xmas">
@@ -65,6 +64,7 @@
 @code {
     public bool IsMinimised { get; set; } = false;
     bool isXmas = false;
+    string OrganisationName = string.Empty;
 
     void OnToggleMinimised()
     {
@@ -78,6 +78,7 @@
         {
             using (var dbc = U3Adbfactory.CreateDbContext())
             {
+                OrganisationName = dbc.TenantInfo.Name!;
                 var today = dbc.GetLocalDate();
                 var xmas = new DateTime(today.Year, 12, 25);
                 if (today > xmas.AddDays(-7) && today <= xmas) { isXmas = true; }

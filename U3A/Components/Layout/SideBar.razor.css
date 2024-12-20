@@ -12,6 +12,16 @@
     padding: 0.5rem 0.5rem;
 }
 
+.title-sidebar {
+    border-bottom-style: solid;
+    border-bottom-width: var(--bs-body-line-height);
+    border-bottom-color: gainsboro;
+    margin-top: 0.8rem;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .logo {
     text-align: center;
 }
@@ -22,12 +32,7 @@
 }
 
 .menu-button {
-    padding: 0.375rem;
-    width: 1.875rem;
-    height: 1.875rem;
-    background-image: url("images/menu.svg");
-    background-position: center;
-    background-repeat: no-repeat;
+    color: var(--bs-body-bg);
     cursor: pointer;
 }
 
