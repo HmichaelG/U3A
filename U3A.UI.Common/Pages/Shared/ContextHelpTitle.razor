@@ -27,12 +27,12 @@
                 }
             }
             <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
-            RenderStyleMode="ButtonRenderStyleMode.Outline"
-            RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly)
+                      RenderStyleMode="ButtonRenderStyleMode.Outline"
+                      RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly)
                                             ?   ButtonRenderStyle.Primary
                                             :   ButtonRenderStyle.None)"
-            CssClass="@ButtonCssClass"
-            Click="ShowTopicAsync" Id="helpButton" />
+                      CssClass="@ButtonCssClass"
+                      Click="ShowTopicAsync" Id="helpButton" />
             break;
         case HelpActivationStyle.StandardButtonAndTitle:
         case HelpActivationStyle.ButtonAndTitleNoMessages:
@@ -40,9 +40,9 @@
             <div class="d-flex">
                 <h1 class="@TitleCssClass title-color h3">
                     <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
-                    RenderStyleMode="ButtonRenderStyleMode.Outline"
-                    RenderStyle="ButtonRenderStyle.None"
-                    Click="ShowTopicAsync" Id="helpButton" />
+                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                              RenderStyle="ButtonRenderStyle.None"
+                              Click="ShowTopicAsync" Id="helpButton" />
                     @Title
                 </h1>
                 @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
@@ -64,18 +64,18 @@
             break;
     }
     <DxWindow @ref=@helpWindow Width="@windowWidth"
-    Visible=false
-    Closed="OnClosed"
-    HorizontalAlignment="HorizontalAlignment.Right"
-    VerticalAlignment="VerticalAlignment.Center"
-    Height="100vh"
-    AllowResize="true"
-    Context="windowContext"
-    CloseOnEscape=true
-    ShowCloseButton=true
-    ShowFooter=true
-    Scrollable=true
-    HeaderText="Help">
+              Visible=false
+              Closed="OnClosed"
+              HorizontalAlignment="HorizontalAlignment.Right"
+              VerticalAlignment="VerticalAlignment.Center"
+              Height="100vh"
+              AllowResize="true"
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              HeaderText="Help">
         <BodyTextTemplate>
             <iframe src="@helpFile" class="iframe-size p-1"></iframe>
         </BodyTextTemplate>
@@ -84,23 +84,24 @@
 
 <style>
     .iframe-size {
-    height: 100%;
-    width: 100%;
-    padding-bottom: 5px;
+        height: 100%;
+        width: 100%;
+        padding-bottom: 5px;
     }
 
     .alert-style {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-    margin-bottom: 0.5dvh !important;
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+        margin-bottom: 0.5dvh !important;
     }
 
     .help-btn {
-    color: cornflowerblue;
-    font-weight:900;
+        color: var(--dxbl-client-component-palette-info);
+        font-weight: 900;
     }
+
     .title-color {
-        color: var(--bs-primary);
+        color: var(--dxbl-client-component-palette-primary);
     }
 </style>
 
