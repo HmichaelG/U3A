@@ -20,7 +20,8 @@ namespace U3A.UI.Reports
         public U3ADbContext DbContext { get; set; }
         private void CeasedParticipantList_DataSourceDemanded(object sender, EventArgs e)
         {
-            DataSource = DbContext.Volunteer.Include(x => x.Person).Where(x => x.Person.DateCeased == null).ToList();
+            DataSource = DbContext.Volunteer.Include(x => x.Person).IgnoreQueryFilters()
+                            .Where(x => x.Person.DateCeased == null).ToList();
         }
     }
 }

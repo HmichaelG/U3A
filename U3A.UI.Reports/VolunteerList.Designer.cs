@@ -32,6 +32,7 @@
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
             this.pageInfo1 = new DevExpress.XtraReports.UI.XRPageInfo();
             this.pageInfo2 = new DevExpress.XtraReports.UI.XRPageInfo();
+            this.groupHeaderBand1 = new DevExpress.XtraReports.UI.GroupHeaderBand();
             this.ReportHeader = new DevExpress.XtraReports.UI.ReportHeaderBand();
             this.Detail = new DevExpress.XtraReports.UI.DetailBand();
             this.table2 = new DevExpress.XtraReports.UI.XRTable();
@@ -64,13 +65,12 @@
             this.DetailData3_Odd = new DevExpress.XtraReports.UI.XRControlStyle();
             this.PageInfo = new DevExpress.XtraReports.UI.XRControlStyle();
             this.PageHeader = new DevExpress.XtraReports.UI.PageHeaderBand();
+            this.label1 = new DevExpress.XtraReports.UI.XRLabel();
             this.ReportFooter = new DevExpress.XtraReports.UI.ReportFooterBand();
             this.xrLabel2 = new DevExpress.XtraReports.UI.XRLabel();
             this.objectDataSource1 = new DevExpress.DataAccess.ObjectBinding.ObjectDataSource(this.components);
-            this.groupHeaderBand1 = new DevExpress.XtraReports.UI.GroupHeaderBand();
             this.groupFooterBand1 = new DevExpress.XtraReports.UI.GroupFooterBand();
             this.xrLabel3 = new DevExpress.XtraReports.UI.XRLabel();
-            this.label1 = new DevExpress.XtraReports.UI.XRLabel();
             ((System.ComponentModel.ISupportInitialize)(this.table2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.table1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).BeginInit();
@@ -106,6 +106,14 @@
             this.pageInfo2.StyleName = "PageInfo";
             this.pageInfo2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight;
             this.pageInfo2.TextFormatString = "Page {0} of {1}";
+            // 
+            // groupHeaderBand1
+            // 
+            this.groupHeaderBand1.GroupFields.AddRange(new DevExpress.XtraReports.UI.GroupField[] {
+            new DevExpress.XtraReports.UI.GroupField("Activity", DevExpress.XtraReports.UI.XRColumnSortOrder.Ascending)});
+            this.groupHeaderBand1.HeightF = 0F;
+            this.groupHeaderBand1.Name = "groupHeaderBand1";
+            this.groupHeaderBand1.PageBreak = DevExpress.XtraReports.UI.PageBreak.AfterBandExceptLastEntry;
             // 
             // ReportHeader
             // 
@@ -212,6 +220,7 @@
             // 
             // xrTableCell15
             // 
+            this.xrTableCell15.CanShrink = true;
             this.xrTableCell15.Multiline = true;
             this.xrTableCell15.Name = "xrTableCell15";
             this.xrTableCell15.StyleName = "DetailData1";
@@ -219,6 +228,7 @@
             // 
             // xrTableCell16
             // 
+            this.xrTableCell16.CanShrink = true;
             this.xrTableCell16.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Person].[ICEContact]")});
             this.xrTableCell16.Multiline = true;
@@ -231,6 +241,7 @@
             // 
             // xrTableCell17
             // 
+            this.xrTableCell17.CanShrink = true;
             this.xrTableCell17.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Person].[ICEPhone]")});
             this.xrTableCell17.Multiline = true;
@@ -427,6 +438,14 @@
             this.PageHeader.HeightF = 86.19433F;
             this.PageHeader.Name = "PageHeader";
             // 
+            // label1
+            // 
+            this.label1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
+            this.label1.Name = "label1";
+            this.label1.SizeF = new System.Drawing.SizeF(727F, 24.19433F);
+            this.label1.StyleName = "Title";
+            this.label1.Text = "[Activity] Volunteers";
+            // 
             // ReportFooter
             // 
             this.ReportFooter.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
@@ -463,14 +482,6 @@
             this.objectDataSource1.DataSource = typeof(global::U3A.Model.Volunteer);
             this.objectDataSource1.Name = "objectDataSource1";
             // 
-            // groupHeaderBand1
-            // 
-            this.groupHeaderBand1.GroupFields.AddRange(new DevExpress.XtraReports.UI.GroupField[] {
-            new DevExpress.XtraReports.UI.GroupField("Activity", DevExpress.XtraReports.UI.XRColumnSortOrder.Ascending)});
-            this.groupHeaderBand1.HeightF = 0F;
-            this.groupHeaderBand1.Name = "groupHeaderBand1";
-            this.groupHeaderBand1.PageBreak = DevExpress.XtraReports.UI.PageBreak.AfterBandExceptLastEntry;
-            // 
             // groupFooterBand1
             // 
             this.groupFooterBand1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
@@ -501,14 +512,6 @@
             this.xrLabel3.Summary = xrSummary2;
             this.xrLabel3.Text = "xrLabel2";
             this.xrLabel3.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            // 
-            // label1
-            // 
-            this.label1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
-            this.label1.Name = "label1";
-            this.label1.SizeF = new System.Drawing.SizeF(727F, 24.19433F);
-            this.label1.StyleName = "Title";
-            this.label1.Text = "[Activity] Volunteers";
             // 
             // VolunteerList
             // 
