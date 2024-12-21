@@ -21,7 +21,7 @@ namespace U3A.UI.Reports
         private void CeasedParticipantList_DataSourceDemanded(object sender, EventArgs e)
         {
             DataSource = DbContext.Volunteer.Include(x => x.Person).IgnoreQueryFilters()
-                            .Where(x => x.Person.DateCeased == null).ToList();
+                            .Where(x => x.Person.DateCeased == null && (!x.Person.IsDeleted)).ToList();
         }
     }
 }
