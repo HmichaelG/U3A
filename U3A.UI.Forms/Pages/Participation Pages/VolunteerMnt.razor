@@ -76,7 +76,7 @@ else
                 <Columns>
                     <DxGridSelectionColumn Width="2rem" />
                     <DxGridCommandColumnEx Visible=@((string.IsNullOrWhiteSpace(selectedActivity)) ? false : true) />
-                    <DxGridDataColumn Caption="Volunteer" FieldName="Person.FullName" Width="15rem" />
+                    <DxGridDataColumn Caption="Volunteer" FieldName="Person.FullNameAlpha" SortIndex="0" Width="15rem" />
                     <DxGridDataColumn Caption="Home" FieldName="Person.AdjustedHome" Width="5rem" />
                     <DxGridDataColumn Caption="Mobile" FieldName="Person.AdjustedMobile" Width="5rem" />
                     <DxGridDataColumn Caption="ICE Name" FieldName="Person.ICEContact" Width="15rem" />
@@ -190,7 +190,8 @@ else
         Volunteers = await dbc.Volunteer
                             .Include(x => x.Person)
                             .IgnoreQueryFilters()
-                            .Where(x => x.Activity == selectedActivity).ToListAsync();
+                            .Where(x => x.Activity == selectedActivity)
+                            .ToListAsync();
         StateHasChanged();
     }
 
