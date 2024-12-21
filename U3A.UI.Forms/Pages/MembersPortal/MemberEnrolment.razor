@@ -119,7 +119,7 @@ else
                                     {
                                         <DxButton Text="@GetBriefStatus(c)" CssClass="flex-grow-0"
                                         SizeMode="SizeMode.Small"
-                                        IconCssClass="@($"bi {selectButtonIcon}")"
+                                        IconCssClass="@($"menu-icon bi {selectButtonIcon}")"
                                         RenderStyleMode="ButtonRenderStyleMode.Outline"
                                         Click="@(async () => await SelectedDataItemChanged(c))" />
                                     }
@@ -146,7 +146,7 @@ else
                                                 {
                                                     <DxButton Text="@GetStatus(c)"
                                                     SizeMode="SizeMode.Large"
-                                                    IconCssClass="@($"bi {selectButtonIcon}")"
+                                                    IconCssClass="@($"menu-icon bi {selectButtonIcon}")"
                                                     RenderStyleMode="ButtonRenderStyleMode.Outline"
                                                     Click="@(async () => await SelectedDataItemChanged(c))" />
                                                 }
@@ -218,7 +218,7 @@ else
                                                             @if (c.Venue.CanMapAddress)
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                IconCssClass="bi bi-globe"
+                                                                IconCssClass="menu-icon bi bi-globe"
                                                                 Text="Map"
                                                                 RenderStyle="@ButtonRenderStyle.Primary"
                                                                 RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -227,7 +227,7 @@ else
                                                             @if (!p.IsEmailSilent && !string.IsNullOrWhiteSpace(p.Email))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                IconCssClass="bi bi-envelope"
+                                                                IconCssClass="menu-icon bi bi-envelope"
                                                                 Text="Email"
                                                                 RenderStyle="@ButtonRenderStyle.Primary"
                                                                 RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -236,7 +236,7 @@ else
                                                             @if (!p.IsPhoneSilent && !p.SMSOptOut && !string.IsNullOrWhiteSpace(p.Mobile))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                IconCssClass="bi bi-phone"
+                                                                IconCssClass="menu-icon bi bi-phone"
                                                                 Text="SMS"
                                                                 RenderStyle="@ButtonRenderStyle.Primary"
                                                                 RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -245,7 +245,7 @@ else
                                                             @if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.HomePhone))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                IconCssClass="bi bi-telephone"
+                                                                IconCssClass="menu-icon bi bi-telephone"
                                                                 Text="Home"
                                                                 RenderStyleMode="ButtonRenderStyleMode.Outline"
                                                                 RenderStyle="@ButtonRenderStyle.Primary"
@@ -254,7 +254,7 @@ else
                                                             @if (!p.IsPhoneSilent && !string.IsNullOrWhiteSpace(p.Mobile))
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                IconCssClass="bi bi-phone"
+                                                                IconCssClass="menu-icon bi bi-phone"
                                                                 Text="Mobile"
                                                                 RenderStyleMode="ButtonRenderStyleMode.Outline"
                                                                 RenderStyle="@ButtonRenderStyle.Primary"
@@ -263,7 +263,7 @@ else
                                                             @if (c.CourseContacts.Count > 1)
                                                             {
                                                                 <DxButton CssClass="flex-grow-1"
-                                                                IconCssClass="bi bi-arrow-right"
+                                                                IconCssClass="menu-icon bi bi-arrow-right"
                                                                 IconPosition="ButtonIconPosition.AfterText"
                                                                 Text="Contact"
                                                                 RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -290,7 +290,7 @@ else
                                                 <div class="col-3 px-1 text-center">@c.TotalWaitlistedStudents</div>
                                             </div>
 
-                                            <DxButton CssClass="w-100 mb-1" IconCssClass="bi bi-globe2"
+                                            <DxButton CssClass="w-100 mb-1" IconCssClass="menu-icon bi bi-globe2"
                                             Visible=@(!string.IsNullOrWhiteSpace(c.Course.AdditionalInformationURL))
                                             Text="Additional Information" RenderStyle="@ButtonRenderStyle.Primary"
                                             RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -344,7 +344,7 @@ else
             <div class="input-group">
                 <DxButton CssClass="flex-grow-1"
                 Visible=@(!IsPreview)
-                IconCssClass="bi-door-open"
+                IconCssClass="menu-icon bi-door-open"
                 Text="Return to menu"
                 RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
             </div>

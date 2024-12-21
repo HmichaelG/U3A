@@ -51,21 +51,21 @@ else
                                                 OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
                         }
                         <DxButton Text="Request course enrolments" Context="ThisContext"
-                                  IconCssClass="bi-mortarboard me-3"
+                                  IconCssClass="menu-icon bi bi-mortarboard me-3"
                                   CssClass="col-12 mt-1"
                                   Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoRequestMemberEnrolment))"
                                   RenderStyle="ButtonRenderStyle.Primary"
                                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                         </DxButton>
                         <DxButton Text="Withdraw from course enrolments" Context="ThisContext"
-                                  IconCssClass="bi-trash me-3"
+                                  IconCssClass="menu-icon bi-trash me-3"
                                   CssClass="col-12 mt-1"
                                   Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoWithdrawMemberEnrolment))"
                                   RenderStyle="ButtonRenderStyle.Primary"
                                   RenderStyleMode="ButtonRenderStyleMode.Outline">
                         </DxButton>
                         <DxButton Text="Return to menu"
-                                  IconCssClass="bi-door-closed me-1"
+                                  IconCssClass="menu-icon bi-door-closed me-1"
                                   CssClass="col-12 mt-1"
                                   Click="@(e => OnMenuSelected(e,PortalMenuSelection.ShowMenu))"
                                   RenderStyle="ButtonRenderStyle.Primary"
@@ -89,56 +89,56 @@ else
                             {
                                 <DxButton Text="Select linked member"
                                           Visible="@(loginState.LinkedPeople.Count > 1)"
-                                          IconCssClass="bi-people me-1"
+                                          IconCssClass="menu-icon bi-people me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoSelectLinkedMember))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="Your membership details"
-                                          IconCssClass="bi-person me-1"
+                                          IconCssClass="menu-icon bi-person me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberMaintenance))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="Your membership fees"
-                                          IconCssClass="bi-coin me-1"
+                                          IconCssClass="menu-icon bi-coin me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberPayment))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="Print your member badge"
-                                          IconCssClass="bi-printer me-1"
+                                          IconCssClass="menu-icon bi-printer me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.PrintMemberBadge))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="View your course enrolments"
-                                          IconCssClass="bi-award me-1"
+                                          IconCssClass="menu-icon bi-award me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoViewMemberEnrolment))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="Manage your course enrolments"
-                                          IconCssClass="bi-mortarboard me-1"
+                                          IconCssClass="menu-icon bi-mortarboard me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoShowEnrolmentSubmenu))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="Class Sign In / Sign Out"
-                                          IconCssClass="bi-alarm me-1"
+                                          IconCssClass="menu-icon bi-alarm me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoSignInSignOut))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="On Leave? Please let us know"
-                                          IconCssClass="bi-airplane me-1"
+                                          IconCssClass="menu-icon bi-airplane me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoMemberLeave))"
                                           RenderStyle="ButtonRenderStyle.Primary"
@@ -147,7 +147,7 @@ else
                                 @if (!loginState.IsAdminOnBehalfOfMember)
                                 {
                                     <DxButton Text="What's on today?"
-                                              IconCssClass="bi-clock me-1"
+                                              IconCssClass="menu-icon bi-clock me-1"
                                               CssClass="col-12 mt-1"
                                               Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoWhatsOn))"
                                               RenderStyle="ButtonRenderStyle.Primary"
@@ -155,7 +155,7 @@ else
                                     </DxButton>
                                 }
                                 <DxButton Text="Your Leadership role"
-                                          IconCssClass="bi-person-video3 me-1"
+                                          IconCssClass="menu-icon bi-person-video3 me-1"
                                           CssClass="col-12 mt-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoShowLeaderMenu))"
                                           RenderStyle="ButtonRenderStyle.Primary"
@@ -165,7 +165,7 @@ else
                             @if (loginState.IsAdminOnBehalfOfMember)
                             {
                                 <DxButton Text="Return to Admin Portal"
-                                          IconCssClass="bi-door-closed me-1"
+                                          IconCssClass="menu-icon bi-door-closed me-1"
                                           CssClass="col-12 my-1"
                                           Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoReturnToAdminPortal))"
                                           RenderStyle="ButtonRenderStyle.Primary"
@@ -175,7 +175,7 @@ else
                             else
                             {
                                 <DxButton Text="Logout, when you're finished"
-                                          IconCssClass="bi-door-closed me-1"
+                                          IconCssClass="menu-icon bi-door-closed me-1"
                                           CssClass="col-12 my-1"
                                           Click="@(() => NavigationManager.NavigateTo("Account/Login",true))"
                                           RenderStyle="ButtonRenderStyle.Primary"
@@ -197,21 +197,21 @@ else
                                 <p><strong>Please do not share your password</strong></p>
                             </div>
                             <DxButton Text="Link a new member"
-                                      IconCssClass="bi-person-plus me-1"
+                                      IconCssClass="menu-icon bi-person-plus me-1"
                                       CssClass="col-12 mb-1"
                                       Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoLinkNewMember))"
                                       RenderStyle="ButtonRenderStyle.Primary"
                                       RenderStyleMode="ButtonRenderStyleMode.Outline">
                             </DxButton>
                             <DxButton Text="Link an existing member"
-                                      IconCssClass="bi-person-plus me-1"
+                                      IconCssClass="menu-icon bi-person-plus me-1"
                                       CssClass="col-12 mb-1"
                                       Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoLinkExistingMember))"
                                       RenderStyle="ButtonRenderStyle.Primary"
                                       RenderStyleMode="ButtonRenderStyleMode.Outline">
                             </DxButton>
                             <DxButton Text="Unlink a member"
-                                      IconCssClass="bi-person-dash me-1"
+                                      IconCssClass="menu-icon bi-person-dash me-1"
                                       CssClass="col-12 mb-1"
                                       Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoUnlinkMember))"
                                       RenderStyle="ButtonRenderStyle.Primary"
@@ -224,21 +224,21 @@ else
                         <DxAccordionItem Text="Manage Credentials">
                             <ContentTemplate>
                                 <DxButton Text="Change your email address"
-                                          IconCssClass="bi-shield-check me-1"
+                                          IconCssClass="menu-icon bi-shield-check me-1"
                                           CssClass="col-12 mb-1"
                                           Click="@(e => OnChangeCredential(e,"Email"))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="Change your password"
-                                          IconCssClass="bi-shield-lock me-1"
+                                          IconCssClass="menu-icon bi-shield-lock me-1"
                                           CssClass="col-12 mb-1"
                                           Click="@(e => OnChangeCredential(e,"ChangePassword"))"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
                                 <DxButton Text="Two-Factor authentication"
-                                          IconCssClass="bi-shield-check me-1"
+                                          IconCssClass="menu-icon bi-shield-check me-1"
                                           CssClass="col-12 mb-1"
                                           Click="@(e => OnChangeCredential(e,"TwoFactorAuthentication"))"
                                           RenderStyle="ButtonRenderStyle.Primary"
