@@ -4,22 +4,18 @@
     max-width: 15rem;
 }
 
+::deep .menu-title {
+    margin-top: 1rem;
+    margin-left: 0.475rem;
+    color: var(--bs-primary);
+}
+
 ::deep .minimise-button-container {
     align-self: start;
 }
 
 ::deep .sidebar-header {
     padding: 0.5rem 0.5rem;
-}
-
-.title-sidebar {
-    border-bottom-style: solid;
-    border-bottom-width: var(--bs-body-line-height);
-    border-bottom-color: gainsboro;
-    margin-top: 0.8rem;
-    width: 100%;
-    text-overflow: ellipsis;
-    overflow: hidden;
 }
 
 .logo {
@@ -32,7 +28,12 @@
 }
 
 .menu-button {
-    color: var(--bs-body-bg);
+    padding: 0.375rem;
+    width: 1.875rem;
+    height: 1.875rem;
+    background-image: url("images/menu.svg");
+    background-position: center;
+    background-repeat: no-repeat;
     cursor: pointer;
 }
 
@@ -64,6 +65,9 @@
     ::deep .img-bg-flower,
     .img-bg-xmas {
         display: none;
+    }
+    .menu-title {
+        color: var(--bs-body-bg);
     }
 }
 
@@ -125,11 +129,14 @@
         }
 
             #sidebar.expanded ::deep .sidebar-header {
+                height: 4rem;
                 border-bottom: 1px solid;
+                display: flex;
+                align-items:center;
             }
 
             #sidebar.expanded .menu-button {
-                background-image: url("images/close.svg");
+                background-image: url("images/menu.svg");
             }
 
         #sidebar:not(.expanded) ::deep .dxbl-gridlayout-root {

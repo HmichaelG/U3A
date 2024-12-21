@@ -3,8 +3,8 @@
 
 <div id="minimiseButton" class="p-1 minimise-button-container">
     <DxButton Click="OnToggleMinimised" Visible=@IsMinimised
-              CssClass="menu-item mt-3"
-              IconCssClass="bi-arrow-right-circle"
+              CssClass="menu-item mt-2"
+              IconCssClass="bi bi-list menu-icon"
               SizeMode="SizeMode.Large"
               RenderStyleMode="ButtonRenderStyleMode.Text"
               RenderStyle="ButtonRenderStyle.Secondary" />
@@ -26,12 +26,13 @@
                 <Template>
                     <span class="minimise-button-container">
                         <DxButton Click="OnToggleMinimised"
-                                  IconCssClass="bi bi-arrow-left-circle"
+                                  IconCssClass="bi bi-list menu-icon"
                                   SizeMode="SizeMode.Large"
+                                  RenderStyle="ButtonRenderStyle.Secondary" 
                                   RenderStyleMode="ButtonRenderStyleMode.Text" />
                         <img src="images/U3ALogo.png" />
-                        <div class="h5 title-sidebar">@OrganisationName</div>
                     </span>
+                    <div class="h5 menu-title w-100">@OrganisationName</div>
                     @if (isXmas)
                     {
                         <svg class="img-bg-xmas" alt="xmas">

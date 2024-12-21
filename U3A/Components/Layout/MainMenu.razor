@@ -23,7 +23,7 @@
                 ? "card shadow-sm w-100"
                 : "sidebar")">
         <div class="d-print-none">
-            <DxMenu CssClass="menu-item menu"
+            <DxMenu CssClass="menu-item menu"                    
                     DropDownActionMode="MenuDropDownActionMode.Click"
                     ItemsPosition="ItemPosition.End"
                     Orientation="@((IsTopMenu) ? Orientation.Horizontal : Orientation.Vertical)"
@@ -31,7 +31,7 @@
                 <TitleTemplate>
                     @if (IsTopMenu)
                     {
-                        <span class="title"><img src="images/U3ALogo.png" >&nbsp;@OrganisationName</span>
+                        <span class="h5"><img src="images/U3ALogo.png" >&nbsp;@OrganisationName</span>
                     }
                 </TitleTemplate>
                 <Items>
@@ -198,11 +198,11 @@
                                                     IconCssClass="menu-icon bi bi-door-open" />
                                     }
                                     <DxMenuItem Text="Change Email Address" IconCssClass="menu-icon bi bi-shield"
-                                                Click="@(() => OnChangeCredential("Email"))" />
+                                                NavigateUrl="Account/Manage/Email" />
                                     <DxMenuItem Text="Change Your Password" IconCssClass="menu-icon bi bi-shield"
-                                                Click="@(() => OnChangeCredential("ChangePassword"))" />
+                                                NavigateUrl="Account/Manage/ChangePassword" />
                                     <DxMenuItem Text="Two-Factor Authentication" IconCssClass="menu-icon bi bi-shield"
-                                                Click="@(() => OnChangeCredential("TwoFactorAuthentication"))" />
+                                                NavigateUrl="Account/Manage/TwoFactorAuthentication" />
                                 </Items>
                             </DxMenuItem>
                             @if (!IsTopMenu)
@@ -217,9 +217,6 @@
             </DxMenu>
         </div>
     </div>
-
-    <MessageBox @ref="@messageBox" />
-    <ContextHelpTitle @ref=@help HelpTopic="" ActivationStyle="HelpActivationStyle.None" Title="Help" />
 
 }
 <style>
