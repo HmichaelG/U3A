@@ -59,7 +59,7 @@ else
                 </DxSplitterPane>
                 <DxSplitterPane>
                     <div class="h6">Attendance Details</div>
-                    <DxGrid Data="@(ChartsData?.Where(x => x.Total != 0))" CssClass="h-100" id="attendGrid"
+                    <DxGrid Data="@(ChartsData?.Where(x => x.Total != 0))" CssClass="w-100 gridHeight" id="attendGrid"
                             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                             AutoExpandAllGroupRows="true"
                             ShowAllRows="true">
@@ -86,6 +86,10 @@ else
 <style>
     .controlHeight {
         height: calc(100dvh - @(ws.UseTopMenu ? "14rem" : "10rem") );
+    }
+
+    .gridHeight {
+        height: calc(100dvh - @(ws.UseTopMenu ? "16.25rem" : "12.25rem") );
     }
 </style>
 

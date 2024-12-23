@@ -283,7 +283,7 @@ namespace U3A.BusinessRules
                     Count = x.Count()
                 }));
             return result
-                .Where(x => x.Count > 0)
+                .Where(x => x.Count != null && x.Count > 0)
                 .OrderBy(x => x.Source);
         }
         private static int GetAge(DateTime birthDate, DateTime LocalTime)

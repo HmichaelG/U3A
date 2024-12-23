@@ -24,7 +24,7 @@
             </DxSplitterPane>
             <DxSplitterPane>
                 <div class="h6">Participation Details</div>
-                <DxPivotTable Data="@memberData" ShowRowGrandTotals="false" CssClass="w-100 controlHeight">
+                <DxPivotTable Data="@memberData" ShowRowGrandTotals="false" CssClass="w-100 gridHeight">
                     <Fields>
                         <DxPivotTableField Field="@nameof(SankeyDataPoint.Group)"
                                            Area="@PivotTableArea.Row" Width="80"
@@ -49,6 +49,10 @@
 <style>
     .controlHeight {
         height: calc(100dvh - @(ws.UseTopMenu ? "12rem" : "8rem") );
+    }
+
+    .gridHeight {
+        height: calc(100dvh - @(ws.UseTopMenu ? "14.25rem" : "10.25rem") );
     }
 </style>
 

@@ -65,7 +65,8 @@
                 </DxChart>
             </DxSplitterPane>
             <DxSplitterPane>
-                <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="h-100"
+                <div class="h6">Receipt Summary</div>
+                <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="gridHeight"
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         AutoExpandAllGroupRows=true
                         ShowFilterRow="false"
@@ -92,6 +93,10 @@
 <style>
     .controlHeight {
         height: calc(100dvh - @(ws.UseTopMenu ? "14rem" : "10rem") );
+    }
+
+    .gridHeight {
+        height: calc(100dvh - @(ws.UseTopMenu ? "16.25rem" : "12.25rem") );
     }
 </style>
 

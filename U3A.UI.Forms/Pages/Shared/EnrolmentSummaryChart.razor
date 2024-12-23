@@ -61,7 +61,7 @@
             </DxSplitterPane>
             <DxSplitterPane>
                 <div class="h6">Enrolment Details</div>
-                <DxGrid Data="@(enrolmentData?.Where(x => x.Count != 0))" CssClass="controlHeight" id="enrolGrid"
+                <DxGrid Data="@(enrolmentData?.Where(x => x.Count != 0))" CssClass="gridHeight" id="enrolGrid"
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         AutoExpandAllGroupRows="true"
                         ShowFilterRow="false"
@@ -88,6 +88,10 @@
 <style>
     .controlHeight {
         height: calc(100dvh - @(ws.UseTopMenu ? "14rem" : "10rem") );
+    }
+
+    .gridHeight {
+        height: calc(100dvh - @(ws.UseTopMenu ? "16.25rem" : "12.25rem") );
     }
 </style>
 
