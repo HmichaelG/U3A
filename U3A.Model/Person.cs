@@ -100,9 +100,27 @@ public class Person : BaseEntity, ISoftDelete
 
     [DateOfBirth]
     public DateTime? BirthDate { get; set; }
+    [NotMapped]
+    public int BirthMonth
+    {
+        get
+        {
+            return (BirthDate == null) ? -1 : BirthDate.Value.Month;
+        }
+    }
+    [NotMapped]
+    public string BirthMonthName
+    {
+        get
+        {
+            return (BirthDate == null) ? string.Empty : BirthDate.Value.ToString("MMMM");
+        }
+    }
+
     public DateTime? DateJoined { get; set; }
     public DateTime? PreviousDateJoined { get; set; }
 
+    [NotMapped]
     public int? MembershipYears
     {
         get
