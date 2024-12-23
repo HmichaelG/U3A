@@ -15,81 +15,83 @@
                    Alignment="ToolbarItemAlignment.Right" CssClass="me-1 my-2"
                    Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
                    IconCssClass="bi bi-filetype-png" />
-    <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
-                   Alignment="ToolbarItemAlignment.Right" CssClass="my-2"
-                   IconCssClass="bi bi-database" />
 </DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutGroup Caption=@title ColSpanLg="9" CssClass="controlHeight">
-        <DxChart Data="receiptData" Id="receiptChart" @ref=@chart
-                 Width="100%" CssClass="controlHeight"
-                 LabelOverlap="ChartLabelOverlap.Hide">
-            <DxChartTitle Text="@title" />
-            <DxChartStackedBarSeries Name="Online"
-                                     Color="System.Drawing.Color.LimeGreen"
-                                     T="ReceiptSummary"
-                                     TArgument="DateTime"
-                                     TValue="decimal"
-                                     ArgumentField="r => new DateTime(r.Year, r.Month, 1)"
-                                     ValueField="r => r.Total"
-                                     Filter="@(r => r.Type == "Online")">
-                <DxChartSeriesLabel Visible=ShowSeriesLabels
-                                    Format="ChartElementFormat.Thousands()" />
-            </DxChartStackedBarSeries>
-            <DxChartStackedBarSeries Name="Other"
-                                     Color="System.Drawing.Color.DarkGreen"
-                                     T="ReceiptSummary"
-                                     TArgument="DateTime"
-                                     TValue="decimal"
-                                     ArgumentField="r => new DateTime(r.Year, r.Month, 1)"
-                                     ValueField="r => r.Total"
-                                     Filter="@(r => r.Type != "Online")">
-                <DxChartSeriesLabel Visible=ShowSeriesLabels
-                                    Format="ChartElementFormat.Thousands()" />
-            </DxChartStackedBarSeries>
-            <DxChartLegend Position="RelativePosition.Outside"
-                           HorizontalAlignment="HorizontalAlignment.Right" />
-            <DxChartTooltip Enabled="!ShowSeriesLabels">
-                @context.Point.Render((seriesPoint) =>
-                    @<div style="margin: 0.75rem">
-                        <div>@seriesPoint.SeriesName</div>
-                        <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
-                        <span>@($"{seriesPoint.Value: $0,.0}K")</span>
-                    </div>
-                         )
-            </DxChartTooltip>
-            <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks" />
-            <DxChartArgumentAxis TickInterval="ChartAxisInterval.Month" MinorTickInterval="ChartAxisInterval.Month">
-                <DxChartAxisLabel Format="ChartElementFormat.MonthAndYear"></DxChartAxisLabel>
-            </DxChartArgumentAxis>
-        </DxChart>
-    </DxFormLayoutGroup>
-    <DxFormLayoutGroup Caption="Cash Receipts by Month" ColSpanLg="3">
-        <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="controlHeight"
-                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                AutoExpandAllGroupRows=true
-                ShowFilterRow="false"
-                ShowAllRows="true">
-            <Columns>
-                <DxGridDataColumn Caption="Type" FieldName="Type" GroupIndex="0" />
-                <DxGridDataColumn Caption="Year" FieldName="Year" GroupIndex="1" DisplayFormat="{0:D4}" />
-                <DxGridDataColumn Caption="Month" FieldName="MonthName" />
-                <DxGridDataColumn Caption="Amount" FieldName="Total" DisplayFormat="{0:c2}" />
-            </Columns>
-            <GroupSummary>
-                <DxGridSummaryItem FooterColumnName="Total"
-                                   SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
-            </GroupSummary>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
-            </TotalSummary>
-        </DxGrid>
-    </DxFormLayoutGroup>
+    <DxSplitter CssClass="border controlHeight" Width="100%">
+        <Panes>
+            <DxSplitterPane Size="75%">
+                <div class="h6">Receipt Details</div>
+                <DxChart Data="receiptData" Id="receiptChart" @ref=@chart
+                         Width="100%" CssClass="h-100"
+                         LabelOverlap="ChartLabelOverlap.Hide">
+                    <DxChartTitle Text="@title" />
+                    <DxChartStackedBarSeries Name="Online"
+                                             Color="System.Drawing.Color.LimeGreen"
+                                             T="ReceiptSummary"
+                                             TArgument="DateTime"
+                                             TValue="decimal"
+                                             ArgumentField="r => new DateTime(r.Year, r.Month, 1)"
+                                             ValueField="r => r.Total"
+                                             Filter="@(r => r.Type == "Online")">
+                        <DxChartSeriesLabel Visible=ShowSeriesLabels
+                                            Format="ChartElementFormat.Thousands()" />
+                    </DxChartStackedBarSeries>
+                    <DxChartStackedBarSeries Name="Other"
+                                             Color="System.Drawing.Color.DarkGreen"
+                                             T="ReceiptSummary"
+                                             TArgument="DateTime"
+                                             TValue="decimal"
+                                             ArgumentField="r => new DateTime(r.Year, r.Month, 1)"
+                                             ValueField="r => r.Total"
+                                             Filter="@(r => r.Type != "Online")">
+                        <DxChartSeriesLabel Visible=ShowSeriesLabels
+                                            Format="ChartElementFormat.Thousands()" />
+                    </DxChartStackedBarSeries>
+                    <DxChartLegend Position="RelativePosition.Outside"
+                                   HorizontalAlignment="HorizontalAlignment.Right" />
+                    <DxChartTooltip Enabled="!ShowSeriesLabels">
+                        @context.Point.Render((seriesPoint) =>
+                            @<div style="margin: 0.75rem">
+                                <div>@seriesPoint.SeriesName</div>
+                                <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
+                                <span>@($"{seriesPoint.Value: ,.0}K")</span>
+                            </div>
+                                 )
+                    </DxChartTooltip>
+                    <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks" />
+                    <DxChartArgumentAxis TickInterval="ChartAxisInterval.Month" MinorTickInterval="ChartAxisInterval.Month">
+                        <DxChartAxisLabel Format="ChartElementFormat.MonthAndYear"></DxChartAxisLabel>
+                    </DxChartArgumentAxis>
+                </DxChart>
+            </DxSplitterPane>
+            <DxSplitterPane>
+                <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="h-100"
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        AutoExpandAllGroupRows=true
+                        ShowFilterRow="false"
+                        ShowAllRows="true">
+                    <Columns>
+                        <DxGridDataColumn Caption="Type" FieldName="Type" GroupIndex="0" />
+                        <DxGridDataColumn Caption="Year" FieldName="Year" GroupIndex="1" DisplayFormat="{0:D4}" />
+                        <DxGridDataColumn Caption="Month" FieldName="MonthName" />
+                        <DxGridDataColumn Caption="Amount" FieldName="Total" DisplayFormat="{0:c2}" />
+                    </Columns>
+                    <GroupSummary>
+                        <DxGridSummaryItem FooterColumnName="Total"
+                                           SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+                    </GroupSummary>
+                    <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+                    </TotalSummary>
+                </DxGrid>
+            </DxSplitterPane>
+        </Panes>
+    </DxSplitter>
 </DxFormLayout>
 
 <style>
     .controlHeight {
-        height: calc(100dvh - @(ws.UseTopMenu ? "18rem" : "14rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "14rem" : "10rem") );
     }
 </style>
 
@@ -102,14 +104,12 @@
     string title = "Cash Receipts Summary";
     DxChart chart;
 
-    async Task OnProcess()
+    protected override async Task OnInitializedAsync()
     {
-        progress?.ShowSmallSpinnerAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             receiptData = BusinessRule.GetReceiptSummaryByMonth(dbc);
         }
-        progress.Close();
     }
 
 }

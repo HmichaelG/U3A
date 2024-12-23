@@ -1,5 +1,7 @@
 ﻿using DevExpress.Blazor.Internal.Editors;
+using DevExpress.Drawing.Internal.Fonts.Interop;
 using DevExpress.Xpo.Logger;
+using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -241,6 +243,49 @@ namespace U3A.BusinessRules
             return result;
         }
 
+        public static IEnumerable<SankeyDataPoint> GetMemberParticipationSummary(U3ADbContext dbc, Term term)
+        {
+            (DateTime?, string, string) e = new();
+            var today = dbc.GetLocalTime().Date;
+            var enrolments = dbc.Enrolment
+                .Include(x => x.Term)
+                .Include(x => x.Person)
+                .Include(x => x.Course).ThenInclude(x => x.CourseType)
+                .Where(x => x.Term.ID == term.ID && x.IsWaitlisted == false)
+                .Select(x => new { x.Person.BirthDate, x.Course.CourseType.ShortName, x.Person.Gender });
+
+            var result = enrolments.AsEnumerable()
+                .GroupBy(x => new
+                {
+                    Age = (x.BirthDate == null) ? int.MinValue : GetAge(x.BirthDate.Value, today),
+                    Gender = x.Gender,
+                })
+                .Select(x => new SankeyDataPoint
+                {
+                    Group = "Age",
+                    Source = (x.Key.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Key.Age),
+                    Target = x.Key.Gender,
+                    Count = x.Count()
+                })
+                .ToList();
+
+            result.AddRange(enrolments.AsEnumerable()
+                .GroupBy(x => new
+                {
+                    Gender = x.Gender,
+                    CourseType = x.ShortName,
+                })
+                .Select(x => new SankeyDataPoint
+                {
+                    Group = "Course",
+                    Source = x.Key.Gender,
+                    Target = x.Key.CourseType,
+                    Count = x.Count()
+                }));
+            return result
+                .Where(x => x.Count > 0)
+                .OrderBy(x => x.Source);
+        }
         private static int GetAge(DateTime birthDate, DateTime LocalTime)
         {
             var today = LocalTime.Date;

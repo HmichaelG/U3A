@@ -19,73 +19,75 @@
                    Alignment="ToolbarItemAlignment.Right" CssClass="me-1 my-2"
                    Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
                    IconCssClass="bi bi-filetype-png" />
-    <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
-                   Alignment="ToolbarItemAlignment.Right" CssClass="my-2"
-                   IconCssClass="bi bi-database" />
 </DxToolbar>
 <DxFormLayout>
-    <DxFormLayoutGroup Caption=@title ColSpanLg="9" CssClass="controlHeight">
-        <DxChart Data="enrolmentData" Id="enrolChart" @ref=@chart
-                 Width="100%" CssClass="controlHeight"
-                 LabelOverlap="ChartLabelOverlap.Hide">
-            <DxChartTitle Text=@title />
-            @if (enrolmentData != null)
-            {
-                foreach (var cType in enrolmentData.Select(x => x.CourseType).Distinct())
-                {
-                    <DxChartStackedBarSeries Name="@cType"
-                                             T="EnrolmentSummary"
-                                             TArgument="DateTime"
-                                             TValue="int"
-                                             ArgumentField="x => x.Period"
-                                             Filter="x => x.CourseType == cType"
-                                             ValueField="x => x.Count" />
-                }
-            }
-            <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks">
-                <DxChartAxisTitle Text="Requests including Waitlist" />
-            </DxChartValueAxis>
-            <DxChartArgumentAxis TickInterval="ChartAxisInterval.Month" />
-            <DxChartLegend Position="RelativePosition.Outside"
-                           Orientation="Orientation.Vertical"
-                           HorizontalAlignment="HorizontalAlignment.Right" />
-            <DxChartTooltip Enabled="true">
-                @context.Point.Render((seriesPoint) =>
-                    @<div style="margin: 0.75rem">
-                        <div>@seriesPoint.SeriesName</div>
-                        <span>@($"{((DateTime)seriesPoint.Argument).ToString("MMM yyyy")}: ")</span>
-                        <span>@($"{seriesPoint.Value: 0,0}")</span>
-                    </div>
-                         )
-            </DxChartTooltip>
-        </DxChart>
-    </DxFormLayoutGroup>
-    <DxFormLayoutGroup Caption="Enrolment Request Summary" ColSpanLg="3">
-        <DxGrid Data="@(enrolmentData?.Where(x => x.Count != 0))" CssClass="controlHeight" id="enrolGrid"
-                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                AutoExpandAllGroupRows="true"
-                ShowFilterRow="false"
-                ShowAllRows="true">
-            <Columns>
-                <DxGridDataColumn Caption="Month" FieldName="Period" GroupIndex="0" GroupInterval="GridColumnGroupInterval.DateMonth" />
-                <DxGridDataColumn Caption="W'drawn?" FieldName="IsDropout" Width="20%" />
-                <DxGridDataColumn Width="45%" Caption="Course Type" FieldName="CourseType" />
-                <DxGridDataColumn Width="30%" Caption="Requests" FieldName="Count" DisplayFormat="{0:n0}" />
-            </Columns>
-            <GroupSummary>
-                <DxGridSummaryItem FooterColumnName="Count"
-                                   SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
-            </GroupSummary>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
-            </TotalSummary>
-        </DxGrid>
-    </DxFormLayoutGroup>
+    <DxSplitter CssClass="border controlHeight" Width="100%">
+        <Panes>
+            <DxSplitterPane Size="75%">
+                <DxChart Data="enrolmentData" Id="enrolChart" @ref=@chart
+                         Width="100%" CssClass="controlHeight"
+                         LabelOverlap="ChartLabelOverlap.Hide">
+                    <DxChartTitle Text=@title />
+                    @if (enrolmentData != null)
+                    {
+                        foreach (var cType in enrolmentData.Select(x => x.CourseType).Distinct())
+                        {
+                            <DxChartStackedBarSeries Name="@cType"
+                                                     T="EnrolmentSummary"
+                                                     TArgument="DateTime"
+                                                     TValue="int"
+                                                     ArgumentField="x => x.Period"
+                                                     Filter="x => x.CourseType == cType"
+                                                     ValueField="x => x.Count" />
+                        }
+                    }
+                    <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks">
+                        <DxChartAxisTitle Text="Requests including Waitlist" />
+                    </DxChartValueAxis>
+                    <DxChartArgumentAxis TickInterval="ChartAxisInterval.Month" />
+                    <DxChartLegend Position="RelativePosition.Outside"
+                                   Orientation="Orientation.Vertical"
+                                   HorizontalAlignment="HorizontalAlignment.Right" />
+                    <DxChartTooltip Enabled="true">
+                        @context.Point.Render((seriesPoint) =>
+                            @<div style="margin: 0.75rem">
+                                <div>@seriesPoint.SeriesName</div>
+                                <span>@($"{((DateTime)seriesPoint.Argument).ToString("MMM yyyy")}: ")</span>
+                                <span>@($"{seriesPoint.Value: 0,0}")</span>
+                            </div>
+                                 )
+                    </DxChartTooltip>
+                </DxChart>
+            </DxSplitterPane>
+            <DxSplitterPane>
+                <div class="h6">Enrolment Details</div>
+                <DxGrid Data="@(enrolmentData?.Where(x => x.Count != 0))" CssClass="controlHeight" id="enrolGrid"
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        AutoExpandAllGroupRows="true"
+                        ShowFilterRow="false"
+                        ShowAllRows="true">
+                    <Columns>
+                        <DxGridDataColumn Caption="Month" FieldName="Period" GroupIndex="0" GroupInterval="GridColumnGroupInterval.DateMonth" />
+                        <DxGridDataColumn Caption="W'drawn?" FieldName="IsDropout" Width="20%" />
+                        <DxGridDataColumn Width="45%" Caption="Course Type" FieldName="CourseType" />
+                        <DxGridDataColumn Width="30%" Caption="Requests" FieldName="Count" DisplayFormat="{0:n0}" />
+                    </Columns>
+                    <GroupSummary>
+                        <DxGridSummaryItem FooterColumnName="Count"
+                                           SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
+                    </GroupSummary>
+                    <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Count" />
+                    </TotalSummary>
+                </DxGrid>
+            </DxSplitterPane>
+        </Panes>
+    </DxSplitter>
 </DxFormLayout>
 
 <style>
     .controlHeight {
-        height: calc(100dvh - @(ws.UseTopMenu ? "18rem" : "14rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? "14rem" : "10rem") );
     }
 </style>
 
@@ -97,9 +99,8 @@
     DxChart chart;
     string title = "Enrolment Request Summary";
 
-    async Task OnProcess()
+    protected override async Task OnInitializedAsync()
     {
-        await progress?.ShowSmallSpinnerAsync();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             var term = await BusinessRule.CurrentTermAsync(dbc);
@@ -109,6 +110,6 @@
                 var json = JsonSerializer.Serialize(enrolmentData);
             }
         }
-        await progress?.Close();
     }
+
 }

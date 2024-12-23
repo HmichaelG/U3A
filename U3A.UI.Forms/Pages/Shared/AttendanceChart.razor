@@ -3,84 +3,89 @@
 @inject WorkStation ws
 
 <Progress @ref=@progress />
-<DxToolbar CssClass="my-1">
-    <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
-                   Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
-                   Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
-                   IconCssClass="bi bi-filetype-png" />
-    <DxToolbarItem Text="Retrieve Data" RenderStyle="ButtonRenderStyle.Primary" Click="OnProcess"
-                   Alignment="ToolbarItemAlignment.Right"
-                   IconCssClass="bi bi-database" />
-</DxToolbar>
-<DxFormLayout>
-    <DxFormLayoutGroup Caption=@title ColSpanMd="9" CssClass="control-height">
-        <DxChart T="AttendClassSummaryByWeek" CssClass="control-height"
-                 Data="@ChartsData" id="myChart" @ref=@chart
-                 Width="100%">
-            <DxChartTitle Text=@title />
-            <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
-                                         TArgument="DateTime"
-                                         TValue="int"
-                                         ArgumentField="a => a.WeekEnd"
-                                         Name="Present"
-                                         ValueField="a => a.Present"
-                                         SummaryMethod="Enumerable.Sum" />
-            <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
-                                         TArgument="DateTime"
-                                         TValue="int"
-                                         ArgumentField="a => a.WeekEnd"
-                                         Name="With Apology"
-                                         ValueField="a => a.AbsentWithApology"
-                                         SummaryMethod="Enumerable.Sum" />
-            <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
-                                         TArgument="DateTime"
-                                         TValue="int"
-                                         ArgumentField="a => a.WeekEnd"
-                                         Name="W/Out Apology"
-                                         ValueField="a => a.AbsentWithoutApology"
-                                         SummaryMethod="Enumerable.Sum" />
-            <DxChartLegend Position="RelativePosition.Outside"
-                           HorizontalAlignment="HorizontalAlignment.Right"
-                           Orientation="Orientation.Vertical"
-                           VerticalAlignment="VerticalEdge.Top" />
-            <DxChartTooltip Enabled="true"
-                            Position="RelativePosition.Inside">
-                <div style="margin: 0.75rem">
-                    <div>@($"{context.Point.Argument:d}")</div>
-                    <div>@context.Point.SeriesName</div>
-                    <div>@($"{context.Point.Value:N0}")</div>
-                </div>
-            </DxChartTooltip>
-        </DxChart>
-    </DxFormLayoutGroup>
 
-    <DxFormLayoutGroup Caption="Attendance Summary" ColSpanMd="3">
-        <DxGrid Data="@(ChartsData?.Where(x => x.Total != 0))" CssClass="control-height" id="attendGrid"
-                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                AutoExpandAllGroupRows="true"
-                ShowAllRows="true">
-            <Columns>
-                <DxGridDataColumn Caption="Week" FieldName="WeekEnd"
-                                  GroupIndex=0 DisplayFormat="{0:dddd, dd MMMM yyyy}" />
-                <DxGridDataColumn Caption="Present" FieldName="Present" DisplayFormat="{0:n0}" />
-                <DxGridDataColumn Caption="Apology" FieldName="AbsentWithApology" DisplayFormat="{0:n0}" />
-                <DxGridDataColumn Caption="No Apology" FieldName="AbsentWithoutApology" DisplayFormat="{0:n0}" />
-                <DxGridDataColumn Caption="Total" FieldName="Total" DisplayFormat="{0:n0}" />
-            </Columns>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Present" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithApology" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithoutApology" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
-            </TotalSummary>
-        </DxGrid>
-
-    </DxFormLayoutGroup>
-</DxFormLayout>
-
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxFormLayout>
+        <DxToolbar CssClass="my-1">
+            <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
+                           Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                           Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
+                           IconCssClass="bi bi-filetype-png" />
+        </DxToolbar>
+        <DxSplitter CssClass="border controlHeight" Width="100%">
+            <Panes>
+                <DxSplitterPane Size="75%">
+                    <DxChart Data="@ChartsData" Height="100%" Width="100%" @ref=@chart>
+                        <DxChartTitle Text=@title />
+                        <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
+                                                     TArgument="DateTime"
+                                                     TValue="int"
+                                                     ArgumentField="a => a.WeekEnd"
+                                                     Name="Present"
+                                                     ValueField="a => a.Present"
+                                                     SummaryMethod="Enumerable.Sum" />
+                        <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
+                                                     TArgument="DateTime"
+                                                     TValue="int"
+                                                     ArgumentField="a => a.WeekEnd"
+                                                     Name="With Apology"
+                                                     ValueField="a => a.AbsentWithApology"
+                                                     SummaryMethod="Enumerable.Sum" />
+                        <DxChartFullStackedBarSeries T="AttendClassSummaryByWeek"
+                                                     TArgument="DateTime"
+                                                     TValue="int"
+                                                     ArgumentField="a => a.WeekEnd"
+                                                     Name="W/Out Apology"
+                                                     ValueField="a => a.AbsentWithoutApology"
+                                                     SummaryMethod="Enumerable.Sum" />
+                        <DxChartLegend Position="RelativePosition.Outside"
+                                       HorizontalAlignment="HorizontalAlignment.Right"
+                                       Orientation="Orientation.Vertical"
+                                       VerticalAlignment="VerticalEdge.Top" />
+                        <DxChartTooltip Enabled="true"
+                                        Position="RelativePosition.Inside">
+                            <div style="margin: 0.75rem">
+                                <div>@($"{context.Point.Argument:d}")</div>
+                                <div>@context.Point.SeriesName</div>
+                                <div>@($"{context.Point.Value:N0}")</div>
+                            </div>
+                        </DxChartTooltip>
+                    </DxChart>
+                </DxSplitterPane>
+                <DxSplitterPane>
+                    <div class="h6">Attendance Details</div>
+                    <DxGrid Data="@(ChartsData?.Where(x => x.Total != 0))" CssClass="h-100" id="attendGrid"
+                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                            AutoExpandAllGroupRows="true"
+                            ShowAllRows="true">
+                        <Columns>
+                            <DxGridDataColumn Caption="Week" FieldName="WeekEnd"
+                                              GroupIndex=0 DisplayFormat="{0:dddd, dd MMMM yyyy}" />
+                            <DxGridDataColumn Caption="Present" FieldName="Present" DisplayFormat="{0:n0}" />
+                            <DxGridDataColumn Caption="Apology" FieldName="AbsentWithApology" DisplayFormat="{0:n0}" />
+                            <DxGridDataColumn Caption="No Apology" FieldName="AbsentWithoutApology" DisplayFormat="{0:n0}" />
+                            <DxGridDataColumn Caption="Total" FieldName="Total" DisplayFormat="{0:n0}" />
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Present" />
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithApology" />
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="AbsentWithoutApology" />
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+                        </TotalSummary>
+                    </DxGrid>
+                </DxSplitterPane>
+            </Panes>
+        </DxSplitter>
+    </DxFormLayout>
+}
 <style>
-    .control-height {
-        height: calc(100dvh - @(ws.UseTopMenu ? "18rem" : "14rem"));
+    .controlHeight {
+        height: calc(100dvh - @(ws.UseTopMenu ? "14rem" : "10rem") );
     }
 </style>
 
@@ -90,16 +95,16 @@
     Progress? progress;
     DxChart chart;
     string title = "Attendance Summary";
+    bool isReady = false;
 
 
-    async Task OnProcess()
+    protected override async Task OnInitializedAsync()
     {
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            await progress.ShowSmallSpinnerAsync();
             ChartsData = await BusinessRule.GetClassAttendanceSummaryByWeek(dbc);
-            await progress.Close();
-            InvokeAsync(StateHasChanged);
         }
+        isReady = true;
     }
+
 }
