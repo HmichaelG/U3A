@@ -6,7 +6,12 @@
 @using System.Text.Json
 
 <Progress @ref=@progress />
-
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
 <DxToolbar CssClass="my-1">
     <DxToolbarItem Alignment="ToolbarItemAlignment.Left">
         <Template>
@@ -84,6 +89,7 @@
         </Panes>
     </DxSplitter>
 </DxFormLayout>
+}
 
 <style>
     .controlHeight {
@@ -102,6 +108,7 @@
     int chartBreaks = 0;
     DxChart chart;
     string title = "Enrolment Request Summary";
+    bool IsReady = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,6 +121,7 @@
                 var json = JsonSerializer.Serialize(enrolmentData);
             }
         }
+        IsReady = true;
     }
 
 }

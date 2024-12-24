@@ -1,7 +1,11 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @using System.Drawing
 
-@if (IsReady)
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
 {
     <DxToolbar CssClass="my-1 d-print-none" SizeMode="SizeMode.Small">
         <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"

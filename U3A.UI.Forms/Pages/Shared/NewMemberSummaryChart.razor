@@ -3,6 +3,12 @@
 @inject WorkStation ws
 
 <Progress @ref=@progress />
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
 <DxToolbar CssClass="my-1">
     <DxToolbarItem Alignment="ToolbarItemAlignment.Left">
         <Template>
@@ -96,6 +102,7 @@
         </Panes>
     </DxSplitter>
 </DxFormLayout>
+}
 
 <style>
     .controlHeight {
@@ -114,6 +121,7 @@
     int chartBreaks = 0;
     DxChart chart;
     string title = "New Member Summary";
+    bool IsReady = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -121,6 +129,7 @@
         {
             memberData = await BusinessRule.GetNewMemberSummaryByMonth(dbc);
         }
+        IsReady = true;
     }
 
 }

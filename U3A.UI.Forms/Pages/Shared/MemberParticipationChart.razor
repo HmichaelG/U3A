@@ -2,7 +2,11 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject WorkStation ws
 
-@if (IsReady)
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
 {
     <DxSplitter CssClass="border controlHeight" Width="100%">
         <Panes>
@@ -12,11 +16,11 @@
                           Height="100%"
                           SourceFieldName="Source"
                           TargetFieldName="Target"
-                          WeightFieldName="Count"
+                          WeightFieldName="Percent"
                           RedrawOnResize="true">
                     <DxSankeyLinkSettings ColorMode="SankeyLinkColorMode.Gradient" />
                     <DxTooltipSettings Enabled="true">
-                        <DxTextFormatSettings Type="TextFormat.Default" Precision="0"></DxTextFormatSettings>
+                        <DxTextFormatSettings Type="TextFormat.Percent" Precision="2"></DxTextFormatSettings>
                     </DxTooltipSettings>
                     <DxTitleSettings Text="Member Participation Summary" />
                     <DxExportSettings Enabled="true" />
