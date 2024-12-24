@@ -253,7 +253,6 @@ namespace U3A.BusinessRules
                 .Include(x => x.Course).ThenInclude(x => x.CourseType)
                 .Where(x => x.Term.ID == term.ID)
                 .Select(x => new { x.Person.BirthDate, x.Course.CourseType.ShortName, x.Person.Gender });
-            var total = enrolments.Count() * 2;
             var result = enrolments.AsEnumerable()
                 .GroupBy(x => new
                 {
@@ -266,7 +265,6 @@ namespace U3A.BusinessRules
                     Source = (x.Key.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Key.Age),
                     Target = x.Key.Gender,
                     Count = x.Count(),
-                    Percent = (total > 0) ? (double)(x.Count() / (double)total) * 2 : (double?)null
         })
                 .ToList();
 
@@ -282,7 +280,6 @@ namespace U3A.BusinessRules
                     Source = x.Key.Gender,
                     Target = x.Key.CourseType,
                     Count = x.Count(),
-                    Percent = (total > 0) ? (double)(x.Count() / (double)total) * 2 : (double?)null
                 }));
             var t = result.Sum(x => x.Count);
             return result
