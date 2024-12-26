@@ -1,0 +1,35 @@
+﻿@inject WorkStation ws
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+@if (isXmas.HasValue)
+{
+    if (isXmas.Value)
+    {
+        <svg class="img-bg-xmas" alt="xmas">
+            <use href="images/sidebar-vectors.svg#xmas"></use>
+        </svg>
+    }
+    else
+    {
+        <svg class="img-bg-flower" alt="flower">
+            <use href="images/sidebar-vectors.svg#flowerLight"></use>
+        </svg>
+    }
+}
+
+@code {
+    bool? isXmas = null;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        using (var dbc = U3Adbfactory.CreateDbContext())
+        {
+            var today = dbc.GetLocalDate();
+            var xmas = new DateTime(today.Year, 12, 25);
+            if (today > xmas.AddDays(-7) && today <= xmas) { isXmas = true; } else { isXmas = false; }
+        }
+
+    }
+
+}

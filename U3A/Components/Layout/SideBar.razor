@@ -33,21 +33,7 @@
                         <img src="images/U3ALogo.png" />
                     </span>
                     <div class="h5 menu-title w-100">@OrganisationName</div>
-                    @if (isXmas.HasValue)
-                    {
-                       if (isXmas.Value)
-                            {
-                            <svg class="img-bg-xmas" alt="xmas">
-                                <use href="images/vectors.svg#xmas"></use>
-                            </svg>
-                        }
-                            else
-                        {
-                            <svg class="img-bg-flower" alt="flower">
-                                <use href="images/vectors.svg#flowerLight"></use>
-                            </svg>
-                        }
-                    }
+                    <SidebarImage />
                 </Template>
             </DxGridLayoutItem>
             <DxGridLayoutItem Area="menu-button" CssClass="sidebar-header menu-button-container">
@@ -66,28 +52,17 @@
 
 @code {
     public bool IsMinimised { get; set; } = false;
-    bool? isXmas = null;
     string OrganisationName = string.Empty;
 
-    void OnToggleMinimised()
+    protected override void OnInitialized()
     {
-        IsMinimised = !IsMinimised;
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
-        if (firstRender)
+        base.OnInitialized();
+        using (var dbc = U3Adbfactory.CreateDbContext())
         {
-            using (var dbc = U3Adbfactory.CreateDbContext())
-            {
-                OrganisationName = dbc.TenantInfo.Name!;
-                var today = dbc.GetLocalDate();
-                var xmas = new DateTime(today.Year, 12, 25);
-                if (today > xmas.AddDays(-7) && today <= xmas) { isXmas = true; } else { isXmas = false; }
-                StateHasChanged();
-            }
+            OrganisationName = dbc.TenantInfo.Name!;
         }
     }
+
+    void OnToggleMinimised() =>  IsMinimised = !IsMinimised;
 
 }

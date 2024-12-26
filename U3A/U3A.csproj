@@ -76,6 +76,12 @@
     <Folder Include="wwwroot\lib\jquery\dist\" />
     <Folder Include="wwwroot\Temp\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="wwwroot\images\sidebar-vectors.svg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="XCOPY &quot;$(SolutionDir)\U3A\wwwroot\help&quot; &quot;$(TargetDir)\wwwroot\help\&quot; /S /Y" />
   </Target>
