@@ -34,7 +34,7 @@
 }
 else
 {
-    @if (isInteractive)
+    @if (isInteractive.HasValue && isInteractive.Value)
     {
         <DxGridLayout>
             <Rows>
@@ -184,7 +184,7 @@ else
         </DxGridLayout>
 
     }
-    else
+    if (isInteractive.HasValue && !isInteractive.Value)
     {
         <NotInteractive />
     }
@@ -211,7 +211,7 @@ else
     bool isNoEnrolmentTermAvailable = false;
     string lockoutMessage = string.Empty;
     bool isReady;
-    bool isInteractive;
+    bool? isInteractive = null;
 
     ErrorBoundary? errorBoundary;
     string? messageText;
