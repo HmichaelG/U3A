@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.Internal.Editors;
+using DevExpress.Blazor.PivotGrid.Internal;
 using DevExpress.Drawing.Internal.Fonts.Interop;
 using DevExpress.Xpo.Logger;
 using Eway.Rapid.Abstractions.Response;
@@ -22,6 +23,12 @@ namespace U3A.BusinessRules
             while (start.Day != 1) { start = start.AddDays(1); }
             var monthlyTotals = dbc.Receipt
                 .Where(r => r.Date >= start).AsEnumerable()
+                .Select(r => new
+                {
+                    r.Date,
+                    r.Amount,
+                    r.IsOnlinePayment
+                })
                 .GroupBy(r => new
                 {
                     Month = r.Date.Month,
@@ -227,7 +234,7 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<MemberSummary>> GetMemberSummaryByGender(U3ADbContext dbc, Term term)
         {
-            var result = await dbc.Person
+            var result = await dbc.Person.Select(x => new { x.Gender, x.FinancialTo })
                 .Where(x => x.FinancialTo >= term.Year)
                 .GroupBy(x => new
                 {
@@ -243,32 +250,58 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        public static IEnumerable<SankeyDataPoint> GetMemberParticipationSummary(U3ADbContext dbc, Term term)
+        public static async Task<IEnumerable<SankeyDataPoint>> GetMemberParticipationSummary(U3ADbContext dbc, Term term)
         {
             (DateTime?, string, string) e = new();
             var today = dbc.GetLocalTime().Date;
-            var enrolments = dbc.Enrolment
+            var enrolments = await dbc.Enrolment
                 .Include(x => x.Term)
                 .Include(x => x.Person)
                 .Include(x => x.Course).ThenInclude(x => x.CourseType)
                 .Where(x => x.Term.ID == term.ID)
-                .Select(x => new { x.Person.BirthDate, x.Course.CourseType.ShortName, x.Person.Gender });
-            var result = enrolments.AsEnumerable()
-                .GroupBy(x => new
-                {
-                    Age = (x.BirthDate == null) ? int.MinValue : GetAge(x.BirthDate.Value, today),
-                    Gender = x.Gender,
-                })
-                .Select(x => new SankeyDataPoint
-                {
-                    Group = "Age",
-                    Source = (x.Key.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Key.Age),
-                    Target = x.Key.Gender,
-                    Count = x.Count(),
-        })
-                .ToList();
+                .Select(x => new { x.Person.BirthDate, x.Course.CourseType.ShortName, x.Person.Gender })
+                .ToListAsync();
 
-            result.AddRange(enrolments.AsEnumerable()
+            // summaries for percentage calculations
+            var total = enrolments.Count();
+            var ages = enrolments
+                                .Select(x => new
+                                {
+                                    Age = (x.BirthDate == null) ? int.MinValue : GetAge(x.BirthDate.Value, today),
+
+                                });
+            var ageRangeSummary = ages.GroupBy(x => new
+            {
+                Category = (x.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Age),
+            });
+            var courseTypes = enrolments.GroupBy(x => new
+            {
+                Category = x.ShortName,
+            });
+            var genders = enrolments.GroupBy(x => new
+            {
+                Category = x.Gender
+            });
+
+            // The result set
+            var result = enrolments
+            .GroupBy(x => new
+            {
+                Age = (x.BirthDate == null) ? int.MinValue : GetAge(x.BirthDate.Value, today),
+                Gender = x.Gender,
+            })
+            .Select(x => new SankeyDataPoint
+            {
+                Group = "Age",
+                Source = (x.Key.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Key.Age),
+                Target = x.Key.Gender,
+                PivotSource = (x.Key.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Key.Age),
+                PivotTarget = x.Key.Gender,
+                Count = x.Count(),
+            }).OrderBy(x => x.Source).ThenBy(x => x.Target)
+            .ToList();
+
+            result.AddRange(enrolments
                 .GroupBy(x => new
                 {
                     Gender = x.Gender,
@@ -279,13 +312,41 @@ namespace U3A.BusinessRules
                     Group = "Course",
                     Source = x.Key.Gender,
                     Target = x.Key.CourseType,
+                    PivotSource = x.Key.Gender,
+                    PivotTarget = x.Key.CourseType,
                     Count = x.Count(),
-                }));
-            var t = result.Sum(x => x.Count);
+                }).OrderBy(x => x.Target).ThenBy(x => x.Source));
+
+            // Add the percentages to the labels
+            foreach (var r in result)
+            {
+                var ageRange = ageRangeSummary.FirstOrDefault(x => x.Key.Category == r.Source);
+                if (ageRange != null)
+                {
+                    r.Source = $"{r.Source}: {GetPercent(total, ageRange.Count())}";
+                }
+                var courseType = courseTypes.FirstOrDefault(x => x.Key.Category == r.Target);
+                if (courseType != null)
+                {
+                    r.Target = $"{r.Target}: {GetPercent(total, courseType.Count())}";
+                }
+                var gender = genders.FirstOrDefault(x => x.Key.Category == r.Source);
+                if (gender != null)
+                {
+                    r.Source = $"{r.Source}: {GetPercent(total, gender.Count())}";
+                }
+                gender = genders.FirstOrDefault(x => x.Key.Category == r.Target);
+                if (gender != null)
+                {
+                    r.Target = $"{r.Target}: {GetPercent(total, gender.Count())}";
+                }
+            }
             return result
-                .Where(x => x.Count != null && x.Count > 0)
-                .OrderBy(x => x.Source);
+            .Where(x => x.Count != null && x.Count > 0);
         }
+
+        private static string GetPercent(int total, int count) => (total <= 0) ? "0%" : $"{((double)count * 100 / total).ToString("n2")}%";
+
         private static int GetAge(DateTime birthDate, DateTime LocalTime)
         {
             var today = LocalTime.Date;
@@ -300,7 +361,7 @@ namespace U3A.BusinessRules
         public static List<MemberSummary> GetMemberSummaryByMshipLength(U3ADbContext dbc, Term term)
         {
             var today = dbc.GetLocalTime().Date;
-            var result = dbc.Person
+            var result = dbc.Person.Select(x => new { x.DateJoined, x.FinancialTo })
                 .Where(p => p.DateJoined != null && p.FinancialTo >= term.Year).AsEnumerable()
                 .GroupBy(p => GetAge(p.DateJoined.Value, dbc.GetLocalTime()))
                 .Select(g => new MemberSummary
@@ -315,7 +376,7 @@ namespace U3A.BusinessRules
         public static List<MemberSummary> GetMemberSummaryByDOB(U3ADbContext dbc, Term term)
         {
             var today = dbc.GetLocalTime().Date;
-            var result = dbc.Person
+            var result = dbc.Person.Select(x => new { x.BirthDate, x.FinancialTo })
                 .Where(p => p.BirthDate != null && p.FinancialTo >= term.Year).AsEnumerable()
                 .GroupBy(p => GetAge(p.BirthDate.Value, dbc.GetLocalTime()))
                 .Select(g => new MemberSummary

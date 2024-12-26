@@ -14,8 +14,8 @@ else
                 <DxSankey Data="@memberData"
                           Width="100%"
                           Height="100%"
-                          SourceFieldName="Source"
-                          TargetFieldName="Target"
+                          SourceFieldName="@nameof(SankeyDataPoint.Source)"
+                          TargetFieldName="@nameof(SankeyDataPoint.Target)"
                           WeightFieldName="Count"
                           RedrawOnResize="true">
                     <DxSankeyLinkSettings ColorMode="SankeyLinkColorMode.Gradient" />
@@ -33,10 +33,10 @@ else
                         <DxPivotTableField Field="@nameof(SankeyDataPoint.Group)"
                                            Area="@PivotTableArea.Row" Width="80"
                                            AreaIndex="0" />
-                        <DxPivotTableField Field="@nameof(SankeyDataPoint.Source)"
+                        <DxPivotTableField Field="@nameof(SankeyDataPoint.PivotSource)"
                                            Area="@PivotTableArea.Row" Width="100"
                                            AreaIndex="1" />
-                        <DxPivotTableField Field="@nameof(SankeyDataPoint.Target)"
+                        <DxPivotTableField Field="@nameof(SankeyDataPoint.PivotTarget)"
                                            Area="@PivotTableArea.Row" Width="100"
                                            AreaIndex="2" />
                         <DxPivotTableField Field="@nameof(SankeyDataPoint.Count)"
@@ -73,7 +73,7 @@ else
             var term = await BusinessRule.CurrentTermAsync(dbc);
             if (term != null)
             {
-                memberData = BusinessRule.GetMemberParticipationSummary(dbc, term);
+                memberData = await BusinessRule.GetMemberParticipationSummary(dbc, term);
             }
         }
         IsReady = true;
