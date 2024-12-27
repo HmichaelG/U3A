@@ -1,0 +1,48 @@
+﻿@inject WorkStation ws
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+@if (isXmas.HasValue)
+{
+    if (isXmas.Value)
+    {
+        <img class="sidebar-image" src="images/sidebar/xmas.svg" alt="xmas" />
+    }
+    else
+    {
+        <img class="@selectedImage?.CssClass" 
+            src="@($"images/sidebar/{selectedImage?.Filename}")" 
+            alt="@selectedImage?.MenuName" />
+    }
+
+}
+}
+
+@code {
+    bool? isXmas = null;
+    int? index = null;
+    SidebarImage? selectedImage;
+    Random rnd = new Random();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var images = new SidebarImages();
+        using (var dbc = U3Adbfactory.CreateDbContext())
+        {
+            var today = dbc.GetLocalDate();
+            var xmas = new DateTime(today.Year, 12, 25);
+            if (today > xmas.AddDays(-7) && today <= xmas)
+            {
+                isXmas = true;
+            }
+            else
+            {
+                isXmas = false;
+                index = rnd.Next(images.Count());
+                selectedImage = images.ElementAt(index.Value);
+            }
+        }
+
+    }
+
+}

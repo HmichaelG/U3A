@@ -27,41 +27,32 @@ else
             <Items>
                 <DxToolbarItem Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
                                CssClass="me-1 mb-1"
-                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                Text="Process Member" IconCssClass="bi bi-person" />
                 <DxToolbarItem Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
                                CssClass="me-1 mb-1"
-                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                Text="What's On Today" IconCssClass="bi bi-clock" />
                 <DxToolbarItem CssClass="me-1 mb-1"
-                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                Text="Attendance" IconCssClass="bi bi-person-check">
                     <Items>
                         <DxToolbarItem Click="@(() => buttonClick = buttonClicks.RecordAttendance)"
                                        RenderStyle="ButtonRenderStyle.Secondary"
-                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                        Text="Record Attendance" IconCssClass="bi bi-emoji-smile" />
                         <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceNotRecorded)"
                                        RenderStyle="ButtonRenderStyle.Secondary"
-                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                        Text="Attendance Not Recorded" IconCssClass="bi bi-emoji-angry" />
                         <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceSummary)"
                                        RenderStyle="ButtonRenderStyle.Secondary"
-                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                        Text="Attendance Summary" IconCssClass="bi bi-columns" />
                         <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceAnalyisis)"
                                        RenderStyle="ButtonRenderStyle.Secondary"
-                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                        Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
                     </Items>
                 </DxToolbarItem>
                 <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
-                               RenderStyle="ButtonRenderStyle.Light" CssClass="me-1 mb-1"
-                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                               CssClass="me-1 mb-1"
                                Text="Leader Report" IconCssClass="bi bi-printer" />
                 <DxToolbarItem Click="@(() => isDrawerOpen = !isDrawerOpen)"
-                               RenderStyle="ButtonRenderStyle.Light" CssClass="mb-1"
-                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                               CssClass="mb-1"
                                Text="Calendar" IconCssClass="bi bi-calendar"
                                Alignment="ToolbarItemAlignment.Right" />
             </Items>

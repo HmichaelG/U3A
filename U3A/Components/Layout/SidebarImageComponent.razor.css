@@ -1,0 +1,21 @@
+﻿@media (max-width: 768px) {
+    .sidebar-image {
+        display: none;
+    }
+
+    .menu-title {
+        margin-left: 2rem !important;
+        color: var(--bs-body-bg);
+    }
+}
+
+@media (min-width: 768px) {
+    .sidebar-image {
+        position: fixed;
+        left: 0px;
+        bottom: 0px;
+        width: 15rem;
+        object-fit: contain;
+    }
+
+}

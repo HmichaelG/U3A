@@ -61,36 +61,6 @@
     background-image: url("images/home.svg");
 }
 
-@media (max-width: 768px) {
-    ::deep .img-bg-flower,
-    .img-bg-xmas {
-        display: none;
-    }
-    .menu-title {
-        margin-left: 2rem !important;
-        color: var(--bs-body-bg);
-    }
-}
-
-@media (min-width: 768px) {
-    ::deep .img-bg-flower,
-    .img-bg-xmas {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 14.75rem;
-    }
-
-    ::deep .img-bg-flower {
-        height: 50%
-    }
-
-    ::deep .img-bg-xmas {
-        height: 35%
-    }
-}
-
-
 
 ::deep .footer {
     text-align: center;
