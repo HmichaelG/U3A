@@ -59,7 +59,7 @@ namespace U3A.UI.Reports
             List<Class> classes = new();
             if (term != null)
             {
-                classes = BusinessRule.GetClassDetails(DbContext, term, settings, ExludeOffScheduleActivities: false);
+                classes = BusinessRule.GetClassDetails(DbContext, term, settings, ExludeOffScheduleActivities: true);
             }
             foreach (var c in classes)
             {
