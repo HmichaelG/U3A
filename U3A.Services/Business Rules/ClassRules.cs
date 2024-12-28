@@ -193,7 +193,11 @@ namespace U3A.BusinessRules
                         .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name).ToList();
 
             Log.Information("{p1} Unique classes returned", TotalClassesRemainingInYear);
-            return classes;
+            return classes
+                .OrderByDescending(x => x.Course.IsFeaturedCourse)
+                .ThenBy(x => x.OnDayID)
+                .ThenBy(x => x.Course.Name)
+                .ToList();
         }
 
         static (int sameInClasses, int differentInClasses) GetEnrolmentTotals(IEnumerable<Class> classes)
@@ -276,14 +280,15 @@ namespace U3A.BusinessRules
         public static int GetRequiredTerm(int termNumber, Class c)
         {
             int Result = termNumber;
-            while (Result > 0)
+            while (Result < 5)
             {
                 if (Result == 1 && c.OfferedTerm1) return Result;
                 if (Result == 2 && c.OfferedTerm2) return Result;
                 if (Result == 3 && c.OfferedTerm3) return Result;
                 if (Result == 4 && c.OfferedTerm4) return Result;
-                Result--;
+                Result++;
             }
+            if (Result >= 5) { Result = 0; }
             return Result;
         }
         private static IEnumerable<Class> EnsureOneClassOnlyForSameParticipantsInEachClass(U3ADbContext dbc, IEnumerable<Class> classes)

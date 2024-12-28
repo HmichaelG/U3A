@@ -19,11 +19,14 @@ else
                         LabelPosition="LabelPosition.Right"
                         Alignment="CheckBoxContentAlignment.Right" />
         </DxFormLayoutItem>
-        <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
+        <DxFormLayoutItem Caption="Course Type" ColSpanMd="8">
             <DxComboBox Data="CourseTypes"
                         @bind-Value="@Course.CourseType"
                         TextFieldName="@nameof(CourseType.NameWithStatus)">
             </DxComboBox>
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Featured Course" ColSpanMd="4">
+            <DxCheckBox @bind-Checked="Course.IsFeaturedCourse" Alignment=CheckBoxContentAlignment.Right />
         </DxFormLayoutItem>
         <DxFormLayoutItem Caption="Participation Type" ColSpanMd="8">
             <DxComboBox Data="CourseParticipationTypes"

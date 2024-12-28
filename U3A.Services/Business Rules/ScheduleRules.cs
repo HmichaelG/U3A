@@ -166,7 +166,7 @@ namespace U3A.BusinessRules
                                     settings));
 
             // sort & return the result
-            return result.OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
+            return result.OrderByDescending(x => x.Course.IsFeaturedCourse).ThenBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
                 .ToList();
         }
         public static async Task<List<Class>> RestoreClassesFromMultiCampusScheduleAsync(U3ADbContext dbc,

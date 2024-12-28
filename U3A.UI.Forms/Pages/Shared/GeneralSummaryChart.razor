@@ -262,21 +262,21 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            term = await BusinessRule.CurrentTermAsync(dbc);
-            if (term != null)
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                memberData = await BusinessRule.GetMemberSummaryByGender(dbc, term);
-                enrolmentData = await BusinessRule.GetEnrolmentSummary(dbc, term);
-                waitlistData = await BusinessRule.GetWaitlistSummary(dbc, term);
-                attritionData = await BusinessRule.GetAttritionSummary(dbc, term);
-                membershipLengthData = BusinessRule.GetMemberSummaryByMshipLength(dbc, term);
-                membershipDOBData = BusinessRule.GetMemberSummaryByDOB(dbc, term);
+                term = await BusinessRule.CurrentTermAsync(dbc);
+                if (term != null)
+                {
+                    memberData = await BusinessRule.GetMemberSummaryByGender(dbc, term);
+                    enrolmentData = await BusinessRule.GetEnrolmentSummary(dbc, term);
+                    waitlistData = await BusinessRule.GetWaitlistSummary(dbc, term);
+                    attritionData = await BusinessRule.GetAttritionSummary(dbc, term);
+                    membershipLengthData = BusinessRule.GetMemberSummaryByMshipLength(dbc, term);
+                    membershipDOBData = BusinessRule.GetMemberSummaryByDOB(dbc, term);
+                }
             }
+            IsReady = true;
         }
-        IsReady = true;
-    }
 
     private void CustomizeGenderSeriesPoint(ChartSeriesPointCustomizationSettings settings)
     {

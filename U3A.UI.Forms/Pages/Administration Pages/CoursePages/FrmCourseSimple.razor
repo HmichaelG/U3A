@@ -12,14 +12,10 @@
                 <div class="flex-grow-1">
                     Course Detail
                 </div>
-                <div class="flex-grow-0 me-4">
+                <div class="flex-grow-0">
                     <DxCheckBox CssClass="align-content-end" tabindex="-1"
                                 @bind-Checked=@showFullDetail
                                 LabelPosition="LabelPosition.Left">Show Detail</DxCheckBox>
-                </div>
-                <div class="flex-grow-0">
-                    <DxCheckBox @bind-Checked="@Course.IsOffScheduleActivity"
-                                LabelPosition="LabelPosition.Left">Off-Schedule Activity?</DxCheckBox>
                 </div>
             </div>
         </HeaderContentTemplate>
@@ -29,11 +25,17 @@
                 <DxMaskedInput @bind-Value="Course.ConversionID"
                                Mask="@NumericMask.WholeNumber" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
+            <DxFormLayoutItem Caption="Course Type" ColSpanMd="6">
                 <DxComboBox Data="CourseTypes"
                             @bind-Value="Course.CourseType"
                             TextFieldName="@nameof(CourseType.NameWithStatus)">
                 </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Off-Schedule?" ColSpanMd="3">
+                <DxCheckBox @bind-Checked="Course.IsOffScheduleActivity" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Featured Course?" ColSpanMd="3">
+                <DxCheckBox @bind-Checked="Course.IsFeaturedCourse" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Course Name" ColSpanMd="12">
                 <DxTextBox @bind-Text="Course.Name" />

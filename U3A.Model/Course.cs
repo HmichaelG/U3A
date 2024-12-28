@@ -29,6 +29,9 @@ namespace U3A.Model
         [MaxLength(100)]
         public string Name { get; set; }
 
+        [FeaturedCourseCannotBeOffSchedule(ErrorMessage = "Featured courses cannot be off-schedule")]
+        public bool IsFeaturedCourse { get; set; }
+
         public DateTime? AllowMultiCampsuFrom { get; set; }
 
         [DefaultValue(" ")]
@@ -157,5 +160,27 @@ namespace U3A.Model
             return (string.IsNullOrWhiteSpace(text) || Uri.TryCreate(text, UriKind.Absolute, out uri));
         }
     }
+
+    public class FeaturedCourseCannotBeOffScheduleAttribute : ValidationAttribute
+    {
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            ErrorMessage = ErrorMessageString;
+
+            var offSchedule = validationContext.ObjectType.GetProperty("IsOffScheduleActivity");
+
+            if (offSchedule == null)
+                throw new ArgumentException("Property with this name not found");
+
+            var isOffSchedule = (bool)offSchedule.GetValue(validationContext.ObjectInstance);
+
+            if ((bool)value && isOffSchedule )
+                return new ValidationResult(ErrorMessage);
+
+            return ValidationResult.Success;
+        }
+    }
+
 
 }

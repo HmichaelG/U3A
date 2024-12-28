@@ -107,6 +107,10 @@ else
                             {
                                 <div class="mx-1 d-flex">
                                     <div class="flex-grow-1 @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
+                                        @if (c.Course.IsFeaturedCourse)
+                                        {
+                                            <div class="badge bg-primary me-1">Featured</div>
+                                        }
                                         @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
@@ -132,6 +136,10 @@ else
                                         <CaptionTemplate>
                                             <div class="mx-1 d-flex w-100 my-auto">
                                                 <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
+                                                    @if (c.Course.IsFeaturedCourse)
+                                                    {
+                                                        <div class="badge bg-primary me-1">Featured</div>
+                                                    }
                                                     @(HighlightSearchText(ClassTitle(c)))
                                                 </div>
                                             </div>
