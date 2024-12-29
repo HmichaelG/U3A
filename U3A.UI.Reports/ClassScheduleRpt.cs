@@ -63,10 +63,15 @@ namespace U3A.UI.Reports
             }
             foreach (var c in classes)
             {
+                // Force featured classes into its own group
+                if (c.Course.IsFeaturedCourse)
+                {
+                    c.OnDayID = -2;
+                }
                 // Force unscheduled class into its own group
                 if ((OccurrenceType)c.OccurrenceID == OccurrenceType.Unscheduled)
                 {
-                    c.OnDayID = -1;
+                    c.OnDayID = 99;
                 }
 
             }
@@ -146,6 +151,10 @@ namespace U3A.UI.Reports
             if ((OccurrenceType)c.OccurrenceID == OccurrenceType.Unscheduled)
             {
                 tableCellOnDay.Text = "Unscheduled (Varies)";
+            }
+            else if (c.Course.IsFeaturedCourse)
+            {
+                tableCellOnDay.Text = "Featured Course";
             }
             else
             {

@@ -120,7 +120,7 @@ namespace U3A.Model
         public int? OccurrenceID { get; set; }
         public Occurrence Occurrence { get; set; }
 
-        [Description("Optional. Number of recurrancies. Only set when not the end of term")]
+        [Description("Optional. Number of recurrencies. Only set when not the end of term")]
         public int? Recurrence { get; set; }
 
         public int OnDayID { get; set; }
