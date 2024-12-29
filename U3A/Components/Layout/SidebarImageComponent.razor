@@ -20,7 +20,6 @@
     bool? isXmas = null;
     int? index = null;
     SidebarImage? selectedImage;
-    Random rnd = new Random();
 
     protected override void OnInitialized()
     {
@@ -37,7 +36,7 @@
             else
             {
                 isXmas = false;
-                index = rnd.Next(images.Count());
+                index = Random.Shared.Next(images.Count());
                 selectedImage = images.ElementAt(index.Value);
             }
         }
