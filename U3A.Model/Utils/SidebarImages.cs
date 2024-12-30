@@ -1,4 +1,4 @@
-﻿namespace U3A;
+﻿namespace U3A.Model;
 
 public class SidebarImages : List<SidebarImage>
 {
@@ -9,6 +9,19 @@ public class SidebarImages : List<SidebarImage>
         Add(new SidebarImage { MenuName = "Pink Flower", Filename = "flower-pink.svg" });
         Add(new SidebarImage { MenuName = "Mandala", Filename = "mandala.svg" });
         Add(new SidebarImage { MenuName = "Elephant", Filename = "elephant.svg" });
+        Add(new SidebarImage { MenuName = "Sacred Energy", Filename = "energy.svg" });
+    }
+}
+
+public class SidebarImageMenuOptions : SidebarImages
+{
+    public SidebarImageMenuOptions()
+    {
+        // sort the base list by MenuName
+        Sort((a, b) => a.MenuName.CompareTo(b.MenuName));
+
+        Insert(0,new SidebarImage { MenuName = "Random Image", Filename = "" });
+        Add(new SidebarImage { MenuName = "No Image", Filename = "" });
     }
 }
 

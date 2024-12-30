@@ -8,10 +8,12 @@
 
 @attribute [Authorize]
 
-@if (!IsReady) {
+@if (!IsReady)
+{
     <LoadingIndicator />
 }
-else {
+else
+{
 
     <div class="container h-100">
         <div class="row  align-content-start">
@@ -28,31 +30,38 @@ else {
             <DataAnnotationsValidator />
             <ValidationSummary />
             <DxFormLayout>
-                <DxFormLayoutItem Caption="Menu Style" ColSpanMd="12">
-                    <DxRadioGroup Items="@menuTypes"
-                    TextFieldName="@nameof(MenuType.Title)"
-                    ValueFieldName="@nameof(MenuType.Key)"
-                    @bind-Value="@ws!.UseTopMenu" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Theme" ColSpanMd="12">
+                <DxFormLayoutGroup ColSpanMd="4">
+                    <DxFormLayoutItem Caption="Menu Style" ColSpanMd="12">
+                        <DxRadioGroup Items="@menuTypes"
+                                      TextFieldName="@nameof(MenuType.Title)"
+                                      ValueFieldName="@nameof(MenuType.Key)"
+                                      @bind-Value="@ws!.UseTopMenu" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Theme" ColSpanMd="12">
                     <DxRadioGroup Items="@themes"
-                    TextFieldName="@nameof(Theme.Title)"
-                    ValueFieldName="@nameof(Theme.Key)"
-                    @bind-Value="@ws.theme" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Font Size" ColSpanMd="12">
-                    <DxRadioGroup Items="@fontSizes"
-                    TextFieldName="@nameof(FontSize.Title)"
-                    ValueFieldName="@nameof(FontSize.Key)"
-                    @bind-Value="@ws.SizeMode" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem ColSpanMd="12">
-                    <Template>
-                        <DxButton SubmitFormOnClick="true" Text="Apply & Restart App" RenderStyle="@ButtonRenderStyle.Primary" CssClass="me-4" />
-                        <DxButton SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
-                    </Template>
-                </DxFormLayoutItem>
-
+                                    TextFieldName="@nameof(Theme.Title)"
+                                    ValueFieldName="@nameof(Theme.Key)"
+                                    @bind-Value="@ws.Theme" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Sidebar Image" ColSpanMd="12">
+                        <DxComboBox Data="@sidebarImageMenu"
+                                    TextFieldName="@nameof(SidebarImage.MenuName)"
+                                    ValueFieldName="@nameof(SidebarImage.MenuName)"
+                                    @bind-Value="@ws.SidebarImage" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Font Size" ColSpanMd="12">
+                        <DxRadioGroup Items="@fontSizes"
+                                      TextFieldName="@nameof(FontSize.Title)"
+                                      ValueFieldName="@nameof(FontSize.Key)"
+                                      @bind-Value="@ws.SizeMode" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <Template>
+                            <DxButton SubmitFormOnClick="true" Text="Apply & Restart App" RenderStyle="@ButtonRenderStyle.Primary" CssClass="me-4" />
+                            <DxButton SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
+                        </Template>
+                    </DxFormLayoutItem>
+                </DxFormLayoutGroup>
             </DxFormLayout>
         </EditForm>
     </div>
@@ -75,8 +84,8 @@ else {
         public string Title;
     }
     IEnumerable<MenuType> menuTypes = new[] { new MenuType() { Key = false, Title = "Use Sidebar" }, new MenuType() { Key = true, Title = "Use Top Menu" } };
-    IEnumerable<Theme> themes = new[] 
-        { 
+    IEnumerable<Theme> themes = new[]
+        {
             new Theme() { Key = "office-white", Title = "Office White" },
             new Theme() { Key = "blazing-berry", Title = "Blazing Berry" },
             new Theme() { Key = "blazing-dark", Title = "Blazing Dark" },
@@ -92,16 +101,21 @@ else {
         };
     string selectedTheme;
 
-    protected override async Task OnInitializedAsync() {
+    IEnumerable<SidebarImage> sidebarImageMenu = new SidebarImageMenuOptions();
+
+    protected override async Task OnInitializedAsync()
+    {
         IsReady = true;
     }
 
-    async void ValidFormSubmitted(EditContext editContext) {
+    async void ValidFormSubmitted(EditContext editContext)
+    {
         await ws.SetWorkstationDetail(localStorage);
-        NavigationManager.NavigateTo("/",true);
+        NavigationManager.NavigateTo("/", true);
     }
 
-    void Close() {
+    void Close()
+    {
         NavigationManager.NavigateTo("/");
     }
 

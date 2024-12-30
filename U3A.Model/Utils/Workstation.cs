@@ -16,12 +16,14 @@ namespace U3A.Model
         public string ID { get; private set; }
         public int SizeMode { get; set; }
 
-        public string theme;
+        public string Theme;
+        public string SidebarImage;
 
         const string WORKSTATION_ID = "WorkstationID";
         const string USE_TOP_MENU_KEY = "use-topmenu";
         const string SIZE_MODE = "size-mode";
         const string THEME = "theme";
+        const string SIDEBAR_IMAGE = "sidebar-image";
 
         public async Task GetWorkstationDetail(ILocalStorageService localStorage)
         {
@@ -46,10 +48,16 @@ namespace U3A.Model
                 SizeMode = await localStorage.GetItemAsync<int>(SIZE_MODE);
             }
             // theme
-            theme = "blazing-berry";
+            Theme = "blazing-berry";
             if (await localStorage.ContainKeyAsync(THEME))
             {
-                theme = await localStorage.GetItemAsync<string>(THEME);
+                Theme = await localStorage.GetItemAsync<string>(THEME);
+            }
+            // sidebar image
+            SidebarImage = "Random Image";
+            if (await localStorage.ContainKeyAsync(SIDEBAR_IMAGE))
+            {
+                SidebarImage = await localStorage.GetItemAsync<string>(SIDEBAR_IMAGE);
             }
 
         }
@@ -60,7 +68,9 @@ namespace U3A.Model
             // size mode
             await localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode);
             // theme
-            await localStorage.SetItemAsync<String>(THEME, theme);
+            await localStorage.SetItemAsync<String>(THEME, Theme);
+            // sidebar image
+            await localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage);
         }
     }
 }
