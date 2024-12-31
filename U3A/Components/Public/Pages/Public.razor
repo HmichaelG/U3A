@@ -34,7 +34,7 @@
 }
 else
 {
-    @if (isInteractive.HasValue && isInteractive.Value)
+    @if (isInteractive)
     {
         <DxGridLayout>
             <Rows>
@@ -184,7 +184,7 @@ else
         </DxGridLayout>
 
     }
-    if (isInteractive.HasValue && !isInteractive.Value)
+    if (!isInteractive)
     {
         <NotInteractive />
     }
@@ -211,7 +211,7 @@ else
     bool isNoEnrolmentTermAvailable = false;
     string lockoutMessage = string.Empty;
     bool isReady;
-    bool? isInteractive = null;
+    bool isInteractive = false;
 
     ErrorBoundary? errorBoundary;
     string? messageText;
@@ -223,6 +223,7 @@ else
         {
             settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
         }
+        isInteractive = false;
         isReady = true;
     }
 

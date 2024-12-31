@@ -16,7 +16,7 @@
 @inject WorkStation ws
 @implements IDisposable
 
-@if ( isInteractive.HasValue && isInteractive.Value)
+@if (isInteractive)
 {
     <div class="container-fluid">
         <DxFormLayout SizeMode="@sizeMode">
@@ -49,17 +49,17 @@
     </div>
 }
 
-@if (isInteractive.HasValue && !isInteractive.Value)
+@if (!isInteractive)
 {
     <NotInteractive />
 }
 <style>
     .container-main {
-        width: 100%;
-        padding-right: var(--bs-gutter-x, 0.50rem);
-        padding-left: var(--bs-gutter-x, 0.50rem);
-        margin-right: auto;
-        margin-left: auto;
+    width: 100%;
+    padding-right: var(--bs-gutter-x, 0.50rem);
+    padding-left: var(--bs-gutter-x, 0.50rem);
+    margin-right: auto;
+    margin-left: auto;
     }
 </style>
 
@@ -75,7 +75,7 @@
     U3ADbContext? dbc { get; set; }
     bool isReady = false;
     string? currentUrl;
-    bool? isInteractive;
+    bool isInteractive = false;
     SizeMode sizeMode;
 
     private DotNetObjectReference<MainLayout>? dotNetObjectReference;

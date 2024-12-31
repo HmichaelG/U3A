@@ -56,18 +56,18 @@
 
     <script>
         function GetTimezoneOffset() {
-            // Returns the time difference in minutes between UTC time and local time.
-            return new Date().getTimezoneOffset();
+        // Returns the time difference in minutes between UTC time and local time.
+        return new Date().getTimezoneOffset();
         }
     </script>
     <script>
 
         window.triggerFileDownload = (fileName, url) => {
-            const anchorElement = document.createElement('a');
-            anchorElement.href = url;
-            anchorElement.download = fileName ?? '';
-            anchorElement.click();
-            anchorElement.remove();
+        const anchorElement = document.createElement('a');
+        anchorElement.href = url;
+        anchorElement.download = fileName ?? '';
+        anchorElement.click();
+        anchorElement.remove();
         }
     </script>
 
