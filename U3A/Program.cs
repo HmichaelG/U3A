@@ -167,7 +167,7 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddRazorPages().AddRazorPagesOptions(o =>
 {
-    o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
+   // o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
 });
 
 constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
@@ -224,7 +224,7 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 });
 builder.Services.AddAntiforgery(options =>
 {
-    options.Cookie.Expiration = TimeSpan.FromSeconds(0);
+   // options.Cookie.Expiration = TimeSpan.FromSeconds(0);
 });
 
 var app = builder.Build();
@@ -248,8 +248,25 @@ app.UseHttpsRedirection();
 app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
-   .DisableAntiforgery()
+   //.DisableAntiforgery()
    .AddInteractiveServerRenderMode();
+
+app.UseAntiforgery();
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (BadHttpRequestException ex)
+    {
+        // Handle the exception
+        if (ex.InnerException is AntiforgeryValidationException)
+        {
+            context.Response.Redirect("/");
+        }
+    }
+});
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();

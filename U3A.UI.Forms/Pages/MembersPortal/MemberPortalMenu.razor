@@ -2,7 +2,7 @@
 
 @layout BasicLayout
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
-@inject NavigationManager NavigationManager
+@inject NavigationManager navMan
 @inject SignInManager<ApplicationUser> SignInMgr
 @inject IJSRuntime js
 @implements IDisposable;
@@ -177,7 +177,7 @@ else
                                 <DxButton Text="Logout, when you're finished"
                                           IconCssClass="menu-icon bi-door-closed me-1"
                                           CssClass="col-12 my-1"
-                                          Click="@(() => NavigationManager.NavigateTo("Account/Login",true))"
+                                          Click="OnLogout"
                                           RenderStyle="ButtonRenderStyle.Primary"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                 </DxButton>
@@ -416,6 +416,12 @@ else
         }
     }
 
+    private void OnLogout()
+    {
+        // forces a close of the menu when it is in mobile mode & expanded.
+        navMan.NavigateTo("javascript:document.getElementById('logout-form').submit();");
+    }
+
     void OnChangeEmail(MouseEventArgs e)
     {
         OnChangeCredential(e, "Email");
@@ -423,7 +429,7 @@ else
 
     void OnChangeCredential(MouseEventArgs e, string page)
     {
-        NavigationManager.NavigateTo("Account/Manage/" + page, true);
+        navMan.NavigateTo("Account/Manage/" + page, true);
     }
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)

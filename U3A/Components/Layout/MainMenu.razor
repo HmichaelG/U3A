@@ -193,7 +193,7 @@
                                 <Items>
                                     @if (IsTopMenu)
                                     {
-                                        <DxMenuItem NavigateUrl="Account/Login"
+                                        <DxMenuItem Click="OnLogout"
                                                     Text="Logout"
                                                     IconCssClass="menu-icon bi bi-door-open" />
                                     }
@@ -207,7 +207,7 @@
                             </DxMenuItem>
                             @if (!IsTopMenu)
                             {
-                                <DxMenuItem NavigateUrl="Account/Login"
+                                <DxMenuItem Click="OnLogout"
                                             Text="Logout"
                                             IconCssClass="menu-icon bi bi-door-open" />
                             }
@@ -291,6 +291,13 @@
     {
         await help!.ShowTopicAsync();
     }
+
+    private void OnLogout()
+    {
+        // forces a close of the menu when it is in mobile mode & expanded.
+        navMan.NavigateTo("javascript:document.getElementById('logout-form').submit();");
+    }
+
 
     async Task OnSwitchMenu()
     {
