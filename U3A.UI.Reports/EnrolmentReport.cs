@@ -20,8 +20,9 @@ public partial class EnrolmentReport : DevExpress.XtraReports.UI.XtraReport, IXt
     }
 
     public U3ADbContext DbContext { get; set; }
-
+    List<(Guid CourseID, Guid PersonID, string ClassStart)> AllEnrolmentsForDifferentParticipantsInEachClass;
     List<Course> Courses;
+
     private void CourseList_ParametersRequestSubmit(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
     {
         Guid id = (Guid)paramCourseYear.Value;
@@ -51,6 +52,8 @@ public partial class EnrolmentReport : DevExpress.XtraReports.UI.XtraReport, IXt
             objectDataSource1.DataSource = data;
             paramTermSummary.Value = term?.TermSummary;
             paramCourseYear.Value = term?.ID;
+            AllEnrolmentsForDifferentParticipantsInEachClass
+                = BusinessRule.AllEnrolmentsForDifferentParticipantsInEachClass(DbContext, term);
         }
     }
 
@@ -148,5 +151,27 @@ public partial class EnrolmentReport : DevExpress.XtraReports.UI.XtraReport, IXt
             result = course.Classes[0].TotalWaitlistedStudents;
         }
         return result;
+    }
+
+    private void xrCheckBox1_BeforePrint(object sender, CancelEventArgs e)
+    {
+        xrCheckBox1.Checked = false;
+        xrCheckBox1.Text = string.Empty;
+        Enrolment enrolment = GetCurrentRow() as Enrolment;
+        if (enrolment != null)
+        {
+            if (!enrolment.IsWaitlisted)
+            {
+                xrCheckBox1.Checked = true;
+                xrCheckBox1.Text = enrolment.DateEnrolled.Value.ToString(constants.STD_DATE_FORMAT);
+            }
+            else
+            {
+                var inOtherClass = AllEnrolmentsForDifferentParticipantsInEachClass
+                    .FirstOrDefault(x => x.CourseID == enrolment.CourseID && x.PersonID == enrolment.PersonID);
+                xrCheckBox1.Text = (inOtherClass == default) ? "Waitlisted" : inOtherClass.ClassStart;
+            }
+        }
+
     }
 }

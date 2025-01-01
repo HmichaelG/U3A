@@ -48,6 +48,12 @@ namespace U3A.BusinessRules
                                     .ToList();
 
         }
+
+        //call AllEnrolmentsForDifferentParticipantsInEachClassAsync synchronously using Task.Run
+        public static List<(Guid CourseID, Guid PersonID, string ClassStart)> AllEnrolmentsForDifferentParticipantsInEachClass(U3ADbContext dbc, Term SelectedTerm)
+        {
+            return Task.Run(() => AllEnrolmentsForDifferentParticipantsInEachClassAsync(dbc, SelectedTerm)).Result;
+        }
         public static async Task<List<(Guid CourseID, Guid PersonID, string ClassStart)>> AllEnrolmentsForDifferentParticipantsInEachClassAsync(U3ADbContext dbc, Term SelectedTerm)
         {
             var result = await dbc.Enrolment.IgnoreQueryFilters().AsNoTracking()

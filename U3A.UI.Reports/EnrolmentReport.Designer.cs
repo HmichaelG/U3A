@@ -43,7 +43,6 @@
             this.xrTableCell1 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell2 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell4 = new DevExpress.XtraReports.UI.XRTableCell();
-            this.xrTableCell8 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell6 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrCheckBox1 = new DevExpress.XtraReports.UI.XRCheckBox();
             this.xrTableCell9 = new DevExpress.XtraReports.UI.XRTableCell();
@@ -180,7 +179,6 @@
             this.xrTableCell1,
             this.xrTableCell2,
             this.xrTableCell4,
-            this.xrTableCell8,
             this.xrTableCell6,
             this.xrTableCell9,
             this.xrTableCell10});
@@ -214,18 +212,7 @@
             this.xrTableCell4.Multiline = true;
             this.xrTableCell4.Name = "xrTableCell4";
             this.xrTableCell4.Text = "xrTableCell4";
-            this.xrTableCell4.Weight = 1.1966695756587062D;
-            // 
-            // xrTableCell8
-            // 
-            this.xrTableCell8.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[EnrolmentStatusText]")});
-            this.xrTableCell8.Multiline = true;
-            this.xrTableCell8.Name = "xrTableCell8";
-            this.xrTableCell8.StylePriority.UseTextAlignment = false;
-            this.xrTableCell8.Text = "xrTableCell8";
-            this.xrTableCell8.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell8.Weight = 0.38992289085140913D;
+            this.xrTableCell4.Weight = 1.1999140286593784D;
             // 
             // xrTableCell6
             // 
@@ -236,17 +223,18 @@
             this.xrTableCell6.StylePriority.UseTextAlignment = false;
             this.xrTableCell6.Text = "xrTableCell6";
             this.xrTableCell6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
-            this.xrTableCell6.Weight = 0.10418625499899335D;
+            this.xrTableCell6.Weight = 0.4908646928497305D;
             // 
             // xrCheckBox1
             // 
-            this.xrCheckBox1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "CheckBoxState", "Iif([IsWaitlisted],\'Unchecked\' , \'Checked\')")});
-            this.xrCheckBox1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
+            this.xrCheckBox1.AnchorHorizontal = ((DevExpress.XtraReports.UI.HorizontalAnchorStyles)((DevExpress.XtraReports.UI.HorizontalAnchorStyles.Left | DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right)));
+            this.xrCheckBox1.GlyphOptions.Alignment = DevExpress.Utils.HorzAlignment.Far;
+            this.xrCheckBox1.LocationFloat = new DevExpress.Utils.PointFloat(3.051758E-05F, 0F);
             this.xrCheckBox1.Name = "xrCheckBox1";
             this.xrCheckBox1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
-            this.xrCheckBox1.SizeF = new System.Drawing.SizeF(23F, 23F);
+            this.xrCheckBox1.SizeF = new System.Drawing.SizeF(107.131F, 23F);
             this.xrCheckBox1.Text = " ";
+            this.xrCheckBox1.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrCheckBox1_BeforePrint);
             // 
             // xrTableCell9
             // 
@@ -1178,7 +1166,7 @@
             this.DetailCaption1,
             this.DetailData1,
             this.PageInfo});
-            this.Version = "24.1";
+            this.Version = "24.2";
             this.ParametersRequestBeforeShow += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.CourseList_ParametersRequestBeforeShow);
             this.ParametersRequestSubmit += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.CourseList_ParametersRequestSubmit);
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).EndInit();
@@ -1253,7 +1241,6 @@
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell1;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell2;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell4;
-        private DevExpress.XtraReports.UI.XRTableCell xrTableCell8;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell9;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell10;
         private DevExpress.XtraReports.UI.GroupHeaderBand groupHeaderBand1;
