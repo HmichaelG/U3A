@@ -138,10 +138,10 @@ else
                                 </DxGridDataColumn>
                                 <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />
                                 <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
-                                <DxGridDataColumn Caption="Other-Class?"
+                                <DxGridDataColumn Caption="Other Class"
                                                   FieldName="EnrolledInOtherClass"
                                                   Visible=@(selectedCourse?.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass)
-                                                  UnboundType="GridUnboundColumnType.Boolean" Width="7rem" />
+                                                  UnboundType="GridUnboundColumnType.String" Width="6rem" />
                                 <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
                                                   Width="5rem" Visible="@settings.RequireVaxCertificate" />
                                 <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialToBriefText" Width="4rem" />
@@ -335,7 +335,7 @@ else
     MemberFeeCalculationService service;
     bool hasMultiCampusVisitors = false;
 
-    List<(Guid CourseID, Guid PersonID)> AllEnrolmentsForDifferentParticipantsInEachClass;
+    List<(Guid CourseID, Guid PersonID, string ClassStart)> AllEnrolmentsForDifferentParticipantsInEachClass;
 
     protected override async Task OnInitializedAsync()
     {
@@ -395,7 +395,7 @@ else
         }
         if (e.FieldName == "EnrolledInOtherClass")
         {
-            e.Value = false;
+            e.Value = string.Empty;
             Guid pID = (Guid)e.GetRowValue("PersonID");
             Guid cID = (Guid)e.GetRowValue("CourseID");
             bool wl = (bool)e.GetRowValue("IsWaitlisted");
@@ -403,7 +403,7 @@ else
             {
                 var inOtherClass = AllEnrolmentsForDifferentParticipantsInEachClass
                                     .FirstOrDefault(x => x.PersonID == pID && x.CourseID == cID);
-                e.Value = (inOtherClass == default) ? false : true;
+                e.Value = (inOtherClass == default) ? string.Empty : inOtherClass.ClassStart;
             }
         }
     }
