@@ -48,6 +48,22 @@ namespace U3A.BusinessRules
                                     .ToList();
 
         }
+        public static async Task<List<(Guid CourseID, Guid PersonID)>> AllEnrolmentsForDifferentParticipantsInEachClassAsync(U3ADbContext dbc, Term SelectedTerm)
+        {
+            var result = await dbc.Enrolment.IgnoreQueryFilters().AsNoTracking()
+                                .Include(x => x.Term)
+                                .Include(x => x.Course)
+                                .Include(x => x.Person)
+                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted
+                                                    && x.Course.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass
+                                                    && x.TermID == SelectedTerm.ID
+                                                    && x.Person.DateCeased == null
+                                                    && !x.IsWaitlisted)
+                                .Select(x => new { x.CourseID, x.PersonID })
+                                .ToListAsync();
+
+            return result.Select(x => (x.CourseID, x.PersonID)).ToList();
+        }
 
         public static async Task<List<Enrolment>> GetEnrolmentIncludeLeadersAsync(U3ADbContext dbc,
                                                   Course thisCourse, Class thisClass, Term thisTerm)

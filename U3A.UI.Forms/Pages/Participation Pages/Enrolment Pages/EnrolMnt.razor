@@ -138,6 +138,10 @@ else
                                 </DxGridDataColumn>
                                 <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />
                                 <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
+                                <DxGridDataColumn Caption="Other-Class?"
+                                                  FieldName="EnrolledInOtherClass"
+                                                  Visible=@(selectedCourse?.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass)
+                                                  UnboundType="GridUnboundColumnType.Boolean" Width="7rem" />
                                 <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
                                                   Width="5rem" Visible="@settings.RequireVaxCertificate" />
                                 <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialToBriefText" Width="4rem" />
@@ -331,6 +335,8 @@ else
     MemberFeeCalculationService service;
     bool hasMultiCampusVisitors = false;
 
+    List<(Guid CourseID, Guid PersonID)> AllEnrolmentsForDifferentParticipantsInEachClass;
+
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
@@ -387,6 +393,19 @@ else
             decimal fee = 0;
             if (feesDue.TryGetValue(p.ID, out fee)) { e.Value = fee; }
         }
+        if (e.FieldName == "EnrolledInOtherClass")
+        {
+            e.Value = false;
+            Guid pID = (Guid)e.GetRowValue("PersonID");
+            Guid cID = (Guid)e.GetRowValue("CourseID");
+            bool wl = (bool)e.GetRowValue("IsWaitlisted");
+            if (wl)
+            {
+                var inOtherClass = AllEnrolmentsForDifferentParticipantsInEachClass
+                                    .FirstOrDefault(x => x.PersonID == pID && x.CourseID == cID);
+                e.Value = (inOtherClass == default) ? false : true;
+            }
+        }
     }
 
     async Task OnWaitlistedChanged(bool isWaitlisted)
@@ -431,6 +450,8 @@ else
         courseComboNullText = "Loading Course & Enrolment data ... please wait";
         StateHasChanged();
         courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
+        AllEnrolmentsForDifferentParticipantsInEachClass =
+            await BusinessRule.AllEnrolmentsForDifferentParticipantsInEachClassAsync(dbc, selectedTerm);
         courseComboNullText = string.Empty;
         courseComboEnabled = true;
         IsSetSelectionEnrolledEnabled = (selectedTerm.Comparer <= currentTerm.Comparer);

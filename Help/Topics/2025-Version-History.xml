@@ -1,14 +1,27 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-01-01T08:20:03.599+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-01-01T17:21:09.012+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>2025 Version History</title>
   <body>
     <header>
       <para styleclass="Heading1">2025 Version History</para>
     </header>
-    <para styleclass="Heading2">Reports</para>
-    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; font-style:italic; color:#000000;">
+    <para styleclass="Heading2"><text style="font-weight:bold;">Version 2025.1.1</text></para>
+    <para styleclass="Heading3">Reports</para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">Added new report, <text style="font-style:italic;">Unsuccessful Requests List</text>. This is a report of members who have requested enrollment in one or more classes but are waitlisted in all. In other words, all their enrollment requests have thus far been unsuccessful.</li>
+    </list>
+    <para styleclass="Heading3">Add/Edit Courses</para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">A new column, <text style="font-style:italic;">1 per Student</text> is now displayed on the grid. It will be checked if a course with multiple classes is restricted to one class per student.</li>
+    </list>
+    <para styleclass="Heading3">Enroll Participants</para>
+    <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">A new column, <text style="font-style:italic;">Other Class</text> is now displayed on the grid if the course participation type is <text style="font-style:italic;">Different participants in each class</text>. The column will be ticked if...</li>
+      <list id="2" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+        <li styleclass="Normal">the participant is waitlisted in the current class, and</li>
+        <li styleclass="Normal">The participant is enrolled in another class in that course.</li>
+      </list>
     </list>
   </body>
 </topic>

@@ -46,6 +46,12 @@ namespace U3A.Model
         public CourseParticipationType CourseParticipationType { get; set; }
         public bool EnforceOneStudentPerClass { get; set; } = true; // Ooops! One Class Per Student
 
+        public bool OneStudentPerClass { 
+            get {
+                return (((ParticipationType)CourseParticipationTypeID) == ParticipationType.DifferentParticipantsInEachClass && EnforceOneStudentPerClass);
+            }
+        }
+
         [Required]
         [Precision(precision: 18, 2)]
         [DefaultValue(0.00)]

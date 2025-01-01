@@ -2,6 +2,7 @@
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
+@inject NavigationManager navMan
 
 @if (isReady)
 {
@@ -78,7 +79,7 @@
               HeaderText="Help">
         <BodyTextTemplate>
             <iframe src="@helpFile" class="iframe-size p-1"></iframe>
-        </BodyTextTemplate>
+</BodyTextTemplate>
     </DxWindow>
 }
 
