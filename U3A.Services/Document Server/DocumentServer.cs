@@ -106,6 +106,8 @@ namespace U3A.Services
             resultServer.Document.CalculateDocumentVariable += Document_CalculateDocumentVariable;
             IEmailSender = EmailFactory.GetEmailSender(dbc);
             if (IEmailSender != null) { IEmailSender.BatchEmailSentEvent += IEmailSender_BatchEmailSentEvent; }
+            server.Document.EmbedFonts = true;
+            resultServer.Document.EmbedFonts = true;
         }
 
         public async Task ConvertDocx2Html(DocumentTemplate DocumentTemplate)

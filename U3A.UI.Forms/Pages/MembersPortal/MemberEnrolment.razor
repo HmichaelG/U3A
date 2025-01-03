@@ -114,9 +114,9 @@ else
                                         @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
-                                                    (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                                    ? $" | {c.Course.OfferedBy}" : "")
-                                                        )
+                                                (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                ? $" | {c.Course.OfferedBy}" : "")
+                                                    )
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
@@ -672,7 +672,7 @@ else
         Logger.LogInformation("Member Enrolment: OnInitializedAsync() {duration}ms", watch.ElapsedMilliseconds);
 
         IsReady = true;
-        await ShowSelectedClasses();
+        await ShowSelectedClasses(scrollToTop: true);
         await OneReadyStatusChanged.InvokeAsync(true); // enable external user input
     }
 
@@ -929,13 +929,15 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
-    async Task ShowSelectedClasses()
+    async Task ShowSelectedClasses(bool scrollToTop)
     {
         selectedClass = null;
+        int currentRow = -1;        
         if (IsEnrolmentRequestView || IsPreview)
         {
             //Enrolment request view
             filterText = null;
+            if (scrollToTop && listGrid != null) { currentRow = listGrid.GetStartRowVisibleIndex(); }
             await GetData();
             isListboxShowingSummary = false;
         }
@@ -945,8 +947,15 @@ else
             ListboxData = selectedClasses;
             isListboxShowingSummary = true;
         }
+        if (scrollToTop) 
+        { 
+            ScrollListboxToTop(); 
+        }
+        else if (currentRow >= 0)
+        {
+            listGrid?.MakeRowVisible(currentRow);
+        }
         SetReviewButtonText();
-        ScrollListboxToTop();
     }
 
     async Task GetData()
@@ -1101,7 +1110,7 @@ else
                 }
                 finally
                 {
-                    await ShowSelectedClasses();
+                    await ShowSelectedClasses(scrollToTop: false);
                     listGrid.EndUpdate();
                     isWorking = false;
                 }
