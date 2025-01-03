@@ -1,27 +1,29 @@
 ﻿@inject WorkStation ws
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-@if (ws!.SidebarImage != "No Image" && today.HasValue)
-{
-    switch (today.Value)
+<div class="justify-content-center align-content-center w-100">
+    @if (ws!.SidebarImage != "No Image" && today.HasValue)
     {
-        case DateTime x when x.Month == 12 && x.Day == 25: //Christmas Day
-            {
-                <img class="sidebar-image" src="images/sidebar/xmas.svg" alt="xmas" />
-            }
-            break;
-        case DateTime x when x.Month == 1 && x.Day == 26: //Australia Day
-            {
-                <img class="sidebar-image" src="images/sidebar/koala.svg" alt="koala" />
-            }
-            break;
-        default:
-            {
-                <img class="@selectedImage?.CssClass" src="images/sidebar/@selectedImage?.Filename" alt="@selectedImage?.MenuName" />
-            }
-            break;
+        switch (today.Value)
+        {
+            case DateTime x when x.Month == 12 && x.Day == 25: //Christmas Day
+                {
+                    <img class="sidebar-image" src="images/sidebar/xmas.svg" alt="xmas" />
+                }
+                break;
+            case DateTime x when x.Month == 1 && x.Day == 26: //Australia Day
+                {
+                    <img class="sidebar-image" src="images/sidebar/koala.svg" alt="koala" />
+                }
+                break;
+            default:
+                {
+                    <img class="@selectedImage?.CssClass" src="images/sidebar/@selectedImage?.Filename" alt="@selectedImage?.MenuName" />
+                }
+                break;
+        }
     }
-}
+</div>
 
 @code {
     int? index = null;

@@ -56,12 +56,7 @@ else
                 <div class="mx-2">
                     Register participants in courses and/or activities offered in the selected term.
                 </div>
-                <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
-                                   ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
-                                   ExpandedChanged="@(async () => {
-                                                                    areDetailsExpanded = !areDetailsExpanded;
-                                                                    fullScreen.RefreshLayout(!areDetailsExpanded);
-                                                                    })">
+                <DxFormLayoutGroup Caption="Enrolment Details">
                     <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms"
                                        @bind-SelectedTerm="@selectedTerm"
@@ -94,7 +89,7 @@ else
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
 
-                <FullScreen @ref="@fullScreen" DisplayOffset="19">
+                <FullScreen @ref="@fullScreen" DisplayOffset="15">
                     <ContentTemplate>
                         <DxGrid Data="@Enrolments" @ref=@mainGrid
                                 ShowAllRows="true"
@@ -263,7 +258,6 @@ else
     bool IsReady;
     int ShowEnrolmentType;
     SystemSettings? settings;
-    bool areDetailsExpanded = true;
 
     private List<Enrolment>? Enrolments { get; set; }
     Enrolment? thisEnrolment;
