@@ -92,7 +92,6 @@ Log.Logger = new LoggerConfiguration()
                             )
     .CreateLogger();
 
-//.Services.AddSerilog();
 builder.Host.UseSerilog(Log.Logger);
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
@@ -140,15 +139,6 @@ builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
     });
 });
 
-// ***
-// If a DxComboBox does not displaye its bind value correctly,
-// temporarially uncomment the following line.
-// Correct the issue by overiding GetHashCode & Equals in the class.
-// Refer to Term & Person for inspiration.
-// ***
-
-//DevExpress.Blazor.CompatibilitySettings.ComboBoxCompatibilityMode = true;
-
 builder.Services.AddDevExpressServerSideBlazorReportViewer();
 builder.Services.AddDevExpressBlazor(options =>
 {
@@ -165,10 +155,7 @@ builder.Services.Configure<reCAPTCHAVerificationOptions>(o =>
 builder.Services.AddTransient<ReCaptchaV2API>();
 builder.Services.AddHttpClient();
 
-builder.Services.AddRazorPages().AddRazorPagesOptions(o =>
-{
-   // o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
-});
+builder.Services.AddRazorPages();
 
 constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
 
@@ -248,7 +235,6 @@ app.UseHttpsRedirection();
 app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
-   //.DisableAntiforgery()
    .AddInteractiveServerRenderMode();
 
 app.UseAntiforgery();
