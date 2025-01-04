@@ -18,17 +18,12 @@
          AllowDrag=true
          HeaderText="Communicate">
     <HeaderContentTemplate>
-        <DxButton Click="@OnCollapseClick"
-                  tooltip="Click to display full screen"
-                  CssClass="toggle-button"
-                  IconCssClass="bi bi-arrow-left-circle"
-                  RenderStyle="ButtonRenderStyle.Secondary" />
         <div class="h6">Communicate</div>
     </HeaderContentTemplate>
     <BodyContentTemplate Context="PopupContext">
         <DxFormLayout>
             <div class="row vw-100 m-1">
-                <div class="col col-4 show-hide">
+                <div class="col col-4">
                     <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
                     <div class="alert alert-warning text-dark text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
                         The mail system is currently disabled or in sandbox mode.<br />
@@ -104,7 +99,7 @@
                     </div>
                 </div>
 
-                <div class="@($"{editorDiv}")">
+                <div class="col col-8">
                     @if (pdfVisible)
                     {
                         <div class="preview">
@@ -156,10 +151,6 @@
         font-size: 16px;
     }
 
-    .show-hide {
-        display: @showHideText;
-    }
-
     .warning-style {
         display: @((isEmailEnabled) ? "block" : "none");
     }
@@ -200,8 +191,6 @@
     List<string?> attachments = new List<string>();
     AttachFile attachFile;
     byte[] pdfContent;
-    string showHideText = "inline";
-    string editorDiv = "col col-8";
     Progress? progressBar;
     bool isEmailEnabled;
 
@@ -235,12 +224,6 @@
         });
         StateHasChanged();
         return tcs.Task;
-    }
-
-    void OnCollapseClick()
-    {
-        showHideText = (showHideText == "inline") ? "none" : "inline";
-        editorDiv = (showHideText == "inline") ? "col col-8" : "col col-12";
     }
 
     void OnAttachedItemsChanged(IEnumerable<string> items)
@@ -423,7 +406,7 @@
         ribbon.Tabs.Clear();
         IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab("File");
         IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
-        IBarButton mm = newFileGroup.Items.AddCustomButton("Mail Merge", MailMergeDocumentAsync);
+        IBarButton mm = newFileGroup.Items.AddCustomButton("Show/Preview Mail", MailMergeDocumentAsync);
         newFileGroup.Items.Add("FullScreen");
         mm.IconCssClass = "icon-size bi-envelope";
         ribbon.Tabs.Add("Home");
