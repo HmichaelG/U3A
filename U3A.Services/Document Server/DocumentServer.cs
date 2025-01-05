@@ -1,4 +1,5 @@
 ﻿using DevExpress.Pdf;
+using DevExpress.Drawing;
 using DevExpress.XtraPrinting;
 using DevExpress.XtraRichEdit;
 using DevExpress.XtraRichEdit.API.Native;
@@ -12,10 +13,17 @@ using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
+using AngleSharp;
+using AngleSharp.Dom;
+using AngleSharp.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
+using static DevExpress.XtraPrinting.Native.ExportOptionsPropertiesNames;
+
 
 namespace U3A.Services;
 
-public partial class DocumentServer
+public partial class DocumentServer : IDisposable
 {
     public event EventHandler<DocumentSentEventArgs> DocumentSentEvent;
 
@@ -92,6 +100,7 @@ public partial class DocumentServer
     IEmailService IEmailSender;
     ISMSSender ISMSSender;
     U3ADbContext dbc;
+    private bool disposedValue;
 
     public DocumentServer(U3ADbContext dbc)
     {
@@ -109,6 +118,14 @@ public partial class DocumentServer
         resultServer.Document.EmbedFonts = true;
     }
 
+    private static void Report_QueryNotFoundFont(object sender, NotFoundFontEventArgs e)
+    {
+        if (e.RequestedFont == "Sankofa Display")
+        {
+            string font = Environment.CurrentDirectory + "\\Data\\SankofaDisplay-Regular.ttf";
+            e.FontFileData = File.ReadAllBytes(font);
+        }
+    }
     public async Task ConvertDocx2Html(DocumentTemplate DocumentTemplate)
     {
         await Task.Run(() =>
@@ -440,7 +457,7 @@ public partial class DocumentServer
         using (var ms = new MemoryStream())
         {
             var opts = new PdfExportOptions() { ImageQuality = PdfJpegImageQuality.Highest };
-            resultServer.ExportToPdf(ms, opts);
+            resultServer.ExportToPdf(ms);
             ms.Position = 0;
             result = ms.ToArray();
         }
@@ -525,6 +542,37 @@ public partial class DocumentServer
             src.MailMerge(dstServer.Document);
         }
         else dstServer.Text = "*** You have no enrolments in the current Term ***";
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // TODO: dispose managed state (managed objects)
+                server.Dispose();
+                resultServer.Dispose();
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            disposedValue = true;
+        }
+    }
+
+    // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+    // ~DocumentServer()
+    // {
+    //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+    //     Dispose(disposing: false);
+    // }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }
 

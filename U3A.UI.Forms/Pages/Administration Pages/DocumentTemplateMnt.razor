@@ -4,6 +4,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
 @using DevExpress.Drawing.Printing
+@using DevExpress.Drawing
 
 @attribute [Authorize]
 
@@ -100,6 +101,7 @@ else
                         <div class="alert-danger text-dark text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
                         <DxRichEdit DocumentContent="@DocumentContent"
                                     CheckSpelling=true
+                                    CustomizeRibbon="OnCustomizeRichEditToolbar"
                                     DocumentFormat="DocumentFormat.Rtf"
                                     DocumentLoaded="OnDocumentLoaded"
                                     @ref="richEdit" CssClass="w-100">
@@ -266,6 +268,31 @@ else
             Console.WriteLine($"{nameof(OperationCanceledException)} thrown with message: {e.Message}");
         }
     }
+
+    void OnCustomizeRichEditToolbar(IRibbon ribbon)
+    {
+        SetupFonts(ribbon.Tabs);
+    }
+
+    void SetupFonts(RibbonTabCollection tabs)
+    {
+        IRibbonTab homeTab = tabs[RichEditRibbonTabNames.Home];
+        IBarGroup homeFontGroup = homeTab.Groups[RichEditRibbonGroupNames.HomeFont];
+        IBarItem fontNameItem = homeFontGroup.Items[RichEditBarItemNames.FontName];
+        if (fontNameItem.Type == BarItemTypes.ComboBox)
+        {
+            IBarComboBox fontNameComboBox = (IBarComboBox)fontNameItem;
+            fontNameComboBox.Items.Clear();
+            foreach (var font in DXFontRepository.Instance.GetFonts())
+            {
+                if (!fontNameComboBox.Items.Any(x => x.Text == font.Name))
+                {
+                    fontNameComboBox.Items.Add(font.Name, font.Name);
+                }
+            }
+        }
+    }
+
 
     async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
     {

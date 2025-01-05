@@ -2,6 +2,7 @@
 @using U3A.Model
 @using DevExpress.Drawing.Printing
 @using U3A.UI.Reports.Pages
+@using DevExpress.Drawing
 
 @inject TenantInfoService tenantService
 
@@ -413,6 +414,26 @@
         ribbon.Tabs.Add("Insert");
         ribbon.Tabs.Add("View");
         ribbon.Tabs.Add("MailMerge");
+        SetupFonts(ribbon.Tabs);
+    }
+
+    void SetupFonts(RibbonTabCollection tabs)
+    {
+        IRibbonTab homeTab = tabs[RichEditRibbonTabNames.Home];
+        IBarGroup homeFontGroup = homeTab.Groups[RichEditRibbonGroupNames.HomeFont];
+        IBarItem fontNameItem = homeFontGroup.Items[RichEditBarItemNames.FontName];
+        if (fontNameItem.Type == BarItemTypes.ComboBox)
+        {
+            IBarComboBox fontNameComboBox = (IBarComboBox)fontNameItem;
+            fontNameComboBox.Items.Clear();
+            foreach (var font in DXFontRepository.Instance.GetFonts())
+            {
+                if (!fontNameComboBox.Items.Any(x => x.Text == font.Name))
+                {
+                    fontNameComboBox.Items.Add(font.Name, font.Name);
+                }
+            }
+        }
     }
 
     async Task MailMergeDocumentAsync()
@@ -423,11 +444,9 @@
             await richEdit.SaveDocumentAsync();
             if (SelectedDocumentTemplate.Content != null)
             {
-                await progressBar.ShowSmallSpinnerAsync();
                 var server = new DocumentServer(dbContext);
                 pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
                                                             ExportData, OverrideCommunicationPreference);
-                await progressBar.Close();
             }
             else
             {
