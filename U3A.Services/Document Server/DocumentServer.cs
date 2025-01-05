@@ -13,13 +13,6 @@ using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
-using AngleSharp;
-using AngleSharp.Dom;
-using AngleSharp.Html;
-using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
-using static DevExpress.XtraPrinting.Native.ExportOptionsPropertiesNames;
-
 
 namespace U3A.Services;
 
