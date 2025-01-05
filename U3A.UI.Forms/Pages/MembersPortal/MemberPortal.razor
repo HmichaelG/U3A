@@ -168,19 +168,26 @@ else
         }
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         Title = settings?.U3AGroup;
-        bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, await GetPersonAsync());
-        if (hasUnprocessedPayments)
+        if (await GetPersonAsync() == null)
         {
-            menuSelection = PortalMenuSelection.DoMemberPayment;
+            menuSelection = PortalMenuSelection.DoMemberMaintenance;
         }
         else
         {
-            await GetQRRequestedClass();
-            if (QRClassID != null)
+            bool hasUnprocessedPayments = await BusinessRule.HasUnprocessedOnlinePayment(dbc, await GetPersonAsync());
+            if (hasUnprocessedPayments)
             {
-                menuSelection = PortalMenuSelection.DoRequestMemberEnrolment;
+                menuSelection = PortalMenuSelection.DoMemberPayment;
             }
-            else { menuSelection = PortalMenuSelection.ShowMenu; }
+            else
+            {
+                await GetQRRequestedClass();
+                if (QRClassID != null)
+                {
+                    menuSelection = PortalMenuSelection.DoRequestMemberEnrolment;
+                }
+                else { menuSelection = PortalMenuSelection.ShowMenu; }
+            }
         }
         IsReady = true;
     }
