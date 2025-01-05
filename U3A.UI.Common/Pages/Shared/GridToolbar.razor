@@ -15,106 +15,106 @@
 <MessageBox @ref=messageBox />
 
 <NavigationLock ConfirmExternalNavigation="@(IsGridEditing())"
-                OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" hidden="@(!Visible)"
-           ItemClick="OnItemClick">
+ItemClick="OnItemClick">
     <Items>
         @CustomButtonContentAtStart
         <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
-                       Visible="@(LinkedGrid?.GetGroupCount() > 0 && !HideGroupPanel)"
-                       BeginGroup="true"
-                       Alignment="ToolbarItemAlignment.Left">
+        Visible="@(LinkedGrid?.GetGroupCount() > 0 && !HideGroupPanel)"
+        BeginGroup="true"
+        Alignment="ToolbarItemAlignment.Left">
             <Items>
                 <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
-                               Name="CollapseGroups" Text="Collapse Group Rows"
-                               Tooltip="Collapse grouped rows">
+                Name="CollapseGroups" Text="Collapse Group Rows"
+                Tooltip="Collapse grouped rows">
                 </DxToolbarItem>
                 <DxToolbarItem IconCssClass="bi bi-arrows-expand"
-                               Name="ExpandGroups" Text="Expand Group Rows"
-                               Tooltip="Expand grouped rows">
+                Name="ExpandGroups" Text="Expand Group Rows"
+                Tooltip="Expand grouped rows">
                 </DxToolbarItem>
                 <DxToolbarItem BeginGroup IconCssClass="bi bi-calendar3" Text="Group Dates By">
                     <Items>
                         <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Day" Text="Day"
-                                       Tooltip="Group dates by day">
+                        Tooltip="Group dates by day">
                         </DxToolbarItem>
                         <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Month" Text="Month"
-                                       Tooltip="Group dates by month">
+                        Tooltip="Group dates by month">
                         </DxToolbarItem>
                         <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Year" Text="Year"
-                                       Tooltip="Group dates by year">
+                        Tooltip="Group dates by year">
                         </DxToolbarItem>
                     </Items>
                 </DxToolbarItem>
             </Items>
         </DxToolbarItem>
         <DxToolbarItem IconCssClass="bi bi-collection" Text="Master/Detail" Visible=@IsMasterDetail
-                       Alignment="ToolbarItemAlignment.Right"
-                       BeginGroup=true>
+        Alignment="ToolbarItemAlignment.Right"
+        BeginGroup=true>
             <Items>
                 <DxToolbarItem IconCssClass="bi bi-arrows-expand"
-                               Name="ShowDetails" Text="Show Detail Rows"
-                               Tooltip="Show Detail rows">
+                Name="ShowDetails" Text="Show Detail Rows"
+                Tooltip="Show Detail rows">
                 </DxToolbarItem>
                 <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
-                               Name="HideDetails" Text="Hide Detail Rows"
-                               Tooltip="Hide Detail rows">
+                Name="HideDetails" Text="Hide Detail Rows"
+                Tooltip="Hide Detail rows">
                 </DxToolbarItem>
             </Items>
         </DxToolbarItem>
         <DxToolbarItem IconCssClass="bi bi-arrows" Name="AutoFit" Text="Auto Fit"
-                       BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right"
-                       CssClass="column-chooser-button"
-                       Tooltip="Adjust column size to fit cell content">
+        BeginGroup=true
+        Alignment="ToolbarItemAlignment.Right"
+        CssClass="column-chooser-button"
+        Tooltip="Adjust column size to fit cell content">
         </DxToolbarItem>
         @if (LayoutKey == null)
         {
             <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Choose" Text="Choose"
-                           BeginGroup=true
-                           Alignment="ToolbarItemAlignment.Right"
-                           CssClass="column-chooser-button"
-                           Tooltip="Customise column display">
+            BeginGroup=true
+            Alignment="ToolbarItemAlignment.Right"
+            CssClass="column-chooser-button"
+            Tooltip="Customise column display">
             </DxToolbarItem>
         }
         else
         {
             <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Layout" Text="Layout"
-                           BeginGroup=true
-                           Alignment="ToolbarItemAlignment.Right"
-                           CssClass="column-chooser-button"
-                           Tooltip="Customise column layout">
+            BeginGroup=true
+            Alignment="ToolbarItemAlignment.Right"
+            CssClass="column-chooser-button"
+            Tooltip="Customise column layout">
                 <Items>
                     <DxToolbarItem IconCssClass="bi bi-list-columns-reverse"
-                                   Name="Choose" Text="Choose fields"
-                                   Tooltip="Choose columns to display">
+                    Name="Choose" Text="Choose fields"
+                    Tooltip="Choose columns to display">
                     </DxToolbarItem>
                     <DxToolbarItem IconCssClass="bi bi-floppy"
-                                   Name="SaveLayout" Text="Save Layout"
-                                   Tooltip="Save the current layout">
+                    Name="SaveLayout" Text="Save Layout"
+                    Tooltip="Save the current layout">
                     </DxToolbarItem>
                     <DxToolbarItem IconCssClass="bi bi-arrow-counterclockwise"
-                                   Name="ResetLayout" Text="Reset Default Layout"
-                                   Tooltip="Reset column layout to its default">
+                    Name="ResetLayout" Text="Reset Default Layout"
+                    Tooltip="Reset column layout to its default">
                     </DxToolbarItem>
                 </Items>
             </DxToolbarItem>
         }
         <DxToolbarItem IconCssClass="bi bi-funnel" Name="Filter" Text="Filter"
-                       BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right"
-                       Tooltip="Filter / search for records">
+        BeginGroup=true
+        Alignment="ToolbarItemAlignment.Right"
+        Tooltip="Filter / search for records">
         </DxToolbarItem>
         <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel Export"
-                       BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right">
+        BeginGroup=true
+        Alignment="ToolbarItemAlignment.Right">
             <Items>
                 <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportAll" Text="Export All"
-                               Tooltip="Export the entire grid to Excel">
+                Tooltip="Export the entire grid to Excel">
                 </DxToolbarItem>
                 <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportSelected" Text="Export Selected"
-                               Tooltip="Export selected rows to Excel">
+                Tooltip="Export selected rows to Excel">
                 </DxToolbarItem>
             </Items>
         </DxToolbarItem>
@@ -151,7 +151,18 @@
             {
                 defaultLayout = LinkedGrid.SaveLayout();
                 layout = await localStorage.GetItemAsync<GridPersistentLayout>(LayoutKey);
-                LinkedGrid.LoadLayout(layout);
+                if (layout != null) { 
+                    LinkedGrid.LoadLayout(layout); 
+                    ToastService.ShowToast(new ToastOptions()
+                        {
+                            Title = "Layout Restored",
+                            Text = "Grid layout restored from saved state.",
+                            ProviderName = "Result",
+                            ThemeMode = ToastThemeMode.Pastel,
+                            RenderStyle = ToastRenderStyle.Success,
+                            IconCssClass = "bi bi-check-circle"
+                        });
+                }
             }
         }
         await base.OnInitializedAsync();
