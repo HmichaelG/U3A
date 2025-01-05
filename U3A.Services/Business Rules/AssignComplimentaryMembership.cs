@@ -123,12 +123,15 @@ namespace U3A.BusinessRules
                 var person = await dbc.Person.FindAsync(p.ID);
                 if (person != null)
                 {
-                    await dbc.Receipt.Where(x => x.PersonID == person.ID
+                    var receipt = await dbc.Receipt.Where(x => x.PersonID == person.ID
                                         && x.FinancialTo >= FinancialTo
-                                        && x.Amount == 0).ExecuteDeleteAsync();
-                    if (person.FinancialTo >= FinancialTo) { person.FinancialTo = FinancialTo - 1; }
-                    if (person.FinancialTo < constants.START_OF_TIME) { person.FinancialTo = constants.START_OF_TIME; }
-                    result++;
+                                        && x.Amount == 0).ToListAsync();
+                    if (receipt != null) { 
+                        dbc.RemoveRange(receipt);
+                        if (person.FinancialTo >= FinancialTo) { person.FinancialTo = FinancialTo - 1; }
+                        if (person.FinancialTo < constants.START_OF_TIME) { person.FinancialTo = constants.START_OF_TIME; }
+                        result++;
+                    }
                 }
             }
             await dbc.SaveChangesAsync();
