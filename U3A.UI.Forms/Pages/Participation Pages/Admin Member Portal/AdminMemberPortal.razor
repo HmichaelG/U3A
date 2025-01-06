@@ -26,49 +26,49 @@ else
             <DxToolbar style="border-bottom:solid; border-color:whitesmoke;">
                 <Items>
                     <DxToolbarItem Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
-                                   CssClass="me-1 mb-1"
-                                   Text="Process Member" IconCssClass="bi bi-person" />
+                    CssClass="me-1 mb-1"
+                    Text="Process Member" IconCssClass="bi bi-person" />
                     <DxToolbarItem Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
-                                   CssClass="me-1 mb-1"
-                                   Text="What's On Today" IconCssClass="bi bi-clock" />
+                    CssClass="me-1 mb-1"
+                    Text="What's On Today" IconCssClass="bi bi-clock" />
                     <DxToolbarItem CssClass="me-1 mb-1"
-                                   Text="Attendance" IconCssClass="bi bi-person-check">
+                    Text="Attendance" IconCssClass="bi bi-person-check">
                         <Items>
                             <DxToolbarItem Click="@(() => buttonClick = buttonClicks.RecordAttendance)"
-                                           RenderStyle="ButtonRenderStyle.Secondary"
-                                           Text="Record Attendance" IconCssClass="bi bi-emoji-smile" />
+                            RenderStyle="ButtonRenderStyle.Secondary"
+                            Text="Record Attendance" IconCssClass="bi bi-emoji-smile" />
                             <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceNotRecorded)"
-                                           RenderStyle="ButtonRenderStyle.Secondary"
-                                           Text="Attendance Not Recorded" IconCssClass="bi bi-emoji-angry" />
+                            RenderStyle="ButtonRenderStyle.Secondary"
+                            Text="Attendance Not Recorded" IconCssClass="bi bi-emoji-angry" />
                             <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceSummary)"
-                                           RenderStyle="ButtonRenderStyle.Secondary"
-                                           Text="Attendance Summary" IconCssClass="bi bi-columns" />
+                            RenderStyle="ButtonRenderStyle.Secondary"
+                            Text="Attendance Summary" IconCssClass="bi bi-columns" />
                             <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceAnalyisis)"
-                                           RenderStyle="ButtonRenderStyle.Secondary"
-                                           Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
+                            RenderStyle="ButtonRenderStyle.Secondary"
+                            Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
                         </Items>
                     </DxToolbarItem>
                     <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
-                                   CssClass="me-1 mb-1"
-                                   Text="Leader Report" IconCssClass="bi bi-printer" />
+                    CssClass="me-1 mb-1"
+                    Text="Leader Report" IconCssClass="bi bi-printer" />
                     <DxToolbarItem Click="@(() => isDrawerOpen = !isDrawerOpen)"
-                                   CssClass="mb-1"
-                                   Text="Calendar" IconCssClass="bi bi-calendar"
-                                   Alignment="ToolbarItemAlignment.Right" />
+                    CssClass="mb-1"
+                    Text="Calendar" IconCssClass="bi bi-calendar"
+                    Alignment="ToolbarItemAlignment.Right" />
                 </Items>
             </DxToolbar>
         </div>
         <DxDrawer @bind-IsOpen="@isDrawerOpen"
-                  CssClass="drawer-style"
-                  Mode="DrawerMode.Shrink"
-                  Position="DrawerPosition.Right"
-                  PanelWidth="20rem">
+        CssClass="drawer-style"
+        Mode="DrawerMode.Shrink"
+        Position="DrawerPosition.Right"
+        PanelWidth="20rem">
             <TargetContent>
                 <DxLoadingPanel @bind-Visible="isProcessing"
-                                IsContentBlocked="true"
-                                ApplyBackgroundShading="true"
-                                IndicatorAreaVisible="false"
-                                Text="Processing Eway receipts...">
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Processing Eway receipts...">
                     @switch (buttonClick)
                     {
                         case buttonClicks.ProcessOnBehalfOf:
@@ -77,8 +77,8 @@ else
                                     <div class="h3 text-center">Member Portal (Administration)</div>
                                     <div class="h6 text-center">This procedure is intended for administration to process enrolments and/or membership fees on behalf of members.</div>
                                     <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals"
-                                                       Visible="@(!isAccordianShowingMemberDetails)"
-                                                       ColSpanMd="12" Context="groupContext">
+                                    Visible="@(!isAccordianShowingMemberDetails)"
+                                    ColSpanMd="12" Context="groupContext">
                                         <HeaderContentTemplate>
                                             <div class="d-flex input-group">
                                                 <div class="text-start flex-grow-1">
@@ -92,8 +92,8 @@ else
                                         <Items>
                                             <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
                                                 <PersonsComboBox People="@people" @bind-SelectedPerson="@selectedPerson"
-                                                                 ShowProcessButton="true"
-                                                                 OnProcessButtonClicked="async(Person value) => {
+                                                ShowProcessButton="true"
+                                                OnProcessButtonClicked="async(Person value) => {
                                                                                                     selectedPerson = value;
                                                                                                     await OnProcess();}" />
                                             </DxFormLayoutItem>
@@ -104,51 +104,50 @@ else
                                 {
                                     <div class="w-100">
                                         <MemberPortal IsAdminMemberPortal="true"
-                                                      OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
+                                        OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
                                     </div>
                                 }
                                 else
                                 {
                                     <div class="@((isDrawerOpen) ? formWidthCalendarOpen : formWidthCalendarClosed)">
                                         <DxAccordion ExpandMode="AccordionExpandMode.Single" CssClass="w-100"
-                                                     ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
+                                        ExpandCollapseAction="AccordionExpandCollapseAction.HeaderClick">
                                             <Items>
                                                 <DxAccordionItem Text="Received Today"
-                                                                 Expanded="true"
-                                                                 Context="receiptContext">
+                                                Expanded="true"
+                                                Context="receiptContext">
                                                     <ContentTemplate>
                                                         <div class="m-2">
                                                             <DxGrid @ref=@receiptGrid Data="@RecevivedToday" CssClass="member-grid-height"
-                                                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                                                    UnboundColumnData="Grid_UnboundColumnData"
-                                                                    TextWrapEnabled="false"
-                                                                    ShowFilterRow="false"
-                                                                    ShowAllRows="true"
-                                                                    KeyFieldName="ID">
+                                                            UnboundColumnData="Grid_UnboundColumnData"
+                                                            TextWrapEnabled="false"
+                                                            ShowFilterRow="false"
+                                                            ShowAllRows="true"
+                                                            KeyFieldName="ID">
                                                                 <Columns>
                                                                     <DxGridDataColumn Width="5rem" Caption="Time"
-                                                                                      FieldName="CreatedTime"
+                                                                    FieldName="CreatedTime"
                                                                                       DisplayFormat="hh:mm tt"
-                                                                                      UnboundType="GridUnboundColumnType.DateTime" />
+                                                                    UnboundType="GridUnboundColumnType.DateTime" />
                                                                     <DxGridDataColumn Width="10rem" Caption="Name" FieldName="Person.FullName" />
-                                                                    <DxGridDataColumn Width="12rem" Caption="Description" FieldName="Description" />
+                                                                    <DxGridDataColumn Width="14rem" Caption="Description" FieldName="Description" />
                                                                     <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
                                                                     <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="Person.FinancialToBriefText" DisplayFormat="f0" />
-                                                                    <DxGridDataColumn Width="7rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
+                                                                    <DxGridDataColumn Width="8rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
                                                                 </Columns>
                                                                 <TotalSummary>
                                                                     <DxGridSummaryItem FieldName="Amount"
-                                                                                       SummaryType="GridSummaryItemType.Sum"
-                                                                                       FooterColumnName="Amount"
-                                                                                       ValueDisplayFormat="c2" />
+                                                                    SummaryType="GridSummaryItemType.Sum"
+                                                                    FooterColumnName="Amount"
+                                                                    ValueDisplayFormat="c2" />
                                                                 </TotalSummary>
                                                             </DxGrid>
                                                         </div>
                                                     </ContentTemplate>
                                                 </DxAccordionItem>
                                                 <DxAccordionItem Text="Add/Edit Member Details"
-                                                                 ExpandedChanged="@((bool expanded) => isAccordianShowingMemberDetails = expanded)"
-                                                                 Expanded="false" Context="memberContext">
+                                                ExpandedChanged="@((bool expanded) => isAccordianShowingMemberDetails = expanded)"
+                                                Expanded="false" Context="memberContext">
                                                     <ContentTemplate>
                                                         <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
                                                         <div class="mx-2"><PersonMnt IsEmbedded="true" /></div>
@@ -199,19 +198,19 @@ else
 <style>
 
     .member-selection-width {
-        width: 98%;
+    width: 98%;
     }
 
     .member-grid-height {
-        height: 40dvh;
+    height: 40dvh;
     }
 
     .drawer-style {
-        max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "3rem") );
+    max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "3rem") );
     }
 
     .tabs-style {
-        width: 98%;
+    width: 98%;
     }
 
 </style>
@@ -268,10 +267,10 @@ else
             {
                 RecevivedToday = (await dbc.Receipt.AsNoTracking()
                             .Include(x => x.Person)
-                            .Where(x => x.Amount != 0 && x.User != null &&
-                             x.User.ToLower() == authEmail.ToLower())
+                            .Where(x => x.CreatedOn >= DateTime.UtcNow.Date.AddDays(-1))
                             .OrderByDescending(x => x.CreatedOn).ToListAsync())
-            .Where(x => dbc.GetLocalTime(x.CreatedOn.Value) >= dbc.GetLocalDate());
+                   .Where(x => dbc.GetLocalTime(x.CreatedOn.Value) >= dbc.GetLocalDate());
+
             }
         }
     }
