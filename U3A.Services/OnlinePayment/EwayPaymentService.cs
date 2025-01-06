@@ -178,7 +178,7 @@ namespace U3A.Services
             }
             else
             {
-                throw new Exception("Internet transmission errors are prventing successful completion of your transaction. Please try again later.");
+                throw new Exception("Internet transmission errors are preventing successful completion of your transaction. Please try again later.");
             }
             if (result != null)
             {
