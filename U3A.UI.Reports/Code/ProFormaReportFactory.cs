@@ -1,15 +1,10 @@
-﻿using DevExpress.CodeParser;
-using DevExpress.DataAccess.Json;
-using DevExpress.DataAccess.ObjectBinding;
-using DevExpress.DataAccess.Sql;
-using DevExpress.ReportServer.ServiceModel.DataContracts;
-using DevExpress.XtraCharts.Native;
-using DevExpress.XtraPrinting;
+﻿using DevExpress.DataAccess.ObjectBinding;
 using DevExpress.XtraReports;
 using DevExpress.XtraReports.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System;
@@ -24,13 +19,13 @@ using U3A.Database;
 using U3A.Model;
 using U3A.Services;
 using U3A.UI.Reports;
-using static DevExpress.Xpo.Helpers.AssociatedCollectionCriteriaHelper;
 
 namespace U3A.UI.Reports
 {
     public class ProFormaReportFactory : IDisposable
     {
 
+        private readonly ILogger log;
         public List<string> PostalReports { get; set; }
 
         IDbContextFactory<U3ADbContext> U3AdbFactory;
@@ -45,8 +40,9 @@ namespace U3A.UI.Reports
         string tenantID;
 
         //Azure Functions only
-        public ProFormaReportFactory(TenantInfo tenant)
+        public ProFormaReportFactory(TenantInfo tenant, ILogger logger)
         {
+            log = logger;
             dbc = new U3ADbContext(tenant);
             isAzureFunction = true;
             isPreview = false;
@@ -63,8 +59,12 @@ namespace U3A.UI.Reports
         }
 
         // Web app 
-        public ProFormaReportFactory(IWebHostEnvironment env, IDbContextFactory<U3ADbContext> U3AdbFactory, bool IsPreview)
+        public ProFormaReportFactory(ILogger logger,
+                                        IWebHostEnvironment env,
+                                        IDbContextFactory<U3ADbContext> U3AdbFactory,
+                                        bool IsPreview)
         {
+            log = logger;
             this.U3AdbFactory = U3AdbFactory ?? throw new ArgumentNullException(nameof(U3AdbFactory));
             ReportStorage = new CustomReportStorageWebExtension(env, this.U3AdbFactory);
             isPreview = IsPreview;
@@ -84,36 +84,44 @@ namespace U3A.UI.Reports
         {
             using (var cashReceiptProForma = new CashReceipt())
             {
-                var detail = BusinessRule.GetReceiptDetail(dbc, receipt);
-                var person = await dbc.Person.FindAsync(receipt.PersonID);
-                var list = new List<ReceiptDetail>();
-                list.Add(detail);
-                cashReceiptProForma.DataSource = list;
-                cashReceiptProForma.CreateDocument();
-                string pdfFilename = GetTempPdfFile();
-                cashReceiptProForma.ExportToPdf(pdfFilename);
-                if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
+                try
                 {
-                    return await emailSender.SendEmailAsync(EmailType.Transactional,
-                                    SendEmailAddress,
-                                    sendEmailDisplayName,
-                                    person.Email,
-                                    person.FullName,
-                                    $"U3A Cash Receipt: {person.FullName}",
-                                    $"<p>Hello {person.FirstName},</p>" +
-                                    $"<p>Please find your U3A cash receipt attached.</p>" +
-                                    GetBlurb() +
-                                    $"<p><p>Thank you<br/>" +
-                                    $"{sendEmailDisplayName}</p>",
-                                    string.Empty,
-                                    new List<string>() { pdfFilename },
-                                    new List<string>() { "Cash Receipt.pdf" }
-                                    );
+                    var detail = BusinessRule.GetReceiptDetail(dbc, receipt);
+                    var person = await dbc.Person.FindAsync(receipt.PersonID);
+                    var list = new List<ReceiptDetail>();
+                    list.Add(detail);
+                    cashReceiptProForma.DataSource = list;
+                    cashReceiptProForma.CreateDocument();
+                    string pdfFilename = GetTempPdfFile();
+                    cashReceiptProForma.ExportToPdf(pdfFilename);
+                    if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
+                    {
+                        return await emailSender.SendEmailAsync(EmailType.Transactional,
+                                        SendEmailAddress,
+                                        sendEmailDisplayName,
+                                        person.Email,
+                                        person.FullName,
+                                        $"U3A Cash Receipt: {person.FullName}",
+                                        $"<p>Hello {person.FirstName},</p>" +
+                                        $"<p>Please find your U3A cash receipt attached.</p>" +
+                                        GetBlurb() +
+                                        $"<p><p>Thank you<br/>" +
+                                        $"{sendEmailDisplayName}</p>",
+                                        string.Empty,
+                                        new List<string>() { pdfFilename },
+                                        new List<string>() { "Cash Receipt.pdf" }
+                                        );
+                    }
+                    else
+                    {
+                        PostalReports.Add(pdfFilename);
+                        return (isPreview) ? String.Empty : "Accepted";
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    PostalReports.Add(pdfFilename);
-                    return (isPreview) ? String.Empty : "Accepted";
+                    log.LogError(ex, $"Tenant: {tenantID} Receipt: {receipt.ID}");
+                    return "Error";
                 }
             }
         }
@@ -122,56 +130,58 @@ namespace U3A.UI.Reports
             var result = new Dictionary<Guid, string>();
             foreach (var kvp in Enrolments)
             {
-                List<(Guid CourseID, Guid? ClassID)> onFile = new();
-                List<Term> terms = new();
-                var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
-                if (currentTerm == null) { currentTerm = await BusinessRule.CurrentTermAsync(dbc); }
-                if (currentTerm != null)
+                try
                 {
-                    terms = await dbc.Term.Where(x => x.Year == currentTerm.Year).ToListAsync();
-                }
-                var personsFiles = new List<string>();
-                Person person = null;
-                foreach (var enrolment in kvp.Value.OrderBy(x => x.Course.Name))
-                {
-                    person = enrolment.Person;
-                    (Guid, Guid?) onfileKey = (enrolment.CourseID, enrolment.ClassID);
-                    if (!onFile.Contains(onfileKey)) // one report per enrolment / class
+                    List<(Guid CourseID, Guid? ClassID)> onFile = new();
+                    List<Term> terms = new();
+                    var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+                    if (currentTerm == null) { currentTerm = await BusinessRule.CurrentTermAsync(dbc); }
+                    if (currentTerm != null)
                     {
-                        onFile.Add(onfileKey);
-                        var detail = BusinessRule.GetEnrolmentDetail(dbc, enrolment);
-                        using (var participantEnrolmentProForma = new ParticipantEnrolment())
+                        terms = await dbc.Term.Where(x => x.Year == currentTerm.Year).ToListAsync();
+                    }
+                    var personsFiles = new List<string>();
+                    Person person = null;
+                    foreach (var enrolment in kvp.Value.OrderBy(x => x.Course.Name))
+                    {
+                        person = enrolment.Person;
+                        (Guid, Guid?) onfileKey = (enrolment.CourseID, enrolment.ClassID);
+                        if (!onFile.Contains(onfileKey)) // one report per enrolment / class
                         {
-                            participantEnrolmentProForma.DataSource = detail;
-                            var dataSources = DataSourceManager.GetDataSources(participantEnrolmentProForma, includeSubReports: false);
-                            foreach (var dataSource in dataSources)
+                            onFile.Add(onfileKey);
+                            var detail = BusinessRule.GetEnrolmentDetail(dbc, enrolment);
+                            using (var participantEnrolmentProForma = new ParticipantEnrolment())
                             {
-                                if (dataSource is ObjectDataSource)
+                                participantEnrolmentProForma.DataSource = detail;
+                                var dataSources = DataSourceManager.GetDataSources(participantEnrolmentProForma, includeSubReports: false);
+                                foreach (var dataSource in dataSources)
                                 {
-                                    var ds = (dataSource as ObjectDataSource);
-                                    if (ds.Name.ToLower() == "objectdatasource2") { ds.DataSource = terms; }
+                                    if (dataSource is ObjectDataSource)
+                                    {
+                                        var ds = (dataSource as ObjectDataSource);
+                                        if (ds.Name.ToLower() == "objectdatasource2") { ds.DataSource = terms; }
+                                    }
                                 }
+                                participantEnrolmentProForma.CreateDocument();
+                                string pdf = GetTempPdfFile();
+                                participantEnrolmentProForma.ExportToPdf(pdf);
+                                personsFiles.Add(pdf);
                             }
-                            participantEnrolmentProForma.CreateDocument();
-                            string pdf = GetTempPdfFile();
-                            participantEnrolmentProForma.ExportToPdf(pdf);
-                            personsFiles.Add(pdf);
                         }
                     }
-                }
-                var pdfFilename = CreateMergedPDF(personsFiles);
-                if (string.IsNullOrWhiteSpace(pdfFilename)) { continue; }
-                if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
-                {
-                    result.Add(kvp.Key, await emailSender.SendEmailAsync(
-                                   EmailType.Transactional,
-                                   SendEmailAddress,
-                                   sendEmailDisplayName,
-                                   person.Email,
-                                   person.FullName,
-                                   $"U3A Enrolment: {person.FullName}",
-                                   $"<p>Hello {person.FirstName},</p>" +
-@"
+                    var pdfFilename = CreateMergedPDF(personsFiles);
+                    if (string.IsNullOrWhiteSpace(pdfFilename)) { continue; }
+                    if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
+                    {
+                        result.Add(kvp.Key, await emailSender.SendEmailAsync(
+                                       EmailType.Transactional,
+                                       SendEmailAddress,
+                                       sendEmailDisplayName,
+                                       person.Email,
+                                       person.FullName,
+                                       $"U3A Enrolment: {person.FullName}",
+                                       $"<p>Hello {person.FirstName},</p>" +
+    @"
 <style>
 table {font - family: arial, sans-serif;
   border-collapse: collapse;
@@ -207,18 +217,24 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
 </td>
 </tr>
 </table>" +
-                                    GetBlurb() +
-                                   $"<p><p>Thank you<br/>" +
-                                   $"{sendEmailDisplayName}</p>",
-                                   string.Empty,
-                                   new List<string>() { pdfFilename },
-                                   new List<string>() { "Your Enrolment Details.pdf" }
-                                   )); ;
+                                        GetBlurb() +
+                                       $"<p><p>Thank you<br/>" +
+                                       $"{sendEmailDisplayName}</p>",
+                                       string.Empty,
+                                       new List<string>() { pdfFilename },
+                                       new List<string>() { "Your Enrolment Details.pdf" }
+                                       )); ;
+                    }
+                    else
+                    {
+                        PostalReports.Add(pdfFilename);
+                        result.Add(kvp.Key, (isPreview) ? String.Empty : "Accepted");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    PostalReports.Add(pdfFilename);
-                    result.Add(kvp.Key, (isPreview) ? String.Empty : "Accepted");
+                    log.LogError(ex, $"Tenant: {tenantID} Enrolment: {kvp.Key}");
+                    result.Add(kvp.Key, "Error");
                 }
             }
             return result;
@@ -238,74 +254,170 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                         Person Leader, Enrolment[] Enrolments)
         {
             var result = string.Empty;
+
             var createdFilenames = new List<string>();
             var reportNames = new List<string>();
             if (DoLeaderReport || !(Enrolments.Where(x => !x.IsWaitlisted).Any()))
             {
-                using (var leaderReportProForma = new LeaderReport())
+                var report = "Leader's Report.pdf";
+                try
                 {
-                    createdFilenames.Add(await CreateLeaderReportAsync(leaderReportProForma, Leader, Enrolments));
-                    reportNames.Add("Leader's Report.pdf");
+                    using (var leaderReportProForma = new LeaderReport())
+                    {
+                        var filename = await CreateLeaderReportAsync(leaderReportProForma, Leader, Enrolments);
+                        if (!string.IsNullOrWhiteSpace(filename))
+                        {
+                            createdFilenames.Add(filename);
+                            reportNames.Add(report);
+                        }
+                        reportNames.Add(report);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                 }
             }
             if (Enrolments.Any(x => !x.IsWaitlisted))
             {
                 if (DoLeaderAttendanceList)
                 {
-                    using (var leaderAttendanceList = new LeaderAttendanceList())
+                    var report = "Student Attendance Record.pdf";
+                    try
                     {
-                        createdFilenames.Add(await CreateLeaderReportAsync(leaderAttendanceList,
-                                                Leader, Enrolments
-                                                            .Where(x => !x.IsWaitlisted && !x.isLeader)
-                                                            .ToArray()));
-                        reportNames.Add("Student Attendance Record.pdf");
+                        using (var leaderAttendanceList = new LeaderAttendanceList())
+                        {
+                            var filename = await CreateLeaderReportAsync(leaderAttendanceList,
+                                                    Leader, Enrolments
+                                                                .Where(x => !x.IsWaitlisted && !x.isLeader)
+                                                                .ToArray());
+                            if (!string.IsNullOrWhiteSpace(filename))
+                            {
+                                createdFilenames.Add(filename);
+                                reportNames.Add(report);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoLeaderClassList)
                 {
-                    using (var leaderClassList = new LeaderClassList())
+                    var report = "Class Contact Listing.pdf";
+                    try
                     {
-                        createdFilenames.Add(await CreateLeaderReportAsync(leaderClassList,
-                                                Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
-                        reportNames.Add("Class Contact Listing.pdf");
+                        using (var leaderClassList = new LeaderClassList())
+                        {
+                            var filename = await CreateLeaderReportAsync(leaderClassList,
+                                                    Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray());
+                            if (!string.IsNullOrWhiteSpace(filename))
+                            {
+                                createdFilenames.Add(filename);
+                                reportNames.Add(report);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoLeaderICEList)
                 {
-                    using (var leaderICEList = new LeaderICEList())
+                    var report = "Class ICE Listing.pdf";
+                    try
                     {
-                        createdFilenames.Add(await CreateLeaderReportAsync(leaderICEList,
-                                                Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
-                        reportNames.Add("Class ICE Listing.pdf");
+                        using (var leaderICEList = new LeaderICEList())
+                        {
+                            var filename = await CreateLeaderReportAsync(leaderICEList,
+                                                    Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray());
+                            if (!string.IsNullOrWhiteSpace(filename))
+                            {
+                                createdFilenames.Add(filename);
+                                reportNames.Add(report);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoMemberBadges)
                 {
-                    var fileName = await CreateMemberBadgesReport(Leader,
-                            Enrolments.Where(x => !x.IsWaitlisted).ToArray());
-                    if (!string.IsNullOrWhiteSpace(fileName))
+                    var report = "Member Badges.pdf";
+                    try
                     {
-                        createdFilenames.Add(await CreateMemberBadgesReport(Leader,
-                                Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
-                        reportNames.Add("Member Badges.pdf");
+                        var fileName = await CreateMemberBadgesReport(Leader,
+                            Enrolments.Where(x => !x.IsWaitlisted).ToArray());
+                        if (!string.IsNullOrWhiteSpace(fileName))
+                        {
+                            createdFilenames.Add(fileName);
+                            reportNames.Add(report);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoAttendanceAnalysis)
                 {
-                    using (var AttendanceAnalysis = new AttendanceAnalysis())
+                    var report = "Attendance Analysis.pdf";
+                    try
                     {
-                        createdFilenames.Add(CreateAttendanceAnalysisReport(AttendanceAnalysis,
-                                                Leader, CourseID));
-                        reportNames.Add("Attendance Analysis.pdf");
+                        using (var AttendanceAnalysis = new AttendanceAnalysis())
+                        {
+                            var filename = CreateAttendanceAnalysisReport(AttendanceAnalysis,
+                                                    Leader, CourseID);
+                            if (!string.IsNullOrWhiteSpace(filename))
+                            {
+                                createdFilenames.Add(filename);
+                                reportNames.Add("Attendance Analysis.pdf");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoLeaderCSVFile && !isPreview)
                 {
-                    createdFilenames.Add(CreateCSVFile(Enrolments.Where(x => !x.IsWaitlisted).ToArray()));
-                    reportNames.Add("Class List.csv");
+                    var report = "Class List.csv";
+                    try
+                    {
+                        var filename = CreateCSVFile(Enrolments.Where(x => !x.IsWaitlisted).ToArray());
+                        if (!string.IsNullOrWhiteSpace(filename))
+                        {
+                            createdFilenames.Add(filename);
+                            reportNames.Add(report);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
+                    }
                 }
             }
-            return await ProcessLeaderReport(Leader, ReportName, CourseName, createdFilenames.ToArray(), reportNames.ToArray());
+            try
+            {
+                if (createdFilenames.Count > 0)
+                {
+                    result = await ProcessLeaderReport(Leader, ReportName, CourseName, createdFilenames.ToArray(), reportNames.ToArray());
+                }
+                else
+                {
+                    result = "Requested report(s) not available";
+                }
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Process {ReportName}");
+            }
+            return result;
         }
 
         string CreateCSVFile(Enrolment[] Enrolments)
@@ -382,6 +494,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 Person Leader,
                 Enrolment[] Enrolments)
         {
+            if (Enrolments.Length == 0) { return string.Empty; }
             var term = dbc.Term.Find(Enrolments[0].TermID);
             var leaderDetail = BusinessRule.GetLeaderDetail(dbc, Leader, term);
             var enrolmentDetails = new List<EnrolmentDetail>();
@@ -522,11 +635,15 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 }
                 outputDocument.Close();
                 // Save the document...
-                var outputFile = GetTempPdfFile();
-                outputDocument.Save(outputFile);
-                return outputFile;
+                if (outputDocument.PageCount > 0)
+                {
+                    var outputFile = GetTempPdfFile();
+                    outputDocument.Save(outputFile);
+                    return outputFile;
+                }
             }
-            else return null;
+            log.LogWarning("No PDF files to merge. The requested reports contained no printed pages usually because there were no enrolments.");
+            return null;
         }
 
         private string GetTempPdfFile()

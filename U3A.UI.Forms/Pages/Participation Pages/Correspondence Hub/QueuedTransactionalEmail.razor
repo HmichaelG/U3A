@@ -210,7 +210,7 @@ else
         var msg = (IsPreview) ? "Preparing Preview" : "Creating Mail Items";
         await ProgressBar.ShowAsync($"{msg} ... Please Wait", items);
         await InvokeAsync(StateHasChanged);
-        reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
+        reportFactory = new ProFormaReportFactory(Logger,Environment, U3Adbfactory, IsPreview);
         var enrolments = new List<Enrolment>();
         var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant);
         foreach (SendMail sm in SelectedDataItems)

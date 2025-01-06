@@ -15,7 +15,7 @@ namespace U3A.WebFunctions.Procedures
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
-            var reportFactory = new ProFormaReportFactory(tenant);
+            var reportFactory = new ProFormaReportFactory(tenant,logger);
             var personEnrolments = new Dictionary<Guid, List<Enrolment>>();
             IList<SendMail> mailItems;
             using (var dbc = new U3ADbContext(tenant))

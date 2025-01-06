@@ -25,7 +25,7 @@ namespace U3A.WebFunctions.Procedures
                 var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
                 if (settings != null)
                 {
-                    reportFactory = new ProFormaReportFactory(tenant);
+                    reportFactory = new ProFormaReportFactory(tenant, logger);
                     var Classes = await BusinessRule.SelectableClassesAsync(dbc, selectedTerm);
                     var count = 0;
                     foreach (var c in Classes)

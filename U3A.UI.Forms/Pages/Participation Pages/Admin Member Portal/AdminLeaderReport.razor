@@ -184,7 +184,7 @@ else
         if (!await IsDataOk(recipients, enrolments)) return;
         var Leader = recipients[0];
         bool isPreview = true;
-        reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, isPreview);
+        reportFactory = new ProFormaReportFactory(Logger,Environment, U3Adbfactory, isPreview);
         var status = await reportFactory.CreateLeaderReports(
              rptSelect.PrintLeaderReport,
              rptSelect.PrintAttendanceRecord,

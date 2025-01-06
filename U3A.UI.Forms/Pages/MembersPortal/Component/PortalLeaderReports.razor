@@ -1,10 +1,12 @@
 ﻿@namespace U3A.UI.Forms
 @using Microsoft.AspNetCore.Hosting;
+@using Microsoft.Extensions.Logging;
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
 @inject IWebHostEnvironment Environment
+@inject ILogger<PortalLeaderReports> log
 
 
 <MessageBox @ref="@messageBox" />
@@ -51,7 +53,7 @@
     async Task<string> ProcessReportsAsync(bool IsPreview)
     {
         var result = string.Empty;
-        reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
+        reportFactory = new ProFormaReportFactory(log,Environment, U3Adbfactory, IsPreview);
         var leader = loginState.SelectedPerson;
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
