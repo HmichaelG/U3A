@@ -23,45 +23,45 @@ else
         <MessageBox @ref="@messageBox" />
 
         <div class="my-2">
-        <DxToolbar style="border-bottom:solid; border-color:whitesmoke;">
-            <Items>
-                <DxToolbarItem Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
-                               CssClass="me-1 mb-1"
-                               Text="Process Member" IconCssClass="bi bi-person" />
-                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
-                               CssClass="me-1 mb-1"
-                               Text="What's On Today" IconCssClass="bi bi-clock" />
-                <DxToolbarItem CssClass="me-1 mb-1"
-                               Text="Attendance" IconCssClass="bi bi-person-check">
-                    <Items>
-                        <DxToolbarItem Click="@(() => buttonClick = buttonClicks.RecordAttendance)"
-                                       RenderStyle="ButtonRenderStyle.Secondary"
-                                       Text="Record Attendance" IconCssClass="bi bi-emoji-smile" />
-                        <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceNotRecorded)"
-                                       RenderStyle="ButtonRenderStyle.Secondary"
-                                       Text="Attendance Not Recorded" IconCssClass="bi bi-emoji-angry" />
-                        <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceSummary)"
-                                       RenderStyle="ButtonRenderStyle.Secondary"
-                                       Text="Attendance Summary" IconCssClass="bi bi-columns" />
-                        <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceAnalyisis)"
-                                       RenderStyle="ButtonRenderStyle.Secondary"
-                                       Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
-                    </Items>
-                </DxToolbarItem>
-                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
-                               CssClass="me-1 mb-1"
-                               Text="Leader Report" IconCssClass="bi bi-printer" />
-                <DxToolbarItem Click="@(() => isDrawerOpen = !isDrawerOpen)"
-                               CssClass="mb-1"
-                               Text="Calendar" IconCssClass="bi bi-calendar"
-                               Alignment="ToolbarItemAlignment.Right" />
-            </Items>
-        </DxToolbar>
+            <DxToolbar style="border-bottom:solid; border-color:whitesmoke;">
+                <Items>
+                    <DxToolbarItem Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
+                                   CssClass="me-1 mb-1"
+                                   Text="Process Member" IconCssClass="bi bi-person" />
+                    <DxToolbarItem Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
+                                   CssClass="me-1 mb-1"
+                                   Text="What's On Today" IconCssClass="bi bi-clock" />
+                    <DxToolbarItem CssClass="me-1 mb-1"
+                                   Text="Attendance" IconCssClass="bi bi-person-check">
+                        <Items>
+                            <DxToolbarItem Click="@(() => buttonClick = buttonClicks.RecordAttendance)"
+                                           RenderStyle="ButtonRenderStyle.Secondary"
+                                           Text="Record Attendance" IconCssClass="bi bi-emoji-smile" />
+                            <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceNotRecorded)"
+                                           RenderStyle="ButtonRenderStyle.Secondary"
+                                           Text="Attendance Not Recorded" IconCssClass="bi bi-emoji-angry" />
+                            <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceSummary)"
+                                           RenderStyle="ButtonRenderStyle.Secondary"
+                                           Text="Attendance Summary" IconCssClass="bi bi-columns" />
+                            <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceAnalyisis)"
+                                           RenderStyle="ButtonRenderStyle.Secondary"
+                                           Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
+                        </Items>
+                    </DxToolbarItem>
+                    <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
+                                   CssClass="me-1 mb-1"
+                                   Text="Leader Report" IconCssClass="bi bi-printer" />
+                    <DxToolbarItem Click="@(() => isDrawerOpen = !isDrawerOpen)"
+                                   CssClass="mb-1"
+                                   Text="Calendar" IconCssClass="bi bi-calendar"
+                                   Alignment="ToolbarItemAlignment.Right" />
+                </Items>
+            </DxToolbar>
         </div>
         <DxDrawer @bind-IsOpen="@isDrawerOpen"
                   CssClass="drawer-style"
                   Mode="DrawerMode.Shrink"
-                  Position="DrawerPosition.Right"                 
+                  Position="DrawerPosition.Right"
                   PanelWidth="20rem">
             <TargetContent>
                 <DxLoadingPanel @bind-Visible="isProcessing"
@@ -75,7 +75,7 @@ else
                             <DxFormLayout CssClass="my-2">
                                 <div hidden="@(isSelected)" class="@((isDrawerOpen) ? formWidthCalendarOpen : formWidthCalendarClosed)">
                                     <div class="h3 text-center">Member Portal (Administration)</div>
-                                    <div class="h6 text-center">This procedure is intended for office staff to process enrolments and/or membership fees on behalf of members.</div>
+                                    <div class="h6 text-center">This procedure is intended for administration to process enrolments and/or membership fees on behalf of members.</div>
                                     <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals"
                                                        Visible="@(!isAccordianShowingMemberDetails)"
                                                        ColSpanMd="12" Context="groupContext">
@@ -118,7 +118,7 @@ else
                                                                  Context="receiptContext">
                                                     <ContentTemplate>
                                                         <div class="m-2">
-                                                            <DxGrid Data="@RecevivedToday" CssClass="member-grid-height"
+                                                            <DxGrid @ref=@receiptGrid Data="@RecevivedToday" CssClass="member-grid-height"
                                                                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                                                                     UnboundColumnData="Grid_UnboundColumnData"
                                                                     TextWrapEnabled="false"
@@ -134,7 +134,7 @@ else
                                                                     <DxGridDataColumn Width="12rem" Caption="Description" FieldName="Description" />
                                                                     <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
                                                                     <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="Person.FinancialToBriefText" DisplayFormat="f0" />
-                                                                    <DxGridDataColumn Width="5rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
+                                                                    <DxGridDataColumn Width="7rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
                                                                 </Columns>
                                                                 <TotalSummary>
                                                                     <DxGridSummaryItem FieldName="Amount"
@@ -230,6 +230,7 @@ else
     static bool isDrawerOpen = false;
     string drawerHeightAdjustment;
     buttonClicks buttonClick = buttonClicks.ProcessOnBehalfOf;
+    IGrid receiptGrid;
 
     MessageBox? messageBox;
     U3ADbContext dbc { get; set; }
@@ -237,7 +238,6 @@ else
     Person selectedPerson { get; set; }
     string authEmail;
     IEnumerable<Receipt> RecevivedToday;
-    TimeSpan offset;
     string formWidthCalendarOpen = "col col-12 mt-1 mx-auto";
     string formWidthCalendarClosed = "col col-12 px-lg-0 col-lg-10 col-xl-8 mt-1 px-1 mx-auto";
 
@@ -264,17 +264,14 @@ else
         using (dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
-            if (offset != null && authEmail != null)
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-                {
-                    RecevivedToday = (await dbc.Receipt.AsNoTracking()
-                                .Include(x => x.Person)
-                                .Where(x => x.Amount != 0 && x.User != null &&
-                                 x.User.ToLower() == authEmail.ToLower())
-                                .OrderByDescending(x => x.CreatedOn).ToListAsync())
-                .Where(x => (x.CreatedOn.Value + offset).Date == (DateTime.UtcNow + offset).Date);
-                }
+                RecevivedToday = (await dbc.Receipt.AsNoTracking()
+                            .Include(x => x.Person)
+                            .Where(x => x.Amount != 0 && x.User != null &&
+                             x.User.ToLower() == authEmail.ToLower())
+                            .OrderByDescending(x => x.CreatedOn).ToListAsync())
+            .Where(x => dbc.GetLocalTime(x.CreatedOn.Value) >= dbc.GetLocalDate());
             }
         }
     }
@@ -284,8 +281,6 @@ else
     {
         if (firstRender)
         {
-            var lt = new LocalTime(js);
-            offset = await lt.GetTimezoneOffsetAsync();
             selectedPerson = null;
             var authenticationState = await authenticationStateTask;
             authEmail = authenticationState.User.Identity.Name;
@@ -370,7 +365,10 @@ else
         var receipt = e.DataItem as Receipt;
         if (e.FieldName == "CreatedTime")
         {
-            e.Value = receipt.CreatedOn.Value + offset;
+            using (var dbc = U3Adbfactory.CreateDbContext())
+            {
+                e.Value = dbc.GetLocalTime(receipt.CreatedOn.Value);
+            }
         }
     }
 
