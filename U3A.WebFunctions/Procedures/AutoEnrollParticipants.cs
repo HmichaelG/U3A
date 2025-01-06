@@ -6,7 +6,7 @@ using U3A.Model;
 
 namespace U3A.WebFunctions.Procedures
 {
-    public static class AutoEnrolParticipants
+    public static class AutoEnrollParticipants
     {
         public static async Task Process(TenantInfo tenant,
                                             string tenantConnectionString,

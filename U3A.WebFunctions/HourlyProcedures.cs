@@ -25,7 +25,7 @@ namespace U3A.WebFunctions
         [Function("HourlyProcedures")]
         public async Task Run([TimerTrigger("0 0 22-23,0-11 * * *"      
 #if DEBUG
-            , RunOnStartup=true
+//            , RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
@@ -44,42 +44,61 @@ namespace U3A.WebFunctions
             TimeSpan utcOffset;
             foreach (var tenant in tenants)
             {
-                using (var dbc = new U3ADbContext(tenant))
+                _logger.LogInformation($"****** Processing AutoEnrollParticipants for {tenant.Identifier}: {tenant.Name}. ******");
+                try
                 {
-                    utcOffset = await Common.GetUtcOffsetAsync(dbc);
-                    dbc.UtcOffset = utcOffset;
-                    _logger.LogInformation($"[{tenant.Identifier}] Local Time: {DateTime.UtcNow + utcOffset}. UTC Offset: {utcOffset}");
-                }
-
-                isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
-                TaskList.Add(AutoEnrolParticipants.Process(tenant, cn!, _logger));
-            }
-            // Make sure all processing is complete before email starts.
-            Task.WaitAll(TaskList.ToArray());
-
-            foreach (var tenant in tenants)
-            {
-                _logger.LogInformation($"****** Processing Email Procedures for {tenant.Identifier}: {tenant.Name}. ******");
-                isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
-                if (isBackgroundProcessingEnabled)
-                {
-                    await ProcessCorrespondence.Process(tenant, cn!, _logger, IsHourlyProcedure: true);
-                }
-                else
-                {
-                    _logger.LogInformation($"[{tenant.Identifier}]: Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
-                }
-            }
-            foreach (var tenant in tenants)
-            {
-                using (var dbc = new U3ADbContext(tenant))
-                {
-                    dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-                    using (var dbcT = new TenantDbContext(cn!))
+                    using (var dbc = new U3ADbContext(tenant))
                     {
-                        await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
+                        utcOffset = await Common.GetUtcOffsetAsync(dbc);
+                        dbc.UtcOffset = utcOffset;
+                        _logger.LogInformation($"[{tenant.Identifier}] Local Time: {DateTime.UtcNow + utcOffset}. UTC Offset: {utcOffset}");
                     }
-                    _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
+                    await AutoEnrollParticipants.Process(tenant, cn!, _logger);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error processing AutoEnrollParticipants for {tenant.Identifier}");
+                }
+            }
+
+            foreach (var tenant in tenants)
+            {
+                _logger.LogInformation($"****** Processing Email for {tenant.Identifier}: {tenant.Name}. ******");
+                try
+                {
+                    isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
+                    if (isBackgroundProcessingEnabled)
+                    {
+                        await ProcessCorrespondence.Process(tenant, cn!, _logger, IsHourlyProcedure: true);
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"[{tenant.Identifier}]: Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error processing Email for {tenant.Identifier}");
+                }
+            }
+
+            foreach (var tenant in tenants)
+            {
+                try
+                {
+                    using (var dbc = new U3ADbContext(tenant))
+                    {
+                        dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
+                        using (var dbcT = new TenantDbContext(cn!))
+                        {
+                            await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
+                        }
+                        _logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error processing Class Schedule cache for {tenant.Identifier}");
                 }
             }
             _logger.LogInformation($"Hourly Procedures complete at: {DateTime.UtcNow} UTC");

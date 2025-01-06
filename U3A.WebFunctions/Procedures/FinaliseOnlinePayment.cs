@@ -28,6 +28,13 @@ namespace U3A.WebFunctions.Procedures
                         await paymentService.FinaliseEwayPyamentAsync(dbc, payment, term);
                         logger.LogInformation($"Online payment for {person.FullName} finalised.");
                     }
+                    catch (EwayResponseException ex)
+                    {
+                        var response = (!string.IsNullOrWhiteSpace(ex.PaymentResult.ResponseCode)) 
+                            ? $"{ ex.PaymentResult.ResponseCode} { ex.PaymentResult.ResponseMessage}"
+                            : "No response received.";
+                        logger.LogError(ex, $"Payment for {person.FullName}: Response: {response}");
+                    }
                     catch (Exception ex)
                     {
                         logger.LogInformation($"Error processing online payment for {person.FullName}. {ex.Message}");

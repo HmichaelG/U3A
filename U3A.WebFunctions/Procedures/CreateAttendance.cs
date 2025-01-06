@@ -40,7 +40,7 @@ namespace U3A.WebFunctions.Procedures
                                                     c.StartTime.Hour, c.StartTime.Minute, 0);
                             var attendance = await BusinessRule.EditableAttendanceAsync(dbc, term, c.Course, c, classDate);
                             await ApplyStudentLeaveAsync(dbc, attendance, course);
-                            logger.LogInformation($"Attendance for {course.Name} at {c.StartTime.ToShortTimeString()} created.");
+                            logger.LogInformation($"{course.Name} at {c.StartTime.ToShortTimeString()} created.");
                         }
                     }
                 }
