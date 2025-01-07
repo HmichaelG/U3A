@@ -121,10 +121,10 @@ namespace U3A.Services
             return result;
         }
 
-        static SemaphoreSlim? semaphore = new(1);
+        static SemaphoreSlim? paymentSemaphore = new(1);
         public async Task FinaliseEwayPyamentAsync(IDbContextFactory<U3ADbContext> U3Adbfactory, OnlinePaymentStatus paymentStatus, Term term)
         {
-            await semaphore.WaitAsync();
+            await paymentSemaphore.WaitAsync();
             try
             {
                 using (var dbc = await U3Adbfactory.CreateDbContextAsync())
@@ -135,7 +135,7 @@ namespace U3A.Services
             }
             finally
             {
-                semaphore.Release();
+                paymentSemaphore.Release();
             }
         }
 
@@ -265,7 +265,21 @@ namespace U3A.Services
             }
         }
 
+        static SemaphoreSlim? cancelSemaphore = new(1);
         public async Task CancelPaymentAsync(U3ADbContext dbc, string AccessCode)
+        {
+            await cancelSemaphore.WaitAsync();
+            try
+            {
+                    await CancelEwayPaymentAsync(dbc, AccessCode);
+            }
+            finally
+            {
+                cancelSemaphore.Release();
+            }
+        }
+
+        private async Task CancelEwayPaymentAsync(U3ADbContext dbc, string AccessCode)
         {
             var request = await dbc.OnlinePaymentStatus.FirstOrDefaultAsync(x => x.AccessCode == AccessCode);
             if (request != null)

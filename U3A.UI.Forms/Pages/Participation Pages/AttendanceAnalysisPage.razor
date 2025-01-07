@@ -9,49 +9,49 @@
 
 <MessageBox @ref="@messageBox" />
 <MessageBox @ref="@inputBox"
-            Caption="Attendance Analysis Parameters"
-            AffirmativeButtonClicked=OnOkButtonClicked
-            NegativeButtonClicked="OnCancelButtonClicked"
-            IsInputBox=true
-            PopupVisible=@isPopupVisible>
+Caption="Attendance Analysis Parameters"
+AffirmativeButtonClicked=OnOkButtonClicked
+NegativeButtonClicked="OnCancelButtonClicked"
+IsInputBox=true
+PopupVisible=@isPopupVisible>
     <TextTemplate>
         <DxFormLayout>
             <DxFormLayoutItem Caption="Report for year" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                 <DxSpinEdit Value=@ReportForYear
-                            ValueChanged="@((int newValue) => OnReportForYearChanged(newValue))"
-                            MinValue="@constants.START_OF_TIME" />
+                ValueChanged="@((int newValue) => OnReportForYearChanged(newValue))"
+                MinValue="@constants.START_OF_TIME" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Course Types to print (select multiple items, if required)" ColSpanMd="12"
-                              CaptionPosition="CaptionPosition.Vertical">
+            CaptionPosition="CaptionPosition.Vertical">
                 <DxTagBox Data="@CourseTypes"
-                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                          NullText="leave blank for all"
-                          Values="@CourseTypesToReport"
-                          ValuesChanged="@((IEnumerable<CourseType> newValues) => OnCourseTypesChanged(newValues))"
-                          TextFieldName="@nameof(Course.Name)">
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                NullText="leave blank for all"
+                Values="@CourseTypesToReport"
+                ValuesChanged="@((IEnumerable<CourseType> newValues) => OnCourseTypesChanged(newValues))"
+                TextFieldName="@nameof(Course.Name)">
                 </DxTagBox>
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Courses to print (select multiple items, if required)" ColSpanMd="12"
-                              CaptionPosition="CaptionPosition.Vertical">
+            CaptionPosition="CaptionPosition.Vertical">
                 <DxTagBox Data="@Courses"
-                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                          NullText="leave blank for all"
-                          @bind-Values="@CoursesToReport"
-                          TextFieldName="@nameof(Course.Name)">
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                NullText="leave blank for all"
+                @bind-Values="@CoursesToReport"
+                TextFieldName="@nameof(Course.Name)">
                 </DxTagBox>
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Minimum months to report (Leave 0 for all)"
-                              CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+            CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
                 <DxSpinEdit @bind-Value=@MinimumMonthsToReport
-                            MinValue=0 MaxValue="12" />
+                MinValue=0 MaxValue="12" />
             </DxFormLayoutItem>
         </DxFormLayout>
     </TextTemplate>
 </MessageBox>
 
-<XtraReportViewer @ref=@viewer 
-        OnCloseButtonClick="@(() => {CoursesToReport = new List<Course>(); isPopupVisible=true;})"
-        Report="@report" />
+<XtraReportViewer @ref=@viewer
+OnCloseButtonClick="@(() => {CoursesToReport = new List<Course>(); isPopupVisible=true;})"
+Report="@report" />
 
 @code {
     MessageBox? messageBox;
@@ -59,6 +59,7 @@
     XtraReportViewer? viewer;
     AttendanceAnalysis? report;
     bool isPopupVisible = true;
+    bool isReportOK = false;
     U3ADbContext dbc;
 
     int ReportForYear;
@@ -91,11 +92,12 @@
         {
             report = new()
                 {
-                    DbContext = dbc,
+                    U3Adbfactory = U3Adbfactory,
                 };
             report.Parameters["prmYear"].Value = ReportForYear;
             report.Parameters["prmCourseFilter"].Value = CoursesToReport.Select(x => x.ID.ToString()).ToArray();
             report.Parameters["prmMinMonths"].Value = MinimumMonthsToReport;
+            isReportOK = true;
             isPopupVisible = false;
         }
     }
@@ -121,7 +123,7 @@
         await OnReportForYearChanged(ReportForYear);
     }
 
-    void OnCancelButtonClicked() => NavMan.NavigateTo("/");
+    void OnCancelButtonClicked() {if (!isReportOK) NavMan.NavigateTo("/"); isReportOK = false; }
 
     public void Dispose()
     {

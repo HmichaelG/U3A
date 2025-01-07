@@ -1,5 +1,6 @@
 ﻿using DevExpress.Web.Internal;
 using DevExpress.XtraReports.UI;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -11,33 +12,43 @@ using U3A.Model;
 
 namespace U3A.UI.Reports
 {
-    public partial class AttendanceAnalysis : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContext
+    public partial class AttendanceAnalysis : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContextFactory
     {
         public AttendanceAnalysis()
         {
             InitializeComponent();
         }
-        public U3ADbContext DbContext { get; set; }
+        public IDbContextFactory<U3ADbContext> U3Adbfactory { get; set; }
         List<AttendClassDetailByWeek> data;
         string[] courseFilter = new string[] { };
         private void AttendanceAnalysis_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
-            prmYear.Value = DbContext.GetLocalTime().Year; 
+            using (var DbContext = U3Adbfactory.CreateDbContext())
+            {
+                if (prmYear.Value == null || (int)prmYear.Value <= 0)
+                {
+                    prmYear.Value = DbContext.GetLocalTime().Year;
+                }
+            }
         }
         private void AttendanceAnalysis_DataSourceDemanded(object sender, EventArgs e)
         {
-            int year = (int)prmYear.Value;
-            if (year == 0) { year = DbContext.GetLocalTime().Year; }
-            xrChart1.Titles[0].Text = $"{year} Attendance Analysis";
-            data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext, year);
-            objectDataSource1.DataSource = data;
-            if (prmCourseFilter.Value != null)
+            using (var DbContext = U3Adbfactory.CreateDbContext())
             {
-                courseFilter = (string[])prmCourseFilter.Value;
+                int year = (int)prmYear.Value;
+                if (year == 0) { year = DbContext.GetLocalTime().Year; }
+                xrChart1.Titles[0].Text = $"{year} Attendance Analysis";
+                data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext, year);
+                objectDataSource1.DataSource = data;
+                if (prmCourseFilter.Value != null)
+                {
+                    courseFilter = (string[])prmCourseFilter.Value;
+                }
             }
         }
 
         Guid LastClass { get; set; } = Guid.Empty;
+
         bool hasPrinted = false;
         private void Detail_BeforePrint(object sender, CancelEventArgs e)
         {

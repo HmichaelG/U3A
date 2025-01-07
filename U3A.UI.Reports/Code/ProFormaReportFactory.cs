@@ -483,7 +483,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 Person Leader,
                 Guid CourseID)
         {
-            report.DbContext = dbc;
+            report.U3Adbfactory = U3AdbFactory;
             report.Parameters["prmCourseID"].Value = CourseID;
             report.CreateDocument();
             string pdfFilename = GetTempPdfFile();
