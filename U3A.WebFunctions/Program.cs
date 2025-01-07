@@ -17,7 +17,6 @@ using DevExpress.Drawing;
 
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
-DevExpress.Drawing.Internal.DXDrawingEngine.ForceSkia();
 foreach (var file in Directory.GetFiles(@"fonts"))
 {
     DXFontRepository.Instance.AddFont(file);
@@ -25,7 +24,7 @@ foreach (var file in Directory.GetFiles(@"fonts"))
 
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults()
+    .ConfigureFunctionsWebApplication()
     .Build();
 
 host.Run();
