@@ -24,8 +24,8 @@
 else
 {
     <CreateDomainLogin @ref="createDomainLogin"
-    Roles="@Roles"
-    Settings="@settings" />
+                       Roles="@Roles"
+                       Settings="@settings" />
 
     <MessageBox @ref="@messageBox" />
     <Progress @ref="@ProgressBar" />
@@ -47,18 +47,18 @@ else
     <FullScreen DisplayOffset="@((IsEmbedded) ? 19 : 8)" HideToggle="@IsEmbedded">
         <ContentTemplate>
             <DxGrid Data="@AppUsers" @ref="mainGrid"
-            UnboundColumnData="Grid_CustomUnboundColumnData"
-            @bind-SelectedDataItems="@SelectedDataItems"
-            ShowSearchBox="true"
-            ShowFilterRow="false"
-            ShowAllRows="false"
-            KeyFieldName="Id"
-            PopupEditFormHeaderText="Edit User Details"
-            EditMode="GridEditMode.PopupEditForm"
-            EditModelSaving="Grid_EditModelSaving"
-            DataItemDeleting="Grid_DataItemDeleting"
-            CustomizeEditModel="Grid_CustomizeEditModel"
-            ValidationEnabled="true">
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    @bind-SelectedDataItems="@SelectedDataItems"
+                    ShowSearchBox="true"
+                    ShowFilterRow="false"
+                    ShowAllRows="false"
+                    KeyFieldName="Id"
+                    PopupEditFormHeaderText="Edit User Details"
+                    EditMode="GridEditMode.PopupEditForm"
+                    EditModelSaving="Grid_EditModelSaving"
+                    DataItemDeleting="Grid_DataItemDeleting"
+                    CustomizeEditModel="Grid_CustomizeEditModel"
+                    ValidationEnabled="true">
                 <ToolbarTemplate>
                     <div hidden="@(!IsEmbedded)" class="bi bi-question-circle-fill text-info">
                         &nbsp;  <b>Note: </b>Deleting a login will require the member to re-register.
@@ -67,21 +67,21 @@ else
                     <GridToolbar LinkedGrid=@mainGrid LayoutKey="{BF214124-CDFA-4724-B2DC-EFF4D58E4244}" Visible="!IsEmbedded">
                         <CustomButtonContent>
                             <DxToolbarItem Text="Create Domain Login" CssClass="mx-1"
-                            Click="@OnCreateDomainLogin"
-                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                            RenderStyle="ButtonRenderStyle.Primary" />
+                                           Click="@OnCreateDomainLogin"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Populate Logins" CssClass="me-1"
-                            Click="@OnPopulateLogins"
-                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                            RenderStyle="ButtonRenderStyle.Primary" />
+                                           Click="@OnPopulateLogins"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Set Email Confirmed" CssClass="me-1"
-                            Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
-                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                            RenderStyle="ButtonRenderStyle.Primary" />
+                                           Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Reset Password"
-                            Click="@OnResetPassword" Enabled="@AreItemsSelected()"
-                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                            RenderStyle="ButtonRenderStyle.Primary" />
+                                           Click="@OnResetPassword" Enabled="@AreItemsSelected()"
+                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                           RenderStyle="ButtonRenderStyle.Primary" />
                         </CustomButtonContent>
                     </GridToolbar>
                 </ToolbarTemplate>
@@ -90,12 +90,16 @@ else
                     <DxGridCommandColumnEx Width="8rem" DeleteButtonVisible=true EditButtonVisible=true NewButtonVisible="false" />
                     <DxGridDataColumn Caption="Email" FieldName="Email" />
                     <DxGridDataColumn FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Width="6rem" FieldName="FinancialTo" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="9em" Caption="Email Confirmed?" FieldName="EmailConfirmed" />
                     <DxGridDataColumn Width="7rem" Visible=false
-                    Caption="Lockout Enabled?" FieldName="User.LockoutEnabled" />
+                                      Caption="Lockout Enabled?" FieldName="User.LockoutEnabled" />
                     <DxGridDataColumn Width="6rem" Caption="Lockout End" Visible=false DisplayFormat="d" FieldName="LockoutEnd" />
                     <DxGridDataColumn Width="5rem" Caption="Login Failures" Visible=false DisplayFormat="n0" FieldName="AccessFailedCount" />
-                    <DxGridDataColumn FieldName="Roles" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Visible="@(!IsEmbedded)" FieldName="Roles" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Width="11em" Caption="Last Update"
+                                      DisplayFormat="@constants.SHORT_DATETIME_FORMAT"                                      
+                                      FieldName="LastUpdate" UnboundType="GridUnboundColumnType.DateTime" />
                 </Columns>
                 <EditFormTemplate Context="EditFormContext">
                     @{
@@ -107,7 +111,7 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="User Roles" ColSpanMd="12">
                             <DxTagBox Data="@Roles" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                            @bind-Values="@SelectedRoles">
+                                      @bind-Values="@SelectedRoles">
                             </DxTagBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Is Email Confirmed?" ColSpanMd="12">
@@ -191,19 +195,19 @@ else
         mainGrid?.ClearSelection();
         mainGrid?.EndUpdate();
     }
-    public async Task<List<ApplicationUser>> GetUsersNotInAnyRoleAsync() 
-    { 
-        var users = await UserManager.Users.ToListAsync(); 
-        var usersNotInRoles = new List<ApplicationUser>(); 
-        foreach (var user in users) 
-        { 
-            var roles = await UserManager.GetRolesAsync(user); 
-            if (roles.Count == 0) 
-            { 
-                usersNotInRoles.Add(user); 
-            } 
-        } 
-        return usersNotInRoles; 
+    public async Task<List<ApplicationUser>> GetUsersNotInAnyRoleAsync()
+    {
+        var users = await UserManager.Users.ToListAsync();
+        var usersNotInRoles = new List<ApplicationUser>();
+        foreach (var user in users)
+        {
+            var roles = await UserManager.GetRolesAsync(user);
+            if (roles.Count == 0)
+            {
+                usersNotInRoles.Add(user);
+            }
+        }
+        return usersNotInRoles;
     }
 
     void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
@@ -232,12 +236,21 @@ else
         }
         if (e.FieldName == "Participant")
         {
-            result = string.Empty;
             foreach (var p in People.Where(x => x.Email != null && x.Email.ToUpper() == appUser.NormalizedEmail))
             {
-                result += $"{p.FullName}, ";
+                e.Value = p.FullName;
             }
-            e.Value = (result != string.Empty) ? result.Substring(0, result.Length - 2) : string.Empty;
+        }
+        if (e.FieldName == "FinancialTo")
+        {
+            foreach (var p in People.Where(x => x.Email != null && x.Email.ToUpper() == appUser.NormalizedEmail))
+            {
+                e.Value = p.FinancialToText;
+            }
+        }
+        if (e.FieldName == "LastUpdate")
+        {
+            e.Value = dbc.GetLocalTime(appUser.LastUpdated);
         }
     }
 

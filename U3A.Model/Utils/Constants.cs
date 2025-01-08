@@ -21,6 +21,7 @@ namespace U3A.Model
         public const string SHORT_DATE_FORMAT = "dd-MMM-yyy";
         public const string SHORTER_DATE_FORMAT = "dd-MMM-yy";
         public const string SHORT_DAY_AND_TIME_FORMAT = "ddd dd MMM, hh:mm tt";
+        public const string SHORT_DATETIME_FORMAT = "dd-MMM-yyy hh:mm tt";
         public const int START_OF_TIME = 2020;
         public const string SYSTEM_DOMAIN = "u3admin.org.au";
         public const string NO_SMS = "(No SMS)";
