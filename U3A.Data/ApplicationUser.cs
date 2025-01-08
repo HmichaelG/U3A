@@ -10,6 +10,8 @@ namespace U3A.Data
         private string _email;
         private string _userName;
         private bool _emailConfirmed;
+        private string _password;
+        private string _confirmPassword;
         public override string? Email
         {
             get => _email;
@@ -55,9 +57,31 @@ namespace U3A.Data
         public DateTime? LastUpdated { get; set; }
 
         [NotMapped]
-        public string Password { get; set; }
+        public string Password
+        {
+            get => _password;
+            set
+            {
+                if (_password != value)
+                {
+                    _password = value;
+                    LastUpdated = DateTime.UtcNow;
+                }
+            }
+        }
         [NotMapped]
-        public string ConfirmPassword { get; set; }
+        public string ConfirmPassword
+        {
+            get => _confirmPassword;
+            set
+            {
+                if (_confirmPassword != value)
+                {
+                    _confirmPassword = value;
+                    LastUpdated = DateTime.UtcNow;
+                }
+            }
+        }
 
     }
 

@@ -98,7 +98,7 @@ else
                     <DxGridDataColumn Width="5rem" Caption="Login Failures" Visible=false DisplayFormat="n0" FieldName="AccessFailedCount" />
                     <DxGridDataColumn Visible="@(!IsEmbedded)" FieldName="Roles" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="11em" Caption="Last Update"
-                                      DisplayFormat="@constants.SHORT_DATETIME_FORMAT"                                      
+                                      DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
                                       FieldName="LastUpdate" UnboundType="GridUnboundColumnType.DateTime" />
                 </Columns>
                 <EditFormTemplate Context="EditFormContext">
@@ -109,11 +109,11 @@ else
                         <DxFormLayoutItem>
                             <ValidationSummary />
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="User Roles" ColSpanMd="12">
-                            <DxTagBox Data="@Roles" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                      @bind-Values="@SelectedRoles">
-                            </DxTagBox>
-                        </DxFormLayoutItem>
+                            <DxFormLayoutItem Visible="@(!IsEmbedded)" Caption="User Roles" ColSpanMd="12">
+                                <DxTagBox Data="@Roles" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                          @bind-Values="@SelectedRoles">
+                                </DxTagBox>
+                            </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Is Email Confirmed?" ColSpanMd="12">
                             <DxCheckBox @bind-Checked=editItem.EmailConfirmed Enabled=!editItem.EmailConfirmed />
                         </DxFormLayoutItem>
