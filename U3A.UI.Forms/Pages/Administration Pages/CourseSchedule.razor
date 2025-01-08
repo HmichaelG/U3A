@@ -104,12 +104,21 @@ else
             </AppointmentTooltipTemplate>
         </DxScheduler>
     </div>
+    <div class="row col col-12 col-md-7 mx-auto mt-2">
+        <DxButton Text="Return to menu" id="exitButton" Visible="@IsPortal"
+                  IconCssClass="menu-icon bi-door-closed me-1"
+                  CssClass="col-12 col-lg-8 mb-1 mx-auto"
+                  Click="@(e => ReturnToMenu(PortalMenuResult.MenuOptionCompleted))"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+        </DxButton>
+    </div>
 }
 
 <style>
     .schedule-height {
         overflow: auto;
-        height: calc(100dvh - @(ws.UseTopMenu ? (IsPortal) ? "5rem" : "13rem" : (IsPortal) ? "5rem" : "10rem"));
+        height: calc(100dvh - @((IsPortal) ? "7rem" : (ws.UseTopMenu) ? "15rem" : "12rem"));
     }
 
 </style>
@@ -120,6 +129,9 @@ else
     public bool IsPortal { get; set; }
     [Parameter]
     public bool IsPublic { get; set; }
+    [Parameter]
+    public EventCallback<PortalMenuResult> OnSelectedOptionCompleted { get; set; }
+
 
     bool IsReady;
     public List<Venue>? AvailableVenues { get; set; }
@@ -195,6 +207,11 @@ else
             ProcessButtonText = "Process";
             SpinnerVisibility = "hidden";
         }
+    }
+
+    async Task ReturnToMenu(PortalMenuResult result)
+    {
+        await OnSelectedOptionCompleted.InvokeAsync(result);
     }
 
     public void Dispose()

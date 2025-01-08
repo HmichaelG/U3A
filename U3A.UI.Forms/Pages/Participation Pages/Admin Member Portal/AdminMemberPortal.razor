@@ -7,6 +7,7 @@
 
 @using Microsoft.AspNetCore.Components.Authorization
 @using U3A.UI.Forms.Pages.MembersPortal
+@using U3A.UI.Forms.Pages.Identity
 
 @implements IDisposable
 
@@ -167,6 +168,11 @@ else
                                                 <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
                                                 <div class="mx-2"><PersonMnt IsEmbedded="true" GridLayoutKey="{1F6F77E7-6276-48FC-A1D3-E3A8959DA561}" /></div>
                                             </DxTabPage>
+                                            <DxTabPage Text="Review Logins">
+                                                <div class="m-1">
+                                                <IdentityUserMnt IsEmbedded="true" />
+                                                </div>
+                                            </DxTabPage>
                                         </DxTabs>
                                     </div>
                                 }
@@ -174,7 +180,7 @@ else
                             break;
 
                         case buttonClicks.WhatsOnToday:
-                            <CourseSchedule IsPortal=true />
+                            <CourseSchedule IsPortal=false />
                             break;
 
                         case buttonClicks.RecordAttendance:
