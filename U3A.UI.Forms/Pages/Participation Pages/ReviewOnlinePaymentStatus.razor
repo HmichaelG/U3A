@@ -13,24 +13,25 @@
 }
 else
 {
-
-    <div class="row">
-        <ContextHelpTitle Title="Review Online Payment Status" HelpTopic="Review-Online-Payment-Status.html"></ContextHelpTitle>
-    </div>
-    <div class="row">
-        <div class="col-11 d-none d-md-inline">
-            Review the status of payment attempts made online.
+    if (!IsEmbedded)
+    {
+        <div class="row">
+            <ContextHelpTitle Title="Review Online Payment Status" HelpTopic="Review-Online-Payment-Status.html"></ContextHelpTitle>
         </div>
+        <div class="row">
+            <div class="col-11 d-none d-md-inline">
+                Review the status of payment attempts made online.
+            </div>
 
-    </div>
-    <br />
+        </div>
+    }
 
     <MessageBox @ref="@messageBox" />
     <Progress @ref=@progressBar />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <FullScreen>
+    <FullScreen DisplayOffset="@((IsEmbedded) ? 18 : 8)" HideToggle="@IsEmbedded">
         <ContentTemplate>
             <DxGrid Data="@PaymentStatus" @ref=@mainGrid
                     AutoExpandAllGroupRows="true"
@@ -42,13 +43,13 @@ else
                     ShowAllRows="true"
                     KeyFieldName="ID">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{41DF3299-CBB3-452F-82B9-0A579829ED66}" >
+                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{41DF3299-CBB3-452F-82B9-0A579829ED66}">
                         <CustomButtonContent>
                             <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
                                 <Template>
                                     <div class="d-flex">
                                         <div class="flex-grow-0 pt-1 pe-2">From:</div>
-                                        <DxDateEdit @bind-Date=@fromDate CssClass="flex-grow-1" />
+                                        <DxDateEdit Date=@startDate DateChanged="@((DateTime newValue) => OnStartDateChanged(newValue))" CssClass="flex-grow-1" />
                                     </div>
                                 </Template>
                             </DxToolbarItem>
@@ -56,27 +57,31 @@ else
                                 <Template>
                                     <div class="d-flex">
                                         <div class="flex-grow-0 pt-1 px-2">To:</div>
-                                        <DxDateEdit @bind-Date=@toDate CssClass="flex-grow-1" />
+                                        <DxDateEdit Date=@endDate DateChanged="@((DateTime newValue) => OnEndDateChanged(newValue))" CssClass="flex-grow-1" />
                                     </div>
                                 </Template>
                             </DxToolbarItem>
-                            <DxToolbarItem Text="Process"
-                                           Alignment="ToolbarItemAlignment.Right"
-                                           RenderStyle="ButtonRenderStyle.Primary"
-                                           Tooltip="Retrieve records for the selected dates."
-                                           Click="OnProcess" />
                             <DxToolbarItem Text="Full Msg" BeginGroup="true"
                                            Alignment="ToolbarItemAlignment.Right"
                                            Tooltip="Display the full Eway result message."
+                                           IconCssClass="bi bi-chat"
                                            RenderStyle="ButtonRenderStyle.Primary"
                                            Click="OnFullMsg" />
-                            <DxToolbarItem Text="Re-Submit"
+                            <DxToolbarItem Text="Re-Submit" BeginGroup="true"
                                            Alignment="ToolbarItemAlignment.Right"
+                                           IconCssClass="bi bi-arrow-clockwise"
                                            Tooltip="Re-submit the selected payment to Eway and process receipt, if successful."
                                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary"
                                            Enabled=@(selectedPaymentStatus != null && string.IsNullOrWhiteSpace(selectedPaymentStatus.Status))
                                            Click="OnResubmit" />
+                            <DxToolbarItem Visible="@IsEmbedded" Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                                <Template>
+                                    <ContextHelpTitle Title="" HelpTopic="Review-Online-Payment-Status.html"
+                                                      ButtonIconCssClass="bi bi-question-circle-fill help-btn"
+                                                      ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                                </Template>
+                            </DxToolbarItem>
                         </CustomButtonContent>
                     </GridToolbar>
                 </ToolbarTemplate>
@@ -97,7 +102,7 @@ else
                     <DxGridDataColumn Width="6rem" Caption="Mobile" FieldName="Mobile" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="6rem" Caption="Phone" FieldName="Phone" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Caption="Email" FieldName="Email" UnboundType="GridUnboundColumnType.String" />
-                    <DxGridDataColumn Caption="Processed By" FieldName="ProcessedBy" UnboundType="GridUnboundColumnType.String" />
+                    <DxGridDataColumn Visible="false" Caption="Processed By" FieldName="ProcessedBy" UnboundType="GridUnboundColumnType.String" />
                 </Columns>
             </DxGrid>
         </ContentTemplate>
@@ -105,6 +110,9 @@ else
 }
 
 @code {
+    [Parameter]
+    public bool IsEmbedded { get; set; }
+
     bool IsReady;
     OnlinePaymentStatus? selectedPaymentStatus;
     private List<OnlinePaymentStatus> PaymentStatus { get; set; }
@@ -119,8 +127,8 @@ else
     internal string ErrorMessage;
     U3ADbContext dbc { get; set; }
     TimeSpan? offset;
-    DateTime fromDate;
-    DateTime toDate;
+    DateTime startDate;
+    DateTime endDate;
 
     Progress? progressBar;
 
@@ -128,22 +136,27 @@ else
     {
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
-        toDate = dbc.GetLocalTime().Date;
-        fromDate = dbc.GetLocalTime().Date.AddDays(-14);
+        startDate = endDate = dbc.GetLocalDate();
+        if (!IsEmbedded) startDate = startDate.AddDays(-7);
         await GetDataAsync();
         IsReady = true;
     }
 
-    async Task OnProcess()
+    async Task OnStartDateChanged(DateTime newValue)
     {
-        await progressBar.ShowSmallSpinnerAsync();
+        startDate = newValue;
         await GetDataAsync();
-        await progressBar.Close();
+    }
+    async Task OnEndDateChanged(DateTime newValue)
+    {
+        endDate = newValue;
+        await GetDataAsync();
     }
     async Task GetDataAsync()
     {
-        PaymentStatus = await BusinessRule.GetOnlinePaymentStatus(dbc,fromDate,toDate);
+        PaymentStatus = await BusinessRule.GetOnlinePaymentStatus(dbc, startDate, endDate);
         People = await BusinessRule.EditablePersonAsync(dbc);
+        await InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -182,11 +195,11 @@ else
         }
         if (e.FieldName == "Created")
         {
-            e.Value = payStatus.CreatedOn + offset;
+            e.Value = dbc?.GetLocalDate(payStatus.CreatedOn);
         }
         if (e.FieldName == "CreatedTime")
         {
-            e.Value = payStatus.CreatedOn + offset;
+            e.Value = dbc.GetLocalTime(payStatus.CreatedOn);
         }
     }
 

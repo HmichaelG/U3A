@@ -18,9 +18,11 @@ namespace U3A.Database
         public TenantInfo TenantInfo { get; set; }
         public TimeSpan UtcOffset { get; set; } = TimeSpan.Zero;
         public DateTime GetLocalTime(DateTime time) => time + UtcOffset;
+        public DateTime GetLocalTime(DateTime? time) => time.GetValueOrDefault() + UtcOffset;
         public DateTime GetLocalTime() => DateTime.UtcNow + UtcOffset;
         public DateTime GetLocalDate() => GetLocalTime().Date;
         public DateTime GetLocalDate(DateTime time) => GetLocalTime(time).Date;
+        public DateTime GetLocalDate(DateTime? time) => GetLocalTime(time.GetValueOrDefault()).Date; 
 
         public DbSet<SystemSettings> SystemSettings { get; set; }
         public DbSet<PublicHoliday> PublicHoliday { get; set; }

@@ -15,13 +15,6 @@
             <DxListEditorColumn FieldName="@nameof(Person.Email)" Caption="Email" Width="15rem" />
             <DxListEditorColumn FieldName="@nameof(Person.FinancialToText)" Caption="Fin-To" Width="4rem" />
         </Columns>
-        <Buttons>
-            <DxEditorButton Text="Process" CssClass="text-primary" Visible="@ShowProcessButton"
-                            IconCssClass="h5 bi bi-check-lg"
-                            Tooltip="Click to process the selected member"
-                            Click="async() => await OnProcessButtonClicked.InvokeAsync(SelectedPerson)" />
-        </Buttons>
-
     </DxComboBox>
 }
 
@@ -43,11 +36,7 @@
     [Parameter, EditorRequired]
     public IEnumerable<Person> People { get; set; }
     [Parameter]
-    public bool ShowProcessButton { get; set; } = false;
-    [Parameter]
     public bool Enabled { get; set; } = true;
-    [Parameter]
-    public EventCallback<Person> OnProcessButtonClicked { get; set; }
     [Parameter]
     public EventCallback<Person> SelectedPersonChanged { get; set; }
     [Parameter]

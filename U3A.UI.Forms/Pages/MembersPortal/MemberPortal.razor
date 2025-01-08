@@ -38,11 +38,11 @@ else
 
                 case PortalMenuSelection.ShowMenu:
                     <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
-                    CurrentTerm="term" ShowEnrolmentSubMneu=false />
+                                      CurrentTerm="term" ShowEnrolmentSubMneu=false />
                     break;
                 case PortalMenuSelection.DoShowEnrolmentSubmenu:
                     <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
-                    CurrentTerm="term" ShowEnrolmentSubMneu=true />
+                                      CurrentTerm="term" ShowEnrolmentSubMneu=true />
                     break;
                 case PortalMenuSelection.DoMemberMaintenance:
                     <MemberDetails IsNewLinkedMember=false OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
@@ -74,13 +74,13 @@ else
 
                 case PortalMenuSelection.DoRequestMemberEnrolment:
                     <MemberEnrolment IsEnrolmentRequestView=true
-                    QRClassID=QRClassID
-                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                                     QRClassID=QRClassID
+                                     OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoWithdrawMemberEnrolment:
                     <MemberEnrolment IsEnrolmentWithdrawalView=true
-                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                                     OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoViewMemberEnrolment:
@@ -89,7 +89,7 @@ else
 
                 case PortalMenuSelection.DoShowLeaderMenu:
                     <LeaderMenu IsAdminPortal="@IsAdminMemberPortal"
-                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                                OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoWhatsOn:
@@ -99,14 +99,14 @@ else
                 case PortalMenuSelection.PrintMemberBadge:
                     <div class="row w-100">
                         <PdfViewer Report="@(GetMemberBadgeReport())"
-                        DisplayHeightOffset="10"
-                        OnCloseButtonClick="@(() => menuSelection = PortalMenuSelection.ShowMenu)" />
+                                   DisplayHeightOffset="10"
+                                   OnCloseButtonClick="@(() => menuSelection = PortalMenuSelection.ShowMenu)" />
                         <DxButton Text="Return to menu"
-                        IconCssClass="bi-door-closed menu-icon me-3 h2"
-                        CssClass="mx-auto col-6 mt-4"
-                        Click="@OnReportComplete"
-                        RenderStyle="ButtonRenderStyle.Primary"
-                        RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                  IconCssClass="bi-door-closed menu-icon me-3 h2"
+                                  CssClass="mx-auto col-6 mt-4"
+                                  Click="@OnReportComplete"
+                                  RenderStyle="ButtonRenderStyle.Primary"
+                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
                         </DxButton>
                     </div>
                     menuSelection = PortalMenuSelection.ShowMenu;
@@ -120,7 +120,7 @@ else
 }
 <style>
     .report-viewer {
-    height: calc(100dvh - 12rem);
+        height: calc(100dvh - 12rem);
     }
 </style>
 
@@ -159,7 +159,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         dbc = await U3Adbfactory.CreateDbContextAsync();
         term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
         if (term == null)
@@ -239,179 +238,179 @@ else
         }
     }
 
-        void EnsureSelectedPersonSet()
+    void EnsureSelectedPersonSet()
+    {
+        if (loginState.LinkedPeople.Count() > 1 && loginState.SelectedPerson == null)
         {
-            if (loginState.LinkedPeople.Count() > 1 && loginState.SelectedPerson == null)
-            {
-                menuSelection = PortalMenuSelection.GetLinkedPerson;
-            }
+            menuSelection = PortalMenuSelection.GetLinkedPerson;
         }
+    }
 
-        void OnChangeCredential(MouseEventArgs e, string page)
+    void OnChangeCredential(MouseEventArgs e, string page)
+    {
+        navMan.NavigateTo("Identity/Account/Manage/" + page, true);
+    }
+
+    async Task OnMenuOptionSelected(PortalMenuSelection selection)
+    {
+        if (await IsSelectionOK(selection))
         {
-            navMan.NavigateTo("Identity/Account/Manage/" + page, true);
+            menuSelection = selection;
         }
-
-        async Task OnMenuOptionSelected(PortalMenuSelection selection)
+        else
         {
-            if (await IsSelectionOK(selection))
-            {
-                menuSelection = selection;
-            }
-            else
-            {
-                menuSelection = PortalMenuSelection.ShowMenu;
-            }
+            menuSelection = PortalMenuSelection.ShowMenu;
         }
+    }
 
-        async Task<Person?> GetPersonAsync()
+    async Task<Person?> GetPersonAsync()
+    {
+        if (loginState == null) return null;
+        if (loginState.SelectedPerson == null) return null;
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            if (loginState == null) return null;
-            if (loginState.SelectedPerson == null) return null;
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-            {
-                var person = await dbc.Person.FindAsync(loginState.SelectedPerson.ID);
-                loginState.SelectedPerson = person;
-                return person;
-            }
+            var person = await dbc.Person.FindAsync(loginState.SelectedPerson.ID);
+            loginState.SelectedPerson = person;
+            return person;
         }
+    }
 
-        async Task<bool> IsSelectionOK(PortalMenuSelection selection)
+    async Task<bool> IsSelectionOK(PortalMenuSelection selection)
+    {
+        bool result = true;
+        string msg = string.Empty;
+        var person = await GetPersonAsync();
+        switch (selection)
         {
-            bool result = true;
-            string msg = string.Empty;
-            var person = await GetPersonAsync();
-            switch (selection)
-            {
-                case PortalMenuSelection.DoMemberMaintenance:
-                    break;
-                case PortalMenuSelection.NotImplemented:
-                    msg = "We're sorry. That option is yet to be implemented.";
-                    await messageBox.ShowOkOnlyAsync("Option Unavailable", msg);
-                    result = false;
-                    break;
-                case PortalMenuSelection.DoRequestMemberEnrolment:
-                    if (result = await AreMemberDetailsOK())
+            case PortalMenuSelection.DoMemberMaintenance:
+                break;
+            case PortalMenuSelection.NotImplemented:
+                msg = "We're sorry. That option is yet to be implemented.";
+                await messageBox.ShowOkOnlyAsync("Option Unavailable", msg);
+                result = false;
+                break;
+            case PortalMenuSelection.DoRequestMemberEnrolment:
+                if (result = await AreMemberDetailsOK())
+                {
+                    if (person.FinancialTo < term.Year)
                     {
-                        if (person.FinancialTo < term.Year)
-                        {
-                            await messageBox.ShowOkOnlyAsync("Your financial status",
-                            "<p>You are currently unfinancial.</p><p>You may continue with enrolment but your requests will remain Waitlisted " +
-                            "until membership fees are paid. Only then will your requests participate in the enrolment selection process<p>");
-                        }
+                        await messageBox.ShowOkOnlyAsync("Your financial status",
+                        "<p>You are currently unfinancial.</p><p>You may continue with enrolment but your requests will remain Waitlisted " +
+                        "until membership fees are paid. Only then will your requests participate in the enrolment selection process<p>");
                     }
-                    break;
-                case PortalMenuSelection.DoLinkNewMember:
-                    result = await HasEmailAsync();
-                    break;
-                case PortalMenuSelection.DoLinkExistingMember:
-                    result = await HasEmailAsync();
-                    break;
-                case PortalMenuSelection.DoUnlinkMember:
-                    result = await HasEmailAsync();
-                    break;
-                case PortalMenuSelection.DoMemberPayment:
-                    result = await AreMemberDetailsOK();
-                    break;
-                default:
-                    result = await AreMemberDetailsOK();
-                    break;
-            }
-            return result;
+                }
+                break;
+            case PortalMenuSelection.DoLinkNewMember:
+                result = await HasEmailAsync();
+                break;
+            case PortalMenuSelection.DoLinkExistingMember:
+                result = await HasEmailAsync();
+                break;
+            case PortalMenuSelection.DoUnlinkMember:
+                result = await HasEmailAsync();
+                break;
+            case PortalMenuSelection.DoMemberPayment:
+                result = await AreMemberDetailsOK();
+                break;
+            default:
+                result = await AreMemberDetailsOK();
+                break;
         }
+        return result;
+    }
 
-        async Task<bool> HasEmailAsync()
+    async Task<bool> HasEmailAsync()
+    {
+        bool result = false;
+        var person = await GetPersonAsync();
+        if (person != null && !string.IsNullOrWhiteSpace(person.Email))
         {
-            bool result = false;
-            var person = await GetPersonAsync();
-            if (person != null && !string.IsNullOrWhiteSpace(person.Email))
-            {
-                result = true;
-            }
-            else
-            {
-                await messageBox.ShowOkOnlyAsync("You have no email address",
-                "<p>You must have a valid email address to link/unlink another member.<p>");
-            }
-            return result;
+            result = true;
         }
-
-        async Task<bool> IsAdminOnU3ADesktop()
+        else
         {
-            if (dbc.TenantInfo.UseEwayTestEnviroment) return true;
-            if (!loginState.IsAdminOnBehalfOfMember) return true;
-            bool result = false;
-            var value = await js.InvokeAsync<string?>("GetSessionState", "isU3ADesktop");
-            if (value != null) result = true;
-            if (!result)
-            {
-                await messageBox.ShowOkOnlyAsync("Not U3A Desktop",
-                    "Our security policy requires that payments made on behalf of another member must be processed via the <strong>U3A Desktop</strong> application.");
-            }
-            return result;
+            await messageBox.ShowOkOnlyAsync("You have no email address",
+            "<p>You must have a valid email address to link/unlink another member.<p>");
         }
+        return result;
+    }
 
-        async Task<bool> AreMemberDetailsOK()
+    async Task<bool> IsAdminOnU3ADesktop()
+    {
+        if (dbc.TenantInfo.UseEwayTestEnviroment) return true;
+        if (!loginState.IsAdminOnBehalfOfMember) return true;
+        bool result = false;
+        var value = await js.InvokeAsync<string?>("GetSessionState", "isU3ADesktop");
+        if (value != null) result = true;
+        if (!result)
         {
-            bool result = true;
-            var person = await GetPersonAsync();
-            if (person == null)
+            await messageBox.ShowOkOnlyAsync("Not U3A Desktop",
+                "Our security policy requires that payments made on behalf of another member must be processed via the <strong>U3A Desktop</strong> application.");
+        }
+        return result;
+    }
+
+    async Task<bool> AreMemberDetailsOK()
+    {
+        bool result = true;
+        var person = await GetPersonAsync();
+        if (person == null)
+        {
+            var msg = "You must provide your member details before selecting this option.";
+            await messageBox.ShowOkOnlyAsync("Option Unavailable", msg);
+            result = false;
+        }
+        else
+        {
+            if (term == null)
             {
-                var msg = "You must provide your member details before selecting this option.";
+                var msg = "Please contact your enrolment officer. Current and Enrolment terms not defined.";
                 await messageBox.ShowOkOnlyAsync("Option Unavailable", msg);
                 result = false;
             }
-            else
-            {
-                if (term == null)
-                {
-                    var msg = "Please contact your enrolment officer. Current and Enrolment terms not defined.";
-                    await messageBox.ShowOkOnlyAsync("Option Unavailable", msg);
-                    result = false;
-                }
-            }
-            return result;
         }
+        return result;
+    }
 
-        async Task OnReportComplete()
-        {
-            await OnSelectedOptionCompleted(PortalMenuResult.MemberDetailsCompleted);
-        }
+    async Task OnReportComplete()
+    {
+        await OnSelectedOptionCompleted(PortalMenuResult.MemberDetailsCompleted);
+    }
 
-        async Task OnSelectedOptionCompleted(PortalMenuResult result)
+    async Task OnSelectedOptionCompleted(PortalMenuResult result)
+    {
+        var person = await GetPersonAsync();
+        switch (result)
         {
-            var person = await GetPersonAsync();
-            switch (result)
-            {
-                case PortalMenuResult.EnrolmentCancelledTermNotDefined:
-                    await messageBox.ShowOkOnlyAsync("Out of enrolment period",
-                            "We're sorry. Our enrolment period is currently closed. Please try again later.");
-                    menuSelection = PortalMenuSelection.ShowMenu;
-                    break;
-                case PortalMenuResult.NewMemberFeePayment:
-                    menuSelection = PortalMenuSelection.DoMemberPayment;
-                    break;
-                case PortalMenuResult.LinkedMemberChanged:
-                    person = getLinkedPerson?.SelectedLinkedMember;
-                    if (person != null) { person.CopyTo(loginState.SelectedPerson); }
-                    menuSelection = PortalMenuSelection.ShowMenu;
-                    break;
-                case PortalMenuResult.EnrolmentSubmenuOptionCancelled:
-                    menuSelection = PortalMenuSelection.DoShowEnrolmentSubmenu;
-                    break;
-                case PortalMenuResult.EnrolmentSubmenuOptionCompleted:
-                    menuSelection = PortalMenuSelection.DoShowEnrolmentSubmenu;
-                    break;
-                default:
-                    menuSelection = PortalMenuSelection.ShowMenu;
-                    break;
-            }
-            QueryResult = null;
-            StateHasChanged();
+            case PortalMenuResult.EnrolmentCancelledTermNotDefined:
+                await messageBox.ShowOkOnlyAsync("Out of enrolment period",
+                        "We're sorry. Our enrolment period is currently closed. Please try again later.");
+                menuSelection = PortalMenuSelection.ShowMenu;
+                break;
+            case PortalMenuResult.NewMemberFeePayment:
+                menuSelection = PortalMenuSelection.DoMemberPayment;
+                break;
+            case PortalMenuResult.LinkedMemberChanged:
+                person = getLinkedPerson?.SelectedLinkedMember;
+                if (person != null) { person.CopyTo(loginState.SelectedPerson); }
+                menuSelection = PortalMenuSelection.ShowMenu;
+                break;
+            case PortalMenuResult.EnrolmentSubmenuOptionCancelled:
+                menuSelection = PortalMenuSelection.DoShowEnrolmentSubmenu;
+                break;
+            case PortalMenuResult.EnrolmentSubmenuOptionCompleted:
+                menuSelection = PortalMenuSelection.DoShowEnrolmentSubmenu;
+                break;
+            default:
+                menuSelection = PortalMenuSelection.ShowMenu;
+                break;
         }
+        QueryResult = null;
+        StateHasChanged();
+    }
 
     public void Dispose()
     {
         dbc?.Dispose();
     }
-    }
+}

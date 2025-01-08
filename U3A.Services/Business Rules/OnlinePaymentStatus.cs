@@ -40,10 +40,11 @@ namespace U3A.BusinessRules
             DateTime fromDate, DateTime toDate)
         {
             var codes = new EwayResultCodes();
-            var status = await dbc.OnlinePaymentStatus
-                .Where(x => x.CreatedOn >= fromDate
-                             && x.CreatedOn < toDate.AddDays(1))
-                .OrderByDescending(x => x.CreatedOn).ToListAsync();
+            var status = (await dbc.OnlinePaymentStatus
+                            .Where(x => x.CreatedOn >= fromDate.AddDays(-2))
+                            .OrderByDescending(x => x.CreatedOn).ToListAsync())
+                            .Where(x => dbc.GetLocalDate(x.CreatedOn.Value) >= fromDate
+                             && dbc.GetLocalDate(x.CreatedOn.Value) <= toDate).ToList();
             foreach (var s in status)
             {
                 var code = codes.FirstOrDefault(x => x.Code == s.ResultCode);
