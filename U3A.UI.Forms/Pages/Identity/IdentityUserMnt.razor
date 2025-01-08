@@ -202,8 +202,8 @@ else
     public async Task<List<ApplicationUser>> GetUsersNotInAnyRoleAsync()
     {
         var usersNotInRoles = from u in users
-                        where !usersRoles.Any(ur => ur.UserId == u.Id)
-                        select u;
+                              where !usersRoles.Any(ur => ur.UserId == u.Id)
+                              select u;
         return usersNotInRoles.ToList();
     }
 
@@ -409,6 +409,7 @@ else
                 var p = await dbc.Person.AsNoTracking().OrderBy(x => x.FirstName).FirstOrDefaultAsync(x => x.Email.ToLower() == u.Email.ToLower());
                 if (p != null)
                 {
+                    u.LastUpdated = DateTime.UtcNow;
                     var token = await UserManager.GeneratePasswordResetTokenAsync(u);
                     var result = await UserManager.ResetPasswordAsync(u, token, p.PersonIdentity);
                 }
