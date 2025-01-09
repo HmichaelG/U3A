@@ -55,6 +55,7 @@ namespace U3A.Data
         }
 
         public DateTime? LastUpdated { get; set; }
+        public DateTime? LastLogin { get; set; }
 
         [NotMapped]
         public string Password

@@ -14,6 +14,7 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <PageTitle>Register</PageTitle>
 
@@ -23,7 +24,7 @@
 </p>
 <p class="text-danger mb-1 h6"><strong>Existing Member?</strong></p>
 <p class="text-danger"><strong>DO NOT</strong> use this form to change your email address.
-        Rather, login and select <strong>Change Email Address</strong> from the <strong>Manage Credentials</strong> menu group.</p>
+    Rather, login and select <strong>Change Email Address</strong> from the <strong>Manage Credentials</strong> menu group.</p>
 
 <div class="row">
     <div class="col col-12">
@@ -48,12 +49,12 @@
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
             <div class="row p-2">
-            <button type="submit" class="w-50 btn btn-primary">Register</button>
-            <a type="button" href="/" class="w-50 btn btn-secondary">Cancel</a>
+                <button type="submit" class="w-50 btn btn-primary">Register</button>
+                <a type="button" href="/" class="w-50 btn btn-secondary">Cancel</a>
             </div>
         </EditForm>
     </div>
-@*     <div class="col-md-6 col-md-offset-2">
+    @*     <div class="col-md-6 col-md-offset-2">
         <section>
             <h3>Use another service to register.</h3>
             <hr />
@@ -88,6 +89,7 @@
             return;
         }
 
+        await UpdateUserAsync(user);
         Logger.LogInformation("User created a new account with password.");
 
         var userId = await UserManager.GetUserIdAsync(user);
@@ -109,6 +111,20 @@
         await SignInManager.SignInAsync(user, isPersistent: false);
         RedirectManager.RedirectTo(ReturnUrl);
     }
+
+    private async Task UpdateUserAsync(ApplicationUser user)
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var appUser = await dbc.Users.FindAsync(user!.Id);
+            if (appUser != null)
+            {
+                appUser.LastUpdated = DateTime.UtcNow;
+                await dbc.SaveChangesAsync();
+            }
+        }
+    }
+
 
     private ApplicationUser CreateUser()
     {

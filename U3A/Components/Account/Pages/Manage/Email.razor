@@ -11,6 +11,7 @@
 @inject IEmailSender<ApplicationUser> EmailSender
 @inject IdentityUserAccessor UserAccessor
 @inject NavigationManager NavigationManager
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <PageTitle>Change your email address</PageTitle>
 
@@ -93,7 +94,7 @@
             new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Input.NewEmail, ["code"] = code });
 
         await EmailSender.SendConfirmationLinkAsync(user, Input.NewEmail, HtmlEncoder.Default.Encode(callbackUrl));
-
+        await UpdateUserAsync();
         message = "Confirmation link to change email sent. Please check your email.";
     }
 
@@ -112,8 +113,21 @@
             new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code });
 
         await EmailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(callbackUrl));
-
+        await UpdateUserAsync();
         message = "Verification email sent. Please check your email.";
+    }
+
+    private async Task UpdateUserAsync()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var appUser = await dbc.Users.FindAsync(user.Id);
+            if (appUser != null)
+            {
+                appUser.LastUpdated = DateTime.UtcNow;
+                await dbc.SaveChangesAsync();
+            }
+        }
     }
 
     private sealed class InputModel

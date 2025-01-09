@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_IsFeaturedCourse
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_ApplicationUser_LastUpdated
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_ApplicationUser_LastUpdated
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_ApplicationUser_LastLogin
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_ApplicationUser_LastUpdated
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_ApplicationUser_LastLogin
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

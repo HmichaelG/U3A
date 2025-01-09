@@ -19,120 +19,123 @@
 
 @if (!IsReady)
 {
-    <LoadingIndicator />
+            <LoadingIndicator />
 }
 else
 {
-    <CreateDomainLogin @ref="createDomainLogin"
-    Roles="@roles"
-    Settings="@settings" />
+            <CreateDomainLogin @ref="createDomainLogin"
+            Roles="@roles"
+            Settings="@settings" />
 
-    <MessageBox @ref="@messageBox" />
-    <Progress @ref="@ProgressBar" />
+            <MessageBox @ref="@messageBox" />
+            <Progress @ref="@ProgressBar" />
 
     @if (!IsEmbedded)
     {
-        <div class="row  align-content-start">
-            <ContextHelpTitle Title="Login &amp; Role Assignment" HelpTopic="login-security--role-assignmen.html" />
-        </div>
+                        <div class="row  align-content-start">
+                            <ContextHelpTitle Title="Login &amp; Role Assignment" HelpTopic="login-security--role-assignmen.html" />
+                        </div>
 
-        <DxTabs @ref="dxTabs" TabClick="@OnTabClick">
-            <DxTabPage Text="All Logins" />
-            <DxTabPage Text="With Roles" />
-            <DxTabPage Text="Without Roles" />
-            <DxTabPage Text="Email Not Confirmed" />
-        </DxTabs>
+                        <DxTabs @ref="dxTabs" TabClick="@OnTabClick">
+                            <DxTabPage Text="All Logins" />
+                            <DxTabPage Text="With Roles" />
+                            <DxTabPage Text="Without Roles" />
+                            <DxTabPage Text="Email Not Confirmed" />
+                        </DxTabs>
     }
 
-    <FullScreen DisplayOffset="@((IsEmbedded) ? 19 : 8)" HideToggle="@IsEmbedded">
-        <ContentTemplate>
-            <DxGrid Data="@AppUsers" @ref="mainGrid"
-            UnboundColumnData="Grid_CustomUnboundColumnData"
-            @bind-SelectedDataItems="@SelectedDataItems"
-            ShowSearchBox="true"
-            ShowFilterRow="false"
-            ShowAllRows="false"
-            KeyFieldName="Id"
-            PopupEditFormHeaderText="Edit User Details"
-            EditMode="GridEditMode.PopupEditForm"
-            EditModelSaving="Grid_EditModelSaving"
-            DataItemDeleting="Grid_DataItemDeleting"
-            CustomizeEditModel="Grid_CustomizeEditModel"
-            ValidationEnabled="true">
-                <ToolbarTemplate>
-                    <div hidden="@(!IsEmbedded)" class="bi bi-question-circle-fill text-info">
-                        &nbsp;  <b>Note: </b>Deleting a login will require the member to re-register.
-                        Otherwise, it is a safe measure of last resort when all else has failed.
-                    </div>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{BF214124-CDFA-4724-B2DC-EFF4D58E4244}" Visible="!IsEmbedded">
-                        <CustomButtonContent>
-                            <DxToolbarItem Text="Create Domain Login" CssClass="mx-1"
-                            Click="@OnCreateDomainLogin"
-                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                            RenderStyle="ButtonRenderStyle.Primary" />
-                            <DxToolbarItem Text="Populate Logins" CssClass="me-1"
-                            Click="@OnPopulateLogins"
-                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                            RenderStyle="ButtonRenderStyle.Primary" />
-                            <DxToolbarItem Text="Set Email Confirmed" CssClass="me-1"
-                            Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
-                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                            RenderStyle="ButtonRenderStyle.Primary" />
-                            <DxToolbarItem Text="Reset Password"
-                            Click="@OnResetPassword" Enabled="@AreItemsSelected()"
-                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                            RenderStyle="ButtonRenderStyle.Primary" />
-                        </CustomButtonContent>
-                    </GridToolbar>
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridSelectionColumn Width="2rem" Visible="@(!IsEmbedded)" />
-                    <DxGridCommandColumnEx Width="8rem" DeleteButtonVisible=true EditButtonVisible=true NewButtonVisible="false" />
-                    <DxGridDataColumn Caption="Email" FieldName="Email" />
-                    <DxGridDataColumn FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
-                    <DxGridDataColumn Width="6rem" FieldName="FinancialTo" UnboundType="GridUnboundColumnType.String" />
-                    <DxGridDataColumn Width="9em" Caption="Email Confirmed?" FieldName="EmailConfirmed" />
-                    <DxGridDataColumn Width="7rem" Visible=false
-                    Caption="Lockout Enabled?" FieldName="User.LockoutEnabled" />
-                    <DxGridDataColumn Width="6rem" Caption="Lockout End" Visible=false DisplayFormat="d" FieldName="LockoutEnd" />
-                    <DxGridDataColumn Width="5rem" Caption="Login Failures" Visible=false DisplayFormat="n0" FieldName="AccessFailedCount" />
-                    <DxGridDataColumn Visible="@(!IsEmbedded)" FieldName="Roles" UnboundType="GridUnboundColumnType.String" />
-                    <DxGridDataColumn Width="11em" Caption="Last Update"
-                    DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
-                    FieldName="LastUpdate" UnboundType="GridUnboundColumnType.DateTime" />
-                </Columns>
-                <EditFormTemplate Context="EditFormContext">
+            <FullScreen DisplayOffset="@((IsEmbedded) ? 19 : 8)" HideToggle="@IsEmbedded">
+                <ContentTemplate>
+                    <DxGrid Data="@AppUsers" @ref="mainGrid"
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    @bind-SelectedDataItems="@SelectedDataItems"
+                    ShowSearchBox="true"
+                    ShowFilterRow="false"
+                    ShowAllRows="false"
+                    KeyFieldName="Id"
+                    PopupEditFormHeaderText="Edit User Details"
+                    EditMode="GridEditMode.PopupEditForm"
+                    EditModelSaving="Grid_EditModelSaving"
+                    DataItemDeleting="Grid_DataItemDeleting"
+                    CustomizeEditModel="Grid_CustomizeEditModel"
+                    ValidationEnabled="true">
+                        <ToolbarTemplate>
+                            <div hidden="@(!IsEmbedded)" class="bi bi-question-circle-fill text-info">
+                                &nbsp;  <b>Note: </b>Deleting a login will require the member to re-register.
+                                Otherwise, it is a safe measure of last resort when all else has failed.
+                            </div>
+                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{BF214124-CDFA-4724-B2DC-EFF4D58E4244}" Visible="!IsEmbedded">
+                                <CustomButtonContent>
+                                    <DxToolbarItem Text="Create Domain Login" CssClass="mx-1"
+                                    Click="@OnCreateDomainLogin"
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
+                                    <DxToolbarItem Text="Populate Logins" CssClass="me-1"
+                                    Click="@OnPopulateLogins"
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
+                                    <DxToolbarItem Text="Set Email Confirmed" CssClass="me-1"
+                                    Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
+                                    <DxToolbarItem Text="Reset Password"
+                                    Click="@OnResetPassword" Enabled="@AreItemsSelected()"
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
+                                </CustomButtonContent>
+                            </GridToolbar>
+                        </ToolbarTemplate>
+                        <Columns>
+                            <DxGridSelectionColumn Width="2rem" Visible="@(!IsEmbedded)" />
+                            <DxGridCommandColumnEx Width="8rem" DeleteButtonVisible=true EditButtonVisible=true NewButtonVisible="false" />
+                            <DxGridDataColumn Caption="Email" FieldName="Email" />
+                            <DxGridDataColumn FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
+                            <DxGridDataColumn Width="6rem" FieldName="FinancialTo" UnboundType="GridUnboundColumnType.String" />
+                            <DxGridDataColumn Width="9em" Caption="Email Confirmed?" FieldName="EmailConfirmed" />
+                            <DxGridDataColumn Width="7rem" Visible=false
+                            Caption="Lockout Enabled?" FieldName="User.LockoutEnabled" />
+                            <DxGridDataColumn Width="6rem" Caption="Lockout End" Visible=false DisplayFormat="d" FieldName="LockoutEnd" />
+                            <DxGridDataColumn Width="5rem" Caption="Login Failures" Visible=false DisplayFormat="n0" FieldName="AccessFailedCount" />
+                            <DxGridDataColumn Visible="@(!IsEmbedded)" FieldName="Roles" UnboundType="GridUnboundColumnType.String" />
+                            <DxGridDataColumn Width="11em" Caption="Last Login"
+                                    DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
+                                    FieldName="LastLoginLocal" UnboundType="GridUnboundColumnType.DateTime" />
+                                <DxGridDataColumn Width="11em" Caption="Last Update"
+                                        DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
+                                        FieldName="LastUpdateLocal" UnboundType="GridUnboundColumnType.DateTime" />
+                            </Columns>
+                        <EditFormTemplate Context="EditFormContext">
                     @{
                         var editItem = (ApplicationUser)EditFormContext.EditModel;
                     }
-                    <DxFormLayout>
-                        <DxFormLayoutItem>
-                            <ValidationSummary />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Visible="@(!IsEmbedded)" Caption="User Roles" ColSpanMd="12">
-                            <DxTagBox Data="@roles" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                            @bind-Values="@SelectedRoles">
-                            </DxTagBox>
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Is Email Confirmed?" ColSpanMd="12">
-                            <DxCheckBox @bind-Checked=editItem.EmailConfirmed Enabled=!editItem.EmailConfirmed />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Password" ColSpanMd="12">
-                            <DxTextBox @bind-Text=editItem.Password NullText="leave blank if unchanged" Password=true />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption=" Confirm Password" ColSpanMd="12">
-                            <DxTextBox @bind-Text=editItem.ConfirmPassword Password=true />
-                        </DxFormLayoutItem>
-                    </DxFormLayout>
-                </EditFormTemplate>
+                            <DxFormLayout>
+                                <DxFormLayoutItem>
+                                    <ValidationSummary />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Visible="@(!IsEmbedded)" Caption="User Roles" ColSpanMd="12">
+                                    <DxTagBox Data="@roles" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    @bind-Values="@SelectedRoles">
+                                    </DxTagBox>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Is Email Confirmed?" ColSpanMd="12">
+                                    <DxCheckBox @bind-Checked=editItem.EmailConfirmed Enabled=!editItem.EmailConfirmed />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Password" ColSpanMd="12">
+                                    <DxTextBox @bind-Text=editItem.Password NullText="leave blank if unchanged" Password=true />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption=" Confirm Password" ColSpanMd="12">
+                                    <DxTextBox @bind-Text=editItem.ConfirmPassword Password=true />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </EditFormTemplate>
 
-                <TotalSummary>
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Total" FieldName="Email" />
-                </TotalSummary>
+                        <TotalSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Total" FieldName="Email" />
+                        </TotalSummary>
 
-            </DxGrid>
-        </ContentTemplate>
-    </FullScreen>
+                    </DxGrid>
+                </ContentTemplate>
+            </FullScreen>
     @quickMessage
 }
 
@@ -245,9 +248,13 @@ else
                 e.Value = p.FinancialToText;
             }
         }
-        if (e.FieldName == "LastUpdate")
+        if (e.FieldName == "LastUpdateLocal")
         {
             e.Value = dbc.GetLocalTime(appUser.LastUpdated);
+        }
+        if (e.FieldName == "LastLoginLocal")
+        {
+            e.Value = dbc.GetLocalTime(appUser.LastLogin);
         }
     }
 
