@@ -182,7 +182,7 @@ else
         }
         await progressBar.Close();
         if (!await IsDataOk(recipients, enrolments)) return;
-        var Leader = recipients[0];
+        var Leader = (recipients.Count > 0) ? recipients[0] : new Person();
         bool isPreview = true;
         reportFactory = new ProFormaReportFactory(Logger,Environment, U3Adbfactory, isPreview);
         var status = await reportFactory.CreateLeaderReports(
@@ -214,20 +214,10 @@ else
         var result = true;
         var enrolmentReqd = rptSelect.RequireEnrolements;
         var msg = "";
-        if (p.Count() <= 0)
-        {
-            result = false;
-            msg += "This course has no leader or clerk with a visible email address.<br/>";
-        }
         if (enrolmentReqd && e.Count() <= 0)
         {
             result = false;
             msg += "The course has no enrolments in the current term";
-        }
-        if (enrolmentReqd && e.Count() == e.Count(x => x.IsWaitlisted || x.isLeader))
-        {
-            result = false;
-            msg += "All participants in the current term are waitlisted.";
         }
         if (!result)
         {
