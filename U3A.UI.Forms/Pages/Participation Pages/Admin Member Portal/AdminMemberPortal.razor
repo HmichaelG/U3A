@@ -162,15 +162,30 @@ else
                                                 </FullScreen>
                                             </DxTabPage>
                                             <DxTabPage Text="Online Payment Status">
+                                                <div class="m-1">
                                                 <ReviewOnlinePaymentStatus IsEmbedded="true" />
+                                                </div>
+                                            </DxTabPage>
+                                            <DxTabPage Text="Email Status">
+                                                <div class="m-1">
+                                                <div class="bi bi-question-circle-fill text-info"><small>&nbsp;Cash Receipt/Enrolment reports within the hour. Leader reports within 48 hours of next class</small></div>
+                                                <QueuedTransactionalEmail IsEmbedded="true" />
+                                                </div>
                                             </DxTabPage>
                                             <DxTabPage Text="Add/Edit Member Details">
-                                                <div class="mt-2 alert-info text-dark text-center"><small>Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
-                                                <div class="mx-2"><PersonMnt IsEmbedded="true" GridLayoutKey="{1F6F77E7-6276-48FC-A1D3-E3A8959DA561}" /></div>
+                                                <div class="m-1">
+                                                <div class="bi bi-question-circle-fill text-info"><small>&nbsp;Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
+                                                <PersonMnt IsEmbedded="true" GridLayoutKey="{1F6F77E7-6276-48FC-A1D3-E3A8959DA561}" />
+                                                </div>
                                             </DxTabPage>
                                             <DxTabPage Text="Review Logins">
                                                 <div class="m-1">
-                                                <IdentityUserMnt IsEmbedded="true" />
+                                                    <div class="bi bi-question-circle-fill text-info">
+                                                        <small>&nbsp;  <b>Note: </b>Deleting a login will require the member to re-register.
+                                                            Otherwise, it is a safe measure of last resort.
+                                                        </small>
+                                                    </div>
+                                                    <IdentityUserMnt IsEmbedded="true" />
                                                 </div>
                                             </DxTabPage>
                                         </DxTabs>

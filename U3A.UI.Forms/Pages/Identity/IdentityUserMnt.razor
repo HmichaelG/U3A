@@ -60,25 +60,21 @@ else
                     CustomizeEditModel="Grid_CustomizeEditModel"
                     ValidationEnabled="true">
                 <ToolbarTemplate>
-                    <div hidden="@(!IsEmbedded)" class="bi bi-question-circle-fill text-info">
-                        &nbsp;  <b>Note: </b>Deleting a login will require the member to re-register.
-                        Otherwise, it is a safe measure of last resort when all else has failed.
-                    </div>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{BF214124-CDFA-4724-B2DC-EFF4D58E4244}" Visible="!IsEmbedded">
+                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{BF214124-CDFA-4724-B2DC-EFF4D58E4244}" >
                         <CustomButtonContent>
-                            <DxToolbarItem Text="Create Domain Login" CssClass="mx-1"
+                            <DxToolbarItem Text="Create Domain Login" CssClass="mx-1" Visible="!IsEmbedded"
                                            Click="@OnCreateDomainLogin"
                                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Populate Logins" CssClass="me-1"
-                                           Click="@OnPopulateLogins"
+                                           Click="@OnPopulateLogins" Visible="!IsEmbedded"
                                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary" />
-                            <DxToolbarItem Text="Set Email Confirmed" CssClass="me-1"
+                            <DxToolbarItem Text="Set Email Confirmed" CssClass="me-1" Visible="!IsEmbedded"
                                            Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
                                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary" />
-                            <DxToolbarItem Text="Reset Password"
+                            <DxToolbarItem Text="Reset Password" Visible="!IsEmbedded"
                                            Click="@OnResetPassword" Enabled="@AreItemsSelected()"
                                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                            RenderStyle="ButtonRenderStyle.Primary" />

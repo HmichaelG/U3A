@@ -1,6 +1,6 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
-@if (!IsDismissed)
+@if (!IsDismissed && Visible)
 {
     <section class="@($"{CssClass} alert-section {alertRender} text-center")" hidden="@isHidden">
         <button class="dismis-button btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
@@ -43,6 +43,7 @@
 
 </style>
 @code {
+    [Parameter] public bool Visible { get; set; } = true;
     [Parameter] public bool ShowCollapseButton { get; set; } = true;
     [Parameter] public string AlertType { get; set; } = "info";
     [Parameter] public string AlertText { get; set; }
