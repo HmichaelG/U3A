@@ -6,7 +6,7 @@
 
 
 @if (isReady) {
-    <section class="card border-info alert-info w-100" hidden="@isHidden">
+    <section class="card border-info alert-info w-100 p-1" hidden="@isHidden">
         <div class=@($"text-center p-2 {fontSizeCssClass}")>
             <button class="btn-close float-right" onclick="@onCloseButtonClick" />
             <strong>Terms &amp; Conditions</strong><br />@introduction

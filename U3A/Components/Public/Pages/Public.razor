@@ -18,15 +18,15 @@
 
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-@bind-IsActive="@IsXtraSmallLayout" />
+                    @bind-IsActive="@IsXtraSmallLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
-@bind-IsActive="@IsSmallLayout" />
+                    @bind-IsActive="@IsSmallLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Medium"
-@bind-IsActive="@IsMediumLayout" />
+                    @bind-IsActive="@IsMediumLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
-@bind-IsActive="@IsLargeLayout" />
+                    @bind-IsActive="@IsLargeLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
-@bind-IsActive="@IsXtraLargeLayout" />
+                    @bind-IsActive="@IsXtraLargeLayout" />
 
 @if (!isReady)
 {
@@ -56,6 +56,18 @@ else
                     {
                         <DxGridLayoutColumn Width="100%" />
                     }
+                    else if (IsMediumLayout)
+                    {
+                        <DxGridLayoutColumn Width="10%" />
+                        <DxGridLayoutColumn Width="80%" />
+                        <DxGridLayoutColumn Width="10%" />
+                    }
+                    else if (IsLargeLayout)
+                    {
+                        <DxGridLayoutColumn Width="5%" />
+                        <DxGridLayoutColumn Width="60%" />
+                        <DxGridLayoutColumn Width="5%" />
+                    }
                     else
                     {
                         <DxGridLayoutColumn Width="10%" />
@@ -76,56 +88,60 @@ else
                         <ErrorBoundary>
                             <ChildContent>
                                 <DxFormLayout>
-                                    <div class="row mx-auto">
+                                    <div class="row col col-12 mx-auto">
                                         <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
-                                        <DxFormLayoutGroup Caption="Display the Class Schedule" ColSpanMd="12" CaptionCssClass="text-primary">
+                                        <DxFormLayoutGroup Caption="Class Schedule" ColSpanMd="8" CssClass="mx-auto" CaptionCssClass="text-primary">
                                             <div class="w-100 px-2 mt-2">
                                                 @if (isNoEnrolmentTermAvailable)
                                                 {
-                                                    <p>We are currently working on a new Class Schedule. It will be available soon.</p>
+                                                    <p class="box-height">We are currently working on a new Class Schedule. It will be available soon.</p>
                                                 }
                                                 else
                                                 {
-                                                    <p>Click below to view the Class Schedule. You do not need to be logged in to view or print this report.</p>
+                                                    <p>
+                                                        Click below to view the <b>@(settings.U3AGroup)</b>
+                                                        Class Schedule, our calendar of classes, activities and events in the year.
+                                                    </p>
+                                                    <p>You do not need to be logged in to view or print this report.</p>
                                                 }
                                                 <DxButton Text="Click to display the schedule" Enabled="@(!isNoEnrolmentTermAvailable)"
-                                                IconCssClass="bi-printer menu-icon me-3 h2"
-                                                CssClass="col-12 mx-auto"
-                                                Click="OnReportClick"
-                                                RenderStyle="ButtonRenderStyle.Primary"
-                                                RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                          IconCssClass="bi-printer menu-icon me-3 h2"
+                                                          CssClass="col-12 mx-auto"
+                                                          Click="OnReportClick"
+                                                          RenderStyle="ButtonRenderStyle.Primary"
+                                                          RenderStyleMode="ButtonRenderStyleMode.Outline">
                                                 </DxButton>
                                             </div>
                                         </DxFormLayoutGroup>
                                         <div class="row col-12 mx-auto">
                                             <DxFormLayoutGroup Caption="New Member?" ColSpanMd="6" CaptionCssClass="text-primary">
                                                 <div class="mt-2 px-2">
-                                                    <div class="h5">Start Here</div>
+                                                    <div class="h6">Start Here</div>
                                                     <p class="box-height">
-                                                        If you wish to join our U3A, register an account to securely use the membership system and protect your privacy. You will need an email address to do so.
+                                                        If you wish to join  <b>@(settings.U3AGroup)</b>, please register to securely use the membership system and protect your privacy. You will need an email address to do so.
                                                     </p>
                                                     <DxButton Text="Register" Enabled="@(!isBeforeEnrolmentDay && !isNoEnrolmentTermAvailable)"
-                                                    IconCssClass="bi bi-person-plus menu-icon me-3 h2"
-                                                    CssClass="col-12 mx-auto"
-                                                    Click="@(e => NavigationManager.NavigateTo("Account/Register",true))"
-                                                    RenderStyle="ButtonRenderStyle.Primary"
-                                                    RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                              IconCssClass="bi bi-person-plus menu-icon me-3 h2"
+                                                              CssClass="col-12 mx-auto"
+                                                              Click="@(e => NavigationManager.NavigateTo("Account/Register",true))"
+                                                              RenderStyle="ButtonRenderStyle.Primary"
+                                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
                                                     </DxButton>
                                                 </div>
                                             </DxFormLayoutGroup>
                                             <DxFormLayoutGroup Caption="Returning Member?" ColSpanMd="6" CaptionCssClass="text-primary">
                                                 <div class="mt-2 px-2">
-                                                    <div class="h5">Login Here</div>
+                                                    <div class="h6">Login Here</div>
                                                     <p class="box-height">
                                                         As an existing member, please login to access your membership details, pay your membership fees,
-                                                        enrol in courses and more!
+                                                        enroll in courses and more!
                                                     </p>
                                                     <DxButton Text="Login" Enabled="@(!isBeforeEnrolmentDay)"
-                                                    IconCssClass="bi bi-person-check menu-icon me-3 h2"
-                                                    CssClass="col-12"
-                                                    Click="@(e => NavigationManager.NavigateTo("Account/Login",true))"
-                                                    RenderStyle="ButtonRenderStyle.Primary"
-                                                    RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                              IconCssClass="bi bi-person-check menu-icon me-3 h2"
+                                                              CssClass="col-12"
+                                                              Click="@(e => NavigationManager.NavigateTo("Account/Login",true))"
+                                                              RenderStyle="ButtonRenderStyle.Primary"
+                                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
                                                     </DxButton>
                                                 </div>
                                             </DxFormLayoutGroup>
@@ -139,11 +155,11 @@ else
                                         }
                                         <div class="row">
                                             <DxButton Text="Return to website"
-                                            IconCssClass="bi bi-globe-asia-australia menu-icon me-3 h2"
-                                            CssClass="col-6 mx-auto mt-2"
-                                            Click="@OnClose"
-                                            RenderStyle="ButtonRenderStyle.Primary"
-                                            RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                      IconCssClass="bi bi-globe-asia-australia menu-icon me-3 h2"
+                                                      CssClass="col-6 mx-auto mt-2"
+                                                      Click="@OnClose"
+                                                      RenderStyle="ButtonRenderStyle.Primary"
+                                                      RenderStyleMode="ButtonRenderStyleMode.Outline">
                                             </DxButton>
                                             <footer class="footer my-2 text-muted">
                                                 <div align="center">
@@ -170,7 +186,7 @@ else
                     </Template>
                 </DxGridLayoutItem>
                 <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none" />
-                @if (!(IsXtraSmallLayout || IsSmallLayout))
+                @if (!(IsXtraSmallLayout || IsSmallLayout || IsMediumLayout))
                 {
                     <DxGridLayoutItem Area="calendar">
                         <Template>
@@ -191,11 +207,11 @@ else
 }
 <style>
     .box-height {
-    height: @((IsXtraSmallLayout || IsSmallLayout) ? "" : (IsLargeLayout || IsXtraLargeLayout) ? "5rem" : "10rem");
+        height: @((IsXtraSmallLayout || IsSmallLayout) ? "" : (IsLargeLayout || IsXtraLargeLayout) ? "5rem" : "10rem");
     }
 
     .calendar-style {
-    width: 95%;
+        width: 95%;
     }
 
 </style>

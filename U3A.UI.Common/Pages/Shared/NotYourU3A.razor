@@ -1,0 +1,41 @@
+﻿@inject IDbContextFactory<TenantDbContext> tenantDbfactory
+@inject NavigationManager navMan
+
+@if (isReady)
+{
+<div class="px-2 border border-1">
+    <div class="h5 text-info"><b>Not Your U3A?</b></div>
+    <p>
+        Not a problem! Here is a list of other U3A using our software. Click to select &hellip;
+    </p>
+    <DxListBox Data="@tenants"
+               CssClass="mb-1"
+               TextFieldName="@nameof(TenantInfo.Name)"
+               ValueFieldName="@nameof(TenantInfo.Website)"
+               ValueChanged="@((string value) => OnRequiredU3AChanged(value))" />
+</div>
+}
+
+@code {
+    bool isReady;
+    List<TenantInfo>? tenants;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        using (var dbc = await tenantDbfactory.CreateDbContextAsync())
+        {
+            tenants = await dbc.TenantInfo
+                        .AsNoTracking()
+                        .Where(t => !t.UsePostmarkTestEnviroment)
+                        .OrderBy(t => t.Name)
+                        .ToListAsync();
+        }
+        isReady = true;
+    }
+
+    void OnRequiredU3AChanged(string website)
+    {
+        navMan.NavigateTo(website, true);
+    }
+}
