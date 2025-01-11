@@ -21,6 +21,8 @@ namespace U3A.WebFunctions.Procedures
             using (var dbc = new U3ADbContext(tenant))
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
+                var settings = dbc.SystemSettings.OrderBy(x=>x.ID).FirstOrDefault();
+                var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 using (var dbcT = new TenantDbContext(tenantConnectionString))
                 {
                     List<(Guid, Guid, Guid?)> onFile = new();
@@ -58,9 +60,15 @@ namespace U3A.WebFunctions.Procedures
                                                     .Include(x => x.Course)
                                                     .Include(x => x.Person)
                                                     .Where(x => !x.IsDeleted && x.ID == sm.RecordKey).FirstOrDefaultAsync();
-                                if (enrolment == null)
+                                if (enrolment == null && currentTerm != null && settings != null)
                                 {
-                                    enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT, sm.RecordKey, tenant.Identifier!);
+                                    if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
+                                    {
+                                        if (!BusinessRule.IsPreRandomAllocationEmailDay(currentTerm, settings, today))
+                                        {
+                                            enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT, sm.RecordKey, tenant.Identifier!);
+                                        }
+                                    }
                                 }
                                 if (enrolment != null)
                                 {
