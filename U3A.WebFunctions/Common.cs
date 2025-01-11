@@ -35,7 +35,7 @@ namespace U3A.WebFunctions
                                         UseEwayTestEnviroment,
                                         PostmarkAPIKey, 
                                         PostmarkSandboxAPIKey, 
-                                        UsePostmarkTestEnviroment FROM TenantInfo";
+                                        UsePostmarkTestEnviroment FROM TenantInfo ORDER BY Identifier";
                 using (var cmd = new SqlCommand(cmdText, cnn))
                 {
                     SqlDataReader? rdr;
