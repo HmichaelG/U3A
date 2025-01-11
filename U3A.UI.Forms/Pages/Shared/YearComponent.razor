@@ -43,7 +43,11 @@
         await base.OnInitializedAsync();
         dbc = await U3Adbfactory.CreateDbContextAsync();
         currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-        years = await dbc.Term.OrderBy(x=>x.Year).Select(x => x.Year).Distinct().ToListAsync();
+        years = await dbc.Term
+                        .OrderByDescending(x=>x.Year)
+                        .Select(x => x.Year)
+                        .Distinct()
+                        .ToListAsync();
         if (currentTerm != null)
         {
             Year = currentTerm.Year;

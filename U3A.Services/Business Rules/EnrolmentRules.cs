@@ -687,11 +687,11 @@ namespace U3A.BusinessRules
             }
             if (await dbc.Class.AnyAsync(x => x.ID == c.ID))
             {
-                result = await AddEnrolmentRequests(dbc, c, person, term, prevTerm);
+                result = await AddEnrolmentRequests(dbc, c, person, thisTerm, thisPrevTerm);
             }
             else
             {
-                result = await AddMultiCampusEnrolmentRequests(dbT, c, person, term, prevTerm);
+                result = await AddMultiCampusEnrolmentRequests(dbT, c, person, thisTerm, thisPrevTerm);
             }
             return result;
         }
