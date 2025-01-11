@@ -5,7 +5,21 @@
 <MessageBox @ref="@messageBox" />
 <div class="@cssClass" styel="height: auto">
     <h3>@Year</h3>
-    <DxButton Text="Change Year" RenderStyle="ButtonRenderStyle.Primary" Click="OnChangeClick" CssClass="mb-1" />
+    <DxDropDownButton RenderStyle="ButtonRenderStyle.Primary"
+    Text="Change Year"
+    ItemClick="@OnYearItemClick"
+    IconCssClass="tb-icon tb-icon-paste"
+    CssClass="mb-1">
+        <Items>
+            @{
+                var displayYears = years;
+                foreach (var y in displayYears)
+                {
+                    <DxDropDownButtonItem Text="@y.ToString()"  />
+                }
+            }
+        </Items>
+    </DxDropDownButton>
 </div>
 
 @code {
@@ -16,23 +30,23 @@
     [Parameter]
     public int Year { get; set; }
     [Parameter]
-    public string CssClass { get { return CssClass; } set{ cssClass = $"{value} {cssClass}".Trim(); } }
+    public string CssClass { get { return CssClass; } set { cssClass = $"{value} {cssClass}".Trim(); } }
     Term currentTerm;
-    Term firstTermNextYear;
     MessageBox? messageBox;
     U3ADbContext dbc { get; set; }
+    List<int> years;
 
 
-    protected override async Task OnInitializedAsync() {
+
+    protected override async Task OnInitializedAsync()
+    {
         await base.OnInitializedAsync();
         dbc = await U3Adbfactory.CreateDbContextAsync();
         currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+        years = await dbc.Term.OrderBy(x=>x.Year).Select(x => x.Year).Distinct().ToListAsync();
         if (currentTerm != null)
         {
             Year = currentTerm.Year;
-            firstTermNextYear = await BusinessRule.FirstTermNextYearAsync(dbc, currentTerm.Year);
-            if (firstTermNextYear != null 
-                && DateTime.Today >= firstTermNextYear.EnrolmentStartDate) Year = firstTermNextYear.Year;
         }
     }
 
@@ -45,19 +59,21 @@
         }
     }
 
-
-    async Task OnChangeClick() {
-        if (Year == currentTerm.Year ) { Year++; } else { Year--; }
-        if (Year != currentTerm.Year) {
-            if (firstTermNextYear == null) {
-                await messageBox.ShowOkOnlyAsync("Year Cannot Be Changed", $"Use <strong>Add/Edit Enrolment Terms</strong> to create a terms in {Year}.");
-                Year--;
+    async Task OnYearItemClick(DropDownButtonItemClickEventArgs args)
+    {
+        if (args != null)
+        {
+            int value;
+            if (int.TryParse( args.ItemInfo.Text, out value)) {
+                Year = value;
+                await OnYearChangedEvent.InvokeAsync(Year);
             }
         }
-        await OnYearChangedEvent.InvokeAsync(Year);
     }
 
-    public void Dispose() {
+
+    public void Dispose()
+    {
         dbc?.Dispose();
     }
 
