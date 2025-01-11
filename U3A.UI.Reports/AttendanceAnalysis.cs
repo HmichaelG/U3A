@@ -1,4 +1,5 @@
-﻿using DevExpress.Web.Internal;
+﻿using DevExpress.CodeParser;
+using DevExpress.Web.Internal;
 using DevExpress.XtraReports.UI;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,13 +13,16 @@ using U3A.Model;
 
 namespace U3A.UI.Reports
 {
-    public partial class AttendanceAnalysis : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContextFactory
+    public partial class AttendanceAnalysis
+        : DevExpress.XtraReports.UI.XtraReport, IXtraReportWithDbContextFactory, IXtraReportWithDbContext
     {
         public AttendanceAnalysis()
         {
             InitializeComponent();
         }
         public IDbContextFactory<U3ADbContext> U3Adbfactory { get; set; }
+        public U3ADbContext DbContext { get; set; }
+
         List<AttendClassDetailByWeek> data;
         string[] courseFilter = new string[] { };
         private void AttendanceAnalysis_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
@@ -33,17 +37,33 @@ namespace U3A.UI.Reports
         }
         private void AttendanceAnalysis_DataSourceDemanded(object sender, EventArgs e)
         {
-            using (var DbContext = U3Adbfactory.CreateDbContext())
+            if (U3Adbfactory != null)
             {
-                int year = (int)prmYear.Value;
-                if (year == 0) { year = DbContext.GetLocalTime().Year; }
-                xrChart1.Titles[0].Text = $"{year} Attendance Analysis";
-                data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext, year);
-                objectDataSource1.DataSource = data;
-                if (prmCourseFilter.Value != null)
+                using (DbContext = U3Adbfactory.CreateDbContext())
                 {
-                    courseFilter = (string[])prmCourseFilter.Value;
+                    ProcessReport(DbContext);
                 }
+            }
+            else if (DbContext != null)
+            {
+                ProcessReport(DbContext);
+            }
+            else
+            {
+                throw new NullReferenceException("DbContext or U3AdbFactory must be set");
+            }
+        }
+
+        private void ProcessReport(U3ADbContext DbContext)
+        {
+            int year = (int)prmYear.Value;
+            if (year == 0) { year = DbContext.GetLocalTime().Year; }
+            xrChart1.Titles[0].Text = $"{year} Attendance Analysis";
+            data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext, year);
+            objectDataSource1.DataSource = data;
+            if (prmCourseFilter.Value != null)
+            {
+                courseFilter = (string[])prmCourseFilter.Value;
             }
         }
 
