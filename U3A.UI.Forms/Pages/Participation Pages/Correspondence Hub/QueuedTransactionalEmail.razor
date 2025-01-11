@@ -45,7 +45,7 @@ else
             <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
             <div class="pb-1" />
-            <FullScreen @ref=@fullScreen DisplayOffset="@contentSize">
+            <FullScreen @ref=@fullScreen DisplayOffset="@contentSize" HideToggle="@IsEmbedded">
                 <ContentTemplate>
                     <DxGrid Data="@SendMail" @ref=@mainGrid
                             @bind-SelectedDataItems="@SelectedDataItems"
@@ -54,7 +54,7 @@ else
                             ShowAllRows="false"
                             KeyFieldName="ID"
                             ValidationEnabled="true"
-                            SelectionMode="GridSelectionMode.Multiple">
+                            SelectionMode="@((IsEmbedded) ? GridSelectionMode.Single : GridSelectionMode.Multiple)">
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid LayoutKey="{5AC4F74E-C707-4297-8949-A64FB18C0819}">
                                 <CustomButtonContent>
@@ -68,7 +68,7 @@ else
                                                    Tooltip="Send email to selected participants, now."
                                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                                    RenderStyle="ButtonRenderStyle.Primary" />
-                                    <DxToolbarItem Text="Delete" IconCssClass="bi bi-trash"
+                                    <DxToolbarItem Text="Delete" IconCssClass="bi bi-trash" Visible="@(!IsEmbedded)"
                                                    Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
                                                    Tooltip="Delete the selected email."
                                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
