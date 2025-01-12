@@ -114,9 +114,9 @@ else
                                         @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
-                                                (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                                ? $" | {c.Course.OfferedBy}" : "")
-                                                    )
+                                                        (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                        ? $" | {c.Course.OfferedBy}" : "")
+                                                            )
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
@@ -931,6 +931,7 @@ else
 
     async Task ShowSelectedClasses(bool scrollToTop)
     {
+        var savedFilter = filterText;
         selectedClass = null;
         if (IsEnrolmentRequestView || IsPreview)
         {
@@ -945,6 +946,7 @@ else
             ListboxData = selectedClasses;
             isListboxShowingSummary = true;
         }
+        if (!string.IsNullOrWhiteSpace(savedFilter)) { await OnFilterTextChanged(savedFilter); }
         if (scrollToTop)
         {
             ScrollListboxToTop();
