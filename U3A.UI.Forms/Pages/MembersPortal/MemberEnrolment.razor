@@ -722,7 +722,7 @@ else
                 if (thisClass != null)
                 {
                     await SelectedClassChanged(thisClass);
-                    QRClassID = null; //clear so we dont double process the request
+                    QRClassID = null; //clear so we don't double process the request
                 }
                 else
                 {
@@ -883,8 +883,8 @@ else
         }
         if (leaderExceptions.Any())
         {
-            var msg = "<p>You have or are attempting to enrol in classes you lead.<br/>" +
-            "Course leaders do not enrol in their own classes.</p>";
+            var msg = "<p>You have or are attempting to enroll in classes you lead.<br/>" +
+            "Course leaders do not enroll in their own classes.</p>";
             foreach (var c in leaderExceptions)
             {
                 msg += $"<p><strong>Course:</strong> {c.Course.Name}</p>";
@@ -932,14 +932,12 @@ else
     async Task ShowSelectedClasses(bool scrollToTop)
     {
         selectedClass = null;
-        int currentRow = -1;        
         if (IsEnrolmentRequestView || IsPreview)
         {
             //Enrolment request view
-            filterText = null;
-            if (scrollToTop && listGrid != null) { currentRow = listGrid.GetStartRowVisibleIndex(); }
             await GetData();
             isListboxShowingSummary = false;
+            filterText = null;
         }
         else
         {
@@ -947,13 +945,9 @@ else
             ListboxData = selectedClasses;
             isListboxShowingSummary = true;
         }
-        if (scrollToTop) 
-        { 
-            ScrollListboxToTop(); 
-        }
-        else if (currentRow >= 0)
+        if (scrollToTop)
         {
-            listGrid?.MakeRowVisible(currentRow);
+            ScrollListboxToTop();
         }
         SetReviewButtonText();
     }
@@ -997,19 +991,12 @@ else
         }
     }
 
-    async Task<bool> SelectedDataItemChanged(bool IsSelected, Class selectedClass)
-    {
-        selectedClass.IsSelected = IsSelected;
-        await SelectedClassChanged(selectedClass);
-        return selectedClass.IsSelected;
-    }
-
     async Task SelectedDataItemChanged(Class selectedClass)
     {
         if (selectedClass == null) { return; }
         if (showingWebLink) { return; }
         if (IsReadOnly || IsPreview) { return; }
-        SelectedClassChanged(selectedClass);
+        await SelectedClassChanged(selectedClass);
     }
 
     async Task SelectedClassChanged(Class thisClass)
@@ -1099,7 +1086,6 @@ else
                         await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolment, term, settings));
                     }
                     isDirty = false;
-                    StateHasChanged();
                 }
                 catch (Exception ex)
                 {
