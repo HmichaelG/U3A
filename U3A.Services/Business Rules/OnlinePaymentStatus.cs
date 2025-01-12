@@ -53,6 +53,11 @@ namespace U3A.BusinessRules
                     s.ResultDescription = code.CodeAndDescription;
                     s.ResultLongDescription = code.LongDescription;
                 }
+                else
+                {
+                    s.ResultDescription = $"{s.ResultCode} Not documented";
+                    s.ResultLongDescription = "The response returned from the bank to EWAY is not documented.";
+                }
             }
             return status;
         }
