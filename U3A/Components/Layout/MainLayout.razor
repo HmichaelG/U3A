@@ -55,11 +55,11 @@
 }
 <style>
     .container-main {
-    width: 100%;
-    padding-right: var(--bs-gutter-x, 0.50rem);
-    padding-left: var(--bs-gutter-x, 0.50rem);
-    margin-right: auto;
-    margin-left: auto;
+        width: 100%;
+        padding-right: var(--bs-gutter-x, 0.50rem);
+        padding-left: var(--bs-gutter-x, 0.50rem);
+        margin-right: auto;
+        margin-left: auto;
     }
 </style>
 
@@ -171,6 +171,7 @@
     public void HandleCircuitsChanged(object sender, EventArgs args)
     {
         openCircuits = (circuitHandler as CircuitHandlerService)!.CircuitDetails.Count;
+        InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
