@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using U3A.Database;
@@ -16,11 +17,8 @@ namespace U3A.Services
     public class CircuitHandlerService : CircuitHandler
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        public ConcurrentDictionary<string, CircuitDetail> CircuitDetails
-        {
-            get;
-            set;
-        }
+
+        public ConcurrentDictionary<string, CircuitDetail> CircuitDetails { get; set; }
 
         public event EventHandler CircuitsChanged;
 
@@ -33,8 +31,7 @@ namespace U3A.Services
             CircuitDetails = new ConcurrentDictionary<string, CircuitDetail>();
         }
 
-        public override Task OnCircuitOpenedAsync(Circuit circuit,
-                             CancellationToken cancellationToken)
+        public override async Task OnCircuitOpenedAsync(Circuit circuit, CancellationToken cancellationToken)
         {
             var id = httpContextAccessor?.HttpContext?.User?.Identity;
             var host = httpContextAccessor?.HttpContext?.Request?.Host.Host;
@@ -51,38 +48,33 @@ namespace U3A.Services
                 CircuitDetails.TryAdd(circuit.Id, cd);
                 OnCircuitsChanged();
             }
-            return base.OnCircuitOpenedAsync(circuit,
-                                  cancellationToken);
+            await base.OnCircuitOpenedAsync(circuit, cancellationToken);
         }
 
-        public override Task OnCircuitClosedAsync(Circuit circuit,
-                  CancellationToken cancellationToken)
+        public override async Task OnCircuitClosedAsync(Circuit circuit, CancellationToken cancellationToken)
         {
             CircuitDetail circuitRemoved;
             if (CircuitDetails.TryRemove(circuit.Id, out circuitRemoved))
             {
                 OnCircuitsChanged();
             }
-            return base.OnCircuitClosedAsync(circuit,
-                              cancellationToken);
+            await base.OnCircuitClosedAsync(circuit, cancellationToken);
         }
 
-        public override Task OnConnectionDownAsync(Circuit circuit,
-                              CancellationToken cancellationToken)
+        public override async Task OnConnectionDownAsync(Circuit circuit, CancellationToken cancellationToken)
         {
             var kvp = CircuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
-            if (kvp!.Value != null) { kvp.Value.Down = DateTime.UtcNow; }
-            return base.OnConnectionDownAsync(circuit,
-                             cancellationToken);
+            if (kvp!.Value != null && kvp.Value.Down == null) { kvp.Value.Down = DateTime.UtcNow; }
+            await base.OnConnectionDownAsync(circuit, cancellationToken);
         }
 
-        public override Task OnConnectionUpAsync(Circuit circuit,
-                            CancellationToken cancellationToken)
+        public override async Task OnConnectionUpAsync(Circuit circuit, CancellationToken cancellationToken)
         {
             var kvp = CircuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
             if (kvp!.Value != null) { kvp.Value.Down = null; }
-            return base.OnConnectionUpAsync(circuit, cancellationToken);
+            await base.OnConnectionUpAsync(circuit, cancellationToken);
         }
+
     }
 
     public class CircuitDetail

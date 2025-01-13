@@ -22,25 +22,36 @@
 }
 else
 {
-    <DxPopup HeaderText="Open Circuits" Width="50%" ShowFooter="true" 
-    @ref="@circuitDisplay"
-    @bind-Visible=@showPopup>
+    <DxWindow HeaderText="Open Circuits" Width="800px" ShowFooter="true"
+              ShowCloseButton="true"
+              CloseOnEscape="true"
+              @ref="@circuitDisplay"
+              @bind-Visible=@showPopup>
         <BodyTemplate>
-            <DxGrid Data="@circuitDetails"
-                VirtualScrollingEnabled="true"
-                FooterDisplayMode="GridFooterDisplayMode.Always">
-                <Columns>
-                    <DxGridDataColumn Fieldname="UpTime" />
-                    <DxGridDataColumn Fieldname="DownTime" />
-                    <DxGridDataColumn Fieldname="Name" Caption="Login"/>
-                    <DxGridDataColumn Fieldname="Tenant" />
-                </Columns>
-            </DxGrid>
+            <FullScreen DisplayOffset="20" HideToggle="true">
+                <ContentTemplate>
+                    <DxGrid Data="@circuitDetails"
+                            VirtualScrollingEnabled="true"
+                            FooterDisplayMode="GridFooterDisplayMode.Always">
+                        <Columns>
+                            <DxGridDataColumn Fieldname="UpTime" />
+                            <DxGridDataColumn Fieldname="DownTime" />
+                            <DxGridDataColumn Fieldname="Name" Caption="Login" />
+                            <DxGridDataColumn Fieldname="Tenant" />
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="UpTime" FooterColumnName="UpTime" />
+                        </TotalSummary>
+
+                    </DxGrid>
+                </ContentTemplate>
+            </FullScreen>
         </BodyTemplate>
         <FooterTemplate>
-            <DxButton Text="Refresh" Click="() => StateHasChanged()" />
+            <DxButton Text="Refresh" CssClass="m-1"
+                Click="() => {GetCircuitData();StateHasChanged();}" />
         </FooterTemplate>
-    </DxPopup>
+    </DxWindow>
     <MessageBox @ref="@messageBox" />
 
     <DxFormLayout CssClass="@($"px-2 mt-{ws.SizeMode+2}")">
@@ -53,18 +64,18 @@ else
             <div class="@($"input-group d-print-none mt-{ws.SizeMode+2}")">
                 <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
-                ButtonIconCssClass="bi bi-check2-circle"
-                HelpTopic=@($"{versionYear}-Version-History.html")
-                ActivationStyle="@HelpActivationStyle.ButtonOnly" />
+                                  ButtonIconCssClass="bi bi-check2-circle"
+                                  HelpTopic=@($"{versionYear}-Version-History.html")
+                                  ActivationStyle="@HelpActivationStyle.ButtonOnly" />
                 <DxButton Text="Support"
-                RenderStyleMode="ButtonRenderStyleMode.Outline"
-                NavigateUrl="Public/Support"
-                CssClass="ms-1"
-                IconCssClass="bi bi-person" />
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          NavigateUrl="Public/Support"
+                          CssClass="ms-1"
+                          IconCssClass="bi bi-person" />
                 <ContextHelpTitle Title=""
-                HelpTopic="Introduction.html"
-                IncludeTableOfContents=true
-                ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                                  HelpTopic="Introduction.html"
+                                  IncludeTableOfContents=true
+                                  ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
             </div>
             <DxTabs CssClass="w-100">
                 <DxTabPage Text="Member Summary">
@@ -101,11 +112,11 @@ else
 <style>
 
     .iframe-style {
-    width: 85vw;
-    min-height: 40dvh;
-    height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem") );
-    border-style: none;
-    padding-bottom: 5px;
+        width: 85vw;
+        min-height: 40dvh;
+        height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem") );
+        border-style: none;
+        padding-bottom: 5px;
     }
 
 </style>
@@ -126,7 +137,7 @@ else
     DateTime now;
     string? qrMessage = null;
     string? versionYear;
-    DxPopup? circuitDisplay;
+    DxWindow? circuitDisplay;
     List<CircuitDetail>? circuitDetails;
     bool showPopup;
 
@@ -204,15 +215,19 @@ else
 
     void OnCircuitClick()
     {
+        GetCircuitData();
+        showPopup = true;
+    }
+
+    void GetCircuitData()
+    {
         circuitDetails = [];
         foreach (var kvp in (circuitHandler as CircuitHandlerService)!.CircuitDetails)
         {
             var cd = kvp.Value;
             circuitDetails.Add(kvp.Value);
         }
-        showPopup = true;
     }
-
 
     public string GetAssemblyVersion()
     {
