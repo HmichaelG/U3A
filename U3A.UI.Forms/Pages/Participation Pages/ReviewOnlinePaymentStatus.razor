@@ -34,14 +34,14 @@ else
     <FullScreen DisplayOffset="@((IsEmbedded) ? 18 : 8)" HideToggle="@IsEmbedded">
         <ContentTemplate>
             <DxGrid Data="@PaymentStatus" @ref=@mainGrid
-                    AutoExpandAllGroupRows="true"
-                    SelectionMode="GridSelectionMode.Single"
-                    SelectedDataItem="selectedPaymentStatus"
-                    SelectedDataItemChanged="OnSelectionChanged"
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    UnboundColumnData="Grid_UnboundColumnData"
-                    ShowAllRows="true"
-                    KeyFieldName="ID">
+            AutoExpandAllGroupRows="true"
+            SelectionMode="GridSelectionMode.Single"
+            SelectedDataItem="selectedPaymentStatus"
+            SelectedDataItemChanged="OnSelectionChanged"
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            UnboundColumnData="Grid_UnboundColumnData"
+            ShowAllRows="true"
+            KeyFieldName="ID">
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid LayoutKey="{41DF3299-CBB3-452F-82B9-0A579829ED66}">
                         <CustomButtonContent>
@@ -62,24 +62,24 @@ else
                                 </Template>
                             </DxToolbarItem>
                             <DxToolbarItem Text="Full Msg" BeginGroup="true"
-                                           Alignment="ToolbarItemAlignment.Right"
-                                           Tooltip="Display the full Eway result message."
-                                           IconCssClass="bi bi-chat"
-                                           RenderStyle="ButtonRenderStyle.Primary"
-                                           Click="OnFullMsg" />
+                            Alignment="ToolbarItemAlignment.Right"
+                            Tooltip="Display the full Eway result message."
+                            IconCssClass="bi bi-chat"
+                            RenderStyle="ButtonRenderStyle.Primary"
+                            Click="OnFullMsg" />
                             <DxToolbarItem Text="Re-Submit" BeginGroup="true"
-                                           Alignment="ToolbarItemAlignment.Right"
-                                           IconCssClass="bi bi-arrow-clockwise"
-                                           Tooltip="Re-submit the selected payment to Eway and process receipt, if successful."
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary"
-                                           Enabled=@(selectedPaymentStatus != null && string.IsNullOrWhiteSpace(selectedPaymentStatus.Status))
-                                           Click="OnResubmit" />
+                            Alignment="ToolbarItemAlignment.Right"
+                            IconCssClass="bi bi-arrow-clockwise"
+                            Tooltip="Re-submit the selected payment to Eway and process receipt, if successful."
+                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                            RenderStyle="ButtonRenderStyle.Primary"
+                            Enabled=@(selectedPaymentStatus != null && !finalisedCodes.Contains(selectedPaymentStatus.ResultCode))
+                            Click="OnResubmit" />
                             <DxToolbarItem Visible="@IsEmbedded" Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
                                 <Template>
                                     <ContextHelpTitle Title="" HelpTopic="Review-Online-Payment-Status.html"
-                                                      ButtonIconCssClass="bi bi-question-circle-fill help-btn"
-                                                      ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                                    ButtonIconCssClass="bi bi-question-circle-fill help-btn"
+                                    ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
                                 </Template>
                             </DxToolbarItem>
                         </CustomButtonContent>
@@ -88,14 +88,14 @@ else
                 <Columns>
                     <DxGridSelectionColumn Width="4rem" />
                     <DxGridDataColumn Width="5rem" Caption="Date"
-                                      FieldName="Created"
-                                      DisplayFormat="dd-MMM-yyyy"
-                                      UnboundType="GridUnboundColumnType.DateTime"
-                                      SortOrder="GridColumnSortOrder.Descending" />
+                    FieldName="Created"
+                    DisplayFormat="dd-MMM-yyyy"
+                    UnboundType="GridUnboundColumnType.DateTime"
+                    SortOrder="GridColumnSortOrder.Descending" />
                     <DxGridDataColumn Width="5rem" Caption="Time"
-                                      FieldName="CreatedTime"
-                                      DisplayFormat="hh:mm tt"
-                                      UnboundType="GridUnboundColumnType.DateTime" />
+                    FieldName="CreatedTime"
+                    DisplayFormat="hh:mm tt"
+                    UnboundType="GridUnboundColumnType.DateTime" />
                     <DxGridDataColumn Width="6rem" Caption="Status" FieldName="Status" />
                     <DxGridDataColumn Caption="Result Code" FieldName="ResultDescription" />
                     <DxGridDataColumn Caption="Participant" FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
@@ -129,6 +129,7 @@ else
     TimeSpan? offset;
     DateTime startDate;
     DateTime endDate;
+    string[] finalisedCodes = { "00", "--" }; 
 
     Progress? progressBar;
 

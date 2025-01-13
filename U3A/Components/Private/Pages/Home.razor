@@ -22,11 +22,13 @@
 }
 else
 {
-    <DxPopup HeaderText="Open Circuits" Width="50%" ShowFooter="true"
+    <DxPopup HeaderText="Open Circuits" Width="50%" ShowFooter="true" 
     @ref="@circuitDisplay"
     @bind-Visible=@showPopup>
         <BodyTemplate>
-            <DxGrid Data="@circuitDetails" FooterDisplayMode="GridFooterDisplayMode.Always">
+            <DxGrid Data="@circuitDetails"
+                VirtualScrollingEnabled="true"
+                FooterDisplayMode="GridFooterDisplayMode.Always">
                 <Columns>
                     <DxGridDataColumn Fieldname="UpTime" />
                     <DxGridDataColumn Fieldname="DownTime" />
