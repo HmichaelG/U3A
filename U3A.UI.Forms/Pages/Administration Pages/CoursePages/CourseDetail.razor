@@ -11,14 +11,6 @@
 else
 {
     <DxFormLayout Data="@Course" CssClass="w-100 p-1">
-
-        @if (!IsReadOnly)
-        {
-            <DxFormLayoutItem ColSpanMd="12">
-                <ValidationSummary />
-            </DxFormLayoutItem>
-        }
-
         <DxTabs @ref=@TabPages
                 CssClass="page-height w-100" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
             <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>

@@ -26,7 +26,6 @@ else
                   OnValidSubmit=@ValidFormSubmitted
                   Context="editContext">
             <DataAnnotationsValidator />
-            <ValidationSummary />
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
                 @if (loginState.SelectedPerson == null)
                 {
@@ -73,11 +72,9 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
                             <DxTextBox @bind-Text="@person.FirstName" ReadOnly="@(isDatabaseCheckDone)" />
-                            <ValidationMessage For="@(() => person.FirstName)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
                             <DxTextBox @bind-Text="@person.LastName" ReadOnly="@(isDatabaseCheckDone)" />
-                            <ValidationMessage For="@(() => person.LastName)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12" Visible=@systemSettings.AllowPostNominalLetters>
                             <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
@@ -85,7 +82,6 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
                             <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
-                            <ValidationMessage For="@(() => person.Gender)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
                             <DxDateEdit @bind-Date="@person.BirthDate" 
@@ -101,19 +97,15 @@ else
                     <DxFormLayoutGroup Caption="Address / Contact Information">
                         <DxFormLayoutItem Caption="Street" ColSpanXl="12">
                             <DxTextBox @bind-Text="@person.Address" />
-                            <ValidationMessage For="@(() => person.Address)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="City" ColSpanMd="12">
                             <DxTextBox @bind-Text="@person.City" ReadOnly="@(isDatabaseCheckDone)" />
-                            <ValidationMessage For="@(() => person.City)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="State" ColSpanMd="6">
                             <DxComboBox Data="@states" @bind-Value="@person.State" />
-                            <ValidationMessage For="@(() => person.State)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
                             <DxSpinEdit @bind-Value="@person.Postcode" />
-                            <ValidationMessage For="@(() => person.Postcode)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Email" ColSpanMd="12">
                             <DxTextBox @bind-Text="@person.Email" ReadOnly="true">

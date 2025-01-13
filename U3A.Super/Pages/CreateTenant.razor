@@ -48,7 +48,6 @@ else
         </div>
         <EditForm Model="@details" OnValidSubmit=@ValidFormSubmitted Context="editContext">
             <DataAnnotationsValidator />
-            <ValidationSummary />
             <DxFormLayout>
                 <DxFormLayoutItem Caption="Tenant ID" ColSpanMd="7">
                     <DxTextBox @bind-Text=@details!.TenantKey NullText="The unique tenant subdomain & database name. Must conform to DNS naming standards." />
@@ -65,7 +64,6 @@ else
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="State" ColSpanMd="7">
                     <DxComboBox Data="@states" @bind-Value="@details!.State" />
-                    <ValidationMessage For="@(() => details.State)" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem ColSpanMd="12" Context="myContext">
                     <Template>

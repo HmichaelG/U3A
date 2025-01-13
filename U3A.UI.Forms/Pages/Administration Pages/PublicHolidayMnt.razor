@@ -65,9 +65,6 @@ else {
                     var editItem = (PublicHoliday)EditFormContext.EditModel;
                 }
                 <DxFormLayout>
-                    <DxFormLayoutItem ColSpanMd="12">
-                        <ValidationSummary />
-                    </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Date" ColSpanMd="12">
                         <DxDateEdit @bind-Date="@editItem.Date" />
                     </DxFormLayoutItem>

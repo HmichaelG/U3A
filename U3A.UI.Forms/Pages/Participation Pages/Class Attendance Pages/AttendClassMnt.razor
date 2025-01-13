@@ -208,9 +208,6 @@ else
                         var editItem = (AttendClass)EditFormContext.EditModel;
                     }
                     <DxFormLayout>
-                        <DxFormLayoutItem ColSpanMd="12">
-                            <ValidationSummary />
-                        </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Class Attendance" ColSpanMd="12">
                             <DxComboBox Data="ClassAttendanceStatus"
                                         @bind-Value="@editItem.AttendClassStatus"

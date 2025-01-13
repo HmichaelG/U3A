@@ -14,7 +14,9 @@ namespace U3A.Model
     public class PublicHoliday
     {
         public Guid ID { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public DateTime Date { get; set; }
     }
 }

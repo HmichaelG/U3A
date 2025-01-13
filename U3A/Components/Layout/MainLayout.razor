@@ -65,12 +65,10 @@
 
 @code {
 
-    public int openCircuits { get; set; }
-    public bool hasRole { get; set; }
-    public bool? useTopMenu = null; // default is sidebar
-
-    [CascadingParameter]
-    public LoginState? loginState { get; set; }
+    private int openCircuits { get; set; }
+    private bool hasRole { get; set; }
+    private bool? useTopMenu = null; // default is sidebar
+    private LoginState? loginState { get; set; }
 
     U3ADbContext? dbc { get; set; }
     bool isReady = false;

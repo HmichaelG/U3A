@@ -55,9 +55,6 @@ else
                         var editItem = (Committee)CommitteeContext.EditModel;
                     }
                     <DxFormLayout>
-                        <DxFormLayoutItem ColSpanMd="12">
-                            <ValidationSummary />
-                        </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Position" ColSpanMd="12">
                             <DxComboBox Data="@Positions" @bind-Value="@editItem.Position" />
                         </DxFormLayoutItem>

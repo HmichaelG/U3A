@@ -38,7 +38,6 @@ else
         <div hidden="@(selectedTenant.Id == null)">
             <EditForm Model="@selectedTenant" OnValidSubmit=@ValidFormSubmitted Context="editContext">
                 <DataAnnotationsValidator />
-                <ValidationSummary />
                 <DxFormLayout>
                     <DxFormLayoutGroup Caption="Tenant Details" ColSpanLg="12">
                         <DxFormLayoutItem Caption="Host Name" ColSpanMd="12">

@@ -56,9 +56,6 @@ else
                         var editItem = (CourseType)EditFormContext.EditModel;
                     }
                     <DxFormLayout>
-                        <DxFormLayoutItem ColSpanMd="12">
-                            <ValidationSummary />
-                        </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Course Type" ColSpanMd="12">
                             <DxTextBox @bind-Text="@editItem.Name" @bind-Text:after="@(() => SetupShortName(editItem))" />
                         </DxFormLayoutItem>

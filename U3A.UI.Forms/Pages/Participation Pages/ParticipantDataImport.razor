@@ -167,9 +167,6 @@ else {
                     var editItem = (PersonImport)EditFormContext.EditModel;
                 }
                 <DxFormLayout>
-                    <DxFormLayoutItem>
-                        <ValidationSummary />
-                    </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Is New Participant?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@editItem.IsNewPerson"
                                 Alignment="CheckBoxContentAlignment.Right" />

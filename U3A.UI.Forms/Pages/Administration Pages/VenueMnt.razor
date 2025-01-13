@@ -61,9 +61,6 @@ else
                         var editItem = (Venue)EditFormContext.EditModel;
                     }
                     <DxFormLayout>
-                        <DxFormLayoutItem ColSpanMd="12">
-                            <ValidationSummary />
-                        </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Venue Name" ColSpanMd="12">
                             <DxTextBox @bind-Text="@editItem.Name" InputId="Venue-Name" />
                         </DxFormLayoutItem>

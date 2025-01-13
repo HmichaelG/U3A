@@ -89,9 +89,6 @@ else
                         var editItem = (Volunteer)VolunteerContext.EditModel;
                     }
                     <DxFormLayout>
-                        <DxFormLayoutItem ColSpanMd="12">
-                            <ValidationSummary />
-                        </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Volunteer" ColSpanMd="12">
                                     <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person"
                                              @bind-SelectedPerson:after="async() => OnPersonChangedAsync(editItem)"/>

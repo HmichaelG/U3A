@@ -44,7 +44,6 @@ else {
         <div class="alert alert-success pb-4" hidden="@(string.IsNullOrWhiteSpace(SuccessMessage))">@SuccessMessage</div>
         <EditForm Model="@details" OnValidSubmit=@ValidFormSubmitted Context="editContext">
             <DataAnnotationsValidator />
-            <ValidationSummary />
             <DxFormLayout>
                 <DxFormLayoutItem Caption="Tenant ID" ColSpanMd="12">
                     <DxTextBox @bind-Text=@details.TenantKey NullText="The tenant subdomain name." />
