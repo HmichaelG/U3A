@@ -26,7 +26,8 @@ namespace U3A.WebFunctions.Static_Web_Functions
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "application/json; charset=utf-8");
             var tenant = (await GetTenantAsync()).ToArray();
-            response.WriteString(JsonSerializer.Serialize(tenant));
+            var jsonResponse = JsonSerializer.Serialize(tenant);
+            await response.WriteStringAsync(jsonResponse);
             return response;
         }
 

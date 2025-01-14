@@ -18,7 +18,7 @@ namespace U3A.WebFunctions
         }
 
         [Function("ReCaptchaClient")]
-        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
         {
 
             var reCaptchaSecret = _config.GetValue(typeof(string), "GoogleReCaptchaClientKey");
@@ -28,7 +28,7 @@ namespace U3A.WebFunctions
 
             if (reCaptchaSecret != null)
             {
-                response.WriteString((string)reCaptchaSecret);
+                await response.WriteStringAsync((string)reCaptchaSecret);
             }
             return response;
         }
