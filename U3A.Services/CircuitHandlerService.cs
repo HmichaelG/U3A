@@ -18,7 +18,12 @@ namespace U3A.Services
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public ConcurrentDictionary<string, CircuitDetail> CircuitDetails { get; set; }
+        private ConcurrentDictionary<string, CircuitDetail> _circuitDetails { get; set; }
+        public IEnumerable<CircuitDetail> CircuitDetails { get 
+            {
+              return _circuitDetails.Values.AsEnumerable()  ; 
+            } 
+        } 
 
         public event EventHandler CircuitsChanged;
 
@@ -28,7 +33,7 @@ namespace U3A.Services
         public CircuitHandlerService(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
-            CircuitDetails = new ConcurrentDictionary<string, CircuitDetail>();
+            _circuitDetails = new ConcurrentDictionary<string, CircuitDetail>();
         }
 
         public override async Task OnCircuitOpenedAsync(Circuit circuit, CancellationToken cancellationToken)
@@ -45,7 +50,7 @@ namespace U3A.Services
                     Name = (!string.IsNullOrWhiteSpace(id?.Name)) ? id.Name : "Anonymous (Public)",
                     Tenant = tenant,
                 };
-                CircuitDetails.TryAdd(circuit.Id, cd);
+                _circuitDetails.TryAdd(circuit.Id, cd);
                 OnCircuitsChanged();
             }
             await base.OnCircuitOpenedAsync(circuit, cancellationToken);
@@ -54,7 +59,7 @@ namespace U3A.Services
         public override async Task OnCircuitClosedAsync(Circuit circuit, CancellationToken cancellationToken)
         {
             CircuitDetail circuitRemoved;
-            if (CircuitDetails.TryRemove(circuit.Id, out circuitRemoved))
+            if (_circuitDetails.TryRemove(circuit.Id, out circuitRemoved))
             {
                 OnCircuitsChanged();
             }
@@ -63,14 +68,14 @@ namespace U3A.Services
 
         public override async Task OnConnectionDownAsync(Circuit circuit, CancellationToken cancellationToken)
         {
-            var kvp = CircuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
+            var kvp = _circuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
             if (kvp!.Value != null && kvp.Value.Down == null) { kvp.Value.Down = DateTime.UtcNow; }
             await base.OnConnectionDownAsync(circuit, cancellationToken);
         }
 
         public override async Task OnConnectionUpAsync(Circuit circuit, CancellationToken cancellationToken)
         {
-            var kvp = CircuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
+            var kvp = _circuitDetails.FirstOrDefault(x => x.Value.Id == circuit.Id);
             if (kvp!.Value != null) { kvp.Value.Down = null; }
             await base.OnConnectionUpAsync(circuit, cancellationToken);
         }
@@ -84,6 +89,11 @@ namespace U3A.Services
         public string? Tenant { get; set; }
         public DateTime? Created { get; set; } = DateTime.UtcNow;
         public DateTime? Down { get; set; }
+        public string Status { get 
+            {
+                return (Down == null) ? "Active" : "Disconnected" ; 
+            } 
+        }
 
         public string UpTime
         {
@@ -97,8 +107,8 @@ namespace U3A.Services
             get
             {
                 return (Down != null)
-                        ? "Down: " + ((TimeSpan)(DateTime.UtcNow - Down!)).ToString(@"hh\:mm\:ss")
-                        : "Active";
+                        ? ((TimeSpan)(DateTime.UtcNow - Down!)).ToString(@"hh\:mm\:ss")
+                        : "";
             }
         }
     }

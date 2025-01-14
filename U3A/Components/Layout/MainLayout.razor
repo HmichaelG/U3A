@@ -136,7 +136,7 @@
 
         var ch = circuitHandler as CircuitHandlerService;
         ch!.CircuitsChanged += HandleCircuitsChanged!;
-        openCircuits = ch.CircuitDetails.Count;
+        openCircuits = ch.CircuitDetails.Count();
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
         isReady = true;
         await base.OnInitializedAsync();
@@ -168,7 +168,7 @@
 
     public void HandleCircuitsChanged(object sender, EventArgs args)
     {
-        openCircuits = (circuitHandler as CircuitHandlerService)!.CircuitDetails.Count;
+        openCircuits = (circuitHandler as CircuitHandlerService)!.CircuitDetails.Count();
         InvokeAsync(StateHasChanged);
     }
 

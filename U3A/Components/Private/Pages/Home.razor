@@ -31,18 +31,23 @@ else
             <FullScreen DisplayOffset="20" HideToggle="true">
                 <ContentTemplate>
                     <DxGrid Data="@circuitDetails"
+                            ShowGroupPanel="true"
                             VirtualScrollingEnabled="true"
+                            AutoExpandAllGroupRows="true"
                             FooterDisplayMode="GridFooterDisplayMode.Always">
                         <Columns>
-                            <DxGridDataColumn Fieldname="UpTime" />
+                            <DxGridDataColumn Fieldname="Status" GroupIndex="0" />
+                            <DxGridDataColumn Fieldname="UpTime" SortIndex="0"/>
                             <DxGridDataColumn Fieldname="DownTime" />
                             <DxGridDataColumn Fieldname="Name" Caption="Login" />
                             <DxGridDataColumn Fieldname="Tenant" />
                         </Columns>
+                        <GroupSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="UpTime" FooterColumnName="UpTime" />
+                        </GroupSummary>
                         <TotalSummary>
                             <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="UpTime" FooterColumnName="UpTime" />
                         </TotalSummary>
-
                     </DxGrid>
                 </ContentTemplate>
             </FullScreen>
@@ -162,6 +167,11 @@ else
             await messageBox!.ShowOkOnlyAsync("Not Available", qrMessage);
             qrMessage = null;
         }
+        if (showPopup && circuitDetails?.Count != openCircuits)
+        {
+            GetCircuitData();
+            StateHasChanged();
+        }
         await base.OnAfterRenderAsync(firstRender);
     }
 
@@ -221,12 +231,7 @@ else
 
     void GetCircuitData()
     {
-        circuitDetails = [];
-        foreach (var kvp in (circuitHandler as CircuitHandlerService)!.CircuitDetails)
-        {
-            var cd = kvp.Value;
-            circuitDetails.Add(kvp.Value);
-        }
+        circuitDetails = (circuitHandler as CircuitHandlerService)!.CircuitDetails.ToList();
     }
 
     public string GetAssemblyVersion()
