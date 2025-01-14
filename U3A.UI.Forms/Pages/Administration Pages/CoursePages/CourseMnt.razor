@@ -11,6 +11,8 @@
 @using Microsoft.AspNetCore.Http
 @using U3A.UI.Forms.Pages.Shared
 @using U3A.UI.Forms.Pages.MembersPortal
+@using System.Reflection
+@using System.Text
 
 
 @if (!IsReady)
@@ -419,10 +421,22 @@ else
         if (isProcessing) { return; }
         try
         {
+            //throw new InvalidAccessException("just testing");
             await SaveRecordSafely(e);
         }
-        catch (Exception ex) {throw new Exception("Error saving Course record.",ex);}
+        catch (Exception ex) {
+            var msg = "Error saving Course record.";
+            var editModel = (Course)e.EditModel;
+            if (editModel != null)
+            {
+                var year = editModel.Year;
+                var name = editModel.Name ?? "Not set";
+                msg = $"Error saving Course: {year} {name}";
+            }
+            throw new Exception(msg, ex);
+        }
     }
+
 
     async Task SaveRecordSafely(GridEditModelSavingEventArgs e)
     {
