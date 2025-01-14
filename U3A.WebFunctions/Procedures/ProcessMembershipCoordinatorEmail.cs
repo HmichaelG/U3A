@@ -177,9 +177,9 @@ namespace U3A.WebFunctions.Procedures
                                 .Where(x => x.FinancialTo < term.Year).ToList();
                     if (people?.Any() == true)
                     {
-                        var introduction = $@"<p>The following members have requested enrolment in class(es) but are not tfinancial.
+                        var introduction = $@"<p>The following members have requested enrolment in class(es) but are not financial.
                                             <br/>Their course enrolment requests will remain waitlisted until payment is made.
-                                            <br>For detail on classes requested review the report, <strong>Course By Particiapnt List</strong>
+                                            <br>For detail on classes requested review the report, <strong>Course By Participant List</strong>
                                                 and filter by <strong>financial status</strong>.</p>";
                         msg += FormatPeopleAndClasses(people, introduction);
                     }
