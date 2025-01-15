@@ -78,7 +78,7 @@ pageinfo = [[0,0,0,0,null],
 	[0,0,0,0,null]];
 pagedata = [ ["./2023-version-history.html","2023 Version History","version 2023.12 Add/Edit Receipts Added the ability to set/reset the participant&#39;s Financial Year. Please refer to Add/Edit Receipts for details. ...",""],
 ["./2024-version-history.html","2024 Version History","Version 2024.12.30 Themes &#38; Settings You can now choose the image to be displayed at the bottom of the sidebar menu. The default is to display...",""],
-["./2025-version-history.html","2025 Version History","Version 2025.1.11 Add/Edit Courses The Year component now contains a drop down button to select any year defined within the system. Add/Edit Recei...",""],
+["./2025-version-history.html","2025 Version History","Version 2025.1.16 Login &#38; Role Assignment Added the email address as a read only field when changing passwords. Added show/hide toggle to pass...",""],
 ["./add_edit-committee.html","Participation Menu &#62; Add/Edit Committee","This procedure allows you to assign a Committee position to a participant.",""],
 ["./add_edit-contacts.html","Participation Menu &#62; Add/Edit Contacts","A contact can be any person associated with your U3A but is not a participant. Think of the list of contacts as your U3A&#39;s virtual Teledex.",""],
 ["./add_edit-course-types.html","Course Menu &#62; Add/Edit Course Types","A Course Type categorizes Courses &#38; Activities into groups. Common Course Types might include...",""],
