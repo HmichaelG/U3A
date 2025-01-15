@@ -143,9 +143,9 @@ namespace U3A.BusinessRules
             var enrolments = await dbc.Enrolment.IgnoreQueryFilters()
                                         .Include(x => x.Term)
                                         .Include(x => x.Person)
-                                        .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                        .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                     && (x.Term.Year == term.Year ||
-                                                        x.Term.Year == term.Year-1 && x.Term.TermNumber == 4)).ToListAsync();
+                                                        x.Term.Year == term.Year - 1 && x.Term.TermNumber == 4)).ToListAsync();
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.IsDefaultTerm);
             var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
@@ -175,7 +175,7 @@ namespace U3A.BusinessRules
                 .OrderBy(x => x.Course.Name)
                 .Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
             var TotalClassesRemainingInYear = classes.Count();
-            classes = classes.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term)).ToList();
+            classes = classes.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term,dbc.GetLocalDate())).ToList();
             var TotalClassesInReportingPeriod = classes.Count();
             foreach (var c in classes)
             {
@@ -562,7 +562,7 @@ namespace U3A.BusinessRules
             return (Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4);
         }
         public static bool IsClassInReportingPeriod(ClassScheduleDisplayPeriod reportPeriod,
-                            Class Class, Term term)
+                            Class Class, Term term,DateTime today)
         {
             List<bool> termsOffered = new();
             termsOffered.Add(Class.OfferedTerm1);
@@ -587,6 +587,7 @@ namespace U3A.BusinessRules
                     if (!termsOffered[term.TermNumber - 1]) { result = false; }
                     break;
             }
+            if (Class.StartDate.GetValueOrDefault() >= today && Class.OccurrenceID == (int)OccurrenceType.OnceOnly) { result = true; }
             return result;
         }
         public static bool IsClassInRemainingYear(Class Class, int termNumber)
@@ -721,18 +722,43 @@ namespace U3A.BusinessRules
             AssignTermForOnceOnlyClass(c, terms);
         }
 
-        public static Term? AssignTermForOnceOnlyClass( 
-                                                Class c, 
-                                                IEnumerable<Term>? terms, 
-                                                Term currentTerm = default )
+        public static Term? AssignTermForOnceOnlyClass(
+                                                Class c,
+                                                IEnumerable<Term>? terms,
+                                                Term currentTerm = default)
         {
             Term reqdTerm = default;
             if (c.StartDate == null) { return currentTerm; }
             if (c.OccurrenceID != (int)OccurrenceType.OnceOnly) { return currentTerm; }
-            foreach (var t in terms.OrderBy(x => x.Year).ThenBy(x => x.TermNumber)) 
+            var termCopy = terms.OrderBy(x => x.Year).ThenBy(x => x.TermNumber).ToList();
+            foreach (var t in terms.OrderBy(x => x.Year).ThenBy(x => x.TermNumber))
             {
-                if ((c.StartDate >= t.StartDate && c.StartDate <= t.EndDate) ||
-                        (c.StartDate.Value.Year == t.Year && t.TermNumber == 4))
+                // class within a term
+                DateTime testDate = new DateTime(2025, 1, 29);
+                if (c.StartDate >= t.StartDate && c.StartDate <= t.EndDate)
+                {
+                    reqdTerm = t;
+                    break;
+                }
+                // class in term shoulder
+                var nextTerm = termCopy.Where(x => x.StartDate > t.StartDate).FirstOrDefault();
+                if (nextTerm != null)
+                {
+                    if (c.StartDate > t.EndDate && c.StartDate < nextTerm.StartDate)
+                    {
+                        reqdTerm = t;
+                        break;
+                    }
+                }
+                var year = c.StartDate.Value.Year;
+                // Between end of term 4 and 31st December
+                if (c.StartDate > t.EndDate && t.Year == year && t.TermNumber == 4)
+                {
+                    reqdTerm = t;
+                    break;
+                }
+                // Between 1st Jan and start of term 1
+                if (c.StartDate < t.StartDate && t.Year == year && t.TermNumber == 1)
                 {
                     reqdTerm = t;
                     break;
@@ -750,6 +776,7 @@ namespace U3A.BusinessRules
                     case 4: c.OfferedTerm4 = true; break;
                 }
             }
+            c.TermNumber = reqdTerm.TermNumber;
             return reqdTerm;
         }
 
