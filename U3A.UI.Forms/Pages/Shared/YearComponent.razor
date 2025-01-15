@@ -13,9 +13,12 @@
         <Items>
             @{
                 var displayYears = years;
-                foreach (var y in displayYears)
+                if (displayYears != null)
                 {
-                    <DxDropDownButtonItem Text="@y.ToString()"  />
+                    foreach (var y in displayYears)
+                    {
+                        <DxDropDownButtonItem Text="@y.ToString()"  />
+                    }
                 }
             }
         </Items>
