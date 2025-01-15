@@ -24,8 +24,8 @@
 else
 {
     <CreateDomainLogin @ref="createDomainLogin"
-                       Roles="@roles"
-                       Settings="@settings" />
+    Roles="@roles"
+    Settings="@settings" />
 
     <MessageBox @ref="@messageBox" />
     <Progress @ref="@ProgressBar" />
@@ -47,37 +47,37 @@ else
     <FullScreen DisplayOffset="@((IsEmbedded) ? 19 : 8)" HideToggle="@IsEmbedded">
         <ContentTemplate>
             <DxGrid Data="@AppUsers" @ref="mainGrid"
-                    UnboundColumnData="Grid_CustomUnboundColumnData"
-                    @bind-SelectedDataItems="@SelectedDataItems"
-                    ShowSearchBox="true"
-                    ShowFilterRow="false"
-                    ShowAllRows="false"
-                    KeyFieldName="Id"
-                    PopupEditFormHeaderText="Edit User Details"
-                    EditMode="GridEditMode.PopupEditForm"
-                    EditModelSaving="Grid_EditModelSaving"
-                    DataItemDeleting="Grid_DataItemDeleting"
-                    CustomizeEditModel="Grid_CustomizeEditModel"
-                    ValidationEnabled="true">
+            UnboundColumnData="Grid_CustomUnboundColumnData"
+            @bind-SelectedDataItems="@SelectedDataItems"
+            ShowSearchBox="true"
+            ShowFilterRow="false"
+            ShowAllRows="false"
+            KeyFieldName="Id"
+            PopupEditFormHeaderText="Edit User Details"
+            EditMode="GridEditMode.PopupEditForm"
+            EditModelSaving="Grid_EditModelSaving"
+            DataItemDeleting="Grid_DataItemDeleting"
+            CustomizeEditModel="Grid_CustomizeEditModel"
+            ValidationEnabled="true">
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid LayoutKey="{BF214124-CDFA-4724-B2DC-EFF4D58E4244}" >
                         <CustomButtonContent>
                             <DxToolbarItem Text="Create Domain Login" CssClass="mx-1" Visible="!IsEmbedded"
-                                           Click="@OnCreateDomainLogin"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary" />
+                            Click="@OnCreateDomainLogin"
+                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                            RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Populate Logins" CssClass="me-1"
-                                           Click="@OnPopulateLogins" Visible="!IsEmbedded"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary" />
+                            Click="@OnPopulateLogins" Visible="!IsEmbedded"
+                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                            RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Set Email Confirmed" CssClass="me-1" Visible="!IsEmbedded"
-                                           Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary" />
+                            Click="@OnSetEmailConfirmed" Enabled="@AreItemsSelected()"
+                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                            RenderStyle="ButtonRenderStyle.Primary" />
                             <DxToolbarItem Text="Reset Password" Visible="!IsEmbedded"
-                                           Click="@OnResetPassword" Enabled="@AreItemsSelected()"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           RenderStyle="ButtonRenderStyle.Primary" />
+                            Click="@OnResetPassword" Enabled="@AreItemsSelected()"
+                            RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                            RenderStyle="ButtonRenderStyle.Primary" />
                         </CustomButtonContent>
                     </GridToolbar>
                 </ToolbarTemplate>
@@ -89,16 +89,16 @@ else
                     <DxGridDataColumn Width="6rem" FieldName="FinancialTo" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="9em" Caption="Email Confirmed?" FieldName="EmailConfirmed" />
                     <DxGridDataColumn Width="7rem" Visible=false
-                                      Caption="Lockout Enabled?" FieldName="User.LockoutEnabled" />
+                    Caption="Lockout Enabled?" FieldName="User.LockoutEnabled" />
                     <DxGridDataColumn Width="6rem" Caption="Lockout End" Visible=false DisplayFormat="d" FieldName="LockoutEnd" />
                     <DxGridDataColumn Width="5rem" Caption="Login Failures" Visible=false DisplayFormat="n0" FieldName="AccessFailedCount" />
                     <DxGridDataColumn Visible="@(!IsEmbedded)" FieldName="Roles" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="11em" Caption="Last Login"
-                                      DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
-                                      FieldName="LastLoginLocal" UnboundType="GridUnboundColumnType.DateTime" />
+                    DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
+                    FieldName="LastLoginLocal" UnboundType="GridUnboundColumnType.DateTime" />
                     <DxGridDataColumn Width="11em" Caption="Last Update"
-                                      DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
-                                      FieldName="LastUpdateLocal" UnboundType="GridUnboundColumnType.DateTime" />
+                    DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
+                    FieldName="LastUpdateLocal" UnboundType="GridUnboundColumnType.DateTime" />
                 </Columns>
                 <EditFormTemplate Context="EditFormContext">
                     @{
@@ -107,17 +107,27 @@ else
                     <DxFormLayout>
                         <DxFormLayoutItem Visible="@(!IsEmbedded)" Caption="User Roles" ColSpanMd="12">
                             <DxTagBox Data="@roles" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                      @bind-Values="@SelectedRoles">
+                            @bind-Values="@SelectedRoles">
                             </DxTagBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Is Email Confirmed?" ColSpanMd="12">
                             <DxCheckBox @bind-Checked=editItem.EmailConfirmed Enabled=!editItem.EmailConfirmed />
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Password" ColSpanMd="12">
-                            <DxTextBox @bind-Text=editItem.Password NullText="leave blank if unchanged" Password=true />
+                        <DxFormLayoutItem Caption="Email" ColSpanMd="12">
+                            <DxTextBox @bind-Text=editItem.Email Enabled=false />
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption=" Confirm Password" ColSpanMd="12">
-                            <DxTextBox @bind-Text=editItem.ConfirmPassword Password=true />
+                        <DxFormLayoutItem Caption="New Password" ColSpanMd="12">
+                            <DxTextBox @bind-Text=editItem.Password
+                                       NullText="leave blank if unchanged" Password="@(!showPassword)" autocomplete="new-password">
+                                <Buttons>
+                                    <DxEditorButton IconCssClass="bi bi-eye"
+                                                    Tooltip="Show/hide password"
+                                                    Click="@(() => showPassword = !showPassword)" />
+                                </Buttons>
+                        </DxTextBox>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption=" Confirm New Password" ColSpanMd="12">
+                            <DxTextBox @bind-Text=editItem.ConfirmPassword Password="@(!showPassword)" autocomplete="new-password" />
                         </DxFormLayoutItem>
                     </DxFormLayout>
                 </EditFormTemplate>
@@ -155,6 +165,7 @@ else
     Progress? ProgressBar;
     CreateDomainLogin? createDomainLogin;
     AuthenticationState? authenticationState;
+    bool showPassword = false;
 
     MessageBox? messageBox { get; set; }
 
