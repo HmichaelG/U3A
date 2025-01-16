@@ -28,6 +28,23 @@ else
     Settings="@settings" />
 
     <MessageBox @ref="@messageBox" />
+    <MessageBox @ref="@passwordTestMessageBox" OnShown="@(() => testPasswordTextBox?.FocusAsync())">
+        <TextTemplate>
+            <DxFormLayoutItem Caption="Test password for" ColSpanMd="12">
+                <DxTextBox @bind-Text=testPasswordEmail Enabled=false />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Enter Password" ColSpanMd="12">
+                <DxTextBox @ref=@testPasswordTextBox @bind-Text=testPassword
+                Password="@(!showTestPassword)" autocomplete="new-password">
+                    <Buttons>
+                        <DxEditorButton IconCssClass="bi bi-eye"                        
+                        Tooltip="Show/hide password"
+                        Click="@(() => showTestPassword = !showTestPassword)" />
+                    </Buttons>
+                </DxTextBox>
+            </DxFormLayoutItem>
+        </TextTemplate>
+    </MessageBox>
     <Progress @ref="@ProgressBar" />
 
     @if (!IsEmbedded)
@@ -60,7 +77,7 @@ else
             CustomizeEditModel="Grid_CustomizeEditModel"
             ValidationEnabled="true">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{BF214124-CDFA-4724-B2DC-EFF4D58E4244}" >
+                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{BF214124-CDFA-4724-B2DC-EFF4D58E4244}">
                         <CustomButtonContent>
                             <DxToolbarItem Text="Create Domain Login" CssClass="mx-1" Visible="!IsEmbedded"
                             Click="@OnCreateDomainLogin"
@@ -84,6 +101,14 @@ else
                 <Columns>
                     <DxGridSelectionColumn Width="2rem" Visible="@(!IsEmbedded)" />
                     <DxGridCommandColumnEx Width="8rem" DeleteButtonVisible=true EditButtonVisible=true NewButtonVisible="false" />
+                    <DxGridDataColumn Width="4rem" Caption="Password" AllowGroup="false">
+                        <CellDisplayTemplate>
+                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Text"
+                            IconCssClass="bi bi-shield-check"
+                            RenderStyle="ButtonRenderStyle.Primary" Text="Test"
+                            Click="() => OnTestEmail(((ApplicationUser)context.DataItem).Email)"></DxButton>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
                     <DxGridDataColumn Caption="Email" FieldName="Email" />
                     <DxGridDataColumn FieldName="Participant" UnboundType="GridUnboundColumnType.String" />
                     <DxGridDataColumn Width="6rem" FieldName="FinancialTo" UnboundType="GridUnboundColumnType.String" />
@@ -118,13 +143,13 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="New Password" ColSpanMd="12">
                             <DxTextBox @bind-Text=editItem.Password
-                                       NullText="leave blank if unchanged" Password="@(!showPassword)" autocomplete="new-password">
+                            NullText="leave blank if unchanged" Password="@(!showPassword)" autocomplete="new-password">
                                 <Buttons>
                                     <DxEditorButton IconCssClass="bi bi-eye"
-                                                    Tooltip="Show/hide password"
-                                                    Click="@(() => showPassword = !showPassword)" />
+                                    Tooltip="Show/hide password"
+                                    Click="@(() => showPassword = !showPassword)" />
                                 </Buttons>
-                        </DxTextBox>
+                            </DxTextBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption=" Confirm Password" ColSpanMd="12">
                             <DxTextBox @bind-Text=editItem.ConfirmPassword Password="@(!showPassword)" autocomplete="new-password" />
@@ -168,6 +193,11 @@ else
     bool showPassword = false;
 
     MessageBox? messageBox { get; set; }
+    MessageBox? passwordTestMessageBox;
+    string testPassword;
+    bool showTestPassword;
+    string testPasswordEmail;
+    DxTextBox? testPasswordTextBox;
 
     internal GridToolbar? Toolbar;
 
@@ -520,6 +550,22 @@ else
     {
         await createDomainLogin.ShowAsync();
         await RefreshDataAsync();
+    }
+
+    async Task OnTestEmail(string Email)
+    {
+        testPassword = string.Empty;
+        testPasswordEmail = Email;
+        if (await passwordTestMessageBox.ShowAsync("Test Password", string.Empty))
+        {
+            var user = await UserManager.FindByEmailAsync(Email);
+            if (user != null)
+            {
+                var result = await UserManager.CheckPasswordAsync(user, testPassword);
+                var resultMsg = (result) ? "The password is correct!" : "The password is not correct!";
+                await messageBox.ShowOkOnlyAsync("Test Result", resultMsg);
+            }
+        }
     }
 
     public void Dispose()
