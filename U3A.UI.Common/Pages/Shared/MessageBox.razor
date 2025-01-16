@@ -1,14 +1,14 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <DxPopup Visible="@PopupVisible" @ref="@messageBox" Width="@PopupWidth"
-         ApplyBackgroundShading="true"         
-         Closed="@OnNegativeButtonClicked"
-         CloseOnEscape="false"
-         CloseOnOutsideClick="false"
-         ShowFooter="true"
-         AllowDrag=true
-         AllowResize=true
-         HeaderText=@mCaption>
+ApplyBackgroundShading="true"         
+Closed="@OnNegativeButtonClicked"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+ShowFooter="true"
+AllowDrag=true
+AllowResize=true
+HeaderText=@mCaption>
     <BodyContentTemplate Context="PopupContext">
         @TextTemplate
         <div class="messagebox-body-height">
@@ -19,28 +19,28 @@
         @if (mLayoutKey != null)
         {
             <DxCheckBox @bind-Checked=@dontShowAgain @bind-Checked:after=@SaveDontShowResponse
-                        Alignment="CheckBoxContentAlignment.Left"
-                        LabelPosition="LabelPosition.Right" CssClass="me-2">Don't show agian</DxCheckBox>
+            Alignment="CheckBoxContentAlignment.Left"
+            LabelPosition="LabelPosition.Right" CssClass="me-2">Don't show agian</DxCheckBox>
         }
         <DxButton CssClass="popup-button" Visible="@mShowOkButton"
-                  RenderStyle="ButtonRenderStyle.Primary"
-                  Text="@mOKButtonText"
-                  Click="@OnAffirmativeButtonClicked" />
+        RenderStyle="ButtonRenderStyle.Primary"
+        Text="@mOKButtonText"
+        Click="@OnAffirmativeButtonClicked" />
         <DxButton CssClass="popup-button ms-1" Visible="@mShowNoButton"
-                  RenderStyle="ButtonRenderStyle.Light"
-                  Text="@mNoButtonText"
-                  Click="@OnNoButtonClicked" />
+        RenderStyle="ButtonRenderStyle.Light"
+        Text="@mNoButtonText"
+        Click="@OnNoButtonClicked" />
         <DxButton CssClass="popup-button ms-1" Visible="@mShowCancelButton"
-                  RenderStyle="ButtonRenderStyle.Secondary"
-                  Text="@mCancelButtonText"
-                  Click="@OnNegativeButtonClicked" />
+        RenderStyle="ButtonRenderStyle.Secondary"
+        Text="@mCancelButtonText"
+        Click="@OnNegativeButtonClicked" />
     </FooterContentTemplate>
 </DxPopup>
 
 <style>
     .messagebox-body-height {
-        max-height: 75vh;
-        overflow: auto;
+    max-height: 75vh;
+    overflow: auto;
     }
 </style>
 
@@ -89,6 +89,8 @@
     public EventCallback NegativeButtonClicked { get; set; }
     [Parameter]
     public EventCallback NoButtonClicked { get; set; }
+    [Parameter]
+    public EventCallback OnShown { get; set; }
 
     public MessageBoxDialogResult MessageBoxResult { get; set; }
 
@@ -107,6 +109,12 @@
     bool dontShowAgain { get; set; }
 
     TaskCompletionSource<bool>? tcs;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await OnShown.InvokeAsync();
+        await base.OnAfterRenderAsync(firstRender);
+    }
 
     public async Task SetPopupWidth(string Width)
     {
