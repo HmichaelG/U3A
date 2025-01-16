@@ -1,0 +1,83 @@
+﻿@using DevExpress.Blazor.PivotTable
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject WorkStation ws
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxSplitter CssClass="border controlHeight" Width="100%">
+        <Panes>
+            <DxSplitterPane Size="66%">
+                <DxSankey Data="@memberData"
+                          Width="100%"
+                          Height="100%"
+                          SourceFieldName="@nameof(SankeyDataPoint.Source)"
+                          TargetFieldName="@nameof(SankeyDataPoint.Target)"
+                          WeightFieldName="Count"
+                          RedrawOnResize="true">
+                    <DxSankeyLinkSettings ColorMode="SankeyLinkColorMode.Gradient" />
+                    <DxTooltipSettings Enabled="true">
+                        <DxTextFormatSettings Type="TextFormat.Default" Precision="0"></DxTextFormatSettings>
+                    </DxTooltipSettings>
+                    <DxTitleSettings Text="Membership Attrition (Did Not Renew)" />
+                    <DxExportSettings Enabled="true" />
+                </DxSankey>
+            </DxSplitterPane>
+            <DxSplitterPane>
+                <div class="h6">Participation Details</div>
+                <DxPivotTable Data="@memberData" ShowRowGrandTotals="false" CssClass="w-100 gridHeight">
+                    <Fields>
+                        <DxPivotTableField Field="@nameof(SankeyDataPoint.Group)"
+                                           Area="@PivotTableArea.Row" Width="80"
+                                           AreaIndex="0" />
+                        <DxPivotTableField Field="@nameof(SankeyDataPoint.PivotSource)"
+                                           Area="@PivotTableArea.Row" Width="100"
+                                           AreaIndex="1" />
+                        <DxPivotTableField Field="@nameof(SankeyDataPoint.PivotTarget)"
+                                           Area="@PivotTableArea.Row" Width="100"
+                                           AreaIndex="2" />
+                        <DxPivotTableField Field="@nameof(SankeyDataPoint.Count)"
+                                           Area="@PivotTableArea.Data" Width="80"
+                                           AreaIndex="0">
+                        </DxPivotTableField>
+                    </Fields>
+                </DxPivotTable>
+            </DxSplitterPane>
+        </Panes>
+    </DxSplitter>
+}
+
+<style>
+    .controlHeight {
+        height: calc(100dvh - @(ws.UseTopMenu ? "12rem" : "8rem") );
+    }
+
+    .gridHeight {
+        height: calc(100dvh - @(ws.UseTopMenu ? "14.25rem" : "10.25rem") );
+    }
+</style>
+
+
+@code {
+
+    IEnumerable<SankeyDataPoint> memberData;
+    bool IsReady = false;
+
+    override protected async Task OnInitializedAsync()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var term = await BusinessRule.CurrentTermAsync(dbc);
+            if (term != null)
+            {
+                memberData = await BusinessRule.GetAttritionDetail(dbc, term);
+            }
+        }
+        IsReady = true;
+        await base.OnInitializedAsync();
+    }
+
+}

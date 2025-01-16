@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using Twilio.TwiML.Fax;
+using Twilio.TwiML.Messaging;
 using Twilio.TwiML.Voice;
 using U3A.Database;
 using U3A.Model;
@@ -250,6 +251,98 @@ namespace U3A.BusinessRules
             return result;
         }
 
+        public static async Task<IEnumerable<SankeyDataPoint>> GetAttritionDetail(U3ADbContext dbc, Term term)
+        {
+            var today = dbc.GetLocalTime().Date;
+            var didNotRenew = await dbc.Person
+                            .Where(x => x.FinancialTo == term.Year - 1).ToListAsync();
+            var total = didNotRenew.Count;
+            var ages = didNotRenew
+                                .Select(x => new
+                                {
+                                    Age = (x.BirthDate == null) ? int.MinValue : GetAge(x.BirthDate.Value, today),
+
+                                });
+            var ageRangeSummary = ages.GroupBy(x => new
+            {
+                Category = (x.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Age),
+            });
+            var membershipYears = didNotRenew
+                                .Select(x => new
+                                {
+                                    MembershipYears = (x.DateJoined == null) ? int.MinValue : GetAge(x.DateJoined.Value, today),
+
+                                });
+            var MembershipYearsRangeSummary = membershipYears.GroupBy(x => new
+            {
+                Category = (x.MembershipYears == int.MinValue) ? "Unknown" : GetJoiningYearRange(x.MembershipYears,DoExtendedYears:true),
+            });
+            var genders = didNotRenew.GroupBy(x => new
+            {
+                Category = x.Gender
+            });
+
+            // The result set
+            var result = didNotRenew
+            .GroupBy(x => new
+            {
+                Age = (x.BirthDate == null) ? "Unknown" : GetBirthDateRange(GetAge(x.BirthDate.Value, today)),
+                Gender = x.Gender,
+            })
+            .Select(x => new SankeyDataPoint
+            {
+                Group = "Age",
+                Source = x.Key.Age,
+                Target = x.Key.Gender,
+                PivotSource = x.Key.Age,
+                PivotTarget = x.Key.Gender,
+                Count = x.Count(),
+            }).OrderBy(x => x.Source).ThenBy(x => x.Target)
+            .ToList();
+
+            result.AddRange(didNotRenew
+            .GroupBy(x => new
+            {
+                joinYearsRange = (x.DateJoined == null) ? "Unknown" : GetJoiningYearRange(GetAge(x.DateJoined.Value, today),DoExtendedYears:true),
+                Gender = x.Gender,
+            })
+            .Select(x => new SankeyDataPoint
+            {
+                Group = "M'ship Years",
+                Source = x.Key.Gender,
+                Target = x.Key.joinYearsRange,
+                PivotSource = x.Key.Gender,
+                PivotTarget = x.Key.joinYearsRange,
+                Count = x.Count(),
+            }).OrderBy(x => x.Target).ThenBy(x => x.Source));
+
+            // Add the percentages to the labels
+            foreach (var r in result)
+            {
+                var ageRange = ageRangeSummary.FirstOrDefault(x => x.Key.Category == r.Source);
+                if (ageRange != null)
+                {
+                    r.Source = $"{r.Source}: {GetPercent(total, ageRange.Count())}";
+                }
+                var courseType = MembershipYearsRangeSummary.FirstOrDefault(x => x.Key.Category == r.Target);
+                if (courseType != null)
+                {
+                    r.Target = $"{r.Target}: {GetPercent(total, courseType.Count())}";
+                }
+                var gender = genders.FirstOrDefault(x => x.Key.Category == r.Source);
+                if (gender != null)
+                {
+                    r.Source = $"{r.Source}: {GetPercent(total, gender.Count())}";
+                }
+                gender = genders.FirstOrDefault(x => x.Key.Category == r.Target);
+                if (gender != null)
+                {
+                    r.Target = $"{r.Target}: {GetPercent(total, gender.Count())}";
+                }
+            }
+            return result
+            .Where(x => x.Count != null && x.Count > 0);
+        }
         public static async Task<IEnumerable<SankeyDataPoint>> GetMemberParticipationSummary(U3ADbContext dbc, Term term)
         {
             (DateTime?, string, string) e = new();
@@ -287,15 +380,15 @@ namespace U3A.BusinessRules
             var result = enrolments
             .GroupBy(x => new
             {
-                Age = (x.BirthDate == null) ? int.MinValue : GetAge(x.BirthDate.Value, today),
+                Age = (x.BirthDate == null) ? "Unknown" : GetBirthDateRange(GetAge(x.BirthDate.Value, today)),
                 Gender = x.Gender,
             })
             .Select(x => new SankeyDataPoint
             {
                 Group = "Age",
-                Source = (x.Key.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Key.Age),
+                Source = x.Key.Age,
                 Target = x.Key.Gender,
-                PivotSource = (x.Key.Age == int.MinValue) ? "Unknown" : GetBirthDateRange(x.Key.Age),
+                PivotSource = x.Key.Age,
                 PivotTarget = x.Key.Gender,
                 Count = x.Count(),
             }).OrderBy(x => x.Source).ThenBy(x => x.Target)
@@ -440,19 +533,24 @@ namespace U3A.BusinessRules
                 return "100+ years";
             }
         }
-        private static string GetJoiningYearRange(int years)
+        private static string GetJoiningYearRange(int years,bool DoExtendedYears = false)
         {
             if (years == 0)
             {
-                return "< 1 year";
+                return " < 1 year";
             }
-            else if (years >= 1 && years <= 5)
+            else if (years == 1 && DoExtendedYears) { return " 1-2 years"; }
+            else if (years == 2 && DoExtendedYears) { return " 2-3 years"; }
+            else if (years == 3 && DoExtendedYears) { return " 3-4 years"; }
+            else if (years == 4 && DoExtendedYears) { return " 4-5 years"; }
+            else if (years == 5 && DoExtendedYears) { return " 5-6 years"; }
+            else if (years >= 1 && years <= 5 && !DoExtendedYears)
             {
-                return "1-5 years";
+                return " 1-5 years";
             }
             else if (years >= 6 && years <= 10)
             {
-                return "6-10 years";
+                return " 6-10 years";
             }
             else if (years >= 11 && years <= 15)
             {
