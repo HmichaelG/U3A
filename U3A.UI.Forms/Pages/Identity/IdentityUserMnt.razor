@@ -556,7 +556,7 @@ else
     {
         testPassword = string.Empty;
         testPasswordEmail = Email;
-        if (await passwordTestMessageBox.ShowAsync("Test Password", string.Empty))
+        if (await passwordTestMessageBox.ShowAsync("Test Password", "<b>Hint</b>: check your <span class='badge bg-danger'>Caps Lock</span> button is off"))
         {
             var user = await UserManager.FindByEmailAsync(Email);
             if (user != null)
