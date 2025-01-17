@@ -43,7 +43,7 @@ namespace U3A.WebFunctions
 
             var tenants = new List<TenantInfo>();
             var cn = _config.GetConnectionString(Common.TENANT_CN_CONFIG);
-            Common.GetTeanats(tenants, cn!);
+            Common.GetTenants(tenants, cn!);
             _logger.LogInformation($"{tenants.Count} tenants retrieved from database.");
 
             _logger.LogInformation("UTC Time: {0}", DateTime.UtcNow);

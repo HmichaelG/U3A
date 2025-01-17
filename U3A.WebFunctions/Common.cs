@@ -23,11 +23,12 @@ namespace U3A.WebFunctions
             return result;
         }
 
-        public static void GetTeanats(List<TenantInfo> tenants, string ConnectionString)
+        public static void GetTenants(List<TenantInfo> tenants, string ConnectionString, string tenant = "")
         {
             using (var cnn = new SqlConnection(ConnectionString))
             {
-                var cmdText = @"SELECT Identifier, 
+                var whereClause = (string.IsNullOrEmpty(tenant) ? "" : $"WHERE Identifier = '{tenant}'");
+                var cmdText = @$"SELECT Identifier, 
                                         Name, 
                                         ConnectionString,
                                         EwayAPIKey,
@@ -35,7 +36,10 @@ namespace U3A.WebFunctions
                                         UseEwayTestEnviroment,
                                         PostmarkAPIKey, 
                                         PostmarkSandboxAPIKey, 
-                                        UsePostmarkTestEnviroment FROM TenantInfo ORDER BY Identifier";
+                                        UsePostmarkTestEnviroment 
+                                        FROM TenantInfo 
+                                        {whereClause}
+                                        ORDER BY Identifier";
                 using (var cmd = new SqlCommand(cmdText, cnn))
                 {
                     SqlDataReader? rdr;

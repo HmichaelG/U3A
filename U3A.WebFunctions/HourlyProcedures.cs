@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -25,15 +26,19 @@ namespace U3A.WebFunctions
         [Function("HourlyProcedures")]
         public async Task Run([TimerTrigger("0 0 22-23,0-11 * * *"      
 #if DEBUG
-//            , RunOnStartup=true
+           // , RunOnStartup=true
 #endif            
             )] TimerInfo myTimer)
         {
+            await DoWork();
+        }
+
+        private async Task DoWork() {
 
             //Retrieve the tenants
             var tenants = new List<TenantInfo>();
             var cn = _config.GetConnectionString(Common.TENANT_CN_CONFIG);
-            Common.GetTeanats(tenants, cn!);
+            Common.GetTenants(tenants, cn!);
 
             _logger.LogInformation($"{tenants.Count} tenants retrieved from database.");
             _logger.LogInformation($"UTC Time is: {DateTime.UtcNow}");
