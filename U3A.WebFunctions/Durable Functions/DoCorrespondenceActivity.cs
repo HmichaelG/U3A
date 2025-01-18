@@ -1,0 +1,44 @@
+﻿using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using U3A.WebFunctions.Procedures;
+
+
+namespace U3A.WebFunctions;
+
+public partial class DurableFunctions
+{
+    [Function(nameof(DoCorrespondenceActivity))]
+    public async Task<string> DoCorrespondenceActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
+    {
+        ILogger logger = executionContext.GetLogger(nameof(DoCorrespondenceActivity));
+        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        bool isBackgroundProcessingEnabled = true;
+        if (cn != null)
+        {
+            foreach (var tenant in GetTenants(logger, tenantToProcess, cn))
+            {
+                logger.LogInformation($"****** Started {nameof(DoCorrespondenceActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
+                try
+                {
+                    await LogStartTime(logger, tenant);
+                    isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
+                    if (isBackgroundProcessingEnabled)
+                    {
+                        await ProcessCorrespondence.Process(tenant, cn!, logger, IsHourlyProcedure: true);
+                    }
+                    else
+                    {
+                        logger.LogInformation($"[{tenant.Identifier}]: Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"Error processing {nameof(DoCorrespondenceActivity)} for {tenant.Identifier}");
+                }
+            }
+        }
+        else { throw new NullReferenceException("Database Connection string is null"); }
+        return $"{nameof(DoCorrespondenceActivity)} completed.";
+    }
+}
