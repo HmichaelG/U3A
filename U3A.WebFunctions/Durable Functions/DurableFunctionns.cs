@@ -101,14 +101,18 @@ public partial class DurableFunctions
     [Function(nameof(DoDailyProcedures))]
     public static async Task DoDailyProcedures(
         [TimerTrigger("0 0 17 * * *"
-    #if DEBUG
-               , RunOnStartup=true
-    #endif            
+    //#if DEBUG
+    //           , RunOnStartup=true
+    //#endif            
                 )]
                 TimerInfo myTimer,
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
+        OrchestrationRuntimeStatus[] statuses = { OrchestrationRuntimeStatus.Failed };
+        PurgeInstancesFilter filter = new PurgeInstancesFilter() { Statuses = statuses };
+        await client.PurgeAllInstancesAsync(filter);
+        
         ILogger logger = executionContext.GetLogger(nameof(DoDailyProcedures));
         var options = new U3AFunctionOptions()
         {
