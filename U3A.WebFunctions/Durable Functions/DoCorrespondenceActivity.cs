@@ -13,7 +13,6 @@ public partial class DurableFunctions
     {
         ILogger logger = executionContext.GetLogger(nameof(DoCorrespondenceActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
-        bool isBackgroundProcessingEnabled = true;
         if (cn != null)
         {
             foreach (var tenant in GetTenants(logger, tenantToProcess, cn))
@@ -22,7 +21,7 @@ public partial class DurableFunctions
                 try
                 {
                     await LogStartTime(logger, tenant);
-                    isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
+                    var isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                     if (isBackgroundProcessingEnabled)
                     {
                         await ProcessCorrespondence.Process(tenant, cn!, logger, IsHourlyProcedure: true);

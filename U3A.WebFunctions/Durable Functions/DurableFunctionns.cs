@@ -43,11 +43,18 @@ public partial class DurableFunctions
         { result = await context.CallActivityAsync<string>(nameof(DoBringForwardEnrolmentsActivity), options.TenantIdentifier); }
         if (options.DoCorrespondence)
         { result = await context.CallActivityAsync<string>(nameof(DoCorrespondenceActivity), options.TenantIdentifier); }
+        if (options.DoSendLeaderReports)
+        { result = await context.CallActivityAsync<string>(nameof(DoSendLeaderReportsActivity), options.TenantIdentifier); }
+        if (options.DoProcessQueuedDocuments)
+        { result = await context.CallActivityAsync<string>(nameof(DoProcessQueuedDocumentsActivity), options.TenantIdentifier); }
         if (options.DoBuildSchedule)
         { result = await context.CallActivityAsync<string>(nameof(DoBuildScheduleActivity), options.TenantIdentifier); }
+        if (options.DoDatabaseCleanup)
+        { result = await context.CallActivityAsync<string>(nameof(DoDatabaseCleanupActivity), options.TenantIdentifier); }
     }
 
-    async Task LogStartTime(ILogger logger,TenantInfo tenant) {
+    async Task LogStartTime(ILogger logger, TenantInfo tenant)
+    {
         using (var dbc = new U3ADbContext(tenant))
         {
             var utcOffset = await Common.GetUtcOffsetAsync(dbc);
@@ -67,27 +74,58 @@ public partial class DurableFunctions
         return tenants.ToArray();
     }
 
-    [Function("DurableHourlyProcedureStart")]
-    public static async Task DurableHourlyProcedureStart(
+    [Function(nameof(DoHourlyProcedures))]
+    public static async Task DoHourlyProcedures(
         [TimerTrigger("0 0 22-23,0-11 * * *"
+    //#if DEBUG
+    //           , RunOnStartup=true
+    //#endif            
+                )]
+                TimerInfo myTimer,
+        [DurableClient] DurableTaskClient client,
+        FunctionContext executionContext)
+    {
+        ILogger logger = executionContext.GetLogger(nameof(DoHourlyProcedures));
+        var options = new U3AFunctionOptions()
+        {
+            DoAutoEnrolment = true,
+            DoCorrespondence = true,
+            DoBuildSchedule = true
+        };
+        // Start the orchestration
+        string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
+            nameof(DurableFunctions), options);
+        logger.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+    }
+
+    [Function(nameof(DoDailyProcedures))]
+    public static async Task DoDailyProcedures(
+        [TimerTrigger("0 0 17 * * *"
     #if DEBUG
-               //, RunOnStartup=true
+               , RunOnStartup=true
     #endif            
                 )]
                 TimerInfo myTimer,
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger(nameof(DurableHourlyProcedureStart));
-        var options = new U3AFunctionOptions() 
-        { 
-            DoAutoEnrolment =true, 
-            DoCorrespondence=true, 
-            DoBuildSchedule = true
+        ILogger logger = executionContext.GetLogger(nameof(DoDailyProcedures));
+        var options = new U3AFunctionOptions()
+        {
+            DoFinalisePayments = true,
+            DoAutoEnrolment = true,
+            DoBringForwardEnrolments = true,
+            DoCreateAttendance = true,
+            DoCorrespondence = true,
+            DoSendLeaderReports = true,
+            DoMembershipAlertsEmail = true,
+            DoProcessQueuedDocuments = true,
+            DoBuildSchedule = true,
+            DoDatabaseCleanup = true,
         };
         // Start the orchestration
         string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
-            nameof(DurableFunctions),options);
+            nameof(DurableFunctions), options);
         logger.LogInformation($"Started orchestration with ID = '{instanceId}'.");
     }
 

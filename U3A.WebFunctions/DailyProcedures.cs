@@ -138,7 +138,7 @@ namespace U3A.WebFunctions
                         }
                         try
                         {
-                            await ProcessMembershipCoordinatorEmail.Process(tenant, _logger);
+                            await ProcessMembershipAlertsEmail.Process(tenant, _logger);
                         }
                         catch (Exception ex)
                         {

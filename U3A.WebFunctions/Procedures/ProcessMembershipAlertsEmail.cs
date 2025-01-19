@@ -10,7 +10,7 @@ using U3A.Services.Email;
 
 namespace U3A.WebFunctions.Procedures
 {
-    public static class ProcessMembershipCoordinatorEmail
+    public static class ProcessMembershipAlertsEmail
     {
 
         public static async Task Process(TenantInfo tenant, ILogger logger)
