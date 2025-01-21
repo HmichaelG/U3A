@@ -3,6 +3,12 @@
     "appInsights1": {
       "type": "appInsights.sdk"
     },
+    "secrets1": {
+      "secretStore": null,
+      "resourceId": null,
+      "type": "secrets.user",
+      "connectionId": null
+    },
     "storage1": {
       "secretStore": "LocalSecretsFile",
       "resourceId": null,
@@ -14,15 +20,9 @@
       "secretStore": "LocalSecretsFile",
       "containerName": "azurite",
       "containerImage": "mcr.microsoft.com/azure-storage/azurite",
-      "type": "storage.container",
-      "connectionId": "StorageConnection",
-      "dynamicId": null
-    },
-    "secrets1": {
-      "secretStore": null,
       "resourceId": null,
-      "type": "secrets.user",
-      "connectionId": null
+      "type": "storage.container",
+      "connectionId": "StorageConnection"
     }
   }
 }

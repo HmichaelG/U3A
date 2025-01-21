@@ -109,9 +109,9 @@ public partial class DurableFunctions
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
-        OrchestrationRuntimeStatus[] statuses = { OrchestrationRuntimeStatus.Failed };
-        PurgeInstancesFilter filter = new PurgeInstancesFilter() { Statuses = statuses };
-        await client.PurgeAllInstancesAsync(filter);
+        //OrchestrationRuntimeStatus[] statuses = { OrchestrationRuntimeStatus.Failed };
+        //PurgeInstancesFilter filter = new PurgeInstancesFilter() { Statuses = statuses };
+        //await client.PurgeAllInstancesAsync(filter);
         
         ILogger logger = executionContext.GetLogger(nameof(DoDailyProcedures));
         var options = new U3AFunctionOptions()
