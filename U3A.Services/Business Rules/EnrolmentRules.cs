@@ -509,7 +509,7 @@ namespace U3A.BusinessRules
                                         Course selectedCourse, Class selectedClass)
         {
             if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.DifferentParticipantsInEachClass &&
-                selectedClass != null)
+                selectedClass != null && !selectedCourse.OneStudentPerClass)
             {
                 return await dbc.Enrolment.AsNoTracking()
                             .Include(x => x.Course)
@@ -539,7 +539,7 @@ namespace U3A.BusinessRules
                                         Course? selectedCourse, Class selectedClass)
         {
             if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.DifferentParticipantsInEachClass &&
-                selectedClass != null)
+                selectedClass != null && !selectedCourse.OneStudentPerClass)
             {
                 return await dbc.Enrolment
                             .Include(x => x.Course)

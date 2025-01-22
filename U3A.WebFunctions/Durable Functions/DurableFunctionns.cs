@@ -14,6 +14,10 @@ using System.Text.Json.Serialization;
 using System.IdentityModel.Tokens.Jwt;
 using Serilog.Core;
 using System.Reflection;
+using System.Threading;
+using AngleSharp.Io;
+using Twilio.Rest.Api.V2010.Account;
+using System.Net;
 
 
 namespace U3A.WebFunctions;
@@ -61,6 +65,37 @@ public partial class DurableFunctions
             dbc.UtcOffset = utcOffset;
             logger.LogInformation($"[{tenant.Name}] Local Time: {DateTime.UtcNow + utcOffset}. UTC Offset: {utcOffset}");
         }
+    }
+
+    static async Task<HttpResponseData> ScheduleFunctionAsync(string functionName,
+                                     DurableTaskClient client,
+                                     FunctionContext executionContext,
+                                     HttpRequestData req,
+                                     U3AFunctionOptions options)
+    {
+        ILogger logger = executionContext.GetLogger(functionName);
+        var instanceId = functionName;
+        // Wait for current instance to finish
+        var existingInstance = await client.GetInstanceAsync(instanceId);
+        if (!(existingInstance == null
+            || existingInstance.RuntimeStatus == OrchestrationRuntimeStatus.Completed
+            || existingInstance.RuntimeStatus == OrchestrationRuntimeStatus.Failed
+            || existingInstance.RuntimeStatus == OrchestrationRuntimeStatus.Terminated))
+        {
+           var result = await client.WaitForInstanceCompletionAsync(instanceId);
+        }
+        // Start the orchestration
+        StartOrchestrationOptions startOrchestrationOptions = new StartOrchestrationOptions()
+        {
+            InstanceId = instanceId
+        };
+        instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
+            nameof(DurableFunctions), options, startOrchestrationOptions);
+        logger.LogInformation("Started orchestration with ID = '{instanceId}'.", instanceId);
+
+        // Returns an HTTP 202 response with an instance management payload.
+        // See https://learn.microsoft.com/azure/azure-functions/durable/durable-functions-http-api#start-orchestration
+        return await client.CreateCheckStatusResponseAsync(req, instanceId);
     }
 
     TenantInfo[] GetTenants(ILogger logger, string tenantToProcess, string connectionString)
@@ -112,7 +147,7 @@ public partial class DurableFunctions
         //OrchestrationRuntimeStatus[] statuses = { OrchestrationRuntimeStatus.Failed };
         //PurgeInstancesFilter filter = new PurgeInstancesFilter() { Statuses = statuses };
         //await client.PurgeAllInstancesAsync(filter);
-        
+
         ILogger logger = executionContext.GetLogger(nameof(DoDailyProcedures));
         var options = new U3AFunctionOptions()
         {

@@ -14,76 +14,20 @@ using Microsoft.AspNetCore.Http;
 
 namespace U3A.Services.APIClient;
 
-public class APIClient
+public class APIClient : APIClientBase
 {
-    private string _authToken = string.Empty;
-    private string _apiBaseAddress = string.Empty;
-    public APIClient(string serverToken, string apiBaseAddress = "")
-    {
-        _authToken = serverToken;
-        _apiBaseAddress = apiBaseAddress;
-    }
-
-    public APIClient(string apiBaseUri = "")
-    {
-        _apiBaseAddress = apiBaseUri;
-    }
+    public APIClient() : base() { }
 
     public async Task<string> DoBuildSchedule(string tenant = "")
     {
         var function = "DoBuildSchedule";
-        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(function,tenant));
-        var response = await SendAsync(request);
-        return response;
+        return await sendAPIRequestAsync(function, tenant);
     }
-
-    private string ConstructQuery(string function, string tenant)
+    public async Task<string> DoProcessQueuedDocuments(string tenant = "")
     {
-        var query = string.Empty;
-        if (string.IsNullOrWhiteSpace(tenant))
-        {
-            query = function;
-        }else
-        {
-            query = $"{function}?tenant={tenant}";
-        }
-        return query;
+        var function = "DoProcessQueuedDocuments";
+        return await sendAPIRequestAsync(function, tenant);
     }
 
-    private async Task<string> SendAsync(HttpRequestMessage requestMessage)
-    {
-        using (HttpClient client = new HttpClient())
-        {
-            var responseBody = string.Empty;
-            // Set the base address and headers
-            if (!string.IsNullOrEmpty(_apiBaseAddress))
-            {
-                client.BaseAddress = new Uri(_apiBaseAddress);
-            }
-            else
-            {
-                client.BaseAddress = new Uri("http://localhost:7071/api/");
-            }
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // Add authentication headers if needed
-            if (!string.IsNullOrEmpty(_authToken))
-            {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _authToken);
-            }
-
-            try
-            {
-                HttpResponseMessage response = await client.SendAsync(requestMessage);
-                response.EnsureSuccessStatusCode();
-                responseBody = await response.Content.ReadAsStringAsync();
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine($"Request error: {e.Message}");
-            }
-            return responseBody;
-        }
-    }
 }

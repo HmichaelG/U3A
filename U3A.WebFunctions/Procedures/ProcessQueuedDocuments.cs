@@ -16,49 +16,55 @@ namespace U3A.WebFunctions.Procedures
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
                 var today = await Common.GetTodayAsync(dbc);
+                DocumentTemplate? documentTemplate;
                 if (dbc.DocumentQueue.Any(x => x.Status == DocumentQueueStatus.ReadyToSend))
                 {
-                    var s = new Stopwatch();
                     var server = new DocumentServer(dbc);
+                    string subject = string.Empty;
                     foreach (var queueItem in await dbc.DocumentQueue
                                     .Where(x => x.Status == DocumentQueueStatus.ReadyToSend)
                                     .Include(x => x.DocumentAttachments).ToListAsync())
                     {
-                        s.Start();
-                        DocumentTemplate? documentTemplate = JsonSerializer.Deserialize<DocumentTemplate>(queueItem.DocumentTemplateJSON);
+                        queueItem.Status = DocumentQueueStatus.InProcess;
+                        var result = await dbc.SaveChangesAsync();
                         try
                         {
-                            List<ExportData>? exportData = JsonSerializer.Deserialize<List<ExportData>>(queueItem.ExportDataJSON);
-                            queueItem.Status = DocumentQueueStatus.InProcess;
-                            _ = await dbc.SaveChangesAsync();
-                            if (queueItem.DocumentAttachments != null)
+                            documentTemplate = JsonSerializer.Deserialize<DocumentTemplate>(queueItem.DocumentTemplateJSON);
+                            if (documentTemplate != null)
                             {
-                                documentTemplate!.AttachmentBytes = new List<byte[]>();
-                                foreach (var attachment in queueItem.DocumentAttachments)
+                                subject = documentTemplate.Subject!;
+                                List<ExportData>? exportData = JsonSerializer.Deserialize<List<ExportData>>(queueItem.ExportDataJSON);
+                                if (queueItem.DocumentAttachments != null)
                                 {
-                                    documentTemplate.AttachmentBytes.Add(attachment.Attachment);
+                                    documentTemplate!.AttachmentBytes = new List<byte[]>();
+                                    foreach (var attachment in queueItem.DocumentAttachments)
+                                    {
+                                        documentTemplate.AttachmentBytes.Add(attachment.Attachment);
+                                    }
                                 }
-                            }
-                            if (queueItem.SendToMultipleRecipients)
-                            {
-                                await server.SendQueuedEmailToMultipleRecipientsAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
-                            }
-                            else
-                            {
-                                await server.SendQueuedEmailToSingleRecipientAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
-                            }
-                            s.Stop();
-                            queueItem.Status = DocumentQueueStatus.Complete;
-                            queueItem.Result = "Ok";
+                                if (queueItem.SendToMultipleRecipients)
+                                {
+                                    await server.SendQueuedEmailToMultipleRecipientsAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
+                                }
+                                else
+                                {
+                                    await server.SendQueuedEmailToSingleRecipientAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
+                                }
+                                queueItem.Status = DocumentQueueStatus.Complete;
+                                queueItem.Result = "Ok";
 
+                            }
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError(ex, $"Error Processing: {documentTemplate!.Subject}");
+                            logger.LogError(ex, $"Error Processing: {subject}");
                             queueItem.Status = DocumentQueueStatus.Error;
                             queueItem.Result = "Processing Error";
                         }
-                        finally { _ = await dbc.SaveChangesAsync(); }
+                        finally 
+                        { 
+                            result = await dbc.SaveChangesAsync(); 
+                        }
                     }
                     logger.LogInformation($"Queued Documents: {server.BatchCount} Batches, {server.BatchSuccessCount} Accepted, {server.BatchFailureCount} Failures.");
                 }
@@ -70,7 +76,7 @@ namespace U3A.WebFunctions.Procedures
                 var deleted = dbc.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
                 if (deleted > 0)
                 {
-                    _ = await dbc.SaveChangesAsync();
+                    var result = await dbc.SaveChangesAsync();
                     logger.LogInformation($"Deleted {deleted} document queue records because they are more than 7 days old.");
                 }
             }

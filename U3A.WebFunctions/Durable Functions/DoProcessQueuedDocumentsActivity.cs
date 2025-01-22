@@ -4,6 +4,8 @@ using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using U3A.WebFunctions.Procedures;
+using Microsoft.DurableTask;
+using System.Net;
 
 
 namespace U3A.WebFunctions;
@@ -50,16 +52,9 @@ public partial class DurableFunctions
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger("DoProcessQueuedDocuments");
         var options = new U3AFunctionOptions(req) { DoProcessQueuedDocuments = true };
-        string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
-            nameof(DurableFunctions), options);
-
-        logger.LogInformation("Started orchestration with ID = '{instanceId}'.", instanceId);
-
-        // Returns an HTTP 202 response with an instance management payload.
-        // See https://learn.microsoft.com/azure/azure-functions/durable/durable-functions-http-api#start-orchestration
-        return await client.CreateCheckStatusResponseAsync(req, instanceId);
+        return await ScheduleFunctionAsync(nameof(DoProcessQueuedDocuments), client, executionContext,req, options);
     }
 }
+
 
