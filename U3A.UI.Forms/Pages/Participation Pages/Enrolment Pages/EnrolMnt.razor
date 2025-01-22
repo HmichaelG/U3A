@@ -570,18 +570,18 @@ else
     }
 
 
-    bool isBusy;
+    bool isBusySaving;
     async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
     {
-        if (isBusy) return;
-        isBusy = true;
+        if (isBusySaving) return;
+        isBusySaving = true;
         try
         {
             await SaveRecord(e);
         }
         finally
         {
-            isBusy = false;
+            isBusySaving = false;
         }
     }
 
