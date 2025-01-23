@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using U3A.WebFunctions.Procedures;
+using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.DurableTask.Client;
+using U3A.Model;
 
 
 namespace U3A.WebFunctions;
@@ -15,7 +18,8 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            foreach (var tenant in GetTenants(logger, tenantToProcess, cn))
+            var tenant = GetTenants(logger, tenantToProcess, cn);
+            if (tenant == null)
             {
                 logger.LogInformation($"****** Started {nameof(DoCorrespondenceActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
@@ -39,5 +43,19 @@ public partial class DurableFunctions
         }
         else { throw new NullReferenceException("Database Connection string is null"); }
         return $"{nameof(DoCorrespondenceActivity)} completed.";
+    }
+
+
+    [Function("DoCorrespondence")]
+    public static async Task<HttpResponseData> DoCorrespondence(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
+        [DurableClient] DurableTaskClient client,
+        FunctionContext executionContext)
+    {
+        var options = new U3AFunctionOptions(req)
+        {
+            DurableActivity = DurableActivity.DoCorrespondence
+        };
+        return await ScheduleFunctionAsync(client, executionContext, req, options);
     }
 }

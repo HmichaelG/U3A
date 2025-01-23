@@ -39,9 +39,10 @@ public abstract class APIClientBase :IDisposable
         }
     }
 
-    internal async Task<string> sendAPIRequestAsync(string APIFunctionName, string tenant)
+    internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(APIFunctionName, tenant));
+        var functionName = Enum.GetName<DurableActivity>(durableActivity);
+        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant));
         var response = await SendAsync(request);
         return response;
     }

@@ -27,7 +27,8 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            foreach (var tenant in GetTenants(logger, tenantToProcess, cn))
+            var tenant = GetTenants(logger, tenantToProcess, cn);
+            if (tenant != null)
             {
                 logger.LogInformation($"****** Started {nameof(DoBuildScheduleActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
@@ -61,16 +62,11 @@ public partial class DurableFunctions
     [DurableClient] DurableTaskClient client,
     FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger(nameof(DoBuildSchedule));
-        var options = new U3AFunctionOptions(req) { DoBuildSchedule = true };
-        string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
-            nameof(DurableFunctions), options);
-
-        logger.LogInformation("Started orchestration with ID = '{instanceId}'.", instanceId);
-
-        // Returns an HTTP 202 response with an instance management payload.
-        // See https://learn.microsoft.com/azure/azure-functions/durable/durable-functions-http-api#start-orchestration
-        return await client.CreateCheckStatusResponseAsync(req, instanceId);
+        var options = new U3AFunctionOptions(req)
+        {
+            DurableActivity = DurableActivity.DoBuildSchedule
+        };
+        return await ScheduleFunctionAsync(client, executionContext, req, options);
     }
 
 }

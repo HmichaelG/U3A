@@ -4,6 +4,7 @@ using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using U3A.WebFunctions.Procedures;
+using U3A.Model;
 using Microsoft.DurableTask;
 using System.Net;
 
@@ -20,7 +21,8 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            foreach (var tenant in GetTenants(logger, tenantToProcess, cn))
+            var tenant = GetTenants(logger, tenantToProcess, cn);
+            if (tenant != null) 
             {
                 logger.LogInformation($"****** Started {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
@@ -52,8 +54,11 @@ public partial class DurableFunctions
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
-        var options = new U3AFunctionOptions(req) { DoProcessQueuedDocuments = true };
-        return await ScheduleFunctionAsync(nameof(DoProcessQueuedDocuments), client, executionContext,req, options);
+        var options = new U3AFunctionOptions(req)
+        {
+            DurableActivity = DurableActivity.DoProcessQueuedDocuments
+        };
+        return await ScheduleFunctionAsync(client, executionContext, req, options);
     }
 }
 

@@ -18,6 +18,8 @@ using System.Threading;
 using AngleSharp.Io;
 using Twilio.Rest.Api.V2010.Account;
 using System.Net;
+using DevExpress.CodeParser;
+using Eway.Rapid.Abstractions.Response;
 
 
 namespace U3A.WebFunctions;
@@ -39,22 +41,36 @@ public partial class DurableFunctions
         var json = JsonSerializer.Serialize(optionsData);
         var options = JsonSerializer.Deserialize<U3AFunctionOptions>(json);
         var result = string.Empty;
-        if (options.DoFinalisePayments)
-        { result = await context.CallActivityAsync<string>(nameof(DoFinalisePaymentsActivity), options.TenantIdentifier); }
-        if (options.DoAutoEnrolment)
-        { result = await context.CallActivityAsync<string>(nameof(DoAutoEnrolmentActivity), options.TenantIdentifier); }
-        if (options.DoBringForwardEnrolments)
-        { result = await context.CallActivityAsync<string>(nameof(DoBringForwardEnrolmentsActivity), options.TenantIdentifier); }
-        if (options.DoCorrespondence)
-        { result = await context.CallActivityAsync<string>(nameof(DoCorrespondenceActivity), options.TenantIdentifier); }
-        if (options.DoSendLeaderReports)
-        { result = await context.CallActivityAsync<string>(nameof(DoSendLeaderReportsActivity), options.TenantIdentifier); }
-        if (options.DoProcessQueuedDocuments)
-        { result = await context.CallActivityAsync<string>(nameof(DoProcessQueuedDocumentsActivity), options.TenantIdentifier); }
-        if (options.DoBuildSchedule)
-        { result = await context.CallActivityAsync<string>(nameof(DoBuildScheduleActivity), options.TenantIdentifier); }
-        if (options.DoDatabaseCleanup)
-        { result = await context.CallActivityAsync<string>(nameof(DoDatabaseCleanupActivity), options.TenantIdentifier); }
+        switch (options.DurableActivity)
+        {
+            case DurableActivity.DoFinalisePayments:
+                result = await context.CallActivityAsync<string>(nameof(DoFinalisePaymentsActivity), options.TenantIdentifier);
+                break;
+            case DurableActivity.DoAutoEnrolment:
+                result = await context.CallActivityAsync<string>(nameof(DoAutoEnrolmentActivity), options.TenantIdentifier);
+                break;
+            case DurableActivity.DoBringForwardEnrolments:
+                result = await context.CallActivityAsync<string>(nameof(DoBringForwardEnrolmentsActivity), options.TenantIdentifier);
+                break;
+            case DurableActivity.DoCorrespondence:
+                result = await context.CallActivityAsync<string>(nameof(DoCorrespondenceActivity), options.TenantIdentifier);
+                break;
+            case DurableActivity.DoSendLeaderReports:
+                result = await context.CallActivityAsync<string>(nameof(DoSendLeaderReportsActivity), options.TenantIdentifier);
+                break;
+            case DurableActivity.DoProcessQueuedDocuments:
+                result = await context.CallActivityAsync<string>(nameof(DoProcessQueuedDocumentsActivity), options.TenantIdentifier);
+                break;
+            case DurableActivity.DoCreateAttendance:
+                result = await context.CallActivityAsync<string>(nameof(DoCreateAttendanceActivity), options.TenantIdentifier);
+                break;
+            case DurableActivity.DoBuildSchedule:
+                result = await context.CallActivityAsync<string>(nameof(DoBuildScheduleActivity), options.TenantIdentifier);
+                break;
+            case DurableActivity.DoDatabaseCleanup:
+                result = await context.CallActivityAsync<string>(nameof(DoDatabaseCleanupActivity), options.TenantIdentifier);
+                break;
+        }
     }
 
     async Task LogStartTime(ILogger logger, TenantInfo tenant)
@@ -67,14 +83,15 @@ public partial class DurableFunctions
         }
     }
 
-    static async Task<HttpResponseData> ScheduleFunctionAsync(string functionName,
-                                     DurableTaskClient client,
+    static async Task<HttpResponseData> ScheduleFunctionAsync(DurableTaskClient client,
                                      FunctionContext executionContext,
                                      HttpRequestData req,
-                                     U3AFunctionOptions options)
+                                     U3AFunctionOptions options,
+                                     bool WaitForCompletion = false)
     {
-        ILogger logger = executionContext.GetLogger(functionName);
-        var instanceId = functionName;
+        var activity = Enum.GetName<DurableActivity>(options.DurableActivity);
+        ILogger logger = executionContext.GetLogger(activity);
+        var instanceId = $"{activity}_{options.TenantIdentifier}";
         // Wait for current instance to finish
         var existingInstance = await client.GetInstanceAsync(instanceId);
         if (!(existingInstance == null
@@ -82,7 +99,7 @@ public partial class DurableFunctions
             || existingInstance.RuntimeStatus == OrchestrationRuntimeStatus.Failed
             || existingInstance.RuntimeStatus == OrchestrationRuntimeStatus.Terminated))
         {
-           var result = await client.WaitForInstanceCompletionAsync(instanceId);
+            var result = await client.WaitForInstanceCompletionAsync(instanceId);
         }
         // Start the orchestration
         StartOrchestrationOptions startOrchestrationOptions = new StartOrchestrationOptions()
@@ -93,20 +110,24 @@ public partial class DurableFunctions
             nameof(DurableFunctions), options, startOrchestrationOptions);
         logger.LogInformation("Started orchestration with ID = '{instanceId}'.", instanceId);
 
+        // wait for completion, if necessary
+        if (WaitForCompletion)
+        {
+         var result = await client.WaitForInstanceCompletionAsync(instanceId);
+        }
+
         // Returns an HTTP 202 response with an instance management payload.
         // See https://learn.microsoft.com/azure/azure-functions/durable/durable-functions-http-api#start-orchestration
         return await client.CreateCheckStatusResponseAsync(req, instanceId);
     }
 
-    TenantInfo[] GetTenants(ILogger logger, string tenantToProcess, string connectionString)
+    TenantInfo? GetTenants(ILogger logger, string tenantToProcess, string connectionString)
     {
         var tenants = new List<TenantInfo>();
         Common.GetTenants(tenants, connectionString!, tenantToProcess);
-        var name = (string.IsNullOrEmpty(tenantToProcess) ? "All Tenants" : tenantToProcess);
-        logger.LogInformation($"Processing activity for: {name}.");
-        logger.LogInformation($"{tenants.Count} tenants retrieved from database.");
+        logger.LogInformation($"Processing activity for: {tenantToProcess}.");
         logger.LogInformation($"UTC Time is: {DateTime.UtcNow}");
-        return tenants.ToArray();
+        return (tenants.Count > 0) ? tenants.ToArray()[0] : null;
     }
 
     [Function(nameof(DoHourlyProcedures))]

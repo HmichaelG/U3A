@@ -18,16 +18,41 @@ public class APIClient : APIClientBase
 {
     public APIClient() : base() { }
 
-    public async Task<string> DoBuildSchedule(string tenant = "")
+    public async Task<string> DoBuildSchedule(string tenant)
     {
-        var function = "DoBuildSchedule";
-        return await sendAPIRequestAsync(function, tenant);
+        return await sendAPIRequestAsync(DurableActivity.DoBuildSchedule, tenant);
     }
-    public async Task<string> DoProcessQueuedDocuments(string tenant = "")
+    public async Task<string> DoProcessQueuedDocuments(string tenant)
     {
-        var function = "DoProcessQueuedDocuments";
-        return await sendAPIRequestAsync(function, tenant);
+        return await sendAPIRequestAsync(DurableActivity.DoProcessQueuedDocuments, tenant);
     }
-
+    public async Task<string> DoAutoEnrolment(string tenant)
+    {
+        return await sendAPIRequestAsync(DurableActivity.DoAutoEnrolment, tenant);
+    }
+    public async Task<string> DoDoFinalisePayments(string tenant)
+    {
+        return await sendAPIRequestAsync(DurableActivity.DoFinalisePayments, tenant);
+    }
+    public async Task<string> DoCorrespondence(string tenant)
+    {
+        return await sendAPIRequestAsync(DurableActivity.DoCorrespondence, tenant);
+    }
+    public async Task<string> DoBringForwardEnrolments(string tenant)
+    {
+        return await sendAPIRequestAsync(DurableActivity.DoBringForwardEnrolments, tenant);
+    }
+    public async Task<string> DoSendLeaderReports(string tenant)
+    {
+        return await sendAPIRequestAsync(DurableActivity.DoSendLeaderReports, tenant);
+    }
+    public async Task<string> DoCreateAttendance(string tenant)
+    {
+        return await sendAPIRequestAsync(DurableActivity.DoCreateAttendance, tenant);
+    }
+    public async Task<string> DoDatabaseCleanup(string tenant)
+    {
+        return await sendAPIRequestAsync(DurableActivity.DoDatabaseCleanup, tenant);
+    }
 
 }
