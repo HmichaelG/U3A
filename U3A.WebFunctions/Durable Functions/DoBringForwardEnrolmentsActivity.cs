@@ -19,7 +19,7 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenants(logger, tenantToProcess, cn);
+            var tenant = GetTenant(logger, tenantToProcess, cn);
             if (tenant != null) 
             {
                 logger.LogInformation($"****** Started {nameof(DoBringForwardEnrolmentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");

@@ -21,14 +21,14 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenants(logger, tenantToProcess, cn);
+            var tenant = GetTenant(logger, tenantToProcess, cn);
             if (tenant != null) 
             {
                 logger.LogInformation($"****** Started {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
                     await LogStartTime(logger, tenant);
-                    var isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
+                    var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
                         await ProcessQueuedDocuments.Process(tenant, logger);

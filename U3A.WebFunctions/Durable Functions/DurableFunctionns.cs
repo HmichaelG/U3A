@@ -4,22 +4,9 @@ using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
-using U3A.WebFunctions.Procedures;
 using System.Text.Json;
-using System.ComponentModel;
-using System.Text.Json.Serialization;
-using System.IdentityModel.Tokens.Jwt;
-using Serilog.Core;
-using System.Reflection;
-using System.Threading;
-using AngleSharp.Io;
-using Twilio.Rest.Api.V2010.Account;
-using System.Net;
-using DevExpress.CodeParser;
-using Eway.Rapid.Abstractions.Response;
 
 
 namespace U3A.WebFunctions;
@@ -58,6 +45,9 @@ public partial class DurableFunctions
             case DurableActivity.DoSendLeaderReports:
                 result = await context.CallActivityAsync<string>(nameof(DoSendLeaderReportsActivity), options.TenantIdentifier);
                 break;
+            case DurableActivity.DoMembershipAlertsEmail:
+                result = await context.CallActivityAsync<string>(nameof(DoMembershipAlertsEmailActivity), options.TenantIdentifier);
+                break;
             case DurableActivity.DoProcessQueuedDocuments:
                 result = await context.CallActivityAsync<string>(nameof(DoProcessQueuedDocumentsActivity), options.TenantIdentifier);
                 break;
@@ -90,6 +80,10 @@ public partial class DurableFunctions
                                      bool WaitForCompletion = false)
     {
         var activity = Enum.GetName<DurableActivity>(options.DurableActivity);
+        if (activity == null)
+        {
+            throw new ArgumentException("Invalid activity specified.");
+        }
         ILogger logger = executionContext.GetLogger(activity);
         var instanceId = $"{activity}_{options.TenantIdentifier}";
         // Wait for current instance to finish
@@ -121,20 +115,23 @@ public partial class DurableFunctions
         return await client.CreateCheckStatusResponseAsync(req, instanceId);
     }
 
-    TenantInfo? GetTenants(ILogger logger, string tenantToProcess, string connectionString)
+    string GetInstanceId(U3AFunctionOptions options)
+    {
+        return $"{options.DurableActivity}_{options.TenantIdentifier}";
+    }
+
+    TenantInfo? GetTenant(ILogger logger, string tenantToProcess, string connectionString)
     {
         var tenants = new List<TenantInfo>();
         Common.GetTenants(tenants, connectionString!, tenantToProcess);
-        logger.LogInformation($"Processing activity for: {tenantToProcess}.");
-        logger.LogInformation($"UTC Time is: {DateTime.UtcNow}");
         return (tenants.Count > 0) ? tenants.ToArray()[0] : null;
     }
 
     [Function(nameof(DoHourlyProcedures))]
-    public static async Task DoHourlyProcedures(
+    public async Task DoHourlyProcedures(
         [TimerTrigger("0 0 22-23,0-11 * * *"
     //#if DEBUG
-    //           , RunOnStartup=true
+           //    , RunOnStartup=true
     //#endif            
                 )]
                 TimerInfo myTimer,
@@ -142,52 +139,94 @@ public partial class DurableFunctions
         FunctionContext executionContext)
     {
         ILogger logger = executionContext.GetLogger(nameof(DoHourlyProcedures));
-        var options = new U3AFunctionOptions()
+
+        string instanceId;
+        var tenants = new List<TenantInfo>();
+        //Retrieve the tenants
+        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        Common.GetTenants(tenants, cn!);
+        
+        foreach (var tenant in tenants)
         {
-            DoAutoEnrolment = true,
-            DoCorrespondence = true,
-            DoBuildSchedule = true
-        };
-        // Start the orchestration
-        string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
-            nameof(DurableFunctions), options);
-        logger.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoCorrespondence, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoProcessQueuedDocuments, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client);
+        }
     }
 
     [Function(nameof(DoDailyProcedures))]
-    public static async Task DoDailyProcedures(
+    public async Task DoDailyProcedures(
         [TimerTrigger("0 0 17 * * *"
     //#if DEBUG
-    //           , RunOnStartup=true
+               , RunOnStartup=true
     //#endif            
                 )]
                 TimerInfo myTimer,
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
-        //OrchestrationRuntimeStatus[] statuses = { OrchestrationRuntimeStatus.Failed };
-        //PurgeInstancesFilter filter = new PurgeInstancesFilter() { Statuses = statuses };
-        //await client.PurgeAllInstancesAsync(filter);
-
         ILogger logger = executionContext.GetLogger(nameof(DoDailyProcedures));
-        var options = new U3AFunctionOptions()
+
+        string instanceId;
+        var tenants = new List<TenantInfo>();
+        //Retrieve the tenants
+        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        Common.GetTenants(tenants, cn!);
+
+        foreach (var tenant in tenants)
         {
-            DoFinalisePayments = true,
-            DoAutoEnrolment = true,
-            DoBringForwardEnrolments = true,
-            DoCreateAttendance = true,
-            DoCorrespondence = true,
-            DoSendLeaderReports = true,
-            DoMembershipAlertsEmail = true,
-            DoProcessQueuedDocuments = true,
-            DoBuildSchedule = true,
-            DoDatabaseCleanup = true,
-        };
-        // Start the orchestration
-        string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
-            nameof(DurableFunctions), options);
-        logger.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBringForwardEnrolments, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoCreateAttendance, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoCorrespondence, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoSendLeaderReports, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoMembershipAlertsEmail, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoProcessQueuedDocuments, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoDatabaseCleanup, client);
+        }
+        await client.PurgeInstancesAsync(createdFrom: new DateTime(1900,1,1),
+                                            createdTo: DateTime.UtcNow.AddHours(-1));
     }
+
+    async Task<string> ScheduleTimerFunction(ILogger logger, string tenantIdentifier, 
+                                            DurableActivity durableActivity, 
+                                            DurableTaskClient client)
+    {
+        U3AFunctionOptions options;
+        string instanceId;
+        StartOrchestrationOptions startOrchestrationOptions;
+        options = new U3AFunctionOptions()
+        {
+            TenantIdentifier = tenantIdentifier!,
+            DurableActivity = durableActivity
+        };
+        instanceId = GetInstanceId(options);
+        // Wait for current instance to finish
+        var existingInstance = await client.GetInstanceAsync(instanceId);
+        if (!(existingInstance == null
+            || existingInstance.RuntimeStatus == OrchestrationRuntimeStatus.Completed
+            || existingInstance.RuntimeStatus == OrchestrationRuntimeStatus.Failed
+            || existingInstance.RuntimeStatus == OrchestrationRuntimeStatus.Terminated))
+        {
+            var result = await client.WaitForInstanceCompletionAsync(instanceId);
+        }
+       
+        // Start the orchestration
+        startOrchestrationOptions = new StartOrchestrationOptions()
+        {
+            InstanceId = instanceId            
+        };
+        instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
+                        nameof(DurableFunctions), options, startOrchestrationOptions);
+        logger.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+        _ = await client.WaitForInstanceCompletionAsync(instanceId);
+        return instanceId;
+    }
+
 
 
 }

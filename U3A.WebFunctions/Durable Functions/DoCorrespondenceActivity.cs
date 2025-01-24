@@ -18,14 +18,14 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenants(logger, tenantToProcess, cn);
-            if (tenant == null)
+            var tenant = GetTenant(logger, tenantToProcess, cn);
+            if (tenant != null)
             {
                 logger.LogInformation($"****** Started {nameof(DoCorrespondenceActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
                     await LogStartTime(logger, tenant);
-                    var isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
+                    var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
                         await ProcessCorrespondence.Process(tenant, cn!, logger, IsHourlyProcedure: true);

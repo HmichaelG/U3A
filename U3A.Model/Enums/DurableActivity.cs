@@ -31,7 +31,9 @@ namespace U3A.Model
         [Display(Name = "Build Schedule")]
         DoBuildSchedule,
         [Display(Name = "Database Cleanup")]
-        DoDatabaseCleanup
+        DoDatabaseCleanup,
+        [Display(Name = "Membership Alert Email")]
+        DoMembershipAlertsEmail
     }
 
     [NotMapped]
