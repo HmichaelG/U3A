@@ -173,7 +173,7 @@ public class Person : BaseEntity, ISoftDelete
 
 
     [MaxLength(256)]
-    [EmailAddressAlowNull]
+    [EmailAddressAllowNull]
     public string? Email { get; set; }
 
     public string? AdjustedEmail
@@ -560,7 +560,7 @@ public class EmailCommunicationRequiresEmailAddressAttribute : ValidationAttribu
     }
 }
 
-public class EmailAddressAlowNullAttribute : ValidationAttribute
+public class EmailAddressAllowNullAttribute : ValidationAttribute
 {
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
