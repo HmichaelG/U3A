@@ -174,6 +174,7 @@
                         @{
                             var editItem = (Person)EditFormContext.EditModel;
                         }
+                        <ValidationSummary Model="editItem" />
                         <DxFormLayout style="white-space:nowrap">
                             <div style="white-space:normal" class="m-2 w-100 alert alert-warning text-center" hidden="@(!isEmailEditing)">
                                 <strong>NB:</strong> The recommended way of changing an Email address is via <b>Manage Credentials</b> within the  Member Portal.
@@ -222,7 +223,8 @@
                                     <DxSpinEdit @bind-Value="@editItem.Postcode" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Email" onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"
+                                    <DxTextBox @bind-Text="@editItem.Email"
+                                    onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"
                                     autocomplete="new-password"
                                     ReadOnly="@(!isEmailEditing)" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
                                         <Buttons>
@@ -440,11 +442,7 @@
         // Assign changes from the edit model to the data item.
         if (dataItem != null)
         {
-            if (e.IsNew)
-            {
-                if (!(await AddEmail(editModel.Email, editModel.PersonIdentity))) { e.Cancel = true; return; }
-            }
-            else if (editModel.Email?.Trim().ToLower() != dataItem.Email?.Trim().ToLower())
+            if (!e.IsNew && editModel.Email?.Trim().ToLower() != dataItem.Email?.Trim().ToLower())
             {
                 if (!(await ChangeEmail(dataItem.Email, editModel.Email, editModel.PersonIdentity))) { e.Cancel = true; return; }
             }
@@ -456,6 +454,8 @@
                 // update the Grid.
                 if (e.IsNew)
                 {
+                    var person = await dbc.Person.FindAsync(dataItem.ID);
+                    if (!(await AddEmail(person.Email, person.PersonIdentity))) { e.Cancel = true; return; }
                     Persons.Insert(0, dataItem);
                 }
                 else
@@ -483,7 +483,13 @@
                     PasswordHash = hasher.HashPassword(null, personIdentity)
                 };
             var callResult = await UserManager.CreateAsync(user);
-            if (!callResult.Succeeded)
+            if (callResult.Succeeded)
+            {
+                string msg = $@"A login has been created for: <b>{email}</b><br/>
+                                and confirmed with password: <b>{personIdentity}</b>";
+                await messageBox.ShowOkOnlyAsync("Login created", msg);
+            }
+            else
             {
                 var msg = string.Empty;
                 foreach (var err in callResult.Errors)
@@ -507,14 +513,7 @@
         if (!string.IsNullOrWhiteSpace(originalEmail)) user = await UserManager.FindByEmailAsync(originalEmail);
         if (user is null)
         {
-            user = new ApplicationUser()
-                {
-                    Email = newEmail,
-                    UserName = newEmail,
-                    EmailConfirmed = true,
-                    PasswordHash = hasher.HashPassword(null, personIdentity)
-                };
-            callResult = await UserManager.CreateAsync(user);
+            result = await AddEmail(newEmail, personIdentity);
         }
         else
         {
@@ -523,26 +522,37 @@
                 user.UserName = newEmail;
                 user.Email = newEmail;
                 callResult = await UserManager.UpdateAsync(user);
-                var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-                _ = await UserManager.ConfirmEmailAsync(user, token);
+                if (callResult.Succeeded)
+                {
+                    var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+                    _ = await UserManager.ConfirmEmailAsync(user, token);
+                    string msg = $@"The login has changed<br/> 
+                                from: <b>{originalEmail}</b><br/> 
+                                to <b>{newEmail}</b>.<br/>
+                                It is confirmed and the password remains unchanged";
+                    _ = await messageBox.ShowOkOnlyAsync("Login changed", msg);
+                }
+                else
+                {
+                    var msg = string.Empty;
+                    foreach (var err in callResult.Errors)
+                    {
+                        msg += $"&nbsp;&nbsp;{err.Description}<br/>";
+                    }
+                    result = await messageBox.ShowAsync("Email change failed",
+                                            $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
+                        <p>Are you sure you wish to continue?</p>");
+                }
             }
             else
             {
                 callResult = await UserManager.DeleteAsync(user);
+                if (callResult.Succeeded)
+                {
+                    _ = await messageBox.ShowOkOnlyAsync("Login removed", "The login has been removed from the system.");
+                }
             }
         }
-        if (!callResult.Succeeded)
-        {
-            var msg = string.Empty;
-            foreach (var err in callResult.Errors)
-            {
-                msg += $"&nbsp;&nbsp;{err.Description}<br/>";
-            }
-            result = await messageBox.ShowAsync("Email change failed",
-                                $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
-                        <p>Are you sure you wish to continue?</p>");
-        }
-
         return result;
     }
 
@@ -759,6 +769,11 @@
     {
         emailsSent += e.DocumentsSent;
         await ProgressBar.SetValueAsync(emailsSent);
+    }
+
+    void OnEmailChanged(string newValue)
+    {
+
     }
 
     public void Dispose()
