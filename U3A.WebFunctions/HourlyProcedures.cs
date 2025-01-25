@@ -33,7 +33,8 @@ namespace U3A.WebFunctions
             await DoWork();
         }
 
-        private async Task DoWork() {
+        private async Task DoWork()
+        {
 
             //Retrieve the tenants
             var tenants = new List<TenantInfo>();

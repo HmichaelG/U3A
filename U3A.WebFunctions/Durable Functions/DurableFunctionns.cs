@@ -160,7 +160,7 @@ public partial class DurableFunctions
     public async Task DoDailyProcedures(
         [TimerTrigger("0 0 17 * * *"
     //#if DEBUG
-               , RunOnStartup=true
+              // , RunOnStartup=true
     //#endif            
                 )]
                 TimerInfo myTimer,
