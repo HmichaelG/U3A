@@ -520,17 +520,18 @@ else
             var processed = 0;
             await ProgressBar.ShowAsync("Populate Logins", max);
             mainGrid.BeginUpdate();
-            foreach (var p in dbc.Person.AsNoTracking()
+            foreach (var p in await dbc.Person.AsNoTracking()
                             .OrderBy(x => x.LastName).ThenBy(x => x.FirstName)
-                            .Where(x => x.DateCeased == null && !string.IsNullOrWhiteSpace(x.Email)))
+                            .Where(x => x.DateCeased == null && !string.IsNullOrWhiteSpace(x.Email)).ToListAsync())
             {
                 await ProgressBar.SetValueAsync(count++);
-                if (await UserManager.FindByEmailAsync(p.Email) == null)
+                var email = p.Email.Trim();
+                if (await UserManager.FindByEmailAsync(email) == null)
                 {
                     var user = new ApplicationUser()
                         {
-                            Email = p.Email,
-                            UserName = p.Email,
+                            Email = email,
+                            UserName = email,
                             EmailConfirmed = true,
                             PasswordHash = hasher.HashPassword(null, p.PersonIdentity)
                         };
