@@ -11,7 +11,7 @@ namespace U3A.WebFunctions.Procedures
     {
         public static async Task Process(TenantInfo tenant,
             string tenantConnectionString,
-            ILogger logger, bool IsHourlyProcedure, bool hasRandomAllocationExecuted)
+            ILogger logger, bool IsHourlyProcedure)
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
@@ -126,14 +126,14 @@ namespace U3A.WebFunctions.Procedures
                                     if (!onFile.Contains(onFileKey))
                                     {
                                         onFile.Add(onFileKey);
-                                        if (hasRandomAllocationExecuted ||
+                                        if (DailyProcedures.RandomAllocationExecuted[tenant.Identifier!] ||
                                             (classOnDayID >= todayID && classOnDayID <= todayID + 1))
                                         {
                                             if (course != null) courseName = course.Name;
                                             sm.Status = await reportFactory.CreateLeaderReportProForma(leader,
                                                                 courseName,
                                                                 enrolments.ToArray(),
-                                                                hasRandomAllocationExecuted);
+                                                                DailyProcedures.RandomAllocationExecuted[tenant.Identifier!]);
                                             logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
                                         }
                                     }

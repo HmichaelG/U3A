@@ -12,15 +12,13 @@ namespace U3A.WebFunctions;
 public partial class DurableFunctions
 {
     [Function(nameof(DoCorrespondenceActivity))]
-    public async Task<string> DoCorrespondenceActivity([ActivityTrigger] 
-                        U3AFunctionOptions options, 
-                        FunctionContext executionContext)
+    public async Task<string> DoCorrespondenceActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
     {
         ILogger logger = executionContext.GetLogger(nameof(DoCorrespondenceActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
+            var tenant = GetTenant(logger, tenantToProcess, cn);
             if (tenant != null)
             {
                 logger.LogInformation($"****** Started {nameof(DoCorrespondenceActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
@@ -30,7 +28,7 @@ public partial class DurableFunctions
                     var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
-                        await ProcessCorrespondence.Process(tenant, cn!, logger, IsHourlyProcedure: true, options.HasRandomAllocationExecuted);
+                        await ProcessCorrespondence.Process(tenant, cn!, logger, IsHourlyProcedure: true);
                     }
                     else
                     {
@@ -47,4 +45,17 @@ public partial class DurableFunctions
         return $"{nameof(DoCorrespondenceActivity)} completed.";
     }
 
+
+    [Function("DoCorrespondence")]
+    public static async Task<HttpResponseData> DoCorrespondence(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
+        [DurableClient] DurableTaskClient client,
+        FunctionContext executionContext)
+    {
+        var options = new U3AFunctionOptions(req)
+        {
+            DurableActivity = DurableActivity.DoCorrespondence
+        };
+        return await ScheduleFunctionAsync(client, executionContext, req, options);
+    }
 }

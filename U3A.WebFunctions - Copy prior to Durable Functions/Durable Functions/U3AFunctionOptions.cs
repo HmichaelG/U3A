@@ -14,8 +14,8 @@ public class U3AFunctionOptions
             TenantIdentifier = queryStrings[0];
         }
     }
-    public DurableActivity DurableActivity { get; set; }
     public string TenantIdentifier { get; set; } = string.Empty;
-    public bool HasRandomAllocationExecuted { get; set; } = false;  
+    public DurableActivity DurableActivity { get; set; }
+
 }
 

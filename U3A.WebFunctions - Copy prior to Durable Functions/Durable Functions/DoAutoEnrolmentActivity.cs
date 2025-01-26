@@ -13,9 +13,8 @@ public partial class DurableFunctions
 {
 
     [Function(nameof(DoAutoEnrolmentActivity))]
-    public async Task<bool> DoAutoEnrolmentActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
+    public async Task<string> DoAutoEnrolmentActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
     {
-        bool hasRandomAllocationExecuted = false; //Return value
         ILogger logger = executionContext.GetLogger(nameof(DoAutoEnrolmentActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
@@ -28,7 +27,7 @@ public partial class DurableFunctions
                     try
                     {
                         await LogStartTime(logger, tenant);
-                        hasRandomAllocationExecuted = await AutoEnrollParticipants.Process(tenant, cn!, logger);
+                        await AutoEnrollParticipants.Process(tenant, cn!, logger);
                     }
                     catch (Exception ex)
                     {
@@ -38,7 +37,7 @@ public partial class DurableFunctions
             }
             else { throw new NullReferenceException("Database connection string is null"); }
         }
-        return hasRandomAllocationExecuted;
+        return $"{nameof(DoAutoEnrolmentActivity)} completed.";
     }
 
     [Function("DoAutoEnrolment")]

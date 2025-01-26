@@ -34,10 +34,6 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoFinalisePayments, tenant);
     }
-    public async Task<string> DoCorrespondence(string tenant)
-    {
-        return await sendAPIRequestAsync(DurableActivity.DoCorrespondence, tenant);
-    }
     public async Task<string> DoBringForwardEnrolments(string tenant)
     {
         return await sendAPIRequestAsync(DurableActivity.DoBringForwardEnrolments, tenant);

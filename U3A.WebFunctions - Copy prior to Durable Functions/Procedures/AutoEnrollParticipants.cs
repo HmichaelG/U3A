@@ -1,5 +1,4 @@
-﻿using DevExpress.CodeParser;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using U3A.BusinessRules;
 using U3A.Database;
@@ -9,11 +8,10 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class AutoEnrollParticipants
     {
-        public static async Task<bool> Process(TenantInfo tenant,
+        public static async Task Process(TenantInfo tenant,
                                             string tenantConnectionString,
                                             ILogger logger)
         {
-            bool hasRandomAllocationExecuted = false; //Return value
             using (var dbc = new U3ADbContext(tenant))
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
@@ -23,7 +21,7 @@ namespace U3A.WebFunctions.Procedures
                 if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
                 {
                     logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
-                    return hasRandomAllocationExecuted;
+                    return;
                 }
                 var IsClassAllocationFinalised = false;
                 var forceEmailQueue = false;
@@ -35,7 +33,7 @@ namespace U3A.WebFunctions.Procedures
 
                 //get the current enrolment term
                 var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
-                if (currentTerm == null) return hasRandomAllocationExecuted;
+                if (currentTerm == null) return;
                 if (settings.AutoEnrolRemainderMethod.ToLower() == "random")
                 {
                     //Allocation is random
@@ -46,7 +44,7 @@ namespace U3A.WebFunctions.Procedures
                         if (BusinessRule.IsPreRandomAllocationDay(currentTerm, settings, today))
                         {
                             logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
-                            return hasRandomAllocationExecuted;
+                            return;
                         }
                         else
                         {
@@ -63,7 +61,7 @@ namespace U3A.WebFunctions.Procedures
                                 // force all members to get a report
                                 forceEmailQueue = true;
                                 // set TRUE to force all leaders to get a report
-                                hasRandomAllocationExecuted = true;
+                                DailyProcedures.RandomAllocationExecuted[tenant.Identifier!] = true;
                             }
 #if DEBUG
                             forceEmailQueue = false;
@@ -96,7 +94,7 @@ namespace U3A.WebFunctions.Procedures
                     await BusinessRule.AutoEnrolMultiCampus(tenant, tenantConnectionString, now);
                 }
             }
-            return hasRandomAllocationExecuted;
+            return;
         }
 
     }
