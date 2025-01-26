@@ -11,24 +11,24 @@ namespace U3A.WebFunctions.Procedures
     {
         public static async Task Process(TenantInfo tenant,
             string tenantConnectionString,
-            ILogger logger, bool IsNotDailyProcedure, bool hasRandomAllocationExecuted)
+            ILogger logger, bool IsDailyProcedure, bool hasRandomAllocationExecuted)
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
-            var reportFactory = new ProFormaReportFactory(tenant,logger);
+            var reportFactory = new ProFormaReportFactory(tenant, logger);
             var personEnrolments = new Dictionary<Guid, List<Enrolment>>();
             IList<SendMail> mailItems;
             using (var dbc = new U3ADbContext(tenant))
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-                var settings = dbc.SystemSettings.OrderBy(x=>x.ID).FirstOrDefault();
+                var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
                 var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 using (var dbcT = new TenantDbContext(tenantConnectionString))
                 {
                     List<(Guid, Guid, Guid?)> onFile = new();
                     (Guid, Guid, Guid?) onFileKey;
                     var today = await Common.GetTodayAsync(dbc);
-                    var utcTime = DateTime.UtcNow; 
+                    var utcTime = DateTime.UtcNow;
                     mailItems = await dbc.SendMail.IgnoreQueryFilters()
                                             .Include(x => x.Person)
                                             .Where(x => !x.Person.IsDeleted && string.IsNullOrWhiteSpace(x.Status)
@@ -41,6 +41,9 @@ namespace U3A.WebFunctions.Procedures
                     foreach (SendMail sm in mailItems)
                     {
                         var p = sm.Person;
+                        string courseName = "";
+                        Course? course = null;
+                        var enrolments = new List<Enrolment>();
                         switch (sm.DocumentName)
                         {
                             case "Cash Receipt":
@@ -84,98 +87,100 @@ namespace U3A.WebFunctions.Procedures
                                 else sm.Status = "Enrolment not found";
                                 break;
                             case "Leader Report":
-                                if (IsNotDailyProcedure) { break; }
-                                string courseName = "";
-                                Course? course = null;
-                                var leader = await dbc.Person.IgnoreQueryFilters()
-                                                    .Where(x => !x.IsDeleted && x.ID == sm.PersonID).FirstOrDefaultAsync();
-                                var enrolments = new List<Enrolment>();
-                                var todayID = (int)today.DayOfWeek;
-                                int classOnDayID = -1;
-                                if (dbc.Class.Any(x => x.ID == sm.RecordKey))
+                                if (IsDailyProcedure)
                                 {
-                                    enrolments = dbc.Enrolment.IgnoreQueryFilters()
-                                                        .Where(x => !x.IsDeleted && x.ClassID == sm.RecordKey
-                                                               && x.TermID == sm.TermID).ToList();
-                                    enrolments.AddRange(mcEnrolments
-                                                        .Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
-                                    var Class = dbc.Class.Find(sm.RecordKey);
-                                    course = dbc.Course.Find(Class!.CourseID);
-                                    classOnDayID = Class.OnDayID;
-                                }
-                                else
-                                {
-                                    course = dbc.Course.Find(sm.RecordKey);
-                                    if (course != null)
+                                    var leader = await dbc.Person.IgnoreQueryFilters()
+                                                        .Where(x => !x.IsDeleted && x.ID == sm.PersonID).FirstOrDefaultAsync();
+                                    var todayID = (int)today.DayOfWeek;
+                                    int classOnDayID = -1;
+                                    if (dbc.Class.Any(x => x.ID == sm.RecordKey))
                                     {
                                         enrolments = dbc.Enrolment.IgnoreQueryFilters()
-                                                            .Where(x => !x.IsDeleted && x.CourseID == course.ID
-                                                                              && x.TermID == sm.TermID).ToList();
-                                        enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
-                                                                              && x.TermID == sm.TermID));
-                                        foreach (var c in dbc.Class.Where(x => x.CourseID == course.ID).OrderBy(x => x.OnDayID))
-                                        {
-                                            if (c.OnDayID >= todayID) { classOnDayID = c.OnDayID; break; }
-                                        }
+                                                            .Where(x => !x.IsDeleted && x.ClassID == sm.RecordKey
+                                                                   && x.TermID == sm.TermID).ToList();
+                                        enrolments.AddRange(mcEnrolments
+                                                            .Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
+                                        var Class = dbc.Class.Find(sm.RecordKey);
+                                        course = dbc.Course.Find(Class!.CourseID);
+                                        classOnDayID = Class.OnDayID;
                                     }
-                                }
-                                if (leader != null && enrolments.Count > 0)
-                                {
-                                    onFileKey = (leader.ID, enrolments[0].CourseID, enrolments[0].ClassID);
-                                    if (!onFile.Contains(onFileKey))
+                                    else
                                     {
-                                        onFile.Add(onFileKey);
-                                        if (hasRandomAllocationExecuted ||
-                                            (classOnDayID >= todayID && classOnDayID <= todayID + 1))
+                                        course = dbc.Course.Find(sm.RecordKey);
+                                        if (course != null)
                                         {
-                                            if (course != null) courseName = course.Name;
-                                            sm.Status = await reportFactory.CreateLeaderReportProForma(leader,
-                                                                courseName,
-                                                                enrolments.ToArray(),
-                                                                hasRandomAllocationExecuted);
-                                            logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
+                                            enrolments = dbc.Enrolment.IgnoreQueryFilters()
+                                                                .Where(x => !x.IsDeleted && x.CourseID == course.ID
+                                                                                  && x.TermID == sm.TermID).ToList();
+                                            enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
+                                                                                  && x.TermID == sm.TermID));
+                                            foreach (var c in dbc.Class.Where(x => x.CourseID == course.ID).OrderBy(x => x.OnDayID))
+                                            {
+                                                if (c.OnDayID >= todayID) { classOnDayID = c.OnDayID; break; }
+                                            }
                                         }
                                     }
+                                    if (leader != null && enrolments.Count > 0)
+                                    {
+                                        onFileKey = (leader.ID, enrolments[0].CourseID, enrolments[0].ClassID);
+                                        if (!onFile.Contains(onFileKey))
+                                        {
+                                            onFile.Add(onFileKey);
+                                            if (hasRandomAllocationExecuted ||
+                                                (classOnDayID >= todayID && classOnDayID <= todayID + 1))
+                                            {
+                                                if (course != null) courseName = course.Name;
+                                                sm.Status = await reportFactory.CreateLeaderReportProForma(leader,
+                                                                    courseName,
+                                                                    enrolments.ToArray(),
+                                                                    hasRandomAllocationExecuted);
+                                                logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
+                                            }
+                                        }
+                                    }
+                                    else { sm.Status = "Enrolments not found."; }
                                 }
-                                else { sm.Status = "Enrolments not found."; }
                                 break;
                             case "U3A Leaders Reports":
-                                if (IsNotDailyProcedure && !sm.IsUserRequested) { break; }
-                                var thisClass = await dbc.Class.FindAsync(sm.RecordKey);
-                                if (thisClass == null) {
-                                    sm.Status = "Class not found - deleted!";
-                                    continue; 
-                                }
-                                course = await dbc.Course.FindAsync(thisClass!.CourseID);
-                                var thisTerm = await dbc.Term.FindAsync(sm.TermID);
-                                enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
-                                if (course!.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                                if (IsDailyProcedure || sm.IsUserRequested)
                                 {
-                                    enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null));
+                                    var thisClass = await dbc.Class.FindAsync(sm.RecordKey);
+                                    if (thisClass == null)
+                                    {
+                                        sm.Status = "Class not found - deleted!";
+                                        continue;
+                                    }
+                                    course = await dbc.Course.FindAsync(thisClass!.CourseID);
+                                    var thisTerm = await dbc.Term.FindAsync(sm.TermID);
+                                    enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
+                                    if (course!.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                                    {
+                                        enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null));
+                                    }
+                                    else
+                                    {
+                                        enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == thisClass.ID));
+                                    }
+                                    if (enrolments?.Count > 0)
+                                    {
+                                        sm.Status = await reportFactory.CreateLeaderReports(
+                                                  sm.PrintLeaderReport,
+                                                  sm.PrintAttendanceRecord,
+                                                  sm.PrintClassList,
+                                                  sm.PrintICEList,
+                                                  sm.PrintCSVFile,
+                                                  sm.PrintAttendanceAnalysis,
+                                                  sm.PrintMemberBadges,
+                                                  course!.ID,
+                                                  "U3A Report Package",
+                                                  course.Name,
+                                                  sm.Person, enrolments.OrderBy(x => x.IsWaitlisted)
+                                                                              .ThenBy(x => x.Person.LastName)
+                                                                              .ThenBy(x => x.Person.FirstName).ToArray());
+                                        logger.LogInformation($"{sm.DocumentName} sent to: {p.FullName} via {p.Communication}.");
+                                    }
+                                    else { sm.Status = "Enrolments not found."; }
                                 }
-                                else
-                                {
-                                    enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == thisClass.ID));
-                                }
-                                if (enrolments?.Count > 0)
-                                {
-                                    sm.Status = await reportFactory.CreateLeaderReports(
-                                              sm.PrintLeaderReport,
-                                              sm.PrintAttendanceRecord,
-                                              sm.PrintClassList,
-                                              sm.PrintICEList,
-                                              sm.PrintCSVFile,
-                                              sm.PrintAttendanceAnalysis,
-                                              sm.PrintMemberBadges,
-                                              course!.ID,
-                                              "U3A Report Package",
-                                              course.Name,
-                                              sm.Person, enrolments.OrderBy(x => x.IsWaitlisted)
-                                                                          .ThenBy(x => x.Person.LastName)
-                                                                          .ThenBy(x => x.Person.FirstName).ToArray());
-                                    logger.LogInformation($"{sm.DocumentName} sent to: {p.FullName} via {p.Communication}.");
-                                }
-                                else { sm.Status = "Enrolments not found."; }
                                 break;
                             default:
                                 break;

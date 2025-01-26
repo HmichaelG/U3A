@@ -129,7 +129,7 @@ public partial class DurableFunctions
     public async Task DoHourlyProcedures(
         [TimerTrigger("0 0 22-23,0-11 * * *"
     #if DEBUG
-               //, RunOnStartup=true
+               , RunOnStartup=true
     #endif            
                 )]
                 TimerInfo myTimer,
@@ -146,9 +146,9 @@ public partial class DurableFunctions
 
         foreach (var tenant in tenants)
         {
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client,false);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client,false);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client, true);
         }
     }
 
@@ -173,23 +173,24 @@ public partial class DurableFunctions
 
         foreach (var tenant in tenants)
         {
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBringForwardEnrolments, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoCreateAttendance, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoSendLeaderReports, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoMembershipAlertsEmail, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoProcessQueuedDocuments, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoDatabaseCleanup, client);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client,true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client, true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBringForwardEnrolments, client, true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoCreateAttendance, client, true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoSendLeaderReports, client, true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoMembershipAlertsEmail, client, true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoProcessQueuedDocuments, client, true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client, true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoDatabaseCleanup, client, true);
         }
         await client.PurgeInstancesAsync(createdFrom: new DateTime(1900, 1, 1),
-                                            createdTo: DateTime.UtcNow.AddHours(-1));
+                                            createdTo: DateTime.UtcNow.AddDays(-7));
     }
 
     async Task<string> ScheduleTimerFunction(ILogger logger, string tenantIdentifier,
                                             DurableActivity durableActivity,
-                                            DurableTaskClient client)
+                                            DurableTaskClient client,
+                                            bool isDailyProcedure)
     {
         U3AFunctionOptions options;
         string instanceId;
@@ -198,7 +199,7 @@ public partial class DurableFunctions
         {
             TenantIdentifier = tenantIdentifier!,
             DurableActivity = durableActivity,
-            IsNotDailyProcedure = false
+            IsDailyProcedure = isDailyProcedure
         };
         instanceId = GetInstanceId(options);
         // Wait for current instance to finish

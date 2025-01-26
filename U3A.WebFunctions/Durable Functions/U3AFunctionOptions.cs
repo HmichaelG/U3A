@@ -17,6 +17,6 @@ public class U3AFunctionOptions
     public DurableActivity DurableActivity { get; set; }
     public string TenantIdentifier { get; set; } = string.Empty;
     public bool HasRandomAllocationExecuted { get; set; } = false;
-    public bool IsNotDailyProcedure { get; set; } = true;
+    public bool IsDailyProcedure { get; set; } = false;
 }
 
