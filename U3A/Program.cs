@@ -91,12 +91,6 @@ builder.Host.UseSerilog(Log.Logger);
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
 DevExpress.Drawing.Settings.DrawingEngine = DrawingEngine.Default;
 
-foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
-{
-    DXFontRepository.Instance.AddFont(file);
-}
-
-
 // TenantDbContextFactory
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 {

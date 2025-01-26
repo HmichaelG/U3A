@@ -310,7 +310,7 @@
         }
         if (result)
         {
-            result = await messageBox.ShowAsync("Porcess Documents", "Are you sure you are ready to process this communication to the selected members?");
+            result = await messageBox.ShowAsync("Process Documents", "Are you sure you are ready to process this communication to the selected members?");
         }
         return result;
     }
@@ -414,27 +414,8 @@
         ribbon.Tabs.Add("Insert");
         ribbon.Tabs.Add("View");
         ribbon.Tabs.Add("MailMerge");
-        SetupFonts(ribbon.Tabs);
     }
 
-    void SetupFonts(RibbonTabCollection tabs)
-    {
-        IRibbonTab homeTab = tabs[RichEditRibbonTabNames.Home];
-        IBarGroup homeFontGroup = homeTab.Groups[RichEditRibbonGroupNames.HomeFont];
-        IBarItem fontNameItem = homeFontGroup.Items[RichEditBarItemNames.FontName];
-        if (fontNameItem.Type == BarItemTypes.ComboBox)
-        {
-            IBarComboBox fontNameComboBox = (IBarComboBox)fontNameItem;
-            fontNameComboBox.Items.Clear();
-            foreach (var font in DXFontRepository.Instance.GetFonts())
-            {
-                if (!fontNameComboBox.Items.Any(x => x.Text == font.Name))
-                {
-                    fontNameComboBox.Items.Add(font.Name, font.Name);
-                }
-            }
-        }
-    }
 
     async Task MailMergeDocumentAsync()
     {
