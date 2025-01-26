@@ -148,7 +148,6 @@ public partial class DurableFunctions
         {
             instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client);
             instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoSendLeaderReports, client);
             instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client);
         }
     }
