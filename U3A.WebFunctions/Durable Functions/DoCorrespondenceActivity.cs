@@ -30,7 +30,7 @@ public partial class DurableFunctions
                     var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
-                        await ProcessCorrespondence.Process(tenant, cn!, logger, IsHourlyProcedure: true, options.HasRandomAllocationExecuted);
+                        await ProcessCorrespondence.Process(tenant, cn!, logger, options.IsNotDailyProcedure, options.HasRandomAllocationExecuted);
                     }
                     else
                     {

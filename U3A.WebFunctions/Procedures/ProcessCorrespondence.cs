@@ -11,7 +11,7 @@ namespace U3A.WebFunctions.Procedures
     {
         public static async Task Process(TenantInfo tenant,
             string tenantConnectionString,
-            ILogger logger, bool IsHourlyProcedure, bool hasRandomAllocationExecuted)
+            ILogger logger, bool IsNotDailyProcedure, bool hasRandomAllocationExecuted)
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
@@ -44,7 +44,6 @@ namespace U3A.WebFunctions.Procedures
                         switch (sm.DocumentName)
                         {
                             case "Cash Receipt":
-                                if (IsHourlyProcedure) { break; }
                                 var receipt = await dbc.Receipt
                                                     .Include(x => x.Person)
                                                     .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
@@ -85,7 +84,7 @@ namespace U3A.WebFunctions.Procedures
                                 else sm.Status = "Enrolment not found";
                                 break;
                             case "Leader Report":
-                                if (IsHourlyProcedure) { break; }
+                                if (IsNotDailyProcedure) { break; }
                                 string courseName = "";
                                 Course? course = null;
                                 var leader = await dbc.Person.IgnoreQueryFilters()
@@ -141,7 +140,7 @@ namespace U3A.WebFunctions.Procedures
                                 else { sm.Status = "Enrolments not found."; }
                                 break;
                             case "U3A Leaders Reports":
-                                if (IsHourlyProcedure && !sm.IsUserRequested) { break; }
+                                if (IsNotDailyProcedure && !sm.IsUserRequested) { break; }
                                 var thisClass = await dbc.Class.FindAsync(sm.RecordKey);
                                 if (thisClass == null) {
                                     sm.Status = "Class not found - deleted!";

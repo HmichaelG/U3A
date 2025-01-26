@@ -129,7 +129,7 @@ public partial class DurableFunctions
     public async Task DoHourlyProcedures(
         [TimerTrigger("0 0 22-23,0-11 * * *"
     #if DEBUG
-               , RunOnStartup=true
+               //, RunOnStartup=true
     #endif            
                 )]
                 TimerInfo myTimer,
@@ -197,7 +197,8 @@ public partial class DurableFunctions
         options = new U3AFunctionOptions()
         {
             TenantIdentifier = tenantIdentifier!,
-            DurableActivity = durableActivity
+            DurableActivity = durableActivity,
+            IsNotDailyProcedure = false
         };
         instanceId = GetInstanceId(options);
         // Wait for current instance to finish
