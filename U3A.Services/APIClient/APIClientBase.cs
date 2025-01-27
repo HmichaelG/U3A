@@ -39,10 +39,10 @@ public abstract class APIClientBase :IDisposable
         }
     }
 
-    internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant)
+    internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant, Guid? ProcessID = null)
     {
         var functionName = Enum.GetName<DurableActivity>(durableActivity);
-        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant));
+        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant,ProcessID));
         var response = await SendAsync(request);
         return response;
     }
@@ -64,7 +64,7 @@ public abstract class APIClientBase :IDisposable
         }
         return responseBody;
     }
-    private string ConstructQuery(string function, string tenant)
+    private string ConstructQuery(string function, string tenant,Guid? ProcessID)
     {
         var query = string.Empty;
         if (string.IsNullOrWhiteSpace(tenant))
@@ -74,6 +74,10 @@ public abstract class APIClientBase :IDisposable
         else
         {
             query = $"{function}?tenant={tenant}";
+            if (ProcessID.HasValue)
+            {
+                query += $"&ProcessID={ProcessID.Value}";
+            }
         }
         return query;
     }

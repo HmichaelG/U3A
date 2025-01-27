@@ -82,8 +82,8 @@ public partial class DurableFunctions
         {
             throw new ArgumentException("Invalid activity specified.");
         }
-        ILogger logger = executionContext.GetLogger(activity);
         var instanceId = $"{activity}_{options.TenantIdentifier}";
+        ILogger logger = executionContext.GetLogger(instanceId);
         // Wait for current instance to finish
         var existingInstance = await client.GetInstanceAsync(instanceId);
         if (!(existingInstance == null
@@ -129,7 +129,7 @@ public partial class DurableFunctions
     public async Task DoHourlyProcedures(
         [TimerTrigger("0 0 22-23,0-11 * * *"
     #if DEBUG
-               , RunOnStartup=true
+              // , RunOnStartup=true
     #endif            
                 )]
                 TimerInfo myTimer,

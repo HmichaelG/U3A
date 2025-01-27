@@ -22,9 +22,9 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoBuildSchedule, tenant);
     }
-    public async Task<string> DoProcessQueuedDocuments(string tenant)
+    public async Task<string> DoProcessQueuedDocuments(string tenant, Guid? ProcessID)
     {
-        return await sendAPIRequestAsync(DurableActivity.DoProcessQueuedDocuments, tenant);
+        return await sendAPIRequestAsync(DurableActivity.DoProcessQueuedDocuments, tenant, ProcessID);
     }
     public async Task<string> DoAutoEnrolment(string tenant)
     {

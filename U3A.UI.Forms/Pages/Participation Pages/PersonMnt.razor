@@ -379,7 +379,6 @@
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         server = new DocumentServer(dbc);
-        server.DocumentSentEvent += Server_DocumentSent;
         currentTerm = await BusinessRule.CurrentTermAsync(dbc);
         await GetData();
         IsReady = true;
@@ -756,7 +755,7 @@
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             emailsSent = 0;
-            await ProgressBar.ShowAsync("Sending ... Please Wait", SelectedDataItems.Count);
+            await ProgressBar.ShowSmallSpinnerAsync();
             List<ExportData> exportData = await BusinessRule.GetExportDataAsync(dbc, SendTo);
             bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;
             await server.MailMerge(dbc, selectDocumentTemplatePopup.SelectedDocumentTemplate, exportData, overridePreference);
@@ -765,11 +764,6 @@
         }
     }
 
-    async void Server_DocumentSent(object sender, DocumentSentEventArgs e)
-    {
-        emailsSent += e.DocumentsSent;
-        await ProgressBar.SetValueAsync(emailsSent);
-    }
 
     void OnEmailChanged(string newValue)
     {

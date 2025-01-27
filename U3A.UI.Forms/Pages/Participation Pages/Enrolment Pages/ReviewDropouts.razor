@@ -146,8 +146,6 @@ else
         Communication = new Communication();
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         server = new DocumentServer(dbc);
-        server.DocumentSentEvent += Server_DocumentSent;
-
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         currentTerm = selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
@@ -279,7 +277,7 @@ else
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             documentsSent = 0;
-            await ProgressBar.ShowAsync("Sending ... Please Wait", SelectedDataItems.Count);
+            await ProgressBar.ShowSmallSpinnerAsync();
             List<ExportData>
                 exportData = await BusinessRule.GetExportDataAsync(dbc, SendTo);
             bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;

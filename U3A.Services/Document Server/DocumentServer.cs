@@ -13,12 +13,12 @@ using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
+using U3A.Services.APIClient;
 
 namespace U3A.Services;
 
 public partial class DocumentServer : IDisposable
 {
-    public event EventHandler<DocumentSentEventArgs> DocumentSentEvent;
 
     public int SuccessTransmissionAttempts { get; set; } = 0;
     public int FailureTransmissionAttempts { get; set; } = 0;
@@ -47,39 +47,7 @@ public partial class DocumentServer : IDisposable
 
     public string GetHTMLResult()
     {
-        var sb = new StringBuilder();
-        if (IsOvernightBatch)
-        {
-            sb.AppendLine($"{SuccessTransmissionAttempts} email items have been queued for overnight processing.");
-        }
-        else
-        {
-            var elapsedTime = String.Format("{0:00}:{1:00}:{2:00}",
-                    ElapsedTime.Hours, ElapsedTime.Minutes, ElapsedTime.Seconds);
-            sb.AppendLine($"Batch Sent: {sendTime.ToShortDateString()} {sendTime.ToLongTimeString()}");
-            sb.AppendLine($"<br/>{SuccessTransmissionAttempts + FailureTransmissionAttempts} transmission attempts - elapsed time: {elapsedTime}.");
-            if (BulkRecipientCount > 0)
-            {
-                sb.AppendLine($"<p>{BatchSuccessCount} items(s) were successfully sent in {BatchCount} batches(s). There was {BatchFailureCount} failure(s).</p>");
-            }
-            else sb.AppendLine($"<p>{SuccessTransmissionAttempts} items(s) were successfully sent and there were {FailureTransmissionAttempts} failures.</p>");
-            if (FailureTransmissionAttempts > 0)
-            {
-                sb.AppendLine("<table class='table'>");
-                sb.AppendLine("<thead><tr>");
-                sb.AppendLine("<th scope='col'>Status</th>");
-                sb.AppendLine("<th scope='col'>Count</th>");
-                sb.AppendLine("</tr></thead>");
-                sb.AppendLine("<tbody>");
-                foreach (var item in Result)
-                {
-                    if (item.Value != 0) sb.AppendLine($"<tr><td>{item.Key}</td><td>{item.Value}</td></tr>");
-                }
-                sb.AppendLine("</tbody></table>");
-                sb.AppendLine("<p>Consult the Event Log and / or your Service Provider logs for further details.</p>");
-            }
-        }
-        return sb.ToString();
+        return $"{SuccessTransmissionAttempts} email items have been queued for overnight processing.";
     }
 
     struct DocumentText
@@ -106,7 +74,6 @@ public partial class DocumentServer : IDisposable
         resultServer = new RichEditDocumentServer();
         resultServer.Document.CalculateDocumentVariable += Document_CalculateDocumentVariable;
         IEmailSender = EmailFactory.GetEmailSender(dbc);
-        if (IEmailSender != null) { IEmailSender.BatchEmailSentEvent += IEmailSender_BatchEmailSentEvent; }
         server.Document.EmbedFonts = true;
         resultServer.Document.EmbedFonts = true;
     }
@@ -177,113 +144,23 @@ public partial class DocumentServer : IDisposable
                                             bool OverrideCommunicationPreference)
     {
         if (!documentTemplate.DocumentType.IsEmail) return;
-        if (IsOvernightQueueRequired(documentTemplate, exportData, OverrideCommunicationPreference))
-        {
-            IsOvernightBatch = true;
-            var sendToMultipleRecipients = true;
-            await QueueEmailOvernight(documentTemplate,
-                                            exportData,
-                                            OverrideCommunicationPreference,
-                                            sendToMultipleRecipients);
-            SuccessTransmissionAttempts = BulkRecipientCount;
-        }
-        else
-        {
-            IsOvernightBatch = false;
-            await SendEmailToMultipleRecipientsNowAsync(documentTemplate,
-                                            exportData,
-                                            OverrideCommunicationPreference);
-            OnDocumentSent(new DocumentSentEventArgs() { DocumentsSent = BulkRecipientCount });
-        }
-        await dbc.SaveChangesAsync();
-    }
-
-    async Task SendEmailToMultipleRecipientsNowAsync(DocumentTemplate documentTemplate,
-                                            List<ExportData> exportData,
-                                            bool OverrideCommunicationPreference)
-    {
-
-        DocumentText bodyText = GetBodyText(documentTemplate);
-
-        List<string> toAddressList, toDisplayNameList;
-        GetAddressList(documentTemplate, exportData, OverrideCommunicationPreference,
-                                            out toAddressList, out toDisplayNameList);
-
-        List<string>? filenames, pathnames;
-        GetAttachments(documentTemplate, out filenames, out pathnames);
-
-        // Send It!
-        var response = await IEmailSender.SendEmailToMultipleRecipientsAsync(
-                                    EmailType.Broadcast,
-                                    documentTemplate.FromEmailAddress,
-                                    documentTemplate.FromDisplayName,
-                                    toAddressList,
-                                    toDisplayNameList,
-                                    documentTemplate.Subject,
-                                    bodyText.HtmlText,
-                                    bodyText.PlainText,
-                                    pathnames, filenames);
-    }
-
-    async Task SendSingleEmailNowAsync(DocumentTemplate documentTemplate,
-                    List<ExportData> ExportData,
-                    bool OverrideCommunicationPreference)
-    {
-
-        List<string> toAddressList, toDisplayNameList;
-        GetAddressList(documentTemplate, ExportData, OverrideCommunicationPreference,
-                                            out toAddressList, out toDisplayNameList);
-
-        List<string>? filenames, pathnames;
-        GetAttachments(documentTemplate, out filenames, out pathnames);
-
-        var docsSent = 0;
-        foreach (var mergeItem in FilterPreference(documentTemplate,
-                                        ExportData,
-                                        OverrideCommunicationPreference))
-        {
-            DocumentText bodyText = MergeDocument(documentTemplate, mergeItem);
-            var response = await IEmailSender.SendEmailAsync(EmailType.Broadcast,
-                                        documentTemplate.FromEmailAddress,
-                                        documentTemplate.FromDisplayName,
-                                        mergeItem.P_Email,
-                                        mergeItem.P_FullName,
-                                        documentTemplate.Subject,
-                                        bodyText.HtmlText,
-                                        bodyText.PlainText,
-                                        pathnames, filenames);
-            docsSent++;
-        }
-        OnDocumentSent(new DocumentSentEventArgs() { DocumentsSent = docsSent });
+        IsOvernightBatch = true;
+        var sendToMultipleRecipients = true;
+        await CreateDocumentQueuedItem(documentTemplate,
+                                        exportData,
+                                        OverrideCommunicationPreference,
+                                        sendToMultipleRecipients);
+        SuccessTransmissionAttempts = exportData.Count;
     }
 
     async Task SendEmailToSingleRecipientAsync(DocumentTemplate documentTemplate,
                 List<ExportData> ExportData,
                 bool OverrideCommunicationPreference)
     {
-        if (IsOvernightQueueRequired(documentTemplate, ExportData, OverrideCommunicationPreference))
-        {
-            IsOvernightBatch = true;
-            var sendToMultipleRecipients = false;
-            await QueueEmailOvernight(documentTemplate, ExportData, OverrideCommunicationPreference, sendToMultipleRecipients);
-            SuccessTransmissionAttempts = BulkRecipientCount;
-        }
-        else
-        {
-            IsOvernightBatch = false;
-            await SendSingleEmailNowAsync(documentTemplate, ExportData, OverrideCommunicationPreference);
-        }
-    }
-
-    private bool IsOvernightQueueRequired(DocumentTemplate documentTemplate,
-                                                    List<ExportData> ExportData,
-                                                    bool OverrideCommunicationPreference)
-    {
-        BulkRecipientCount = FilterPreference(documentTemplate,
-                                        ExportData,
-                                        OverrideCommunicationPreference).Count();
-        return BulkRecipientCount > 1 &&
-            (HasMergeCodes(documentTemplate.Content) || documentTemplate.Attachments.Count() > 0);
+        IsOvernightBatch = true;
+        var sendToMultipleRecipients = false;
+        await CreateDocumentQueuedItem(documentTemplate, ExportData, OverrideCommunicationPreference, sendToMultipleRecipients);
+        SuccessTransmissionAttempts = ExportData.Count;
     }
 
     private void GetAttachments(DocumentTemplate documentTemplate,
@@ -352,7 +229,7 @@ public partial class DocumentServer : IDisposable
         return result;
     }
 
-    private async Task QueueEmailOvernight(DocumentTemplate documentTemplate,
+    private async Task CreateDocumentQueuedItem(DocumentTemplate documentTemplate,
                                             List<ExportData> exportData,
                                             bool OverrideCommunicationPreference,
                                             bool SendToMultipleRecipients)
@@ -362,6 +239,7 @@ public partial class DocumentServer : IDisposable
         var jsonExportData = JsonSerializer.Serialize(exportData);
         var docQueue = new DocumentQueue()
         {
+            ID = Guid.NewGuid(),
             DocumentTemplateJSON = jsonDocumentTemplate,
             ExportDataJSON = jsonExportData,
             SendToMultipleRecipients = SendToMultipleRecipients,
@@ -380,21 +258,8 @@ public partial class DocumentServer : IDisposable
         }
         await dbc.AddAsync(docQueue);
         await dbc.SaveChangesAsync();
-    }
-
-    private void IEmailSender_BatchEmailSentEvent(object? sender, BatchEmailSentEventArgs e)
-    {
-        var to = (e.FailedEmailAddress == null)
-                    ? $"Bulk email batch {e.BatchNumber}: {e.EmailSent + e.EmailFailed} email addresses."
-                    : e.FailedEmailAddress;
-        if (e.EmailSent > 0) SuccessTransmissionAttempts++;
-        if (e.EmailFailed > 0) FailureTransmissionAttempts++;
-        BatchCount++;
-        BatchSuccessCount += e.EmailSent;
-        BatchFailureCount += e.EmailFailed;
-        if (!Result.ContainsKey(e.Response)) { Result.Add(e.Response, 0); }
-        Result[e.Response] += e.EmailSent + e.EmailFailed;
-        OnDocumentSent(new DocumentSentEventArgs() { DocumentsSent = e.EmailSent + e.EmailFailed });
+        var client = new APIClient.APIClient();
+        await client.DoProcessQueuedDocuments(dbc.TenantInfo.Identifier,docQueue.ID);
     }
 
     async Task SendSMSAsync(DocumentTemplate documentTemplate,
@@ -414,12 +279,6 @@ public partial class DocumentServer : IDisposable
             if (!Result.ContainsKey(response)) { Result.Add(response, 0); }
             Result[response] += 1;
         }
-    }
-
-    protected virtual void OnDocumentSent(DocumentSentEventArgs e)
-    {
-        EventHandler<DocumentSentEventArgs> handler = DocumentSentEvent;
-        handler?.Invoke(this, e);
     }
 
     private DocumentText MergeDocument(DocumentTemplate DocumentTemplate, ExportData mergeItem)

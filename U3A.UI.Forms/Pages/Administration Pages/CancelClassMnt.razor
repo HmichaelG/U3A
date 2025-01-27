@@ -232,7 +232,6 @@ else
         Communication = new Communication();
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         server = new DocumentServer(dbc);
-        server.DocumentSentEvent += Server_DocumentSent;
 
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
@@ -476,7 +475,7 @@ else
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             documentsSent = 0;
-            await ProgressBar.ShowAsync("Sending ... Please Wait", SelectedDataItems.Count);
+            await ProgressBar.ShowSmallSpinnerAsync();
             List<ExportData> exportData = await BusinessRule.GetExportDataAsync(dbc, SendTo);
             bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;
             await server.MailMerge(dbc, selectDocumentTemplatePopup.SelectedDocumentTemplate, exportData, overridePreference);
@@ -484,13 +483,6 @@ else
             await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
         }
     }
-
-    async void Server_DocumentSent(object sender, DocumentSentEventArgs e)
-    {
-        documentsSent += e.DocumentsSent;
-        await ProgressBar.SetValueAsync(documentsSent);
-    }
-
 
     public void Dispose()
     {

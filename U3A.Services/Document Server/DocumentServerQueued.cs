@@ -68,7 +68,6 @@ namespace U3A.Services
                                             PDFFileContents, filenames);
                 docsSent++;
             }
-            OnDocumentSent(new DocumentSentEventArgs() { DocumentsSent = docsSent });
         }
 
         private void GetAttachments(DocumentTemplate documentTemplate,
