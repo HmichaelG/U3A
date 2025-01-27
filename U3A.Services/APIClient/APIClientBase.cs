@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace U3A.Services.APIClient;
 
-public abstract class APIClientBase :IDisposable
+public abstract class APIClientBase : IDisposable
 {
     readonly HttpClient _httpClient;
     readonly string _authToken;
@@ -29,7 +29,7 @@ public abstract class APIClientBase :IDisposable
         _authToken = string.Empty;
         _apiBaseAddress = (constants.IS_DEVELOPMENT)
             ? "http://localhost:7071/api/"
-            : "http://localhost:7071/api/"
+            : "https://u3a-functions.azurewebsites.net/api/"
             ;
         _httpClient.BaseAddress = new Uri(_apiBaseAddress);
         // Add authentication headers if needed
@@ -42,7 +42,7 @@ public abstract class APIClientBase :IDisposable
     internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant, Guid? ProcessID = null)
     {
         var functionName = Enum.GetName<DurableActivity>(durableActivity);
-        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant,ProcessID));
+        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant, ProcessID));
         var response = await SendAsync(request);
         return response;
     }
@@ -52,19 +52,12 @@ public abstract class APIClientBase :IDisposable
         var responseBody = string.Empty;
         _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        try
-        {
-            HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
-            response.EnsureSuccessStatusCode();
-            responseBody = await response.Content.ReadAsStringAsync();
-        }
-        catch (HttpRequestException e)
-        {
-            Console.WriteLine($"Request error: {e.Message}");
-        }
+        HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
+        response.EnsureSuccessStatusCode(); // Throw if not a success code.
+        responseBody = await response.Content.ReadAsStringAsync();
         return responseBody;
     }
-    private string ConstructQuery(string function, string tenant,Guid? ProcessID)
+    private string ConstructQuery(string function, string tenant, Guid? ProcessID)
     {
         var query = string.Empty;
         if (string.IsNullOrWhiteSpace(tenant))
@@ -76,7 +69,7 @@ public abstract class APIClientBase :IDisposable
             query = $"{function}?tenant={tenant}";
             if (ProcessID.HasValue)
             {
-                query += $"&ProcessID={ProcessID.Value}";
+                query += $"&processId={ProcessID.Value}";
             }
         }
         return query;

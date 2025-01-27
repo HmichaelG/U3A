@@ -56,6 +56,14 @@ namespace U3A.BusinessRules
                              };
             return await exportData.ToListAsync();
         }
+        public static async Task<List<ExportData>> GetExportDataAsync(U3ADbContext dbc, IEnumerable<Guid> ExportTo)
+        {
+            var result = (from exportData in await BusinessRule.GetExportDataAsync(dbc)
+                          join exportTo in ExportTo
+                          on exportData.P_Key equals exportTo
+                          select exportData).ToList();
+            return result;
+        }
         public static async Task<List<ExportData>> GetExportDataAsync(U3ADbContext dbc, IEnumerable<Person> ExportTo)
         {
             var result = (from exportData in await BusinessRule.GetExportDataAsync(dbc)

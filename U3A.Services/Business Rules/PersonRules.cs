@@ -293,7 +293,7 @@ public static partial class BusinessRule
         var term = dbc.Term.Find(TermID);
         if (term == null) { return new List<Person> { }; }
         var Classes = dbc.Class.AsNoTracking()
-                    .Include(x => x.Enrolments)
+                    //.Include(x => x.Enrolments)
                     .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
                     .Include(x => x.Venue)
                     .Include(x => x.OnDay)

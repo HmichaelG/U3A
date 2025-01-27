@@ -12,8 +12,10 @@ namespace U3A.Model
     public class DocumentQueue : BaseEntity
     {
         public Guid ID { get; set; }
+        public int DelayInHours { get; set; } = 0;
         public string DocumentTemplateJSON { get; set; }
         public string ExportDataJSON { get; set; }
+        public string? MemberIdToExport { get; set; } = null;
         public bool SendToMultipleRecipients { get; set; }
         public DocumentQueueStatus Status { get; set; }
         public List<DocumentQueueAttachment> DocumentAttachments { get; set; } = new List<DocumentQueueAttachment>();

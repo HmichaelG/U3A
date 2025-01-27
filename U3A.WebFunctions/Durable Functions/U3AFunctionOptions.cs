@@ -13,10 +13,16 @@ public class U3AFunctionOptions
         {
             TenantIdentifier = queryStrings[0];
         }
+        queryStrings = req.Query.GetValues("processId");
+        if (queryStrings?.Count() > 0)
+        {
+            IdToProcess = Guid.Parse(queryStrings[0]);
+        }
     }
     public DurableActivity DurableActivity { get; set; }
     public string TenantIdentifier { get; set; } = string.Empty;
     public bool HasRandomAllocationExecuted { get; set; } = false;
     public bool IsDailyProcedure { get; set; } = false;
+    public Guid? IdToProcess { get; set; } = null;
 }
 

@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SkiaSharp;
 using System.Diagnostics;
 using System.Text.Json;
+using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
@@ -10,8 +12,9 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class ProcessQueuedDocuments
     {
-        public static async Task Process(TenantInfo tenant, ILogger logger)
+        public static async Task Process(TenantInfo tenant, Guid? IdToProcess, ILogger logger)
         {
+            List<DocumentQueue> queueItems = new();
             using (var dbc = new U3ADbContext(tenant))
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
@@ -21,49 +24,81 @@ namespace U3A.WebFunctions.Procedures
                 {
                     var server = new DocumentServer(dbc);
                     string subject = string.Empty;
-                    foreach (var queueItem in await dbc.DocumentQueue
-                                    .Where(x => x.Status == DocumentQueueStatus.ReadyToSend)
-                                    .Include(x => x.DocumentAttachments).ToListAsync())
+                    if (IdToProcess != null)
                     {
-                        queueItem.Status = DocumentQueueStatus.InProcess;
-                        var result = await dbc.SaveChangesAsync();
-                        try
+                        queueItems = await dbc.DocumentQueue
+                            .Where(x => x.ID == IdToProcess)
+                            .Include(x => x.DocumentAttachments).ToListAsync();
+                    }
+                    else
+                    {
+                        queueItems = await dbc.DocumentQueue
+                            .Where(x => x.Status == DocumentQueueStatus.ReadyToSend)
+                            .Include(x => x.DocumentAttachments).ToListAsync();
+                    }
+                    foreach (var queueItem in queueItems)
+                    {
+                        if (DateTime.UtcNow > queueItem.CreatedOn!.Value.AddHours(queueItem.DelayInHours))
                         {
-                            documentTemplate = JsonSerializer.Deserialize<DocumentTemplate>(queueItem.DocumentTemplateJSON);
-                            if (documentTemplate != null)
+                            queueItem.Status = DocumentQueueStatus.InProcess;
+                            var result = await dbc.SaveChangesAsync();
+                            try
                             {
-                                subject = documentTemplate.Subject!;
-                                List<ExportData>? exportData = JsonSerializer.Deserialize<List<ExportData>>(queueItem.ExportDataJSON);
-                                if (queueItem.DocumentAttachments != null)
+                                documentTemplate = JsonSerializer.Deserialize<DocumentTemplate>(queueItem.DocumentTemplateJSON);
+                                if (documentTemplate != null)
                                 {
-                                    documentTemplate!.AttachmentBytes = new List<byte[]>();
-                                    foreach (var attachment in queueItem.DocumentAttachments)
-                                    {
-                                        documentTemplate.AttachmentBytes.Add(attachment.Attachment);
-                                    }
-                                }
-                                if (queueItem.SendToMultipleRecipients)
-                                {
-                                    await server.SendQueuedEmailToMultipleRecipientsAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
-                                }
-                                else
-                                {
-                                    await server.SendQueuedEmailToSingleRecipientAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
-                                }
-                                queueItem.Status = DocumentQueueStatus.Complete;
-                                queueItem.Result = "Ok";
+                                    subject = documentTemplate.Subject!;
+                                    List<ExportData>? exportData = new();
 
+                                    // get members who are to receive the document
+                                    if (!string.IsNullOrWhiteSpace(queueItem.MemberIdToExport))
+                                    {
+                                        List<Guid>? personIDsToExport = JsonSerializer.Deserialize<List<Guid>>(queueItem.MemberIdToExport);
+                                        if (personIDsToExport != null)
+                                        {
+                                            exportData = await BusinessRule.GetExportDataAsync(dbc, personIDsToExport);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //Obsolete: backwards compatibility only
+                                        exportData = JsonSerializer.Deserialize<List<ExportData>>(queueItem.ExportDataJSON);
+                                    }
+
+                                    // Get the attachments, if any
+                                    if (queueItem.DocumentAttachments != null)
+                                    {
+                                        documentTemplate!.AttachmentBytes = new List<byte[]>();
+                                        foreach (var attachment in queueItem.DocumentAttachments)
+                                        {
+                                            documentTemplate.AttachmentBytes.Add(attachment.Attachment);
+                                        }
+                                    }
+
+                                    //and, process...
+                                    if (queueItem.SendToMultipleRecipients)
+                                    {
+                                        await server.SendQueuedEmailToMultipleRecipientsAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
+                                    }
+                                    else
+                                    {
+                                        await server.SendQueuedEmailToSingleRecipientAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
+                                    }
+                                    queueItem.Status = DocumentQueueStatus.Complete;
+                                    queueItem.Result = "Ok";
+
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(ex, $"Error Processing: {subject}");
-                            queueItem.Status = DocumentQueueStatus.Error;
-                            queueItem.Result = "Processing Error";
-                        }
-                        finally 
-                        { 
-                            result = await dbc.SaveChangesAsync(); 
+                            catch (Exception ex)
+                            {
+                                logger.LogError(ex, $"Error Processing: {subject}");
+                                queueItem.Status = DocumentQueueStatus.Error;
+                                queueItem.Result = "Processing Error";
+                            }
+                            finally
+                            {
+                                result = await dbc.SaveChangesAsync();
+                            }
                         }
                     }
                     logger.LogInformation($"Queued Documents: {server.BatchCount} Batches, {server.BatchSuccessCount} Accepted, {server.BatchFailureCount} Failures.");

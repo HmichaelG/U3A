@@ -59,6 +59,7 @@ else
                                           UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
                         <DxGridDataColumn Width="6rem" Caption="Recipients" FieldName="Recipients"
                                           UnboundType="GridUnboundColumnType.Integer" />
+                        <DxGridDataColumn Caption="Delay (Hrs)" FieldName=@(nameof(DocumentQueue.DelayInHours)) />
                         <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
                         <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
                                           UnboundType="GridUnboundColumnType.DateTime"
@@ -152,7 +153,17 @@ else
         }
         if (e.FieldName == "Recipients")
         {
-            e.Value = JsonSerializer.Deserialize<IEnumerable<ExportData>>(q.ExportDataJSON).Count();
+            int count = 0;
+            if (!string.IsNullOrEmpty(q.MemberIdToExport))
+            {
+                var list = JsonSerializer.Deserialize<IEnumerable<Guid>>(q.MemberIdToExport);
+                count = list.Count();
+            }
+            else
+            {
+                count = JsonSerializer.Deserialize<IEnumerable<ExportData>>(q.ExportDataJSON).Count();
+            }
+            e.Value = count;
         }
     }
 

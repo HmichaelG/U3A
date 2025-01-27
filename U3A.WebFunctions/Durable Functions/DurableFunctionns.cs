@@ -47,7 +47,7 @@ public partial class DurableFunctions
                 result = await context.CallActivityAsync<string>(nameof(DoMembershipAlertsEmailActivity), options.TenantIdentifier);
                 break;
             case DurableActivity.DoProcessQueuedDocuments:
-                result = await context.CallActivityAsync<string>(nameof(DoProcessQueuedDocumentsActivity), options.TenantIdentifier);
+                result = await context.CallActivityAsync<string>(nameof(DoProcessQueuedDocumentsActivity), options);
                 break;
             case DurableActivity.DoCreateAttendance:
                 result = await context.CallActivityAsync<string>(nameof(DoCreateAttendanceActivity), options.TenantIdentifier);
@@ -82,8 +82,8 @@ public partial class DurableFunctions
         {
             throw new ArgumentException("Invalid activity specified.");
         }
+        ILogger logger = executionContext.GetLogger(activity);
         var instanceId = $"{activity}_{options.TenantIdentifier}";
-        ILogger logger = executionContext.GetLogger(instanceId);
         // Wait for current instance to finish
         var existingInstance = await client.GetInstanceAsync(instanceId);
         if (!(existingInstance == null
@@ -129,7 +129,7 @@ public partial class DurableFunctions
     public async Task DoHourlyProcedures(
         [TimerTrigger("0 0 22-23,0-11 * * *"
     #if DEBUG
-              // , RunOnStartup=true
+               , RunOnStartup=true
     #endif            
                 )]
                 TimerInfo myTimer,
@@ -147,7 +147,8 @@ public partial class DurableFunctions
         foreach (var tenant in tenants)
         {
             instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client,false);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client,false);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client, false);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoProcessQueuedDocuments, client, false);
             instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client, true);
         }
     }

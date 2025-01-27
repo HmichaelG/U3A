@@ -15,13 +15,13 @@ public partial class DurableFunctions
 {
 
     [Function(nameof(DoProcessQueuedDocumentsActivity))]
-    public async Task<string> DoProcessQueuedDocumentsActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
+    public async Task<string> DoProcessQueuedDocumentsActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
         ILogger logger = executionContext.GetLogger(nameof(DoProcessQueuedDocumentsActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, tenantToProcess, cn);
+            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
             if (tenant != null) 
             {
                 logger.LogInformation($"****** Started {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
@@ -31,7 +31,7 @@ public partial class DurableFunctions
                     var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
-                        await ProcessQueuedDocuments.Process(tenant, logger);
+                        await ProcessQueuedDocuments.Process(tenant,options.IdToProcess, logger);
                     }
                     else
                     {

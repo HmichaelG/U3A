@@ -47,7 +47,7 @@ public partial class DocumentServer : IDisposable
 
     public string GetHTMLResult()
     {
-        return $"{SuccessTransmissionAttempts} email items have been queued for overnight processing.";
+        return $"{SuccessTransmissionAttempts} email items have been queued for processing.";
     }
 
     struct DocumentText
@@ -96,8 +96,9 @@ public partial class DocumentServer : IDisposable
     }
     public async Task MailMerge(U3ADbContext dbc,
                         DocumentTemplate documentTemplate,
-                        List<ExportData> ExportData,
-                        bool OverrideCommunicationPreference)
+                        List<Guid> PersonIDsToExport,
+                        bool OverrideCommunicationPreference,
+                        int DelayedStart)
     {
         IsOvernightBatch = false;
         if (documentTemplate == null) { return; }
@@ -106,15 +107,15 @@ public partial class DocumentServer : IDisposable
         s.Start();
         if (documentTemplate.DocumentType.IsSMS)
         {
-            await SendSMSAsync(documentTemplate, ExportData, OverrideCommunicationPreference);
+            await SendSMSAsync(documentTemplate, PersonIDsToExport, OverrideCommunicationPreference);
         }
-        else if (HasMergeCodes(documentTemplate.Content) || ExportData.Count() == 1)
+        else if (HasMergeCodes(documentTemplate.Content) || PersonIDsToExport.Count() == 1)
         {
-            await SendEmailToSingleRecipientAsync(documentTemplate, ExportData, OverrideCommunicationPreference);
+            await SendEmailToSingleRecipientAsync(documentTemplate, PersonIDsToExport, OverrideCommunicationPreference,DelayedStart);
         }
         else
         {
-            await SendEmailToMultipleRecipients(documentTemplate, ExportData, OverrideCommunicationPreference);
+            await SendEmailToMultipleRecipients(documentTemplate, PersonIDsToExport, OverrideCommunicationPreference, DelayedStart);
         };
         s.Stop();
         ElapsedTime = s.Elapsed;
@@ -140,27 +141,30 @@ public partial class DocumentServer : IDisposable
     }
 
     async Task SendEmailToMultipleRecipients(DocumentTemplate documentTemplate,
-                                            List<ExportData> exportData,
-                                            bool OverrideCommunicationPreference)
+                                            List<Guid> personIDsToExport,
+                                            bool OverrideCommunicationPreference,
+                                            int DelayedStart)
     {
         if (!documentTemplate.DocumentType.IsEmail) return;
         IsOvernightBatch = true;
         var sendToMultipleRecipients = true;
         await CreateDocumentQueuedItem(documentTemplate,
-                                        exportData,
+                                        personIDsToExport,
                                         OverrideCommunicationPreference,
-                                        sendToMultipleRecipients);
-        SuccessTransmissionAttempts = exportData.Count;
+                                        sendToMultipleRecipients,
+                                        DelayedStart);
+        SuccessTransmissionAttempts = personIDsToExport.Count;
     }
 
     async Task SendEmailToSingleRecipientAsync(DocumentTemplate documentTemplate,
-                List<ExportData> ExportData,
-                bool OverrideCommunicationPreference)
+                List<Guid> personIDsToExport,
+                bool OverrideCommunicationPreference,
+                int delayedStart)
     {
         IsOvernightBatch = true;
         var sendToMultipleRecipients = false;
-        await CreateDocumentQueuedItem(documentTemplate, ExportData, OverrideCommunicationPreference, sendToMultipleRecipients);
-        SuccessTransmissionAttempts = ExportData.Count;
+        await CreateDocumentQueuedItem(documentTemplate, personIDsToExport, OverrideCommunicationPreference, sendToMultipleRecipients,delayedStart);
+        SuccessTransmissionAttempts = personIDsToExport.Count;
     }
 
     private void GetAttachments(DocumentTemplate documentTemplate,
@@ -230,21 +234,24 @@ public partial class DocumentServer : IDisposable
     }
 
     private async Task CreateDocumentQueuedItem(DocumentTemplate documentTemplate,
-                                            List<ExportData> exportData,
+                                            List<Guid> personIDsToExport,
                                             bool OverrideCommunicationPreference,
-                                            bool SendToMultipleRecipients)
+                                            bool SendToMultipleRecipients,
+                                            int DelayedStart)
     {
         documentTemplate.AttachmentBytes = new List<byte[]>(); //to be sure
         var jsonDocumentTemplate = JsonSerializer.Serialize(documentTemplate);
-        var jsonExportData = JsonSerializer.Serialize(exportData);
+        var jsonExportData = JsonSerializer.Serialize(personIDsToExport);
         var docQueue = new DocumentQueue()
         {
             ID = Guid.NewGuid(),
             DocumentTemplateJSON = jsonDocumentTemplate,
-            ExportDataJSON = jsonExportData,
+            MemberIdToExport = jsonExportData,
+            ExportDataJSON = string.Empty,
             SendToMultipleRecipients = SendToMultipleRecipients,
             Status = DocumentQueueStatus.ReadyToSend,
             OverrideCommunicationPreference = OverrideCommunicationPreference,
+            DelayInHours = DelayedStart,
             Result = string.Empty
         };
         foreach (var pathname in documentTemplate.Attachments)
@@ -258,17 +265,40 @@ public partial class DocumentServer : IDisposable
         }
         await dbc.AddAsync(docQueue);
         await dbc.SaveChangesAsync();
-        var client = new APIClient.APIClient();
-        await client.DoProcessQueuedDocuments(dbc.TenantInfo.Identifier,docQueue.ID);
+        if (DelayedStart <= 0)
+        {
+            using (var client = new APIClient.APIClient())
+            {
+                try
+                {
+                    await client.DoProcessQueuedDocuments(dbc.TenantInfo.Identifier, docQueue.ID);
+                }
+                catch (HttpRequestException e)
+                {
+                    docQueue.Result = e.Message;
+                }
+                catch (Exception ex)
+                {
+                    docQueue.Status = DocumentQueueStatus.Error;
+                    docQueue.Result = ex.Message;
+                    await dbc.SaveChangesAsync();
+                }
+                finally
+                {
+                    await dbc.SaveChangesAsync();
+                }
+            }
+        }
     }
 
     async Task SendSMSAsync(DocumentTemplate documentTemplate,
-                                        List<ExportData> ExportTo,
+                                        List<Guid> PersonIDsToSend,
                                         bool OverrideCommunicationPreference)
     {
         if (!documentTemplate.DocumentType.IsSMS) return;
+        List<ExportData> exportData = await BusinessRule.GetExportDataAsync(dbc, PersonIDsToSend);
         foreach (var mergeItem in FilterPreference(documentTemplate,
-                                        ExportTo,
+                                        exportData,
                                         OverrideCommunicationPreference))
         {
             DocumentText bodyText = MergeDocument(documentTemplate, mergeItem);

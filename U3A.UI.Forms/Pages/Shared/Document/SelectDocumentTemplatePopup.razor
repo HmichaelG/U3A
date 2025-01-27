@@ -81,6 +81,11 @@
                                       IconCssClass="bi bi-upload" />
                         </DxFormLayoutItem>
                         <DxFormLayout CssClass="m-2">
+                            <DxFormLayoutItem Caption="Start Delay (Hours)"
+                                              Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
+                                              ColSpanMd="9">
+                                <DxSpinEdit @bind-Value="@DelayedStart" MinValue=0 />
+                            </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Override Communication Preference?"
                                               Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
                                               ColSpanMd="12">
@@ -170,6 +175,8 @@
     public DocumentTemplate SelectedDocumentTemplate { get; set; }
     [Parameter]
     public bool OverrideCommunicationPreference { get; set; }
+    [Parameter]
+    public int DelayedStart { get; set; }
 
     List<ExportData>? ExportData;
     MessageBox? messageBox;

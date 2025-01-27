@@ -1043,9 +1043,14 @@ else
         {
             documentsSent = 0;
             await ProgressBar.ShowSmallSpinnerAsync();
-            List<ExportData> exportData = await BusinessRule.GetExportDataAsync(dbc, SendTo);
+            List<Guid> personIDsToExport = SendTo.Select(x => x.ID).ToList();
             bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;
-            await server.MailMerge(dbc, selectDocumentTemplatePopup.SelectedDocumentTemplate, exportData, overridePreference);
+            int delayedStart = selectDocumentTemplatePopup.DelayedStart;
+            await server.MailMerge(dbc,
+                selectDocumentTemplatePopup.SelectedDocumentTemplate,
+                personIDsToExport,
+                overridePreference,
+                delayedStart);
             await ProgressBar.Close();
             await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
         }
