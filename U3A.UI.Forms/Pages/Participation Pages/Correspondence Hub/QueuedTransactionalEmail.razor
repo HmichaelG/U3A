@@ -354,8 +354,8 @@ else
             }
             await ProgressBar.SetValueAsync(mailItems);
         }
-        await BusinessRule.UpdateMultiCampusMailAsync(dbcT, SelectedDataItems.Cast<SendMail>());
         if (!IsPreview) { await dbc.SaveChangesAsync(); await dbcT.SaveChangesAsync(); }
+
         // finish up
         s.Stop();
         await ProgressBar.Close();
