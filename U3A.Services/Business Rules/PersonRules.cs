@@ -292,8 +292,7 @@ public static partial class BusinessRule
     {
         var term = dbc.Term.Find(TermID);
         if (term == null) { return new List<Person> { }; }
-        var Classes = dbc.Class.AsNoTracking()
-                    //.Include(x => x.Enrolments)
+        var Classes = dbc.Class.AsNoTracking().AsSplitQuery()
                     .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
                     .Include(x => x.Venue)
                     .Include(x => x.OnDay)
@@ -306,18 +305,24 @@ public static partial class BusinessRule
         }
         var people = dbc.Person.IgnoreQueryFilters()
                         .Where(x => !x.IsDeleted && x.DateCeased == null).AsNoTracking().ToList();
-        var enrolments = dbc.Enrolment.IgnoreQueryFilters()
+        var enrolments = dbc.Enrolment.IgnoreQueryFilters().AsSplitQuery()
             .Include(x => x.Term)
             .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
             .Include(x => x.Course).ThenInclude(x => x.Classes)
-            .Include(x => x.Class).ThenInclude(x => x.Course)
-            .Include(x => x.Class).ThenInclude(x => x.Venue)
-            .Include(x => x.Class).ThenInclude(x => x.OnDay)
-            .Include(x => x.Class).ThenInclude(x => x.Leader)
-            .Include(x => x.Class).ThenInclude(x => x.Occurrence)
             .Where(x => !x.IsDeleted && x.TermID == TermID
                         && (WaitlistStatus == null || x.IsWaitlisted == WaitlistStatus))
                         .AsEnumerable().Where(x => IsCourseInTerm(x.Course, x.Term)).ToList();
+        
+
+        foreach (var e in enrolments)
+        {
+            e.Person = people.FirstOrDefault(x => x.ID == e.PersonID);
+            if (e.ClassID != null)
+            {
+                e.Class = Classes.FirstOrDefault(x => x.ID == e.ClassID);
+            }
+        }
+
         foreach (var person in people)
         {
             person.Enrolments = enrolments.Where(e => e.PersonID == person.ID).ToList();
