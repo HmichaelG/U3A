@@ -28,18 +28,6 @@ namespace U3A.BusinessRules
             }
             return result;
         }
-        public static async Task UpdateMultiCampusMailAsync(TenantDbContext dbcT, IEnumerable<SendMail> MailItems)
-        {
-            foreach (var m in MailItems)
-            {
-                var mcItem = dbcT.MultiCampusSendMail.Find(m.ID);
-                if (mcItem != null)
-                {
-                    mcItem.Status = m.Status;
-                    dbcT.Update(mcItem);
-                }
-            }
-        }
         public static async Task CreateMultiCampusEnrolmentSendMailAsync(
                                             TenantDbContext dbcT,
                                             IEnumerable<Class> classes,
