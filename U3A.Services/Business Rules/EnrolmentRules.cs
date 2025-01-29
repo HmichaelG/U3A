@@ -69,7 +69,7 @@ namespace U3A.BusinessRules
                                 .Select(x => new { x.CourseID, x.PersonID, x.Class.OnDay.ShortDay, x.Class.StartTime })
                                 .ToListAsync();
 
-            return result.Select(x => (x.CourseID, x.PersonID,$"{x.ShortDay} {x.StartTime.ToShortTimeString()}")).ToList();
+            return result.Select(x => (x.CourseID, x.PersonID, $"{x.ShortDay} {x.StartTime.ToShortTimeString()}")).ToList();
         }
 
         public static async Task<List<Enrolment>> GetEnrolmentIncludeLeadersAsync(U3ADbContext dbc,
@@ -505,35 +505,38 @@ namespace U3A.BusinessRules
             return result.ToString();
         }
         static async Task<Enrolment?> DuplicateEnrolment(U3ADbContext dbc,
-                                        Enrolment enrolment, Term selectedTerm,
-                                        Course selectedCourse, Class selectedClass)
+                                                        Enrolment enrolment, Term selectedTerm,
+                                                        Course selectedCourse, Class selectedClass)
         {
+            if (enrolment.ID != Guid.Empty) return null; // not a new enrolment; no need to check for duplicates
+
             if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.DifferentParticipantsInEachClass &&
                 selectedClass != null && !selectedCourse.OneStudentPerClass)
             {
                 return await dbc.Enrolment.AsNoTracking()
-                            .Include(x => x.Course)
-                            .Include(x => x.Class)
-                            .Include(x => x.Term)
-                            .Include(x => x.Person)
-                            .Where(x => x.ID != enrolment.ID &&
-                                        x.PersonID == enrolment.Person.ID &&
-                                        x.TermID == selectedTerm.ID &&
-                                        x.CourseID == selectedCourse.ID &&
-                                        x.ClassID == selectedClass.ID).FirstOrDefaultAsync();
+                        .Include(x => x.Course)
+                        .Include(x => x.Class)
+                        .Include(x => x.Term)
+                        .Include(x => x.Person)
+                        .Where(x => x.ID != enrolment.ID &&
+                                    x.PersonID == enrolment.Person.ID &&
+                                    x.TermID == selectedTerm.ID &&
+                                    x.CourseID == selectedCourse.ID &&
+                                    x.ClassID == selectedClass.ID).FirstOrDefaultAsync();
             }
             else
             {
                 return await dbc.Enrolment.AsNoTracking()
-                            .Include(x => x.Course)
-                            .Include(x => x.Term)
-                            .Include(x => x.Person)
-                            .Where(x => x.ID != enrolment.ID &&
-                                        x.PersonID == enrolment.Person.ID &&
-                                        x.TermID == selectedTerm.ID &&
-                                        x.CourseID == selectedCourse.ID).FirstOrDefaultAsync();
+                        .Include(x => x.Course)
+                        .Include(x => x.Term)
+                        .Include(x => x.Person)
+                        .Where(x => x.ID != enrolment.ID &&
+                                    x.PersonID == enrolment.Person.ID &&
+                                    x.TermID == selectedTerm.ID &&
+                                    x.CourseID == selectedCourse.ID).FirstOrDefaultAsync();
             }
         }
+        
         public static async Task<Enrolment?> DuplicateEnrolment(U3ADbContext dbc,
                                         Person selectedPerson, Term selectedTerm,
                                         Course? selectedCourse, Class selectedClass)

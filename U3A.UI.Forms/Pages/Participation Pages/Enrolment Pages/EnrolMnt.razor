@@ -586,7 +586,6 @@ else
 
     async Task SaveRecord(GridEditModelSavingEventArgs e)
     {
-        dbc?.ChangeTracker?.Clear();
         Enrolment dataItem = null;
         var editModel = (Enrolment)e.EditModel;
         if (!await IsDataOk(editModel))
@@ -595,6 +594,7 @@ else
             e.Cancel = true; return;
         }
         // Re-query a data item from the store.
+        dbc?.ChangeTracker?.Clear();
         if (editModel.Person.IsMultiCampusVisitor)
         {
             var mce = await dbcT.MultiCampusEnrolment.FindAsync(editModel.ID);
