@@ -149,7 +149,7 @@ public partial class DurableFunctions
             instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoFinalisePayments, client,false);
             instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoAutoEnrolment, client, false);
             instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoProcessQueuedDocuments, client, false);
-            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client, true);
+            instanceId = await ScheduleTimerFunction(logger, tenant.Identifier!, DurableActivity.DoBuildSchedule, client, false);
         }
     }
 
@@ -191,7 +191,8 @@ public partial class DurableFunctions
     async Task<string> ScheduleTimerFunction(ILogger logger, string tenantIdentifier,
                                             DurableActivity durableActivity,
                                             DurableTaskClient client,
-                                            bool isDailyProcedure)
+                                            bool isDailyProcedure,
+                                            bool WaitForCompletion = false)
     {
         U3AFunctionOptions options;
         string instanceId;
@@ -221,7 +222,10 @@ public partial class DurableFunctions
         instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
                         nameof(DurableFunctions), options, startOrchestrationOptions);
         logger.LogInformation($"Started orchestration with ID = '{instanceId}'.");
-        _ = await client.WaitForInstanceCompletionAsync(instanceId);
+        if (WaitForCompletion)
+        {
+            var result = await client.WaitForInstanceCompletionAsync(instanceId);
+        }   
         return instanceId;
     }
 

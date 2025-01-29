@@ -106,14 +106,10 @@ namespace U3A.WebFunctions.Procedures
                 else { logger.LogInformation("There were no queued documents to send."); }
 
                 // Delete expired records
-                dbc.RemoveRange(dbc.DocumentQueue.AsEnumerable()
-                    .Where(x => (today - x.CreatedOn.GetValueOrDefault()).Days > 7));
-                var deleted = dbc.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
-                if (deleted > 0)
-                {
-                    var result = await dbc.SaveChangesAsync();
-                    logger.LogInformation($"Deleted {deleted} document queue records because they are more than 7 days old.");
-                }
+                int daysToKeep = 14;
+                dbc.Database.SetCommandTimeout(60 * 3);
+                var deleted = dbc.Database.ExecuteSql($"DELETE FROM DocumentQueue WHERE DATEDIFF(DAY, CreatedOn, GETDATE()) > {daysToKeep}");
+                logger.LogInformation($"Deleted {deleted} document queue records because they are more than {daysToKeep} days old.");
             }
         }
     }

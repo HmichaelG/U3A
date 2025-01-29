@@ -60,7 +60,7 @@ public partial class DurableFunctions
                                 executionContext,
                                 req,
                                 options,
-                                WaitForCompletion: true);
+                                WaitForCompletion: false);
     }
 }
 

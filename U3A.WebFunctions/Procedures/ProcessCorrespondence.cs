@@ -202,9 +202,9 @@ namespace U3A.WebFunctions.Procedures
                             if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
                         }
                     }
-                    await BusinessRule.UpdateMultiCampusMailAsync(dbcT, mailItems);
                     _ = await dbc.SaveChangesAsync();
                     _ = await dbcT.SaveChangesAsync();
+
                     var postalCount = reportFactory.PostalReports.Count;
                     if (postalCount > 0)
                     {

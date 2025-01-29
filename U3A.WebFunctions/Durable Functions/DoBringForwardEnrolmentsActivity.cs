@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using U3A.WebFunctions.Procedures;
 using U3A.Model;
+using DevExpress.XtraReports.UI;
 
 
 namespace U3A.WebFunctions;
@@ -52,7 +53,7 @@ public partial class DurableFunctions
                                 executionContext,
                                 req,
                                 options,
-                                WaitForCompletion: true);
+                                WaitForCompletion: false);
     }
 }
 

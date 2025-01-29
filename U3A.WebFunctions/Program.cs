@@ -14,6 +14,8 @@ using System.Data;
 using U3A.WebFunctions;
 using Microsoft.Extensions.Configuration;
 using DevExpress.Drawing;
+using U3A.Model;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
@@ -21,6 +23,12 @@ DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.R
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .Build();
+
+string var = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") ?? "";
+if (var == "Development")
+{
+    constants.IS_DEVELOPMENT = true;
+}
 
 host.Run();
 

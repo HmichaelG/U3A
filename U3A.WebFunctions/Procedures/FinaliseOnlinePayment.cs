@@ -33,11 +33,11 @@ namespace U3A.WebFunctions.Procedures
                         var response = (!string.IsNullOrWhiteSpace(ex.PaymentResult.ResponseCode)) 
                             ? $"{ ex.PaymentResult.ResponseCode} { ex.PaymentResult.ResponseMessage}"
                             : "No response received.";
-                        logger.LogError(ex, $"Payment for {person.FullName}: Response: {response}");
+                        logger.LogInformation(ex, $"Payment for {person.FullName} not processed: EWAY reason: {response}");
                     }
                     catch (Exception ex)
                     {
-                        logger.LogInformation($"Error processing online payment for {person.FullName}. {ex.Message}");
+                        logger.LogError($"Error processing online payment for {person.FullName}. {ex.Message}");
                     }
                 }
             }
