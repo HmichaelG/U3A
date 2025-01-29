@@ -23,9 +23,8 @@ else
 {
     <div class="px-2">
         <CollapsableContent DismissKey="{E580636E-C7CB-45FF-91A4-5AE4E3B0A2CF}"
-                        AlertText=@($@"<p><strong>Broadcast email</strong> queued and processed overnight.<br />
-                        That is, those email with attachments or merge codes that could not be sent immediately.<br/>
-                        Processed correspondence is deleted after 7 days.</p>")
+                        AlertText=@($@"<p><strong>Broadcast email</strong> queued and processed immediately<br />
+                        unless a delayed start has been requested. Processed correspondence is deleted after 14 days.</p>")
                             OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
                             OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
