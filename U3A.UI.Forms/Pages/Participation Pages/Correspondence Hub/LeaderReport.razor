@@ -4,6 +4,8 @@
 @inject IJSRuntime js
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Logging
+@using U3A.Services.APIClient
+
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
@@ -24,7 +26,7 @@ else
         <h3>Queue Leader Reports for email</h3>
         <p>Queue Class reports for selected courses/leaders.</p>
         <CollapsableContent DismissKey="{40D384A9-AA9E-49AD-8F70-BA65C97ACF0D}"
-                        AlertText=@(@"<p><strong>Leader Reports</strong> is now an automated procedure.<br />
+                            AlertText=@(@"<p><strong>Leader Reports</strong> is now an automated procedure.<br />
                         All reports are automatically sent to leaders one day prior (Sunday) to the
                         start of term.</p>")
                             OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
@@ -104,7 +106,6 @@ else
 
     bool AreSelectionsMade { get; set; }
     SelectLeaderReports? rptSelect;
-    ProFormaReportFactory reportFactory;
 
     DxGridCommandColumnEx? GridCommandColumn;
     MessageBox messageBox;
@@ -153,8 +154,12 @@ else
     async Task OnQueueReportsSelected()
     {
         ErrorMessage = "";
+        // using (var client = new APIClient())
+        // {
+        //     await client.IsActivityInUse(DurableActivity.DoSendRequestedLeaderReports, dbc.TenantInfo.Identifier);
+        // }
         await ProcessReportsAsync(false);
-        var msg = $"<p>The selected documents have been queued and will be sent via email within the hour.</p>";
+        var msg = $"<p>The selected documents have been queued for immediate processing and will be sent via email.</p>";
         if (ErrorMessage != "") { msg += $"<div class='alert alert-danger text-dark'>{ErrorMessage}</div>"; }
         await messageBox.SetPopupWidth("30%");
         await messageBox.ShowOkOnlyAsync("Communication Complete", msg);
@@ -163,8 +168,8 @@ else
     async Task ProcessReportsAsync(bool IsPreview)
     {
         dbc.ChangeTracker.Clear();
-        await ProgressBar.ShowAsync("Processing ... Please Wait", SelectedDataItems.Count);
-        reportFactory = new ProFormaReportFactory(Logger,Environment, U3Adbfactory, IsPreview);
+        List<Guid> idsToSend = new();
+        await ProgressBar.ShowAsync("Creating Report Requests ... Please Wait", SelectedDataItems.Count);
         int count = 0;
         foreach (var c in SelectedDataItems.Cast<Class>())
         {
@@ -173,7 +178,7 @@ else
             {
                 foreach (var r in recipients)
                 {
-                    await ProcessReportAsync(r.Person, c.Course, c);
+                    idsToSend.AddRange(await ProcessReportAsync(r.Person, c.Course, c));
                 }
                 count++;
             }
@@ -182,10 +187,57 @@ else
         }
         await ProgressBar.Close();
         await dbc.SaveChangesAsync();
+        if (idsToSend.Count > 0)
+        {
+            await ProgressBar.ShowSpinnerAsync("Queue Mail Requests ... Please Wait");
+            ErrorMessage = await ProcessMailAsync(idsToSend);
+            await ProgressBar.Close();
+        }
     }
 
-    async Task ProcessReportAsync(Person Leader, Course Course, Class Class)
+    async Task<string> ProcessMailAsync(IEnumerable<Guid> IdsToSend)
     {
+        await SetStatus(IdsToSend, "Queued");
+        string result = "Your leader report emails have been successfully queued for immediate processing";
+        using (var client = new APIClient())
+        {
+            try
+            {
+                await client.DoSendRequestedLeaderReports(dbc.TenantInfo.Identifier, IdsToSend);
+            }
+            catch (HttpRequestException e)
+            {
+                result = $@"<p>An Internet issue is currently preventing you mail from being processed.<br/>
+                                        We'll keep trying. If you do not receive your mail withing the hour, contact your U3A.</p>
+                        {e.Message}";
+                await SetStatus(IdsToSend, ""); // clear the status to allow retry
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+                await SetStatus(IdsToSend, "Failed");
+            }
+            finally
+            {
+                await dbc.SaveChangesAsync();
+            }
+        }
+        return result;
+    }
+
+    async Task SetStatus(IEnumerable<Guid> IdsToSend, string Status)
+    {
+        foreach (var id in IdsToSend)
+        {
+            var mail = await dbc.SendMail.FindAsync(id);
+            mail.Status = Status;
+        }
+        await dbc.SaveChangesAsync();
+    }
+
+    async Task<List<Guid>> ProcessReportAsync(Person Leader, Course Course, Class Class)
+    {
+        List<Guid> result = new List<Guid>();
         var enrolments = new List<Enrolment>();
         if (dbc.Enrolment.Any(x => x.ClassID == Class.ID && x.TermID == selectedTerm.ID))
         {
@@ -209,6 +261,7 @@ else
         {
             var mail = new SendMail()
                 {
+                    ID = Guid.NewGuid(),
                     DocumentName = "U3A Leaders Reports",
                     Person = await dbc.Person.FindAsync(Leader.ID),
                     PersonID = Leader.ID,
@@ -224,11 +277,13 @@ else
                     IsUserRequested = true
                 };
             dbc.Add(mail);
+            result.Add(mail.ID);
         }
         else
         {
             ErrorMessage += $"<strong>{Course.Name}</strong> not printed because it has no enrolments<br/>";
         }
+        return result;
     }
 
     void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)

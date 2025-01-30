@@ -7,7 +7,7 @@ using U3A.UI.Reports;
 
 namespace U3A.WebFunctions.Procedures
 {
-    public static class SendLeaderReports
+    public static class SendLeaderReportsAtTermStart
     {
 
         static ProFormaReportFactory? reportFactory;

@@ -12,7 +12,7 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class ProcessQueuedDocuments
     {
-        public static async Task Process(TenantInfo tenant, Guid? IdToProcess, ILogger logger)
+        public static async Task Process(TenantInfo tenant, U3AFunctionOptions options, ILogger logger)
         {
             List<DocumentQueue> queueItems = new();
             using (var dbc = new U3ADbContext(tenant))
@@ -24,11 +24,13 @@ namespace U3A.WebFunctions.Procedures
                 {
                     var server = new DocumentServer(dbc);
                     string subject = string.Empty;
-                    if (IdToProcess != null)
+                    if (options.IdToProcess.Count > 0)
                     {
-                        queueItems = await dbc.DocumentQueue
-                            .Where(x => x.ID == IdToProcess)
-                            .Include(x => x.DocumentAttachments).ToListAsync();
+                        queueItems = dbc.DocumentQueue
+                            .Include(x => x.DocumentAttachments)
+                            .AsEnumerable()
+                            .Where(x => options.IdToProcess.Contains(x.ID))
+                            .ToList();
                     }
                     else
                     {

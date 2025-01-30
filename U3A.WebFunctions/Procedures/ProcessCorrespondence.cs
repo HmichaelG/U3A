@@ -10,8 +10,8 @@ namespace U3A.WebFunctions.Procedures
     public static class ProcessCorrespondence
     {
         public static async Task Process(TenantInfo tenant,
-            string tenantConnectionString,
-            ILogger logger, bool IsDailyProcedure, bool hasRandomAllocationExecuted)
+            string tenantConnectionString, U3AFunctionOptions options,
+            ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
@@ -29,13 +29,23 @@ namespace U3A.WebFunctions.Procedures
                     (Guid, Guid, Guid?) onFileKey;
                     var today = await Common.GetTodayAsync(dbc);
                     var utcTime = DateTime.UtcNow;
-                    mailItems = await dbc.SendMail.IgnoreQueryFilters()
-                                            .Include(x => x.Person)
-                                            .Where(x => !x.Person.IsDeleted && string.IsNullOrWhiteSpace(x.Status)
-                                                    && utcTime >= x.CreatedOn).ToListAsync();
-                    foreach (var sm in await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant.Identifier!))
+                    if (options.IdToProcess != null)
                     {
-                        if (string.IsNullOrWhiteSpace(sm.Status)) { mailItems.Add(sm); }
+                        mailItems = dbc.SendMail.IgnoreQueryFilters()
+                                                .Include(x => x.Person)
+                                                .Where(x => !x.Person.IsDeleted && 
+                                                                options.IdToProcess.Contains(x.ID)).ToList();
+                    }
+                    else
+                    {
+                        mailItems = await dbc.SendMail.IgnoreQueryFilters()
+                                                .Include(x => x.Person)
+                                                .Where(x => !x.Person.IsDeleted && string.IsNullOrWhiteSpace(x.Status)
+                                                        && utcTime >= x.CreatedOn).ToListAsync();
+                        foreach (var sm in await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant.Identifier!))
+                        {
+                            if (string.IsNullOrWhiteSpace(sm.Status)) { mailItems.Add(sm); }
+                        }
                     }
                     var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant.Identifier!);
                     foreach (SendMail sm in mailItems)
@@ -87,7 +97,7 @@ namespace U3A.WebFunctions.Procedures
                                 else sm.Status = "Enrolment not found";
                                 break;
                             case "Leader Report":
-                                if (IsDailyProcedure)
+                                if (options.IsDailyProcedure)
                                 {
                                     var leader = await dbc.Person.IgnoreQueryFilters()
                                                         .Where(x => !x.IsDeleted && x.ID == sm.PersonID).FirstOrDefaultAsync();
@@ -126,14 +136,14 @@ namespace U3A.WebFunctions.Procedures
                                         if (!onFile.Contains(onFileKey))
                                         {
                                             onFile.Add(onFileKey);
-                                            if (hasRandomAllocationExecuted ||
+                                            if (options.HasRandomAllocationExecuted ||
                                                 (classOnDayID >= todayID && classOnDayID <= todayID + 1))
                                             {
                                                 if (course != null) courseName = course.Name;
                                                 sm.Status = await reportFactory.CreateLeaderReportProForma(leader,
                                                                     courseName,
                                                                     enrolments.ToArray(),
-                                                                    hasRandomAllocationExecuted);
+                                                                    options.HasRandomAllocationExecuted);
                                                 logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
                                             }
                                         }
@@ -142,7 +152,8 @@ namespace U3A.WebFunctions.Procedures
                                 }
                                 break;
                             case "U3A Leaders Reports":
-                                if (IsDailyProcedure || sm.IsUserRequested)
+                                logger.LogInformation($"Processing {sm.DocumentName} for {p.FullName}.");
+                                if (options.IsDailyProcedure || sm.IsUserRequested)
                                 {
                                     var thisClass = await dbc.Class.FindAsync(sm.RecordKey);
                                     if (thisClass == null)

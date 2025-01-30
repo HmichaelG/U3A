@@ -22,7 +22,7 @@ public abstract class APIClientBase : IDisposable
 {
     readonly HttpClient _httpClient;
     readonly string _authToken;
-    readonly string _apiBaseAddress;
+    internal readonly string _apiBaseAddress;
     public APIClientBase()
     {
         _httpClient = new HttpClient();
@@ -39,7 +39,22 @@ public abstract class APIClientBase : IDisposable
         }
     }
 
-    internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant, Guid? ProcessID = null)
+    internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant)
+    {
+        var functionName = Enum.GetName<DurableActivity>(durableActivity);
+        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant));
+        var response = await SendAsync(request);
+        return response;
+    }
+    internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant, Guid ProcessID)
+    {
+        var functionName = Enum.GetName<DurableActivity>(durableActivity);
+        var request = new HttpRequestMessage(HttpMethod.Get,
+                            ConstructQuery(functionName,tenant, new List<Guid> { ProcessID}));
+        var response = await SendAsync(request);
+        return response;
+    }
+    internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant, IEnumerable<Guid> ProcessID = null)
     {
         var functionName = Enum.GetName<DurableActivity>(durableActivity);
         var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant, ProcessID));
@@ -47,7 +62,7 @@ public abstract class APIClientBase : IDisposable
         return response;
     }
 
-    private async Task<string> SendAsync(HttpRequestMessage requestMessage)
+    internal async Task<string> SendAsync(HttpRequestMessage requestMessage)
     {
         var responseBody = string.Empty;
         _httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -57,9 +72,10 @@ public abstract class APIClientBase : IDisposable
         responseBody = await response.Content.ReadAsStringAsync();
         return responseBody;
     }
-    private string ConstructQuery(string function, string tenant, Guid? ProcessID)
+    private string ConstructQuery(string function, string tenant, IEnumerable<Guid>? ProcessIDs = null)
     {
         var query = string.Empty;
+        //construct the query string
         if (string.IsNullOrWhiteSpace(tenant))
         {
             query = function;
@@ -67,9 +83,10 @@ public abstract class APIClientBase : IDisposable
         else
         {
             query = $"{function}?tenant={tenant}";
-            if (ProcessID.HasValue)
+            if (ProcessIDs != null)
             {
-                query += $"&processId={ProcessID.Value}";
+                var csv = string.Join(",", ProcessIDs);
+                query += $"&processId={csv}";
             }
         }
         return query;

@@ -1,4 +1,6 @@
 ﻿@namespace U3A.UI.Forms
+
+@using U3A.Services.APIClient
 @using Microsoft.AspNetCore.Hosting;
 @using Microsoft.Extensions.Logging;
 
@@ -20,8 +22,8 @@
             accordance with privacy law &amp; regulations in your State.
         </div>
         <SelectLeaderReports @ref=@rptSelect ColSpan="6"
-                             AreSelectionsMade="@true"
-                             OnQueueReportsSelected="OnQueueReportsSelected" />
+        AreSelectionsMade="@true"
+        OnQueueReportsSelected="OnQueueReportsSelected" />
     </DxFormLayoutGroup>
 </div>
 
@@ -46,12 +48,13 @@
     async Task OnQueueReportsSelected()
     {
         var msg = await ProcessReportsAsync(false);
-        if (msg == string.Empty) msg = $"<p>The selected documents have been queued and will be sent via email within the hour.</p>";
+        if (msg == string.Empty) msg = $"<p>The selected documents have been queued for immediate processing. They will be sent via email shortly.</p>";
         await messageBox.ShowOkOnlyAsync("Leaders Reports", msg);
     }
 
     async Task<string> ProcessReportsAsync(bool IsPreview)
     {
+        await ProgressBar.ShowSmallSpinnerAsync();
         var result = string.Empty;
         reportFactory = new ProFormaReportFactory(log,Environment, U3Adbfactory, IsPreview);
         var leader = loginState.SelectedPerson;
@@ -81,6 +84,7 @@
                 {
                     var mail = new SendMail()
                         {
+                            ID = Guid.NewGuid(),
                             DocumentName = "U3A Leaders Reports",
                             Person = await dbc.Person.FindAsync(leader.ID),
                             PersonID = leader.ID,
@@ -97,6 +101,27 @@
                         };
                     dbc.Add(mail);
                     await dbc.SaveChangesAsync();
+                    using (var client = new APIClient())
+                    {
+                        try
+                        {
+                            await client.DoSendRequestedLeaderReports(dbc.TenantInfo.Identifier, new List<Guid> { mail.ID });
+                        }
+                        catch (HttpRequestException e)
+                        {
+                            result = $@"<p>An Internet issue is currently preventing you mail from being processed.</p>
+                                        We'll keep trying. If you do not receive your mail withing the hour, contact your U3A.</p>
+                                        {e.Message}";
+                        }
+                        catch (Exception ex)
+                        {
+                            mail.Status = ex.Message;
+                        }
+                        finally
+                        {
+                            await dbc.SaveChangesAsync();
+                        }
+                    }
                 }
                 else { result = "<p>The selected reports could not be created because this course has no enrolments.</p>"; }
                 rptSelect.PrintLeaderReport = false;
@@ -105,6 +130,7 @@
                 rptSelect.PrintAttendanceRecord = false;
                 rptSelect.PrintCSVFile = false;
                 rptSelect.PrintAttendanceAnalysis = false;
+                await ProgressBar.Close();
                 return result;
             }
         }

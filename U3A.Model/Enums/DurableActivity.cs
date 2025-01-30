@@ -22,8 +22,8 @@ namespace U3A.Model
         DoBringForwardEnrolments,
         //[Display(Name = "Send Correspondence")]
         //DoCorrespondence,
-        [Display(Name = "Leader Reports")]
-        DoSendLeaderReports,
+        [Display(Name = "Requested Leader Reports")]
+        DoSendRequestedLeaderReports,
         [Display(Name = "Process Queued Documents")]
         DoProcessQueuedDocuments,
         [Display(Name = "Create Attendance")]

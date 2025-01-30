@@ -11,6 +11,8 @@ using PostmarkDotNet.Model.Webhooks;
 using U3A.Model;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Http;
+using DevExpress.XtraRichEdit.Model;
+using System.Diagnostics;
 
 namespace U3A.Services.APIClient;
 
@@ -22,7 +24,7 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoBuildSchedule, tenant);
     }
-    public async Task<string> DoProcessQueuedDocuments(string tenant, Guid? ProcessID)
+    public async Task<string> DoProcessQueuedDocuments(string tenant, Guid ProcessID)
     {
         return await sendAPIRequestAsync(DurableActivity.DoProcessQueuedDocuments, tenant, ProcessID);
     }
@@ -38,9 +40,9 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoBringForwardEnrolments, tenant);
     }
-    public async Task<string> DoSendLeaderReports(string tenant)
+    public async Task<string> DoSendRequestedLeaderReports(string tenant, IEnumerable<Guid> ProcessID)
     {
-        return await sendAPIRequestAsync(DurableActivity.DoSendLeaderReports, tenant);
+        return await sendAPIRequestAsync(DurableActivity.DoSendRequestedLeaderReports, tenant, ProcessID);
     }
     public async Task<string> DoCreateAttendance(string tenant)
     {
@@ -50,5 +52,26 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoDatabaseCleanup, tenant);
     }
+
+    public async Task IsActivityInUse(DurableActivity activity,string tenant)
+    {
+        using (var client = new HttpClient())
+        {
+            var instanceId = $"{Enum.GetName<DurableActivity>(activity)}_{tenant}";
+            string functionAppUrl = $"{_apiBaseAddress}status/{instanceId}";
+            HttpResponseMessage response = await client.GetAsync(functionAppUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response: {responseBody}");
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
+        }
+    }
+
 
 }
