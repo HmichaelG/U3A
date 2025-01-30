@@ -17,7 +17,7 @@
 <div class="mx-4 my-1">
     <DxFormLayoutGroup Caption="Leader Reports" ColSpanXs="12">
         <div class="alert alert-info text-dark text-center m-1 p-2">
-            <strong>Private Information</strong><br/>
+            <strong>Private Information</strong><br />
             Leader reports contain the private contact details of members. Please use &amp; dispose of responsibly in
             accordance with privacy law &amp; regulations in your State.
         </div>
@@ -56,7 +56,7 @@
     {
         await ProgressBar.ShowSmallSpinnerAsync();
         var result = string.Empty;
-        reportFactory = new ProFormaReportFactory(log,Environment, U3Adbfactory, IsPreview);
+        reportFactory = new ProFormaReportFactory(log, Environment, U3Adbfactory, IsPreview);
         var leader = loginState.SelectedPerson;
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
@@ -103,6 +103,7 @@
                     await dbc.SaveChangesAsync();
                     using (var client = new APIClient())
                     {
+                        await SetStatus(dbc, mail.ID, "Queued");
                         try
                         {
                             await client.DoSendRequestedLeaderReports(dbc.TenantInfo.Identifier, new List<Guid> { mail.ID });
@@ -111,15 +112,13 @@
                         {
                             result = $@"<p>An Internet issue is currently preventing you mail from being processed.</p>
                                         We'll keep trying. If you do not receive your mail withing the hour, contact your U3A.</p>
-                                        {e.Message}";
+                                {e.Message}";
+                            await SetStatus(dbc, mail.ID, ""); // Clear the status to allow retry
                         }
                         catch (Exception ex)
                         {
                             mail.Status = ex.Message;
-                        }
-                        finally
-                        {
-                            await dbc.SaveChangesAsync();
+                            await SetStatus(dbc, mail.ID, "Failed");
                         }
                     }
                 }
@@ -134,6 +133,14 @@
                 return result;
             }
         }
+
+    }
+
+    async Task SetStatus(U3ADbContext dbc, Guid IdToSend, string Status)
+    {
+        var mail = await dbc.SendMail.FindAsync(IdToSend);
+        mail.Status = Status;
+        await dbc.SaveChangesAsync();
     }
 
 }

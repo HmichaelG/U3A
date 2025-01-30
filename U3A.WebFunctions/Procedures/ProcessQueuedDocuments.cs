@@ -12,9 +12,12 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class ProcessQueuedDocuments
     {
+
         public static async Task Process(TenantInfo tenant, U3AFunctionOptions options, ILogger logger)
         {
+            int count = 0;
             List<DocumentQueue> queueItems = new();
+            List<ExportData> exportData = new();
             using (var dbc = new U3ADbContext(tenant))
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
@@ -50,7 +53,7 @@ namespace U3A.WebFunctions.Procedures
                                 if (documentTemplate != null)
                                 {
                                     subject = documentTemplate.Subject!;
-                                    List<ExportData>? exportData = new();
+                                    exportData = new();
 
                                     // get members who are to receive the document
                                     if (!string.IsNullOrWhiteSpace(queueItem.MemberIdToExport))
@@ -64,8 +67,9 @@ namespace U3A.WebFunctions.Procedures
                                     else
                                     {
                                         //Obsolete: backwards compatibility only
-                                        exportData = JsonSerializer.Deserialize<List<ExportData>>(queueItem.ExportDataJSON);
+                                        exportData = JsonSerializer.Deserialize<List<ExportData>>(queueItem.ExportDataJSON) ?? new();
                                     }
+                                    count += exportData.Count;
 
                                     // Get the attachments, if any
                                     if (queueItem.DocumentAttachments != null)
@@ -88,7 +92,6 @@ namespace U3A.WebFunctions.Procedures
                                     }
                                     queueItem.Status = DocumentQueueStatus.Complete;
                                     queueItem.Result = "Ok";
-
                                 }
                             }
                             catch (Exception ex)
@@ -103,7 +106,7 @@ namespace U3A.WebFunctions.Procedures
                             }
                         }
                     }
-                    logger.LogInformation($"Queued Documents: {server.BatchCount} Batches, {server.BatchSuccessCount} Accepted, {server.BatchFailureCount} Failures.");
+                    logger.LogInformation($"{count} queued documents sent.");
                 }
                 else { logger.LogInformation("There were no queued documents to send."); }
 

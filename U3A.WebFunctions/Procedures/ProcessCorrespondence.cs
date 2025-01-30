@@ -33,7 +33,7 @@ namespace U3A.WebFunctions.Procedures
                     {
                         mailItems = dbc.SendMail.IgnoreQueryFilters()
                                                 .Include(x => x.Person)
-                                                .Where(x => !x.Person.IsDeleted && 
+                                                .Where(x => !x.Person.IsDeleted &&
                                                                 options.IdToProcess.Contains(x.ID)).ToList();
                     }
                     else
@@ -152,7 +152,6 @@ namespace U3A.WebFunctions.Procedures
                                 }
                                 break;
                             case "U3A Leaders Reports":
-                                logger.LogInformation($"Processing {sm.DocumentName} for {p.FullName}.");
                                 if (options.IsDailyProcedure || sm.IsUserRequested)
                                 {
                                     var thisClass = await dbc.Class.FindAsync(sm.RecordKey);

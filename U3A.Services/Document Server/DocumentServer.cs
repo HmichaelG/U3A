@@ -22,9 +22,9 @@ public partial class DocumentServer : IDisposable
 
     public int SuccessTransmissionAttempts { get; set; } = 0;
     public int FailureTransmissionAttempts { get; set; } = 0;
-    public int BatchCount { get; set; } = 0;
-    public int BatchSuccessCount { get; set; } = 0;
-    public int BatchFailureCount { get; set; } = 0;
+    //public int BatchCount { get; set; } = 0;
+    //public int BatchSuccessCount { get; set; } = 0;
+    //public int BatchFailureCount { get; set; } = 0;
     public int BulkRecipientCount { get; set; } = 0;
     DateTime sendTime;
     public TimeSpan ElapsedTime { get; set; }
@@ -36,9 +36,6 @@ public partial class DocumentServer : IDisposable
     {
         SuccessTransmissionAttempts = 0;
         FailureTransmissionAttempts = 0;
-        BatchCount = 0;
-        BatchSuccessCount = 0;
-        BatchFailureCount = 0;
         BulkRecipientCount = 0;
         sendTime = DateTime.UtcNow;
     }
