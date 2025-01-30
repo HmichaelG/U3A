@@ -14,7 +14,6 @@
 @inject ILogger<QueuedTransactionalEmail> Logger
 @inject IWebHostEnvironment Environment
 @inject NavigationManager NavigationManager
-@implements IDisposable
 
 
 @if (!IsReady)
@@ -73,6 +72,10 @@ else
                                                    Tooltip="Delete the selected email."
                                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                                    RenderStyle="ButtonRenderStyle.Primary" />
+                                    <DxToolbarItem Text="Refresh" IconCssClass="bi bi-arrow-clockwise" Visible="@(!IsEmbedded)"
+                                                   Click="@GetData" Tooltip="Refresh data"
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   RenderStyle="ButtonRenderStyle.Success" />
                                 </CustomButtonContent>
                             </GridToolbar>
                         </ToolbarTemplate>
@@ -126,8 +129,6 @@ else
     bool showPDF = false;
     string pdfPath;
 
-    U3ADbContext dbc { get; set; }
-    TenantDbContext dbcT { get; set; }
     string tenant;
     SystemSettings? settings;
     Byte[] pdfContent;
@@ -136,10 +137,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        dbcT = await TenantDbfactory.CreateDbContextAsync();
-        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        tenant = await tenantInfoService.GetTenantIdentifierAsync();
         await GetData();
         IsReady = true;
     }
@@ -154,7 +151,10 @@ else
     {
         if (e.FieldName == "CreatedOnLocal")
         {
-            e.Value = dbc.GetLocalTime(((SendMail)e.DataItem).CreatedOn.Value);
+            using (var dbc = U3Adbfactory.CreateDbContext())
+            {
+                e.Value = dbc.GetLocalTime(((SendMail)e.DataItem).CreatedOn.Value);
+            }
         }
     }
 
@@ -170,14 +170,25 @@ else
 
     async Task GetData()
     {
+        if (ProgressBar != null) { await ProgressBar?.ShowSmallSpinnerAsync(); }
         mainGrid?.ClearSelection();
-        SendMail = await dbc.SendMail
-                            .IgnoreQueryFilters()
-                            .Include(x => x.Person)
-                            .Where(x => !x.Person.IsDeleted)
-                            .ToListAsync();
-        SendMail.AddRange(await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant));
-        SendMail = SendMail.OrderByDescending(x => x.CreatedOn).ToList();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
+            {
+                settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+                tenant = await tenantInfoService.GetTenantIdentifierAsync();
+                SendMail = await dbc.SendMail
+                                    .IgnoreQueryFilters()
+                                    .Include(x => x.Person)
+                                    .Where(x => !x.Person.IsDeleted)
+                                    .ToListAsync();
+                SendMail.AddRange(await BusinessRule.GetMultiCampusMailAsync(dbcT, tenant));
+                SendMail = SendMail.OrderByDescending(x => x.CreatedOn).ToList();
+                if (ProgressBar != null) { await ProgressBar?.Close(); }
+                await InvokeAsync(StateHasChanged);
+            }
+        }
     }
 
     async Task OnPreview()
@@ -215,146 +226,152 @@ else
         await InvokeAsync(StateHasChanged);
         reportFactory = new ProFormaReportFactory(Logger, Environment, U3Adbfactory, IsPreview);
         var enrolments = new List<Enrolment>();
-        var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant);
-        foreach (SendMail sm in SelectedDataItems)
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            mailItems++;
-            var scopedMCEnrolments = mcEnrolments;  //Don't know why - probably something to do with LINQ
-            await ProgressBar.SetValueAsync(mailItems);
-            switch (sm.DocumentName)
+            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
             {
-                case "Cash Receipt":
-                    var receipt = await dbc.Receipt
-                                        .Include(x => x.Person)
-                                        .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
-                    if (receipt != null)
+                var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant);
+                foreach (SendMail sm in SelectedDataItems)
+                {
+                    mailItems++;
+                    var scopedMCEnrolments = mcEnrolments;  //Don't know why - probably something to do with LINQ
+                    await ProgressBar.SetValueAsync(mailItems);
+                    switch (sm.DocumentName)
                     {
-                        sm.Status = await reportFactory.CreateCashReceiptProForma(receipt);
+                        case "Cash Receipt":
+                            var receipt = await dbc.Receipt
+                                                .Include(x => x.Person)
+                                                .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
+                            if (receipt != null)
+                            {
+                                sm.Status = await reportFactory.CreateCashReceiptProForma(receipt);
+                            }
+                            else sm.Status = "Receipt not found";
+                            break;
+                        case "Participant Enrolment":
+                            var enrolment = await dbc.Enrolment.IgnoreQueryFilters()
+                                                .Include(x => x.Course)
+                                                .Include(x => x.Person)
+                                                .Where(x => !x.IsDeleted && x.ID == sm.RecordKey).FirstOrDefaultAsync();
+                            if (enrolment == null)
+                            {
+                                enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT, sm.RecordKey, tenant);
+                            }
+                            if (enrolment != null)
+                            {
+                                var key = enrolment.PersonID;
+                                var theseEnrolments = new List<Enrolment>();
+                                if (!personEnrolments.TryGetValue(key, out theseEnrolments))
+                                {
+                                    theseEnrolments = new List<Enrolment>();
+                                    personEnrolments.Add(key, theseEnrolments);
+                                }
+                                theseEnrolments.Add(enrolment);
+                            }
+                            else sm.Status = "Enrolment not found";
+                            break;
+                        case "Leader Report":
+                            string courseName = "";
+                            Course course = null;
+                            var leader = await dbc.Person
+                                                .Where(x => x.ID == sm.PersonID).FirstOrDefaultAsync();
+                            if (dbc.Class.Any(x => x.ID == sm.RecordKey))
+                            {
+                                enrolments = await dbc.Enrolment.Where(x => x.ClassID == sm.RecordKey
+                                                                    && x.TermID == sm.TermID).ToListAsync();
+                                enrolments.AddRange(scopedMCEnrolments.Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
+                                var Class = await dbc.Class.FindAsync(sm.RecordKey);
+                                course = await dbc.Course.FindAsync(Class.CourseID);
+                            }
+                            else
+                            {
+                                course = dbc.Course.Find(sm.RecordKey);
+                                if (course != null)
+                                {
+                                    enrolments = dbc.Enrolment.Where(x => x.CourseID == course.ID
+                                                                          && x.TermID == sm.TermID).ToList();
+                                    enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
+                                                                          && x.TermID == sm.TermID));
+                                }
+                            };
+                            if (leader != null && enrolments.Count > 0)
+                            {
+                                if (course != null) courseName = course.Name;
+                                onFileKey = (leader.ID, enrolments[0].CourseID, enrolments[0].ClassID);
+                                if (!onFile.Contains(onFileKey))
+                                {
+                                    onFile.Add(onFileKey);
+                                    sm.Status = await reportFactory.CreateLeaderReportProForma(leader, courseName, enrolments.ToArray());
+                                }
+                            }
+                            else { sm.Status = "Enrolments not found."; }
+                            break;
+                        case "U3A Leaders Reports":
+                            Class thisClass = await dbc.Class.FindAsync(sm.RecordKey);
+                            if (thisClass is null)
+                            {
+                                sm.Status = "Class record not found.";
+                                continue;
+                            }
+                            course = await dbc.Course.FindAsync(thisClass.CourseID);
+                            var thisTerm = await dbc.Term.FindAsync(sm.TermID);
+                            enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
+                            if (course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                            {
+                                enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null));
+                            }
+                            else
+                            {
+                                enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == thisClass.ID));
+                            }
+                            bool isEnrolmentReqd = sm.PrintAttendanceRecord ||
+                                                            sm.PrintClassList ||
+                                                            sm.PrintCSVFile ||
+                                                            sm.PrintICEList ||
+                                                            sm.PrintLeaderReport;
+                            if (enrolments?.Count > 0 || !isEnrolmentReqd)
+                            {
+                                sm.Status = await reportFactory.CreateLeaderReports(
+                                     sm.PrintLeaderReport,
+                                     sm.PrintAttendanceRecord,
+                                     sm.PrintClassList,
+                                     sm.PrintICEList,
+                                     sm.PrintCSVFile,
+                                     sm.PrintAttendanceAnalysis,
+                                     sm.PrintMemberBadges,
+                                      course.ID,
+                                      "U3A Report Package",
+                                     course.Name,
+                                     sm.Person, enrolments.OrderBy(x => x.IsWaitlisted)
+                                                                 .ThenBy(x => x.Person.LastName)
+                                                                 .ThenBy(x => x.Person.FirstName).ToArray());
+                            }
+                            else { sm.Status = "Enrolments not found."; }
+                            break;
+                        default:
+                            break;
                     }
-                    else sm.Status = "Receipt not found";
-                    break;
-                case "Participant Enrolment":
-                    var enrolment = await dbc.Enrolment.IgnoreQueryFilters()
-                                        .Include(x => x.Course)
-                                        .Include(x => x.Person)
-                                        .Where(x => !x.IsDeleted && x.ID == sm.RecordKey).FirstOrDefaultAsync();
-                    if (enrolment == null)
+                    if (!IsPreview) await dbc.SaveChangesAsync();
+                }
+                await ProgressBar.ShowSpinnerAsync("Processing Enrolment Emails");
+                // process enrolments because they receive one email per member
+                var enrolmentResults = await reportFactory.CreateEnrolmentProForma(personEnrolments);
+                foreach (var kvp in enrolmentResults)
+                {
+                    mailItems++;
+                    foreach (var sm in dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key))
                     {
-                        enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT, sm.RecordKey, tenant);
+                        if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
                     }
-                    if (enrolment != null)
+                    foreach (var sm in dbcT.MultiCampusSendMail.Where(x => x.PersonID == kvp.Key))
                     {
-                        var key = enrolment.PersonID;
-                        var theseEnrolments = new List<Enrolment>();
-                        if (!personEnrolments.TryGetValue(key, out theseEnrolments))
-                        {
-                            theseEnrolments = new List<Enrolment>();
-                            personEnrolments.Add(key, theseEnrolments);
-                        }
-                        theseEnrolments.Add(enrolment);
+                        if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
                     }
-                    else sm.Status = "Enrolment not found";
-                    break;
-                case "Leader Report":
-                    string courseName = "";
-                    Course course = null;
-                    var leader = await dbc.Person
-                                        .Where(x => x.ID == sm.PersonID).FirstOrDefaultAsync();
-                    if (dbc.Class.Any(x => x.ID == sm.RecordKey))
-                    {
-                        enrolments = await dbc.Enrolment.Where(x => x.ClassID == sm.RecordKey
-                                                            && x.TermID == sm.TermID).ToListAsync();
-                        enrolments.AddRange(scopedMCEnrolments.Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
-                        var Class = await dbc.Class.FindAsync(sm.RecordKey);
-                        course = await dbc.Course.FindAsync(Class.CourseID);
-                    }
-                    else
-                    {
-                        course = dbc.Course.Find(sm.RecordKey);
-                        if (course != null)
-                        {
-                            enrolments = dbc.Enrolment.Where(x => x.CourseID == course.ID
-                                                                  && x.TermID == sm.TermID).ToList();
-                            enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
-                                                                  && x.TermID == sm.TermID));
-                        }
-                    };
-                    if (leader != null && enrolments.Count > 0)
-                    {
-                        if (course != null) courseName = course.Name;
-                        onFileKey = (leader.ID, enrolments[0].CourseID, enrolments[0].ClassID);
-                        if (!onFile.Contains(onFileKey))
-                        {
-                            onFile.Add(onFileKey);
-                            sm.Status = await reportFactory.CreateLeaderReportProForma(leader, courseName, enrolments.ToArray());
-                        }
-                    }
-                    else { sm.Status = "Enrolments not found."; }
-                    break;
-                case "U3A Leaders Reports":
-                    Class thisClass = await dbc.Class.FindAsync(sm.RecordKey);
-                    if (thisClass is null)
-                    {
-                        sm.Status = "Class record not found.";
-                        continue;
-                    }
-                    course = await dbc.Course.FindAsync(thisClass.CourseID);
-                    var thisTerm = await dbc.Term.FindAsync(sm.TermID);
-                    enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
-                    if (course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
-                    {
-                        enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null));
-                    }
-                    else
-                    {
-                        enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == thisClass.ID));
-                    }
-                    bool isEnrolmentReqd = sm.PrintAttendanceRecord ||
-                                                    sm.PrintClassList ||
-                                                    sm.PrintCSVFile ||
-                                                    sm.PrintICEList ||
-                                                    sm.PrintLeaderReport;
-                    if (enrolments?.Count > 0 || !isEnrolmentReqd)
-                    {
-                        sm.Status = await reportFactory.CreateLeaderReports(
-                             sm.PrintLeaderReport,
-                             sm.PrintAttendanceRecord,
-                             sm.PrintClassList,
-                             sm.PrintICEList,
-                             sm.PrintCSVFile,
-                             sm.PrintAttendanceAnalysis,
-                             sm.PrintMemberBadges,
-                              course.ID,
-                              "U3A Report Package",
-                             course.Name,
-                             sm.Person, enrolments.OrderBy(x => x.IsWaitlisted)
-                                                         .ThenBy(x => x.Person.LastName)
-                                                         .ThenBy(x => x.Person.FirstName).ToArray());
-                    }
-                    else { sm.Status = "Enrolments not found."; }
-                    break;
-                default:
-                    break;
+                    await ProgressBar.SetValueAsync(mailItems);
+                }
+                if (!IsPreview) { await dbc.SaveChangesAsync(); await dbcT.SaveChangesAsync(); }
             }
-            if (!IsPreview) await dbc.SaveChangesAsync();
         }
-        await ProgressBar.ShowSpinnerAsync("Processing Enrolment Emails");
-        // process enrolments because they receive one email per member
-        var enrolmentResults = await reportFactory.CreateEnrolmentProForma(personEnrolments);
-        foreach (var kvp in enrolmentResults)
-        {
-            mailItems++;
-            foreach (var sm in dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key))
-            {
-                if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
-            }
-            foreach (var sm in dbcT.MultiCampusSendMail.Where(x => x.PersonID == kvp.Key))
-            {
-                if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
-            }
-            await ProgressBar.SetValueAsync(mailItems);
-        }
-        if (!IsPreview) { await dbc.SaveChangesAsync(); await dbcT.SaveChangesAsync(); }
 
         // finish up
         s.Stop();
@@ -388,28 +405,29 @@ else
 
     async Task OnDeleteSelection()
     {
-        foreach (var o in SelectedDataItems)
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            var sm = o as SendMail;
-            if (sm.Person.IsMultiCampusVisitor)
+            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
             {
-                var mcSM = await dbcT.MultiCampusSendMail.FindAsync(sm.ID);
-                if (mcSM != null) { dbcT.Remove(mcSM); }
-            }
-            else
-            {
-                dbc.Remove(sm);
+                foreach (var o in SelectedDataItems)
+                {
+                    var sm = o as SendMail;
+                    if (sm.Person.IsMultiCampusVisitor)
+                    {
+                        var mcSM = await dbcT.MultiCampusSendMail.FindAsync(sm.ID);
+                        if (mcSM != null) { dbcT.Remove(mcSM); }
+                    }
+                    else
+                    {
+                        dbc.Remove(sm);
+                    }
+                }
+                await dbc.SaveChangesAsync();
+                await dbcT.SaveChangesAsync();
             }
         }
-        await dbc.SaveChangesAsync();
-        await dbcT.SaveChangesAsync();
         await GetData();
     }
 
-    public void Dispose()
-    {
-        dbc?.Dispose();
-        dbcT?.Dispose();
-    }
 
 }
