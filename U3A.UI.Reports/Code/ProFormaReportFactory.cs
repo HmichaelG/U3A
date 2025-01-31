@@ -504,7 +504,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             bool isMultiCampus = false;
             foreach (var enrolment in Enrolments)
             {
-                if (enrolment.Person != null && enrolment.Person.IsMultiCampusVisitor) { isMultiCampus = true; };
+                if (enrolment.Person != null && enrolment.Person.IsMultiCampusVisitor) { isMultiCampus = true; }
                 if (enrolment.IsWaitlisted) { totalWaitListed++; } else { totalEnrolled++; }
                 enrolmentDetails.AddRange(BusinessRule.GetEnrolmentDetail(dbc, enrolment));
             }

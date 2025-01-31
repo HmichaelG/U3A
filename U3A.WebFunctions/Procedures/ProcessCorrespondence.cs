@@ -30,7 +30,7 @@ namespace U3A.WebFunctions.Procedures
                     (Guid, Guid, Guid?) onFileKey;
                     var today = await Common.GetTodayAsync(dbc);
                     var utcTime = DateTime.UtcNow;
-                    if (options.IdToProcess != null)
+                    if (options.IdToProcess != null && options.IdToProcess.Count > 0)
                     {
                         mailItems = dbc.SendMail.IgnoreQueryFilters()
                                                 .Include(x => x.Person)
