@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 
-namespace U3A.WebFunctions.Static_Web_Functions
+namespace U3A.WebFunctions
 {
     public class GetTenants
     {

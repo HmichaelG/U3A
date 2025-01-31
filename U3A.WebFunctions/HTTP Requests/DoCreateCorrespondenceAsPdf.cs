@@ -12,7 +12,6 @@ using U3A.UI.Reports;
 using U3A.Services;
 using U3A.BusinessRules;
 using Serilog.Core;
-using U3A.WebFunctions.Static_Web_Functions;
 
 
 namespace U3A.WebFunctions;
@@ -20,7 +19,7 @@ namespace U3A.WebFunctions;
 public class DoCreateCorrespondenceAsPdf
 {
     private readonly IConfiguration config;
-    private readonly ILogger log;   
+    private readonly ILogger log;
     public DoCreateCorrespondenceAsPdf(IConfiguration config, ILoggerFactory loggerFactory)
     {
         this.config = config;
@@ -59,7 +58,7 @@ public class DoCreateCorrespondenceAsPdf
         var personEnrolments = new Dictionary<Guid, List<Enrolment>>();
         List<(Guid, Guid, Guid?)> onFile = new();
         (Guid, Guid, Guid?) onFileKey;
-        var reportFactory = new ProFormaReportFactory(tenant, log,IsPreview: true);       
+        var reportFactory = new ProFormaReportFactory(tenant, log, IsPreview: true);
         var enrolments = new List<Enrolment>();
         using (var dbc = new U3ADbContext(tenant))
         {
