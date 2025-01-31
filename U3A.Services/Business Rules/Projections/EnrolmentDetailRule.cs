@@ -16,57 +16,64 @@ namespace U3A.BusinessRules
 
         public static List<EnrolmentDetail> GetEnrolmentDetail(U3ADbContext dbc, Enrolment enrolment)
         {
-            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
-            var people = dbc.Person.IgnoreQueryFilters()
-                            .Where(x => !x.IsDeleted && x.DateCeased == null).ToList();
+            Task<List<EnrolmentDetail>> syncTask = Task.Run(async () =>
+            {
+                return await GetEnrolmentDetailAsync(dbc, enrolment);
+            });
+            syncTask.Wait();
+            return syncTask.Result;
+        }
+        public static async  Task<List<EnrolmentDetail>> GetEnrolmentDetailAsync(U3ADbContext dbc, Enrolment enrolment)
+        {
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             var result = new List<EnrolmentDetail>();
             EnrolmentDetail ed;
             var p = enrolment.Person
-                        ?? BusinessRule.SelectPerson(dbc, enrolment.PersonID) ?? throw new ArgumentNullException(nameof(Person));
+                        ?? await BusinessRule.SelectPersonAsync(dbc, enrolment.PersonID) ?? throw new ArgumentNullException(nameof(Person));
             var t = enrolment.Term
-                        ?? dbc.Term.Find(enrolment.TermID) ?? throw new ArgumentNullException(nameof(Term));
-            var cr = dbc.Course.Where(x => x.ID == enrolment.CourseID).Include(x => x.Enrolments).FirstOrDefault();
-            var pt = dbc.CourseParticpationType.Find(cr.CourseParticipationTypeID);
-            var ct = dbc.CourseType.Find(cr.CourseTypeID);
+                        ?? await dbc.Term.FindAsync(enrolment.TermID) ?? throw new ArgumentNullException(nameof(Term));
+            var cr = await dbc.Course.Where(x => x.ID == enrolment.CourseID).Include(x => x.Enrolments).FirstOrDefaultAsync();
+            var pt = await dbc.CourseParticpationType.FindAsync(cr.CourseParticipationTypeID);
+            var ct = await dbc.CourseType.FindAsync(cr.CourseTypeID);
             var classes = new List<Class>();
             var IsPreRandomAllocationPeriod = BusinessRule.IsPreRandomAllocationEmailDay(t, settings, dbc.GetLocalTime());
             if (enrolment.ClassID != null)
             {
-                classes.Add(dbc.Class
+                classes.Add(await dbc.Class
                                 .Include(c => c.Enrolments)
                                 .Include(x => x.Leader)
                                 .Include(x => x.Leader2)
                                 .Include(x => x.Leader3)
                                 .Include(x => x.Course)
                                 .Include(x => x.Occurrence)
-                                .Where(x => x.ID == enrolment.ClassID).FirstOrDefault());
+                                .Where(x => x.ID == enrolment.ClassID).FirstOrDefaultAsync());
             }
             else
             {
-                classes.AddRange(dbc.Class
+                classes.AddRange(await dbc.Class
                                 .Include(x => x.Leader)
                                 .Include(x => x.Leader2)
                                 .Include(x => x.Leader3)
                                 .Include(x => x.Course).ThenInclude(c => c.Enrolments)
                                 .Include(x => x.Occurrence)
-                                .Where(x => x.CourseID == cr.ID).ToList());
+                                .Where(x => x.CourseID == cr.ID).ToListAsync());
             }
             foreach (Class c in classes)
             {
                 foreach (var e in c.Enrolments)
                 {
-                    e.Person = people.FirstOrDefault(x => x.ID == e.PersonID);
+                    if (e.Person == null) { e.Person = await dbc.Person.FindAsync(e.PersonID); }
                 }
                 c.Enrolments = c.Enrolments.Where(x => x.Person != null).ToList();
                 BusinessRule.AssignClassContacts(c, t, settings);
             }
-            var termEnrolments = dbc.Enrolment.AsNoTracking().Where(x => x.TermID == t.ID);
+            var termEnrolments = await dbc.Enrolment.AsNoTracking().Where(x => x.CourseID == cr.ID && x.TermID == t.ID).ToListAsync();
             foreach (var c in classes)
             {
-                SetCourseParticipationDetails(dbc, c, termEnrolments);
-                var od = dbc.WeekDay.Find(c.OnDayID);
-                var v = dbc.Venue.Find(c.VenueID);
-                var l = dbc.Person.Find(c.LeaderID);
+                SetCourseParticipationDetails(c, termEnrolments);
+                var od = await dbc.WeekDay.FindAsync(c.OnDayID);
+                var v = await dbc.Venue.FindAsync(c.VenueID);
+                var l = await dbc.Person.FindAsync(c.LeaderID);
                 ed = new EnrolmentDetail()
                 {
                     // Course
@@ -134,7 +141,7 @@ Your request has been <b>Waitlisted</b> meaning you will be notified should a pl
                     }
                 }
                 else { ed.WaitlistMessage = string.Empty; }
-                GetOrganisationPersonDetail(dbc, ed, t, p);
+                GetOrganisationPersonDetail(settings, ed, t, p);
                 if (ed.EnrolmentIsLeader) { ed.PersonFullName += " (Leader)"; }
                 if (ed.EnrolmentIsClerk) { ed.PersonFullName += " (Clerk)"; }
                 result.Add(ed);

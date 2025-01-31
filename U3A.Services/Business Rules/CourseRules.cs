@@ -100,7 +100,7 @@ namespace U3A.BusinessRules
             {
                 Parallel.ForEach(course.Classes, c =>
                 {
-                    SetCourseParticipationDetails(dbc, c, termEnrolments);
+                    SetCourseParticipationDetails(c, termEnrolments);
                 });
             });
             return courses;
@@ -191,7 +191,7 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        public static Class SetCourseParticipationDetails(U3ADbContext dbc, Class Class, IEnumerable<Enrolment> termEnrolments)
+        public static Class SetCourseParticipationDetails(Class Class, IEnumerable<Enrolment> termEnrolments)
         {
             double maxStudents = Class.Course.MaximumStudents; ;
             Class.ParticipationRate = 0;

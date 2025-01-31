@@ -32,18 +32,10 @@ public class DoCreateCorrespondenceAsPdf
         log.LogInformation("C# HTTP trigger function processed a request.");
         var options = new U3AFunctionOptions(req);
         Byte[]? pdf = await CreateMailPreview(options);
-
-        if (pdf == null)
-        {
-            var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound);
-            await notFoundResponse.WriteStringAsync("PDF generation failed.");
-            return notFoundResponse;
-        }
-
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "application/pdf");
         response.Headers.Add("Content-Disposition", "attachment; filename=GeneratedDocument.pdf");
-        await response.WriteBytesAsync(pdf);
+        if (pdf != null) { await response.WriteBytesAsync(pdf); }
         return response;
     }
 

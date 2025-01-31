@@ -10,6 +10,7 @@ namespace U3A.BusinessRules
     {
         public static List<LeaderDetail> GetLeaderDetailSample(U3ADbContext dbc, out List<EnrolmentDetail> EnrolmentDetails)
         {
+            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
             var eDetails = new List<EnrolmentDetail>();
             LeaderDetail leader = new LeaderDetail();
             Person? leaderPerson;
@@ -29,7 +30,7 @@ namespace U3A.BusinessRules
                     {
                         leaderPerson = c.Leader;
                         if (leaderPerson == null) { leaderPerson = new Person() { LastName = "" }; }
-                        GetOrganisationPersonDetail(dbc, leader, term, c.Leader);
+                        GetOrganisationPersonDetail(settings, leader, term, c.Leader);
                         leader.CourseID = e.CourseID;
                         leader.ClassID = e.ClassID;
                         var enrolments = new List<Enrolment>();
@@ -54,19 +55,18 @@ namespace U3A.BusinessRules
             return new List<LeaderDetail>() { leader };
         }
 
-        public static List<LeaderDetail> GetLeaderDetail(U3ADbContext dbc, Person person, Term term)
+        public static List<LeaderDetail> GetLeaderDetail(SystemSettings settings, Person person, Term term)
         {
             var leader = new LeaderDetail();
-            GetOrganisationPersonDetail(dbc, leader, term, person);
+            GetOrganisationPersonDetail(settings, leader, term, person);
             return new List<LeaderDetail>() { leader };
         }
 
-        private static void GetOrganisationPersonDetail(U3ADbContext dbc,
+        private static void GetOrganisationPersonDetail(SystemSettings settings,
                     OrganisationPersonDetail opd,
                     Term t,
                     Person person)
         {
-            var settings = dbc.SystemSettings.FirstOrDefault() ?? throw new ArgumentNullException(nameof(Person));
             opd.U3AGroup = settings.U3AGroup;
             opd.U3AOfficeLocation = settings.OfficeLocation;
             opd.U3APostalAddress = settings.PostalAddress;

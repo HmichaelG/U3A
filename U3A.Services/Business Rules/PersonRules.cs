@@ -60,6 +60,14 @@ public static partial class BusinessRule
         ApplyGroups(dbc, person);
         return person;
     }
+    public static async Task<Person> SelectPersonAsync(U3ADbContext dbc, Guid ID)
+    {
+        var person = await dbc.Person
+                        .IgnoreQueryFilters()
+                        .FirstOrDefaultAsync(x => x.ID == ID) ?? throw new ArgumentNullException(nameof(Person));
+        await ApplyGroupsAsync(dbc, person);
+        return person;
+    }
 
     public static async Task<List<Person>> SelectablePersonsAsync(U3ADbContext dbc, Term term)
     {
@@ -443,6 +451,24 @@ public static partial class BusinessRule
         }
         if (dbc.Volunteer.Where(x => x.PersonID == person.ID).Any()) { person.IsVolunteer = true; }
         if (dbc.Committee.Where(x => x.PersonID == person.ID).Any()) { person.IsCommitteeMember = true; }
+        if (person.IsCourseLeader || person.IsLifeMember || person.IsCommitteeMember)
+        {
+            if (person.FinancialTo < term.Year) person.FinancialTo += term.Year;
+        }
+    }
+    static async Task ApplyGroupsAsync(U3ADbContext dbc, Person person)
+    {
+        Term? term = await dbc.Term.Where(x => x.IsDefaultTerm).FirstOrDefaultAsync();
+        if (term != null)
+        {
+            if (await dbc.Class.Include(x => x.Course)
+                .Where(x => x.Course.Year == term.Year
+                    && (x.LeaderID == person.ID
+                        || x.Leader2ID == person.ID
+                        || x.Leader3ID == person.ID)).AnyAsync()) person.IsCourseLeader = true;
+        }
+        if (await dbc.Volunteer.Where(x => x.PersonID == person.ID).AnyAsync()) { person.IsVolunteer = true; }
+        if (await dbc.Committee.Where(x => x.PersonID == person.ID).AnyAsync()) { person.IsCommitteeMember = true; }
         if (person.IsCourseLeader || person.IsLifeMember || person.IsCommitteeMember)
         {
             if (person.FinancialTo < term.Year) person.FinancialTo += term.Year;

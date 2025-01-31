@@ -61,6 +61,11 @@ public class APIClient : APIClientBase
         var functionName = nameof(DoCreateCorrespondenceAsPdf);
         var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant, ProcessID));
         var response = await GetPdfReportAsync(request);
+        if (response.Length == 0)
+        {
+            throw new Exception(@"No data returned from API.<br/> 
+                        Your report(s) could not be created usually because there were no enrolments in the requested course.");
+        }
         return response;
     }
 

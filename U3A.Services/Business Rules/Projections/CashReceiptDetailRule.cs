@@ -29,7 +29,8 @@ namespace U3A.BusinessRules
                 ReceiptIdentifier = receipt.Identifier,
 
             };
-            GetOrganisationPersonDetail(dbc, rd, t, p);
+            var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+            GetOrganisationPersonDetail(settings, rd, t, p);
             return rd;
         }
 

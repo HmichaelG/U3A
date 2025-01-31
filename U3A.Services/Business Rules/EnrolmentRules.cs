@@ -207,13 +207,13 @@ namespace U3A.BusinessRules
             {
                 if (e.Class != null)
                 {
-                    SetCourseParticipationDetails(dbc, e.Class, enrolments);
+                    SetCourseParticipationDetails(e.Class, enrolments);
                 }
                 else
                 {
                     Parallel.ForEach(e.Course.Classes, c =>
                     {
-                        SetCourseParticipationDetails(dbc, c, enrolments);
+                        SetCourseParticipationDetails(c, enrolments);
                     });
                 }
             });
