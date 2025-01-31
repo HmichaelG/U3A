@@ -50,7 +50,7 @@ public abstract class APIClientBase : IDisposable
     {
         var functionName = Enum.GetName<DurableActivity>(durableActivity);
         var request = new HttpRequestMessage(HttpMethod.Get,
-                            ConstructQuery(functionName,tenant, new List<Guid> { ProcessID}));
+                            ConstructQuery(functionName, tenant, new List<Guid> { ProcessID }));
         var response = await SendAsync(request);
         return response;
     }
@@ -72,7 +72,17 @@ public abstract class APIClientBase : IDisposable
         responseBody = await response.Content.ReadAsStringAsync();
         return responseBody;
     }
-    private string ConstructQuery(string function, string tenant, IEnumerable<Guid>? ProcessIDs = null)
+    internal async Task<Byte[]> GetPdfReportAsync(HttpRequestMessage requestMessage)
+    {
+        Byte[] pdf = null;
+        _httpClient.DefaultRequestHeaders.Accept.Clear();
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
+        response.EnsureSuccessStatusCode(); // Throw if not a success code.
+        pdf = await response.Content.ReadAsByteArrayAsync();
+        return pdf;
+    }
+    internal string ConstructQuery(string function, string tenant, IEnumerable<Guid>? ProcessIDs = null)
     {
         var query = string.Empty;
         //construct the query string

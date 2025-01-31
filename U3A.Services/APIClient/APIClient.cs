@@ -28,6 +28,10 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoProcessQueuedDocuments, tenant, ProcessID);
     }
+    public async Task<string> DoCorrespondence(string tenant, IEnumerable<Guid> ProcessIDs)
+    {
+        return await sendAPIRequestAsync(DurableActivity.DoCorrespondence, tenant, ProcessIDs);
+    }
     public async Task<string> DoAutoEnrolment(string tenant, IEnumerable<Guid> ProcessIDs)
     {
         return await sendAPIRequestAsync(DurableActivity.DoAutoEnrolment, tenant, ProcessIDs);
@@ -52,26 +56,14 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoDatabaseCleanup, tenant);
     }
-
-    public async Task IsActivityInUse(DurableActivity activity,string tenant)
+    public async Task<Byte[]> DoCreateCorrespondenceAsPdf(string tenant, IEnumerable<Guid> ProcessID = null)
     {
-        using (var client = new HttpClient())
-        {
-            var instanceId = $"{Enum.GetName<DurableActivity>(activity)}_{tenant}";
-            string functionAppUrl = $"{_apiBaseAddress}status/{instanceId}";
-            HttpResponseMessage response = await client.GetAsync(functionAppUrl);
-
-            if (response.IsSuccessStatusCode)
-            {
-                string responseBody = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Response: {responseBody}");
-            }
-            else
-            {
-                Console.WriteLine($"Error: {response.StatusCode}");
-            }
-        }
+        var functionName = nameof(DoCreateCorrespondenceAsPdf);
+        var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant, ProcessID));
+        var response = await GetPdfReportAsync(request);
+        return response;
     }
+
 
 
 }

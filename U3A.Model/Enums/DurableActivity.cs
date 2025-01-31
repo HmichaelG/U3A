@@ -20,8 +20,8 @@ namespace U3A.Model
         DoAutoEnrolment,
         [Display(Name = "Bring Forward Enrolments")]
         DoBringForwardEnrolments,
-        //[Display(Name = "Send Correspondence")]
-        //DoCorrespondence,
+        [Display(Name = "Send Correspondence")]
+        DoCorrespondence,
         [Display(Name = "Requested Leader Reports")]
         DoSendRequestedLeaderReports,
         [Display(Name = "Process Queued Documents")]

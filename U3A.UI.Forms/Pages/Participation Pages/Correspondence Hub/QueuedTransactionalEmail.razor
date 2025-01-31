@@ -6,6 +6,7 @@
 @using Microsoft.Extensions.Logging
 @using Microsoft.EntityFrameworkCore.Query
 @using U3A.UI.Reports.Pages
+@using U3A.Services.APIClient
 
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
@@ -32,12 +33,12 @@ else
     {
         <div class="px-2">
             <CollapsableContent DismissKey="{D46A020E-E4C2-4A3A-A684-80EE7B36AE34}" Visible="@(!IsEmbedded)"
-                                AlertText=@($@"<p><strong>Transactional email</strong> is queued &amp; background processed.<br />
+            AlertText=@($@"<p><strong>Transactional email</strong> is queued &amp; background processed.<br />
                         Cash Receipts and Enrolments are sent hourly, Leader Reports are sent within 48 hours of the next class.<br/>
                         Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.<br />
                         Processed correspondence is deleted after 30 days</p>.")
-                                OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
-                                OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+            OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+            OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
             <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
             <Progress @ref="@ProgressBar" />
@@ -47,44 +48,44 @@ else
             <FullScreen @ref=@fullScreen DisplayOffset="@contentSize" HideToggle="@IsEmbedded">
                 <ContentTemplate>
                     <DxGrid Data="@SendMail" @ref=@mainGrid
-                            @bind-SelectedDataItems="@SelectedDataItems"
-                            UnboundColumnData="Grid_CustomUnboundColumnData"
-                            ShowFilterRow="false"
-                            ShowAllRows="false"
-                            KeyFieldName="ID"
-                            ValidationEnabled="true"
-                            SelectionMode="@((IsEmbedded) ? GridSelectionMode.Single : GridSelectionMode.Multiple)">
+                    @bind-SelectedDataItems="@SelectedDataItems"
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    ShowFilterRow="false"
+                    ShowAllRows="false"
+                    KeyFieldName="ID"
+                    ValidationEnabled="true"
+                    SelectionMode="@((IsEmbedded) ? GridSelectionMode.Single : GridSelectionMode.Multiple)">
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid LayoutKey="{5AC4F74E-C707-4297-8949-A64FB18C0819}">
                                 <CustomButtonContent>
                                     <DxToolbarItem Text="Preview" IconCssClass="bi bi-eyeglasses"
-                                                   Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                                   Tooltip="Preview the email to be sent to selected participants."
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   RenderStyle="ButtonRenderStyle.Primary" />
+                                    Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                    Tooltip="Preview the email to be sent to selected participants."
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
                                     <DxToolbarItem Text="Send Mail" IconCssClass="bi bi-envelope"
-                                                   Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                                   Tooltip="Send email to selected participants, now."
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   RenderStyle="ButtonRenderStyle.Primary" />
+                                    Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                    Tooltip="Send email to selected participants, now."
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
                                     <DxToolbarItem Text="Delete" IconCssClass="bi bi-trash" Visible="@(!IsEmbedded)"
-                                                   Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                                   Tooltip="Delete the selected email."
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   RenderStyle="ButtonRenderStyle.Primary" />
+                                    Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                    Tooltip="Delete the selected email."
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Primary" />
                                     <DxToolbarItem Text="Refresh" IconCssClass="bi bi-arrow-clockwise" Visible="@(!IsEmbedded)"
-                                                   Click="@GetData" Tooltip="Refresh data"
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   RenderStyle="ButtonRenderStyle.Success" />
+                                    Click="@GetData" Tooltip="Refresh data"
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    RenderStyle="ButtonRenderStyle.Success" />
                                 </CustomButtonContent>
                             </GridToolbar>
                         </ToolbarTemplate>
                         <Columns>
                             <DxGridSelectionColumn Width="2rem" />
                             <DxGridDataColumn Width="10rem" Caption="Email On/After"
-                                              UnboundType=GridUnboundColumnType.DateTime
-                                              FieldName="CreatedOnLocal"
-                                              DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                            UnboundType=GridUnboundColumnType.DateTime
+                            FieldName="CreatedOnLocal"
+                            DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
                             <DxGridDataColumn Width="12rem" Caption="Document" FieldName="DocumentName" />
                             <DxGridDataColumn Width="12rem" Caption="Send To" FieldName="Person.FullName" />
                             <DxGridDataColumn Width="6rem" Caption="Send Via" FieldName="Person.SendTransactionalEmailVia" />
@@ -100,15 +101,15 @@ else
 }
 <style>
     .viewer-height {
-        height: 10rem !important;
+    height: 10rem !important;
     }
 </style>
 
 @code {
-    [Parameter]
-    public bool IsEmbedded { get; set; }
+        [Parameter]
+        public bool IsEmbedded { get; set; }
 
-    bool IsReady;
+        bool IsReady;
     private List<SendMail> SendMail { get; set; }
     IReadOnlyList<object>? SelectedDataItems { get; set; }
     ProFormaReportFactory reportFactory;
@@ -206,200 +207,97 @@ else
         try
         {
             isProcessing = true;
-            await CreateMail(IsPreview);
+            if (IsPreview) { await CreateMailPreview(); }
+            else { await CreateMail(); }
         }
         finally { isProcessing = false; }
     }
 
-    async Task CreateMail(bool IsPreview)
+    async Task CreateMail()
     {
-        var mailItems = 0;
-        var postItems = 0;
-        var s = new System.Diagnostics.Stopwatch();
-        var items = SelectedDataItems.Count();
-        var personEnrolments = new Dictionary<Guid, List<Enrolment>>();
-        List<(Guid, Guid, Guid?)> onFile = new();
-        (Guid, Guid, Guid?) onFileKey;
-        s.Start();
-        var msg = (IsPreview) ? "Preparing Preview" : "Creating Mail Items";
-        await ProgressBar.ShowAsync($"{msg} ... Please Wait", items);
-        await InvokeAsync(StateHasChanged);
-        reportFactory = new ProFormaReportFactory(Logger, Environment, U3Adbfactory, IsPreview);
-        var enrolments = new List<Enrolment>();
+        await ProgressBar.ShowSpinnerAsync($"Processing email ... Please Wait");
+        List<Guid> IdsToSend = SelectedDataItems.Select(x => ((SendMail)x).ID).ToList();
+        var result = await ProcessMailAsync(IdsToSend);
+        await ProgressBar.Close();
+        await GetData();
+        await messageBox.ShowOkOnlyAsync("Email Processing", result);
+    }
+
+    async Task<string> ProcessMailAsync(IEnumerable<Guid> IdsToSend)
+    {
+        string result = "Your requested report emails have been successfully queued for immediate processing";
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
+            await SetStatus(dbc, IdsToSend, "Queued");
+            using (var client = new APIClient())
             {
-                var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant);
-                foreach (SendMail sm in SelectedDataItems)
+                try
                 {
-                    mailItems++;
-                    var scopedMCEnrolments = mcEnrolments;  //Don't know why - probably something to do with LINQ
-                    await ProgressBar.SetValueAsync(mailItems);
-                    switch (sm.DocumentName)
-                    {
-                        case "Cash Receipt":
-                            var receipt = await dbc.Receipt
-                                                .Include(x => x.Person)
-                                                .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
-                            if (receipt != null)
-                            {
-                                sm.Status = await reportFactory.CreateCashReceiptProForma(receipt);
-                            }
-                            else sm.Status = "Receipt not found";
-                            break;
-                        case "Participant Enrolment":
-                            var enrolment = await dbc.Enrolment.IgnoreQueryFilters()
-                                                .Include(x => x.Course)
-                                                .Include(x => x.Person)
-                                                .Where(x => !x.IsDeleted && x.ID == sm.RecordKey).FirstOrDefaultAsync();
-                            if (enrolment == null)
-                            {
-                                enrolment = await BusinessRule.GetMultiCampusEnrolmentAsync(dbc, dbcT, sm.RecordKey, tenant);
-                            }
-                            if (enrolment != null)
-                            {
-                                var key = enrolment.PersonID;
-                                var theseEnrolments = new List<Enrolment>();
-                                if (!personEnrolments.TryGetValue(key, out theseEnrolments))
-                                {
-                                    theseEnrolments = new List<Enrolment>();
-                                    personEnrolments.Add(key, theseEnrolments);
-                                }
-                                theseEnrolments.Add(enrolment);
-                            }
-                            else sm.Status = "Enrolment not found";
-                            break;
-                        case "Leader Report":
-                            string courseName = "";
-                            Course course = null;
-                            var leader = await dbc.Person
-                                                .Where(x => x.ID == sm.PersonID).FirstOrDefaultAsync();
-                            if (dbc.Class.Any(x => x.ID == sm.RecordKey))
-                            {
-                                enrolments = await dbc.Enrolment.Where(x => x.ClassID == sm.RecordKey
-                                                                    && x.TermID == sm.TermID).ToListAsync();
-                                enrolments.AddRange(scopedMCEnrolments.Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
-                                var Class = await dbc.Class.FindAsync(sm.RecordKey);
-                                course = await dbc.Course.FindAsync(Class.CourseID);
-                            }
-                            else
-                            {
-                                course = dbc.Course.Find(sm.RecordKey);
-                                if (course != null)
-                                {
-                                    enrolments = dbc.Enrolment.Where(x => x.CourseID == course.ID
-                                                                          && x.TermID == sm.TermID).ToList();
-                                    enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
-                                                                          && x.TermID == sm.TermID));
-                                }
-                            };
-                            if (leader != null && enrolments.Count > 0)
-                            {
-                                if (course != null) courseName = course.Name;
-                                onFileKey = (leader.ID, enrolments[0].CourseID, enrolments[0].ClassID);
-                                if (!onFile.Contains(onFileKey))
-                                {
-                                    onFile.Add(onFileKey);
-                                    sm.Status = await reportFactory.CreateLeaderReportProForma(leader, courseName, enrolments.ToArray());
-                                }
-                            }
-                            else { sm.Status = "Enrolments not found."; }
-                            break;
-                        case "U3A Leaders Reports":
-                            Class thisClass = await dbc.Class.FindAsync(sm.RecordKey);
-                            if (thisClass is null)
-                            {
-                                sm.Status = "Class record not found.";
-                                continue;
-                            }
-                            course = await dbc.Course.FindAsync(thisClass.CourseID);
-                            var thisTerm = await dbc.Term.FindAsync(sm.TermID);
-                            enrolments = await BusinessRule.GetEnrolmentIncludeLeadersAsync(dbc, course!, thisClass, thisTerm!);
-                            if (course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
-                            {
-                                enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null));
-                            }
-                            else
-                            {
-                                enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == thisClass.ID));
-                            }
-                            bool isEnrolmentReqd = sm.PrintAttendanceRecord ||
-                                                            sm.PrintClassList ||
-                                                            sm.PrintCSVFile ||
-                                                            sm.PrintICEList ||
-                                                            sm.PrintLeaderReport;
-                            if (enrolments?.Count > 0 || !isEnrolmentReqd)
-                            {
-                                sm.Status = await reportFactory.CreateLeaderReports(
-                                     sm.PrintLeaderReport,
-                                     sm.PrintAttendanceRecord,
-                                     sm.PrintClassList,
-                                     sm.PrintICEList,
-                                     sm.PrintCSVFile,
-                                     sm.PrintAttendanceAnalysis,
-                                     sm.PrintMemberBadges,
-                                      course.ID,
-                                      "U3A Report Package",
-                                     course.Name,
-                                     sm.Person, enrolments.OrderBy(x => x.IsWaitlisted)
-                                                                 .ThenBy(x => x.Person.LastName)
-                                                                 .ThenBy(x => x.Person.FirstName).ToArray());
-                            }
-                            else { sm.Status = "Enrolments not found."; }
-                            break;
-                        default:
-                            break;
-                    }
-                    if (!IsPreview) await dbc.SaveChangesAsync();
+                    await client.DoCorrespondence(dbc.TenantInfo.Identifier, IdsToSend);
                 }
-                await ProgressBar.ShowSpinnerAsync("Processing Enrolment Emails");
-                // process enrolments because they receive one email per member
-                var enrolmentResults = await reportFactory.CreateEnrolmentProForma(personEnrolments);
-                foreach (var kvp in enrolmentResults)
+                catch (HttpRequestException e)
                 {
-                    mailItems++;
-                    foreach (var sm in dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key))
-                    {
-                        if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
-                    }
-                    foreach (var sm in dbcT.MultiCampusSendMail.Where(x => x.PersonID == kvp.Key))
-                    {
-                        if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
-                    }
-                    await ProgressBar.SetValueAsync(mailItems);
+                    result = $@"<p>An Internet issue is currently preventing you mail from being processed.<br/>
+                                        We'll keep trying. If you do not receive your mail withing the hour, contact your U3A.</p>
+                    {e.Message}";
+                    await SetStatus(dbc, IdsToSend, ""); // clear the status to allow retry
                 }
-                if (!IsPreview) { await dbc.SaveChangesAsync(); await dbcT.SaveChangesAsync(); }
+                catch (Exception ex)
+                {
+                    result = ex.Message;
+                    await SetStatus(dbc, IdsToSend, "Failed");
+                }
+                finally
+                {
+                    await dbc.SaveChangesAsync();
+                }
             }
         }
+        return result;
+    }
 
-        // finish up
-        s.Stop();
-        await ProgressBar.Close();
-        if (!IsPreview)
+    async Task SetStatus(U3ADbContext dbc, IEnumerable<Guid> IdsToSend, string Status)
+    {
+        foreach (var id in IdsToSend)
         {
-            var elapsedTime = String.Format("{0:00}:{1:00}:{2:00}",
-            s.Elapsed.Hours, s.Elapsed.Minutes, s.Elapsed.Seconds);
-            postItems = reportFactory.PostalReports.Count();
-            //            messageBoxWidth = "33%";
-            msg = $"<p>{items} selected documents have been sent.</p>" +
-                    $"<p>There were {postItems} postal documents and {items - postItems} emails.<br/>" +
-                    $"Postal documents (if any) will be displayed when this message is closed. These must be printed or saved on your PC.</p>" +
-                    $"Elapsed time is: {elapsedTime}";
-            await messageBox.SetPopupWidth("33%");
-            await messageBox.ShowOkOnlyAsync("Communication Complete", msg);
-            await GetData();
-            mainGrid.ClearSelection();
-            StateHasChanged();
+            var mail = await dbc.SendMail.FindAsync(id);
+            mail.Status = Status;
         }
-        var pdfFilename = reportFactory.CreatePostalPDF();
-        if (pdfFilename != null)
-        {
-            pdfPath = Path.Combine(reportFactory.ReportStorage.TempDirectory, pdfFilename);
-            pdfContent = File.ReadAllBytes(pdfPath);
+        await dbc.SaveChangesAsync();
+    }
 
-            showPDF = true;
-            await InvokeAsync(StateHasChanged);
+
+    async Task CreateMailPreview()
+    {
+        await ProgressBar.ShowSpinnerAsync($"Processing preview ... Please Wait");
+        List<Guid> IdsToSend = SelectedDataItems.Select(x => ((SendMail)x).ID).ToList();
+        string result = string.Empty;
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            using (var client = new APIClient())
+            {
+                try
+                {
+                    pdfContent = await client.DoCreateCorrespondenceAsPdf(dbc.TenantInfo.Identifier, IdsToSend);
+                    showPDF = true;
+                }
+                catch (HttpRequestException e)
+                {
+                    result = $@"<p>An Internet issue is currently preventing your report from being processed.<br/>
+                                Wait a while and try again. If the issue persists, contact your U3A.</p>
+                {e.Message}";
+                }
+                catch (Exception ex)
+                {
+                    result = ex.Message;
+                }
+                finally
+                {
+                    await ProgressBar.Close();
+//                    await InvokeAsync(StateHasChanged);
+                    if (!string.IsNullOrWhiteSpace(result)) { await messageBox.ShowOkOnlyAsync("Processing issue", result); }
+                }
+            }
         }
     }
 

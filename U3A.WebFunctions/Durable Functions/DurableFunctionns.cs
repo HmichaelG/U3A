@@ -40,6 +40,9 @@ public partial class DurableFunctions
                 options.HasRandomAllocationExecuted = await context.CallActivityAsync<bool>(nameof(DoAutoEnrolmentActivity), options);
                 result = await context.CallActivityAsync<string>(nameof(DoCorrespondenceActivity), options);
                 break;
+            case DurableActivity.DoCorrespondence:
+                result = await context.CallActivityAsync<string>(nameof(DoCorrespondenceActivity), options);
+                break;
             case DurableActivity.DoBringForwardEnrolments:
                 result = await context.CallActivityAsync<string>(nameof(DoBringForwardEnrolmentsActivity), options);
                 break;
@@ -153,7 +156,7 @@ public partial class DurableFunctions
     public async Task DoDailyProcedures(
         [TimerTrigger("0 0 17 * * *"
     //#if DEBUG
-               , RunOnStartup=true
+               //, RunOnStartup=true
     //#endif            
                 )]
                 TimerInfo myTimer,

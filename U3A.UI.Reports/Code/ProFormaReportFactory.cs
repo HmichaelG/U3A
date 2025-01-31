@@ -40,12 +40,12 @@ namespace U3A.UI.Reports
         string tenantID;
 
         //Azure Functions only
-        public ProFormaReportFactory(TenantInfo tenant, ILogger logger)
+        public ProFormaReportFactory(TenantInfo tenant, ILogger logger, bool IsPreview=false)
         {
             log = logger;
             dbc = new U3ADbContext(tenant);
             isAzureFunction = true;
-            isPreview = false;
+            isPreview = IsPreview;
             tenantID = tenant.Identifier;
             ReportStorage = new CustomReportStorageWebExtension(tenant);
             var settings = dbc.SystemSettings.FirstOrDefault() ?? throw new ArgumentNullException(nameof(SystemSettings));

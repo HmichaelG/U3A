@@ -13,6 +13,7 @@ namespace U3A.WebFunctions.Procedures
             string tenantConnectionString, U3AFunctionOptions options,
             ILogger logger)
         {
+            bool isAdHocReport = false;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
             var reportFactory = new ProFormaReportFactory(tenant, logger);
@@ -35,6 +36,7 @@ namespace U3A.WebFunctions.Procedures
                                                 .Include(x => x.Person)
                                                 .Where(x => !x.Person.IsDeleted &&
                                                                 options.IdToProcess.Contains(x.ID)).ToList();
+                        isAdHocReport = true; // generated via HTTP request
                     }
                     else
                     {
@@ -46,6 +48,7 @@ namespace U3A.WebFunctions.Procedures
                         {
                             if (string.IsNullOrWhiteSpace(sm.Status)) { mailItems.Add(sm); }
                         }
+                        isAdHocReport = false;
                     }
                     var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant.Identifier!);
                     foreach (SendMail sm in mailItems)
@@ -97,7 +100,7 @@ namespace U3A.WebFunctions.Procedures
                                 else sm.Status = "Enrolment not found";
                                 break;
                             case "Leader Report":
-                                if (options.IsDailyProcedure)
+                                if (options.IsDailyProcedure || isAdHocReport)
                                 {
                                     var leader = await dbc.Person.IgnoreQueryFilters()
                                                         .Where(x => !x.IsDeleted && x.ID == sm.PersonID).FirstOrDefaultAsync();
@@ -136,7 +139,7 @@ namespace U3A.WebFunctions.Procedures
                                         if (!onFile.Contains(onFileKey))
                                         {
                                             onFile.Add(onFileKey);
-                                            if (options.HasRandomAllocationExecuted ||
+                                            if (isAdHocReport || options.HasRandomAllocationExecuted ||
                                                 (classOnDayID >= todayID && classOnDayID <= todayID + 1))
                                             {
                                                 if (course != null) courseName = course.Name;
@@ -205,11 +208,11 @@ namespace U3A.WebFunctions.Procedures
                     {
                         foreach (var sm in dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key))
                         {
-                            if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
+                            sm.Status = kvp.Value; 
                         }
                         foreach (var sm in dbcT.MultiCampusSendMail.Where(x => x.PersonID == kvp.Key))
                         {
-                            if (string.IsNullOrWhiteSpace(sm.Status)) { sm.Status = kvp.Value; }
+                            sm.Status = kvp.Value; 
                         }
                     }
                     _ = await dbc.SaveChangesAsync();
