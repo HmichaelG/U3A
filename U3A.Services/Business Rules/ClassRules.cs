@@ -710,8 +710,8 @@ namespace U3A.BusinessRules
         private static void LogClassDetails(Class Class, Term term)
         {
             Log.Information("    Start Date:         {p}", Class.StartDate);
-            Log.Information("    Occurence:          {p}", (OccurrenceType)Class.OccurrenceID);
-            Log.Information("    Recurence:          {p}", Class.Recurrence);
+            Log.Information("    Occurrence:         {p}", (OccurrenceType)Class.OccurrenceID);
+            Log.Information("    Recurrence:         {p}", Class.Recurrence);
             Log.Information("    Class Term:         {p}", (Class.TermNumber > 0) ? $"Term-{Class.TermNumber}" : "Undefined");
             Log.Information("    Offered:            {p}", Class.OfferedSummary);
         }
