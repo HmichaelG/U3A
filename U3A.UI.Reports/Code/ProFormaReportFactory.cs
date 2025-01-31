@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Logging;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -240,6 +242,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             return result;
         }
 
+        Stopwatch sw = new();
         public async Task<string> CreateLeaderReports(
                                         bool DoLeaderReport,
                                         bool DoLeaderAttendanceList,
@@ -260,17 +263,20 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             if (DoLeaderReport || !(Enrolments.Where(x => !x.IsWaitlisted).Any()))
             {
                 var report = "Leader's Report.pdf";
+                sw.Start();
+                log.LogInformation($"Creating {report} at {sw.Elapsed}");
                 try
                 {
                     using (var leaderReportProForma = new LeaderReport())
                     {
+                        log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
                         var filename = await CreateLeaderReportAsync(leaderReportProForma, Leader, Enrolments);
                         if (!string.IsNullOrWhiteSpace(filename))
                         {
                             createdFilenames.Add(filename);
                             reportNames.Add(report);
                         }
-                        reportNames.Add(report);
+                        log.LogInformation($"Completed {report} at {sw.Elapsed}");
                     }
                 }
                 catch (Exception ex)
@@ -283,10 +289,13 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 if (DoLeaderAttendanceList)
                 {
                     var report = "Student Attendance Record.pdf";
+                    sw.Start();
+                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         using (var leaderAttendanceList = new LeaderAttendanceList())
                         {
+                            log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderAttendanceList,
                                                     Leader, Enrolments
                                                                 .Where(x => !x.IsWaitlisted && !x.isLeader)
@@ -296,6 +305,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                 createdFilenames.Add(filename);
                                 reportNames.Add(report);
                             }
+                            log.LogInformation($"Completed {report} at {sw.Elapsed}");
                         }
                     }
                     catch (Exception ex)
@@ -306,10 +316,13 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 if (DoLeaderClassList)
                 {
                     var report = "Class Contact Listing.pdf";
+                    sw.Restart();
+                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         using (var leaderClassList = new LeaderClassList())
                         {
+                            log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderClassList,
                                                     Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray());
                             if (!string.IsNullOrWhiteSpace(filename))
@@ -317,6 +330,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                 createdFilenames.Add(filename);
                                 reportNames.Add(report);
                             }
+                            log.LogInformation($"Completed {report} at {sw.Elapsed}");
                         }
                     }
                     catch (Exception ex)
@@ -327,16 +341,20 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 if (DoLeaderICEList)
                 {
                     var report = "Class ICE Listing.pdf";
+                    sw.Restart();
+                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         using (var leaderICEList = new LeaderICEList())
                         {
+                            log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderICEList,
                                                     Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray());
                             if (!string.IsNullOrWhiteSpace(filename))
                             {
                                 createdFilenames.Add(filename);
                                 reportNames.Add(report);
+                                log.LogInformation($"Completed {report} at {sw.Elapsed}");
                             }
                         }
                     }
@@ -348,6 +366,8 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 if (DoMemberBadges)
                 {
                     var report = "Member Badges.pdf";
+                    sw.Restart();
+                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         var fileName = await CreateMemberBadgesReport(Leader,
@@ -357,6 +377,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                             createdFilenames.Add(fileName);
                             reportNames.Add(report);
                         }
+                        log.LogInformation($"Completed {report} at {sw.Elapsed}");
                     }
                     catch (Exception ex)
                     {
@@ -366,10 +387,13 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 if (DoAttendanceAnalysis)
                 {
                     var report = "Attendance Analysis.pdf";
+                    sw.Restart();
+                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         using (var AttendanceAnalysis = new AttendanceAnalysis())
                         {
+                            log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
                             var filename = CreateAttendanceAnalysisReport(AttendanceAnalysis,
                                                     Leader, CourseID);
                             if (!string.IsNullOrWhiteSpace(filename))
@@ -378,6 +402,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                 reportNames.Add("Attendance Analysis.pdf");
                             }
                         }
+                        log.LogInformation($"Completed {report} at {sw.Elapsed}");
                     }
                     catch (Exception ex)
                     {
@@ -508,6 +533,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 if (enrolment.IsWaitlisted) { totalWaitListed++; } else { totalEnrolled++; }
                 enrolmentDetails.AddRange(BusinessRule.GetEnrolmentDetail(dbc, enrolment));
             }
+            log.LogInformation($"Enrolment details: {sw.Elapsed}");
             if (isMultiCampus)
             {   // we need to recalculate totals
                 foreach (var ed in enrolmentDetails)
@@ -532,9 +558,10 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 else
                     ds.DataSource = enrolmentDetails;
             }
-            report.CreateDocument();
+            log.LogInformation($"Document created: {sw.Elapsed}");
             string pdfFilename = GetTempPdfFile();
             report.ExportToPdf(pdfFilename);
+            log.LogInformation($"Document exported: {sw.Elapsed}");
             return pdfFilename;
         }
 
