@@ -524,15 +524,15 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             var term = dbc.Term.Find(Enrolments[0].TermID);
             var leaderDetail = BusinessRule.GetLeaderDetail(dbc, Leader, term);
             var enrolmentDetails = new List<EnrolmentDetail>();
-            var totalEnrolled = 0.00;
-            var totalWaitListed = 0.00;
+            var totalEnrolled = 0;
+            var totalWaitListed = 0;
             bool isMultiCampus = false;
             foreach (var enrolment in Enrolments)
             {
                 if (enrolment.Person != null && enrolment.Person.IsMultiCampusVisitor) { isMultiCampus = true; }
                 if (enrolment.IsWaitlisted) { totalWaitListed++; } else { totalEnrolled++; }
                 enrolmentDetails.AddRange(BusinessRule.GetEnrolmentDetail(dbc, enrolment));
-            }
+                }
             log.LogInformation($"Enrolment details: {sw.Elapsed}");
             if (isMultiCampus)
             {   // we need to recalculate totals
