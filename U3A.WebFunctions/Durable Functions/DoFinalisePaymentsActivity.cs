@@ -13,13 +13,13 @@ public partial class DurableFunctions
 {
 
     [Function(nameof(DoFinalisePaymentsActivity))]
-    public async Task<string> DoFinalisePaymentsActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
+    public async Task<string> DoFinalisePaymentsActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
         ILogger logger = executionContext.GetLogger(nameof(DoFinalisePaymentsActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, tenantToProcess, cn);
+            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
             if (tenant != null) 
             {
                 logger.LogInformation($"****** Started {nameof(DoFinalisePaymentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");

@@ -13,13 +13,13 @@ public partial class DurableFunctions
 {
 
     [Function(nameof(DoCreateAttendanceActivity))]
-    public async Task<string> DoCreateAttendanceActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
+    public async Task<string> DoCreateAttendanceActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
         ILogger logger = executionContext.GetLogger(nameof(DoCreateAttendanceActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, tenantToProcess, cn);
+            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
             if (tenant != null) 
             {
                 logger.LogInformation($"****** Started {nameof(DoCreateAttendanceActivity)} for {tenant.Identifier}: {tenant.Name}. ******");

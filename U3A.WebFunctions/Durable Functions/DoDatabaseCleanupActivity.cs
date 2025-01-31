@@ -13,13 +13,13 @@ public partial class DurableFunctions
 {
 
     [Function(nameof(DoDatabaseCleanupActivity))]
-    public async Task<string> DoDatabaseCleanupActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
+    public async Task<string> DoDatabaseCleanupActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
         ILogger logger = executionContext.GetLogger(nameof(DoDatabaseCleanupActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, tenantToProcess, cn);
+            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
             if (tenant != null) 
             {
                 logger.LogInformation($"****** Started {nameof(DoDatabaseCleanupActivity)} for {tenant.Identifier}: {tenant.Name}. ******");

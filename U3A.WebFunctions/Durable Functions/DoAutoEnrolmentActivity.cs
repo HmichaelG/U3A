@@ -13,14 +13,14 @@ public partial class DurableFunctions
 {
 
     [Function(nameof(DoAutoEnrolmentActivity))]
-    public async Task<bool> DoAutoEnrolmentActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
+    public async Task<bool> DoAutoEnrolmentActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
         bool hasRandomAllocationExecuted = false; //Return value
         ILogger logger = executionContext.GetLogger(nameof(DoAutoEnrolmentActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, tenantToProcess, cn);
+            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 {
@@ -41,22 +41,5 @@ public partial class DurableFunctions
         return hasRandomAllocationExecuted;
     }
 
-    [Function("DoAutoEnrolment")]
-        public static async Task<HttpResponseData> DoAutoEnrolment(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
-            [DurableClient] DurableTaskClient client,
-            FunctionContext executionContext)
-        {
-
-        var options = new U3AFunctionOptions(req)
-        {
-            DurableActivity = DurableActivity.DoAutoEnrolment
-        };
-        return await ScheduleFunctionAsync(client, 
-                                executionContext, 
-                                req, 
-                                options,
-                                WaitForCompletion: false);
-        }
-    }
+}
 

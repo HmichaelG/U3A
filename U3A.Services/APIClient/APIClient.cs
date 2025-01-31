@@ -28,9 +28,9 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoProcessQueuedDocuments, tenant, ProcessID);
     }
-    public async Task<string> DoAutoEnrolment(string tenant)
+    public async Task<string> DoAutoEnrolment(string tenant, IEnumerable<Guid> ProcessIDs)
     {
-        return await sendAPIRequestAsync(DurableActivity.DoAutoEnrolment, tenant);
+        return await sendAPIRequestAsync(DurableActivity.DoAutoEnrolment, tenant, ProcessIDs);
     }
     public async Task<string> DoDoFinalisePayments(string tenant)
     {
@@ -40,9 +40,9 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoBringForwardEnrolments, tenant);
     }
-    public async Task<string> DoSendRequestedLeaderReports(string tenant, IEnumerable<Guid> ProcessID)
+    public async Task<string> DoSendRequestedLeaderReports(string tenant, IEnumerable<Guid> ProcessIDs)
     {
-        return await sendAPIRequestAsync(DurableActivity.DoSendRequestedLeaderReports, tenant, ProcessID);
+        return await sendAPIRequestAsync(DurableActivity.DoSendRequestedLeaderReports, tenant, ProcessIDs);
     }
     public async Task<string> DoCreateAttendance(string tenant)
     {

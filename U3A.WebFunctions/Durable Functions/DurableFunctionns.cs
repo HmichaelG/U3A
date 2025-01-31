@@ -34,32 +34,32 @@ public partial class DurableFunctions
         switch (options.DurableActivity)
         {
             case DurableActivity.DoFinalisePayments:
-                result = await context.CallActivityAsync<string>(nameof(DoFinalisePaymentsActivity), options.TenantIdentifier);
+                result = await context.CallActivityAsync<string>(nameof(DoFinalisePaymentsActivity), options);
                 break;
             case DurableActivity.DoAutoEnrolment:
-                options.HasRandomAllocationExecuted = await context.CallActivityAsync<bool>(nameof(DoAutoEnrolmentActivity), options.TenantIdentifier);
+                options.HasRandomAllocationExecuted = await context.CallActivityAsync<bool>(nameof(DoAutoEnrolmentActivity), options);
                 result = await context.CallActivityAsync<string>(nameof(DoCorrespondenceActivity), options);
                 break;
             case DurableActivity.DoBringForwardEnrolments:
-                result = await context.CallActivityAsync<string>(nameof(DoBringForwardEnrolmentsActivity), options.TenantIdentifier);
+                result = await context.CallActivityAsync<string>(nameof(DoBringForwardEnrolmentsActivity), options);
                 break;
             case DurableActivity.DoSendRequestedLeaderReports:
                 result = await context.CallActivityAsync<string>(nameof(DoSendRequestedLeaderReportsActivity), options);
                 break;
             case DurableActivity.DoMembershipAlertsEmail:
-                result = await context.CallActivityAsync<string>(nameof(DoMembershipAlertsEmailActivity), options.TenantIdentifier);
+                result = await context.CallActivityAsync<string>(nameof(DoMembershipAlertsEmailActivity), options);
                 break;
             case DurableActivity.DoProcessQueuedDocuments:
                 result = await context.CallActivityAsync<string>(nameof(DoProcessQueuedDocumentsActivity), options);
                 break;
             case DurableActivity.DoCreateAttendance:
-                result = await context.CallActivityAsync<string>(nameof(DoCreateAttendanceActivity), options.TenantIdentifier);
+                result = await context.CallActivityAsync<string>(nameof(DoCreateAttendanceActivity), options);
                 break;
             case DurableActivity.DoBuildSchedule:
-                result = await context.CallActivityAsync<string>(nameof(DoBuildScheduleActivity), options.TenantIdentifier);
+                result = await context.CallActivityAsync<string>(nameof(DoBuildScheduleActivity), options);
                 break;
             case DurableActivity.DoDatabaseCleanup:
-                result = await context.CallActivityAsync<string>(nameof(DoDatabaseCleanupActivity), options.TenantIdentifier);
+                result = await context.CallActivityAsync<string>(nameof(DoDatabaseCleanupActivity), options);
                 break;
         }
     }
@@ -153,7 +153,7 @@ public partial class DurableFunctions
     public async Task DoDailyProcedures(
         [TimerTrigger("0 0 17 * * *"
     //#if DEBUG
-              // , RunOnStartup=true
+               , RunOnStartup=true
     //#endif            
                 )]
                 TimerInfo myTimer,
