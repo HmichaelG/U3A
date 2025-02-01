@@ -48,18 +48,20 @@ public partial class DurableFunctions
         return $"{nameof(DoProcessQueuedDocumentsActivity)} completed.";
     }
 
-    [Function("DoCorrespondence")]
-    public static async Task<HttpResponseData> DoCorrespondence(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
-        [DurableClient] DurableTaskClient client,
-        FunctionContext executionContext)
+    [Function("DoProcessQueuedDocuments")]
+    public static async Task<HttpResponseData> DoProcessQueuedDocuments(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
+    [DurableClient] DurableTaskClient client,
+    FunctionContext executionContext)
     {
         var options = new U3AFunctionOptions(req)
         {
-            DurableActivity = DurableActivity.DoCorrespondence
+            DurableActivity = DurableActivity.DoProcessQueuedDocuments
         };
         return await ScheduleFunctionAsync(client, executionContext, req, options);
     }
+
+
 }
 
 

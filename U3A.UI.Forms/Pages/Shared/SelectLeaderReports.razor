@@ -2,55 +2,50 @@
 
 <MessageBox @ref="@messageBox" />
 <DxFormLayoutGroup Caption="Select Report" ColSpanMd="12">
-    @if (SingleReportOnly)
-    {
-        <DxRadioGroup Items="@reports"
-        @bind-Value="@selectedReport" />
-    }
-    else
-    {
-        <div class="col @($"col-{ColSpan}")">
-            <DxFormLayoutItem Caption="@(reports[0])" ColSpanMd="12">
-                <DxCheckBox @bind-Checked="@PrintLeaderReport" Alignment="CheckBoxContentAlignment.Right" />
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Class Contact List" ColSpanMd="12">
-                <DxCheckBox @bind-Checked="@PrintClassList" Alignment="CheckBoxContentAlignment.Right" />
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="In Case of Emergency List" ColSpanMd="12">
-                <DxCheckBox @bind-Checked="@PrintICEList" Alignment="CheckBoxContentAlignment.Right" />
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Attendance Record" ColSpanMd="12">
-                <DxCheckBox @bind-Checked="@PrintAttendanceRecord" Alignment="CheckBoxContentAlignment.Right" />
-            </DxFormLayoutItem>
-        </div>
-        <div class="col @($"col-{ColSpan}")">
-            <DxFormLayoutItem Caption="Attendance Analysis" ColSpanMd="12">
-                <DxCheckBox @bind-Checked="@PrintAttendanceAnalysis" Alignment="CheckBoxContentAlignment.Right" />
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Member Badges" ColSpanMd="12">
-                <DxCheckBox @bind-Checked="@PrintMemberBadges" Alignment="CheckBoxContentAlignment.Right" />
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Class CSV file" ColSpanMd="12">
-                <DxCheckBox @bind-Checked="@PrintCSVFile" Alignment="CheckBoxContentAlignment.Right" />
-            </DxFormLayoutItem>
-        </div>
-    }
+    <div class="col @($"col-{ColSpan}")">
+        <DxFormLayoutItem Caption="Leader Report" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintLeaderReport" Alignment="CheckBoxContentAlignment.Right" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Class Contact List" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintClassList" Alignment="CheckBoxContentAlignment.Right" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="In Case of Emergency List" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintICEList" Alignment="CheckBoxContentAlignment.Right" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Attendance Record" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintAttendanceRecord" Alignment="CheckBoxContentAlignment.Right" />
+        </DxFormLayoutItem>
+    </div>
+    <div class="col @($"col-{ColSpan}")">
+        <DxFormLayoutItem Caption="Attendance Analysis" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintAttendanceAnalysis" Alignment="CheckBoxContentAlignment.Right" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Member Badges" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintMemberBadges" Alignment="CheckBoxContentAlignment.Right" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Class CSV file" ColSpanMd="12">
+            <DxCheckBox @bind-Checked="@PrintCSVFile" Alignment="CheckBoxContentAlignment.Right" />
+        </DxFormLayoutItem>
+    </div>
 </DxFormLayoutGroup>
-@if (SingleReportOnly)
+@if (AllowPrintAndEmail)
 {
-    <DxButton Text="Print Report" IconCssClass="bi bi-print menu-icon" CssClass="col col-12"
-    Enabled="@AreSelectionsMade"
-    RenderStyle="ButtonRenderStyle.Primary" Click="@DoPrintAsync" />
+    <DxButton Text="Print Report" IconCssClass="bi bi-printer menu-icon" CssClass="col col-12 mb-1"
+              Enabled="@AreSelectionsMade"
+              RenderStyle="ButtonRenderStyle.Primary" Click="@DoPrintAsync" />
 }
-else
-{
-    <DxButton Text="Queue Report(s) for email" IconCssClass="bi bi-envelope menu-icon" CssClass="col col-12"
-    Enabled="@AreSelectionsMade"
-    RenderStyle="ButtonRenderStyle.Primary" Click="@DoMailAsync" />
-}
+<DxButton Text="Queue Report(s) for email" IconCssClass="bi bi-envelope menu-icon" CssClass="col col-12"
+          Enabled="@AreSelectionsMade"
+          RenderStyle="ButtonRenderStyle.Primary" Click="@DoMailAsync" />
+
+
 @code {
     [Parameter]
-    public bool SingleReportOnly { get; set; }
+    public EventCallback QueueSelectedReports { get; set; }
+    [Parameter]
+    public EventCallback PrintSelectedReports { get; set; }
+    [Parameter]
+    public bool AllowPrintAndEmail { get; set; }
     [Parameter]
     public int ColSpan { get; set; } = 12;
 
@@ -79,16 +74,20 @@ else
                                             "Attendance Record",
                                             "Attendance Analysis",
                                             "Member Badges"};
-    string selectedReport = reports[0];
-
-    [Parameter]
-    public EventCallback<PortalMenuSelection> OnQueueReportsSelected { get; set; }
+    string selectedReport;
 
     async void DoMailAsync()
     {
-        InvokeAsync(StateHasChanged); await OnQueueReportsSelected.InvokeAsync();
+        //if (!SetupReports()) return;
+        InvokeAsync(StateHasChanged); await QueueSelectedReports.InvokeAsync();
     }
     async void DoPrintAsync()
+    {
+        //if (!SetupReports()) return;
+        InvokeAsync(StateHasChanged); await PrintSelectedReports.InvokeAsync();
+    }
+
+    bool SetupReports()
     {
         PrintLeaderReport = false;
         PrintClassList = false;
@@ -107,9 +106,9 @@ else
              !PrintAttendanceRecord &&
              !PrintAttendanceAnalysis && !PrintMemberBadges)
         {
-            await messageBox.ShowOkOnlyAsync("Select Report", "A report must be selected.");
+            messageBox.ShowOkOnlyAsync("Select Report", "A report must be selected.");
+            return false;
         }
-        else { InvokeAsync(StateHasChanged); await OnQueueReportsSelected.InvokeAsync(); }
+        return true;
     }
-
 }

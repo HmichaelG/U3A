@@ -1139,7 +1139,7 @@ else
             var reason = "Full";
             if (!selectedClass.Course.AllowAutoEnrol) reason = "Closed";
             var extendedReason = "Full";
-            if (!selectedClass.Course.AllowAutoEnrol) extendedReason = "Closed.<br/>A closed class means the leader has requested that new enrolments be suspended";
+            if (!selectedClass.Course.AllowAutoEnrol) extendedReason = "Closed.<br/>A closed class is one in which new enrolments are currently suspended";
             result = $@"<div class='alert alert-danger text-dark text-center'><h5>Class is {reason}</h5>
                         You have requested enrolment in a class that is {extendedReason}.<br/>
                         Your request will be <strong>Waitlisted</strong> meaning you will

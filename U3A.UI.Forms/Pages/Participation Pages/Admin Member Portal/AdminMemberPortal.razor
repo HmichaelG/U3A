@@ -8,6 +8,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using U3A.UI.Forms.Pages.MembersPortal
 @using U3A.UI.Forms.Pages.Identity
+@using U3A.UI.Forms
 
 @implements IDisposable
 
@@ -217,7 +218,7 @@ else
                             break;
 
                         case buttonClicks.AdminLeaderReport:
-                            <AdminLeaderReport />
+                            <LeaderReport Title="Print/Email Leader Reports" AllowPrintAndEmail="true" AllowMultipleSelection="false"  />
                             break;
                     }
 
