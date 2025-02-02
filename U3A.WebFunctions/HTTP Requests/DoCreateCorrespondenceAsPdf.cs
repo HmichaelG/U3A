@@ -37,8 +37,11 @@ public class DoCreateCorrespondenceAsPdf
         {
             using var reader = new StreamReader(req.Body);
             var body = await reader.ReadToEndAsync();
-            printDoc = JsonSerializer.Deserialize<SendMail>(body);
-            options.PrintDoc = printDoc;
+            if (!string.IsNullOrEmpty(body))
+            {
+                printDoc = JsonSerializer.Deserialize<SendMail>(body);
+                options.PrintDoc = printDoc;
+            }
         }
         Byte[]? pdf = await CreateMailPreview(options);
         var response = req.CreateResponse(HttpStatusCode.OK);
