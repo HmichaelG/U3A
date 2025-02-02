@@ -78,28 +78,17 @@
 
     async void DoMailAsync()
     {
-        //if (!SetupReports()) return;
+        if (!SetupReports()) return;
         InvokeAsync(StateHasChanged); await QueueSelectedReports.InvokeAsync();
     }
     async void DoPrintAsync()
     {
-        //if (!SetupReports()) return;
+        if (!SetupReports()) return;
         InvokeAsync(StateHasChanged); await PrintSelectedReports.InvokeAsync();
     }
 
     bool SetupReports()
     {
-        PrintLeaderReport = false;
-        PrintClassList = false;
-        PrintICEList = false;
-        PrintAttendanceRecord = false;
-        PrintAttendanceAnalysis = false;
-        if (selectedReport == reports[0]) PrintLeaderReport = true;
-        if (selectedReport == reports[1]) PrintClassList = true;
-        if (selectedReport == reports[2]) PrintICEList = true;
-        if (selectedReport == reports[3]) PrintAttendanceRecord = true;
-        if (selectedReport == reports[4]) PrintAttendanceAnalysis = true;
-        if (selectedReport == reports[5]) PrintMemberBadges = true;
         if (!PrintLeaderReport &&
              !PrintClassList &&
              !PrintICEList &&

@@ -45,5 +45,6 @@ public class U3AFunctionOptions
     public bool HasRandomAllocationExecuted { get; set; } = false;
     public bool IsDailyProcedure { get; set; } = false;
     public List<Guid> IdToProcess { get; set; } = new();
+    public SendMail? PrintDoc { get; set; } = null; // Dummy SendMail containing Leader Report print options
 }
 

@@ -367,16 +367,22 @@ namespace U3A.BusinessRules
                 AddContact(c, CourseContactType.Leader, c.Leader);
                 AddContact(c, CourseContactType.Leader, c.Leader2);
                 AddContact(c, CourseContactType.Leader, c.Leader3);
-                foreach (var clerk in clerks.OrderBy(x => x.FullNameAlpha))
+                if (clerks != null && clerks.Count > 0)
                 {
-                    AddContact(c, CourseContactType.Clerk, clerk);
+                    foreach (var clerk in clerks)
+                    {
+                        if (clerk != null) { AddContact(c, CourseContactType.Clerk, clerk); }
+                    }
                 }
             }
             else
             {
-                foreach (var clerk in clerks)
+                if (clerks != null && clerks.Count > 0)
                 {
-                    AddContact(c, CourseContactType.Clerk, clerk);
+                    foreach (var clerk in clerks)
+                    {
+                        if (clerk != null) { AddContact(c, CourseContactType.Clerk, clerk); }
+                    }
                 }
                 if (c.CourseContacts.Count <= 0)
                 {

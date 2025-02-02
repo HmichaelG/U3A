@@ -31,6 +31,15 @@ public class DoCreateCorrespondenceAsPdf
     {
         log.LogInformation("C# HTTP trigger function processed a request.");
         var options = new U3AFunctionOptions(req);
+        // retrieve SendMail from request body json text
+        SendMail? printDoc = null;
+        if (req.Body != null)
+        {
+            using var reader = new StreamReader(req.Body);
+            var body = await reader.ReadToEndAsync();
+            printDoc = JsonSerializer.Deserialize<SendMail>(body);
+            options.PrintDoc = printDoc;
+        }
         Byte[]? pdf = await CreateMailPreview(options);
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "application/pdf");
@@ -52,14 +61,19 @@ public class DoCreateCorrespondenceAsPdf
         (Guid, Guid, Guid?) onFileKey;
         var reportFactory = new ProFormaReportFactory(tenant, log, IsPreview: true);
         var enrolments = new List<Enrolment>();
+        List<SendMail> mailItems = new();
         using (var dbc = new U3ADbContext(tenant))
         {
             using (var dbcT = new TenantDbContext(cn))
             {
-                var mailItems = await dbc.SendMail.IgnoreQueryFilters()
+                if (options.PrintDoc is not null) { mailItems.Add(options.PrintDoc); }
+                else
+                {
+                    mailItems = await dbc.SendMail.IgnoreQueryFilters()
                                          .Include(x => x.Person)
                                          .Where(x => !x.Person.IsDeleted &&
                                                          options.IdToProcess.Contains(x.ID)).ToListAsync();
+                }
                 var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant.Identifier!);
                 foreach (SendMail sm in mailItems)
                 {
@@ -169,7 +183,8 @@ public class DoCreateCorrespondenceAsPdf
                                       course!.ID,
                                       "U3A Report Package",
                                      course.Name,
-                                     sm.Person, enrolments!.OrderBy(x => x.IsWaitlisted)
+                                     sm.Person ?? dbc.Person.Find(sm.PersonID) ?? new Person(),
+                                     enrolments!.OrderBy(x => x.IsWaitlisted)
                                                                  .ThenBy(x => x.Person.LastName)
                                                                  .ThenBy(x => x.Person.FirstName).ToArray());
                             }

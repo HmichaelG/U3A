@@ -34,16 +34,16 @@ else
             <h3>@Title</h3>
             <p>Queue Class reports for selected courses/leaders.</p>
             <CollapsableContent DismissKey="{40D384A9-AA9E-49AD-8F70-BA65C97ACF0D}"
-            AlertText=@(@"<p><strong>Leader Reports</strong> is now an automated procedure.<br />
+                                AlertText=@(@"<p><strong>Leader Reports</strong> is now an automated procedure.<br />
                         All reports are automatically sent to leaders one day prior (Sunday) to the
                         start of term.</p>")
-            OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
-            OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+                                OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+                                OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
             <DxFormLayout>
                 <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
                     <TermsComboBox Terms="@terms"
-                    @bind-SelectedTerm="@selectedTerm"
-                    @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+                                   @bind-SelectedTerm="@selectedTerm"
+                                   @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
                 </DxFormLayoutItem>
             </DxFormLayout>
             <br />
@@ -57,15 +57,15 @@ else
                     <FullScreen DisplayOffset="@contentSize">
                         <ContentTemplate>
                             <DxGrid Data="@Classes" @ref=@mainGrid
-                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                            ShowFilterRow="false"
-                            ShowAllRows="true"
-                            KeyFieldName="ID"
-                            SelectionMode="@((AllowMultipleSelection) ? GridSelectionMode.Multiple : GridSelectionMode.Single)"
-                            UnboundColumnData="Grid_CustomUnboundColumnData"
-                            SelectedDataItemChanged="OnSelectedDataItemChanged"
-                            @bind-SelectedDataItems="SelectedDataItems"
-                            ValidationEnabled="true">
+                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                    ShowFilterRow="false"
+                                    ShowAllRows="true"
+                                    KeyFieldName="ID"
+                                    SelectionMode="@((AllowMultipleSelection) ? GridSelectionMode.Multiple : GridSelectionMode.Single)"
+                                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                                    SelectedDataItemChanged="OnSelectedDataItemChanged"
+                                    @bind-SelectedDataItems="SelectedDataItems"
+                                    ValidationEnabled="true">
                                 <ToolbarTemplate>
                                     <GridToolbar LinkedGrid=@mainGrid LayoutKey="{3607602E-7BF7-40D9-9D42-B3DEA3BCC287}" />
                                 </ToolbarTemplate>
@@ -77,11 +77,11 @@ else
                                     <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
                                     <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
                                     <DxGridDataColumn Caption="Send To 1" FieldName="Recipient0"
-                                    UnboundType="GridUnboundColumnType.String" Width="10rem" />
+                                                      UnboundType="GridUnboundColumnType.String" Width="10rem" />
                                     <DxGridDataColumn Caption="Send To 2" FieldName="Recipient1"
-                                    UnboundType="GridUnboundColumnType.String" />
+                                                      UnboundType="GridUnboundColumnType.String" />
                                     <DxGridDataColumn Caption="Send To 3" FieldName="Recipient2"
-                                    UnboundType="GridUnboundColumnType.String" />
+                                                      UnboundType="GridUnboundColumnType.String" />
                                 </Columns>
                                 <TotalSummary>
                                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
@@ -93,8 +93,8 @@ else
                 </div>
                 <div class="col col-3">
                     <SelectLeaderReports @ref=@rptSelect AllowPrintAndEmail="@AllowPrintAndEmail"
-                    AreSelectionsMade="@AreSelectionsMade" PrintSelectedReports="OnPrintReportsAsync"
-                    QueueSelectedReports="OnQueueReportsSelected" />
+                                         AreSelectionsMade="@AreSelectionsMade" PrintSelectedReports="OnPrintReportsAsync"
+                                         QueueSelectedReports="OnQueueReportsSelected" />
                 </div>
             </DxFormLayout>
         </div>
@@ -189,34 +189,50 @@ else
         }
         if (await IsDataOk(recipients, enrolments))
         {
-            var Leader = (recipients.Count > 0) ? recipients[0] : new Person();
-            bool isPreview = true;
-            var reportFactory = new ProFormaReportFactory(Logger, Environment, U3Adbfactory, isPreview);
-            var status = await reportFactory.CreateLeaderReports(
-                 rptSelect.PrintLeaderReport,
-                 rptSelect.PrintAttendanceRecord,
-                 rptSelect.PrintClassList,
-                 rptSelect.PrintICEList,
-                 rptSelect.PrintCSVFile,
-                 rptSelect.PrintAttendanceAnalysis,
-                 rptSelect.PrintMemberBadges,
-                 Course.ID,
-                 "U3A Report Package",
-                 Course.Name,
-                 Leader, enrolments.OrderBy(x => x.IsWaitlisted)
-                                             .ThenBy(x => x.Person.LastName)
-                                             .ThenBy(x => x.Person.FirstName).ToArray());
-            var pdfFilename = reportFactory.CreatePostalPDF();
-            if (pdfFilename != null)
-            {
-                pdfPath = Path.Combine(reportFactory.ReportStorage.TempDirectory, pdfFilename);
-                pdfContent = File.ReadAllBytes(pdfPath);
-                showPDF = true;
-                InvokeAsync(StateHasChanged);
-            }
+            // create a dummy SendMail object
+            var printDoc = new SendMail()
+                {
+                    ID = Guid.NewGuid(),
+                    DocumentName = "U3A Leaders Reports",
+                    PersonID = Class.LeaderID ?? Class.Leader2ID ?? Class.Leader3ID ?? Guid.Empty,
+                    TermID = selectedTerm.ID,
+                    PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
+                    PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
+                    PrintClassList = rptSelect.PrintClassList,
+                    PrintCSVFile = rptSelect.PrintCSVFile,
+                    PrintICEList = rptSelect.PrintICEList,
+                    PrintLeaderReport = rptSelect.PrintLeaderReport,
+                    PrintMemberBadges = rptSelect.PrintMemberBadges,
+                    RecordKey = Class.ID,
+                    IsUserRequested = true
+                };
+            await ProcessPrintDocAsync(printDoc);
         }
         await ProgressBar.Close();
     }
+
+    async Task ProcessPrintDocAsync(SendMail printDoc)
+    {
+        using (var client = new APIClient())
+        {
+            try
+            {
+                pdfContent = await client.DoCreateCorrespondenceAsPdf(dbc.TenantInfo.Identifier, printDoc);
+                showPDF = true;
+            }
+            catch (HttpRequestException e)
+            {
+                await messageBox.ShowOkOnlyAsync("Internet Issue", $@"<p>An Internet issue is currently preventing you mail from being processed.<br/>
+                                        Keep trying, but if you do not receive a successful response shortly (say 5 minutes), contact your U3A.</p>
+                {e.Message}");
+            }
+            catch (Exception ex)
+            {
+                await messageBox.ShowOkOnlyAsync("Procedure Exception", ex.Message);
+            }
+        }
+    }
+
 
     async Task<bool> IsDataOk(IEnumerable<Person> p, IEnumerable<Enrolment> e)
     {
@@ -290,7 +306,7 @@ else
             {
                 result = $@"<p>An Internet issue is currently preventing you mail from being processed.<br/>
                                         We'll keep trying. If you do not receive your mail within the hour, contact your U3A.</p>
-                        {e.Message}";
+                    {e.Message}";
                 await SetStatus(IdsToSend, ""); // clear the status to allow retry
             }
             catch (Exception ex)

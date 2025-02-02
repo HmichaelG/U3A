@@ -56,10 +56,19 @@ public class APIClient : APIClientBase
     {
         return await sendAPIRequestAsync(DurableActivity.DoDatabaseCleanup, tenant);
     }
-    public async Task<Byte[]> DoCreateCorrespondenceAsPdf(string tenant, IEnumerable<Guid> ProcessID = null)
+    public async Task<Byte[]> DoCreateCorrespondenceAsPdf(string tenant, SendMail printDoc)
+    {
+        return await DoCreateCorrespondenceAsPdf(tenant, null, printDoc);
+    }
+    public async Task<Byte[]> DoCreateCorrespondenceAsPdf(string tenant, 
+                                IEnumerable<Guid> ProcessID = null, SendMail printDoc = null)
     {
         var functionName = nameof(DoCreateCorrespondenceAsPdf);
         var request = new HttpRequestMessage(HttpMethod.Get, ConstructQuery(functionName, tenant, ProcessID));
+        if (printDoc != null)
+        {
+            request.Content = new StringContent(JsonSerializer.Serialize(printDoc), System.Text.Encoding.UTF8, "application/json");
+        }
         var response = await GetPdfReportAsync(request);
         if (response.Length == 0)
         {

@@ -257,7 +257,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                         Person Leader, Enrolment[] Enrolments)
         {
             var result = string.Empty;
-
+            (var enrolmentDetails,var leaderDetails, var settings, var term) = await GetEnrolmentDetails(Leader, Enrolments);
             var createdFilenames = new List<string>();
             var reportNames = new List<string>();
             if (DoLeaderReport || !(Enrolments.Where(x => !x.IsWaitlisted).Any()))
@@ -270,7 +270,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                     using (var leaderReportProForma = new LeaderReport())
                     {
                         log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
-                        var filename = await CreateLeaderReportAsync(leaderReportProForma, Leader, Enrolments);
+                        var filename = await CreateLeaderReportAsync(leaderReportProForma,settings,term,leaderDetails,enrolmentDetails.AsEnumerable());
                         if (!string.IsNullOrWhiteSpace(filename))
                         {
                             createdFilenames.Add(filename);
@@ -297,9 +297,8 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                         {
                             log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderAttendanceList,
-                                                    Leader, Enrolments
-                                                                .Where(x => !x.IsWaitlisted && !x.isLeader)
-                                                                .ToArray());
+                                                    settings, term, leaderDetails, 
+                                                    enrolmentDetails.Where(x => !x.EnrolmentIsWaitlisted && !x.EnrolmentIsLeader));
                             if (!string.IsNullOrWhiteSpace(filename))
                             {
                                 createdFilenames.Add(filename);
@@ -323,8 +322,9 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                         using (var leaderClassList = new LeaderClassList())
                         {
                             log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
-                            var filename = await CreateLeaderReportAsync(leaderClassList,
-                                                    Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray());
+                            var filename = await CreateLeaderReportAsync(leaderClassList, 
+                                                        settings, term, leaderDetails, 
+                                                        enrolmentDetails.Where(x => !x.EnrolmentIsWaitlisted));
                             if (!string.IsNullOrWhiteSpace(filename))
                             {
                                 createdFilenames.Add(filename);
@@ -349,7 +349,8 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                         {
                             log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderICEList,
-                                                    Leader, Enrolments.Where(x => !x.IsWaitlisted).ToArray());
+                                                        settings, term, leaderDetails,
+                                                        enrolmentDetails.Where(x => !x.EnrolmentIsWaitlisted));
                             if (!string.IsNullOrWhiteSpace(filename))
                             {
                                 createdFilenames.Add(filename);
@@ -472,7 +473,8 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
         {
             using (var leaderReportProForma = new LeaderReport())
             {
-                var report = await CreateLeaderReportAsync(leaderReportProForma, Leader, Enrolments);
+                (var enrolmentDetails, var leaderDetails, var settings, var term) = await GetEnrolmentDetails(Leader, Enrolments);
+                var report = await CreateLeaderReportAsync(leaderReportProForma, settings, term, leaderDetails, enrolmentDetails);
                 return await ProcessLeaderReport(Leader,
                                 "U3A Leader's Report",
                                 CourseName,
@@ -511,42 +513,16 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             if (U3AdbFactory != null) report.U3Adbfactory = U3AdbFactory;
             if (dbc != null) report.DbContext = dbc;
             report.Parameters["prmCourseID"].Value = CourseID;
-            report.CreateDocument();
             string pdfFilename = GetTempPdfFile();
             report.ExportToPdf(pdfFilename);
             return pdfFilename;
         }
         async Task<string> CreateLeaderReportAsync(XtraReport report,
-                Person Leader,
-                Enrolment[] Enrolments)
+                SystemSettings settings,
+                Term term,
+                IEnumerable<LeaderDetail> leaderDetail,
+                IEnumerable<EnrolmentDetail> enrolmentDetails)
         {
-            if (Enrolments.Length == 0) { return string.Empty; }
-            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-            var term = dbc.Term.Find(Enrolments[0].TermID);
-            var leaderDetail = BusinessRule.GetLeaderDetail(settings, Leader, term);
-            var enrolmentDetails = new List<EnrolmentDetail>();
-            var totalEnrolled = 0.00;
-            var totalWaitListed = 0.00;
-            bool isMultiCampus = false;
-            foreach (var enrolment in Enrolments)
-            {
-                if (enrolment.Person != null && enrolment.Person.IsMultiCampusVisitor) { isMultiCampus = true; }
-                if (enrolment.IsWaitlisted) { totalWaitListed++; } else { totalEnrolled++; }
-                enrolmentDetails.AddRange(await BusinessRule.GetEnrolmentDetailAsync(dbc, enrolment));
-                }
-            log.LogInformation($"Enrolment details: {sw.Elapsed}");
-            if (isMultiCampus)
-            {   // we need to recalculate totals
-                foreach (var ed in enrolmentDetails)
-                {
-                    ed.CourseTotalActiveStudents = (int)totalEnrolled;
-                    ed.CourseTotalWaitlistedStudents = (int)totalWaitListed;
-                    if (ed.CourseMaximumStudents > 0)
-                    {
-                        ed.CourseParticipationRate = (totalEnrolled + totalWaitListed) / (double)ed.CourseMaximumStudents;
-                    }
-                }
-            }
             var dataSources = DataSourceManager.GetDataSources<ObjectDataSource>(
                 report: report,
                 includeSubReports: true
@@ -564,6 +540,40 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             report.ExportToPdf(pdfFilename);
             log.LogInformation($"Document exported: {sw.Elapsed}");
             return pdfFilename;
+        }
+
+        private async Task<(IEnumerable<EnrolmentDetail>,IEnumerable<LeaderDetail>, SystemSettings,Term)> GetEnrolmentDetails(Person Leader, Enrolment[] Enrolments)
+        {
+            List<EnrolmentDetail> enrolmentDetails = new();
+            List<LeaderDetail> leaderDetails = new();
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+            var term = dbc.Term.Find(Enrolments[0].TermID);
+            if (Enrolments.Length == 0) { return (enrolmentDetails,leaderDetails, settings,term); }
+
+            leaderDetails = BusinessRule.GetLeaderDetail(settings, Leader, term);
+            enrolmentDetails = new List<EnrolmentDetail>();
+            var totalEnrolled = 0.00;
+            var totalWaitListed = 0.00;
+            bool isMultiCampus = false;
+            foreach (var enrolment in Enrolments)
+            {
+                if (enrolment.Person != null && enrolment.Person.IsMultiCampusVisitor) { isMultiCampus = true; }
+                if (enrolment.IsWaitlisted) { totalWaitListed++; } else { totalEnrolled++; }
+                enrolmentDetails.AddRange(await BusinessRule.GetEnrolmentDetailAsync(dbc, enrolment));
+            }
+            if (isMultiCampus)
+            {   // we need to recalculate totals
+                foreach (var ed in enrolmentDetails)
+                {
+                    ed.CourseTotalActiveStudents = (int)totalEnrolled;
+                    ed.CourseTotalWaitlistedStudents = (int)totalWaitListed;
+                    if (ed.CourseMaximumStudents > 0)
+                    {
+                        ed.CourseParticipationRate = (totalEnrolled + totalWaitListed) / (double)ed.CourseMaximumStudents;
+                    }
+                }
+            }
+            return (enrolmentDetails,leaderDetails,settings,term);
         }
 
         async Task<string> ProcessLeaderReport(Person Leader,
