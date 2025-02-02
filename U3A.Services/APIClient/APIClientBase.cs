@@ -18,6 +18,35 @@ using Microsoft.AspNetCore.Http;
 
 namespace U3A.Services.APIClient;
 
+public class U3AFunctionsHttpClient
+{
+    private const string variableName = "U3A-FUNCTIONS-KEY";
+    private static string _authToken = string.Empty;
+    private static readonly string _apiBaseAddress = (constants.IS_DEVELOPMENT)
+            ? "http://localhost:7071/api/"
+            : "https://u3a-functions.azurewebsites.net/api/"
+            ;
+    private static readonly Lazy<HttpClient> lazyHttpClient = new Lazy<HttpClient>(() => new HttpClient());
+
+    private U3AFunctionsHttpClient()
+    {
+    }
+
+    public static HttpClient Instance()
+    {
+        if (lazyHttpClient.Value.BaseAddress == null)
+        {
+            _authToken = Environment.GetEnvironmentVariable(variableName);
+            lazyHttpClient.Value.BaseAddress = new Uri(_apiBaseAddress);
+            // Add authentication headers if needed
+            if (!string.IsNullOrEmpty(_authToken))
+            {
+                lazyHttpClient.Value.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _authToken);
+            }
+        }
+        return lazyHttpClient.Value;
+    }
+}
 public abstract class APIClientBase : IDisposable
 {
     readonly HttpClient _httpClient;
@@ -25,18 +54,7 @@ public abstract class APIClientBase : IDisposable
     internal readonly string _apiBaseAddress;
     public APIClientBase()
     {
-        _httpClient = new HttpClient();
-        _authToken = string.Empty;
-        _apiBaseAddress = (constants.IS_DEVELOPMENT)
-            ? "http://localhost:7071/api/"
-            : "https://u3a-functions.azurewebsites.net/api/"
-            ;
-        _httpClient.BaseAddress = new Uri(_apiBaseAddress);
-        // Add authentication headers if needed
-        if (!string.IsNullOrEmpty(_authToken))
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _authToken);
-        }
+        _httpClient = U3AFunctionsHttpClient.Instance();
     }
 
     internal async Task<string> sendAPIRequestAsync(DurableActivity durableActivity, string tenant)
@@ -65,8 +83,7 @@ public abstract class APIClientBase : IDisposable
     internal async Task<string> SendAsync(HttpRequestMessage requestMessage)
     {
         var responseBody = string.Empty;
-        _httpClient.DefaultRequestHeaders.Accept.Clear();
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        AddJsonMediaType();
         HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode(); // Throw if not a success code.
         responseBody = await response.Content.ReadAsStringAsync();
@@ -75,8 +92,7 @@ public abstract class APIClientBase : IDisposable
     internal async Task<Byte[]> GetPdfReportAsync(HttpRequestMessage requestMessage)
     {
         Byte[] pdf = null;
-        _httpClient.DefaultRequestHeaders.Accept.Clear();
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        AddJsonMediaType();
         HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode(); // Throw if not a success code.
         pdf = await response.Content.ReadAsByteArrayAsync();
@@ -102,9 +118,14 @@ public abstract class APIClientBase : IDisposable
         return query;
     }
 
+    private void AddJsonMediaType()
+    {
+        _httpClient.DefaultRequestHeaders.Accept.Clear();
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    }
+
     public void Dispose()
     {
-        if (_httpClient != null) { _httpClient.Dispose(); }
     }
 
 }
