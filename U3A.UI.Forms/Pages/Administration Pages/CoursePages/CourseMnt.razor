@@ -281,7 +281,7 @@ else
         try
         {
             var client = new APIClient();
-            msg = "The rebuild of the Class Schedule cache Has been scheduled for immediate execution. It will take a few seconds to complete.";
+            msg = "The rebuild of the Class Schedule cache has been scheduled for immediate execution. It will take a few seconds to complete.";
             await client.DoBuildSchedule(dbc.TenantInfo.Identifier);
         }
         catch (HttpRequestException e)
