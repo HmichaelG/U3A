@@ -1,5 +1,4 @@
-﻿@implements IAsyncDisposable
-
+﻿
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
@@ -1229,32 +1228,4 @@ else
         }
     }
 
-    async Task DoAutoEnrolment()
-    {
-        // just fire and forget
-        try
-        {
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-            {
-                if (loginState.SelectedPerson != null)
-                {
-                    var tenant = dbc.TenantInfo.Identifier;
-                    var client = new APIClient();
-                    List<Guid> mailIds = dbc.SendMail.Where(x => x.PersonID == loginState.SelectedPerson.ID).Select(x => x.ID).ToList();
-                    if (mailIds.Count > 0)
-                    {
-                        await client.DoCorrespondence(tenant, mailIds);
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (isAutoEnrolmentRequired) { await DoAutoEnrolment(); }
-    }
 }
