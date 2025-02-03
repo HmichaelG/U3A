@@ -21,7 +21,6 @@ namespace U3A.Services.APIClient;
 public class U3AFunctionsHttpClient
 {
     private const string variableName = "U3A-FUNCTIONS-KEY";
-    private static string _authToken = string.Empty;
     private static readonly string _apiBaseAddress = (constants.IS_DEVELOPMENT)
             ? "http://localhost:7071/api/"
             : "https://u3a-functions.azurewebsites.net/api/"
@@ -34,24 +33,23 @@ public class U3AFunctionsHttpClient
 
     public static HttpClient Instance()
     {
-        if (lazyHttpClient.Value.BaseAddress == null)
+        var client = lazyHttpClient.Value;
+        if (client.BaseAddress == null)
         {
-            _authToken = Environment.GetEnvironmentVariable(variableName);
-            lazyHttpClient.Value.BaseAddress = new Uri(_apiBaseAddress);
+            var authToken = Environment.GetEnvironmentVariable(variableName);
+            client.BaseAddress = new Uri(_apiBaseAddress);
             // Add authentication headers if needed
-            if (!string.IsNullOrEmpty(_authToken))
+            if (!string.IsNullOrEmpty(authToken))
             {
-                lazyHttpClient.Value.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _authToken);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             }
         }
-        return lazyHttpClient.Value;
+        return client;
     }
 }
 public abstract class APIClientBase : IDisposable
 {
     readonly HttpClient _httpClient;
-    readonly string _authToken;
-    internal readonly string _apiBaseAddress;
     public APIClientBase()
     {
         _httpClient = U3AFunctionsHttpClient.Instance();
