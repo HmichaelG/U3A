@@ -1,4 +1,6 @@
-﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@implements IAsyncDisposable
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
 @inject IJSRuntime js
@@ -14,6 +16,7 @@
 @using System.Text.RegularExpressions;
 @using Microsoft.Extensions.Logging
 @using System.Diagnostics
+@using U3A.Services.APIClient
 
 @attribute [Authorize]
 
@@ -114,9 +117,9 @@ else
                                         @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
-                                                        (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                                        ? $" | {c.Course.OfferedBy}" : "")
-                                                            )
+                                                                                        (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                                                        ? $" | {c.Course.OfferedBy}" : "")
+                                                                                            )
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
@@ -488,8 +491,10 @@ else
     bool showCourseFullWatermark = false;
     bool IsMobileLayout;
 
-    Person perosn;
+    Person person;
     bool isFinancial;
+    bool isAutoEnrolmentRequired = false;
+    string tenant;
     bool isNotInEnrolmentPeriod = false;
     bool IsReady = false;
     bool isDirty = false;
@@ -1077,6 +1082,7 @@ else
                         await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, Classes, settings);
                         await dbc.SaveChangesAsync();
                         await dbcT.SaveChangesAsync();
+                        isAutoEnrolmentRequired = true;
                     }
                     selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
                     foreach (var c in selectedClasses)
@@ -1223,4 +1229,32 @@ else
         }
     }
 
+    async Task DoAutoEnrolment()
+    {
+        // just fire and forget
+        try
+        {
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                if (loginState.SelectedPerson != null)
+                {
+                    var tenant = dbc.TenantInfo.Identifier;
+                    var client = new APIClient();
+                    List<Guid> mailIds = dbc.SendMail.Where(x => x.PersonID == loginState.SelectedPerson.ID).Select(x => x.ID).ToList();
+                    if (mailIds.Count > 0)
+                    {
+                        await client.DoCorrespondence(tenant, mailIds);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (isAutoEnrolmentRequired) { await DoAutoEnrolment(); }
+    }
 }

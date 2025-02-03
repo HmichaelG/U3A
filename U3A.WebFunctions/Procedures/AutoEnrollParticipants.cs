@@ -10,6 +10,7 @@ namespace U3A.WebFunctions.Procedures
     public static class AutoEnrollParticipants
     {
         public static async Task<bool> Process(TenantInfo tenant,
+                                            U3AFunctionOptions options,
                                             string tenantConnectionString,
                                             ILogger logger)
         {

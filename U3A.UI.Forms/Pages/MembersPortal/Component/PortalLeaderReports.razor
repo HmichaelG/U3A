@@ -22,8 +22,8 @@
             accordance with privacy law &amp; regulations in your State.
         </div>
         <SelectLeaderReports @ref=@rptSelect ColSpan="6"
-        AreSelectionsMade="@true"
-        QueueSelectedReports="OnQueueReportsSelected" />
+                             AreSelectionsMade="@true"
+                             QueueSelectedReports="OnQueueReportsSelected" />
     </DxFormLayoutGroup>
 </div>
 
@@ -101,25 +101,23 @@
                         };
                     dbc.Add(mail);
                     await dbc.SaveChangesAsync();
-                    using (var client = new APIClient())
+                    await SetStatus(dbc, mail.ID, "Queued");
+                    try
                     {
-                        await SetStatus(dbc, mail.ID, "Queued");
-                        try
-                        {
-                            await client.DoSendRequestedLeaderReports(dbc.TenantInfo.Identifier, new List<Guid> { mail.ID });
-                        }
-                        catch (HttpRequestException e)
-                        {
-                            result = $@"<p>An Internet issue is currently preventing you mail from being processed.</p>
+                        var client = new APIClient();
+                        await client.DoSendRequestedLeaderReports(dbc.TenantInfo.Identifier, new List<Guid> { mail.ID });
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        result = $@"<p>An Internet issue is currently preventing you mail from being processed.</p>
                                         We'll keep trying. If you do not receive your mail withing the hour, contact your U3A.</p>
-                                {e.Message}";
-                            await SetStatus(dbc, mail.ID, ""); // Clear the status to allow retry
-                        }
-                        catch (Exception ex)
-                        {
-                            mail.Status = ex.Message;
-                            await SetStatus(dbc, mail.ID, "Failed");
-                        }
+                            {e.Message}";
+                        await SetStatus(dbc, mail.ID, ""); // Clear the status to allow retry
+                    }
+                    catch (Exception ex)
+                    {
+                        mail.Status = ex.Message;
+                        await SetStatus(dbc, mail.ID, "Failed");
                     }
                 }
                 else { result = "<p>The selected reports could not be created because this course has no enrolments.</p>"; }
