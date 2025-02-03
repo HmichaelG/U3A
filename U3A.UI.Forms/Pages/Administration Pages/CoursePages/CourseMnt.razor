@@ -13,6 +13,7 @@
 @using U3A.UI.Forms.Pages.MembersPortal
 @using System.Reflection
 @using System.Text
+@using U3A.Services.APIClient
 
 
 @if (!IsReady)
@@ -267,14 +268,40 @@ else
     async Task OnRebuild()
     {
         await progressBar.ShowSmallSpinnerAsync();
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        // using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        // {
+        //     var tenant = await tenantService.GetTenantInfoAsync();
+        //     await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory, tenant.Identifier);
+        //     await progressBar.Close();
+        //     await InvokeAsync(StateHasChanged);
+        //     await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");
+        // }
+
+        using (var client = new APIClient())
         {
-            var tenant = await tenantService.GetTenantInfoAsync();
-            await BusinessRule.BuildScheduleAsync(dbc, TenantDbfactory, tenant.Identifier);
-            await progressBar.Close();
-            await InvokeAsync(StateHasChanged);
-            await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");
+            var msg = string.Empty;
+            try
+            {
+                msg = "Rebuild of the Class Schedule cache is in progress. It will take a few seconds to complete."; 
+                await client.DoBuildSchedule(dbc.TenantInfo.Identifier);
+            }
+            catch (HttpRequestException e)
+            {
+                msg = $@"<p>An Internet issue is currently preventing completion of this procedure.<br/>
+                                        Keep trying, but if you do not receive a successful response shortly (say 5 minutes), contact your U3A.</p>
+            {e.Message}";
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+            finally
+            {
+                await progressBar.Close();
+                await messageBox.ShowOkOnlyAsync("Class Schedule Cache", msg);
+            }
         }
+
     }
 
 
