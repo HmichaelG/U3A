@@ -22,7 +22,7 @@ namespace U3A.WebFunctions.Procedures
             using (var dbc = new U3ADbContext(tenant))
             {
                 dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-                var settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+                var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
                 var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 using (var dbcT = new TenantDbContext(tenantConnectionString))
                 {
@@ -32,10 +32,10 @@ namespace U3A.WebFunctions.Procedures
                     var utcTime = DateTime.UtcNow;
                     if (options.IdToProcess != null && options.IdToProcess.Count > 0)
                     {
-                        mailItems = dbc.SendMail.IgnoreQueryFilters()
+                        mailItems = await dbc.SendMail.IgnoreQueryFilters()
                                                 .Include(x => x.Person)
                                                 .Where(x => !x.Person.IsDeleted &&
-                                                                options.IdToProcess.Contains(x.ID)).ToList();
+                                                                options.IdToProcess.Contains(x.ID)).ToListAsync();
                         isAdHocReport = true; // generated via HTTP request
                     }
                     else
@@ -106,28 +106,28 @@ namespace U3A.WebFunctions.Procedures
                                                         .Where(x => !x.IsDeleted && x.ID == sm.PersonID).FirstOrDefaultAsync();
                                     var todayID = (int)today.DayOfWeek;
                                     int classOnDayID = -1;
-                                    if (dbc.Class.Any(x => x.ID == sm.RecordKey))
+                                    if (await dbc.Class.AnyAsync(x => x.ID == sm.RecordKey))
                                     {
-                                        enrolments = dbc.Enrolment.IgnoreQueryFilters()
+                                        enrolments = await dbc.Enrolment.IgnoreQueryFilters()
                                                             .Where(x => !x.IsDeleted && x.ClassID == sm.RecordKey
-                                                                   && x.TermID == sm.TermID).ToList();
+                                                                   && x.TermID == sm.TermID).ToListAsync();
                                         enrolments.AddRange(mcEnrolments
                                                             .Where(x => x.ClassID == sm.RecordKey && x.TermID == sm.TermID));
-                                        var Class = dbc.Class.Find(sm.RecordKey);
-                                        course = dbc.Course.Find(Class!.CourseID);
+                                        var Class = await dbc.Class.FindAsync(sm.RecordKey);
+                                        course = await dbc.Course.FindAsync(Class!.CourseID);
                                         classOnDayID = Class.OnDayID;
                                     }
                                     else
                                     {
-                                        course = dbc.Course.Find(sm.RecordKey);
+                                        course = await dbc.Course.FindAsync(sm.RecordKey);
                                         if (course != null)
                                         {
-                                            enrolments = dbc.Enrolment.IgnoreQueryFilters()
+                                            enrolments = await dbc.Enrolment.IgnoreQueryFilters()
                                                                 .Where(x => !x.IsDeleted && x.CourseID == course.ID
-                                                                                  && x.TermID == sm.TermID).ToList();
+                                                                                  && x.TermID == sm.TermID).ToListAsync();
                                             enrolments.AddRange(mcEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
                                                                                   && x.TermID == sm.TermID));
-                                            foreach (var c in dbc.Class.Where(x => x.CourseID == course.ID).OrderBy(x => x.OnDayID))
+                                            foreach (var c in await dbc.Class.Where(x => x.CourseID == course.ID).OrderBy(x => x.OnDayID).ToListAsync())
                                             {
                                                 if (c.OnDayID >= todayID) { classOnDayID = c.OnDayID; break; }
                                             }
@@ -149,6 +149,11 @@ namespace U3A.WebFunctions.Procedures
                                                                     options.HasRandomAllocationExecuted);
                                                 logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
                                             }
+                                        }
+                                        else 
+                                        {
+                                            logger.LogInformation($"{sm.DocumentName} already sent to: {leader.FullName}.");
+                                            sm.Status = "Accepted"; 
                                         }
                                     }
                                     else { sm.Status = "Enrolments not found."; }
@@ -198,7 +203,7 @@ namespace U3A.WebFunctions.Procedures
                             default:
                                 break;
                         }
-                        _ = await dbc.SaveChangesAsync();
+                        await dbc.SaveChangesAsync();
                     }
 
                     // process enrolments because they receive one email per member
@@ -206,17 +211,17 @@ namespace U3A.WebFunctions.Procedures
                     logger.LogInformation($"Processed {personEnrolments.Count} Participant Enrolment correspondence.");
                     foreach (var kvp in enrolmentResults)
                     {
-                        foreach (var sm in dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key))
+                        foreach (var sm in await dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key).ToListAsync())
                         {
-                            sm.Status = kvp.Value; 
+                            sm.Status = kvp.Value;
                         }
-                        foreach (var sm in dbcT.MultiCampusSendMail.Where(x => x.PersonID == kvp.Key))
+                        foreach (var sm in await dbcT.MultiCampusSendMail.Where(x => x.PersonID == kvp.Key).ToListAsync())
                         {
-                            sm.Status = kvp.Value; 
+                            sm.Status = kvp.Value;
                         }
                     }
-                    _ = await dbc.SaveChangesAsync();
-                    _ = await dbcT.SaveChangesAsync();
+                    await dbc.SaveChangesAsync();
+                    await dbcT.SaveChangesAsync();
 
                     var postalCount = reportFactory.PostalReports.Count;
                     if (postalCount > 0)
@@ -226,7 +231,7 @@ namespace U3A.WebFunctions.Procedures
                     }
                     // Delete expired records
                     dbc.RemoveRange(dbc.SendMail.AsEnumerable()
-                        .Where(x => (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
+                                            .Where(x => (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
                     dbcT.RemoveRange(dbcT.MultiCampusSendMail.AsEnumerable()
                         .Where(x => (today - x.CreatedOn.GetValueOrDefault()).Days > 30));
                     var deleted = dbc.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
@@ -235,8 +240,8 @@ namespace U3A.WebFunctions.Procedures
                     {
                         logger.LogInformation($"Deleted {deleted} correspondence queue records because they are more than 30 days old.");
                     }
-                    _ = await dbc.SaveChangesAsync();
-                    _ = await dbcT.SaveChangesAsync();
+                    await dbc.SaveChangesAsync();
+                    await dbcT.SaveChangesAsync();
                 }
             }
         }
