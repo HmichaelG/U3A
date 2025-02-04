@@ -535,10 +535,8 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                 else
                     ds.DataSource = enrolmentDetails;
             }
-            log.LogInformation($"Document created: {sw.Elapsed}");
             string pdfFilename = GetTempPdfFile();
             report.ExportToPdf(pdfFilename);
-            log.LogInformation($"Document exported: {sw.Elapsed}");
             return pdfFilename;
         }
 
