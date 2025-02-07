@@ -26,7 +26,7 @@ else
     <MessageBox @ref=@failedMessageBox>
         <TextTemplate>
             <p>
-                Your support request has failed reCAPTCHA evrification.
+                Your support request has failed reCAPTCHA verification.
                 If you are not a robot, please feel free to try again.
             </p>
         </TextTemplate>
@@ -44,8 +44,13 @@ else
                   Context="editContext">
             <h3>Request Support</h3>
             <p>
-                Please enter or confirm your contact details and provide a <strong>clear, succinct</strong>
+                You are valued & important. Please enter or confirm your contact details and provide a clear, concise
                 description of your issue.
+                </p>
+                <p>
+                A dedicated member from @(settings?.U3AGroup) will be in contact soon.
+                Please remember we are volunteers and thank you for your patience and understanding.
+                We ask that you remain courteous & respectful in your communication.                
             </p>
             <DataAnnotationsValidator />
             <DxFormLayout>
@@ -61,18 +66,17 @@ else
                 <DxFormLayoutItem Caption="Your Email Address" ColSpanMd="12">
                     <DxTextBox @bind-Text="@supportModel!.Email" />
                 </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Problem Description" ColSpanMd="12">
+                <DxFormLayoutItem Caption="Issue Description" ColSpanMd="12">
                     <DxMemo Rows="8" @bind-Text="@supportModel!.Description" />
                 </DxFormLayoutItem>
-                    <div class="flex mt-2 mx-auto">                    
+                <div class="flex mt-2 mx-auto">
                     <ReCAPTCHA @ref="@reCAPTCHAComponent" SiteKey="6LcT11spAAAAAEc0vtGQmtI2Kv5jII5kB2pz5Gnn" OnSuccess="OnSuccess" OnExpired="OnExpired" />
-                    </div>
-            <footer class="input-group px-2 mt-2" id="footer">
-                <DxButton 
-                    Enabled="@enableSubmitButton"
-                    CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
+                </div>
+                <footer class="input-group px-2 mt-2" id="footer">
+                    <DxButton Enabled="@enableSubmitButton"
+                              CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
                     <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" onclick="window.location = '/';" />
-            </footer>
+                </footer>
             </DxFormLayout>
         </EditForm>
     </DxLoadingPanel>
@@ -88,7 +92,7 @@ else
     MessageBox? successMessageBox;
     MessageBox? failedMessageBox;
     MessageBox? errorMessageBox;
-    SupportModel? supportModel; 
+    SupportModel? supportModel;
 
     private ReCAPTCHA? reCAPTCHAComponent;
     private bool ValidReCAPTCHA = false;
