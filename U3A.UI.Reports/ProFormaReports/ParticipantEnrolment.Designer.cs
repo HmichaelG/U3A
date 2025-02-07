@@ -354,6 +354,7 @@
             this.xrRichText1.SizeF = new System.Drawing.SizeF(540.6538F, 37.50003F);
             this.xrRichText1.StylePriority.UseFont = false;
             this.xrRichText1.StylePriority.UsePadding = false;
+            this.xrRichText1.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrRichText1_BeforePrint);
             // 
             // xrTableRow4
             // 
@@ -1097,7 +1098,7 @@
             this.crossTabHeaderStyle1,
             this.crossTabDataStyle1,
             this.crossTabTotalStyle1});
-            this.Version = "24.1";
+            this.Version = "24.2";
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrRichText1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable4)).EndInit();

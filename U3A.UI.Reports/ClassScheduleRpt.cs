@@ -3,6 +3,7 @@ using DevExpress.DataAccess.ObjectBinding;
 using DevExpress.ReportServer.ServiceModel.DataContracts;
 using DevExpress.XtraPrinting.BarCode;
 using DevExpress.XtraReports.UI;
+using DevExpress.XtraRichEdit;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections;
@@ -174,8 +175,15 @@ namespace U3A.UI.Reports
         {
             Class c = (Class)GetCurrentRow();
             if (c == null) { return; }
-            xrRichText1.Html = c.Course.Description.Replace("<p><br><p>", "<p>");
+            using (RichEditDocumentServer docServer = new RichEditDocumentServer())
+            {
+                docServer.RtfText = xrRichText1.Rtf;
+                docServer.Document.DefaultCharacterProperties.FontName = "Times New Roman";
+                docServer.Document.DefaultCharacterProperties.FontSize = (float?)10;
+                xrRichText1.Rtf = docServer.RtfText;
+            }
         }
+
     }
 
 

@@ -168,7 +168,7 @@
             // lblWatermark
             // 
             this.lblWatermark.CanShrink = true;
-            this.lblWatermark.Font = new DevExpress.Drawing.DXFont("Arial", 21.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.lblWatermark.Font = new DevExpress.Drawing.DXFont("Times New Roman", 21.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.lblWatermark.ForeColor = System.Drawing.Color.Crimson;
             this.lblWatermark.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
@@ -206,7 +206,7 @@
             this.xrMessage.BorderWidth = 2F;
             this.xrMessage.CanPublish = false;
             this.xrMessage.CanShrink = true;
-            this.xrMessage.Font = new DevExpress.Drawing.DXFont("Arial", 18F);
+            this.xrMessage.Font = new DevExpress.Drawing.DXFont("Times New Roman", 18F);
             this.xrMessage.ForeColor = System.Drawing.Color.Red;
             this.xrMessage.LocationFloat = new DevExpress.Utils.PointFloat(142.4583F, 173.9167F);
             this.xrMessage.Multiline = true;
@@ -245,7 +245,7 @@
             // 
             // xrLabel4
             // 
-            this.xrLabel4.Font = new DevExpress.Drawing.DXFont("Arial", 20.25F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.xrLabel4.Font = new DevExpress.Drawing.DXFont("Times New Roman", 20.25F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrLabel4.LocationFloat = new DevExpress.Utils.PointFloat(0F, 67.45832F);
             this.xrLabel4.Multiline = true;
@@ -274,7 +274,7 @@
             // 
             this.xrLabel3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "?prmU3AGroup")});
-            this.xrLabel3.Font = new DevExpress.Drawing.DXFont("Arial", 20.25F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.xrLabel3.Font = new DevExpress.Drawing.DXFont("Times New Roman", 20.25F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrLabel3.Multiline = true;
@@ -289,7 +289,7 @@
             // lblTitleWatermark
             // 
             this.lblTitleWatermark.CanShrink = true;
-            this.lblTitleWatermark.Font = new DevExpress.Drawing.DXFont("Arial", 21.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.lblTitleWatermark.Font = new DevExpress.Drawing.DXFont("Times New Roman", 21.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.lblTitleWatermark.ForeColor = System.Drawing.Color.Crimson;
             this.lblTitleWatermark.LocationFloat = new DevExpress.Utils.PointFloat(0F, 125.5277F);
@@ -340,7 +340,7 @@
             // 
             this.tableRow2.Cells.AddRange(new DevExpress.XtraReports.UI.XRTableCell[] {
             this.tableCellOnDay});
-            this.tableRow2.Font = new DevExpress.Drawing.DXFont("Arial", 12F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.tableRow2.Font = new DevExpress.Drawing.DXFont("Times New Roman", 12F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.tableRow2.Name = "tableRow2";
             this.tableRow2.StylePriority.UseFont = false;
@@ -350,7 +350,7 @@
             // 
             this.tableCellOnDay.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Bookmark", "\n")});
-            this.tableCellOnDay.Font = new DevExpress.Drawing.DXFont("Arial", 12F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.tableCellOnDay.Font = new DevExpress.Drawing.DXFont("Times New Roman", 12F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.tableCellOnDay.Name = "tableCellOnDay";
             this.tableCellOnDay.StyleName = "GroupData1";
@@ -418,7 +418,7 @@
             this.tableCellCourseName.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Course].[NameAndNumber]"),
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Bookmark", "[Course].[Name]\n")});
-            this.tableCellCourseName.Font = new DevExpress.Drawing.DXFont("Arial", 12F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.tableCellCourseName.Font = new DevExpress.Drawing.DXFont("Times New Roman", 12F, DevExpress.Drawing.DXFontStyle.Bold, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.tableCellCourseName.Multiline = true;
             this.tableCellCourseName.Name = "tableCellCourseName";
@@ -444,7 +444,7 @@
             this.xrTableCell11.BackColor = System.Drawing.Color.WhiteSmoke;
             this.xrTableCell11.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif([Course].[AllowAutoEnrol],\'Class is Full\' ,\'Class is Closed\' )")});
-            this.xrTableCell11.Font = new DevExpress.Drawing.DXFont("Arial", 18F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.xrTableCell11.Font = new DevExpress.Drawing.DXFont("Times New Roman", 18F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrTableCell11.ForeColor = System.Drawing.Color.Magenta;
             this.xrTableCell11.Name = "xrTableCell11";
             this.xrTableCell11.StylePriority.UseBackColor = false;
@@ -468,7 +468,7 @@
             this.xrTableCell3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(IsNullOrEmpty([Course].[OfferedBy]),\'\' ,\'Offered By: \' + [Course].[OfferedBy]" +
                     " )")});
-            this.xrTableCell3.Font = new DevExpress.Drawing.DXFont("Arial", 12F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.xrTableCell3.Font = new DevExpress.Drawing.DXFont("Times New Roman", 12F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrTableCell3.Multiline = true;
             this.xrTableCell3.Name = "xrTableCell3";
             this.xrTableCell3.StylePriority.UseBackColor = false;
@@ -509,7 +509,7 @@
             this.xrRichText1.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.xrRichText1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Html", "[Course].[DisplayDescription]")});
-            this.xrRichText1.Font = new DevExpress.Drawing.DXFont("Arial", 6F);
+            this.xrRichText1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 6F);
             this.xrRichText1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrRichText1.Name = "xrRichText1";
             this.xrRichText1.Padding = new DevExpress.XtraPrinting.PaddingInfo(8, 8, 8, 8, 100F);
@@ -518,6 +518,7 @@
             this.xrRichText1.StylePriority.UseBorders = false;
             this.xrRichText1.StylePriority.UseFont = false;
             this.xrRichText1.StylePriority.UsePadding = false;
+            this.xrRichText1.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrRichText1_BeforePrint);
             // 
             // xrTableCell2
             // 
@@ -894,7 +895,7 @@
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "NavigateUrl", "[Course].[AdditionalInformationURL]"),
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "!IsNullOrEmpty([Course].[AdditionalInformationURL])"),
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "\'Visit: \' + [Course].[AdditionalInformationURL]")});
-            this.xrTableCell1.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.xrTableCell1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 9.75F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrTableCell1.ForeColor = System.Drawing.Color.RoyalBlue;
             this.xrTableCell1.Multiline = true;
             this.xrTableCell1.Name = "xrTableCell1";
@@ -934,7 +935,7 @@
             this.Title.BorderColor = System.Drawing.Color.Black;
             this.Title.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.Title.BorderWidth = 1F;
-            this.Title.Font = new DevExpress.Drawing.DXFont("Arial", 14.25F);
+            this.Title.Font = new DevExpress.Drawing.DXFont("Times New Roman", 14.25F);
             this.Title.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(70)))), ((int)(((byte)(80)))));
             this.Title.Name = "Title";
             this.Title.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 6, 0, 0, 100F);
@@ -945,7 +946,7 @@
             this.GroupCaption1.BorderColor = System.Drawing.Color.White;
             this.GroupCaption1.Borders = DevExpress.XtraPrinting.BorderSide.Bottom;
             this.GroupCaption1.BorderWidth = 2F;
-            this.GroupCaption1.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.GroupCaption1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.GroupCaption1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(228)))), ((int)(((byte)(228)))), ((int)(((byte)(228)))));
             this.GroupCaption1.Name = "GroupCaption1";
             this.GroupCaption1.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 2, 0, 0, 100F);
@@ -957,7 +958,7 @@
             this.GroupData1.BorderColor = System.Drawing.Color.White;
             this.GroupData1.Borders = DevExpress.XtraPrinting.BorderSide.Bottom;
             this.GroupData1.BorderWidth = 2F;
-            this.GroupData1.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.GroupData1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.GroupData1.ForeColor = System.Drawing.Color.White;
             this.GroupData1.Name = "GroupData1";
             this.GroupData1.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 2, 0, 0, 100F);
@@ -969,7 +970,7 @@
             this.DetailCaption1.BorderColor = System.Drawing.Color.White;
             this.DetailCaption1.Borders = DevExpress.XtraPrinting.BorderSide.Left;
             this.DetailCaption1.BorderWidth = 2F;
-            this.DetailCaption1.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.DetailCaption1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.DetailCaption1.ForeColor = System.Drawing.Color.White;
             this.DetailCaption1.Name = "DetailCaption1";
             this.DetailCaption1.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 6, 0, 0, 100F);
@@ -980,7 +981,7 @@
             this.DetailData1.BorderColor = System.Drawing.Color.Transparent;
             this.DetailData1.Borders = DevExpress.XtraPrinting.BorderSide.Left;
             this.DetailData1.BorderWidth = 2F;
-            this.DetailData1.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F);
+            this.DetailData1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8.25F);
             this.DetailData1.ForeColor = System.Drawing.Color.Black;
             this.DetailData1.Name = "DetailData1";
             this.DetailData1.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 6, 0, 0, 100F);
@@ -992,7 +993,7 @@
             this.GroupFooterBackground3.BorderColor = System.Drawing.Color.White;
             this.GroupFooterBackground3.Borders = DevExpress.XtraPrinting.BorderSide.Bottom;
             this.GroupFooterBackground3.BorderWidth = 2F;
-            this.GroupFooterBackground3.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.GroupFooterBackground3.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.GroupFooterBackground3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(228)))), ((int)(((byte)(228)))), ((int)(((byte)(228)))));
             this.GroupFooterBackground3.Name = "GroupFooterBackground3";
             this.GroupFooterBackground3.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 2, 0, 0, 100F);
@@ -1004,7 +1005,7 @@
             this.DetailData3_Odd.BorderColor = System.Drawing.Color.Transparent;
             this.DetailData3_Odd.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.DetailData3_Odd.BorderWidth = 1F;
-            this.DetailData3_Odd.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F);
+            this.DetailData3_Odd.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8.25F);
             this.DetailData3_Odd.ForeColor = System.Drawing.Color.Black;
             this.DetailData3_Odd.Name = "DetailData3_Odd";
             this.DetailData3_Odd.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 6, 0, 0, 100F);
@@ -1012,7 +1013,7 @@
             // 
             // PageInfo
             // 
-            this.PageInfo.Font = new DevExpress.Drawing.DXFont("Arial", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.PageInfo.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8.25F, DevExpress.Drawing.DXFontStyle.Bold);
             this.PageInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(70)))), ((int)(((byte)(80)))));
             this.PageInfo.Name = "PageInfo";
             this.PageInfo.Padding = new DevExpress.XtraPrinting.PaddingInfo(6, 6, 0, 0, 100F);
@@ -1049,7 +1050,7 @@
             // xrLabel2
             // 
             this.xrLabel2.CanShrink = true;
-            this.xrLabel2.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F, DevExpress.Drawing.DXFontStyle.Italic, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+            this.xrLabel2.Font = new DevExpress.Drawing.DXFont("Times New Roman", 9.75F, DevExpress.Drawing.DXFontStyle.Italic, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
             new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
             this.xrLabel2.LocationFloat = new DevExpress.Utils.PointFloat(613.5417F, 0F);
             this.xrLabel2.Multiline = true;
@@ -1127,7 +1128,7 @@
             this.objectDataSource1,
             this.objectDataSource2});
             this.DataSource = this.objectDataSource1;
-            this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
+            this.Font = new DevExpress.Drawing.DXFont("Times New Roman", 9.75F);
             this.Margins = new DevExpress.Drawing.DXMargins(44F, 50F, 50F, 76F);
             this.PageHeight = 1169;
             this.PageWidth = 827;
@@ -1162,7 +1163,7 @@
             this.DetailData3_Odd,
             this.PageInfo});
             this.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            this.Version = "24.1";
+            this.Version = "24.2";
             this.ParametersRequestBeforeShow += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.ClassSchedule_ParametersRequestBeforeShow);
             this.ParametersRequestSubmit += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.ClassSchedule_ParametersRequestSubmit);
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource2)).EndInit();
