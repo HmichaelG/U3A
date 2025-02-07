@@ -123,9 +123,11 @@ namespace U3A.BusinessRules
                     Log.Information("Auto-Enrolment Allocation log as at {DateTime:dd-MM-yyyy hh:mm:ss tt}", dbc.GetLocalTime());
                     Log.Information("===============================================================");
                     // Do part paid first
-                    await WaitListPartPaidMembers(dbc, SelectedTerm);
-                    await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
-                    await dbc.SaveChangesAsync();
+                    if (await WaitListPartPaidMembers(dbc, SelectedTerm) > 0)
+                    {
+                        await BusinessRule.CreateEnrolmentSendMailAsync(dbc, EmailDate);
+                        await dbc.SaveChangesAsync();
+                    }
 
                     // and everybody else
                     var today = dbc.GetLocalTime().Date;
@@ -223,14 +225,14 @@ namespace U3A.BusinessRules
                         {
                             var waitlist = enrolmentsToProcess.Count(e => e.IsWaitlisted);
                             var notFinancial = waitlistNotFinancial.Count();
-                            Log.Information("No enrolments processed. {waitlist} remain waitlisted.",waitlist+notFinancial);
+                            Log.Information("No enrolments processed. {waitlist} remain waitlisted.", waitlist + notFinancial);
                         }
                         if (waitlistNotFinancial.Count > 0)
                         {
                             Log.Information("{waitlistNotFinancial} Not Financial enrolments remain waitlisted.", waitlistNotFinancial.Count);
                             foreach (var e in waitlistNotFinancial)
                             {
-                                Log.Information("Waitlisted\tFin-To: {FinTo}\t{Student}",e.Person.FinancialToBriefText,e.Person.FullName);
+                                Log.Information("Waitlisted\tFin-To: {FinTo}\t{Student}", e.Person.FinancialToBriefText, e.Person.FullName);
                             }
                         }
                     }
@@ -240,6 +242,91 @@ namespace U3A.BusinessRules
                     Log.Information("");
                 }
             }
+        }
+        public static async Task AutoEnrolParticipantsAsync(U3ADbContext dbc, Term SelectedTerm,
+                                    IEnumerable<Guid> EnrolmentIdsToProcess)
+        {
+            List<Enrolment> enrollments = await dbc.Enrolment
+                                    .Include(x => x.Course)
+                                    .Include(x => x.Term)
+                                    .Include(x => x.Person)
+                                    .Where(x => EnrolmentIdsToProcess.Contains(x.ID))
+                                    .ToListAsync();
+            if (enrollments == null || enrollments.Count == 0)
+            {
+                Log.Information("No enrolments to process.");
+                return;
+            }
+            var today = dbc.GetLocalTime().Date;
+            AutoEnrolments = new List<string>();
+            List<Enrolment> enrolmentsToProcess = new();
+            List<Enrolment> waitlistNotFinancial = new();
+            List<Person> CourseLeaders = new();
+            foreach (var enrollment in enrollments)
+            {
+                var course = enrollment.Course;
+                int enrolledCount = 0;
+                CourseLeaders = new();
+                foreach (var c in course.Classes)
+                {
+                    if (c.Leader != null && !CourseLeaders.Contains(c.Leader)) { CourseLeaders.Add(c.Leader); }
+                    if (c.Leader2 != null && !CourseLeaders.Contains(c.Leader2)) { CourseLeaders.Add(c.Leader2); }
+                    if (c.Leader3 != null && !CourseLeaders.Contains(c.Leader3)) { CourseLeaders.Add(c.Leader3); }
+                }
+                if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+                {
+                    enrolmentsToProcess = await dbc.Enrolment
+                                                .Include(x => x.Course)
+                                                .Include(x => x.Term)
+                                                .Include(x => x.Person)
+                                                .Where(x => (x.TermID == SelectedTerm.ID ||
+                                                             (x.Course.AllowMultiCampsuFrom != null &&
+                                                             x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
+                                                                && x.CourseID == course.ID
+                                                                && x.Person.DateCeased == null
+                                                                && !CourseLeaders.Contains(x.Person))
+                                                .ToListAsync();
+
+                    waitlistNotFinancial = enrolmentsToProcess.Where(x => x.IsWaitlisted && !IsPersonFinancial(x.Person, SelectedTerm)).ToList();
+                    enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
+                    if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
+                    {
+                        enrolledCount = await ProcessEnrolments(dbc,
+                                           SelectedTerm,
+                                           course,
+                                           enrolmentsToProcess);
+                        await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
+                        await dbc.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    foreach (var courseClass in course.Classes)
+                    {
+                        enrolmentsToProcess = await dbc.Enrolment
+                                                    .Include(x => x.Course)
+                                                    .Include(x => x.Term)
+                                                    .Include(x => x.Person)
+                                                    .Where(x => x.TermID == SelectedTerm.ID
+                                                                    && x.ClassID == courseClass.ID
+                                                                    && x.Person.DateCeased == null
+                                                                    && !CourseLeaders.Contains(x.Person))
+                                                .ToListAsync();
+                        waitlistNotFinancial = enrolmentsToProcess.Where(x => x.IsWaitlisted && !IsPersonFinancial(x.Person, SelectedTerm)).ToList();
+                        enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
+                        if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
+                        {
+                            enrolledCount += await ProcessEnrolments(dbc,
+                                                  SelectedTerm,
+                                                  course,
+                                                  enrolmentsToProcess);
+                            await BusinessRule.CreateEnrolmentSendMailAsync(dbc);
+                            await dbc.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+            await dbc.SaveChangesAsync();
         }
 
         private static async Task<SortedList<(double, int, Guid), Course>> GetRankedCourses(U3ADbContext dbc, Term term)
@@ -350,9 +437,16 @@ namespace U3A.BusinessRules
         private static async Task<int> ProcessEnrolments(U3ADbContext dbc,
                                     Term term,
                                     Course course,
+                                    List<Enrolment> enrolments)
+        {
+            return await ProcessEnrolments(dbc, term, course, enrolments, new List<Guid>(), false,true);
+        }
+        private static async Task<int> ProcessEnrolments(U3ADbContext dbc,
+                                    Term term,
+                                    Course course,
                                     List<Enrolment> enrolments,
                                     List<Guid> PeoplePreviouslyEnrolled,
-                                    bool ForceEmailQueue)
+                                    bool ForceEmailQueue, bool DisableRandomEnrolment = false)
         {
             int count = 0;
             var today = DateTime.UtcNow.Date;
@@ -374,14 +468,15 @@ namespace U3A.BusinessRules
 
             // We will do a random allocation once per allocation period (annual, semester or term)
             // On completion IsClassAllocationFinalised is aet True.
-            var DoRandomEnrol = !term.IsClassAllocationFinalised && isRandomEnrol &&
+            var DoRandomEnrol = (DisableRandomEnrolment) 
+                                    ? false 
+                                    : !term.IsClassAllocationFinalised && isRandomEnrol &&
                                             today >= GetThisTermAllocationDay(term, settings);
-
             int enrolled = enrolments.Where(x => !x.IsWaitlisted).Count();
             if (enrolled >= course.MaximumStudents) { return 0; }
             int waitlisted = enrolments.Where(x => x.IsWaitlisted
                                 && (!IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))).Count();
-            // If available places is less than waitlisted then enrol everyone.
+            // If available places is less than waitlisted then enroll everyone.
             if (waitlisted <= course.MaximumStudents - enrolled)
             {
                 Log.Information("All students enrolled because Wautlist: {Waitlist} is less than Maximum Students: {MazStudents}", waitlisted, course.MaximumStudents);

@@ -30,12 +30,12 @@ namespace U3A.WebFunctions.Procedures
                     (Guid, Guid, Guid?) onFileKey;
                     var today = await Common.GetTodayAsync(dbc);
                     var utcTime = DateTime.UtcNow;
-                    if (options.IdToProcess != null && options.IdToProcess.Count > 0)
+                    if (options.SendMailIdsToProcess != null && options.SendMailIdsToProcess.Count > 0)
                     {
                         mailItems = await dbc.SendMail.IgnoreQueryFilters()
                                                 .Include(x => x.Person)
                                                 .Where(x => !x.Person.IsDeleted &&
-                                                                options.IdToProcess.Contains(x.ID)).ToListAsync();
+                                                                options.SendMailIdsToProcess.Contains(x.ID)).ToListAsync();
                         isAdHocReport = true; // generated via HTTP request
                     }
                     else

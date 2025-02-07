@@ -80,6 +80,13 @@ namespace U3A.WebFunctions
             }
         }
 
+        public static TenantInfo? GetTenant(ILogger logger, string tenantToProcess, string connectionString)
+        {
+            var tenants = new List<TenantInfo>();
+            Common.GetTenants(tenants, connectionString!, tenantToProcess);
+            return (tenants.Count > 0) ? tenants.ToArray()[0] : null;
+        }
+
         public static async Task<DateTime> GetTodayAsync(U3ADbContext dbc)
         {
             return (await GetNowAsync(dbc)).Date;

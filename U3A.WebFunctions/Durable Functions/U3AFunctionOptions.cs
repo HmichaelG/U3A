@@ -7,35 +7,43 @@ namespace U3A.WebFunctions;
 public class U3AFunctionOptions
 {
     public U3AFunctionOptions() { }
+
     public U3AFunctionOptions(HttpRequestData req)
+    {
+        SetTenant(req);
+        SetSendMailIdsToProcess(req);
+    }
+
+    public void SetTenant(HttpRequestData req)
     {
         var queryStrings = req.Query.GetValues("tenant");
         if (queryStrings?.Count() > 0)
         {
             TenantIdentifier = queryStrings[0];
         }
-        queryStrings = req.Query.GetValues("processId");
+    }
+
+    public void SetSendMailIdsToProcess(HttpRequestData req)
+    {
+        var queryStrings = req.Query.GetValues("processId");
         if (queryStrings?.Count() > 0)
         {
             var ids = queryStrings[0].Split(',');
             foreach (var id in ids)
             {
-                IdToProcess.Add(Guid.Parse(id));
+                SendMailIdsToProcess.Add(Guid.Parse(id));
             }
         }
     }
-    public U3AFunctionOptions(HttpRequest req)
+    public void SetEnrollmentIdsToProcess(HttpRequestData req)
     {
-        if (req.Query.TryGetValue("tenant", out var tenantValues) && tenantValues.Count > 0)
+        var queryStrings = req.Query.GetValues("processId");
+        if (queryStrings?.Count() > 0)
         {
-            TenantIdentifier = tenantValues[0]!;
-        }
-        if (req.Query.TryGetValue("processId", out var processIdValues) && processIdValues.Count > 0)
-        {
-            var ids = processIdValues[0]!.Split(',');
+            var ids = queryStrings[0].Split(',');
             foreach (var id in ids)
             {
-                IdToProcess.Add(Guid.Parse(id));
+                EnrollmentIdsToProcess.Add(Guid.Parse(id));
             }
         }
     }
@@ -44,7 +52,8 @@ public class U3AFunctionOptions
     public string TenantIdentifier { get; set; } = string.Empty;
     public bool HasRandomAllocationExecuted { get; set; } = false;
     public bool IsDailyProcedure { get; set; } = false;
-    public List<Guid> IdToProcess { get; set; } = new();
+    public List<Guid> SendMailIdsToProcess { get; set; } = new();
+    public List<Guid> EnrollmentIdsToProcess { get; set; } = new();
     public SendMail? PrintDoc { get; set; } = null; // Dummy SendMail containing Leader Report print options
 }
 

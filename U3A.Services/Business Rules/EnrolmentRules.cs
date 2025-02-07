@@ -798,7 +798,7 @@ namespace U3A.BusinessRules
                 var status = GetEnrolmentStatus(e, term, settings, localTime);
                 result.AppendLine($"<tr><td>{e.Course.Name}</td><td>{status}</td></tr>");
                 result.AppendLine("</tbody></table>");
-                var processMsg = "Pending allocations are processed hourly";
+                var processMsg = "Pending allocations will processed when you click <b>Return to menu</b>. An email confirmation wil be sent shortly thereafter.";
                 if (IsEnrolmentBlackoutPeriod(settings))
                 {
                     var processDate = dbc.GetLocalTime(settings.EnrolmentBlackoutEndsUTC.Value).ToString(constants.STD_DATETIME_FORMAT);

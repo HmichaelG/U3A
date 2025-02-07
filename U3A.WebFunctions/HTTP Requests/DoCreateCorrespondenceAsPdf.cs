@@ -56,7 +56,7 @@ public class DoCreateCorrespondenceAsPdf
         Byte[]? Result = null;
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn is null) { throw new NullReferenceException("Database Connection string is null"); }
-        var tenant = GetTenant(log, options.TenantIdentifier, cn);
+        var tenant = Common.GetTenant(log, options.TenantIdentifier, cn);
         if (tenant is null) { throw new NullReferenceException("Tenant not found"); }
 
         var personEnrolments = new Dictionary<Guid, List<Enrolment>>();
@@ -75,7 +75,7 @@ public class DoCreateCorrespondenceAsPdf
                     mailItems = await dbc.SendMail.IgnoreQueryFilters()
                                          .Include(x => x.Person)
                                          .Where(x => !x.Person.IsDeleted &&
-                                                         options.IdToProcess.Contains(x.ID)).ToListAsync();
+                                                         options.SendMailIdsToProcess.Contains(x.ID)).ToListAsync();
                 }
                 var mcEnrolments = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant.Identifier!);
                 foreach (SendMail sm in mailItems)
@@ -207,13 +207,6 @@ public class DoCreateCorrespondenceAsPdf
                 return Result;
             }
         }
-    }
-
-    TenantInfo? GetTenant(ILogger logger, string tenantToProcess, string connectionString)
-    {
-        var tenants = new List<TenantInfo>();
-        Common.GetTenants(tenants, connectionString!, tenantToProcess);
-        return (tenants.Count > 0) ? tenants.ToArray()[0] : null;
     }
 
 }

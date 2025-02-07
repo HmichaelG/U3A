@@ -67,15 +67,18 @@ namespace U3A.BusinessRules
                 trm.IsDefaultTerm = true;
             }
             await dbc.SaveChangesAsync();
-            await WaitListPartPaidMembers(dbc, targetTerm);
-            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, DateTime.UtcNow);
-            await dbc.SaveChangesAsync();
+            if (await WaitListPartPaidMembers(dbc, targetTerm) > 0)
+            {
+                await BusinessRule.CreateEnrolmentSendMailAsync(dbc, DateTime.UtcNow);
+                await dbc.SaveChangesAsync();
+            }
         }
 
-        static async Task WaitListPartPaidMembers(U3ADbContext dbc, Term targetTerm)
+        static async Task<int> WaitListPartPaidMembers(U3ADbContext dbc, Term targetTerm)
         {
-            if (targetTerm.TermNumber < 3) { return; }
-            foreach (var e in dbc.Enrolment.IgnoreQueryFilters()
+            int count = 0;
+            if (targetTerm.TermNumber < 3) { return count; }
+            foreach (var e in await dbc.Enrolment.IgnoreQueryFilters()
                             .Include(x => x.Term)
                             .Include(x => x.Class)
                             .Include(x => x.Course)
@@ -84,15 +87,17 @@ namespace U3A.BusinessRules
                                                     && x.Person.DateCeased == null
                                                     && x.Person.FinancialTo <= targetTerm.Year
                                                     && (x.Person.FinancialToTerm != null
-                                                        && x.Person.FinancialToTerm < targetTerm.TermNumber)))
+                                                        && x.Person.FinancialToTerm < targetTerm.TermNumber)).ToListAsync())
             {
                 if (!e.IsWaitlisted)
                 {
                     e.IsWaitlisted = true;
                     e.DateEnrolled = null;
                     dbc.Update(e);
+                    count++;
                 }
             }
+            return count;
         }
         static async Task BringForwardEnrolmentsAsync(U3ADbContext dbc,
                                     List<Enrolment> addedEnrolments,

@@ -27,12 +27,12 @@ namespace U3A.WebFunctions.Procedures
                 {
                     var server = new DocumentServer(dbc);
                     string subject = string.Empty;
-                    if (options.IdToProcess.Count > 0)
+                    if (options.SendMailIdsToProcess.Count > 0)
                     {
                         queueItems = dbc.DocumentQueue
                             .Include(x => x.DocumentAttachments)
                             .AsEnumerable()
-                            .Where(x => options.IdToProcess.Contains(x.ID))
+                            .Where(x => options.SendMailIdsToProcess.Contains(x.ID))
                             .ToList();
                     }
                     else
