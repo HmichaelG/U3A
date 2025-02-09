@@ -30,14 +30,14 @@ public partial class DurableFunctions
                 try
                 {
                     await LogStartTime(logger, tenant);
-                    if (options.SendMailIdsToProcess.Count > 0)
-                    {
-                        hasRandomAllocationExecuted = await AutoEnrollParticipants.Process(tenant, cn!, logger);
-                    }
-                    else
+                    if (options.EnrollmentIdsToProcess.Count > 0)
                     {
                         await AutoEnrollParticipants.ProcessByEnrolment(tenant, options.EnrollmentIdsToProcess, cn!, logger);
                         hasRandomAllocationExecuted = false;
+                    }
+                    else
+                    {
+                        hasRandomAllocationExecuted = await AutoEnrollParticipants.Process(tenant, cn!, logger);
                     }
                 }
                 catch (Exception ex)

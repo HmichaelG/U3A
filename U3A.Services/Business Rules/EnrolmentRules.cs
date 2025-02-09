@@ -367,7 +367,8 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        public static string GetEnrolmentStatus(Enrolment? enrolment, Term term, SystemSettings settings, DateTime localTime)
+        public static string GetEnrolmentStatus(Enrolment? enrolment, 
+            Term term, SystemSettings settings, DateTime localTime)
         {
             var result = "Pending";
             if (enrolment != null)
@@ -379,7 +380,7 @@ namespace U3A.BusinessRules
                 }
                 else if (enrolment.IsWaitlisted)
                 {
-                    if (!IsAllocationDone(enrolment.Created))
+                    if (!IsAllocationDone(enrolment))
                     {
                         result = "Waitlisted: (Pending Allocation)";
                     }
@@ -409,7 +410,7 @@ namespace U3A.BusinessRules
                     result = (enrolment.IsWaitlisted) ? "Waitlisted" : "Enrolled";
                     if (enrolment.IsWaitlisted)
                     {
-                        if (!IsAllocationDone(enrolment.Created))
+                        if (!IsAllocationDone(enrolment))
                         {
                             result = "Waitlisted: (Pending Allocation)";
                         }
@@ -419,15 +420,15 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        private static bool IsAllocationDone(DateTime EnrolmentCreated)
+        private static bool IsAllocationDone(Enrolment enrolment)
         {
-            // backgorund processing to occur every hour on the hour
+            // background processing to occur every hour on the hour
             var now = DateTime.UtcNow;
             var minute = now.Minute;
             var second = now.Second;
             var lastProcessed = now.AddMinutes(-minute).AddSeconds(-second);
             // do the test
-            return (EnrolmentCreated <= lastProcessed) ? true : false;
+            return (enrolment.CreatedOn <= lastProcessed || enrolment.CreatedOn != enrolment.UpdatedOn) ? true : false;
         }
 
         public static string GetCourseEnrolmentStatus(Course course, List<Enrolment> enrolments)
@@ -798,7 +799,7 @@ namespace U3A.BusinessRules
                 var status = GetEnrolmentStatus(e, term, settings, localTime);
                 result.AppendLine($"<tr><td>{e.Course.Name}</td><td>{status}</td></tr>");
                 result.AppendLine("</tbody></table>");
-                var processMsg = "Pending allocations will processed when you click <b>Return to menu</b>. An email confirmation wil be sent shortly thereafter.";
+                var processMsg = "Pending allocations are queued for immediate processing. An email confirmation will be sent shortly.";
                 if (IsEnrolmentBlackoutPeriod(settings))
                 {
                     var processDate = dbc.GetLocalTime(settings.EnrolmentBlackoutEndsUTC.Value).ToString(constants.STD_DATETIME_FORMAT);

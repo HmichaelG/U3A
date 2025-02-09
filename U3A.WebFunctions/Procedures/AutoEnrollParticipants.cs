@@ -99,7 +99,7 @@ public static class AutoEnrollParticipants
         return hasRandomAllocationExecuted;
     }
     public static async Task ProcessByEnrolment(TenantInfo tenant,
-                                        IEnumerable<Guid> IdsToProcess,
+                                        IEnumerable<Guid> EnrollmentIdsToProcess,
                                         string tenantConnectionString,
                                         ILogger logger)
     {
@@ -136,9 +136,7 @@ public static class AutoEnrollParticipants
             if (today > allocationDate.AddDays(constants.RANDOM_ALLOCATION_PREVIEW))
             {
                 // process for participants
-                await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm,
-                                            IsClassAllocationDone: false,
-                                            ForceEmailQueue: false);
+                await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm,EnrollmentIdsToProcess);
                 logger.LogInformation($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
                 foreach (var log in BusinessRule.AutoEnrolments)
                 {

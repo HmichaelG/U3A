@@ -257,6 +257,10 @@ namespace U3A.BusinessRules
                 Log.Information("No enrolments to process.");
                 return;
             }
+            //update UpdatedOn to identify that allocation has been done
+            enrollments.ForEach(x => x.UpdatedOn = DateTime.UtcNow.AddSeconds(1));
+            await dbc.SaveChangesAsync();
+
             var today = dbc.GetLocalTime().Date;
             AutoEnrolments = new List<string>();
             List<Enrolment> enrolmentsToProcess = new();
@@ -448,6 +452,7 @@ namespace U3A.BusinessRules
                                     List<Guid> PeoplePreviouslyEnrolled,
                                     bool ForceEmailQueue, bool DisableRandomEnrolment = false)
         {
+
             int count = 0;
             var today = DateTime.UtcNow.Date;
             var AlreadyEnrolledInCourse = new List<Guid>();
