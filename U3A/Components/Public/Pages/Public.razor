@@ -104,21 +104,30 @@ else
                                                     </p>
                                                     <p>You do not need to be logged in to view or print this report.</p>
                                                 }
-                                                <DxButton Text="Click to display the schedule" Enabled="@(!isNoEnrolmentTermAvailable)"
-                                                          IconCssClass="bi-printer menu-icon me-3 h2"
-                                                          CssClass="col-12 mx-auto"
-                                                          Click="OnReportClick"
-                                                          RenderStyle="ButtonRenderStyle.Primary"
-                                                          RenderStyleMode="ButtonRenderStyleMode.Outline">
-                                                </DxButton>
+                                                <div class="d-flex w-100">
+                                                    <DxButton Text="Print (Desktop View)" Enabled="@(!isNoEnrolmentTermAvailable)"
+                                                              IconCssClass="bi-printer menu-icon h2"
+                                                              Click="OnReportClick"
+                                                              CssClass="flex-grow-1 me-1"
+                                                              RenderStyle="ButtonRenderStyle.Primary"
+                                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                    </DxButton>
+                                                    <DxButton Text="Display (Mobile View)" Enabled="@(!isNoEnrolmentTermAvailable)"
+                                                              IconCssClass="bi-phone menu-icon h2"
+                                                              Click="OnPreviewClick"
+                                                              CssClass="flex-grow-1 me-1"
+                                                              RenderStyle="ButtonRenderStyle.Primary"
+                                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                    </DxButton>
+                                                </div>
                                             </div>
                                         </DxFormLayoutGroup>
                                         <div class="row col-12 mx-auto">
                                             <DxFormLayoutGroup Caption="New Member?" ColSpanMd="6" CaptionCssClass="text-primary">
-                                                <div class="mt-2 px-2">
+                                                <div class="mt-2 px-2 col-12">
                                                     <div class="h6">Start Here</div>
-                                                    <p class="box-height">
-                                                        If you wish to join  <b>@(settings.U3AGroup)</b>, please register to securely use the membership system and protect your privacy. You will need an email address to do so.
+                                                    <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
+                                                        If you wish to join <b>@(settings.U3AGroup)</b>, please register to securely use the membership system and protect your privacy. You will need an email address to do so.
                                                     </p>
                                                     <DxButton Text="Register" Enabled="@(!isBeforeEnrolmentDay && !isNoEnrolmentTermAvailable)"
                                                               IconCssClass="bi bi-person-plus menu-icon me-3 h2"
@@ -130,9 +139,9 @@ else
                                                 </div>
                                             </DxFormLayoutGroup>
                                             <DxFormLayoutGroup Caption="Returning Member?" ColSpanMd="6" CaptionCssClass="text-primary">
-                                                <div class="mt-2 px-2">
+                                                <div class="mt-2 px-2 col-12">
                                                     <div class="h6">Login Here</div>
-                                                    <p class="box-height">
+                                                    <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
                                                         As an existing member, please login to access your membership details, pay your membership fees,
                                                         enroll in courses and more!
                                                     </p>
@@ -198,7 +207,6 @@ else
                 }
             </Items>
         </DxGridLayout>
-
     }
     if (!isInteractive)
     {
@@ -228,6 +236,8 @@ else
     string lockoutMessage = string.Empty;
     bool isReady;
     bool isInteractive = false;
+    bool DoPreview;
+    Term? currentTerm;
 
     ErrorBoundary? errorBoundary;
     string? messageText;
@@ -258,7 +268,7 @@ else
             {
                 // no ernolment term in force
                 var localTime = await lt.GetLocalTimeAsync();
-                var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc, localTime);
+                currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc, localTime);
                 if (currentTerm == null)
                 {
                     currentTerm = await BusinessRule.CurrentTermAsync(dbc);
@@ -304,6 +314,11 @@ else
     void OnReportClick()
     {
         var url = "/public/ClassScheduleView";
+        NavigationManager.NavigateTo(url);
+    }
+    void OnPreviewClick()
+    {
+        var url = "/public/ClassSchedulePreview";
         NavigationManager.NavigateTo(url);
     }
 

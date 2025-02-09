@@ -22,15 +22,17 @@
 else
 {
     <PortalHeader NavigateTo="/public" NoU3AGroup="true" />
-    <p>@message</p>
-    <DxReportViewer @ref="@reportViewer" Id="reportViewer"
-                    Report="@rpt" SizeMode="SizeMode.Small"
-                    SinglePagePreview="false"
-                    RootCssClasses="w-100 view-normal"
-                    TabPanelMinWidth="200"
-                    TabPanelMaxWidth="200"                                     
-                    Zoom="1"
-                    OnCustomizeToolbar="@OnCustomizeToolbar" />
+    <div class="col col-md-10 col-lg-8 mx-auto">
+        <p>@message</p>
+        <DxReportViewer @ref="@reportViewer" Id="reportViewer"
+                        Report="@rpt" SizeMode="SizeMode.Small"
+                        SinglePagePreview="false"
+                        RootCssClasses="w-100 view-normal"
+                        TabPanelMinWidth="200"
+                        TabPanelMaxWidth="200"
+                        Zoom="1"
+                        OnCustomizeToolbar="@OnCustomizeToolbar" />
+    </div>
 }
 <style>
     .view-normal {
@@ -79,7 +81,7 @@ else
     {
         string[] itemsToRemove = new string[] {"HighlightEditingFields",
                                                 "CancelDocumentCreation"
-                                };
+                            };
         foreach (var item in toolbarModel.AllItems)
         {
             if (itemsToRemove.Contains(item.Id))
