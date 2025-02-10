@@ -678,7 +678,7 @@ namespace U3A.BusinessRules
             if (Class.Recurrence == null)
             {
                 var offeredTermNumber = GetNextTermOffered(Class, term.TermNumber);
-                var offeredTerm = allTerms.FirstOrDefault(x => x.TermNumber == offeredTermNumber);
+                var offeredTerm = allTerms.FirstOrDefault(x => x.Year == term.Year && x.TermNumber == offeredTermNumber);
                 if (offeredTerm != null)
                 {
                     endDate = offeredTerm.EndDate;
