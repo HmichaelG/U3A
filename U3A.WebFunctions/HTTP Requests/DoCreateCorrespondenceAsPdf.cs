@@ -56,7 +56,7 @@ public class DoCreateCorrespondenceAsPdf
         Byte[]? Result = null;
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn is null) { throw new NullReferenceException("Database Connection string is null"); }
-        var tenant = Common.GetTenant(log, options.TenantIdentifier, cn);
+        var tenant = Common.GetTenant(options.TenantIdentifier, cn);
         if (tenant is null) { throw new NullReferenceException("Tenant not found"); }
 
         var personEnrolments = new Dictionary<Guid, List<Enrolment>>();

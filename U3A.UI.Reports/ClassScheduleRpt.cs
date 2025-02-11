@@ -28,7 +28,6 @@ namespace U3A.UI.Reports
 
         public U3ADbContext DbContext { get; set; }
         public TenantDbContext TenantDbContext { get; set; }
-        public TenantInfoService TenantService { get; set; }
         public NavigationManager NavManager { get; set; }
 
         private void ClassSchedule_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
@@ -120,7 +119,7 @@ namespace U3A.UI.Reports
             var Class = GetCurrentRow() as Class;
             if (Class == null) { return; }
             xrBarCode1.ShowText = false;
-            xrBarCode1.Text = $"{NavManager.BaseUri}EnrolClass={Class.ID}";
+            if (NavManager != null) { xrBarCode1.Text = $"{NavManager.BaseUri}EnrolClass={Class.ID}"; }
             xrBarCode1.NavigateUrl = xrBarCode1.Text;
             // Adjust the properties specific to the barcode type.
             ((QRCodeGenerator)xrBarCode1.Symbology).CompactionMode = QRCodeCompactionMode.Byte;

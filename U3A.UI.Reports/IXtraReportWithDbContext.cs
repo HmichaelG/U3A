@@ -16,6 +16,5 @@ namespace U3A.UI.Reports
     {
         public U3ADbContext DbContext { get; set; }
         public TenantDbContext TenantDbContext { get; set; }
-        public TenantInfoService TenantService { get; set; }
     }
 }

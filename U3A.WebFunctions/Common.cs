@@ -80,7 +80,7 @@ namespace U3A.WebFunctions
             }
         }
 
-        public static TenantInfo? GetTenant(ILogger logger, string tenantToProcess, string connectionString)
+        public static TenantInfo? GetTenant(string tenantToProcess, string connectionString)
         {
             var tenants = new List<TenantInfo>();
             Common.GetTenants(tenants, connectionString!, tenantToProcess);
