@@ -29,13 +29,14 @@ var host = new HostBuilder()
             .MinimumLevel.Override("Azure.Storage", LogEventLevel.Error)
             .MinimumLevel.Override("Azure.Core", LogEventLevel.Error)
             .MinimumLevel.Override("Azure.Identity", LogEventLevel.Error)
-            .Enrich.WithProperty("Application", "SHDev Blog Functions")
             .Enrich.FromLogContext()
-            .WriteTo.Console(LogEventLevel.Debug)
-            .WriteTo.File(filePath, LogEventLevel.Debug, rollingInterval: RollingInterval.Day)
+            .WriteTo.Console(LogEventLevel.Information)
+            .WriteTo.File(filePath, 
+                        LogEventLevel.Information, 
+                        shared: true,
+                        rollingInterval: RollingInterval.Day)
             .CreateLogger();
-
-        logging.AddSerilog(Log.Logger, true);
+        logging.AddSerilog(Log.Logger,true);
     })
     .Build();
 
