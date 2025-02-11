@@ -39,7 +39,7 @@ else
     <Progress @ref=@progressBar />
     <MessageBox @ref="@messageBox" />
     <SelectCourseView @ref="selectCourseView"
-    PopupWidth="50rem" />
+                      PopupWidth="50rem" />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
@@ -51,10 +51,10 @@ else
         <DxTabPage Text="Multi-Campus" />
         <DxTabPage Text="Class View">
             <ClassView Year="@Year" AnyEnrolmentsInYear="@anyEnrolmentsInYear"
-            Settings=@settings
-            Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
-            Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
-            CourseParticipationTypes="@CourseParticipationTypes" />
+                       Settings=@settings
+                       Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
+                       Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
+                       CourseParticipationTypes="@CourseParticipationTypes" />
         </DxTabPage>
     </DxTabs>
     @if (tabs?.ActiveTabIndex != 5)
@@ -62,40 +62,40 @@ else
         <FullScreen DisplayOffset="9">
             <ContentTemplate>
                 <DxGrid Data="@Courses" @ref=@mainGrid
-                AutoCollapseDetailRow="true"
-                DetailRowDisplayMode="GridDetailRowDisplayMode.Auto"
-                KeyFieldName="ID"
-                ValidationEnabled="true"
-                EditStart="Grid_EditStart"
-                EditMode="GridEditMode.PopupEditForm"
-                EditModelSaving="Grid_EditModelSaving"
-                EditCanceling="Grid_EditCanceling"
-                PopupEditFormCssClass="popup-width"
-                PopupEditFormHeaderText="Add/Edit Course"
-                UnboundColumnData="Grid_CustomUnboundColumnData"
-                CustomizeEditModel="Grid_CustomizeEditModel"
-                DataItemDeleting="Grid_DataItemDeleting">
+                        AutoCollapseDetailRow="true"
+                        DetailRowDisplayMode="GridDetailRowDisplayMode.Auto"
+                        KeyFieldName="ID"
+                        ValidationEnabled="true"
+                        EditStart="Grid_EditStart"
+                        EditMode="GridEditMode.PopupEditForm"
+                        EditModelSaving="Grid_EditModelSaving"
+                        EditCanceling="Grid_EditCanceling"
+                        PopupEditFormCssClass="popup-width"
+                        PopupEditFormHeaderText="Add/Edit Course"
+                        UnboundColumnData="Grid_CustomUnboundColumnData"
+                        CustomizeEditModel="Grid_CustomizeEditModel"
+                        DataItemDeleting="Grid_DataItemDeleting">
                     <ToolbarTemplate>
                         <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid IsMasterDetail=true LayoutKey="{2A9D0137-5DD2-4290-A9B7-4C4F5676F224}">
                             <CustomButtonContent>
                                 <DxToolbarItem CssClass="w-100 mx-1" IconCssClass="bi bi-database"
-                                Text="Rebuild Cache"
-                                RenderStyle="@ButtonRenderStyle.Primary"
-                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                Click="@OnRebuild" />
+                                               Text="Rebuild Cache"
+                                               RenderStyle="@ButtonRenderStyle.Primary"
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               Click="@OnRebuild" />
                                 <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-check-circle"
-                                Text="Preview Schedule"
-                                RenderStyle="@ButtonRenderStyle.Info"
-                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained">
+                                               Text="Preview Schedule"
+                                               RenderStyle="@ButtonRenderStyle.Info"
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained">
                                     <Items>
                                         <DxToolbarItem Enabled="@isPreviewReady"
-                                        Text="Preview Term 1" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(1))" />
+                                                       Text="Preview Term 1" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(1))" />
                                         <DxToolbarItem Enabled="@isPreviewReady"
-                                        Text="Preview Term 2" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(2))" />
+                                                       Text="Preview Term 2" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(2))" />
                                         <DxToolbarItem Enabled="@isPreviewReady"
-                                        Text="Preview Term 3" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(3))" />
+                                                       Text="Preview Term 3" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(3))" />
                                         <DxToolbarItem Enabled="@isPreviewReady"
-                                        Text="Preview Term 4" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(4))" />
+                                                       Text="Preview Term 4" RenderStyle="@ButtonRenderStyle.Info" Click="@(()=> OnPreview(4))" />
 
                                     </Items>
                                 </DxToolbarItem>
@@ -104,18 +104,18 @@ else
                     </ToolbarTemplate>
                     <Columns>
                         <DxGridCommandColumnEx @ref="GridCommandColumn"
-                        NewButtonVisible="true"
-                        EditButtonVisible="true"
-                        DeleteButtonVisible="true" FixedPosition="GridColumnFixedPosition.Left" />
+                                               NewButtonVisible="true"
+                                               EditButtonVisible="true"
+                                               DeleteButtonVisible="true" FixedPosition="GridColumnFixedPosition.Left" />
                         <DxGridDataColumn Caption="Year" FieldName="Year"
-                        FixedPosition="GridColumnFixedPosition.Left"
-                        Width="3rem" DisplayFormat="####" />
+                                          FixedPosition="GridColumnFixedPosition.Left"
+                                          Width="3rem" DisplayFormat="####" />
                         <DxGridDataColumn Caption="ID" FieldName="ConversionID"
-                        FixedPosition="GridColumnFixedPosition.Left"
-                        Visible="false" Width="3rem" DisplayFormat="#####" />
+                                          FixedPosition="GridColumnFixedPosition.Left"
+                                          Visible="false" Width="3rem" DisplayFormat="#####" />
                         <DxGridDataColumn Caption="Name" FieldName="Name"
-                        FixedPosition="GridColumnFixedPosition.Left"
-                        Width="15rem" />
+                                          FixedPosition="GridColumnFixedPosition.Left"
+                                          Width="15rem" />
                         <DxGridDataColumn Caption="Type" FieldName="CourseType.ShortName" Width="6rem" />
                         <DxGridDataColumn Caption="Featured?" FieldName="IsFeaturedCourse" Width="7rem" />
                         <DxGridDataColumn Caption="Off Schedule?" FieldName="IsOffScheduleActivity" Width="7rem" />
@@ -139,22 +139,22 @@ else
 
                     <GroupSummary>
                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                        FieldName="ID" DisplayText="{0:n0}  Courses"
-                        FooterColumnName="Name" />
+                                           FieldName="ID" DisplayText="{0:n0}  Courses"
+                                           FooterColumnName="Name" />
                     </GroupSummary>
                     <TotalSummary>
                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                        FieldName="ID" DisplayText="{0:n0}  Courses"
-                        FooterColumnName="Name" />
+                                           FieldName="ID" DisplayText="{0:n0}  Courses"
+                                           FooterColumnName="Name" />
                     </TotalSummary>
 
                     <EditFormTemplate Context="EditFormContext">
                         <CourseDetail @ref="@courseDetail" AnyEnrolmentsInYear="@anyEnrolmentsInYear"
-                        Settings=@settings
-                        Course="(Course)EditFormContext.EditModel"
-                        Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
-                        Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
-                        CourseParticipationTypes="@CourseParticipationTypes" />
+                                      Settings=@settings
+                                      Course="(Course)EditFormContext.EditModel"
+                                      Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
+                                      Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
+                                      CourseParticipationTypes="@CourseParticipationTypes" />
                     </EditFormTemplate>
                 </DxGrid>
             </ContentTemplate>
@@ -162,25 +162,25 @@ else
     }
 
     <DxWindow @ref=@previewWindow Width="60vw"
-    Visible=false
-    HorizontalAlignment="HorizontalAlignment.Center"
-    VerticalAlignment="VerticalAlignment.Center"
-    Height="90vh"
-    AllowResize="true"
-    Context="windowContext"
-    CloseOnEscape=true
-    ShowCloseButton=true
-    ShowFooter=true
-    Scrollable=true
-    BodyCssClass="h-100"
-    Closing="@((WindowClosingEventArgs e) => e.Cancel = !isPreviewReady)"
-    Closed="@(() => isPreviewOpen = false)"
-    HeaderText="Preview">
+              Visible=false
+              HorizontalAlignment="HorizontalAlignment.Center"
+              VerticalAlignment="VerticalAlignment.Center"
+              Height="90vh"
+              AllowResize="true"
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              BodyCssClass="h-100"
+              Closing="@((WindowClosingEventArgs e) => e.Cancel = !isPreviewReady)"
+              Closed="@(() => isPreviewOpen = false)"
+              HeaderText="Preview">
         <BodyTextTemplate>
             <DxLoadingPanel Visible="@(!isPreviewReady)" ApplyBackgroundShading="true">
                 <div class="overflow-hidden">
                     <MemberEnrolment OneReadyStatusChanged="@((bool value) => {isPreviewReady = value; StateHasChanged();})"
-                    IsPreview=true PreviewTerm="previewTerm" />
+                                     IsPreview=true PreviewTerm="previewTerm" />
                 </div>
             </DxLoadingPanel>
         </BodyTextTemplate>
@@ -189,7 +189,7 @@ else
 }
 <style>
     .popup-width {
-    min-width: min(65rem, 100%);
+        min-width: min(65rem, 100%);
     }
 </style>
 
@@ -267,7 +267,7 @@ else
 
     async Task OnRebuild()
     {
-        await progressBar.ShowSmallSpinnerAsync();
+        // await progressBar.ShowSmallSpinnerAsync();
         // using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         // {
         //     var tenant = await tenantService.GetTenantInfoAsync();
@@ -277,28 +277,10 @@ else
         //     await messageBox.ShowOkOnlyAsync("Class Schedule Cache", "The class schedule cache has been rebuilt!");
         // }
 
-        var msg = string.Empty;
-        try
-        {
-            var client = new APIClient();
-            msg = "The rebuild of the Class Schedule cache has been scheduled for immediate execution. It will take a few seconds to complete.";
-            await client.DoBuildSchedule(dbc.TenantInfo.Identifier);
-        }
-        catch (HttpRequestException e)
-        {
-            msg = $@"<p>An Internet issue is currently preventing completion of this procedure.<br/>
-                                        Keep trying, but if you do not receive a successful response shortly (say 5 minutes), contact your U3A.</p>
-        {e.Message}";
-        }
-        catch (Exception ex)
-        {
-            msg = ex.Message;
-        }
-        finally
-        {
-            await progressBar.Close();
-            await messageBox.ShowOkOnlyAsync("Class Schedule Cache", msg);
-        }
+        var client = new APIClient();
+        client.DoBuildSchedule(dbc.TenantInfo.Identifier).SafeFireAndForget();
+        var msg = "The rebuild of the Class Schedule cache has been scheduled for immediate execution. It will take a few seconds to complete.";
+        await messageBox.ShowOkOnlyAsync("Class Schedule Cache", msg);
     }
 
 
