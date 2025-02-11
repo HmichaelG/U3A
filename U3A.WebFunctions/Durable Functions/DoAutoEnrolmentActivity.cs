@@ -23,7 +23,7 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
+            var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 logger.LogInformation($"****** Started {nameof(DoAutoEnrolmentActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
@@ -71,7 +71,7 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
+            var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 using (var dbc = new U3ADbContext(tenant))

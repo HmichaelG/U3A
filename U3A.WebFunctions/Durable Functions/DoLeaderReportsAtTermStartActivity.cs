@@ -19,7 +19,7 @@ public partial class DurableFunctions
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, tenantToProcess, cn);
+            var tenant = GetTenant(tenantToProcess, cn);
             if (tenant != null)
             {
                 logger.LogInformation($"****** Started {nameof(DoLeaderReportsAtTermStartActivity)} for {tenant.Identifier}: {tenant.Name}. ******");

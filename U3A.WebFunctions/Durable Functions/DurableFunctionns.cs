@@ -117,7 +117,7 @@ public partial class DurableFunctions
         return $"{options.DurableActivity}_{options.TenantIdentifier}";
     }
 
-    TenantInfo? GetTenant(ILogger logger, string tenantToProcess, string connectionString)
+    TenantInfo? GetTenant(string tenantToProcess, string connectionString)
     {
         var tenants = new List<TenantInfo>();
         Common.GetTenants(tenants, connectionString!, tenantToProcess);

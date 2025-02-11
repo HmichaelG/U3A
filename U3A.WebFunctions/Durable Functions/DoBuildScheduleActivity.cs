@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
-using Microsoft.Extensions.Logging;
+using MS_LOG=Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using U3A.BusinessRules;
 using U3A.Database;
@@ -12,7 +12,8 @@ using System.Text.Json;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.IdentityModel.Tokens.Jwt;
-using Serilog.Core;
+using Serilog;
+using Serilog.Extensions.Logging;
 using System.Reflection;
 
 
@@ -23,14 +24,14 @@ public partial class DurableFunctions
     [Function(nameof(DoBuildScheduleActivity))]
     public async Task<string> DoBuildScheduleActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger(nameof(DoBuildScheduleActivity));
+        MS_LOG.ILogger logger = executionContext.GetLogger(nameof(DoBuildScheduleActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(logger, options.TenantIdentifier, cn);
+            var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
-                logger.LogInformation($"****** Started {nameof(DoBuildScheduleActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
+                Log.Information($"****** Started {nameof(DoBuildScheduleActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
                     await LogStartTime(logger, tenant);
@@ -41,12 +42,12 @@ public partial class DurableFunctions
                         {
                             await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
                         }
-                        logger.LogInformation($"Class Schedule cache created for: {tenant.Identifier}.");
+                        Log.Information($"Class Schedule cache created for: {tenant.Identifier}.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, $"Error processing {nameof(DoBuildScheduleActivity)} for {tenant.Identifier}");
+                    Log.Error(ex, $"Error processing {nameof(DoBuildScheduleActivity)} for {tenant.Identifier}");
                 }
             }
         }
