@@ -1,10 +1,22 @@
 ﻿@namespace U3A.UI.Forms
 @inherits LayoutComponentBase
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
+<PageTitle>@($"{tenantId} Member Portal")</PageTitle>
 
 <div class="page" >
     @Body
 </div>
 @code {
+    string? tenantId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            tenantId = dbc.TenantInfo.Identifier;
+        }
+        await base.OnInitializedAsync();
+    }
 
 }

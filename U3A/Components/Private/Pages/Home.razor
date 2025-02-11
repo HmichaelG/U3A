@@ -1,12 +1,11 @@
 ﻿@page "/"
 
-<PageTitle>U3Amin Administration</PageTitle>
-
 @using Microsoft.AspNetCore.Components.Server.Circuits
 
 @using System.IO
 @using System.Web
 @using System.Text
+@using System.Globalization
 @using System.Collections.ObjectModel
 
 @inject NavigationManager navMan
@@ -23,18 +22,18 @@
 else
 {
     <DxWindow HeaderText="Open Circuits" Width="800px" ShowFooter="true"
-              ShowCloseButton="true"
-              CloseOnEscape="true"
-              @ref="@circuitDisplay"
-              @bind-Visible=@showPopup>
+    ShowCloseButton="true"
+    CloseOnEscape="true"
+    @ref="@circuitDisplay"
+    @bind-Visible=@showPopup>
         <BodyTemplate>
             <FullScreen DisplayOffset="20" HideToggle="true">
                 <ContentTemplate>
                     <DxGrid Data="@circuitDetails"
-                            ShowGroupPanel="true"
-                            VirtualScrollingEnabled="true"
-                            AutoExpandAllGroupRows="true"
-                            FooterDisplayMode="GridFooterDisplayMode.Always">
+                    ShowGroupPanel="true"
+                    VirtualScrollingEnabled="true"
+                    AutoExpandAllGroupRows="true"
+                    FooterDisplayMode="GridFooterDisplayMode.Always">
                         <Columns>
                             <DxGridDataColumn Fieldname="Status" GroupIndex="0" />
                             <DxGridDataColumn Fieldname="UpTime" SortIndex="0"/>
@@ -54,7 +53,7 @@ else
         </BodyTemplate>
         <FooterTemplate>
             <DxButton Text="Refresh" CssClass="m-1"
-                Click="() => {GetCircuitData();StateHasChanged();}" />
+            Click="() => {GetCircuitData();StateHasChanged();}" />
         </FooterTemplate>
     </DxWindow>
     <MessageBox @ref="@messageBox" />
@@ -62,25 +61,27 @@ else
     <DxFormLayout CssClass="@($"px-2 mt-{ws.SizeMode+2}")">
         @if (!hasRole)
         {
+            <PageTitle>@($"{tenantId}: Member Portal")</PageTitle>
             <U3A.UI.Forms.Pages.MembersPortal.MemberPortal />
         }
         else
         {
+            <PageTitle>@($"{tenantId}: Site Administration")</PageTitle>
             <div class="@($"input-group d-print-none mt-{ws.SizeMode+2}")">
                 <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
-                                  ButtonIconCssClass="bi bi-check2-circle"
-                                  HelpTopic=@($"{versionYear}-Version-History.html")
-                                  ActivationStyle="@HelpActivationStyle.ButtonOnly" />
+                ButtonIconCssClass="bi bi-check2-circle"
+                HelpTopic=@($"{versionYear}-Version-History.html")
+                ActivationStyle="@HelpActivationStyle.ButtonOnly" />
                 <DxButton Text="Support"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          NavigateUrl="Public/Support"
-                          CssClass="ms-1"
-                          IconCssClass="bi bi-person" />
+                RenderStyleMode="ButtonRenderStyleMode.Outline"
+                NavigateUrl="Public/Support"
+                CssClass="ms-1"
+                IconCssClass="bi bi-person" />
                 <ContextHelpTitle Title=""
-                                  HelpTopic="Introduction.html"
-                                  IncludeTableOfContents=true
-                                  ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                HelpTopic="Introduction.html"
+                IncludeTableOfContents=true
+                ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
             </div>
             <DxTabs CssClass="w-100">
                 <DxTabPage Text="Member Summary">
@@ -120,11 +121,11 @@ else
 <style>
 
     .iframe-style {
-        width: 85vw;
-        min-height: 40dvh;
-        height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem") );
-        border-style: none;
-        padding-bottom: 5px;
+    width: 85vw;
+    min-height: 40dvh;
+    height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem") );
+    border-style: none;
+    padding-bottom: 5px;
     }
 
 </style>
@@ -148,10 +149,13 @@ else
     DxWindow? circuitDisplay;
     List<CircuitDetail>? circuitDetails;
     bool showPopup;
+    string tenantId;
 
     protected override async Task OnInitializedAsync()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+        tenantId = textInfo.ToTitleCase(dbc.TenantInfo.Identifier!);
         now = dbc.GetLocalTime();
         homePage = dbc.TenantInfo.Website;
         await base.OnInitializedAsync();

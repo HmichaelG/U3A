@@ -3,7 +3,7 @@
 
 @using Microsoft.AspNetCore.Components.Forms
 
-<PageTitle>U3A Report</PageTitle>
+<PageTitle>@($"{tenantId}: U3A Report")</PageTitle>
 
 @inject NavigationManager NavMan
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
@@ -22,6 +22,7 @@
 @using DevExpress.Blazor.Reporting.Models
 @using U3A.Services
 @using U3A.UI.Common.Pages.Shared
+@using System.Globalization
 
 @attribute [Authorize]
 
@@ -35,16 +36,16 @@
 else
 {
     <DxReportViewer @ref="@reportViewer"
-                    Report="@Report"
-                    SinglePagePreview="false"
-                    Zoom="1"
-                    CssClass="w-100"
-                    OnCustomizeToolbar="OnCustomizeToolbar"
-                    RootCssClasses="@RootCssClass" />
+    Report="@Report"
+    SinglePagePreview="false"
+    Zoom="1"
+    CssClass="w-100"
+    OnCustomizeToolbar="OnCustomizeToolbar"
+    RootCssClasses="@RootCssClass" />
 }
 <style>
     .view-normal {
-        height: @viewerHeight
+    height: @viewerHeight
     }
 
 </style>
@@ -67,12 +68,15 @@ else
 
     U3ADbContext dbc { get; set; }
     TenantDbContext dbcT { get; set; }
+    string? tenantId;
     bool isReady;
 
     protected override async Task OnInitializedAsync()
     {
         viewerHeight = (ws.UseTopMenu) ? "calc(100dvh - 4rem) !important;" : "calc(100dvh - 1rem) !important;";
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+        tenantId = textInfo.ToTitleCase(dbc.TenantInfo.Identifier!);
         dbcT = await TenantDbfactory.CreateDbContextAsync();
         if (Report == null)
         {

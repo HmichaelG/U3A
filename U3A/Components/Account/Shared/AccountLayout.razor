@@ -1,6 +1,8 @@
 ﻿@inherits LayoutComponentBase
 @layout BasicLayout
 @inject NavigationManager NavigationManager
+@using U3A.Database
+
 
 @if (HttpContext is null)
 {
@@ -8,6 +10,7 @@
 }
 else
 {
+    <PageTitle>@($"{tenantId}: Account")</PageTitle>
     <PortalHeader NavigateTo="/" />
     <div class="container">
         <main role="main" align="center">
@@ -28,6 +31,7 @@ else
 @code {
     [CascadingParameter]
     private HttpContext? HttpContext { get; set; }
+    string tenantId;
 
     protected override void OnParametersSet()
     {
@@ -37,6 +41,11 @@ else
             // The identity pages need to set cookies, so they require an HttpContext. To achieve this we
             // must transition back from interactive mode to a server-rendered page.
             NavigationManager.Refresh(forceReload: true);
+        }
+        else
+        {
+            HostStrategy hs = new HostStrategy();
+            tenantId = hs.GetIdentifier(HttpContext.Request.Host.Host);
         }
     }
 }
