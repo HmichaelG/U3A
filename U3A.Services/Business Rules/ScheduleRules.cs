@@ -58,11 +58,6 @@ namespace U3A.BusinessRules
             enrolmentKeys.AddRange(await dbcT.MultiCampusEnrolment
                                                 .AsNoTracking()
                                                 .Select(x => x.ID).ToListAsync());
-            // Get Class updates since cache creation
-            foreach (var c in await GetClassDetailsAsync(dbc, term, settings, excludeOffScheduleActivities, lastSchedule.UpdatedOn))
-            {
-                classes.Add(c);
-            }
             // Get the new enrolments
             var newEnrolments = await dbc.Enrolment.AsNoTracking()
                                 .Include(x => x.Term)
