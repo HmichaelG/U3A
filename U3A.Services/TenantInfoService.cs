@@ -12,8 +12,7 @@ namespace U3A.Services
     {
         private readonly IDbContextFactory<TenantDbContext> TenantDbFactory;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public TenantInfoService(
-                                IDbContextFactory<TenantDbContext> TenantDbFactory,
+        public TenantInfoService(IDbContextFactory<TenantDbContext> TenantDbFactory,
                                 IHttpContextAccessor httpContextAccessor)
         {
             this.TenantDbFactory = TenantDbFactory;
@@ -30,16 +29,15 @@ namespace U3A.Services
         public async Task<TenantInfo> GetTenantInfoAsync()
         {
             HostStrategy hs = new HostStrategy();
-
-            var identifirer = hs.GetIdentifier(httpContextAccessor.HttpContext.Request.Host.Host);
+            var identifier = hs.GetIdentifier(httpContextAccessor.HttpContext.Request.Host.Host);
             TenantInfo tenantInfo = null;
             using (var dbc = TenantDbFactory.CreateDbContext())
             {
                 tenantInfo = await dbc.TenantInfo.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Identifier == identifirer);
+                    .FirstOrDefaultAsync(x => x.Identifier == identifier);
                 if (tenantInfo == null)
                 {
-                    tenantInfo =await dbc.TenantInfo
+                    tenantInfo = await dbc.TenantInfo
                         .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.Identifier == "demo"); //finbuckle leftover
                 }
