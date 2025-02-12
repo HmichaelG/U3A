@@ -114,7 +114,7 @@ ItemClick="OnItemClick">
                 Tooltip="Export the entire grid to Excel">
                 </DxToolbarItem>
                 <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportSelected" Text="Export Selected"
-                Tooltip="Export selected rows to Excel">
+                Tooltip="Export selected rows to Excel" Visible="@areRowsSelectable" >
                 </DxToolbarItem>
             </Items>
         </DxToolbarItem>
@@ -142,6 +142,7 @@ ItemClick="OnItemClick">
     GridPersistentLayout? layout;
     GridPersistentLayout? defaultLayout { get; set; }
     MessageBox? messageBox;
+    bool areRowsSelectable;
 
     protected override async Task OnInitializedAsync()
     {
@@ -188,11 +189,16 @@ ItemClick="OnItemClick">
                 LinkedGrid.VirtualScrollingEnabled = true;
             }
             LinkedGrid.TextWrapEnabled = false;
+            areRowsSelectable = false;
             foreach (var col in LinkedGrid.GetColumns())
             {
                 if (col is DxGridDataColumn)
                 {
                     if (col.MinWidth < 75) { col.MinWidth = 75; }
+                }
+                if (col is DxGridSelectionColumn)
+                {
+                    areRowsSelectable = true;
                 }
             }
             LinkedGrid.EndUpdate();
@@ -318,7 +324,7 @@ ItemClick="OnItemClick">
     }
 
     async Task ExcelExport(bool SelectedRowsOnly)
-    {
+    {    
         foreach (var col in LinkedGrid!.GetDataColumns())
         {
             col.ExportEnabled = col.Visible;
@@ -358,7 +364,19 @@ ItemClick="OnItemClick">
                 }
             };
         options.ExportSelectedRowsOnly = SelectedRowsOnly;
-        await LinkedGrid.ExportToXlsxAsync("gridExport.Xlsx", options);
+        try
+        {
+            await LinkedGrid.ExportToXlsxAsync("gridExport.Xlsx", options);
+        }
+        catch (NullReferenceException ex)
+        {
+            await messageBox.ShowOkOnlyAsync("Export Error",
+            $"{ex.Message}<p>This error will occur when there are no grid rows selected.</p>");
+        }
+        catch (Exception ex)
+        {
+            await messageBox.ShowOkOnlyAsync("Export Error", ex.Message);
+        }
     }
 
     /// <summary>
