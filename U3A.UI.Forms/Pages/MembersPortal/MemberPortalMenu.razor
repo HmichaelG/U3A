@@ -330,9 +330,9 @@ else
         var welcome = "Welcome to our U3A";
         if (loginState.SelectedPerson != null)
         {
+            person = loginState.SelectedPerson;
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                person = await dbc.Person.FindAsync(loginState.SelectedPerson.ID);
                 nextTerm = await BusinessRule.GetNextTermAsync(dbc, CurrentTerm);
                 //Special case: enrolment day
                 openingTime = await BusinessRule.IsEnrolmentDayLockoutPeriod(dbc, dbc.GetLocalTime().Date);
