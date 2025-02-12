@@ -243,7 +243,7 @@ else
         dbc = await U3Adbfactory.CreateDbContextAsync();
         systemSettings = await dbc.SystemSettings.FirstOrDefaultAsync();
         surcharge = systemSettings.MailSurcharge.ToString("c2");
-        person = await dbc.Person.FindAsync(loginState?.SelectedPerson?.ID);
+        person = loginState.SelectedPerson;
         if (person == null || IsNewLinkedMember)
         {
             person = new Person()
