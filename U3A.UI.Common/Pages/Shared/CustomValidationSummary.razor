@@ -1,0 +1,27 @@
+﻿@inherits ValidationSummary
+
+@if (Context != null && HasValidationErrors())
+{
+    <div class="validation-summary">
+        One or more fields with invalid data detected. Please correct before continuing.
+    </div>
+}
+
+<style>
+    .validation-summary
+    {
+        margin-left: 0.5rem;
+     color: red;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public EditContext? Context { get; set; }
+
+    private bool HasValidationErrors()
+    {
+        var messages = Context?.GetValidationMessages();
+        return messages != null && messages.Any();
+    }
+}
