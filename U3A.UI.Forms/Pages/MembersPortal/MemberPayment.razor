@@ -75,7 +75,9 @@ else
                             </div>
                         }
                         <div class="m-auto">
-                            <TermsAndConditions RequireConfirmation="true" OnConfirmationChanged="@((bool value) => areTermsConfirmed = value)"
+                            <TermsAndConditions RequireConfirmation="true" 
+                                                Participant="@loginState?.SelectedPerson"
+                                                OnConfirmationChanged="@((bool value) => areTermsConfirmed = value)"
                                                 SystemSettings="@settings"
                                                 OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                         </div>

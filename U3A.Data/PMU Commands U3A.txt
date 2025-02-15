@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_DocumentQueue_DelayInHours
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_ConfirmationOnPayment
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_ConfirmationOnPayment
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Person_DateTermsLastAgreed
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_ConfirmationOnPayment
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Person_DateTermsLastAgreed
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

@@ -73,6 +73,7 @@
                 VirtualScrollingEnabled="true"
                 PopupEditFormCssClass="popup-width"
                 EditMode="GridEditMode.PopupEditForm"
+                UnboundColumnData="Grid_UnboundColumnData"
                 CustomizeEditModel="Grid_CustomizeEditModel"
                 EditModelSaving="Grid_EditModelSaving"
                 PopupEditFormHeaderText="Add/Edit Participant"
@@ -154,6 +155,9 @@
                         <DxGridDataColumn Caption="DOB" FieldName="BirthDate" Visible="false" Width="6rem" />
                         <DxGridDataColumn Caption="Month Born" FieldName="BirthMonthName" Width="6rem" />
                         <DxGridDataColumn Caption="Joined" FieldName="DateJoined" Width="6rem" />
+                        <DxGridDataColumn Caption="T&C's Agreed"
+                        UnboundType="GridUnboundColumnType.DateTime"
+                        FieldName="TermsLastAgreed" Width="6rem" DisplayFormat="d/M/yy HH:mm" />
                         <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToBriefText" Width="6rem" SortMode="GridColumnSortMode.Value" />
                         <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
                         <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
@@ -407,6 +411,15 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
+    void Grid_UnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        Person person = e.DataItem as Person;
+        if (e.FieldName == "TermsLastAgreed")
+        {
+            if (person.DateTermsLastAgreed != null) { e.Value = dbc?.GetLocalTime(person.DateTermsLastAgreed); }
+        }
+    }
+
     void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
     {
         if (e.IsNew)
@@ -496,7 +509,7 @@
                     msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                 }
                 result = await messageBox.ShowAsync("Email change failed",
-                                    $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
+                                                        $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
             }
         }
@@ -525,8 +538,8 @@
                 {
                     var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
                     _ = await UserManager.ConfirmEmailAsync(user, token);
-                    string msg = $@"The login has changed<br/> 
-                                from: <b>{originalEmail}</b><br/> 
+                    string msg = $@"The login has changed<br/>
+                                from: <b>{originalEmail}</b><br/>
                                 to <b>{newEmail}</b>.<br/>
                                 It is confirmed and the password remains unchanged";
                     _ = await messageBox.ShowOkOnlyAsync("Login changed", msg);
@@ -539,7 +552,7 @@
                         msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                     }
                     result = await messageBox.ShowAsync("Email change failed",
-                                            $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
+                                                                $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
                 }
             }

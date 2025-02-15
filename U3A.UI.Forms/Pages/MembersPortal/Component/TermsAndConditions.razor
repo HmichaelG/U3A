@@ -1,5 +1,7 @@
 ﻿@namespace U3A.UI.Forms
 
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" @bind-IsActive="@isMobileLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Small" @bind-IsActive="@isTabletLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Medium" @bind-IsActive="@isTabletLayout" />
@@ -19,7 +21,7 @@
             RenderStyle="ButtonRenderStyle.Info"
             RenderStyleMode="ButtonRenderStyleMode.Contained">
             </DxButton>
-            <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-danger" hidden="@(!RequireConfirmation)"
+            <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-danger" hidden="@(!isConfirmationRequired)"
             SizeMode="SizeMode.Small"
             CheckedChanged="@(async (bool value) => await ConfirmationChanged(value))"
             Alignment="CheckBoxContentAlignment.Right"
@@ -76,6 +78,7 @@
 @code {
     [Parameter] public bool RequireConfirmation { get; set; }
     [Parameter] public EventCallback<bool> OnConfirmationChanged { get; set; }
+    [Parameter] public Person Participant { get; set; }
 
     [Parameter, EditorRequired] public SystemSettings? SystemSettings { get; set; }
     [Parameter] public bool IsEnrolmentNotice { get; set; }
@@ -90,6 +93,7 @@
     string windowCssClass;
     string introduction;
     string fontSizeCssClass;
+    bool isConfirmationRequired;
 
     bool isHidden = false;
 
@@ -108,6 +112,17 @@
             if (SystemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment)
             {
                 fireConfirmationEvent = true;
+            }
+            else if (RequireConfirmation) 
+            {
+                if (Participant?.DateTermsLastAgreed != null)
+                {
+                    isConfirmationRequired = Participant?.DateTermsLastAgreed?.AddDays(120) < DateTime.UtcNow;
+                }
+                else
+                {
+                    isConfirmationRequired = true;
+                }
             }
             isReady = true;
         }
@@ -152,6 +167,15 @@
 
     async Task ConfirmationChanged(bool value)
     {
+        if (value && Participant != null && isConfirmationRequired)
+        {
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                var p = await dbc.Person.FindAsync(Participant.ID);
+                p.DateTermsLastAgreed = DateTime.UtcNow;
+                await dbc.SaveChangesAsync();
+            }
+        }
         await OnConfirmationChanged.InvokeAsync(value);
     }
 }

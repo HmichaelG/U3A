@@ -520,6 +520,7 @@ public class Person : BaseEntity, ISoftDelete
     [NotMapped][JsonIgnore] public bool IsMultiCampusVisitor { get; set; } = false;
     public bool IsDeleted { get; set; }
     public DateTime? DeletedAt { get; set; }
+    public DateTime? DateTermsLastAgreed { get; set; }
 }
 public class PersonList : BindingList<Person> { }
 
