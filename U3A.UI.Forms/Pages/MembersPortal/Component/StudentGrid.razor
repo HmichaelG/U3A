@@ -5,8 +5,8 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 
-<DxLayoutBreakpoint MaxWidth="768"
-                    @bind-IsActive="@IsSmallLayout" />
+<DxLayoutBreakpoint MaxWidth="1360" @bind-IsActive="@IsSmallLayout" />
+
 @if (!IsReady)
 {
     <LoadingIndicator />
@@ -15,34 +15,45 @@ else
 {
     <div class="mt-3">
         <DxGrid @ref=@grid Data="@Enrolments" CssClass="student-grid-style" id="myGrid"
-                ShowAllRows="true"
-                ShowSearchBox=true
-                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                KeyFieldName="ID"
-                ValidationEnabled="true"
-                SelectionMode="GridSelectionMode.Multiple"
-                AllowSelectRowByClick="false"
-                UnboundColumnData="Grid_CustomUnboundColumnData"
-                @bind-SelectedDataItems="SelectedDataItems">
+        ShowAllRows="true"
+        ShowSearchBox=true
+        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+        KeyFieldName="ID"
+        ValidationEnabled="true"
+        SelectionMode="GridSelectionMode.Multiple"
+        AllowSelectRowByClick="false"
+        UnboundColumnData="Grid_CustomUnboundColumnData"
+        @bind-SelectedDataItems="SelectedDataItems">
             <Columns>
                 <DxGridSelectionColumn Width="1rem" />
-                <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
+                @*                 <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
                                   Visible="@(!IsManageEnrolmentsView)"
                                   UnboundType="GridUnboundColumnType.Integer" />
-                <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
-                                  Visible="@IsManageEnrolmentsView" />
-                <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag">
+ *@                <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
+                Visible="@IsManageEnrolmentsView" />
+                <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag" >
                     <CellDisplayTemplate>
                         @{
                             if (context.DataItem != null)
                             {
                                 Enrolment e = (Enrolment)context.DataItem;
                                 var isCourseClerk = e.IsCourseClerk;
-                                var namecss = "col-8 text-start ";
-                                var outerCss = "w-100";
-                                if (isCourseClerk) outerCss += " badge badge-size bg-success text-white";
-                                <div class="@outerCss">
-                                    <div class=@namecss>@context.Value</div>
+                                var hasEmail = !e.Person.IsEmailSilent;
+                                var hasMobile = !string.IsNullOrEmpty(e.Person.Mobile) && !e.Person.IsPhoneSilent && !e.Person.SMSOptOut;
+                                var hasPhone = !string.IsNullOrEmpty(e.Person.HomePhone) && !e.Person.IsPhoneSilent;
+                                var highlightcss = (isCourseClerk)
+                                ? "alert-link text-primary"
+                                : "";
+                                var width = (IsSmallLayout) ? "col col-9" : "col col-12";
+                                var css = $"{width} text-start {highlightcss}";
+                                var emailcss = (hasEmail) ? "bi-envelope" : "";
+                                var mobilecss = (hasMobile) ? "bi-phone" : "";
+                                var phonecss = (hasPhone) ? "bi-telephone" : "";
+                                <div class="input-group">
+                                    <div class=@css>@context.Value</div>
+                                    <div class=@($"col col-1 {emailcss} {highlightcss}") hidden="@(!IsSmallLayout)" />
+                                    <div class=@($"col col-1 {mobilecss} {highlightcss}") hidden="@(!IsSmallLayout)" />
+                                    <div class=@($"col col-1 {phonecss} {highlightcss}") hidden="@(!IsSmallLayout)" />
                                 </div>
                             }
                         }
@@ -62,6 +73,9 @@ else
                                   FieldName="Person.FinancialToBriefText"
                                   Visible="!IsSmallLayout"
                                   Width="4rem" />
+                <DxGridDataColumn Caption="Email"
+                                  Visible="!IsSmallLayout"
+                                  FieldName="Person.Email" />
                 <DxGridDataColumn Caption="Mobile"
                                   Visible="!IsSmallLayout"
                                   FieldName="Person.MobileOrSilent"
@@ -84,7 +98,7 @@ else
 }
 <style>
     .student-grid-style {
-        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "22rem" : "20rem" : "20rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "22rem" : "20rem" : "20rem") );
     }
 
     .badge-size {
@@ -120,7 +134,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        sequence = 0;
+        sequence = 1;
         service = new MemberFeeCalculationService();
         FeeDue = new Dictionary<Guid, decimal>();
         if (Enrolments != null && Enrolments.Count > 0)
@@ -149,6 +163,7 @@ else
             grid.AutoFitColumnWidths();
             isAutoFitted = true;
         }
+        sequence = 1;
         return base.OnAfterRenderAsync(firstRender);
     }
 
@@ -173,11 +188,11 @@ else
         }
     }
 
-    public void ClearSelections() 
-    { 
-        if (grid != null)  
+    public void ClearSelections()
+    {
+        if (grid != null)
         {
-            grid.ClearSelection(); 
+            grid.ClearSelection();
         }
     }
 }
