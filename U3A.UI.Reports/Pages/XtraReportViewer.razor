@@ -2,6 +2,7 @@
 @page "/XtraReportViewer/{ReportName?}"
 
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Configuration;
 
 <PageTitle>@($"{tenantId}: U3A Report")</PageTitle>
 
@@ -10,9 +11,11 @@
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService TenantService
 @inject WorkStation ws
+@inject IConfiguration config
 
 @implements IDisposable
 
+@using DevExpress.Drawing
 @using DevExpress.XtraReports.Services
 @using DevExpress.XtraPrinting.Caching;
 @using DevExpress.XtraReports.UI;
@@ -70,9 +73,12 @@ else
     TenantDbContext dbcT { get; set; }
     string? tenantId;
     bool isReady;
+    string googleFontsAPIKey;
 
     protected override async Task OnInitializedAsync()
     {
+        googleFontsAPIKey = config.GetValue<string>("GoogleFontsAPIKey");
+        DXFontRepository.QueryNotFoundFont += Report_QueryNotFoundFont;
         viewerHeight = (ws.UseTopMenu) ? "calc(100dvh - 4rem) !important;" : "calc(100dvh - 1rem) !important;";
         dbc = await U3Adbfactory.CreateDbContextAsync();
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -118,6 +124,14 @@ else
             }
         }
     }
+
+    private void Report_QueryNotFoundFont(object sender, NotFoundFontEventArgs e)
+    {
+        var service = new FontCollectorService();
+        var fontData = service.ProcessFont(googleFontsAPIKey, e.RequestedFont).Result;
+        e.FontFileData = fontData;
+    }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
