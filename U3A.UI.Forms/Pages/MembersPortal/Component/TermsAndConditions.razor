@@ -97,6 +97,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        bool fireConfirmationEvent = false;
         if (SystemSettings != null && SystemSettings.TermsAndConditionsEnabled)
         {
             htmlText = SystemSettings.TermsAndConditionsHTML;
@@ -106,10 +107,15 @@
             fontSizeCssClass = (isMobileLayout) ? "small-font" : "";
             if (SystemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment)
             {
-                await OnConfirmationChanged.InvokeAsync(true);
+                fireConfirmationEvent = true;
             }
             isReady = true;
         }
+        if (SystemSettings != null && !SystemSettings.TermsAndConditionsEnabled)
+        {
+            fireConfirmationEvent = true;
+        }
+        if (fireConfirmationEvent) { await OnConfirmationChanged.InvokeAsync(true); }
     }
 
     protected override async Task OnParametersSetAsync()
