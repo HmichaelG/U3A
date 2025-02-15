@@ -41,6 +41,17 @@ function setFocus(id) {
     }
 }
 
+function ScrollToElementId(id) {
+    const element = document.getElementById(id);
+    if (element instanceof HTMLElement) {
+        element.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+            inline: "nearest"
+        });
+    }
+}
+
 function getWindowBounds(id) {
     let elem = document.getElementById(id);
     if (!elem) return null;
@@ -111,8 +122,8 @@ function setTheme() {
         theme = theme.replace('"', '',);
         if (theme.startsWith("fluent")) {
             theme = theme.replace('.bs5', '',);
-        // whenfluent theme is working correctly
-        //    theme = 'window.matchMedia('(prefers-color-scheme: dark)').matches ? 'fluent-dark' : 'fluent-light'
+            // whenfluent theme is working correctly
+            //    theme = 'window.matchMedia('(prefers-color-scheme: dark)').matches ? 'fluent-dark' : 'fluent-light'
         }
         href = href.replace('office-white', theme);
     }

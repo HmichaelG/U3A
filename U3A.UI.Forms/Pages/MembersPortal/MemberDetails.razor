@@ -23,7 +23,7 @@ else
 
     <div class="col col-12 col-md-10 col-lg-8 mx-auto mt-2">
         <EditForm Model="@person"
-                  OnValidSubmit=@ValidFormSubmitted
+                  OnSubmit="@OnValidateForm"
                   Context="editContext">
             <DataAnnotationsValidator />
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
@@ -53,7 +53,7 @@ else
                                 <DxTextBox @bind-Text="@City" />
                             </DxFormLayoutItem>
                             <DxButton CssClass="mt-2 ms-2" IconCssClass="bi bi-search"
-                                Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
+                                      Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
                         </DxFormLayoutGroup>
                     </div>
                 }
@@ -84,9 +84,9 @@ else
                             <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
-                            <DxDateEdit @bind-Date="@person.BirthDate" 
-                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                NullText="Optional It helps to know you." />
+                            <DxDateEdit @bind-Date="@person.BirthDate"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                        NullText="Optional It helps to know you." />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                             <DxMemo @bind-Text="@person.Occupation" Rows="3"
@@ -158,11 +158,11 @@ else
 
                     </DxFormLayoutGroup>
                     <DxFormLayoutGroup Caption="In Case of Emergency">
-                        <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
+                        <DxFormLayoutItem Id="ICEContact" Caption="Contact" ColSpanMd="12">
                             <DxTextBox @bind-Text="@person.ICEContact" />
                             <ValidationMessage For="@(() => person.ICEContact)" />
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
+                        <DxFormLayoutItem id="ICEPhone" Caption="Phone" ColSpanMd="12">
                             <DxTextBox @bind-Text="@person.ICEPhone" />
                             <ValidationMessage For="@(() => person.ICEPhone)" />
                         </DxFormLayoutItem>
@@ -188,7 +188,7 @@ else
         display: block;
         width: 100%;
         min-width: 1px;
-        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "10rem" : "8rem" : "8rem"));
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "10rem" : "8rem" : "8rem") );
         overflow-y: auto;
         border-bottom: thin;
     }
@@ -263,55 +263,77 @@ else
     }
 
     bool isBusy;
-    async Task ValidFormSubmitted(EditContext editContext)
+    async Task OnValidateForm(EditContext editContext)
     {
         if (isBusy) return;
         isBusy = true;
         try
         {
-            isNew = false;
-            var editModel = (Person)editContext.Model;
-            if (!await IsDataOK(editModel)) return;
-            // Re-query a data item from the store.
-            var dataItem = dbc.Person.Find(editModel.ID);
-            if (dataItem == null)
+            var isValid = editContext.Validate();
+            if (!isValid)
             {
-                dataItem = new Person();
-                isNew = true;
-            }
-            // Assign changes from the edit model to the data item.
-            if (dataItem != null)
-            {
-                editModel.CopyTo(dataItem);
-                try
+                if (!editContext.IsValid(editContext.Field("ICEContact")))
                 {
-                    // Post changes to the database.
-                    if (isNew) await dbc.AddAsync(dataItem);
-                    await dbc.SaveChangesAsync();
-                    loginState.SelectedPerson = dataItem;
-                    if (IsNewLinkedMember)
-                    {
-                        await messageBox.ShowOkOnlyAsync("Link Succeeded", "You must now re-login for the change to take affect.<br>" +
-                                                            "Click Ok to logout");
-                        loginState.SelectedPerson = null;
-                        await OnCancel();
-                    }
-                    else
-                    {
-                        if (isNew) await DoFeePaymentRequest();
-                        else await ReturnToMenu(PortalMenuResult.MemberDetailsCompleted);
-                    }
+                    await ScrollToInvalidField("ICEContact");
                 }
-                catch (Exception ex)
+                else if (!editContext.IsValid(editContext.Field("ICEPhone")))
                 {
-                    ErrorHeader = "Save to database error";
-                    ErrorMessage = Helpers.GetErrorMessage(ex);
-                    await ErrorPopup.ShowPopupAsync();
-                    dbc?.ChangeTracker?.Clear();
+                    await ScrollToInvalidField("ICEPhone");
                 }
             }
+            else await ValidFormSubmitted(editContext);
         }
         finally { isBusy = false; }
+    }
+
+    private async Task ScrollToInvalidField(string fieldName)
+    {
+        await js.InvokeVoidAsync("ScrollToElementId", fieldName);
+    }
+
+    async Task ValidFormSubmitted(EditContext editContext)
+    {
+        isNew = false;
+        var editModel = (Person)editContext.Model;
+        if (!await IsDataOK(editModel)) return;
+        // Re-query a data item from the store.
+        var dataItem = dbc.Person.Find(editModel.ID);
+        if (dataItem == null)
+        {
+            dataItem = new Person();
+            isNew = true;
+        }
+        // Assign changes from the edit model to the data item.
+        if (dataItem != null)
+        {
+            editModel.CopyTo(dataItem);
+            try
+            {
+                // Post changes to the database.
+                if (isNew) await dbc.AddAsync(dataItem);
+                await dbc.SaveChangesAsync();
+                loginState.SelectedPerson = dataItem;
+                if (IsNewLinkedMember)
+                {
+                    await messageBox.ShowOkOnlyAsync("Link Succeeded", "You must now re-login for the change to take affect.<br>" +
+                                                        "Click Ok to logout");
+                    loginState.SelectedPerson = null;
+                    await OnCancel();
+                }
+                else
+                {
+                    if (isNew) await DoFeePaymentRequest();
+                    else await ReturnToMenu(PortalMenuResult.MemberDetailsCompleted);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHeader = "Save to database error";
+                ErrorMessage = Helpers.GetErrorMessage(ex);
+                await ErrorPopup.ShowPopupAsync();
+                dbc?.ChangeTracker?.Clear();
+            }
+        }
     }
 
     async Task<bool> IsDataOK(Person person)
