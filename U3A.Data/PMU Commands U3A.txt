@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_ApplicationUser_LastLogin
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_DocumentQueue_DelayInHours
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_DocumentQueue_DelayInHours
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_ConfirmationOnPayment
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_DocumentQueue_DelayInHours
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Settings_ConfirmationOnPayment
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

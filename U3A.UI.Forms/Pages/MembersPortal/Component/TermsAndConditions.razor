@@ -5,29 +5,40 @@
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Medium" @bind-IsActive="@isTabletLayout" />
 
 
-@if (isReady) {
+@if (isReady)
+{
     <section class="card border-info alert-info w-100 p-1" hidden="@isHidden">
         <div class=@($"text-center p-2 {fontSizeCssClass}")>
             <button class="btn-close float-right" onclick="@onCloseButtonClick" />
             <strong>Terms &amp; Conditions</strong><br />@introduction
         </div>
-        <DxButton Text="Click to view our T & C's" SizeMode="SizeMode.Small" CssClass="w-100" IconCssClass="bi bi-eyeglasses menu-icon"
-                  Click="@(e => OnTandCClicked())"
-                  RenderStyle="ButtonRenderStyle.Info"
-                  RenderStyleMode="ButtonRenderStyleMode.Contained">
-        </DxButton>
+        <div class="input-group">
+            <DxButton Text="Click to view our T & C's" SizeMode="SizeMode.Small"
+            CssClass="flex-grow-1" IconCssClass="bi bi-eyeglasses menu-icon"
+            Click="@(e => OnTandCClicked())"
+            RenderStyle="ButtonRenderStyle.Info"
+            RenderStyleMode="ButtonRenderStyleMode.Contained">
+            </DxButton>
+            <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-danger" hidden="@(!RequireConfirmation)"
+            SizeMode="SizeMode.Small"
+            CheckedChanged="@(async (bool value) => await ConfirmationChanged(value))"
+            Alignment="CheckBoxContentAlignment.Right"
+            LabelPosition="LabelPosition.Left">
+                I have read & agree with the Terms & Conditions
+            </DxCheckBox>
+        </div>
     </section>
 
     <DxWindow @ref=@detailsForm
-              AllowResize="false"
-              AllowDrag=false
-              Context="windowContext"
-              CloseOnEscape=true
-              ShowCloseButton=true
-              ShowFooter=true
-              Scrollable=true
-              CssClass=@windowCssClass
-              HeaderText="Terms & Conditions">
+    AllowResize="false"
+    AllowDrag=false
+    Context="windowContext"
+    CloseOnEscape=true
+    ShowCloseButton=true
+    ShowFooter=true
+    Scrollable=true
+    CssClass=@windowCssClass
+    HeaderText="Terms & Conditions">
         <BodyTextTemplate>
             <div class="card overflow-scroll">
                 <div class="card-body">
@@ -42,27 +53,30 @@
 }
 <style>
     .mobile-device {
-        width: 100vw !important;
+    width: 100vw !important;
     }
 
     .tablet-device {
-        width: 80vw !important;
+    width: 80vw !important;
     }
 
     .other-device {
-        width: 50vw !important;
+    width: 50vw !important;
     }
 
     .small-font {
-        font-size: x-small !important;
+    font-size: x-small !important;
     }
 
     .float-right {
-        float: right;
+    float: right;
     }
 </style>
 
 @code {
+    [Parameter] public bool RequireConfirmation { get; set; }
+    [Parameter] public EventCallback<bool> OnConfirmationChanged { get; set; }
+
     [Parameter, EditorRequired] public SystemSettings? SystemSettings { get; set; }
     [Parameter] public bool IsEnrolmentNotice { get; set; }
     [Parameter] public EventCallback OnCollapsed { get; set; }
@@ -70,6 +84,7 @@
     DxWindow? detailsForm;
     string htmlText;
     bool isReady;
+    bool isConfirmed;
     bool isMobileLayout;
     bool isTabletLayout;
     string windowCssClass;
@@ -79,19 +94,36 @@
     bool isHidden = false;
 
 
-    protected override void OnInitialized() {
-        base.OnInitialized();
-        if (SystemSettings != null && SystemSettings.TermsAndConditionsEnabled) {
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (SystemSettings != null && SystemSettings.TermsAndConditionsEnabled)
+        {
             htmlText = SystemSettings.TermsAndConditionsHTML;
             introduction = (IsEnrolmentNotice)
                                 ? $"By participation, you acknowledge and accept the {SystemSettings?.U3AGroup} terms and conditions of membership."
                                 : $"By your fee payment, you acknowledge and accept the {SystemSettings?.U3AGroup} terms and conditions of membership.";
             fontSizeCssClass = (isMobileLayout) ? "small-font" : "";
+            if (SystemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment)
+            {
+                await OnConfirmationChanged.InvokeAsync(true);
+            }
             isReady = true;
         }
     }
 
-    async void OnTandCClicked() {
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SystemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment)
+        {
+            RequireConfirmation = false;
+            isConfirmed = true;
+        }
+        await base.OnParametersSetAsync();
+    }
+
+    async void OnTandCClicked()
+    {
         windowCssClass = (isMobileLayout)
                             ? "mobile-device vh-100"
                             : (isTabletLayout)
@@ -100,14 +132,20 @@
         await detailsForm.ShowAsync();
     }
 
-    async void onClick() {
+    async void onClick()
+    {
         await detailsForm.CloseAsync();
     }
 
-    async Task onCloseButtonClick() {
+    async Task onCloseButtonClick()
+    {
         isHidden = true;
         InvokeAsync(StateHasChanged);
         await OnCollapsed.InvokeAsync();
     }
 
+    async Task ConfirmationChanged(bool value)
+    {
+        await OnConfirmationChanged.InvokeAsync(value);
+    }
 }

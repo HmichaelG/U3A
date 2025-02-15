@@ -75,7 +75,9 @@ else
                             </div>
                         }
                         <div class="m-auto">
-                            <TermsAndConditions SystemSettings="@settings" OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                            <TermsAndConditions RequireConfirmation="true" OnConfirmationChanged="@((bool value) => areTermsConfirmed = value)"
+                                                SystemSettings="@settings"
+                                                OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                         </div>
                     </DxFormLayoutGroup>
                     @if (!string.IsNullOrWhiteSpace(OnlineErrorMessage))
@@ -191,6 +193,7 @@ else
     U3ADbContext? dbc { get; set; }
 
     bool IsReady = false;
+    bool areTermsConfirmed;
     bool IsSmallLayout;
     bool showFeesDueToggle;
     SystemSettings? settings;
@@ -285,6 +288,7 @@ else
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
     {
         if (!await AreThereFeesToBePaid()) return;
+        if (!await AreTermsConfirmed()) return;
         menuSelection = selection;
         StateHasChanged();
     }
@@ -308,21 +312,31 @@ else
 
     string GetFeeAsString(decimal fullFee)
     {
-        decimal result = (selectedPaymentType == null)  ? fullFee : selectedPaymentType.Amount;
+        decimal result = (selectedPaymentType == null) ? fullFee : selectedPaymentType.Amount;
         return result.ToString("c2");
     }
 
     async Task<decimal> CalculateFeeAsync()
     {
-        decimal result = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson,term);
+        decimal result = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson, term);
         feeAsString = GetFeeAsString(result);
         return result;
+    }
+
+    async Task<bool> AreTermsConfirmed()
+    {
+        if (!areTermsConfirmed)
+        {
+            await messageBox.ShowOkOnlyAsync("Confirm Terms & Conditions", "Please confirm you have read and agree to our terms & conditions.");
+        }
+        return areTermsConfirmed;
     }
 
     async Task OnPayOnline(MouseEventArgs e)
     {
         if (!await AreThereFeesToBePaid()) return;
         if (!await IsAdminOnU3ADesktop()) return;
+        if (!await AreTermsConfirmed()) return;
         IsProcessing = true;
         InvokeAsync(StateHasChanged);
         string email = "";

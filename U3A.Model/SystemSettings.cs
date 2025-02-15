@@ -161,6 +161,7 @@ namespace U3A.Model
         public ClassScheduleDisplayPeriod ClassScheduleDisplayPeriod { get; set; }
         public MemberFeePaymentType AllowedMemberFeePaymentTypes { get; set; }
         public DateTime? EnrolmentBlackoutEndsUTC { get; set; }
+        public bool DoNotRequireTermsAndConditionsConfirmationOnFeePayment { get; set; }
 
         private string mTimeZoneId;
         [DefaultValue("Australia/Sydney")]

@@ -270,6 +270,9 @@ else
                                         <DxFormLayoutItem Caption="Enable Terms & Conditions display?" ColSpanMd="12">
                                             <DxCheckBox @bind-Checked="@systemSettings.TermsAndConditionsEnabled" />
                                         </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Do not require Terms & Conditions confirmation on fee payment?" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@systemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment" />
+                                        </DxFormLayoutItem>
                                         <DxFormLayoutItem ColSpanMd="12">
                                             <DxRichEdit @ref="@richEdit"
                                                         DocumentContent=@systemSettings.TermsAndConditions

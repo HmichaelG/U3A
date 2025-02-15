@@ -15,7 +15,7 @@
 </style>
 
 @code {
-    [Parameter]
+    [Parameter, EditorRequired]
     public EditContext? Context { get; set; }
 
     private bool HasValidationErrors()
