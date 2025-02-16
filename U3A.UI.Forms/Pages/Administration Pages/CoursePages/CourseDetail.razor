@@ -55,10 +55,9 @@ else
             </DxTabPage>
 
             <DxTabPage Text="Description">
-                <DxFormLayoutItem ColSpanMd="12">
-                    <HtmlEditor @bind-Markup="@Course.Description"
-                                Height="30rem" Width="100%" />
-                </DxFormLayoutItem>
+                <HtmlEditor @bind-Markup="@Course.Description"
+                            DisableAIExtensions="true"
+                            Height="30rem" Width="100%" />
             </DxTabPage>
 
             <DxTabPage Text="Settings">
@@ -145,6 +144,7 @@ else
     DxTabs? TabPages;
     bool EnableMultiCampus;
     bool isReady;
+    string htmlText;
 
     List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
     List<CourseContactOrderWrapper> contactOrder = new CourseContactOrderList();
@@ -186,7 +186,7 @@ else
         }
         if (CourseViewType != CourseEditViewType.Settings &&
             CourseViewType != CourseEditViewType.Description) { Course.EditType = CourseViewType; }
-            StateHasChanged();
+        StateHasChanged();
     }
 
 }

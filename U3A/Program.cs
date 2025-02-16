@@ -24,7 +24,12 @@ using U3A.Data;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
-
+using Azure.AI.OpenAI;
+using Microsoft.Extensions.AI;
+using Azure;
+using DevExpress.Blazor.Reporting;
+using DevExpress.AIIntegration.Blazor.Reporting.Viewer.Models;
+using DevExpress.AIIntegration;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -155,6 +160,30 @@ constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
 
 builder.Services.AddScoped<WorkStation>();
 
+string AIuri = "https://u3a-ai.openai.azure.com/";
+string AIkey = "EIBJovQCsKFu258ypOgsvTIRV05LsO6ywVm1ATdrgxWaqpwgyJIOJQQJ99BBACL93NaXJ3w3AAABACOGNxwk";
+string deploymentName = "gpt-35-turbo";
+
+IChatClient chatClient = new AzureOpenAIClient(
+    new Uri(AIuri),
+    new AzureKeyCredential(AIkey)).AsChatClient(deploymentName);
+
+builder.Services.AddDevExpressBlazor();
+builder.Services.AddChatClient(chatClient);
+builder.Services.AddDevExpressAI(config =>
+{
+    config.AddBlazorReportingAIIntegration(options =>
+    {
+        options.Languages = new List<LanguageItem>() {
+            new LanguageItem() { Key = "en", Text = "English" },
+            new LanguageItem() { Key = "de", Text = "German" },
+            new LanguageItem() { Key = "es", Text = "Spanish" }
+            };
+        options.SummarizationMode = SummarizationMode.Abstractive;
+    });
+});
+
+
 //**** End local modifications ****
 
 
@@ -205,7 +234,7 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 });
 builder.Services.AddAntiforgery(options =>
 {
-   // options.Cookie.Expiration = TimeSpan.FromSeconds(0);
+    // options.Cookie.Expiration = TimeSpan.FromSeconds(0);
 });
 
 var app = builder.Build();
@@ -256,4 +285,5 @@ app.MapControllers();
 app.MapFallbackToFile("/fallback.html");
 
 app.Run();
+
 

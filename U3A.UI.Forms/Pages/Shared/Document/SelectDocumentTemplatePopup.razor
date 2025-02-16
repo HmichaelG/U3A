@@ -3,6 +3,8 @@
 @using DevExpress.Drawing.Printing
 @using U3A.UI.Reports.Pages
 @using DevExpress.Drawing
+@using DevExpress.AIIntegration.Blazor.RichEdit
+@using DevExpress.Blazor.RichEdit
 
 @inject TenantInfoService tenantService
 
@@ -126,6 +128,17 @@
                                     DocumentLoaded="OnDocumentLoaded"
                                     DocumentContentChanged="OnDocumentContentChanged"
                                     CssClass="w-100 rtf-style">
+                            <AdditionalItems>
+                                <SummarizeAIContextMenuItem />
+                                <ExplainAIContextMenuItem />
+                                <ProofreadAIContextMenuItem />
+                                <ExpandAIContextMenuItem />
+                                <ShortenAIContextMenuItem />
+                                <AskAssistantAIContextMenuItem />
+                                <ChangeStyleAIContextMenuItem />
+                                <ChangeToneAIContextMenuItem />
+                                <GenerateDescriptionAIContextMenuItem />
+                            </AdditionalItems>
                             <MailMergeSettings>
                                 <DxMailMergeSettings Data="@ExportData" />
                             </MailMergeSettings>
