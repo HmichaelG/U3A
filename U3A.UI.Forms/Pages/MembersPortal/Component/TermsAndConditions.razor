@@ -16,31 +16,31 @@
         </div>
         <div class="input-group">
             <DxButton Text="Click to view our T & C's" SizeMode="SizeMode.Small"
-            CssClass="flex-grow-1" IconCssClass="bi bi-eyeglasses menu-icon"
-            Click="@(e => OnTandCClicked())"
-            RenderStyle="ButtonRenderStyle.Info"
-            RenderStyleMode="ButtonRenderStyleMode.Contained">
+                      CssClass="flex-grow-1" IconCssClass="bi bi-eyeglasses menu-icon"
+                      Click="@(e => OnTandCClicked())"
+                      RenderStyle="ButtonRenderStyle.Info"
+                      RenderStyleMode="ButtonRenderStyleMode.Contained">
             </DxButton>
             <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-danger" hidden="@(!isConfirmationRequired)"
-            SizeMode="SizeMode.Small"
-            CheckedChanged="@(async (bool value) => await ConfirmationChanged(value))"
-            Alignment="CheckBoxContentAlignment.Right"
-            LabelPosition="LabelPosition.Left">
+                        SizeMode="SizeMode.Small"
+                        CheckedChanged="@(async (bool value) => await ConfirmationChanged(value))"
+                        Alignment="CheckBoxContentAlignment.Right"
+                        LabelPosition="LabelPosition.Left">
                 I have read & agree with the Terms & Conditions
             </DxCheckBox>
         </div>
     </section>
 
     <DxWindow @ref=@detailsForm
-    AllowResize="false"
-    AllowDrag=false
-    Context="windowContext"
-    CloseOnEscape=true
-    ShowCloseButton=true
-    ShowFooter=true
-    Scrollable=true
-    CssClass=@windowCssClass
-    HeaderText="Terms & Conditions">
+              AllowResize="false"
+              AllowDrag=false
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              CssClass=@windowCssClass
+              HeaderText="Terms & Conditions">
         <BodyTextTemplate>
             <div class="card overflow-scroll">
                 <div class="card-body">
@@ -55,23 +55,23 @@
 }
 <style>
     .mobile-device {
-    width: 100vw !important;
+        width: 100vw !important;
     }
 
     .tablet-device {
-    width: 80vw !important;
+        width: 80vw !important;
     }
 
     .other-device {
-    width: 50vw !important;
+        width: 50vw !important;
     }
 
     .small-font {
-    font-size: x-small !important;
+        font-size: x-small !important;
     }
 
     .float-right {
-    float: right;
+        float: right;
     }
 </style>
 
@@ -101,7 +101,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        bool fireConfirmationEvent = false;
+        isConfirmationRequired = false;
         if (SystemSettings != null && SystemSettings.TermsAndConditionsEnabled)
         {
             htmlText = SystemSettings.TermsAndConditionsHTML;
@@ -109,28 +109,23 @@
                                 ? $"By participation, you acknowledge and accept the {SystemSettings?.U3AGroup} terms and conditions of membership."
                                 : $"By your fee payment, you acknowledge and accept the {SystemSettings?.U3AGroup} terms and conditions of membership.";
             fontSizeCssClass = (isMobileLayout) ? "small-font" : "";
-            if (SystemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment)
+            if (!SystemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment)
             {
-                fireConfirmationEvent = true;
-            }
-            else if (RequireConfirmation) 
-            {
-                if (Participant?.DateTermsLastAgreed != null)
+                if (RequireConfirmation)
                 {
-                    isConfirmationRequired = Participant?.DateTermsLastAgreed?.AddDays(120) < DateTime.UtcNow;
-                }
-                else
-                {
-                    isConfirmationRequired = true;
+                    if (Participant?.DateTermsLastAgreed != null)
+                    {
+                        isConfirmationRequired = Participant?.DateTermsLastAgreed?.AddDays(120) < DateTime.UtcNow;
+                    }
+                    else
+                    {
+                        isConfirmationRequired = true;
+                    }
                 }
             }
             isReady = true;
         }
-        if (SystemSettings != null && !SystemSettings.TermsAndConditionsEnabled)
-        {
-            fireConfirmationEvent = true;
-        }
-        if (fireConfirmationEvent) { await OnConfirmationChanged.InvokeAsync(true); }
+        if (!isConfirmationRequired) { await OnConfirmationChanged.InvokeAsync(true); }
     }
 
     protected override async Task OnParametersSetAsync()
