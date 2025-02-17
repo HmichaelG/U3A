@@ -18,7 +18,6 @@
         TableResizeEnabled="true"
         MediaResizeEnabled="false"
         Markup="@Markup" MarkupChanged="@OnMarkupChanged"
-        BindMarkupMode="HtmlEditorBindMarkupMode.OnLostFocus"
         Width="@Width" Height="@Height">
             <AdditionalItems>
                 @if (!DisableAIExtensions)
@@ -102,8 +101,11 @@
 
     async Task OnMarkupChanged(string newValue)
     {
-        Markup = newValue;
-        await MarkupChanged.InvokeAsync(Markup);
+        if (!string.IsNullOrWhiteSpace(newValue))
+        {
+            Markup = newValue;
+            await MarkupChanged.InvokeAsync(Markup);
+        }
     }
 
     async Task OnEditorTextChanged()

@@ -40,6 +40,7 @@ else
     <MessageBox @ref="@messageBox" />
     <SelectCourseView @ref="selectCourseView"
                       PopupWidth="50rem" />
+    <DescriptionEditor @ref="@descriptionEditor" />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
@@ -116,6 +117,17 @@ else
                         <DxGridDataColumn Caption="Name" FieldName="Name"
                                           FixedPosition="GridColumnFixedPosition.Left"
                                           Width="15rem" />
+                        <DxGridDataColumn Width="5rem" Caption="Description"
+                                          FixedPosition="GridColumnFixedPosition.Left"
+                                          AllowGroup="false">
+                            <CellDisplayTemplate>
+                                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                          IconCssClass="bi bi-pencil"
+                                          RenderStyle="ButtonRenderStyle.Primary" Text="Edit"
+                                          Click="async () => OnDescriptionEdit((Course)context.DataItem)"></DxButton>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+
                         <DxGridDataColumn Caption="Type" FieldName="CourseType.ShortName" Width="6rem" />
                         <DxGridDataColumn Caption="Course Type" FieldName="CourseType.Name" Width="6rem" Visible="false" />
                         <DxGridDataColumn Caption="Featured?" FieldName="IsFeaturedCourse" Width="7rem" />
@@ -221,6 +233,7 @@ else
     bool isPreviewOpen;
     bool isPreviewReady = true;
     bool isProcessing = false;
+    DescriptionEditor? descriptionEditor;
 
     List<SendLeaderReportsToWrapper> sendLeaderReportsToList = new SendLeadersReportsToList();
     List<CourseContactOrderWrapper> courseContactList = new CourseContactOrderList();
@@ -284,7 +297,25 @@ else
         await messageBox.ShowOkOnlyAsync("Class Schedule Cache", msg);
     }
 
+    async Task OnDescriptionEdit(Course course)
+    {
+        if (await descriptionEditor.ShowAsync(course.Name, course.Description))
+        {
 
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            {
+                var c = await dbc.Course.FindAsync(course.ID);
+                if (c != null)
+                {
+                    c.Description = descriptionEditor.descriptionHtml;
+                    c.DisplayDescription = HtmlEditor.AdjustAndMinifyHtml(c.Description);
+                    dbc.Update(c);
+                    await dbc.SaveChangesAsync();
+                    await GetData();
+                }
+            }
+        };
+    }
 
     bool inPreview;
     async Task OnPreview(int TermNumber)

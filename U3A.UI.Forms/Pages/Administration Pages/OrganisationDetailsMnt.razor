@@ -8,6 +8,8 @@
 @implements IDisposable
 
 @using System.Collections.ObjectModel
+@using DevExpress.AIIntegration.Blazor.RichEdit
+@using DevExpress.Blazor.RichEdit
 
 
 @attribute [Authorize]
@@ -281,6 +283,18 @@ else
                                                         BarMode=BarMode.Ribbon
                                                         DocumentFormat="DocumentFormat.Rtf"
                                                         CssClass="w-100 rich-style">
+                                                <AdditionalItems>
+                                                    <SummarizeAIContextMenuItem />
+                                                    <ExplainAIContextMenuItem />
+                                                    <ProofreadAIContextMenuItem />
+                                                    <ExpandAIContextMenuItem />
+                                                    <ShortenAIContextMenuItem />
+                                                    <AskAssistantAIContextMenuItem />
+                                                    <ChangeStyleAIContextMenuItem />
+                                                    <ChangeToneAIContextMenuItem />
+                                                    <GenerateDescriptionAIContextMenuItem />
+                                                    <TranslateAIContextMenuItem Languages="@("English, German, French, Chinese")" />
+                                                </AdditionalItems>
                                             </DxRichEdit>
                                         </DxFormLayoutItem>
                                     </Template>

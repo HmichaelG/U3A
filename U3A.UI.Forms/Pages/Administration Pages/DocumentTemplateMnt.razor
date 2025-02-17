@@ -5,6 +5,8 @@
 @implements IDisposable
 @using DevExpress.Drawing.Printing
 @using DevExpress.Drawing
+@using DevExpress.AIIntegration.Blazor.RichEdit
+@using DevExpress.Blazor.RichEdit
 
 @attribute [Authorize]
 
@@ -101,6 +103,18 @@ else
                                     DocumentFormat="DocumentFormat.Rtf"
                                     DocumentLoaded="OnDocumentLoaded"
                                     @ref="richEdit" CssClass="w-100">
+                            <AdditionalItems>
+                                <SummarizeAIContextMenuItem />
+                                <ExplainAIContextMenuItem />
+                                <ProofreadAIContextMenuItem />
+                                <ExpandAIContextMenuItem />
+                                <ShortenAIContextMenuItem />
+                                <AskAssistantAIContextMenuItem />
+                                <ChangeStyleAIContextMenuItem />
+                                <ChangeToneAIContextMenuItem />
+                                <GenerateDescriptionAIContextMenuItem />
+                                <TranslateAIContextMenuItem Languages="@("English, German, French, Chinese")" />
+                            </AdditionalItems>
                             <MailMergeSettings>
                                 <DxMailMergeSettings Data="@MergeData" ViewMergedData="false" />
                             </MailMergeSettings>

@@ -1,0 +1,101 @@
+﻿<DxPopup Visible="@PopupVisible" @ref="@messageBox" Width="40rem"
+         ApplyBackgroundShading="true"
+         Closed="@NegativeButtonClicked"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         AllowDrag=false
+         AllowResize=false
+         HeaderText=@mCaption>
+    <BodyContentTemplate Context="PopupContext">
+        <DxFormLayout>
+            <DxFormLayoutGroup Caption="Course Description" ColSpanMd="12">
+                <HtmlEditor @bind-Markup="@descriptionHtml" Height="500" />
+            </DxFormLayoutGroup>
+        </DxFormLayout>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button" Visible="@mShowOkButton"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  Text="@mOKButtonText"
+                  Click="@AffirmativeButtonClicked" />
+        <DxButton CssClass="popup-button" Visible="@mShowCancelButton"
+                  RenderStyle="ButtonRenderStyle.Secondary"
+                  Text="@mCancelButtonText"
+                  Click="@NegativeButtonClicked" />
+    </FooterContentTemplate>
+</DxPopup>
+<style>
+    .messagebox-body-height {
+        max-height: 75vh;
+        overflow: auto;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public bool PopupVisible { get; set; }
+    [Parameter]
+    public string PopupWidth { get; set; }
+
+    DxPopup? messageBox;
+
+    string mOKButtonText { get; set; }
+    string mCancelButtonText { get; set; }
+    string mMessage { get; set; }
+    string mCaption { get; set; }
+    bool mShowCancelButton { get; set; }
+    bool mShowOkButton { get; set; } = true;
+
+    public string descriptionHtml { get; set; }
+
+    TaskCompletionSource<bool>? tcs;
+
+    public async Task SetPopupWidth(string Width)
+    {
+        PopupWidth = Width;
+        await InvokeAsync(StateHasChanged);
+    }
+    public async Task<bool> ShowAsync(string Caption, string DescriptionHtml)
+    {
+        mOKButtonText = "Ok";
+        mCancelButtonText = "Cancel";
+        mShowOkButton = true;
+        mShowCancelButton = true;
+        mCaption = Caption;
+        descriptionHtml = DescriptionHtml;
+        return await ShowAsync();
+    }
+
+    private Task<bool> ShowAsync()
+    {
+        PopupVisible = true;
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
+            PopupVisible = false;
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    void AffirmativeButtonClicked()
+    {
+        PopupVisible = false;
+        tcs?.TrySetResult(true);
+    }
+    void NegativeButtonClicked()
+    {
+        PopupVisible = false;
+        tcs?.TrySetResult(false);
+    }
+
+    public async Task Close()
+    {
+        await Task.Run(() =>
+        {
+            PopupVisible = false;
+        });
+        StateHasChanged();
+    }
+}
