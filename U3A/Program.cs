@@ -160,9 +160,9 @@ constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
 
 builder.Services.AddScoped<WorkStation>();
 
-string AIuri = "https://u3a-ai.openai.azure.com/";
-string AIkey = "EIBJovQCsKFu258ypOgsvTIRV05LsO6ywVm1ATdrgxWaqpwgyJIOJQQJ99BBACL93NaXJ3w3AAABACOGNxwk";
-string deploymentName = "gpt-35-turbo";
+string AIuri = builder.Configuration.GetValue<String>("AzureAIEndpoint")!;
+string AIkey = builder.Configuration.GetValue<String>("AzureAIKey")!;
+string deploymentName = "gpt-4o-mini";
 
 IChatClient chatClient = new AzureOpenAIClient(
     new Uri(AIuri),
