@@ -30,6 +30,7 @@ using Azure;
 using DevExpress.Blazor.Reporting;
 using DevExpress.AIIntegration.Blazor.Reporting.Viewer.Models;
 using DevExpress.AIIntegration;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -162,16 +163,19 @@ builder.Services.AddScoped<WorkStation>();
 
 string AIuri = builder.Configuration.GetValue<String>("AzureAIEndpoint")!;
 string AIkey = builder.Configuration.GetValue<String>("AzureAIKey")!;
+string openAIkey = builder.Configuration.GetValue<String>("OpenAIKey")!;
 string deploymentName = "gpt-4o-mini";
 
 IChatClient chatClient = new AzureOpenAIClient(
     new Uri(AIuri),
     new AzureKeyCredential(AIkey)).AsChatClient(deploymentName);
 
+var aiAssistant = new OpenAI.OpenAIClient(openAIkey);
 builder.Services.AddDevExpressBlazor();
 builder.Services.AddChatClient(chatClient);
 builder.Services.AddDevExpressAI(config =>
 {
+    config.RegisterOpenAIAssistants(aiAssistant, deploymentName);
     config.AddBlazorReportingAIIntegration(options =>
     {
         options.Languages = new List<LanguageItem>() {

@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -501,6 +502,7 @@ namespace U3A.Model
         [NotMapped]
         [Comment("Set By Business Rule")]
         public int TotalActiveStudents { get; set; }
+
         [NotMapped]
         [Comment("Set By Business Rule")]
         public int TotalWaitlistedStudents { get; set; }
@@ -517,6 +519,9 @@ namespace U3A.Model
         public bool ShowMap { get; set; } = false;
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
+
+        [NotMapped]
+        public List<DateTime> ClassDates { get; set; } = new();
 
         public override int GetHashCode()
         {

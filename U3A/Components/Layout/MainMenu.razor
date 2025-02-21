@@ -47,14 +47,7 @@
                                     <Items>
                                         @if (constants.IS_DEBUG)
                                         {
-                                            <DxMenuItem Text="Update Database Schema"
-                                            Click="@(async() =>
-                                                    {
-                                                    await dbc!.Database.MigrateAsync();
-                                                    await messageBox!.ShowOkOnlyAsync("Schema Updated","Done");
-                                                    })" />
-                                            <DxMenuItem Text="Test API Client"
-                                            Click="@testAPIClient" />
+                                            <DxMenuItem Text="AI Chat" NavigateUrl="AIChat" />
                                         }
                                         @if (isSecurityAdminRole)
                                         {
@@ -331,17 +324,6 @@
     void OnChangeCredential(string page)
     {
         navMan.NavigateTo("Account/Manage/" + page, true);
-    }
-
-    async Task testAPIClient()
-    {
-        using (var client = new APIClient())
-        {
-            // await client.DoBuildSchedule();
-            // await client.DoBuildSchedule("localhost");
-            //var result = await client.DoAutoEnrolment("localhost");
-            var result = await client.DoBringForwardEnrolments("localhost");
-        }
     }
 
     public void Dispose()

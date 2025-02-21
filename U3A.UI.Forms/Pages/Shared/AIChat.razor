@@ -1,0 +1,174 @@
+﻿@page "/AIChat"
+
+@using DevExpress.AIIntegration.OpenAI.Services
+@using DevExpress.AIIntegration.Blazor.Chat
+@using System.Reflection
+@using System.Text
+@using System.Text.RegularExpressions
+@using System.Text.Json
+@using Markdig
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
+
+<ContextHelpTitle Title="AI Chat (Preview)" HelpTopic="ai-chat.html"></ContextHelpTitle>
+<div>
+    <b>Caveats:</b>
+    <ul>
+        <li>AI Chat is a work in progress and may not always provide accurate answers.</li>
+        <li>Initialisation is slow</li>
+        <li>Responses are very slow</li>
+        <li>System may appear to hang when closed. Its not a hang, its just slow.</li>
+    </ul>
+    </div>
+<div class="chat-container">
+<DxAIChat CssClass="chat-box" UseStreaming="true"
+          Initialized="Initialized"
+          ResponseContentFormat="ResponseContentFormat.Markdown">
+    <MessageContentTemplate>
+        <div class="my-chat-content">
+            @ToHtml(context.Content)
+        </div>
+    </MessageContentTemplate>
+</DxAIChat>
+</div>
+
+<style>
+    .chat-container {
+        width: 50%;
+        margin: auto
+   }
+
+    .chat-box {
+        width: 100%;
+        height: 75dvh;
+    }
+</style>
+
+@code {
+
+    static readonly Regex trimmer = new Regex(@"[^\S\r\n]+");
+
+    const string prompt = @"""You are an customer support representative specialized in analyzing JSON documents.
+                            Your role is to assist users by providing complete, accurate answers to their questions about data contained within these files.
+                            ### Tasks:
+                            - Perform various types of data analyses, including summaries, calculations, data filtering, and trend identification.
+                            - Clearly explain your analysis process to ensure users understand how you arrived at your answers.
+                            - Always provide precise and accurate information based on the JSON data.
+                            - If you cannot find an answer based on the provided data, explicitly state: 'The requested information cannot be found in the data provided.'
+                            ###
+                            Examples:
+                            1. **Summarization:**
+                                - **User Question:** ""Is there an exercise class on Wednesdays?""
+                                - **Response:** ""The exercise classes available on Wednesdays are Balance & Bones, Yoga For Beginners and Yoga For Seniors.""
+                            2. **Data Filtering:**
+                                - **User Question:** ""What is the average number of enrolments per class for all exercise classes?""
+                                - **Response:** ""The The average number of enrolments per class is 15""
+                            3. **Insufficient Data:**
+                                - **User Question:** ""What is the enrolment trend for Yoga over the past 5 years?""
+                                - **Response:** ""The requested information cannot be found in the data provided, as the dataset only includes data for the current year.""
+                            ### Additional Instructions ###
+                            - never provide the home or postal address. Email and phone contact details only.
+                            - a leader is also known as a teacher, lecturer or tutor.
+                            - a clerk is also known as class administrator or class coordinator.
+                            - a member is also known as a student or participant.
+                            - if Total Active Students >= Maximum Students then the class is full.
+                            - Avoid providing any answers if the data in the file is insufficient for a reliable response.
+                            - Ask clarifying questions if the user's query is ambiguous or lacks detail.
+                            - Remember, your primary goal is to provide helpful, data-driven insights that directly answer the user's questions. Do not assume or infer information not present in the dataset.""";
+
+    async Task Initialized(IAIChat chat)
+    {
+        var strippedPrompt = trimmer.Replace(prompt, " ");
+        var json = await GetData();
+        byte[] bytes = Encoding.UTF8.GetBytes(json);
+        using (var ms = new MemoryStream(bytes))
+        {
+            await chat.SetupAssistantAsync(new OpenAIAssistantOptions(
+                $"{Guid.NewGuid().ToString("N")}.json",
+                ms,
+                strippedPrompt)
+            );
+        }
+    }
+
+    MarkupString ToHtml(string text)
+    {
+        return (MarkupString)Markdown.ToHtml(text);
+    }
+
+    async Task<string> GetData()
+    {
+        ChatData data = new();
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var today = dbc.GetLocalTime().Date;
+            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
+            {
+                // settings
+                data.Settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+
+                // Terms
+                data.Terms = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc);
+
+                // Classes
+                var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+                if (term == null)
+                {
+                    var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+                }
+                if (term != null)
+                {
+                    var prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
+
+                    // Fast lookup from Schedule cache
+                    var classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, data.Settings, true, true);
+                    await getClassAppointments(dbc, term, classes);
+                    data.Classes = classes;
+                }
+            }
+        }
+        string json = JsonSerializer.Serialize<ChatData>(data);
+        return json;
+    }
+
+    async Task getClassAppointments(U3ADbContext dbc, Term term,
+                IEnumerable<Class> classes)
+    {
+        var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, term);
+        var range = new DxSchedulerDateTimeRange(term.StartDate, new DateTime(term.Year, 12, 31));
+        Dictionary<Guid, List<DxSchedulerAppointmentItem>> classAppointments = new();
+        foreach (var a in dataStorage?.GetAppointments(range))
+        {
+            Class c = (Class)a.CustomFields["Source"];
+            if (c != null && (int)a.LabelId != 9)
+            {
+                if (!classAppointments.ContainsKey(c.ID))
+                {
+                    classAppointments.Add(c.ID, new List<DxSchedulerAppointmentItem>());
+                }
+                classAppointments[c.ID].Add(a);
+            }
+        }
+        foreach (Class c in classes)
+        {
+            if (classAppointments.ContainsKey(c.ID))
+            {
+                foreach (var a in classAppointments[c.ID])
+                {
+                    c.ClassDates.Add(a.Start);
+                }
+            }
+        }
+
+    }
+
+    public class ChatData
+    {
+        public List<Class> Classes { get; set; }
+        public List<Term> Terms { get; set; }
+        public SystemSettings Settings { get; set; }
+    }
+
+}
