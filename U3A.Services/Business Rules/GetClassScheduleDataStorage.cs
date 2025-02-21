@@ -10,19 +10,19 @@ namespace U3A.BusinessRules
     {
         public static async Task<DxSchedulerDataStorage> GetCalendarDataStorageAsync(U3ADbContext dbc, Term selectedTerm)
         {
-            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>(), IsCalendarView: true);
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>(), IsCalendarView: true, IncludeOffScheduleActivities: false);
         }
-        public static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc, Term selectedTerm)
+        public static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc, Term selectedTerm, bool IncludeOffScheduleActivities = true)
         {
-            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>(), IsCalendarView: false);
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>(), IsCalendarView: false, IncludeOffScheduleActivities);
         }
         public static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc,
-                    Term selectedTerm, IEnumerable<Venue> VenuesToFilter)
+                    Term selectedTerm, IEnumerable<Venue> VenuesToFilter, bool IncludeOffScheduleActivities = true)
         {
-            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView: false);
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView: false, IncludeOffScheduleActivities);
         }
         static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc,
-                    Term selectedTerm, IEnumerable<Venue> VenuesToFilter, bool IsCalendarView)
+                    Term selectedTerm, IEnumerable<Venue> VenuesToFilter, bool IsCalendarView, bool IncludeOffScheduleActivities=true)
         {
             var termsInYear = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc, selectedTerm);
             DxSchedulerDataStorage dataStorage = new DxSchedulerDataStorage()
@@ -87,12 +87,12 @@ namespace U3A.BusinessRules
             {
                 foreach (var t in termsInYear)
                 {
-                    list.AddRange(await GetScheduleAsync(dbc, t, VenuesToFilter, IsCalendarView));
+                    list.AddRange(await GetScheduleAsync(dbc, t, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities));
                 }
             }
             else
             {
-                list = await GetScheduleAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView);
+                list = await GetScheduleAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities);
             }
             list.AddRange(await GetPublicHolidays(dbc));
             dataStorage.AppointmentsSource = list;
@@ -128,7 +128,10 @@ namespace U3A.BusinessRules
             return dataStorage;
         }
         static async Task<List<ClassSchedule>> GetScheduleAsync(U3ADbContext dbc,
-                        Term selectedTerm, IEnumerable<Venue> VenuesToFilter, bool IsCalendarView)
+                        Term selectedTerm, 
+                        IEnumerable<Venue> VenuesToFilter, 
+                        bool IsCalendarView,
+                        bool IncludeOffScheduleActivities)
         {
             List<ClassSchedule> list = new List<ClassSchedule>();
             if (selectedTerm == null) { return list; }
@@ -140,7 +143,7 @@ namespace U3A.BusinessRules
             }
             else
             {
-                classes = await BusinessRule.SchedulledClassesWithCourseEnrolmentsAsync(dbc, selectedTerm);
+                classes = await BusinessRule.SchedulledClassesWithCourseEnrolmentsAsync(dbc, selectedTerm, IncludeOffScheduleActivities);
             }
             foreach (Class c in classes)
             {

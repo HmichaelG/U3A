@@ -199,7 +199,7 @@ else
             if (VenuesToFilter == null) { VenuesToFilter = new List<Venue>(); }
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter);
+                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter,IncludeOffScheduleActivities: !IsPortal);
             }
         }
         if (!IsPortal)

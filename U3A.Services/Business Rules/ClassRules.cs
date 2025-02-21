@@ -67,7 +67,7 @@ namespace U3A.BusinessRules
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToListAsync();
             return classes;
         }
-        public static async Task<List<Class>> SchedulledClassesWithCourseEnrolmentsAsync(U3ADbContext dbc, Term term)
+        public static async Task<List<Class>> SchedulledClassesWithCourseEnrolmentsAsync(U3ADbContext dbc, Term term, bool IncludeOffScheduleActivities)
         {
             var enrolments = await dbc.Enrolment.AsNoTracking()
                                     .Where(x => x.TermID == term.ID).ToListAsync();
@@ -80,6 +80,10 @@ namespace U3A.BusinessRules
                             .Include(x => x.Venue)
                             .Where(x => x.Course.Year == term.Year && x.OccurrenceID != 999)
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToListAsync();
+            if (!IncludeOffScheduleActivities)
+            {
+                classes = classes.Where(x => !x.Course.IsOffScheduleActivity).ToList();
+            }
             Parallel.ForEach(classes, c =>
             {
                 if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
