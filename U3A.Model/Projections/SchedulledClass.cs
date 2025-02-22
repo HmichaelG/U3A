@@ -19,14 +19,14 @@ namespace U3A.Model
 
         // From Course
 
-        public string CourseName { get; set; }
+        public string Name { get; set; }
         public bool IsFeaturedCourse { get; set; }
         public string CourseParticipationType { get; set; }
         public bool EnforceOneClassPerStudent { get; set; }
-        public decimal CourseFeePerYear { get; set; }
-        public string? CourseFeePerYearDescription { get; set; }
-        public decimal CourseFeePerTerm { get; set; }
-        public string? CourseFeePerTermDescription { get; set; }
+        public decimal FeePerYear { get; set; }
+        public string? FeePerYearDescription { get; set; }
+        public decimal FeePerTerm { get; set; }
+        public string? FeePerTermDescription { get; set; }
         public decimal Duration { get; set; }
         public int RequiredStudents { get; set; }
         public int MaximumStudents { get; set; }
@@ -50,8 +50,8 @@ namespace U3A.Model
         public string OccurrenceText { get; set; }
         public string Venue { get; set; }
         public string VenueAddress { get; set; }
-        public List<ScheduledPerson> Leaders { get; set; } = new ();
-        public List<ScheduledPerson> Clerks { get; set; } = new ();
+        public List<ScheduledPerson> Leader { get; set; } = new ();
+        public List<ScheduledPerson> Clerk { get; set; } = new ();
         public int TotalActiveStudents { get; set; }
         public int TotalWaitlistedStudents { get; set; }
         public double ParticipationRate { get; set; }

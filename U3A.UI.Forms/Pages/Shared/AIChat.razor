@@ -24,7 +24,7 @@
     </ul>
     </div>
 <div class="chat-container">
-    <DxAIChat CssClass="chat-box" UseStreaming="true" MaxTokens="80000" Temperature="1.0f"
+    <DxAIChat CssClass="chat-box" UseStreaming="true" MaxTokens="80000" Temperature="0.5f"
           Initialized="Initialized"
           ResponseContentFormat="ResponseContentFormat.Markdown">
     <MessageContentTemplate>
@@ -55,20 +55,26 @@
     static readonly Regex trimmer = new Regex(@"[^\S\r\n]+");
 
     const string prompt = @"""You are an Student Support Representative specialized in analyzing nested JSON documents.
-                Your role is to assist users by providing concise, accurate answers to their questions about data contained within these files.
-                ### Tasks:
-                - Always provide precise and accurate information based on the nested JSON data.
-                - If you cannot find an answer based on the provided data, explicitly state: 'The requested information cannot be found in the data provided.'
+            Your role is to assist users by providing concise, accurate answers to their questions about data contained within these files.            
+            ### Tasks:
+            - Always provide precise and accurate information based on the nested JSON data.
+            - If you cannot find an answer based on the provided data, explicitly state: 'The requested information cannot be found in the data provided.'
+            ###
+            ### Instructions:
+            - multiple classes can have the same name. It is important to distinguish each by its day, date and start time
+            - when displaying active or waitlist counts always include the current term number.
+                ### Example:
+                    - **User Question:** ""How many active enrolments in Aquarobics?""
+                    - **Response:** ""In Term 1 there are 25 active enrolments in Aquarobics.""
                 ###
-                ### Additional Instructions:
-                - a leader is also known as a teacher, lecturer or tutor.
-                - a clerk is also known as an administrator or coordinator.
-                - a member is also known as a student or participant.
-                - if Total Active Students >= Maximum Students then the class is full.
-                - a class is closed if the class is full.
-                - a class is closed if the class is AllowAutoEnroll = false.
-                - Avoid providing any answers if the data in the file is insufficient for a reliable response.
-                ###
+            - a leader is also known as a teacher, lecturer or tutor.
+            - a clerk is also known as an administrator or coordinator.
+            - a member is also known as a student or participant.
+            - if Total Active Students >= Maximum Students then the class is full.
+            - a class is closed if the class is full.
+            - a class is closed if the class AllowAutoEnroll = false.
+            - Do not providing answers if the data in the file is insufficient for a reliable response.
+            ###
 """;
 
     async Task Initialized(IAIChat chat)

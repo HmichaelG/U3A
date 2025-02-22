@@ -45,16 +45,16 @@ namespace U3A.BusinessRules
 
                     // From Course
 
-                    CourseName = x.Course.Name,
+                    Name = x.Course.Name,
                     CourseParticipationType = (x.Course.CourseParticipationTypeID == 0)
                                                 ? "Same students in all classes"
                                                 : "Different students in each class",
                     IsFeaturedCourse = x.Course.IsFeaturedCourse,
                     EnforceOneClassPerStudent = x.Course.EnforceOneStudentPerClass,
-                    CourseFeePerYear = x.Course.CourseFeePerYear,
-                    CourseFeePerYearDescription = x.Course.CourseFeePerYearDescription,
-                    CourseFeePerTerm = x.Course.CourseFeePerTerm,
-                    CourseFeePerTermDescription = x.Course.CourseFeePerTermDescription,
+                    FeePerYear = x.Course.CourseFeePerYear,
+                    FeePerYearDescription = x.Course.CourseFeePerYearDescription,
+                    FeePerTerm = x.Course.CourseFeePerTerm,
+                    FeePerTermDescription = x.Course.CourseFeePerTermDescription,
                     Duration = x.Course.Duration,
                     RequiredStudents = x.Course.RequiredStudents,
                     MaximumStudents = x.Course.MaximumStudents,
@@ -86,31 +86,32 @@ namespace U3A.BusinessRules
                     ParticipationRate = x.ParticipationRate
 
                 }).ToList();
+
                 classes.ForEach(delegate (Class c)
                 {
                     var sc = data.Classes.Find(x => x.ID == c.ID);
                     if (sc != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(c.GuestLeader)) sc.Leaders.Add(new ScheduledPerson()
+                        if (!string.IsNullOrWhiteSpace(c.GuestLeader)) sc.Leader.Add(new ScheduledPerson()
                         {
                             Name = c.GuestLeader,
                             IsGuestLeader = true
                         });
-                        if (c.Leader != null) sc.Leaders.Add(new ScheduledPerson()
+                        if (c.Leader != null) sc.Leader.Add(new ScheduledPerson()
                         {
                             Name = c.Leader.FullNameWithPostNominals,
                             Email = c.Leader.Email,
                             Phone = c.Leader.AdjustedHomePhone,
                             Mobile = c.Leader.AdjustedMobile
                         });
-                        if (c.Leader2 != null) sc.Leaders.Add(new ScheduledPerson()
+                        if (c.Leader2 != null) sc.Leader.Add(new ScheduledPerson()
                         {
                             Name = c.Leader2.FullNameWithPostNominals,
                             Email = c.Leader2.Email,
                             Phone = c.Leader2.AdjustedHomePhone,
                             Mobile = c.Leader2.AdjustedMobile
                         });
-                        if (c.Leader3 != null) sc.Leaders.Add(new ScheduledPerson()
+                        if (c.Leader3 != null) sc.Leader.Add(new ScheduledPerson()
                         {
                             Name = c.Leader3.FullNameWithPostNominals,
                             Email = c.Leader3.Email,
@@ -119,7 +120,7 @@ namespace U3A.BusinessRules
                         });
                         foreach (var clerk in c.Clerks)
                         {
-                            sc.Clerks.Add(new ScheduledPerson()
+                            sc.Clerk.Add(new ScheduledPerson()
                             {
                                 Name = clerk.FullNameWithPostNominals,
                                 Email = clerk.Email,
