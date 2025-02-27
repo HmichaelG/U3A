@@ -6,13 +6,17 @@ using System.Text;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
+using AngleSharp.Dom;
+using AngleSharp.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using static Azure.Core.HttpHeader;
 
 namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
-        public static async Task<AIChatClassData> GetAIChatClassDataAsync(U3ADbContext dbc,
+        public static async Task<AIChatClassData> GetJsonAIChatClassDataAsync(U3ADbContext dbc,
                                                         TenantDbContext dbcT,
                                                         TenantInfoService tenantService)
         {
@@ -36,7 +40,7 @@ namespace U3A.BusinessRules
 
                 // Fast lookup from Schedule cache
                 var classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, true, true);
-               // classes = classes.Take(102).ToList();
+                // Get the schedule
                 await getAppointmentsForAiClass(dbc, term, classes);
                 // Transpose to ScheduledClasses
                 data.Classes = classes.Select(x => new ScheduledClass()
@@ -46,10 +50,11 @@ namespace U3A.BusinessRules
                     // From Course
 
                     Name = x.Course.Name,
+                    Description = RemoveHtmlTags( x.Course.Description),
                     CourseParticipationType = (x.Course.CourseParticipationTypeID == 0)
                                                 ? "Same students in all classes"
                                                 : "Different students in each class",
-                    IsFeaturedCourse = x.Course.IsFeaturedCourse,
+                    Featured = x.Course.IsFeaturedCourse,
                     EnforceOneClassPerStudent = x.Course.EnforceOneStudentPerClass,
                     FeePerYear = x.Course.CourseFeePerYear,
                     FeePerYearDescription = x.Course.CourseFeePerYearDescription,
@@ -59,8 +64,9 @@ namespace U3A.BusinessRules
                     RequiredStudents = x.Course.RequiredStudents,
                     MaximumStudents = x.Course.MaximumStudents,
                     AllowAutoEnroll = x.Course.AllowAutoEnrol,
-                    CourseType = x.Course.CourseType.Name,
-                    OfferedBy = x.Course.OfferedBy,
+                    Type = x.Course.CourseType.Name,
+                    ProvidedBy = (x.Course.OfferedBy == null)
+                                ? dbc.TenantInfo.Name : x.Course.OfferedBy,
 
                     // From Class
 
@@ -70,17 +76,16 @@ namespace U3A.BusinessRules
                     OfferedTerm4 = x.OfferedTerm4,
                     StartDate = (x.StartDate != null)
                                     ? DateOnly.FromDateTime(x.StartDate.Value)
-                                    : null,
+                                    : DateOnly.FromDateTime(x.ClassDates.OrderBy(x => x).FirstOrDefault()),
                     StartTime = TimeOnly.FromDateTime(x.StartTime),
                     EndTime = (x.EndTime != null) ? TimeOnly.FromDateTime(x.EndTime.Value)
                                                   : null,
-                    Occurrence = x.Occurrence.Name,
-                    Recurrence = x.Recurrence,
-                    OnDay = x.OnDay.Day,
-                    OccurrenceTextBrief = x.OccurrenceTextBrief,
-                    OccurrenceText = x.OccurrenceText,
+                    Occurs = x.Occurrence.Name,
+                    Repeats = x.Recurrence  ?? term.Duration ,
+                    Day = x.OnDay.Day,
                     Venue = x.Venue.Name,
                     VenueAddress = x.Venue.Address,
+                    ClassSummary = x.OccurrenceText,
                     TotalActiveStudents = x.TotalActiveStudents,
                     TotalWaitlistedStudents = x.TotalWaitlistedStudents,
                     ParticipationRate = x.ParticipationRate
@@ -92,49 +97,51 @@ namespace U3A.BusinessRules
                     var sc = data.Classes.Find(x => x.ID == c.ID);
                     if (sc != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(c.GuestLeader)) sc.Leader.Add(new ScheduledPerson()
+                        if (!string.IsNullOrWhiteSpace(c.GuestLeader)) sc.Contacts.Add(new ScheduledPerson()
                         {
+                            Class = c.Course.Name,
                             Name = c.GuestLeader,
-                            IsGuestLeader = true
+                            Role = "Guest Leader"
                         });
-                        if (c.Leader != null) sc.Leader.Add(new ScheduledPerson()
+                        if (c.Leader != null) sc.Contacts.Add(new ScheduledPerson()
                         {
+                            Class = c.Course.Name,
                             Name = c.Leader.FullNameWithPostNominals,
                             Email = c.Leader.Email,
                             Phone = c.Leader.AdjustedHomePhone,
-                            Mobile = c.Leader.AdjustedMobile
+                            Mobile = c.Leader.AdjustedMobile,
+                            Role = "Leader"
                         });
-                        if (c.Leader2 != null) sc.Leader.Add(new ScheduledPerson()
+                        if (c.Leader2 != null) sc.Contacts.Add(new ScheduledPerson()
                         {
+                            Class = c.Course.Name,
                             Name = c.Leader2.FullNameWithPostNominals,
                             Email = c.Leader2.Email,
                             Phone = c.Leader2.AdjustedHomePhone,
-                            Mobile = c.Leader2.AdjustedMobile
+                            Mobile = c.Leader2.AdjustedMobile,
+                            Role = "Leader"
                         });
-                        if (c.Leader3 != null) sc.Leader.Add(new ScheduledPerson()
+                        if (c.Leader3 != null) sc.Contacts.Add(new ScheduledPerson()
                         {
+                            Class = c.Course.Name,
                             Name = c.Leader3.FullNameWithPostNominals,
                             Email = c.Leader3.Email,
                             Phone = c.Leader3.AdjustedHomePhone,
-                            Mobile = c.Leader3.AdjustedMobile
+                            Mobile = c.Leader3.AdjustedMobile,
+                            Role = "Leader"
+
                         });
                         foreach (var clerk in c.Clerks)
                         {
-                            sc.Clerk.Add(new ScheduledPerson()
+                            sc.Contacts.Add(new ScheduledPerson()
                             {
+                                Class = c.Course.Name,
                                 Name = clerk.FullNameWithPostNominals,
                                 Email = clerk.Email,
                                 Phone = clerk.AdjustedHomePhone,
-                                Mobile = clerk.AdjustedMobile
+                                Mobile = clerk.AdjustedMobile,
+                                Role = "Clerk"
                             });
-                        }
-                        foreach (var d in c.ClassDates)
-                        {
-                            sc.ClassDates.Add(d);
-                        }
-                        if (sc.StartDate == null)
-                        {
-                            sc.StartDate = DateOnly.FromDateTime(sc.ClassDates.OrderBy(x => x).FirstOrDefault());
                         }
                     }
                 });
@@ -142,6 +149,27 @@ namespace U3A.BusinessRules
             return data;
         }
 
+        static IHtmlDocument? ParseHtml(string html)
+        {
+            IHtmlDocument result = null!;
+            var parser = new HtmlParser();
+            try
+            {
+                result = parser.ParseDocument(html);
+            }
+            catch (Exception e) { }
+            return result;
+        }
+
+        static string RemoveHtmlTags(string html)
+        {
+            var result = string.Empty;
+            using (var document = ParseHtml(html))
+            {
+                result = document.Body.TextContent;
+            }
+            return result;
+        }
         static async Task getAppointmentsForAiClass(U3ADbContext dbc, Term term,
             IEnumerable<Class> classes)
         {

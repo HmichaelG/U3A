@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-
     public class ScheduledClass
     {
         public Guid ID { get; set; }
@@ -20,7 +19,8 @@ namespace U3A.Model
         // From Course
 
         public string Name { get; set; }
-        public bool IsFeaturedCourse { get; set; }
+        public bool Featured { get; set; }
+        public string Description { get; set; }
         public string CourseParticipationType { get; set; }
         public bool EnforceOneClassPerStudent { get; set; }
         public decimal FeePerYear { get; set; }
@@ -31,46 +31,45 @@ namespace U3A.Model
         public int RequiredStudents { get; set; }
         public int MaximumStudents { get; set; }
         public bool AllowAutoEnroll { get; set; } = true;
-        public string CourseType { get; set; }
-        public string? OfferedBy { get; set; } // The U3A that owns the course
+        public string Type { get; set; }
+        public string? ProvidedBy { get; set; } // The U3A that owns the course
 
         // From Class
 
-        public Boolean OfferedTerm1 { get; set; } 
-        public Boolean OfferedTerm2 { get; set; } 
-        public Boolean OfferedTerm3 { get; set; } 
-        public Boolean OfferedTerm4 { get; set; } 
+        public Boolean OfferedTerm1 { get; set; }
+        public Boolean OfferedTerm2 { get; set; }
+        public Boolean OfferedTerm3 { get; set; }
+        public Boolean OfferedTerm4 { get; set; }
         public DateOnly? StartDate { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
-        public string Occurrence { get; set; }
-        public int? Recurrence { get; set; }
-        public string OnDay { get; set; }
-        public string OccurrenceTextBrief { get; set; }
-        public string OccurrenceText { get; set; }
+        public string Occurs { get; set; }
+        public int? Repeats { get; set; }
+        public string Day { get; set; }
+        public string ClassSummary { get; set; }
         public string Venue { get; set; }
         public string VenueAddress { get; set; }
-        public List<ScheduledPerson> Leader { get; set; } = new ();
-        public List<ScheduledPerson> Clerk { get; set; } = new ();
         public int TotalActiveStudents { get; set; }
         public int TotalWaitlistedStudents { get; set; }
         public double ParticipationRate { get; set; }
-        public List<DateTime> ClassDates { get; set; } = new();
+        //public List<DateTime> ClassDates { get; set; } = new();
+        public List<ScheduledPerson> Contacts { get; set; } = new();
 
     }
 
     public class ScheduledPerson
     {
+        public string Class { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Mobile { get; set; }
-        public bool IsGuestLeader { get; set; } = false;
+        public string Role { get; set; }
     }
     public class AIChatClassData
     {
-        public List<ScheduledClass> Classes { get; set; }
-        public List<Term> Terms { get; set; }
+        public List<ScheduledClass> Classes { get; set; } = new();
+        public List<Term> Terms { get; set; } = new();
     }
 
 }

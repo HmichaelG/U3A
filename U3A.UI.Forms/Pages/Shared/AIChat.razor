@@ -7,6 +7,7 @@
 @using System.Text.RegularExpressions
 @using System.Text.Json
 @using System.Text.Json.Schema
+@using System.Text.Json.Serialization
 @using Markdig
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
@@ -22,17 +23,17 @@
         <li>Responses are very slow</li>
         <li>System may appear to hang when closed. Its not a hang, its just slow.</li>
     </ul>
-    </div>
+</div>
 <div class="chat-container">
-    <DxAIChat CssClass="chat-box" UseStreaming="true" MaxTokens="80000" Temperature="0.5f"
-          Initialized="Initialized"
-          ResponseContentFormat="ResponseContentFormat.Markdown">
-    <MessageContentTemplate>
-        <div class="my-chat-content">
+    <DxAIChat CssClass="chat-box" UseStreaming="true" Temperature="0.5f"
+              Initialized="Initialized"
+              ResponseContentFormat="ResponseContentFormat.Markdown">
+        <MessageContentTemplate>
+            <div class="my-chat-content">
                 @ToHtml(context.Content)
-        </div>
-    </MessageContentTemplate>
-</DxAIChat>
+            </div>
+        </MessageContentTemplate>
+    </DxAIChat>
 </div>
 
 <style>
@@ -41,7 +42,7 @@
         margin: auto;
         border: 1px solid #ccc;
         border-radius: 10px;
-   }
+    }
 
     .chat-box {
         width: 100%;
@@ -52,49 +53,75 @@
 
 @code {
 
-    static readonly Regex trimmer = new Regex(@"[^\S\r\n]+");
-
-    const string prompt = @"""You are an Student Support Representative specialized in analyzing nested JSON documents.
-            Your role is to assist users by providing concise, accurate answers to their questions about data contained within these files.            
-            ### Tasks:
-            - Always provide precise and accurate information based on the nested JSON data.
-            - If you cannot find an answer based on the provided data, explicitly state: 'The requested information cannot be found in the data provided.'
-            ###
-            ### Instructions:
-            - multiple classes can have the same name. It is important to distinguish each by its day, date and start time
-            - when displaying active or waitlist counts always include the current term number.
-                ### Example:
-                    - **User Question:** ""How many active enrolments in Aquarobics?""
-                    - **Response:** ""In Term 1 there are 25 active enrolments in Aquarobics.""
-                ###
-            - a leader is also known as a teacher, lecturer or tutor.
-            - a clerk is also known as an administrator or coordinator.
-            - a member is also known as a student or participant.
-            - if Total Active Students >= Maximum Students then the class is full.
-            - a class is closed if the class is full.
-            - a class is closed if the class AllowAutoEnroll = false.
-            - Do not providing answers if the data in the file is insufficient for a reliable response.
-            ###
-""";
-
     async Task Initialized(IAIChat chat)
     {
-        var strippedPrompt = trimmer.Replace(prompt, " ");
-        var json = await GetData();
-        byte[] bytes = Encoding.UTF8.GetBytes(json);
+        var fileName = $"Class Schedule {Guid.NewGuid().ToString("N")}.json";
+        byte[] bytes;
+        (string json, string schema) = await GetJsonData();
+        bytes = Encoding.UTF8.GetBytes(json);
+
+        string prompt = $@"
+        ### Introduction:
+        You are a Student Support Representative specialized in analyzing the Class Schedule which is a document in json format.
+        Your role is to assist students by providing accurate answers to their questions about the Class Schedule
+
+        ### Tasks:
+        - Always provide accurate information based on the file data.
+        - Provide the answer in a clear, brief and concise manner.
+        - Do not embellish the answer with additional information.
+        - Do not provide answers if the data in the file is insufficient for a reliable response.
+        - do not attempt to list contacts if none available.
+
+        ### Example Questions:
+        1. Student: 'Who are the contacts for Aquarobics?'
+            Response: 'The contacts for Aquarobics, Mondays 1:45 pm are...
+                        - Fred Bloggs (leader) email: fred@bloggs.com mobile: 0404987654'
+                        - Mary Smith (clerk) email: mary@smith.com.au mobile: 0412345678'
+        2. Student: 'What are Jason's roles?'
+            Response: 'Jason's roles are...
+                        - Yoga, (Leader) Tuesdays 10:00 am at the Community Centre'
+                        - Tai Chi, (Clerk) Thursdays 2:00 pm at the Community Centre'
+
+        ### Instructions:
+        - Multiple classes can have the same name. Distinguish each by its day, date, venue, venue address and start time.
+        - include the day when displaying the time. For example: 'Monday 1:45 pm - 3:00pm'.
+        - Leader, teacher, lecturer, and tutor are interchangeable.
+        - Clerk, administrator and coordinator are interchangeable.
+        - Offered, available, held and open are interchangeable.
+        - If Total Active Students >= Maximum Students, then the class is full.
+        - A class is closed if the class is full.
+        - A class is closed if the class AllowAutoEnroll = false.
+";
         using (var ms = new MemoryStream(bytes))
         {
             await chat.SetupAssistantAsync(new OpenAIAssistantOptions(
-                $"{Guid.NewGuid().ToString("N")}.json",
+                fileName,
                 ms,
-                strippedPrompt)
+                prompt)
             );
         }
     }
 
     MarkupString ToHtml(string text)
     {
-        return (MarkupString)Markdown.ToHtml(ClearAnnotations(text));
+        var html = Markdown.ToHtml(ClearAnnotations(text));
+        html = ClearParagraphBreakPassOne(html);
+        html = ClearParagraphBreakPassTwo(html);
+        return (MarkupString)ClearAnnotations(html);
+    }
+
+    string ClearParagraphBreakPassOne(string text)
+    {
+        string pattern = @"<li><p>(.*?)</p>";
+        string replacement = @"<br/><li>$1</li>";
+        return Regex.Replace(text, pattern, replacement);
+    }
+
+    string ClearParagraphBreakPassTwo(string text)
+    {
+        string pattern = @"<p>(.*?)</p>";
+        string replacement = @"$1";
+        return Regex.Replace(text, pattern, replacement);
     }
 
     string ClearAnnotations(string text)
@@ -102,20 +129,27 @@
         return Regex.Replace(text, @"【.*?】", "");
     }
 
-    async Task<string> GetData()
+    async Task<(string, string)> GetJsonData()
     {
         AIChatClassData data = new();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
             {
-                data = await BusinessRule.GetAIChatClassDataAsync(dbc, dbcT, tenantService);
+                data = await BusinessRule.GetJsonAIChatClassDataAsync(dbc, dbcT, tenantService);
             }
         }
-        string json = JsonSerializer.Serialize<AIChatClassData>(data);
 
-        return json;
+        JsonSerializerOptions options = JsonSerializerOptions.Default;
+        string schema = options.GetJsonSchemaAsNode(typeof(AIChatClassData)).ToString();
+
+        var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+            };
+        string json = JsonSerializer.Serialize<AIChatClassData>(data, jsonOptions);
+
+        return (json, schema);
     }
-
-
 }
