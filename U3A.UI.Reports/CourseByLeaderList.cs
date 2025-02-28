@@ -30,7 +30,7 @@ namespace U3A.UI.Reports
             paramTerm.Value = term?.ID;
         }
 
-        private void CourseByVenueList_ParametersRequestSubmit(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
+        private void CourseByLeaderList_ParametersRequestSubmit(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
             var term = DbContext.Term.Find((Guid)paramTerm.Value);
             DataSource = (prmLeaderType.Value == "Leader")

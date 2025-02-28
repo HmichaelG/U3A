@@ -1,4 +1,4 @@
-﻿@page "/AIChat"
+﻿@page "/AiChat"
 
 @using DevExpress.AIIntegration.OpenAI.Services
 @using DevExpress.AIIntegration.Blazor.Chat
@@ -14,7 +14,7 @@
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
 
-<ContextHelpTitle Title="AI Chat (Preview)" HelpTopic="ai-chat.html"></ContextHelpTitle>
+<ContextHelpTitle Title="Ai Chat (Preview)" HelpTopic="ai-chat.html"></ContextHelpTitle>
 <div>
     <b>Caveats:</b>
     <ul>
@@ -25,7 +25,7 @@
     </ul>
 </div>
 <div class="chat-container">
-    <DxAIChat CssClass="chat-box" UseStreaming="true" Temperature="0.5f"
+    <DxAIChat CssClass="chat-box" UseStreaming="true" Temperature="0.3f"
               Initialized="Initialized"
               ResponseContentFormat="ResponseContentFormat.Markdown">
         <MessageContentTemplate>
@@ -71,26 +71,37 @@
         - Do not embellish the answer with additional information.
         - Do not provide answers if the data in the file is insufficient for a reliable response.
         - do not attempt to list contacts if none available.
+        - organize all lists of people in ascending order based on the field, SortOrder. Ensure the output is a clean, sorted list. Do not include duplicates, and maintain the specified structure.
 
         ### Example Questions:
         1. Student: 'Who are the contacts for Aquarobics?'
             Response: 'The contacts for Aquarobics, Mondays 1:45 pm are...
-                        - Fred Bloggs (leader) email: fred@bloggs.com mobile: 0404987654'
-                        - Mary Smith (clerk) email: mary@smith.com.au mobile: 0412345678'
+                        1. Fred Bloggs (leader) email: fred@bloggs.com mobile: 0404987654'
+                        2. Mary Smith (clerk) email: mary@smith.com.au mobile: 0412345678'
         2. Student: 'What are Jason's roles?'
             Response: 'Jason's roles are...
-                        - Yoga, (Leader) Tuesdays 10:00 am at the Community Centre'
-                        - Tai Chi, (Clerk) Thursdays 2:00 pm at the Community Centre'
+                        1. Yoga, (Leader) Tuesdays 10:00 am at the Community Centre'
+                        2. Tai Chi, (Clerk) Thursdays 2:00 pm at the Community Centre'
+        3. Student: 'list students in Aquarobics'
+            Response: 'In the current term there are 1 students in Aquarobics, Mondays 1:45 pm. They are...
+                        1. Fred Bloggs email: fred@bloggs.com mobile: 0404987654'
+                        2. Mary Smith (clerk) email: mary@smith.com.au mobile: 0412345678'
+        4. Student: 'list waitlist in Aquarobics'
+            Response: 'In the current term (Term 1) there are 1 waitlisted in Aquarobics, Mondays 1:45 pm. They are...
+                        1. Fred Bloggs email: fred@bloggs.com mobile: 0404987654'
+                        2. Mary Smith (clerk) email: mary@smith.com.au mobile: 0412345678'
 
         ### Instructions:
-        - Multiple classes can have the same name. Distinguish each by its day, date, venue, venue address and start time.
+        - never display the SortOrder.
+        - Always identify a class by its name, day, time, venue, venue address and term offered.
         - include the day when displaying the time. For example: 'Monday 1:45 pm - 3:00pm'.
         - Leader, teacher, lecturer, and tutor are interchangeable.
         - Clerk, administrator and coordinator are interchangeable.
-        - Offered, available, held and open are interchangeable.
+        - Offered, held and open are interchangeable.
         - If Total Active Students >= Maximum Students, then the class is full.
         - A class is closed if the class is full.
         - A class is closed if the class AllowAutoEnroll = false.
+        - Always identify whether the class is open or closed giving your reason.
 ";
         using (var ms = new MemoryStream(bytes))
         {

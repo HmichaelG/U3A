@@ -152,18 +152,6 @@ public static partial class BusinessRule
         foreach (var p in people) ApplyGroups(dbc, p);
         return people.Where(x => x.FinancialTo >= finToYear).ToList();
     }
-    public static List<Person> SelectablePersonsIncludeUnfinancial(U3ADbContext dbc)
-    {
-        var people = dbc.Person
-                        .AsNoTracking()
-                        .AsEnumerable()
-                        .Where(x => x.DateCeased == null)
-                        .OrderBy(x => x.LastName)
-                        .ThenBy(x => x.FirstName)
-                        .ThenBy(x => x.Email).ToList();
-        foreach (var p in people) ApplyGroups(dbc, p);
-        return people;
-    }
     public static async Task<List<Person>> SelectablePersonsIncludeUnfinancialAsync(U3ADbContext dbc)
     {
         var people = await dbc.Person
@@ -214,6 +202,7 @@ public static partial class BusinessRule
                         .Include(x => x.Course)
                         .Include(x => x.Course).ThenInclude(x => x.CourseParticipationType)
                         .Include(x => x.Course).ThenInclude(c => c.Classes)
+                        .Include(x => x.Class)
                         .Include(x => x.Person)
                         .Where(x => x.TermID == TermID && x.IsCourseClerk)
                         .AsEnumerable().Where(x => IsCourseInTerm(x.Course, term)).ToList();
@@ -250,6 +239,7 @@ public static partial class BusinessRule
             {
                 if (c != null)
                 {
+                    c.Course = dbc.Course.Find(c.CourseID);
                     c.Enrolments.AddRange(BusinessRule.SelectableEnrolmentsByClass(dbc, c, term, c.Course));
                 }
             }
@@ -260,7 +250,7 @@ public static partial class BusinessRule
     public static async Task<bool> IsLeaderOrClerk(U3ADbContext dbc, Person person, Term term)
     {
         bool isLeader = IsCourseLeader(dbc, person, term);
-        bool isClerk = await IsCourseClerk(dbc, person, term);
+        bool isClerk = await IsCourseClerkAsync(dbc, person, term);
         return isLeader || isClerk;
     }
 
@@ -285,7 +275,7 @@ public static partial class BusinessRule
                                         x.Leader3ID == person.ID) &&
                                         x.Course.Year == term.Year && IsClassInRemainingYear(dbc, x, term, defaultTerm));
     }
-    public static async Task<bool> IsCourseClerk(U3ADbContext dbc, Person person, Term term)
+    public static async Task<bool> IsCourseClerkAsync(U3ADbContext dbc, Person person, Term term)
     {
         return await dbc.Enrolment
                         .Include(x => x.Term)

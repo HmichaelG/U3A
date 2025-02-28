@@ -423,7 +423,7 @@ public class Person : BaseEntity, ISoftDelete
     {
         get
         {
-            return $"{ToTitleText(LastName.Trim())}{ToTitleText(FirstName.Trim())}{PersonID}";
+            return $"{ToTitleText(LastName.Trim()).PadRight(25,'_')}{ToTitleText(FirstName.Trim()).PadRight(25,'_')}{PersonID}";
         }
     }
 

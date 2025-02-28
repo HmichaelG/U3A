@@ -50,11 +50,10 @@ namespace U3A.Model
         public string Venue { get; set; }
         public string VenueAddress { get; set; }
         public int TotalActiveStudents { get; set; }
-        public int TotalWaitlistedStudents { get; set; }
+        public int TotalWaitlisted { get; set; }
         public double ParticipationRate { get; set; }
         //public List<DateTime> ClassDates { get; set; } = new();
         public List<ScheduledPerson> Contacts { get; set; } = new();
-
     }
 
     public class ScheduledPerson
@@ -65,6 +64,7 @@ namespace U3A.Model
         public string Phone { get; set; }
         public string Mobile { get; set; }
         public string Role { get; set; }
+        public string SortOrder { get; set; }
     }
     public class AIChatClassData
     {

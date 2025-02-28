@@ -139,11 +139,11 @@ namespace U3A.BusinessRules
             List<Class> classes;
             if (IsCalendarView)
             {
-                classes = await BusinessRule.SchedulledClassesAsync(dbc, selectedTerm);
+                classes = await BusinessRule.ScheduledClassesAsync(dbc, selectedTerm);
             }
             else
             {
-                classes = await BusinessRule.SchedulledClassesWithCourseEnrolmentsAsync(dbc, selectedTerm, IncludeOffScheduleActivities);
+                classes = await BusinessRule.ScheduledClassesWithCourseEnrolmentsAsync(dbc, selectedTerm, IncludeOffScheduleActivities);
             }
             foreach (Class c in classes)
             {

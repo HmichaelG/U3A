@@ -20,6 +20,7 @@ namespace U3A.BusinessRules
                                                         TenantDbContext dbcT,
                                                         TenantInfoService tenantService)
         {
+            var people = await dbc.Person.ToListAsync();    
             var data = new AIChatClassData();
             // settings
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
@@ -87,7 +88,7 @@ namespace U3A.BusinessRules
                     VenueAddress = x.Venue.Address,
                     ClassSummary = x.OccurrenceText,
                     TotalActiveStudents = x.TotalActiveStudents,
-                    TotalWaitlistedStudents = x.TotalWaitlistedStudents,
+                    TotalWaitlisted = x.TotalWaitlistedStudents,
                     ParticipationRate = x.ParticipationRate
 
                 }).ToList();
@@ -100,12 +101,14 @@ namespace U3A.BusinessRules
                         if (!string.IsNullOrWhiteSpace(c.GuestLeader)) sc.Contacts.Add(new ScheduledPerson()
                         {
                             Class = c.Course.Name,
+                            SortOrder = c.GuestLeader,
                             Name = c.GuestLeader,
                             Role = "Guest Leader"
                         });
                         if (c.Leader != null) sc.Contacts.Add(new ScheduledPerson()
                         {
                             Class = c.Course.Name,
+                            SortOrder = c.Leader.FullNameAlphaKey,
                             Name = c.Leader.FullNameWithPostNominals,
                             Email = c.Leader.Email,
                             Phone = c.Leader.AdjustedHomePhone,
@@ -115,6 +118,7 @@ namespace U3A.BusinessRules
                         if (c.Leader2 != null) sc.Contacts.Add(new ScheduledPerson()
                         {
                             Class = c.Course.Name,
+                            SortOrder = c.Leader2.FullNameAlphaKey,
                             Name = c.Leader2.FullNameWithPostNominals,
                             Email = c.Leader2.Email,
                             Phone = c.Leader2.AdjustedHomePhone,
@@ -124,6 +128,7 @@ namespace U3A.BusinessRules
                         if (c.Leader3 != null) sc.Contacts.Add(new ScheduledPerson()
                         {
                             Class = c.Course.Name,
+                            SortOrder = c.Leader3.FullNameAlphaKey,
                             Name = c.Leader3.FullNameWithPostNominals,
                             Email = c.Leader3.Email,
                             Phone = c.Leader3.AdjustedHomePhone,
@@ -136,11 +141,44 @@ namespace U3A.BusinessRules
                             sc.Contacts.Add(new ScheduledPerson()
                             {
                                 Class = c.Course.Name,
+                                SortOrder = clerk.FullNameAlphaKey,
                                 Name = clerk.FullNameWithPostNominals,
                                 Email = clerk.Email,
                                 Phone = clerk.AdjustedHomePhone,
                                 Mobile = clerk.AdjustedMobile,
                                 Role = "Clerk"
+                            });
+                        }
+                        foreach (var e in c.Course.Enrolments)
+                        {
+                            if (e.IsCourseClerk) continue;
+                            if (e.isLeader) continue;
+                            if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
+                            sc.Contacts.Add(new ScheduledPerson()
+                            {
+                                Class = c.Course.Name,
+                                SortOrder = e.Person.FullNameAlphaKey,
+                                Name = e.Person.FullNameWithPostNominals,
+                                Email = e.Person.Email,
+                                Phone = e.Person.AdjustedHomePhone,
+                                Mobile = e.Person.AdjustedMobile,
+                                Role = (e.IsWaitlisted) ? "Waitlisted" : "Student"
+                            });
+                        }
+                        foreach (var e in c.Enrolments)
+                        {
+                            if (e.IsCourseClerk) continue;
+                            if (e.isLeader) continue;
+                            if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
+                            sc.Contacts.Add(new ScheduledPerson()
+                            {
+                                Class = c.Course.Name,
+                                SortOrder = e.Person.FullNameAlphaKey,
+                                Name = e.Person.FullNameWithPostNominals,
+                                Email = e.Person.Email,
+                                Phone = e.Person.AdjustedHomePhone,
+                                Mobile = e.Person.AdjustedMobile,
+                                Role = (e.IsWaitlisted) ? "Waitlisted" : "Student"
                             });
                         }
                     }

@@ -53,9 +53,9 @@ namespace U3A.BusinessRules
                             .Where(x => IsClassInTerm(x, term.TermNumber))
                             .OrderBy(x => x.Course.Name).ThenBy(x => x.StartTime).ToList();
         }
-        public static async Task<List<Class>> SchedulledClassesAsync(U3ADbContext dbc, Term term)
+        public static async Task<List<Class>> ScheduledClassesAsync(U3ADbContext dbc, Term term)
         {
-            // OccurenceID == 99 is an Unscheduled class
+            // OccurrenceID == 99 is an Unscheduled class
             var classes = await dbc.Class.AsNoTracking()
                             .Include(x => x.OnDay)
                             .Include(x => x.Course)
@@ -67,11 +67,11 @@ namespace U3A.BusinessRules
                             .OrderBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToListAsync();
             return classes;
         }
-        public static async Task<List<Class>> SchedulledClassesWithCourseEnrolmentsAsync(U3ADbContext dbc, Term term, bool IncludeOffScheduleActivities)
+        public static async Task<List<Class>> ScheduledClassesWithCourseEnrolmentsAsync(U3ADbContext dbc, Term term, bool IncludeOffScheduleActivities)
         {
             var enrolments = await dbc.Enrolment.AsNoTracking()
                                     .Where(x => x.TermID == term.ID).ToListAsync();
-            // OccurenceID == 99 is an Unscheduled class
+            // OccurrenceID == 99 is an Unscheduled class
             var classes = await dbc.Class.AsNoTracking()
                             .Include(x => x.OnDay)
                             .Include(x => x.Course)
@@ -99,7 +99,7 @@ namespace U3A.BusinessRules
         }
 
         private static IQueryable<Class> GetSameParticipantClasses(U3ADbContext dbc,
-                                                Term term, bool ExludeOffScheduleActivities, DateTime? LastScheduleUpdate)
+                                                Term term, bool ExcludeOffScheduleActivities, DateTime? LastScheduleUpdate)
         {
             return dbc.Class.AsNoTracking().AsSplitQuery().IgnoreQueryFilters()
                             .Include(x => x.OnDay)
@@ -113,11 +113,11 @@ namespace U3A.BusinessRules
                             .Where(x => !x.IsDeleted && (x.Course.Year == term.Year || (x.StartDate != null && x.StartDate >= dbc.GetLocalDate()))
                                             && (LastScheduleUpdate == null || x.UpdatedOn > LastScheduleUpdate.Value)
                                             && x.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses
-                                            && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities
+                                            && (!ExcludeOffScheduleActivities || (ExcludeOffScheduleActivities
                                             && !x.Course.IsOffScheduleActivity)));
         }
         private static IQueryable<Class> GetDifferentParticipantClasses(U3ADbContext dbc,
-                                            Term term, bool ExludeOffScheduleActivities, DateTime? LastScheduleUpdate)
+                                            Term term, bool ExcludeOffScheduleActivities, DateTime? LastScheduleUpdate)
         {
             return dbc.Class.AsNoTracking().AsSplitQuery().IgnoreQueryFilters()
                             .Include(x => x.OnDay)
@@ -130,7 +130,7 @@ namespace U3A.BusinessRules
                             .Where(x => !x.IsDeleted && (x.Course.Year == term.Year || (x.StartDate != null && x.StartDate >= dbc.GetLocalDate()))
                                         && (LastScheduleUpdate == null || x.UpdatedOn > LastScheduleUpdate.Value)
                                         && x.Course.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass
-                                        && (!ExludeOffScheduleActivities || (ExludeOffScheduleActivities
+                                        && (!ExcludeOffScheduleActivities || (ExcludeOffScheduleActivities
                                         && !x.Course.IsOffScheduleActivity)));
         }
 
@@ -142,7 +142,7 @@ namespace U3A.BusinessRules
         /// <param name="term"></param>
         /// <returns></returns>
         public static async Task<List<Class>> GetClassDetailsAsync(U3ADbContext dbc,
-            Term term, SystemSettings settings, bool ExludeOffScheduleActivities = false, DateTime? LastScheduleUpdate = null)
+            Term term, SystemSettings settings, bool ExcludeOffScheduleActivities = false, DateTime? LastScheduleUpdate = null)
         {
             var enrolments = await dbc.Enrolment.IgnoreQueryFilters()
                                         .Include(x => x.Term)
@@ -152,7 +152,7 @@ namespace U3A.BusinessRules
                                                         x.Term.Year == term.Year - 1 && x.Term.TermNumber == 4)).ToListAsync();
             var terms = await dbc.Term.AsNoTracking().ToListAsync();
             var defaultTerm = await dbc.Term.AsNoTracking().FirstOrDefaultAsync(x => x.IsDefaultTerm);
-            var classes = (await GetSameParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
+            var classes = (await GetSameParticipantClasses(dbc, term, ExcludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync());
             Parallel.ForEach(classes, c =>
                 {
@@ -162,7 +162,7 @@ namespace U3A.BusinessRules
                              ).ToList();
                 }
             );
-            var diffParticipants = await GetDifferentParticipantClasses(dbc, term, ExludeOffScheduleActivities, LastScheduleUpdate)
+            var diffParticipants = await GetDifferentParticipantClasses(dbc, term, ExcludeOffScheduleActivities, LastScheduleUpdate)
                             .ToListAsync();
             Parallel.ForEach(diffParticipants, c =>
                 {
@@ -360,7 +360,7 @@ namespace U3A.BusinessRules
             }
             else
             {
-                clerks = course.Enrolments.Where(x => x.CourseID == course.ID && x.ClassID == c.ID &&
+                clerks = c.Enrolments.Where(x => x.CourseID == course.ID && x.ClassID == c.ID &&
                                                 x.TermID == term.ID &&
                                                 x.IsCourseClerk && !x.IsWaitlisted)
                                                 .Select(x => x.Person).OrderBy(x => x?.FullNameAlpha).ToList();
