@@ -98,14 +98,14 @@ namespace U3A.BusinessRules
                     var sc = data.Classes.Find(x => x.ID == c.ID);
                     if (sc != null)
                     {
-                        if (!string.IsNullOrWhiteSpace(c.GuestLeader)) sc.Contacts.Add(new ScheduledPerson()
+                        if (!string.IsNullOrWhiteSpace(c.GuestLeader)) sc.People.Add(new ScheduledPerson()
                         {
                             Class = c.Course.Name,
                             SortOrder = c.GuestLeader,
                             Name = c.GuestLeader,
                             Role = "Guest Leader"
                         });
-                        if (c.Leader != null) sc.Contacts.Add(new ScheduledPerson()
+                        if (c.Leader != null) sc.People.Add(new ScheduledPerson()
                         {
                             Class = c.Course.Name,
                             SortOrder = c.Leader.FullNameAlphaKey,
@@ -115,7 +115,7 @@ namespace U3A.BusinessRules
                             Mobile = c.Leader.AdjustedMobile,
                             Role = "Leader"
                         });
-                        if (c.Leader2 != null) sc.Contacts.Add(new ScheduledPerson()
+                        if (c.Leader2 != null) sc.People.Add(new ScheduledPerson()
                         {
                             Class = c.Course.Name,
                             SortOrder = c.Leader2.FullNameAlphaKey,
@@ -125,7 +125,7 @@ namespace U3A.BusinessRules
                             Mobile = c.Leader2.AdjustedMobile,
                             Role = "Leader"
                         });
-                        if (c.Leader3 != null) sc.Contacts.Add(new ScheduledPerson()
+                        if (c.Leader3 != null) sc.People.Add(new ScheduledPerson()
                         {
                             Class = c.Course.Name,
                             SortOrder = c.Leader3.FullNameAlphaKey,
@@ -138,7 +138,7 @@ namespace U3A.BusinessRules
                         });
                         foreach (var clerk in c.Clerks)
                         {
-                            sc.Contacts.Add(new ScheduledPerson()
+                            sc.People.Add(new ScheduledPerson()
                             {
                                 Class = c.Course.Name,
                                 SortOrder = clerk.FullNameAlphaKey,
@@ -151,10 +151,9 @@ namespace U3A.BusinessRules
                         }
                         foreach (var e in c.Course.Enrolments)
                         {
-                            if (e.IsCourseClerk) continue;
                             if (e.isLeader) continue;
                             if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
-                            sc.Contacts.Add(new ScheduledPerson()
+                            sc.People.Add(new ScheduledPerson()
                             {
                                 Class = c.Course.Name,
                                 SortOrder = e.Person.FullNameAlphaKey,
@@ -167,10 +166,9 @@ namespace U3A.BusinessRules
                         }
                         foreach (var e in c.Enrolments)
                         {
-                            if (e.IsCourseClerk) continue;
                             if (e.isLeader) continue;
                             if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
-                            sc.Contacts.Add(new ScheduledPerson()
+                            sc.People.Add(new ScheduledPerson()
                             {
                                 Class = c.Course.Name,
                                 SortOrder = e.Person.FullNameAlphaKey,
@@ -181,6 +179,7 @@ namespace U3A.BusinessRules
                                 Role = (e.IsWaitlisted) ? "Waitlisted" : "Student"
                             });
                         }
+                        sc.People = sc.People.OrderBy(x => x.SortOrder).ToList();
                     }
                 });
             }

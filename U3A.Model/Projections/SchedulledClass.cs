@@ -53,7 +53,7 @@ namespace U3A.Model
         public int TotalWaitlisted { get; set; }
         public double ParticipationRate { get; set; }
         //public List<DateTime> ClassDates { get; set; } = new();
-        public List<ScheduledPerson> Contacts { get; set; } = new();
+        public List<ScheduledPerson> People { get; set; } = new();
     }
 
     public class ScheduledPerson
