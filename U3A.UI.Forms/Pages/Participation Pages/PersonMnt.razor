@@ -44,7 +44,7 @@
         <DateFilter @ref=DateFilter />
 
         <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-        DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+                                     DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
 
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
@@ -68,35 +68,35 @@
         <FullScreen DisplayOffset="@((IsEmbedded) ? 19 : 8)" HideToggle="@IsEmbedded">
             <ContentTemplate>
                 <DxGrid Data="@Persons" @ref=@mainGrid
-                @bind-SelectedDataItems="@SelectedDataItems"
-                KeyFieldName="ID"
-                VirtualScrollingEnabled="true"
-                PopupEditFormCssClass="popup-width"
-                EditMode="GridEditMode.PopupEditForm"
-                UnboundColumnData="Grid_UnboundColumnData"
-                CustomizeEditModel="Grid_CustomizeEditModel"
-                EditModelSaving="Grid_EditModelSaving"
-                PopupEditFormHeaderText="Add/Edit Participant"
-                DataItemDeleting="Grid_DataItemDeleting">
+                        @bind-SelectedDataItems="@SelectedDataItems"
+                        KeyFieldName="ID"
+                        VirtualScrollingEnabled="true"
+                        PopupEditFormCssClass="popup-width"
+                        EditMode="GridEditMode.PopupEditForm"
+                        UnboundColumnData="Grid_UnboundColumnData"
+                        CustomizeEditModel="Grid_CustomizeEditModel"
+                        EditModelSaving="Grid_EditModelSaving"
+                        PopupEditFormHeaderText="Add/Edit Participant"
+                        DataItemDeleting="Grid_DataItemDeleting">
                     <ToolbarTemplate>
                         <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey"
-                        SpreadsheetHeaderRows="2"
-                        ToolbarFilterClosed="@(OnToolbarFilterClosed)">
+                                     SpreadsheetHeaderRows="2"
+                                     ToolbarFilterClosed="@(OnToolbarFilterClosed)">
                             <CustomButtonContent>
                                 <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                                Visible="@(!IsEmbedded)"
-                                BeginGroup=true
-                                Click=@OnCommunicate
-                                RenderStyle="ButtonRenderStyle.Primary"
-                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                Alignment="ToolbarItemAlignment.Right"
-                                Tooltip="Send email and/or SMS to participants">
+                                               Visible="@(!IsEmbedded)"
+                                               BeginGroup=true
+                                               Click=@OnCommunicate
+                                               RenderStyle="ButtonRenderStyle.Primary"
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               Alignment="ToolbarItemAlignment.Right"
+                                               Tooltip="Send email and/or SMS to participants">
                                 </DxToolbarItem>
                                 <DxToolbarItem Visible="@IsEmbedded" Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
                                     <Template>
                                         <ContextHelpTitle Title="" HelpTopic="Add_Edit-Participants.html"
-                                        ButtonIconCssClass="bi bi-question-circle-fill help-btn"
-                                        ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                                                          ButtonIconCssClass="bi bi-question-circle-fill help-btn"
+                                                          ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
                                     </Template>
                                 </DxToolbarItem>
                             </CustomButtonContent>
@@ -104,13 +104,13 @@
                     </ToolbarTemplate>
                     <Columns>
                         <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
-                        Width="2rem" Visible="@(!IsEmbedded)" />
+                                               Width="2rem" Visible="@(!IsEmbedded)" />
                         <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
-                        Width="6rem" DeleteButtonVisible=@(!IsEmbedded) />
+                                               Width="6rem" DeleteButtonVisible=@(!IsEmbedded) />
                         <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
-                        Caption="ID" FieldName="PersonIdentity" Width="4rem" />
+                                          Caption="ID" FieldName="PersonIdentity" Width="4rem" />
                         <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
-                        Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
+                                          Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
                         <DxGridDataColumn Caption="Gender" FieldName="Gender" Width="5rem" />
                         <DxGridDataColumn Caption="LegacyID" FieldName="ConversionID" Visible=false DisplayFormat="{0:F0}" />
                         <DxGridBandColumn Caption="Address">
@@ -156,22 +156,22 @@
                         <DxGridDataColumn Caption="Month Born" FieldName="BirthMonthName" Width="6rem" />
                         <DxGridDataColumn Caption="Joined" FieldName="DateJoined" Width="6rem" />
                         <DxGridDataColumn Caption="T&C's Agreed"
-                        UnboundType="GridUnboundColumnType.DateTime"
-                        FieldName="TermsLastAgreed" Width="6rem" DisplayFormat="d/M/yy HH:mm" />
+                                          UnboundType="GridUnboundColumnType.DateTime"
+                                          FieldName="TermsLastAgreed" Width="6rem" DisplayFormat="d/M/yy HH:mm" />
                         <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToBriefText" Width="6rem" SortMode="GridColumnSortMode.Value" />
                         <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
                         <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
-                        DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
+                                          DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
                     </Columns>
                     <GroupSummary>
                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                        FieldName="ID" DisplayText="{0:n0}  Participants"
-                        FooterColumnName="FullNameAlpha" />
+                                           FieldName="ID" DisplayText="{0:n0}  Participants"
+                                           FooterColumnName="FullNameAlpha" />
                     </GroupSummary>
                     <TotalSummary>
                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                        FieldName="ID" DisplayText="{0:n0}  Participants"
-                        FooterColumnName="FullNameAlpha" />
+                                           FieldName="ID" DisplayText="{0:n0}  Participants"
+                                           FooterColumnName="FullNameAlpha" />
                     </TotalSummary>
 
                     <EditFormTemplate Context="EditFormContext">
@@ -187,10 +187,10 @@
                             <DxFormLayoutGroup Caption="Personal" ColSpanMd="6">
                                 <DxFormLayoutItem Caption="Title" ColSpanMd="12">
                                     <DxComboBox TData="string" TValue="string"
-                                    NullText="(Optional) Select or Enter Title"
-                                    Data="@titles"
-                                    @bind-Text="@editItem.Title"
-                                    AllowUserInput="true" />
+                                                NullText="(Optional) Select or Enter Title"
+                                                Data="@titles"
+                                                @bind-Text="@editItem.Title"
+                                                AllowUserInput="true" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
                                     <DxTextBox @bind-Text="@editItem.FirstName" autocomplete="new-password" />
@@ -200,14 +200,14 @@
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12">
                                     <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
-                                    @bind-Text="@editItem.PostNominals" />
+                                               @bind-Text="@editItem.PostNominals" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
                                     <DxComboBox Data="@gender" @bind-Value="@editItem.Gender" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
                                     <DxDateEdit @bind-Date="@editItem.BirthDate"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                                     <DxMemo @bind-Text="@editItem.Occupation" Rows="3" autocomplete="new-password" />
@@ -227,16 +227,19 @@
                                     <DxSpinEdit @bind-Value="@editItem.Postcode" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Email"
-                                    onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"
-                                    autocomplete="new-password"
-                                    ReadOnly="@(!isEmailEditing)" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                        <Buttons>
-                                            <DxEditorButton CssClass="text-warning"
-                                            IconCssClass="bi bi-pencil"
-                                            Click="@(() => {if (!isEmailEditing) isEmailEditing = true;})" />
-                                        </Buttons>
-                                    </DxTextBox>
+                                    <ChildContent>
+                                        <div class="d-flex">
+                                            <DxTextBox @bind-Text="@editItem.Email" CssClass="flex-grow-1"
+                                                       onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"
+                                                       autocomplete="new-password"
+                                                       ReadOnly="@(!isEmailEditing)" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                            </DxTextBox>
+                                            <DxButton CssClass="flex-grow-0"
+                                                      IconCssClass="bi bi-pencil"
+                                                      RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                      Click="@(() => {isEmailEditing = !isEmailEditing;})" />
+                                        </div>
+                                    </ChildContent>
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Home Phone" ColSpanMd="12">
                                     <DxTextBox @bind-Text="@editItem.HomePhone" autocomplete="new-password" />
@@ -246,9 +249,9 @@
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
                                     <DxComboBox Data="silentContactList"
-                                    @bind-Value="@editItem.SilentContact"
-                                    ValueFieldName="@nameof(SilentContactWrapper.Type)"
-                                    TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
+                                                @bind-Value="@editItem.SilentContact"
+                                                ValueFieldName="@nameof(SilentContactWrapper.Type)"
+                                                TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
                                     </DxComboBox>
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Mail Preference" ColSpanMd="6">
@@ -256,7 +259,7 @@
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
                                     <DxCheckBox @bind-Checked="@editItem.SMSOptOut"
-                                    Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
+                                                Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                             </DxFormLayoutGroup>
                             <DxFormLayoutGroup Caption="In Case of Emergency" ColSpanMd="6">
@@ -272,8 +275,8 @@
                                 <Items>
                                     <DxFormLayoutItem Caption="Financial To" ColSpanMd="6">
                                         <DxTextBox Text="@editItem.FinancialToText"
-                                        TextExpression="@(() => editItem.FinancialToText)"
-                                        ReadOnly="true" />
+                                                   TextExpression="@(() => editItem.FinancialToText)"
+                                                   ReadOnly="true" />
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem Caption="Date Joined" ColSpanMd="6">
                                         <DxDateEdit @bind-Date="@editItem.DateJoined" />
@@ -283,12 +286,12 @@
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem Caption="Life Member?" ColSpanMd="6">
                                         <DxCheckBox @bind-Checked="@editItem.IsLifeMember"
-                                        Alignment="CheckBoxContentAlignment.Right" />
+                                                    Alignment="CheckBoxContentAlignment.Right" />
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem Caption="Vax Certificate?" ColSpanMd="6"
-                                    Visible="@settings.RequireVaxCertificate">
+                                                      Visible="@settings.RequireVaxCertificate">
                                         <DxCheckBox @bind-Checked="@editItem.VaxCertificateViewed"
-                                        Alignment="CheckBoxContentAlignment.Right" />
+                                                    Alignment="CheckBoxContentAlignment.Right" />
                                     </DxFormLayoutItem>
                                 </Items>
                             </DxFormLayoutGroup>
@@ -302,7 +305,7 @@
 
 <style>
     .popup-width {
-    min-width: min(65rem, 100%);
+        min-width: min(65rem, 100%);
     }
 </style>
 
@@ -509,7 +512,7 @@
                     msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                 }
                 result = await messageBox.ShowAsync("Email change failed",
-                                                        $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
+                                                                $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
             }
         }
@@ -538,10 +541,10 @@
                 {
                     var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
                     _ = await UserManager.ConfirmEmailAsync(user, token);
-                    string msg = $@"The login has changed<br/>
-                                from: <b>{originalEmail}</b><br/>
-                                to <b>{newEmail}</b>.<br/>
-                                It is confirmed and the password remains unchanged";
+                    string msg = $@"<p>The login has changed...</p>
+                                From: &ensp; <b>{originalEmail}</b><br/>
+                                To: &emsp;&ensp; <b>{newEmail}</b>
+                                <p>The password remains unchanged</p>";
                     _ = await messageBox.ShowOkOnlyAsync("Login changed", msg);
                 }
                 else
@@ -552,7 +555,7 @@
                         msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                     }
                     result = await messageBox.ShowAsync("Email change failed",
-                                                                $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
+                                                                        $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
                 }
             }

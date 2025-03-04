@@ -132,7 +132,7 @@ namespace U3A.BusinessRules
                     {
                         var reason = string.Empty;
                         if (c.TotalActiveStudents >= cr.MaximumStudents) reason = " because it is FULL";
-                        if (!cr.AllowAutoEnrol) reason = " because it is CLOSED for new enrolments.";
+                        if (!cr.AllowAutoEnrol) reason = " because it is CLOSED for new enrolments";
                         ed.WaitlistMessage =
                             $@"Thank you for your interest in our program.
 We are currently unable to place you in this course{reason}. 

@@ -18,95 +18,107 @@ else
     <div class="w-100 px-2">
         <h4>Search Email</h4>
         <DxFormLayout>
-        <DxFormLayoutGroup Caption="Search Email" Expanded="@areDetailsExpanded"
-                           ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End" ColSpanMd="8"
-                           ExpandedChanged="@(async () => {if (fullScreen != null)
+            <DxFormLayoutGroup Caption="Search Email" Expanded="@areDetailsExpanded"
+                               ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End" ColSpanMd="8"
+                               ExpandedChanged="@(async () => {if (fullScreen != null)
                                                             {
                                                                 areDetailsExpanded = !areDetailsExpanded;
                                                                 fullScreen.RefreshLayout(!areDetailsExpanded);
                                                             }
                                                            })">
-            <Items>
-                <DxFormLayoutItem Caption="Search for participant" ColSpanLg="12">
-                    <DxComboBox Data="@people"
-                                AllowUserInput=true
-                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                SearchMode="ListSearchMode.AutoSearch"
-                                ListRenderMode="ListRenderMode.Virtual"
-                                TextFieldName="@nameof(Person.PersonSummary)"
-                                @bind-Value="@selectedPerson">
-                        <Buttons>
-                            <DxEditorButton Text="Search" CssClass="text-primary"
-                                            IconCssClass="h5 bi bi-search"
-                                            Tooltip="Click to search for the selected member"
-                                            Click="@OnSearch" />
-                        </Buttons>
-                    </DxComboBox>
-                </DxFormLayoutItem>
+                <Items>
+                    <DxFormLayoutItem Caption="Search for participant" ColSpanLg="12">
+                        <ChildContent>
+                            <div class="d-flex">
+                                <DxComboBox Data="@people" CssClass="flex-grow-1"
+                                            AllowUserInput=true
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            SearchMode="ListSearchMode.AutoSearch"
+                                            ListRenderMode="ListRenderMode.Virtual"
+                                            TextFieldName="@nameof(Person.PersonSummary)"
+                                            @bind-Value="@selectedPerson">
+                                </DxComboBox>
+                                <DxButton Text="Search" CssClass="flex-grow-0"
+                                          IconCssClass="h5 bi bi-search"
+                                          Tooltip="Click to search for the selected member"
+                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                          Click="@OnSearch" />
+                            </div>
+                        </ChildContent>
+                    </DxFormLayoutItem>
 
-                <DxFormLayoutItem Caption="Or, email address" ColSpanLg="12">
-                    <DxComboBox Id="emailId" Data="@email"
-                                AllowUserInput=true
-                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                SearchMode="ListSearchMode.AutoSearch"
-                                ListRenderMode="ListRenderMode.Virtual"
-                                @bind-Value="@emailAddressValue"
-                                Text="@emailAddress"
-                                TextChanged="@OnEnailChnaged">
-                        <Buttons>
-                            <DxEditorButton Text="Search" CssClass="text-primary"
-                                            IconCssClass="h5 bi bi-search"
-                                            Tooltip="Click to search for the selected member"
-                                            Click="@OnEmailSearch" />
-                        </Buttons>
-                    </DxComboBox>
-                </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Or, email address" ColSpanLg="12">
+                        <ChildContent>
+                            <div class="d-flex">
+                                <DxComboBox Id="emailId" Data="@email" CssClass="flex-grow-1"
+                                            AllowUserInput=true
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            SearchMode="ListSearchMode.AutoSearch"
+                                            ListRenderMode="ListRenderMode.Virtual"
+                                            @bind-Value="@emailAddressValue"
+                                            Text="@emailAddress"
+                                            TextChanged="@OnEnailChnaged">
+                                </DxComboBox>
+                                <DxButton Text="Search" CssClass="flex-grow-0"
+                                          IconCssClass="h5 bi bi-search"
+                                          Tooltip="Click to search for the selected member"
+                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                          Click="@OnEmailSearch" />
+                            </div>
+                        </ChildContent>
+                    </DxFormLayoutItem>
 
-                <DxFormLayoutItem Caption="Or, Date Range" ColSpanLg="6">
-                    <DxDateEdit @bind-Date="@fromDate" MinDate="@minDate" MaxDate="@maxDate" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="To" ColSpanLg="6">
-                    <DxDateEdit @bind-Date="@toDate" MinDate="@minDate" MaxDate="@maxDate">
-                        <Buttons>
-                            <DxEditorButton Text="Search" CssClass="text-primary"
+                    <DxFormLayoutItem Caption="Or, Date Range" ColSpanLg="6">
+                        <DxDateEdit @bind-Date="@fromDate" MinDate="@minDate" MaxDate="@maxDate" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="To" ColSpanLg="6">
+                        <ChildContent>
+                            <div class="d-flex">
+                                <DxDateEdit @bind-Date="@toDate" 
+                                            CssClass="flex-grow-1"
+                                            MinDate="@minDate" 
+                                            MaxDate="@maxDate">
+                                </DxDateEdit>
+                            <DxButton Text="Search" CssClass="flex-grow-0"
                                             IconCssClass="h5 bi bi-search"
+                                            RenderStyleMode="ButtonRenderStyleMode.Outline"
                                             Tooltip="Click to search for the selected member"
                                             Click="@OnDateSearch" />
-                        </Buttons>
-                    </DxDateEdit>
-                </DxFormLayoutItem>
-            </Items>
-        </DxFormLayoutGroup>
+                            </div>
+                        </ChildContent>
+                        </DxFormLayoutItem>
+                </Items>
+            </DxFormLayoutGroup>
 
-        <FullScreen @ref=@fullScreen DisplayOffset="22" AlternateDisplayOffset="13">
-            <ContentTemplate>
-                <DxGrid Data=@messages @ref=@mainGrid
-                        AutoExpandAllGroupRows=false>
-                    <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="{B8414CBE-49B9-47D4-A754-4FDC59A29115}" />
-                    </ToolbarTemplate>
-                    <Columns>
-                        <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-                        <DxGridDataColumn Caption="Stream" FieldName="Stream" />
-                        <DxGridDataColumn Caption="From" FieldName="From" />
-                        <DxGridDataColumn Caption="To" FieldName="To" Visible=@IsSearchByDateRange />
-                        <DxGridDataColumn Caption="Subject" FieldName="Subject" />
-                        <DxGridDataColumn Caption="Attachments" FieldName="Attachments" />
-                        <DxGridDataColumn Caption="Status" FieldName="Status" />
-                        <DxGridDataColumn Width="8rem" Caption="Details" FieldName="MessageID" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
-                            <CellDisplayTemplate>
-                                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
-                                          RenderStyle="ButtonRenderStyle.Primary" Text="Details"
-                                          Click="() => OnDetailsClick((EmailMessage)context.DataItem)"></DxButton>
-                            </CellDisplayTemplate>
-                        </DxGridDataColumn>
-                    </Columns>
-                    <TotalSummary>
-                        <DxGridSummaryItem FieldName="Subject" FooterColumnName="Subject" SummaryType="GridSummaryItemType.Count" />
-                    </TotalSummary>
-                </DxGrid>
-            </ContentTemplate>
-        </FullScreen>
+            <FullScreen @ref=@fullScreen DisplayOffset="22" AlternateDisplayOffset="13">
+                <ContentTemplate>
+                    <DxGrid Data=@messages @ref=@mainGrid
+                            AutoExpandAllGroupRows=false>
+                        <ToolbarTemplate>
+                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{B8414CBE-49B9-47D4-A754-4FDC59A29115}" />
+                        </ToolbarTemplate>
+                        <Columns>
+                            <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                            <DxGridDataColumn Caption="Stream" FieldName="Stream" />
+                            <DxGridDataColumn Caption="From" FieldName="From" />
+                            <DxGridDataColumn Caption="To" FieldName="To" Visible=@IsSearchByDateRange />
+                            <DxGridDataColumn Caption="Subject" FieldName="Subject" />
+                            <DxGridDataColumn Caption="Attachments" FieldName="Attachments" />
+                            <DxGridDataColumn Caption="Status" FieldName="Status" />
+                            <DxGridDataColumn Width="8rem" Caption="Details" FieldName="MessageID" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
+                                <CellDisplayTemplate>
+                                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                              RenderStyle="ButtonRenderStyle.Primary" Text="Details"
+                                              Click="() => OnDetailsClick((EmailMessage)context.DataItem)"></DxButton>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem FieldName="Subject" FooterColumnName="Subject" SummaryType="GridSummaryItemType.Count" />
+                        </TotalSummary>
+                    </DxGrid>
+                </ContentTemplate>
+            </FullScreen>
         </DxFormLayout>
     </div>
 
