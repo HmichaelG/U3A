@@ -269,6 +269,7 @@ namespace U3A.BusinessRules
             foreach (var enrollment in enrollments)
             {
                 var course = enrollment.Course;
+                if (!course.AllowAutoEnrol) { continue; }
                 int enrolledCount = 0;
                 CourseLeaders = new();
                 foreach (var c in course.Classes)

@@ -211,7 +211,7 @@ Please review and note the status of your enrolment request...</p>
 <ol>
 <li>the class is full, or</li>
 <li>Your requested class is not available this term. It is waitlisted until enrolment opens and allocation occurs, or</li>
-<li>the class leader has requested no further enrolments, or</li>
+<li>the class is currently closed for new enrolments, or</li>
 <li>our records indicate that you are currently unfinancial.</li>
 </ol>
 <p>You are waitlisted and will be notified should a place become available.

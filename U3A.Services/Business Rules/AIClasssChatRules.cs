@@ -20,7 +20,16 @@ namespace U3A.BusinessRules
                                                         TenantDbContext dbcT,
                                                         TenantInfoService tenantService)
         {
-            var people = await dbc.Person.ToListAsync();    
+            var thisTenant = dbc.TenantInfo.Identifier;
+            var people = await dbc.Person.IgnoreQueryFilters().ToListAsync();
+            var otherU3APeople = await dbcT.MultiCampusPerson.Where(x => x.TenantIdentifier != thisTenant).ToListAsync();
+            foreach (var p in otherU3APeople)
+            {
+                if (people.Find(x => x.ID == p.ID) == null)
+                {                   
+                    people.Add(GetPersonFromMCPerson(p));
+                }
+            }
             var data = new AIChatClassData();
             // settings
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
@@ -51,7 +60,7 @@ namespace U3A.BusinessRules
                     // From Course
 
                     Name = x.Course.Name,
-                    Description = RemoveHtmlTags( x.Course.Description),
+                    Description = RemoveHtmlTags(x.Course.Description),
                     CourseParticipationType = (x.Course.CourseParticipationTypeID == 0)
                                                 ? "Same students in all classes"
                                                 : "Different students in each class",
@@ -82,7 +91,7 @@ namespace U3A.BusinessRules
                     EndTime = (x.EndTime != null) ? TimeOnly.FromDateTime(x.EndTime.Value)
                                                   : null,
                     Occurs = x.Occurrence.Name,
-                    Repeats = x.Recurrence  ?? term.Duration ,
+                    Repeats = x.Recurrence ?? term.Duration,
                     Day = x.OnDay.Day,
                     Venue = x.Venue.Name,
                     VenueAddress = x.Venue.Address,
@@ -153,31 +162,19 @@ namespace U3A.BusinessRules
                         {
                             if (e.isLeader) continue;
                             if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
-                            sc.People.Add(new ScheduledPerson()
+                            if (e.Person != null)
                             {
-                                Class = c.Course.Name,
-                                SortOrder = e.Person.FullNameAlphaKey,
-                                Name = e.Person.FullNameWithPostNominals,
-                                Email = e.Person.Email,
-                                Phone = e.Person.AdjustedHomePhone,
-                                Mobile = e.Person.AdjustedMobile,
-                                Role = (e.IsWaitlisted) ? "Waitlisted" : "Student"
-                            });
-                        }
-                        foreach (var e in c.Enrolments)
-                        {
-                            if (e.isLeader) continue;
-                            if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
-                            sc.People.Add(new ScheduledPerson()
-                            {
-                                Class = c.Course.Name,
-                                SortOrder = e.Person.FullNameAlphaKey,
-                                Name = e.Person.FullNameWithPostNominals,
-                                Email = e.Person.Email,
-                                Phone = e.Person.AdjustedHomePhone,
-                                Mobile = e.Person.AdjustedMobile,
-                                Role = (e.IsWaitlisted) ? "Waitlisted" : "Student"
-                            });
+                                sc.People.Add(new ScheduledPerson()
+                                {
+                                    Class = c.Course.Name,
+                                    SortOrder = e.Person.FullNameAlphaKey,
+                                    Name = e.Person.FullNameWithPostNominals,
+                                    Email = e.Person.Email,
+                                    Phone = e.Person.AdjustedHomePhone,
+                                    Mobile = e.Person.AdjustedMobile,
+                                    Role = (e.IsWaitlisted) ? "Waitlisted" : "Student"
+                                });
+                            }
                         }
                         sc.People = sc.People.OrderBy(x => x.SortOrder).ToList();
                     }

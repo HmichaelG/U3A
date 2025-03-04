@@ -14,12 +14,12 @@
 <Progress @ref=@progressBar />
 
 <DxPopup Visible="@popupVisible" @ref="@popup" Width="95dvw" CssClass="editor-popup"
-         PositionY="5"
-         CloseButtonClick="@NegativeButtonClicked"
-         CloseOnEscape="false"
-         CloseOnOutsideClick="false"
-         AllowDrag=true
-         HeaderText="Communicate">
+PositionY="5"
+CloseButtonClick="@NegativeButtonClicked"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+AllowDrag=true
+HeaderText="Communicate">
     <HeaderContentTemplate>
         <div class="h6">Communicate</div>
     </HeaderContentTemplate>
@@ -36,74 +36,74 @@
                     <DxFormLayoutGroup Caption="Parameters" CaptionPosition="CaptionPosition.Vertical">
                         <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
                             <DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
-                                        Value="@SelectedDocumentTemplate"
-                                        ValueChanged="@((DocumentTemplate template) => SelectedTemplateChanged(template))"
-                                        EditFormat="{0}">
+                            Value="@SelectedDocumentTemplate"
+                            ValueChanged="@((DocumentTemplate template) => SelectedTemplateChanged(template))"
+                            EditFormat="{0}">
                                 <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Name)"
-                                                    Caption="Template" Width="25rem" />
+                                Caption="Template" Width="25rem" />
                                 <DxListEditorColumn FieldName="@nameof(DocumentTemplate.DocumentTypeName)"
-                                                    Caption="Type" Width="8rem" />
+                                Caption="Type" Width="8rem" />
                                 <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Subject)" Width="25rem" />
                             </DxComboBox>
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Email Subject" ColSpanMd="12" Visible="@IsEmail">
                             <DxTextBox @bind-Text="@SelectedDocumentTemplate.Subject"
-                                       NullText="Enter a Subject" />
+                            NullText="Enter a Subject" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="From Address" ColSpanMd="12" Visible="@IsEmail">
                             <DxComboBox Data="@emailAddresses" AllowUserInput="true"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Enter the email address to send from..."
-                                        TData="string"
-                                        TValue="string"
-                                        Text="@SelectedDocumentTemplate.FromEmailAddress"
-                                        TextExpression="@(() => SelectedDocumentTemplate.FromEmailAddress)"
-                                        TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress))" />
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            NullText="Enter the email address to send from..."
+                            TData="string"
+                            TValue="string"
+                            Text="@SelectedDocumentTemplate.FromEmailAddress"
+                            TextExpression="@(() => SelectedDocumentTemplate.FromEmailAddress)"
+                            TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress))" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="@FromDisplayNameText" ColSpanMd="12" Visible="@IsEmailOrSMS">
                             <DxComboBox Data="@displayNames" AllowUserInput="true"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Enter a friendly name to send from..."
-                                        TData="string"
-                                        TValue="string"
-                                        @bind-Text="@SelectedDocumentTemplate.FromDisplayName" />
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            NullText="Enter a friendly name to send from..."
+                            TData="string"
+                            TValue="string"
+                            @bind-Text="@SelectedDocumentTemplate.FromDisplayName" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Attachments" ColSpanMd="9" Visible="@IsEmail">
                             <DxTagBox Data="@attachments" DropDownVisible=false
-                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                      NullText="Upload attachments, if required."
-                                      TData="String"
-                                      TValue="String"
-                                      Values="@SelectedDocumentTemplate.Attachments"
-                                      ValuesChanged="OnAttachedItemsChanged" />
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            NullText="Upload attachments, if required."
+                            TData="String"
+                            TValue="String"
+                            Values="@SelectedDocumentTemplate.Attachments"
+                            ValuesChanged="OnAttachedItemsChanged" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem ColSpanMd="2" Visible="@IsEmail">
                             <DxButton Text="Pdf"
-                                      Click="OnAttachFile"
-                                      IconCssClass="bi bi-upload" />
+                            Click="OnAttachFile"
+                            IconCssClass="bi bi-upload" />
                         </DxFormLayoutItem>
                         <DxFormLayout CssClass="m-2">
                             <DxFormLayoutItem Caption="Start Delay (Hours)"
-                                              Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
-                                              ColSpanMd="9">
+                            Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
+                            ColSpanMd="9">
                                 <DxSpinEdit @bind-Value="@DelayedStart" MinValue=0 />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Override Communication Preference?"
-                                              Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
-                                              ColSpanMd="12">
+                            Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
+                            ColSpanMd="12">
                                 <DxCheckBox @bind-Checked="@OverrideCommunicationPreference" />
                             </DxFormLayoutItem>
                         </DxFormLayout>
                     </DxFormLayoutGroup>
                     <div class="d-flex mx-2 mt-5">
                         <DxButton CssClass="flex-grow-1 mx-1" Enabled="IsEmailOrSMS"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  Text="Process Email"
-                                  IconCssClass="bi bi-envelope"
-                                  Click="@AffirmativeButtonClicked" />
+                        RenderStyle="ButtonRenderStyle.Primary"
+                        Text="Process Email"
+                        IconCssClass="bi bi-envelope"
+                        Click="@AffirmativeButtonClicked" />
                         <DxButton CssClass="flex-grow-1 me-2"
-                                  RenderStyle="ButtonRenderStyle.Secondary"
-                                  Text="Cancel" Click="@NegativeButtonClicked" />
+                        RenderStyle="ButtonRenderStyle.Secondary"
+                        Text="Cancel" Click="@NegativeButtonClicked" />
                     </div>
                 </div>
 
@@ -118,16 +118,16 @@
                     {
                         <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
                         <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
-                                    ViewType="ViewType.PrintLayout"
-                                    ActiveRibbonTabIndex="@ActiveTabIndex"
-                                    CheckSpelling=true
-                                    BarMode=BarMode.Ribbon
-                                    DocumentContent="@SelectedDocumentTemplate.Content"
-                                    DocumentFormat="DocumentFormat.Rtf"
-                                    CustomizeRibbon="OnCustomizeRichEditToolbar"
-                                    DocumentLoaded="OnDocumentLoaded"
-                                    DocumentContentChanged="OnDocumentContentChanged"
-                                    CssClass="w-100 rtf-style">
+                        ViewType="ViewType.PrintLayout"
+                        ActiveRibbonTabIndex="@ActiveTabIndex"
+                        CheckSpelling=true
+                        BarMode=BarMode.Ribbon
+                        DocumentContent="@SelectedDocumentTemplate.Content"
+                        DocumentFormat="DocumentFormat.Rtf"
+                        CustomizeRibbon="OnCustomizeRichEditToolbar"
+                        DocumentLoaded="OnDocumentLoaded"
+                        DocumentContentChanged="OnDocumentContentChanged"
+                        CssClass="w-100 rtf-style">
                             <AdditionalItems>
                                 <SummarizeAIContextMenuItem />
                                 <ExplainAIContextMenuItem />
@@ -153,26 +153,26 @@
 
 <style>
     .editor-popup {
-        height: calc(100dvh - 2rem);
+    height: calc(100dvh - 2rem);
     }
 
     .preview {
-        height: calc(100dvh - 5rem) !important;
-        overflow: hidden;
+    height: calc(100dvh - 5rem) !important;
+    overflow: hidden;
     }
 
     .rtf-style {
-        height: calc(100dvh - 7rem) !important;
-        overflow: hidden;
+    height: calc(100dvh - 7rem) !important;
+    overflow: hidden;
     }
 
 
     .icon-size {
-        font-size: 16px;
+    font-size: 16px;
     }
 
     .warning-style {
-        display: @((isEmailEnabled) ? "block" : "none");
+    display: @((isEmailEnabled) ? "block" : "none");
     }
 
 </style>
@@ -256,8 +256,10 @@
 
     async Task OnAttachFile()
     {
-        await attachFile.ShowAsync();
-        SelectedDocumentTemplate.Attachments = attachments;
+        if (await attachFile.ShowAsync())
+    {
+            SelectedDocumentTemplate.Attachments = attachments;
+        }
     }
 
     async Task AffirmativeButtonClicked()

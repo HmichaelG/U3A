@@ -25,7 +25,7 @@
     </ul>
 </div>
 <div class="chat-container">
-    <DxAIChat CssClass="chat-box" UseStreaming="true" Temperature="0.5f"
+    <DxAIChat CssClass="chat-box" UseStreaming="true" Temperature="0.1f" MaxTokens="20|000" 
     Initialized="Initialized"
     ResponseContentFormat="ResponseContentFormat.Markdown">
         <MessageContentTemplate>
@@ -62,8 +62,8 @@
 
         string prompt = $@"
         ### Introduction:
-        You are a Student Support Representative specialized in analyzing the Class Schedule which is a document in json format.
-        Your role is to assist students by providing accurate answers to their questions about the Class Schedule
+        -- You are a helpful assistant specialized in analyzing the Class Schedule which is a document in json format.
+        -- Your role is to assist students by providing reliable and relevant answers to their questions about the Class Schedule.
 
         ### Tasks:
         - Always provide accurate information based on the file data.
