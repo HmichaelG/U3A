@@ -7,6 +7,13 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="html\enrolmentEmail.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="html\leaderEmail.html" />
+    <EmbeddedResource Include="html\enrolmentEmail.html" />
+  </ItemGroup>
+  <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
   <ItemGroup>

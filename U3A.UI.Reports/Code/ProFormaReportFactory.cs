@@ -13,6 +13,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,9 +41,11 @@ namespace U3A.UI.Reports
         public string SendEmailAddress { get; set; }
         string sendEmailDisplayName;
         string tenantID;
+        string copyrightYear;
+        string u3aName;
 
         //Azure Functions only
-        public ProFormaReportFactory(TenantInfo tenant, ILogger logger, bool IsPreview=false)
+        public ProFormaReportFactory(TenantInfo tenant, ILogger logger, bool IsPreview = false)
         {
             log = logger;
             dbc = new U3ADbContext(tenant);
@@ -57,6 +60,8 @@ namespace U3A.UI.Reports
                 sendEmailDisplayName = settings.SendEmailDisplayName;
             }
             emailSender = EmailFactory.GetEmailSender(dbc);
+            copyrightYear = DateTime.Now.Year.ToString("D");
+            u3aName = settings.U3AGroup;
             PostalReports = new List<string>();
         }
 
@@ -79,6 +84,8 @@ namespace U3A.UI.Reports
                 sendEmailDisplayName = settings.SendEmailDisplayName;
             }
             emailSender = EmailFactory.GetEmailSender(dbc);
+            copyrightYear = DateTime.Now.Year.ToString("D");
+            u3aName = settings.U3AGroup;
             PostalReports = new List<string>();
         }
 
@@ -130,6 +137,7 @@ namespace U3A.UI.Reports
         public async Task<Dictionary<Guid, string>> CreateEnrolmentProForma(Dictionary<Guid, List<Enrolment>> Enrolments)
         {
             var result = new Dictionary<Guid, string>();
+            var emailTemplate = ReadEmailTemplate("enrolmentEmail");
             foreach (var kvp in Enrolments)
             {
                 try
@@ -175,6 +183,12 @@ namespace U3A.UI.Reports
                     if (string.IsNullOrWhiteSpace(pdfFilename)) { continue; }
                     if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
                     {
+                        var emailText = emailTemplate
+                                            .Replace("{u3aName}", u3aName)
+                                            .Replace("{FirstName}", person.FirstName)
+                                            .Replace("{copyrightYear}", copyrightYear)
+                                            .Replace("{tenantID}", tenantID)
+                                            .Replace("{sendEmailDisplayName}", sendEmailDisplayName);
                         result.Add(kvp.Key, await emailSender.SendEmailAsync(
                                        EmailType.Transactional,
                                        SendEmailAddress,
@@ -182,46 +196,7 @@ namespace U3A.UI.Reports
                                        person.Email,
                                        person.FullName,
                                        $"U3A Enrolment: {person.FullName}",
-                                       $"<p>Hello {person.FirstName},</p>" +
-    @"
-<style>
-table {font - family: arial, sans-serif;
-  border-collapse: collapse;
-}
-
-td, th {border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-</style><p>Your U3A enrolment details are attached. 
-Please review and note the status of your enrolment request...</p>
-<table>
-<tr>
-<th style='width: 15%'>If Status is ...</th>
-<th>The meaning is ...</th>
-</tr>
-<tr>
-<td><strong>Enrolled</strong></td> 
-<td>Your request has been accepted and you are now an active member in the class. Please attend class at the scheduled time.</td>
-</tr>
-<tr>
-<td><strong>Waitlisted</strong></td> 
-<td>Your request <strong>has not</strong> been accepted normally because... 
-<ol>
-<li>the class is full, or</li>
-<li>Your requested class is not available this term. It is waitlisted until enrolment opens and allocation occurs, or</li>
-<li>the class is currently closed for new enrolments, or</li>
-<li>our records indicate that you are currently unfinancial.</li>
-</ol>
-<p>You are waitlisted and will be notified should a place become available.
-Please <strong>do not</strong> attend class unless otherwise notified by email or directly by the class leader.</p>
-</td>
-</tr>
-</table>" +
-                                        GetBlurb() +
-                                       $"<p><p>Thank you<br/>" +
-                                       $"{sendEmailDisplayName}</p>",
+                                       emailText,
                                        string.Empty,
                                        new List<string>() { pdfFilename },
                                        new List<string>() { "Your Enrolment Details.pdf" }
@@ -257,7 +232,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                         Person Leader, Enrolment[] Enrolments)
         {
             var result = string.Empty;
-            (var enrolmentDetails,var leaderDetails, var settings, var term) = await GetEnrolmentDetails(Leader, Enrolments);
+            (var enrolmentDetails, var leaderDetails, var settings, var term) = await GetEnrolmentDetails(Leader, Enrolments);
             var createdFilenames = new List<string>();
             var reportNames = new List<string>();
             if (DoLeaderReport || !(Enrolments.Where(x => !x.IsWaitlisted).Any()))
@@ -270,7 +245,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                     using (var leaderReportProForma = new LeaderReport())
                     {
                         log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
-                        var filename = await CreateLeaderReportAsync(leaderReportProForma,settings,term,leaderDetails,enrolmentDetails.AsEnumerable());
+                        var filename = await CreateLeaderReportAsync(leaderReportProForma, settings, term, leaderDetails, enrolmentDetails.AsEnumerable());
                         if (!string.IsNullOrWhiteSpace(filename))
                         {
                             createdFilenames.Add(filename);
@@ -297,7 +272,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                         {
                             log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderAttendanceList,
-                                                    settings, term, leaderDetails, 
+                                                    settings, term, leaderDetails,
                                                     enrolmentDetails.Where(x => !x.EnrolmentIsWaitlisted && !x.EnrolmentIsLeader));
                             if (!string.IsNullOrWhiteSpace(filename))
                             {
@@ -322,8 +297,8 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                         using (var leaderClassList = new LeaderClassList())
                         {
                             log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
-                            var filename = await CreateLeaderReportAsync(leaderClassList, 
-                                                        settings, term, leaderDetails, 
+                            var filename = await CreateLeaderReportAsync(leaderClassList,
+                                                        settings, term, leaderDetails,
                                                         enrolmentDetails.Where(x => !x.EnrolmentIsWaitlisted));
                             if (!string.IsNullOrWhiteSpace(filename))
                             {
@@ -540,13 +515,13 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
             return pdfFilename;
         }
 
-        private async Task<(IEnumerable<EnrolmentDetail>,IEnumerable<LeaderDetail>, SystemSettings,Term)> GetEnrolmentDetails(Person Leader, Enrolment[] Enrolments)
+        private async Task<(IEnumerable<EnrolmentDetail>, IEnumerable<LeaderDetail>, SystemSettings, Term)> GetEnrolmentDetails(Person Leader, Enrolment[] Enrolments)
         {
             List<EnrolmentDetail> enrolmentDetails = new();
             List<LeaderDetail> leaderDetails = new();
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             var term = dbc.Term.Find(Enrolments[0].TermID);
-            if (Enrolments.Length == 0) { return (enrolmentDetails,leaderDetails, settings,term); }
+            if (Enrolments.Length == 0) { return (enrolmentDetails, leaderDetails, settings, term); }
 
             leaderDetails = BusinessRule.GetLeaderDetail(settings, Leader, term);
             enrolmentDetails = new List<EnrolmentDetail>();
@@ -571,7 +546,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                     }
                 }
             }
-            return (enrolmentDetails,leaderDetails,settings,term);
+            return (enrolmentDetails, leaderDetails, settings, term);
         }
 
         async Task<string> ProcessLeaderReport(Person Leader,
@@ -581,17 +556,21 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                     string[] ReportsNames,
                                     bool RandomAllocationExecuted = false)
         {
-            string randomAllocationMsg = (RandomAllocationExecuted)
-                ?
-                    $@"<p>You have received this email because the random allocation of 
-                            student enrolment requests was performed early this morning.
-                            You now have {constants.RANDOM_ALLOCATION_PREVIEW} days to review this allocation
-                            and request changes prior to your students being informed by email.</p>
-                            <p>Please keep enrolment details confidential until students have received their email.</p>"
-                : "";
+            string randomAllocationMessage = (RandomAllocationExecuted) ? "" : "hidden";
 
             if (!isPreview && !string.IsNullOrEmpty(Leader.Email))
             {
+                var emailTemplate = ReadEmailTemplate("leaderEmail");
+                var emailText = emailTemplate
+                                    .Replace("{u3aName}", u3aName)
+                                    .Replace("{FirstName}", Leader.FirstName)
+                                    .Replace("{CourseName}", CourseName)
+                                    .Replace("{ReportName}", ReportName)
+                                    .Replace("{randomAllocationMessage}", randomAllocationMessage)
+                                    .Replace("{randomAllocationPreviewDays}", constants.RANDOM_ALLOCATION_PREVIEW.ToString())
+                                    .Replace("{copyrightYear}", copyrightYear)
+                                    .Replace("{tenantID}", tenantID)
+                                    .Replace("{sendEmailDisplayName}", sendEmailDisplayName);
                 return await emailSender.SendEmailAsync(
                                 EmailType.Transactional,
                                 SendEmailAddress,
@@ -599,12 +578,7 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
                                 Leader.Email,
                                 Leader.FullName,
                                 $"{ReportName}: {CourseName}",
-                                $"<p>Hello {Leader.FirstName},</p>" +
-                                $"<p>Please find your U3A Leader's report for <strong>{CourseName}</strong> attached.</p>" +
-                                randomAllocationMsg +
-                                GetBlurb() +
-                                $"<p><p>Thank you<br/>" +
-                                $"{sendEmailDisplayName}</p>",
+                                emailText,
                                 string.Empty,
                                 CreatedFilenames, ReportsNames
                                 );
@@ -690,6 +664,18 @@ Please <strong>do not</strong> attend class unless otherwise notified by email o
         private string GetTempCSVFile()
         {
             return Path.Combine(ReportStorage.TempDirectory, Guid.NewGuid() + ".csv");
+        }
+
+        public string ReadEmailTemplate(string emailName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = $"U3A.UI.Reports.html.{emailName}.html";
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
         public void Dispose()
         {
