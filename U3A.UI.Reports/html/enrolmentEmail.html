@@ -55,11 +55,11 @@
         }
 
         /* What it does: Stops email clients resizing small text. */
-                * {
-                    -ms-text-size-adjust: 100%;
-                    -webkit-text-size-adjust: 100%;
-                }
-        
+        * {
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
         /* What it does: Centers email on Android 4.4 */
         div[style*="margin: 16px 0"] {
             margin: 0 !important;
@@ -251,7 +251,7 @@
 <body width="100%" style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #ccc;" class="email-bg">
     <center role="article" aria-roledescription="email" lang="en" style="width: 100%; background-color: #ccc;" class="email-bg">
         <!--[if mso | IE]>
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #222222;" class="email-bg">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ccc;" class="email-bg">
         <tr>
         <td>
         <![endif]-->
@@ -292,13 +292,7 @@
                     </td>
                 </tr>
                 <!-- Email Header : END -->
-                <!-- Hero Image, Flush : BEGIN -->
-                <!--<tr>
-                    <td style="background-color: #ffffff;" class="darkmode-bg">
-                        <img src="https://via.placeholder.com/1360x600" width="680" height="" alt="alt_text" border="0" style="width: 100%; max-width: 680px; height: auto; background: #dddddd; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #555555; margin: auto; display: block;" class="g-img">
-                    </td>
-                </tr>-->
-                <!-- Hero Image, Flush : END -->
+
                 <!-- 1 Column Text + Button : BEGIN -->
                 <tr>
                     <td style="background-color: #ffffff;" class="darkmode-bg">
@@ -336,43 +330,18 @@
                                     <p style="font-size: 14px; text-align: center; padding:0 5px 0 5px"><em>Use the <strong>U3A Member Portal</strong> to pay membership fees, change your membership details, enroll in classes and more!</em></p>
                                 </td>
                             </tr>
+                        </table>
                     </td>
                 </tr>
 
             </table>
 
-            <!-- Full Bleed Background Section : BEGIN -->
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #709f2b;" class="darkmode-fullbleed-bg">
-                <tr>
-                    <td>
-                        <div align="center" style="max-width: 680px; margin: auto;" class="email-container">
-                            <!--[if mso]>
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="680" align="center">
-                            <tr>
-                            <td>
-                            <![endif]-->
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                <tr>
-                                    <td style="padding: 20px; text-align: center; font-family: sans-serif; font-size: 12px; line-height: 20px; color: #ffffff;">
-                                        <p style="margin: 0;">&copy; {copyrightYear} u3admin.org.au</p>
-                                    </td>
-                                </tr>
-                            </table>
-                            <!--[if mso]>
-                            </td>
-                            </tr>
-                            </table>
-                            <![endif]-->
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            <!-- Full Bleed Background Section : END -->
             <!--[if mso | IE]>
             </td>
             </tr>
             </table>
             <![endif]-->
+        </div>
     </center>
 </body>
 </html>
