@@ -256,7 +256,7 @@ else
     {
         foreach (var id in IdsToSend)
         {
-            var mail = await dbc.SendMail.FindAsync(id);
+            var mail = await dbc.SendMail.IgnoreQueryFilters().FirstAsync(x=>x.ID == id);
             mail.Status = Status;
         }
         await dbc.SaveChangesAsync();

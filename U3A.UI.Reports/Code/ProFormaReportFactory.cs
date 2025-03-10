@@ -95,6 +95,7 @@ namespace U3A.UI.Reports
             {
                 try
                 {
+                    var emailTemplate = ReadEmailTemplate("cashReceiptEmail");
                     var detail = BusinessRule.GetReceiptDetail(dbc, receipt);
                     var person = await dbc.Person.FindAsync(receipt.PersonID);
                     var list = new List<ReceiptDetail>();
@@ -105,17 +106,19 @@ namespace U3A.UI.Reports
                     cashReceiptProForma.ExportToPdf(pdfFilename);
                     if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
                     {
+                        var emailText = emailTemplate
+                                            .Replace("{u3aName}", u3aName)
+                                            .Replace("{FirstName}", person.FirstName)
+                                            .Replace("{copyrightYear}", copyrightYear)
+                                            .Replace("{tenantID}", tenantID)
+                                            .Replace("{sendEmailDisplayName}", sendEmailDisplayName);
                         return await emailSender.SendEmailAsync(EmailType.Transactional,
                                         SendEmailAddress,
                                         sendEmailDisplayName,
                                         person.Email,
                                         person.FullName,
                                         $"U3A Cash Receipt: {person.FullName}",
-                                        $"<p>Hello {person.FirstName},</p>" +
-                                        $"<p>Please find your U3A cash receipt attached.</p>" +
-                                        GetBlurb() +
-                                        $"<p><p>Thank you<br/>" +
-                                        $"{sendEmailDisplayName}</p>",
+                                        emailText,
                                         string.Empty,
                                         new List<string>() { pdfFilename },
                                         new List<string>() { "Cash Receipt.pdf" }
@@ -590,18 +593,6 @@ namespace U3A.UI.Reports
             }
         }
 
-        string GetBlurb()
-        {
-            return "<p>Use the <strong>U3A Member Portal</strong> to pay membership fees, change your membership details, enrol in classes and more. " +
-                    "Click the button below to access the portal...</p>" +
-                    @$"<table border=""0"" cellspacing=""0"" cellpadding=""0"">
-                        <tr>
-                        <td style=""padding: 12px 18px 12px 18px; border-radius:5px; background-color: #1F7F4C;"" align=""center"">
-                        <a rel=""noopener"" target=""_blank"" href=""https://{tenantID}.u3admin.org.au"" target=""_blank"" style=""font-size: 18px; font-family: Helvetica, Arial, sans-serif; font-weight: bold; color: #ffffff; text-decoration: none; display: inline-block;"">U3A Member Portal &rarr;</a>
-                        </td>
-                        </tr>
-                        </table>";
-        }
         public string? CreatePostalPDF()
         {
             return Path.GetFileName(CreateMergedPDF(PostalReports));

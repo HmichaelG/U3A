@@ -60,7 +60,7 @@ namespace U3A.WebFunctions.Procedures
                         switch (sm.DocumentName)
                         {
                             case "Cash Receipt":
-                                var receipt = await dbc.Receipt
+                                var receipt = await dbc.Receipt.IgnoreQueryFilters()
                                                     .Include(x => x.Person)
                                                     .Where(x => x.ID == sm.RecordKey).FirstOrDefaultAsync();
                                 if (receipt != null)

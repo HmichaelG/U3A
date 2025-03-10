@@ -11,7 +11,7 @@
     <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no"> <!-- Tell iOS not to automatically link certain text strings. -->
     <meta name="color-scheme" content="light dark">
     <meta name="supported-color-schemes" content="light dark">
-    <title>Your U3A Enrolment Details</title> <!-- The title tag shows in email notifications, like Android 4.4. -->
+    <title>Your U3A Cash Receipt</title> <!-- The title tag shows in email notifications, like Android 4.4. -->
     <!-- What it does: Makes background images in 72ppi Outlook render at correct size. -->
     <!--[if gte mso 9]>
     <xml>
@@ -64,6 +64,7 @@
         div[style*="margin: 16px 0"] {
             margin: 0 !important;
         }
+
         /* What it does: forces Samsung Android mail clients to use the entire viewport */
         #MessageViewBody, #MessageWebViewDiv {
             width: 100% !important;
@@ -118,6 +119,7 @@
             display: none !important;
             opacity: 0.01 !important;
         }
+
         /* If the above doesn't work, add a .g-img class to any image in question. */
         img.g-img + div {
             display: none !important;
@@ -146,6 +148,7 @@
         }
     </style>
     <!-- CSS Reset : END -->
+
     <!-- Progressive Enhancements : BEGIN -->
     <style>
 
@@ -257,7 +260,7 @@
         <![endif]-->
         <!-- Visually Hidden Preheader Text : BEGIN -->
         <div style="max-height:0; overflow:hidden; mso-hide:all;" aria-hidden="true">
-            &#x1F381;&nbsp;Your U3A enrolment details.
+            &#x1F4B2;&nbsp;Your U3A Cash Receipt.
         </div>
         <!-- Visually Hidden Preheader Text : END -->
         <!-- Create white space after the desired preview text so email clients don’t pull other distracting text into the inbox preview. Extend as necessary. -->
@@ -292,7 +295,13 @@
                     </td>
                 </tr>
                 <!-- Email Header : END -->
-
+                <!-- Hero Image, Flush : BEGIN -->
+                <!--<tr>
+                    <td style="background-color: #ffffff;" class="darkmode-bg">
+                        <img src="https://via.placeholder.com/1360x600" width="680" height="" alt="alt_text" border="0" style="width: 100%; max-width: 680px; height: auto; background: #dddddd; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #555555; margin: auto; display: block;" class="g-img">
+                    </td>
+                </tr>-->
+                <!-- Hero Image, Flush : END -->
                 <!-- 1 Column Text + Button : BEGIN -->
                 <tr>
                     <td style="background-color: #ffffff;" class="darkmode-bg">
@@ -301,16 +310,7 @@
                                 <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
                                     <p style="margin: 0 0 15px;">Hello {FirstName},</p>
                                     <p style="margin: 0 0 10px;">
-                                        Your U3A enrolment details are attached.
-                                        Please open and review the status of your enrolment request. This will either be...
-                                    </p>
-                                    <h3 style="margin: 0 0 0;">Status: Enrolled</h3>
-                                    <p style="margin: 0 0 10px;">Enrolled means your request has been accepted and you are now an active member in the class. Please attend class at the scheduled time.</p>
-                                    <h3 style="margin: 0 0 0;">Status: Waitlisted</h3>
-                                    <p style="margin: 0 0 10px;">
-                                        Waitlisted means your enrolment request could not be completed.
-                                        You have been added to the waitlist and will be notified should a place become available.
-                                        Please <strong style="color: red;">do not</strong> attend class unless otherwise notified by email or directly by the class leader.
+                                        Please find your U3A cash receipt attached.
                                     </p>
                                     <p style="margin: 0 0 0;">Thank you,</p>
                                     <p style="margin: 0 0 10px;">{sendEmailDisplayName}</p>
@@ -318,7 +318,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding: 0 20px 20px;">
+                                <td style="padding: 0 10px 10px;">
                                     <!-- Button : BEGIN -->
                                     <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">
                                         <tr>
@@ -328,10 +328,10 @@
                                         </tr>
                                     </table>
                                     <p style="font-size: 14px; text-align: center; padding:0 5px 0 5px"><em>Use the <strong>U3A Member Portal</strong> to pay membership fees, change your membership details, enroll in classes and more!</em></p>
+                                    <!-- Button : END -->
                                 </td>
                             </tr>
                         </table>
-                    </td>
                 </tr>
 
             </table>
@@ -341,7 +341,6 @@
             </tr>
             </table>
             <![endif]-->
-        </div>
     </center>
 </body>
 </html>
