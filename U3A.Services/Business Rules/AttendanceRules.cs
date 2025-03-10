@@ -301,6 +301,11 @@ namespace U3A.BusinessRules
         public static async Task<List<AttendClass>> EditableAttendanceAsync(U3ADbContext dbc,
                                     Term SelectedTerm, Course SelectedCourse, Class SelectedClass, DateTime ClassDate)
         {
+            dbc.RemoveRange(await dbc.AttendClass.Where(a => a.TermID == SelectedTerm.ID
+                                    && a.ClassID == SelectedClass.ID
+                                    && a.Date == ClassDate
+                                    && a.AttendClassStatusID == (int)AttendClassStatusType.AbsentFromClassWithoutApology).ToListAsync());
+            await dbc.SaveChangesAsync();
             List<AttendClass> attendance = await GetAttendanceAsync(dbc, SelectedTerm, SelectedClass, ClassDate);
             var enrolments = await BusinessRule.EditableEnrolmentsAsync(dbc, SelectedTerm, SelectedCourse, SelectedClass);
             AttendClass? a;
