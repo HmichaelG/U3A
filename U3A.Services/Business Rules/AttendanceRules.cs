@@ -306,6 +306,7 @@ namespace U3A.BusinessRules
             AttendClass? a;
             foreach (var e in enrolments.Where(x => !x.IsWaitlisted))
             {
+                if (dbc.GetLocalDate(e.DateEnrolled) > ClassDate) { continue; }
                 if (SelectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                 {
                     a = attendance.Where(a => a.TermID == e.TermID
