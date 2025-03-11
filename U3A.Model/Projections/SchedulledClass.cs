@@ -63,7 +63,7 @@ namespace U3A.Model
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Mobile { get; set; }
-        public string Role { get; set; }
+        public List<string> Roles { get; set; } = new();
         public string SortOrder { get; set; }
     }
     public class AIChatClassData

@@ -112,7 +112,7 @@ namespace U3A.BusinessRules
                             Class = c.Course.Name,
                             SortOrder = c.GuestLeader,
                             Name = c.GuestLeader,
-                            Role = "Guest Leader"
+                            Roles = new List<string>() { "Guest Leader" }
                         });
                         if (c.Leader != null) sc.People.Add(new ScheduledPerson()
                         {
@@ -122,7 +122,7 @@ namespace U3A.BusinessRules
                             Email = c.Leader.Email,
                             Phone = c.Leader.AdjustedHomePhone,
                             Mobile = c.Leader.AdjustedMobile,
-                            Role = "Leader"
+                            Roles = new List<string>() { "Leader" }
                         });
                         if (c.Leader2 != null) sc.People.Add(new ScheduledPerson()
                         {
@@ -132,7 +132,7 @@ namespace U3A.BusinessRules
                             Email = c.Leader2.Email,
                             Phone = c.Leader2.AdjustedHomePhone,
                             Mobile = c.Leader2.AdjustedMobile,
-                            Role = "Leader"
+                            Roles = new List<string>() { "Leader" }
                         });
                         if (c.Leader3 != null) sc.People.Add(new ScheduledPerson()
                         {
@@ -142,7 +142,7 @@ namespace U3A.BusinessRules
                             Email = c.Leader3.Email,
                             Phone = c.Leader3.AdjustedHomePhone,
                             Mobile = c.Leader3.AdjustedMobile,
-                            Role = "Leader"
+                            Roles = new List<string>() { "Leader" }
 
                         });
                         foreach (var clerk in c.Clerks)
@@ -155,7 +155,7 @@ namespace U3A.BusinessRules
                                 Email = clerk.Email,
                                 Phone = clerk.AdjustedHomePhone,
                                 Mobile = clerk.AdjustedMobile,
-                                Role = "Clerk"
+                                Roles = new List<string>() { "Clerk","Student" }
                             });
                         }
                         foreach (var e in c.Course.Enrolments)
@@ -172,7 +172,9 @@ namespace U3A.BusinessRules
                                     Email = e.Person.Email,
                                     Phone = e.Person.AdjustedHomePhone,
                                     Mobile = e.Person.AdjustedMobile,
-                                    Role = (e.IsWaitlisted) ? "Waitlisted" : "Student"
+                                    Roles = (e.IsWaitlisted) 
+                                        ? new List<string>() { "Waitlisted" } 
+                                        : new List<string>() { "Student" }
                                 });
                             }
                         }

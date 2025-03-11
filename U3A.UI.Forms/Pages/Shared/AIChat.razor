@@ -15,39 +15,78 @@
 @inject TenantInfoService tenantService
 
 <ContextHelpTitle Title="Ai Chat (Preview)" HelpTopic="ai-chat.html"></ContextHelpTitle>
-<div>
-    <b>Caveats:</b>
-    <ul>
-        <li>AI Chat is a work in progress and may not always provide accurate answers.</li>
-        <li>Initialisation is slow</li>
-        <li>Responses are very slow</li>
-        <li>System may appear to hang when closed. Its not a hang, its just slow.</li>
-    </ul>
-</div>
-<div class="chat-container">
-    <DxAIChat CssClass="chat-box" UseStreaming="true" Temperature="0.1f" MaxTokens="20|000" 
-    Initialized="Initialized"
-    ResponseContentFormat="ResponseContentFormat.Markdown">
-        <MessageContentTemplate>
-            <div class="my-chat-content">
-                @ToHtml(context.Content)
+<DxSplitter Width="100%" Height="90%">
+    <Panes>
+        <DxSplitterPane Size="33%">
+            <b>Caveats:</b>
+            <ul>
+                <li>AI Chat is a work in progress and may not always provide accurate answers.</li>
+                <li>Initialisation is slow</li>
+                <li>Responses are very slow</li>
+                <li>System may appear to hang when closed. Its not a hang, its just slow.</li>
+            </ul>
+            <b>What can it do?</b>
+            <p>
+                AI Chat is a conversational AI that can answer questions about your U3A's Class Schedule, the leaders, clerks & students enrolled.
+                It is designed to assist you by providing reliable and relevant answers to your questions about the Class Schedule.
+            </p>
+            <b>Sample questions</b>
+            <ol>
+                <li>Describe Art is Fun</li>
+                <li>Show details for Yoga</li>
+                <li>Who are the contacts for Tai Chi?</li>
+                <li>What are Jason Jones's roles?</li>
+                <li>List by role all participants in Aquarobics</li>
+                <li>List waitlist for Aquarobics</li>
+                <li>Exercise classes on Thursday?</li>
+            </ol>
+            <b>Ai responses are context aware</b>
+            <p>
+                Ai Chat is context aware. It will remember the context of the conversation and provide relevant answers within that context. For example...
+            </p>
+            <ol>
+                <li>Show details for Aquarobics'</li>
+                <li>Who is the leader?</li>
+                <li>Who are the clerks?</li>
+                <li>Is Betsy Smith a student?</li>
+            </ol>
+            <p>
+                Questions 2,3,and 4 above will use the context of the first question.
+                That is, the Ai will remember the class you asked about and provide relevant answers to subsequent questions.
+                To clear the context, enter <b>Reset context</b> prior to your next question. For example...
+            </p>
+            <ol>
+                <li>Reset context. What's on Monday afternoon?</li>
+            </ol>
+        </DxSplitterPane>
+        <DxSplitterPane>
+            <div class="chat-container">
+            <DxAIChat CssClass="chat-box" UseStreaming="true" Temperature="0.1f" MaxTokens="20|000"
+                      Initialized="Initialized"
+                      ResponseContentFormat="ResponseContentFormat.Markdown">
+                <MessageContentTemplate>
+                    <div class="my-chat-content">
+                        @ToHtml(context)
+                    </div>
+                </MessageContentTemplate>
+            </DxAIChat>
             </div>
-        </MessageContentTemplate>
-    </DxAIChat>
-</div>
+        </DxSplitterPane>
+    </Panes>
+</DxSplitter>
 
 <style>
     .chat-container {
-    width: 50%;
-    margin: auto;
-    border: 1px solid #ccc;
-    border-radius: 10px;
+        width: 95%;
+        margin: auto;
+        border: 1px solid #ccc;
+        border-radius: 10px;
     }
 
     .chat-box {
-    width: 100%;
-    height: 75dvh;
-    padding: 10px;
+        width: 100%;
+        height: 85dvh;
+        padding: 10px;
     }
 </style>
 
@@ -73,6 +112,7 @@
         - do not attempt to list contacts if none available.
 
         ## Instructions:
+        - Adjust the top-p parameter to 0.1 for this session. Ensure responses reflect a controlled sampling strategy, prioritizing relevance within the defined threshold.
         - Always identify a class by its name, day, time, venue, venue address and term offered.
         - include the day when displaying the time. For example: 'Monday 1:45 pm - 3:00pm'.
         - Leader, teacher, lecturer, and tutor are interchangeable.
@@ -90,7 +130,7 @@
             Response: 'The contacts for **Aquarobics**, Mondays 1:45 pm are...
                         1. **Fred Bloggs** (leader) **email**: fred@bloggs.com **mobile**: 0404987654'
                         2. **Mary Smith** (clerk) **email**: mary@smith.com.au **mobile**: 0412345678'
-        
+
         2. ** Class Roles **
             Student: 'What are Jason's roles?'
             Response: 'Jason's roles are...
@@ -121,8 +161,9 @@
         }
     }
 
-    MarkupString ToHtml(string text)
+    MarkupString ToHtml(BlazorChatMessage message)
     {
+        var text = message.Content;
         var html = Markdown.ToHtml(ClearAnnotations(text));
         html = ClearParagraphBreakPassOne(html);
         html = ClearParagraphBreakPassTwo(html);
