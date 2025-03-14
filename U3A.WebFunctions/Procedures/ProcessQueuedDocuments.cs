@@ -82,14 +82,16 @@ namespace U3A.WebFunctions.Procedures
                                     }
 
                                     //and, process...
+                                    var countSent = 0;
                                     if (queueItem.SendToMultipleRecipients)
                                     {
-                                        await server.SendQueuedEmailToMultipleRecipientsAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
+                                        countSent = await server.SendQueuedEmailToMultipleRecipientsAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
                                     }
                                     else
                                     {
-                                        await server.SendQueuedEmailToSingleRecipientAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
+                                       countSent = await server.SendQueuedEmailToSingleRecipientAsync(documentTemplate!, exportData!, queueItem.OverrideCommunicationPreference);
                                     }
+                                    queueItem.EmailCount = countSent;
                                     queueItem.Status = DocumentQueueStatus.Complete;
                                     queueItem.Result = "Ok";
                                 }

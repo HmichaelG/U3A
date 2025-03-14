@@ -20,6 +20,7 @@ namespace U3A.Model
         public DocumentQueueStatus Status { get; set; }
         public List<DocumentQueueAttachment> DocumentAttachments { get; set; } = new List<DocumentQueueAttachment>();
         public bool OverrideCommunicationPreference { get; set; }
+        public int EmailCount { get; set; }
         public string Result { get; set; }
     }
     public class DocumentQueueAttachment

@@ -23,7 +23,7 @@ else
 {
     <div class="px-2">
         <CollapsableContent DismissKey="{E580636E-C7CB-45FF-91A4-5AE4E3B0A2CF}"
-                        AlertText=@($@"<p><strong>Broadcast email</strong> queued and processed immediately<br />
+                            AlertText=@($@"<p><strong>Broadcast email</strong> queued and processed immediately<br />
                         unless a delayed start has been requested. Processed correspondence is deleted after 14 days.</p>")
                             OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
                             OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
@@ -56,13 +56,16 @@ else
                                           UnboundType="GridUnboundColumnType.Integer" />
                         <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
                                           UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
-                        <DxGridDataColumn Width="6rem" Caption="Recipients" FieldName="Recipients"
+                        <DxGridDataColumn Width="6rem" Caption="Selected #" FieldName="Recipients"
                                           UnboundType="GridUnboundColumnType.Integer" />
                         <DxGridDataColumn Caption="Delay (Hrs)" FieldName=@(nameof(DocumentQueue.DelayInHours)) />
                         <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
                         <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
+                                          
                                           UnboundType="GridUnboundColumnType.DateTime"
                                           DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                        <DxGridDataColumn Caption="Email #" FieldName="unboundEmailCount"
+                                          UnboundType="GridUnboundColumnType.String" />
                         <DxGridDataColumn Caption="Result" FieldName="Result" />
                     </Columns>
 
@@ -163,6 +166,18 @@ else
                 count = JsonSerializer.Deserialize<IEnumerable<ExportData>>(q.ExportDataJSON).Count();
             }
             e.Value = count;
+        }
+        if (e.FieldName == "unboundEmailCount")
+        {
+            var implemented = new DateTime(2025, 3, 14);
+            if (dbc.GetLocalDate(q.UpdatedOn) < implemented)
+            {
+                e.Value = "N/A";
+            }
+            else
+            {
+                e.Value = q.EmailCount;
+            }
         }
     }
 
