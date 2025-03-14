@@ -32,6 +32,7 @@ using DevExpress.AIIntegration.Blazor.Reporting.Viewer.Models;
 using DevExpress.AIIntegration;
 using Microsoft.Extensions.Options;
 using DevExpress.XtraPrinting.Native;
+using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -171,9 +172,17 @@ IChatClient chatClient = new AzureOpenAIClient(
     new Uri(AIuri),
     new AzureKeyCredential(AIkey)).AsChatClient(model);
 
+IChatClient client = new ChatClientBuilder(chatClient)
+         .ConfigureOptions(x => {
+             x.Temperature = 0.2f;
+             x.TopP = 0.1f;
+             x.MaxOutputTokens = 10000;             
+         })
+         .Build();
+
 var aiAssistant = new OpenAI.OpenAIClient(openAIkey);
 builder.Services.AddDevExpressBlazor();
-builder.Services.AddChatClient(chatClient);
+builder.Services.AddChatClient(client);
 builder.Services.AddDevExpressAI(config =>
 {
     config.RegisterOpenAIAssistants(aiAssistant, "gpt-4o-mini");

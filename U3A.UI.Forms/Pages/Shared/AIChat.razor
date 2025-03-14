@@ -32,9 +32,9 @@
             </p>
             <b>Sample questions</b>
             <ol>
-                <li>Describe Art is Fun</li>
+                <li>Describe &quot;Art is Fun&quot;</li>
                 <li>Show details for Yoga</li>
-                <li>Who are the contacts for Tai Chi?</li>
+                <li>Who are the contacts for &quot;Tai Chi&quot;?</li>
                 <li>What are Jason Jones's roles?</li>
                 <li>List by role all participants in Aquarobics</li>
                 <li>List waitlist for Aquarobics</li>
@@ -61,15 +61,15 @@
         </DxSplitterPane>
         <DxSplitterPane>
             <div class="chat-container">
-            <DxAIChat CssClass="chat-box" UseStreaming="true" Temperature="0.1f" MaxTokens="20|000"
-                      Initialized="Initialized"
-                      ResponseContentFormat="ResponseContentFormat.Markdown">
-                <MessageContentTemplate>
-                    <div class="my-chat-content">
-                        @ToHtml(context)
-                    </div>
-                </MessageContentTemplate>
-            </DxAIChat>
+                <DxAIChat CssClass="chat-box"
+                Initialized="Initialized"
+                ResponseContentFormat="ResponseContentFormat.Markdown">
+                    <MessageContentTemplate>
+                        <div class="my-chat-content">
+                            @ToHtml(context)
+                        </div>
+                    </MessageContentTemplate>
+                </DxAIChat>
             </div>
         </DxSplitterPane>
     </Panes>
@@ -77,17 +77,25 @@
 
 <style>
     .chat-container {
-        width: 95%;
-        margin: auto;
-        border: 1px solid #ccc;
-        border-radius: 10px;
+    width: 95%;
+    margin: auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
     }
 
     .chat-box {
-        width: 100%;
-        height: 85dvh;
-        padding: 10px;
+    width: 100%;
+    height: 85dvh;
+    padding: 10px;
     }
+    h3 {
+        font-size: clamp(10px, 2.5vw, 14px);
+        margin-top: 10px;
+    }
+    h1, h2, h4 {
+        margin-top: 10px;
+    }
+
 </style>
 
 @code {
@@ -105,51 +113,25 @@
         -- Your role is to assist students by providing reliable and relevant answers to their questions about the Class Schedule.
 
         ## Tasks:
-        - Always provide accurate information based on the file data.
-        - Provide the answer in a clear, brief and concise manner.
-        - Do not embellish the answer with additional information.
+        - Always provide accurate information based only on the file data.
         - Do not provide answers if the data in the file is insufficient for a reliable response.
-        - do not attempt to list contacts if none available.
+        - do not attempt to list participants if none available.
 
         ## Instructions:
-        - Adjust the top-p parameter to 0.1 for this session. Ensure responses reflect a controlled sampling strategy, prioritizing relevance within the defined threshold.
         - Always identify a class by its name, day, time, venue, venue address and term offered.
         - include the day when displaying the time. For example: 'Monday 1:45 pm - 3:00pm'.
+        - students, leaders and clerks are participants.
+        - a leader is not a student.
+        - a clerk is also a student.
+        - waitlisted are not participants.
         - Leader, teacher, lecturer, and tutor are interchangeable.
         - Clerk, administrator and coordinator are interchangeable.
-        - Leaders and Clerks are class contacts. Students are not.
-        - Offered, held and open are interchangeable.
+        - Contacts are Leaders and Clerks only. 
+        - A student is a contact only if also a clerk.
         - If Total Active Students >= Maximum Students, then the class is full.
         - A class is closed if the class is full.
         - A class is closed if the class AllowAutoEnroll = false.
         - Always identify whether the class is open or closed giving your reason.
-
-        ## Examples and Scenarios:
-        1. ** List Leaders **
-            Student: 'Who are the contacts for Aquarobics?'
-            Response: 'The contacts for **Aquarobics**, Mondays 1:45 pm are...
-                        1. **Fred Bloggs** (leader) **email**: fred@bloggs.com **mobile**: 0404987654'
-                        2. **Mary Smith** (clerk) **email**: mary@smith.com.au **mobile**: 0412345678'
-
-        2. ** Class Roles **
-            Student: 'What are Jason's roles?'
-            Response: 'Jason's roles are...
-
-                        1. **Yoga**, (Leader) Tuesdays 10:00 am at the Community Centre'
-                        2. **Tai Chi**, (Clerk) Thursdays 2:00 pm at the Community Centre'
-
-        3. ** List Students **
-            Student: 'list students in Aquarobics'
-            Response: 'In the current term there are 2 students in **Aquarobics**, Mondays 1:45 pm. They are...
-                        1. **Fred Bloggs** (leader) **email**: fred@bloggs.com **mobile**: 0404987654'
-                        2. **Mary Smith** (clerk) **email**: mary@smith.com.au **mobile**: 0412345678'
-
-        4. ** List Waitlist **
-            Student: 'list waitlist in Aquarobics'
-            Response: 'In the current term (Term 1) there are 2 waitlisted in **Aquarobics**, Mondays 1:45 pm. They are...
-                        1. **Fred Bloggs** (leader) **email**: fred@bloggs.com **mobile**: 0404987654'
-                        2. **Mary Smith** (clerk) **email**: mary@smith.com.au **mobile**: 0412345678'
-
 ";
         using (var ms = new MemoryStream(bytes))
         {
@@ -167,7 +149,8 @@
         var html = Markdown.ToHtml(ClearAnnotations(text));
         html = ClearParagraphBreakPassOne(html);
         html = ClearParagraphBreakPassTwo(html);
-        return (MarkupString)ClearAnnotations(html);
+        Console.WriteLine(html);
+        return (MarkupString)html;
     }
 
     string ClearParagraphBreakPassOne(string text)

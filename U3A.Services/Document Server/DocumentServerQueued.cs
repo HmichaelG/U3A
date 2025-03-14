@@ -10,11 +10,10 @@ namespace U3A.Services
     public partial class DocumentServer
     {
 
-        public async Task SendQueuedEmailToMultipleRecipientsAsync(DocumentTemplate documentTemplate,
+        public async Task<int> SendQueuedEmailToMultipleRecipientsAsync(DocumentTemplate documentTemplate,
                                         List<ExportData> exportData,
                                         bool OverrideCommunicationPreference)
         {
-
             DocumentText bodyText = GetBodyText(documentTemplate);
 
             List<string> toAddressList, toDisplayNameList;
@@ -36,9 +35,10 @@ namespace U3A.Services
                                         bodyText.HtmlText,
                                         bodyText.PlainText,
                                         PDFFileContents, filenames);
+            return toAddressList.Count();
         }
 
-        public async Task SendQueuedEmailToSingleRecipientAsync(DocumentTemplate documentTemplate,
+        public async Task<int> SendQueuedEmailToSingleRecipientAsync(DocumentTemplate documentTemplate,
                         List<ExportData> ExportData,
                         bool OverrideCommunicationPreference)
         {
@@ -68,6 +68,7 @@ namespace U3A.Services
                                             PDFFileContents, filenames);
                 docsSent++;
             }
+            return docsSent;
         }
 
         private void GetAttachments(DocumentTemplate documentTemplate,

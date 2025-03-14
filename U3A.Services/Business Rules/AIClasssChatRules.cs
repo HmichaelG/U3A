@@ -158,31 +158,44 @@ namespace U3A.BusinessRules
                                 Roles = new List<string>() { "Clerk","Student" }
                             });
                         }
-                        foreach (var e in c.Course.Enrolments)
+                        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
                         {
-                            if (e.isLeader) continue;
-                            if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
-                            if (e.Person != null)
-                            {
-                                sc.People.Add(new ScheduledPerson()
-                                {
-                                    Class = c.Course.Name,
-                                    SortOrder = e.Person.FullNameAlphaKey,
-                                    Name = e.Person.FullNameWithPostNominals,
-                                    Email = e.Person.Email,
-                                    Phone = e.Person.AdjustedHomePhone,
-                                    Mobile = e.Person.AdjustedMobile,
-                                    Roles = (e.IsWaitlisted) 
-                                        ? new List<string>() { "Waitlisted" } 
-                                        : new List<string>() { "Student" }
-                                });
-                            }
+                            foreach (var e in c.Course.Enrolments)
+                                AssignParticipants(c, people, sc, e);
+                        }
+                        else
+                        {
+                            foreach (var e in c.Enrolments)
+                                AssignParticipants(c, people, sc, e);
                         }
                         sc.People = sc.People.OrderBy(x => x.SortOrder).ToList();
                     }
                 });
             }
             return data;
+        }
+
+        private static void AssignParticipants(Class c, List<Person> people, ScheduledClass? sc, Enrolment e)
+        {
+            if (!e.isLeader && !e.IsCourseClerk)
+            {
+                if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
+                if (e.Person != null)
+                {
+                    sc.People.Add(new ScheduledPerson()
+                    {
+                        Class = c.Course.Name,
+                        SortOrder = e.Person.FullNameAlphaKey,
+                        Name = e.Person.FullNameWithPostNominals,
+                        Email = e.Person.Email,
+                        Phone = e.Person.AdjustedHomePhone,
+                        Mobile = e.Person.AdjustedMobile,
+                        Roles = (e.IsWaitlisted)
+                            ? new List<string>() { "Waitlisted" }
+                            : new List<string>() { "Student" }
+                    });
+                }
+            }
         }
 
         static IHtmlDocument? ParseHtml(string html)
