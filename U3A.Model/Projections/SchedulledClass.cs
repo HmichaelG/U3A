@@ -14,15 +14,15 @@ namespace U3A.Model
 {
     public class ScheduledClass
     {
+        [JsonIgnore]
         public Guid ID { get; set; }
 
         // From Course
 
         public string Name { get; set; }
-        public bool Featured { get; set; }
         public string Description { get; set; }
-        public string CourseParticipationType { get; set; }
-        public bool EnforceOneClassPerStudent { get; set; }
+        public string ClassType { get; set; }
+        public bool Featured { get; set; }
         public decimal FeePerYear { get; set; }
         public string? FeePerYearDescription { get; set; }
         public decimal FeePerTerm { get; set; }
@@ -31,7 +31,6 @@ namespace U3A.Model
         public int RequiredStudents { get; set; }
         public int MaximumStudents { get; set; }
         public bool AllowAutoEnroll { get; set; } = true;
-        public string Type { get; set; }
         public string? ProvidedBy { get; set; } // The U3A that owns the course
 
         // From Class
@@ -59,7 +58,7 @@ namespace U3A.Model
     public class ScheduledPerson
     {
         public string Class { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; }        
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Mobile { get; set; }

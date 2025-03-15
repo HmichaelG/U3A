@@ -176,7 +176,7 @@ IChatClient client = new ChatClientBuilder(chatClient)
          .ConfigureOptions(x => {
              x.Temperature = 0.2f;
              x.TopP = 0.1f;
-             x.MaxOutputTokens = 10000;             
+             x.MaxOutputTokens = 10|000;       
          })
          .Build();
 

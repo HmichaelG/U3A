@@ -20,9 +20,8 @@
         <DxSplitterPane Size="33%">
             <b>Caveats:</b>
             <ul>
-                <li>AI Chat is a work in progress and may not always provide accurate answers.</li>
-                <li>Initialisation is slow</li>
-                <li>Responses are very slow</li>
+                <li>AI Chat is a work in progress. It is reasonably accurate.</li>
+                <li>Responses can be very slow</li>
                 <li>System may appear to hang when closed. Its not a hang, its just slow.</li>
             </ul>
             <b>What can it do?</b>
@@ -36,7 +35,7 @@
                 <li>Show details for Yoga</li>
                 <li>Who are the contacts for &quot;Tai Chi&quot;?</li>
                 <li>What are Jason Jones's roles?</li>
-                <li>List by role all participants in Aquarobics</li>
+                <li>List by role all participants in Aquarobics, one per line including name and email.</li>
                 <li>List waitlist for Aquarobics</li>
                 <li>Exercise classes on Thursday?</li>
             </ol>
@@ -53,15 +52,11 @@
             <p>
                 Questions 2,3,and 4 above will use the context of the first question.
                 That is, the Ai will remember the class you asked about and provide relevant answers to subsequent questions.
-                To clear the context, enter <b>Reset context</b> prior to your next question. For example...
             </p>
-            <ol>
-                <li>Reset context. What's on Monday afternoon?</li>
-            </ol>
         </DxSplitterPane>
         <DxSplitterPane>
             <div class="chat-container">
-                <DxAIChat CssClass="chat-box"
+                <DxAIChat CssClass="chat-box" 
                 Initialized="Initialized"
                 ResponseContentFormat="ResponseContentFormat.Markdown">
                     <MessageContentTemplate>
@@ -88,26 +83,29 @@
     height: 85dvh;
     padding: 10px;
     }
+
     h3 {
-        font-size: clamp(10px, 2.5vw, 14px);
-        margin-top: 10px;
+    font-size: clamp(10px, 2.5vw, 14px);
+    margin-top: 10px;
     }
+
     h1, h2, h4 {
-        margin-top: 10px;
+    margin-top: 10px;
     }
 
 </style>
 
 @code {
-
     async Task Initialized(IAIChat chat)
     {
-        var fileName = $"Class Schedule {Guid.NewGuid().ToString("N")}.json";
-        byte[] bytes;
-        (string json, string schema) = await GetJsonData();
-        bytes = Encoding.UTF8.GetBytes(json);
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            var fileName = $"Class Schedule.json";
+            byte[] bytes;
+            (string json, string schema) = await GetJsonData();
+            bytes = Encoding.UTF8.GetBytes(json);
 
-        string prompt = $@"
+            string prompt = $@"
         ## Introduction:
         -- You are a helpful assistant specialized in analyzing the Class Schedule which is a document in json format.
         -- Your role is to assist students by providing reliable and relevant answers to their questions about the Class Schedule.
@@ -118,6 +116,7 @@
         - do not attempt to list participants if none available.
 
         ## Instructions:
+        - when searching for classes search in the Name, class Type and Description.
         - Always identify a class by its name, day, time, venue, venue address and term offered.
         - include the day when displaying the time. For example: 'Monday 1:45 pm - 3:00pm'.
         - students, leaders and clerks are participants.
@@ -126,20 +125,24 @@
         - waitlisted are not participants.
         - Leader, teacher, lecturer, and tutor are interchangeable.
         - Clerk, administrator and coordinator are interchangeable.
-        - Contacts are Leaders and Clerks only. 
+        - Contacts are Leaders and Clerks only.
         - A student is a contact only if also a clerk.
         - If Total Active Students >= Maximum Students, then the class is full.
         - A class is closed if the class is full.
         - A class is closed if the class AllowAutoEnroll = false.
         - Always identify whether the class is open or closed giving your reason.
+        - the json schema is a follows...
+
+    {schema}
 ";
-        using (var ms = new MemoryStream(bytes))
-        {
-            await chat.SetupAssistantAsync(new OpenAIAssistantOptions(
-                fileName,
-                ms,
-                prompt)
-            );
+            using (var ms = new MemoryStream(bytes))
+            {
+                await chat.SetupAssistantAsync(new OpenAIAssistantOptions(fileName, ms, prompt)
+                    {
+                        UseFileSearchTool = true
+                    }
+                );
+            }
         }
     }
 

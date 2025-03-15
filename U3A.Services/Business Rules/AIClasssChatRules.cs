@@ -61,11 +61,7 @@ namespace U3A.BusinessRules
 
                     Name = x.Course.Name,
                     Description = RemoveHtmlTags(x.Course.Description),
-                    CourseParticipationType = (x.Course.CourseParticipationTypeID == 0)
-                                                ? "Same students in all classes"
-                                                : "Different students in each class",
                     Featured = x.Course.IsFeaturedCourse,
-                    EnforceOneClassPerStudent = x.Course.EnforceOneStudentPerClass,
                     FeePerYear = x.Course.CourseFeePerYear,
                     FeePerYearDescription = x.Course.CourseFeePerYearDescription,
                     FeePerTerm = x.Course.CourseFeePerTerm,
@@ -74,7 +70,7 @@ namespace U3A.BusinessRules
                     RequiredStudents = x.Course.RequiredStudents,
                     MaximumStudents = x.Course.MaximumStudents,
                     AllowAutoEnroll = x.Course.AllowAutoEnrol,
-                    Type = x.Course.CourseType.Name,
+                    ClassType = x.Course.CourseType.Name,
                     ProvidedBy = (x.Course.OfferedBy == null)
                                 ? dbc.TenantInfo.Name : x.Course.OfferedBy,
 
@@ -118,7 +114,7 @@ namespace U3A.BusinessRules
                         {
                             Class = c.Course.Name,
                             SortOrder = c.Leader.FullNameAlphaKey,
-                            Name = c.Leader.FullNameWithPostNominals,
+                            Name = c.Leader.FullName,
                             Email = c.Leader.Email,
                             Phone = c.Leader.AdjustedHomePhone,
                             Mobile = c.Leader.AdjustedMobile,
@@ -128,7 +124,7 @@ namespace U3A.BusinessRules
                         {
                             Class = c.Course.Name,
                             SortOrder = c.Leader2.FullNameAlphaKey,
-                            Name = c.Leader2.FullNameWithPostNominals,
+                            Name = c.Leader2.FullName,
                             Email = c.Leader2.Email,
                             Phone = c.Leader2.AdjustedHomePhone,
                             Mobile = c.Leader2.AdjustedMobile,
@@ -138,7 +134,7 @@ namespace U3A.BusinessRules
                         {
                             Class = c.Course.Name,
                             SortOrder = c.Leader3.FullNameAlphaKey,
-                            Name = c.Leader3.FullNameWithPostNominals,
+                            Name = c.Leader3.FullName,
                             Email = c.Leader3.Email,
                             Phone = c.Leader3.AdjustedHomePhone,
                             Mobile = c.Leader3.AdjustedMobile,
@@ -151,7 +147,7 @@ namespace U3A.BusinessRules
                             {
                                 Class = c.Course.Name,
                                 SortOrder = clerk.FullNameAlphaKey,
-                                Name = clerk.FullNameWithPostNominals,
+                                Name = clerk.FullName,
                                 Email = clerk.Email,
                                 Phone = clerk.AdjustedHomePhone,
                                 Mobile = clerk.AdjustedMobile,
@@ -186,7 +182,7 @@ namespace U3A.BusinessRules
                     {
                         Class = c.Course.Name,
                         SortOrder = e.Person.FullNameAlphaKey,
-                        Name = e.Person.FullNameWithPostNominals,
+                        Name = e.Person.FullName,
                         Email = e.Person.Email,
                         Phone = e.Person.AdjustedHomePhone,
                         Mobile = e.Person.AdjustedMobile,
