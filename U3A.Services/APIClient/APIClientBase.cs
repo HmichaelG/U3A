@@ -22,7 +22,7 @@ public class U3AFunctionsHttpClient
 {
     private const string variableName = "U3A-FUNCTIONS-KEY";
     private static readonly string _apiBaseAddress = (constants.IS_DEVELOPMENT)
-            ? "http://localhost:7071/api/"
+            ? $"{Environment.GetEnvironmentVariable("aspire-webfunctions-url")}/api/"
             : "https://u3a-functions.azurewebsites.net/api/"
             ;
     private static readonly Lazy<HttpClient> lazyHttpClient = new Lazy<HttpClient>(() => new HttpClient());
@@ -36,6 +36,7 @@ public class U3AFunctionsHttpClient
         var client = lazyHttpClient.Value;
         if (client.BaseAddress == null)
         {
+            var e = Environment.GetEnvironmentVariable("aspire-webfunctions-url");
             var authToken = Environment.GetEnvironmentVariable(variableName);
             client.BaseAddress = new Uri(_apiBaseAddress);
             // Add authentication headers if needed

@@ -35,6 +35,8 @@ using DevExpress.XtraPrinting.Native;
 using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddRazorComponents(options =>
     options.DetailedErrors = builder.Environment.IsDevelopment())
@@ -258,6 +260,8 @@ builder.Services.AddAntiforgery(options =>
 });
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 app.UseRequestLocalization("en-AU");
 
