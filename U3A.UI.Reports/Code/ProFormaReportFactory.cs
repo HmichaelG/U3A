@@ -559,7 +559,9 @@ namespace U3A.UI.Reports
                                     string[] ReportsNames,
                                     bool RandomAllocationExecuted = false)
         {
-            string randomAllocationMessage = (RandomAllocationExecuted) ? "" : "hidden";
+            string randomAllocationMessage = (RandomAllocationExecuted) 
+                                ? "" 
+                                : "hidden  style='visibility: hidden;'";
 
             if (!isPreview && !string.IsNullOrEmpty(Leader.Email))
             {
@@ -569,7 +571,8 @@ namespace U3A.UI.Reports
                                     .Replace("{FirstName}", Leader.FirstName)
                                     .Replace("{CourseName}", CourseName)
                                     .Replace("{ReportName}", ReportName)
-                                    .Replace("{randomAllocationMessage}", randomAllocationMessage)
+                                    .Replace("{RandomAllocationCommentStart}", (RandomAllocationExecuted) ? "" : "<!--")
+                                    .Replace("{RandomAllocationCommentEnd}", (RandomAllocationExecuted) ? "" : "-->")
                                     .Replace("{randomAllocationPreviewDays}", constants.RANDOM_ALLOCATION_PREVIEW.ToString())
                                     .Replace("{copyrightYear}", copyrightYear)
                                     .Replace("{tenantID}", tenantID)

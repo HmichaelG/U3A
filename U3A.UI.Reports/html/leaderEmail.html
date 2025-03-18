@@ -148,7 +148,6 @@
         }
     </style>
     <!-- CSS Reset : END -->
-
     <!-- Progressive Enhancements : BEGIN -->
     <style>
 
@@ -313,17 +312,19 @@
                                     <p style="margin: 0 0 10px;">
                                         Please find your U3A Leader's report for <strong>{CourseName}</strong> attached.
                                     </p>
-                                    <div {randomAllocationMessage}>
-                                        <p style="margin: 0 0 10px;">
-                                            You have received this email because the random allocation of
-                                            student enrolment requests was performed early this morning.
-                                            You now have {randomAllocationPreviewDays} days to review this allocation
-                                            and request changes prior to your students being informed by email.
-                                        </p>
-                                        <p style="margin: 0 0 10px;">
-                                            Please keep enrolment details confidential until students have received their email.
-                                        </p>
-                                    </div>
+
+                                    {RandomAllocationCommentStart}
+                                    <p style="margin: 0 0 10px;">
+                                        You have received this email because the random allocation of
+                                        student enrolment requests was performed early this morning.
+                                        You now have {randomAllocationPreviewDays} days to review this allocation
+                                        and request changes prior to your students being informed by email.
+                                    </p>
+                                    <p style="margin: 0 0 10px;">
+                                        Please keep enrolment details confidential until students have received their email.
+                                    </p>
+                                    {RandomAllocationCommentEnd}
+
                                     <p style="margin: 0 0 0;">Thank you,</p>
                                     <p style="margin: 0 0 10px;">{sendEmailDisplayName}</p>
 
