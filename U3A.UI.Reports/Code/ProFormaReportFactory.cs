@@ -559,10 +559,6 @@ namespace U3A.UI.Reports
                                     string[] ReportsNames,
                                     bool RandomAllocationExecuted = false)
         {
-            string randomAllocationMessage = (RandomAllocationExecuted) 
-                                ? "" 
-                                : "hidden  style='visibility: hidden;'";
-
             if (!isPreview && !string.IsNullOrEmpty(Leader.Email))
             {
                 var emailTemplate = ReadEmailTemplate("leaderEmail");
