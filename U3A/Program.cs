@@ -14,6 +14,7 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Filters;
 using Serilog.Sinks.MSSqlServer;
+using Serilog.Sinks.OpenTelemetry;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
@@ -33,10 +34,13 @@ using DevExpress.AIIntegration;
 using Microsoft.Extensions.Options;
 using DevExpress.XtraPrinting.Native;
 using OpenAI;
+using Serilog.Sinks.SystemConsole.Themes;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Aspire service defaults
 builder.AddServiceDefaults();
+
 // Add services to the container.
 builder.Services.AddRazorComponents(options =>
     options.DetailedErrors = builder.Environment.IsDevelopment())
@@ -53,8 +57,8 @@ if (tenantConnectionString is null)
     tenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString");
 }
 
-LoggingLevelSwitch FatalLevelSwitch
-        = new LoggingLevelSwitch(LogEventLevel.Fatal);
+LoggingLevelSwitch levelSwitch
+        = new LoggingLevelSwitch(LogEventLevel.Warning);
 
 var columnOptions = new ColumnOptions
 {
@@ -70,7 +74,7 @@ var columnOptions = new ColumnOptions
 };
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft", FatalLevelSwitch)
+    .MinimumLevel.Override("Microsoft.AspNetCore", levelSwitch)
     .Enrich.FromLogContext()
     .Enrich.WithExceptionDetails()
     .WriteTo.Logger(lc => lc
@@ -84,7 +88,8 @@ Log.Logger = new LoggerConfiguration()
                                     columnOptions: columnOptions
                                 )
         )
-    .WriteTo.Console(formatProvider: new CultureInfo("en-AU"))
+    .WriteTo.Console(formatProvider: new CultureInfo("en-AU"), theme: AnsiConsoleTheme.Literate)
+    .WriteTo.OpenTelemetry()
     .WriteTo.MSSqlServer(connectionString: tenantConnectionString,
                             formatProvider: new CultureInfo("en-AU"),
                             restrictedToMinimumLevel: LogEventLevel.Error,
@@ -98,6 +103,8 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog(Log.Logger);
 
+Log.Information("Logging started {now}",DateTime.Now);
+
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.Model.Class).Assembly);
 DevExpress.Drawing.Settings.DrawingEngine = DrawingEngine.Default;
@@ -106,6 +113,11 @@ foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
     DXFontRepository.Instance.AddFont(file);
 }
 
+builder.Services.AddDbContext<U3ADbContext>();
+builder.Services.AddDbContext<TenantDbContext>();
+// Enrich with Aspire extensions
+builder.EnrichSqlServerDbContext<U3ADbContext>();
+builder.EnrichSqlServerDbContext<TenantDbContext>();
 
 // TenantDbContextFactory
 builder.Services.AddDbContextFactory<TenantDbContext>(options =>
@@ -114,7 +126,6 @@ builder.Services.AddDbContextFactory<TenantDbContext>(options =>
 }, ServiceLifetime.Scoped);
 
 // U3ADbContextFactory
-builder.Services.AddDbContext<U3ADbContext>();
 
 builder.Services.AddDbContextFactory<U3ADbContext>(options =>
 {
@@ -175,10 +186,11 @@ IChatClient chatClient = new AzureOpenAIClient(
     new AzureKeyCredential(AIkey)).AsChatClient(model);
 
 IChatClient client = new ChatClientBuilder(chatClient)
-         .ConfigureOptions(x => {
+         .ConfigureOptions(x =>
+         {
              x.Temperature = 0.2f;
              x.TopP = 0.1f;
-             x.MaxOutputTokens = 10|000;       
+             x.MaxOutputTokens = 10 | 000;
          })
          .Build();
 

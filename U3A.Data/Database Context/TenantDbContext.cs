@@ -32,7 +32,6 @@ namespace U3A.Database
             base.OnConfiguring(optionsBuilder);
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.EnableSensitiveDataLogging(true);
                 optionsBuilder.UseSqlServer(cnnStr);
             }
         }

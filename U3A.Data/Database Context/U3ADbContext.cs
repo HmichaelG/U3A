@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Data.Common;
 using U3A.Model;
 using static DevExpress.Office.Utils.HdcOriginModifier;
@@ -19,6 +21,9 @@ namespace U3A.Database
         private readonly IDbContextFactory<TenantDbContext> _TenantDbFactory;
         private readonly bool useCachedTenantInfo = false;
 
+        public readonly ILoggerFactory loggerFactory;
+                //= LoggerFactory.Create(builder => { builder.AddSerilog(); });
+
         public U3ADbContext(TenantInfo tenantInfo)
         {
             TenantInfo = tenantInfo;
@@ -27,10 +32,12 @@ namespace U3A.Database
 
         [ActivatorUtilitiesConstructor] // force DI to use this constructor
         public U3ADbContext(AuthenticationStateProvider? AuthStateProvider,
+                    ILoggerFactory loggerFactory,
                     IDbContextFactory<TenantDbContext> TenantDbFactory = default,
                     IHttpContextAccessor HttpContextAccessor = default,
                     LocalTime localTime = null)
         {
+            this.loggerFactory = loggerFactory;
             if (AuthStateProvider != null) authenticationStateProvider = AuthStateProvider;
             _httpContextAccessor = HttpContextAccessor;
             _TenantDbFactory = TenantDbFactory;
@@ -42,8 +49,7 @@ namespace U3A.Database
         {
             //optionsBuilder.EnableSensitiveDataLogging(true);
             //optionsBuilder.EnableDetailedErrors();
-            //optionsBuilder.LogTo(Serilog.Log.Information, Microsoft.Extensions.Logging.LogLevel.Information);
-
+            optionsBuilder.UseLoggerFactory(loggerFactory);
             GetTenantInfo();
             if (TenantInfo != null)
             {
@@ -70,7 +76,7 @@ namespace U3A.Database
                 {
                     TenantInfo = dbc.TenantInfo
                         .AsNoTracking()
-                        .FirstOrDefault(x => x.Identifier == "demo"); //finbuckle leftover
+                        .FirstOrDefault(x => x.Identifier == "demo");
                 }
             }
         }
