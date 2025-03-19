@@ -30,21 +30,17 @@ var host = new HostBuilder()
             .MinimumLevel.Override("Azure.Core", LogEventLevel.Error)
             .MinimumLevel.Override("Azure.Identity", LogEventLevel.Error)
             .Enrich.FromLogContext()
-            .WriteTo.Console(LogEventLevel.Information)
+            .WriteTo.OpenTelemetry()
+            //.WriteTo.Console(LogEventLevel.Information)
             .WriteTo.File(filePath, 
                         LogEventLevel.Information, 
                         shared: true,
                         rollingInterval: RollingInterval.Day)
             .CreateLogger();
         logging.AddSerilog(Log.Logger,true);
+        constants.IS_DEVELOPMENT = hostingContext.HostingEnvironment.IsDevelopment();
     })
     .Build();
-
-string var = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") ?? "";
-if (var == "Development")
-{
-    constants.IS_DEVELOPMENT = true;
-}
 
 host.Run();
 

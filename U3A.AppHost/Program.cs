@@ -6,7 +6,6 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 builder.Services.AddSerilog(config =>
 {
-    config.MinimumLevel.Override("Aspire.Hosting.Dcp",LogEventLevel.Warning);
     config.WriteTo.Console();
 });
 
