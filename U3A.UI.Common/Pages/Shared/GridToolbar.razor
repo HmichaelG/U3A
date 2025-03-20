@@ -352,13 +352,13 @@ ItemClick="OnItemClick">
                     // Highlight header and footer
                     if (e.AreaType == SheetAreaType.Header || e.AreaType == SheetAreaType.TotalFooter)
                     {
-                        e.Formatting.BackColor = System.Drawing.Color.Gainsboro;
+                        if (e.Formatting != null) e.Formatting.BackColor = System.Drawing.Color.Gainsboro;
                         e.Handled = true;
                     }
                     // Highlight Group Footer
                     if (e.AreaType == SheetAreaType.GroupFooter)
                     {
-                        e.Formatting.BackColor = ChangeColorBrightness(Color.Gainsboro, 0.6F);
+                        if (e.Formatting != null) e.Formatting.BackColor = ChangeColorBrightness(Color.Gainsboro, 0.6F);
                         e.Handled = true;
                     }
                 }
