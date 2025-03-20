@@ -8,6 +8,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 using Microsoft.ApplicationInsights.Extensibility;
 using Serilog.Extensions.Logging;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Azure;
 
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
@@ -25,17 +26,18 @@ var host = new HostBuilder()
             .MinimumLevel.Override("Worker", LogEventLevel.Warning)
             .MinimumLevel.Override("Host", LogEventLevel.Warning)
             .MinimumLevel.Override("System", LogEventLevel.Error)
-            .MinimumLevel.Override("Function", LogEventLevel.Debug)
             .MinimumLevel.Override("Azure", LogEventLevel.Error)
+            .MinimumLevel.Override("Aspire", LogEventLevel.Error)
             .Enrich.FromLogContext()
             .WriteTo.OpenTelemetry()
-            //.WriteTo.Console(LogEventLevel.Information)
-            .WriteTo.File(filePath, 
-                        LogEventLevel.Information, 
-                        shared: true,
-                        rollingInterval: RollingInterval.Day)
-            .CreateLogger();
-        logging.AddSerilog(Log.Logger,true);
+                .WriteTo.Console(LogEventLevel.Information, outputTemplate:
+                    "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .WriteTo.File(filePath,
+                            LogEventLevel.Information,
+                            shared: true,
+                            rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+        logging.AddSerilog(Log.Logger, true);
         constants.IS_DEVELOPMENT = hostingContext.HostingEnvironment.IsDevelopment();
     })
     .Build();
