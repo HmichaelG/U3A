@@ -162,7 +162,7 @@ namespace U3A.UI.Reports
                         if (!onFile.Contains(onfileKey)) // one report per enrolment / class
                         {
                             onFile.Add(onfileKey);
-                            var detail = BusinessRule.GetEnrolmentDetail(dbc, enrolment);
+                            var detail = await BusinessRule.GetEnrolmentDetailAsync(dbc, enrolment);
                             using (var participantEnrolmentProForma = new ParticipantEnrolment())
                             {
                                 participantEnrolmentProForma.DataSource = detail;
