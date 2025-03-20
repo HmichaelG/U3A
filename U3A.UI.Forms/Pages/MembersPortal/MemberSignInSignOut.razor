@@ -199,7 +199,10 @@
         return result;
     }
 
+    bool isProcessing = false;
     async Task OnProcess() {
+        if (isProcessing) return;
+        isProcessing = true;
         var isSignIn = IsSignIn();
         var attendClass = await dbc.AttendClass.FindAsync(selectedSignIn.AttendClass.ID);
         if (attendClass != null) {
@@ -212,11 +215,16 @@
             else {
                 attendClass.SignOut = now;
             }
+            dbc.Update(attendClass);
             await dbc.SaveChangesAsync();
             InvokeAsync(StateHasChanged);
         }
+        isProcessing = false;
     }
+
     async Task OnProcessAbsent() {
+        if (isProcessing) return;
+        isProcessing = true;
         var isSignIn = IsSignIn();
         var attendClass = await dbc.AttendClass.FindAsync(selectedSignIn.AttendClass.ID);
         if (attendClass != null) {
@@ -224,9 +232,12 @@
             attendClass.Comment = selectedSignIn.AbsentReason;
             attendClass.SignIn = null;
             attendClass.SignOut = null;
+            dbc.Update(attendClass);
             await dbc.SaveChangesAsync();
             await messageBox.ShowOkOnlyAsync("Saved", "Your class absence has been recorded - thank you.");
         }
+        isProcessing = false;
+        await ReturnToMenu();
     }
 
     async Task ReturnToMenu() {
