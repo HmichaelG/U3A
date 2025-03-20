@@ -32,6 +32,10 @@ namespace U3A.BusinessRules
                         ?? await BusinessRule.SelectPersonAsync(dbc, enrolment.PersonID) ?? throw new ArgumentNullException(nameof(Person));
             var t = enrolment.Term
                         ?? await dbc.Term.FindAsync(enrolment.TermID) ?? throw new ArgumentNullException(nameof(Term));
+            var enrolmentTerm = await CurrentEnrolmentTermAsync(dbc) 
+                        ?? await CurrentTermAsync(dbc)
+                        ?? throw new ArgumentNullException(nameof(Term));
+                    
             var cr = await dbc.Course.Where(x => x.ID == enrolment.CourseID).Include(x => x.Enrolments).FirstOrDefaultAsync();
             var pt = await dbc.CourseParticpationType.FindAsync(cr.CourseParticipationTypeID);
             var ct = await dbc.CourseType.FindAsync(cr.CourseTypeID);
@@ -138,6 +142,13 @@ namespace U3A.BusinessRules
 We are currently unable to place you in this course{reason}. 
 Your request has been <b>Waitlisted</b> meaning you will be notified should a place become available in the future.
 <b>Please do not attend classes in which you are waitlisted.</b>";
+                        if (!IsClassInTerm(c, enrolmentTerm.TermNumber))
+                        {
+                            ed.WaitlistMessage =
+                                $@"The class you have requested will be held in Term {t.TermNumber}.
+Class allocation for <b>{cr.Name}</b> will occur shortly before the commencement of Term {t.TermNumber}. 
+Your request remains <b>Waitlisted</b> until allocation occurs on or before {t.StartDate.ToString(constants.FULL_DAY_DATE_FORMAT)}.";
+                        }
                     }
                 }
                 else { ed.WaitlistMessage = string.Empty; }
