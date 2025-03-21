@@ -14,6 +14,7 @@ using U3A.Database;
 using U3A.Model;
 using U3A.Services;
 using U3A.Services.APIClient;
+using System.Reflection;
 
 namespace U3A.Services;
 
@@ -308,18 +309,35 @@ public partial class DocumentServer : IDisposable
         }
     }
 
-    private DocumentText MergeDocument(DocumentTemplate DocumentTemplate, ExportData mergeItem)
+    private DocumentText MergeDocument(DocumentTemplate documentTemplate, ExportData mergeItem)
     {
         DocumentText result = new DocumentText();
-        server.RtfText = System.Text.Encoding.UTF8.GetString(DocumentTemplate.Content);
+        server.RtfText = System.Text.Encoding.UTF8.GetString(documentTemplate.Content);
         server.Options.MailMerge.ViewMergedData = true;
         server.Options.Export.Html.EmbedImages = true;
         var l = new List<ExportData>() { mergeItem };
         server.Options.MailMerge.DataSource = l;
         server.MailMerge(resultServer.Document);
         result.PlainText = resultServer.Text;
-        result.HtmlText = resultServer.HtmlText;
+        if (!string.IsNullOrWhiteSpace(documentTemplate.EmailPreheader))
+        {
+            result.HtmlText = resultServer.HtmlText.Replace("<body>", ReadPreheaderTemplate().Replace("{Preheader}",documentTemplate.EmailPreheader));
+        }
+        else
+            result.HtmlText = resultServer.HtmlText;
         return result;
+    }
+
+    string ReadPreheaderTemplate()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = $"U3A.Services.Email.Preheader.html";
+
+        using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+        using (StreamReader reader = new StreamReader(stream))
+        {
+            return reader.ReadToEnd();
+        }
     }
     public byte[] MergeDocumentAsPdf(DocumentTemplate DocumentTemplate, List<ExportData> mergeData,
                                     bool OverrideCommunicationPreference)

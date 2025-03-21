@@ -107,7 +107,8 @@
 
             string prompt = $@"
         ## Introduction:
-        -- You are a helpful assistant specialized in analyzing the Class Schedule which is a document in json format.
+        -- You are a helpful assistant specialized in analyzing the Class Schedule which is a json document that conforms to the schema
+            {schema}
         -- Your role is to assist students by providing reliable and relevant answers to their questions about the Class Schedule.
 
         ## Tasks:
@@ -131,9 +132,6 @@
         - A class is closed if the class is full.
         - A class is closed if the class AllowAutoEnroll = false.
         - Always identify whether the class is open or closed giving your reason.
-        - the json schema is a follows...
-
-    {schema}
 ";
             using (var ms = new MemoryStream(bytes))
             {

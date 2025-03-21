@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-02-19T14:56:45.781+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-03-21T13:22:29.052+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Communicate</title>
   <body>
     <header>
@@ -18,12 +18,8 @@
         <td>
           <para styleclass="Heading3">The Postal Service</para>
           <para styleclass="Heading3"><text styleclass="Normal">Sending email and SMS are digital processes and are completely handled within the application. Post however, requires manual intervention. The software will package all postal items into a single PDF and email it to the </text><text styleclass="Normal" style="font-style:italic;">Send Email Address</text><text styleclass="Normal"> as defined in </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Organistaion-Details" styleclass="Normal">Organistaion Details</link><text styleclass="Normal">. It is then the recipient&apos;s responsibility to print the PDF and manually post to the required members. All proforma stationary is designed to fit into standard window envelopes.</text></para>
-          <para styleclass="Heading3">Overnight Processing</para>
-          <para styleclass="Normal">Any email that contains mail merge tags or attachments will be queued for processing overnight. These are compute-intensive tasks best left to quite periods during the night.</para>
-          <para styleclass="Normal">The exception is if the email is to be sent to one member only. In this case it will be sent immediately. This is intended to allow you to test the email.</para>
-          <para styleclass="Normal">Email without mail merge tags or attachments will be sent immediately.</para>
           <para styleclass="Heading3">Broadcast (bulk) Email</para>
-          <para styleclass="Normal">All email sent via the <text style="font-weight:bold;">Communicate</text> procedure will be placed into the broadcast email stream. This stream has the highest potential to be considered spam by members email service providers. Care should therefore be exercise in crafting the email. </para>
+          <para styleclass="Normal">All email sent via the <text style="font-weight:bold;">Communicate</text> procedure will be placed into the broadcast email stream. This stream has the highest potential to be considered spam by members email service providers. Care should therefore be exercised in crafting the email. </para>
           <para styleclass="Normal">In addition, all broadcast email must provide the ability to opt-out or unsubscribe. This is normally a link at the bottom of the email. You cannot create an email without this link.</para>
           <para styleclass="Heading3">SMS</para>
           <para styleclass="Normal">The Australian Government now requires a formal registration and authentication process before you can create bulk SMS messages. Be aware the process is somewhat onerous and time consuming to complete. Also, compared to email, SMS can be quite expensive.</para>
@@ -37,7 +33,7 @@
     <para styleclass="Normal">Alternatively, you may select <text style="font-style:italic;">Custom Email</text> as the document template. This allows the creation of an email document without reference to any template.</para>
     <para styleclass="Normal">Depending on the communication type, you will be presented with one of the following.</para>
     <para styleclass="Normal" style="margin-bottom:0px;"><text style="font-weight:bold;">Email</text></para>
-    <para styleclass="Normal"><table styleclass="Default" rowcount="5" colcount="2">
+    <para styleclass="Normal"><table styleclass="Default" rowcount="6" colcount="2">
       <thead style="vertical-align:top">
         <td style="width:208px;">
           <para styleclass="Normal">Field</para>
@@ -52,6 +48,14 @@
         </td>
         <td style="width:743px;">
           <para styleclass="Normal">Text to be placed on the email&apos;s Subject line</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">Email Preheader</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">(Optional) The email Preheader is a short message displayed in the email inbox immediately below the Subject line. Use wisely to significantly increase the likelihood of an email being opened and read. </para>
         </td>
       </tr>
       <tr style="vertical-align:top">

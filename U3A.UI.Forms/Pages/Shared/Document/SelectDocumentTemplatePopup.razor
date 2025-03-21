@@ -50,6 +50,10 @@ HeaderText="Communicate">
                             <DxTextBox @bind-Text="@SelectedDocumentTemplate.Subject"
                             NullText="Enter a Subject" />
                         </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Email Preheader" ColSpanMd="12" Visible="@IsEmail">
+                            <DxTextBox @bind-Text="@SelectedDocumentTemplate.EmailPreheader"
+                                       NullText="A short introduction displayed in the email inbox." />
+                        </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="From Address" ColSpanMd="12" Visible="@IsEmail">
                             <DxComboBox Data="@emailAddresses" AllowUserInput="true"
                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"

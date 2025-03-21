@@ -48,6 +48,7 @@ namespace U3A.Model
         public List<Byte[]>? AttachmentBytes { get; set; } = new List<byte[]>();
         public byte[] Content { get; set; }
         public string HTML { get; set; }
+        public string? EmailPreheader { get; set; }
 
     }
 

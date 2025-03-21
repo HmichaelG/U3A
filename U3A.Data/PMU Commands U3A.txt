@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_DateTermsLastAgreed
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_DocumentQueue_EmailCount
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_DocumentQueue_EmailCount
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_DocumentTemplate_EmailPreheader
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_DocumentQueue_EmailCount
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_DocumentTemplate_EmailPreheader
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

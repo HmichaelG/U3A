@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2023-06-14T11:56:33.112+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-03-21T13:19:11.213+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Add/Edit Document Templates</title>
   <body>
     <header>
@@ -24,7 +24,7 @@
     <para styleclass="Normal" style="margin-bottom:0px;">This procedure uses a modified version of the rich text editor component supplied by DevExpress Inc. For for details to its use please refer to <link displaytype="text" defaultstyle="true" type="weblink" href="https://devexpress.github.io/dotnet-eud/interface-elements-for-desktop/articles/rich-text-editor.html" target="_blank">DevExpress web rich text editor</link></para>
     <para styleclass="Normal" style="margin-bottom:0px;"></para>
     <para styleclass="Normal" style="margin-bottom:0px;">The template record consists of the following fields...</para>
-    <para styleclass="Normal" style="margin-bottom:0px;"><table styleclass="Default" rowcount="8" colcount="2">
+    <para styleclass="Normal" style="margin-bottom:0px;"><table styleclass="Default" rowcount="9" colcount="2">
       <thead style="vertical-align:top">
         <td style="width:226px;">
           <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
@@ -72,6 +72,14 @@
         </td>
         <td style="width:894px;">
           <para styleclass="Normal">Email Only. Enter a subject for the email.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:226px;">
+          <para styleclass="Normal">Preheader</para>
+        </td>
+        <td style="width:894px;">
+          <para styleclass="Normal">(Optional) The email Preheader is a short message displayed in the email inbox immediately below the Subject line. Use wisely to significantly increase the likelihood of an email being opened and read. </para>
         </td>
       </tr>
       <tr style="vertical-align:top">

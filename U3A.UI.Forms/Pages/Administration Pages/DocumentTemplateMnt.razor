@@ -55,6 +55,7 @@ else
                     <DxGridDataColumn Caption="Type" FieldName="DocumentType.Name" />
                     <DxGridDataColumn Caption="Name" FieldName="Name" />
                     <DxGridDataColumn Caption="Subject" FieldName="Subject" />
+                    <DxGridDataColumn Caption="Preheader" FieldName="EmailPreheader" />
                     <DxGridDataColumn Caption="From" FieldName="FromEmailAddress" />
                     <DxGridDataColumn Caption="Display Name" FieldName="FromDisplayName" />
                 </Columns>
@@ -77,6 +78,10 @@ else
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Subject" ColSpanMd="12" Visible="@IsEmail">
                                 <DxTextBox @bind-Text="@editItem.Subject" />
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Preheader" ColSpanMd="12" Visible="@IsEmail">
+                                <DxTextBox @bind-Text="@editItem.EmailPreheader"
+                                    NullText="A short introduction displayed in the email inbox."/>
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="From Email Address" ColSpanMd="12" Visible="@IsEmail">
                                 <DxComboBox Data="@emailAddresses" AllowUserInput="true"
