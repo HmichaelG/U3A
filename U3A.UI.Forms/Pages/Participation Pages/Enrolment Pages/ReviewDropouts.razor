@@ -17,21 +17,21 @@ else
 
     <DxFormLayout>
         <div class="col col-12 p-2 m-auto">
-        <div class="row align-content-start">
-            <ContextHelpTitle Title="Review Class Dropouts" HelpTopic="Review-Class-Dropouts.html" />
-        </div>
-        <div class="row">
-            <div class="d-none col-lg-8 d-lg-inline pb-2">
-                Review / Reinstate deleted class enrolments.
+            <div class="row align-content-start">
+                <ContextHelpTitle Title="Review Class Dropouts" HelpTopic="Review-Class-Dropouts.html" />
             </div>
-        </div>
+            <div class="row">
+                <div class="d-none col-lg-8 d-lg-inline pb-2">
+                    Review / Reinstate deleted class enrolments.
+                </div>
+            </div>
 
-        <MessageBox @ref="@messageBox" />
-        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+            <MessageBox @ref="@messageBox" />
+            <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-        <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-                                     DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
-        <Progress @ref="@ProgressBar" />
+            <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
+                                         DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+            <Progress @ref="@ProgressBar" />
 
             <FullScreen DisplayOffset="6">
                 <ContentTemplate>
@@ -200,24 +200,47 @@ else
                   $"<p>The {SelectedDataItems.Count} selected students will be reinstated. Their waitlist status will remain unchanged.</p>" +
                   "<p>Do you wish to continue?</p>"))
         {
+            List<string> errors = new List<string>();
             foreach (var obj in SelectedDataItems)
             {
                 var d = (Dropout)(obj);
-                var e = new Enrolment()
-                    {
-                        Course = await dbc.Course.FindAsync(d.CourseID),
-                        DateEnrolled = d.DateEnrolled,
-                        IsWaitlisted = d.IsWaitlisted,
-                        Person = await dbc.Person.FindAsync(d.PersonID),
-                        Term = await dbc.Term.FindAsync(d.TermID)
-                    };
-                if (d.ClassID != null) { e.Class = await dbc.Class.FindAsync(d.ClassID); }
-                await dbc.AddAsync(e);
-                dbc.Remove(d);
+                var person = await dbc.Person.FindAsync(d.PersonID);
+                var course = await dbc.Course.FindAsync(d.CourseID);
+                if (!await dbc.Enrolment.Where(x => x.TermID == d.TermID
+                                                    && x.CourseID == d.CourseID
+                                                    && x.PersonID == d.PersonID
+                                                    && (d.ClassID == null ? x.ClassID == null : x.ClassID == d.ClassID)).AnyAsync())
+                {
+                    var e = new Enrolment()
+                        {
+                            Course = course,
+                            DateEnrolled = d.DateEnrolled,
+                            IsWaitlisted = d.IsWaitlisted,
+                            Person = person,
+                            Term = await dbc.Term.FindAsync(d.TermID)
+                        };
+                    if (d.ClassID != null) { e.Class = await dbc.Class.FindAsync(d.ClassID); }
+                    await dbc.AddAsync(e);
+                    dbc.Remove(d);
+                    await SaveChangesAsync();
+                }
+                else
+                {
+                    errors.Add($"{d.Person.FullName}: {d.Course.Name}.");
+                }
             }
-            await SaveChangesAsync();
-            await messageBox.ShowAsync("Students Reinstated",
-                      $"The {SelectedDataItems.Count} selected students have been reinstated.");
+            string msg = $"The {SelectedDataItems.Count} selected students have been reinstated.";
+            if (errors.Count > 0)
+            {
+                msg = $@"{SelectedDataItems.Count - errors.Count} students have been reinstated.
+                <p>{errors.Count} students were not reinstated:</p><ul>";
+                foreach (var e in errors)
+                {
+                    msg += $"<li>{e}</li>";
+                }
+                msg += "</ul><p>because they are already enrolled.";
+            }
+            await messageBox.ShowAsync("Students Reinstated", msg);
             ClearSelection();
             await GetDropouts();
         }
@@ -273,7 +296,8 @@ else
             ().ToList())
         {
             SendTo.Add(e.Person);
-        };
+        }
+        ;
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             documentsSent = 0;
