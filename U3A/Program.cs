@@ -14,7 +14,6 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Filters;
 using Serilog.Sinks.MSSqlServer;
-using Serilog.Sinks.OpenTelemetry;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
@@ -31,10 +30,9 @@ using Azure;
 using DevExpress.Blazor.Reporting;
 using DevExpress.AIIntegration.Blazor.Reporting.Viewer.Models;
 using DevExpress.AIIntegration;
-using Microsoft.Extensions.Options;
-using DevExpress.XtraPrinting.Native;
-using OpenAI;
 using Serilog.Sinks.SystemConsole.Themes;
+using OpenAI.Assistants;
+using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -176,30 +174,28 @@ constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
 
 builder.Services.AddScoped<WorkStation>();
 
-string AIuri = builder.Configuration.GetValue<String>("AzureAIEndpoint")!;
-string AIkey = builder.Configuration.GetValue<String>("AzureAIKey")!;
+string azureAIuri = builder.Configuration.GetValue<String>("AzureAIEndpoint")!;
+string azureAIkey = builder.Configuration.GetValue<String>("AzureAIKey")!;
 string openAIkey = builder.Configuration.GetValue<String>("OpenAIKey")!;
 string model = "gpt-4o-mini";
 
-IChatClient chatClient = new AzureOpenAIClient(
-    new Uri(AIuri),
-    new AzureKeyCredential(AIkey)).AsChatClient(model);
+OpenAIClient openAiClient;
 
-IChatClient client = new ChatClientBuilder(chatClient)
-         .ConfigureOptions(x =>
-         {
-             x.Temperature = 0.2f;
-             x.TopP = 0.1f;
-             x.MaxOutputTokens = 10 | 000;
-         })
-         .Build();
+// Azure
+//openAiClient = new AzureOpenAIClient(
+//    new Uri(azureAIuri),
+//    new AzureKeyCredential(azureAIkey));
 
-var aiAssistant = new OpenAI.OpenAIClient(openAIkey);
+// OpenAI
+openAiClient = new OpenAI.OpenAIClient(openAIkey);
+
+IChatClient aiChatClient = openAiClient.AsChatClient(model);
+
 builder.Services.AddDevExpressBlazor();
-builder.Services.AddChatClient(client);
+builder.Services.AddChatClient(aiChatClient);
 builder.Services.AddDevExpressAI(config =>
 {
-    config.RegisterOpenAIAssistants(aiAssistant, "gpt-4o-mini");
+    config.RegisterOpenAIAssistants(openAiClient, "gpt-4o-mini");
     config.AddBlazorReportingAIIntegration(options =>
     {
         options.Languages = new List<LanguageItem>() {

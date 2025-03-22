@@ -9,10 +9,12 @@
 @using System.Text.Json.Schema
 @using System.Text.Json.Serialization
 @using Markdig
+@using Microsoft.Extensions.AI
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
+@inject IChatClient aiChatClient
 
 <ContextHelpTitle Title="Ai Chat (Preview)" HelpTopic="ai-chat.html"></ContextHelpTitle>
 <DxSplitter Width="100%" Height="90%">
@@ -56,9 +58,11 @@
         </DxSplitterPane>
         <DxSplitterPane>
             <div class="chat-container">
-                <DxAIChat CssClass="chat-box" 
+                <DxAIChat CssClass="chat-box"
                 Initialized="Initialized"
-                ResponseContentFormat="ResponseContentFormat.Markdown">
+                ResponseContentFormat="ResponseContentFormat.Markdown"
+                MaxTokens="10000"
+                Temperature="0.2f">
                     <MessageContentTemplate>
                         <div class="my-chat-content">
                             @ToHtml(context)
@@ -96,8 +100,10 @@
 </style>
 
 @code {
+
     async Task Initialized(IAIChat chat)
     {
+       
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             var fileName = $"Class Schedule.json";
@@ -108,7 +114,7 @@
             string prompt = $@"
         ## Introduction:
         -- You are a helpful assistant specialized in analyzing the Class Schedule which is a json document that conforms to the schema
-            {schema}
+    {schema}
         -- Your role is to assist students by providing reliable and relevant answers to their questions about the Class Schedule.
 
         ## Tasks:

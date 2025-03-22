@@ -70,7 +70,7 @@ namespace U3A.BusinessRules
                     RequiredStudents = x.Course.RequiredStudents,
                     MaximumStudents = x.Course.MaximumStudents,
                     AllowAutoEnroll = x.Course.AllowAutoEnrol,
-                    ClassType = x.Course.CourseType.Name,
+                    Category = x.Course.CourseType.Name,
                     ProvidedBy = (x.Course.OfferedBy == null)
                                 ? dbc.TenantInfo.Name : x.Course.OfferedBy,
 

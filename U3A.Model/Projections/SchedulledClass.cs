@@ -21,7 +21,7 @@ namespace U3A.Model
 
         public string Name { get; set; }
         public string Description { get; set; }
-        public string ClassType { get; set; }
+        public string Category { get; set; }
         public bool Featured { get; set; }
         public decimal FeePerYear { get; set; }
         public string? FeePerYearDescription { get; set; }
