@@ -16,6 +16,197 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
+        public static async Task<string> GetMarkdownAIChatDataAsync(U3ADbContext dbc,
+                                                        TenantDbContext dbcT,
+                                                        TenantInfoService tenantService)
+        {
+            StringBuilder sb = new();
+            var thisTenant = dbc.TenantInfo.Identifier;
+            var people = await dbc.Person.IgnoreQueryFilters().ToListAsync();
+            var otherU3APeople = await dbcT.MultiCampusPerson.Where(x => x.TenantIdentifier != thisTenant).ToListAsync();
+            foreach (var p in otherU3APeople)
+            {
+                if (people.Find(x => x.ID == p.ID) == null)
+                {
+                    people.Add(GetPersonFromMCPerson(p));
+                }
+            }
+            var data = new AIChatClassData();
+            // settings
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+
+            // Terms
+            var terms = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc);
+
+            // Classes
+            var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+            if (term == null)
+            {
+                term = await BusinessRule.CurrentTermAsync(dbc);
+            }
+            if (term != null)
+            {
+
+                var prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
+
+                // Fast lookup from Schedule cache
+                var classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, true, true);
+                // Get the schedule
+                await getCalendarForAiClass(dbc, term, classes);
+                // create the markdown
+                sb.AppendLine($"# Class Schedule for {settings.U3AGroup}");
+
+                sb.AppendLine("## Summary");
+                sb.Append($"In {term.Year}, {settings.U3AGroup} ");
+                sb.AppendLine($"offers a total of {classes.Count} classes categorised as follows...");
+                foreach (var c in classes
+                            .GroupBy(x => new { Name = x.Course.CourseType.Name })
+                            .Select(g => new { Name = g.Key.Name, Total = g.Count() }))
+                {
+                    sb.AppendLine($"- {c.Name}: {c.Total} classes");
+                }
+
+                sb.AppendLine("");
+                sb.Append("Unless otherwise stated, classes are held during during term. ");
+                sb.AppendLine($"For {term.Year} the term dates are... ");
+                foreach (var t in terms)
+                {
+                    sb.AppendLine($"- {t.Name}: {t.StartDate.ToString("d")} to {t.EndDate.ToString("d")}");
+                }
+                sb.AppendLine("### Membership Fees");
+                sb.AppendLine($"- A renewing member or a member that joins in Term 1: {settings.MembershipFee.ToString("c2")}");
+                sb.AppendLine($"- A member that joins in Term 2: {settings.MembershipFeeTerm2.ToString("c2")}");
+                sb.AppendLine($"- A member that joins in Term 3: {settings.MembershipFeeTerm3.ToString("c2")}");
+                sb.AppendLine($"- A member that joins in Term 4: {settings.MembershipFeeTerm4.ToString("c2")}");
+                if (settings.MailSurcharge != 0)
+                {
+                    sb.AppendLine($"- If mail is receive via post rather than email, a mail surcharge of {settings.MailSurcharge.ToString("c2")} applies.");
+                }
+                sb.AppendLine("");
+                sb.AppendLine("*Notes*");
+                if (settings.AllowedMemberFeePaymentTypes == MemberFeePaymentType.PerYearOnly)
+                {
+                    sb.AppendLine($"1. {term.Year} member fees must be paid in full prior to enrolemnt in classes.");
+                }
+                else
+                {
+                    sb.AppendLine($"1. {term.Year} member fees may be paid in full or in two equal instalments due on or before Term 1 and Term 3.");
+                }
+                sb.AppendLine("1. Additional Course fees may apply depending on courses enrolled.");
+                foreach (var c in classes.OrderBy(x => x.Course.Name))
+                {
+                    sb.AppendLine("{");
+                    // From Course
+                    sb.AppendLine($"## Class: {c.Course.Name}");
+                    sb.AppendLine($"### Description:{Environment.NewLine}{RemoveHtmlTags(c.Course.Description)}");
+                    GetContactsAsMarkdonw(sb, c);
+                    sb.AppendLine($"### Details");
+                    sb.AppendLine($"- **Category**:  {c.Course.CourseType.Name}");
+                    sb.AppendLine($"- **Featured Course?**: {c.Course.IsFeaturedCourse}");
+                    sb.AppendLine($"- **Fee Per Year**:  {c.Course.CourseFeePerYear.ToString("c2")}");
+                    sb.AppendLine($"- **Fee Per Year Description**:  {c.Course.CourseFeePerYearDescription}");
+                    sb.AppendLine($"- **Fee Per Term**:  {c.Course.CourseFeePerTerm.ToString("c2")}");
+                    sb.AppendLine($"- **Fee Per Term Description**:  {c.Course.CourseFeePerTermDescription}");
+                    sb.AppendLine($"- **Duration**:  {c.Course.Duration.ToString("n2")}");
+                    sb.AppendLine($"- **Required Students**:  {c.Course.RequiredStudents}");
+                    sb.AppendLine($"- **Maximum Students**:  {c.Course.MaximumStudents}");
+                    sb.AppendLine($"- **Allow Automatic Enrolment**:  {c.Course.AllowAutoEnrol}");
+                    sb.AppendLine($"- **Provided By**:  {((c.Course.OfferedBy == null) ? settings.U3AGroup : c.Course.OfferedBy)}");
+
+                    // From Class
+
+                    sb.AppendLine($"- **Offered Term 1**:  {c.OfferedTerm1}");
+                    sb.AppendLine($"- **Offered Term 2**:  {c.OfferedTerm2}");
+                    sb.AppendLine($"- **Offered Term 3**:  {c.OfferedTerm3}");
+                    sb.AppendLine($"- **Offered Term 4**:  {c.OfferedTerm4}");
+                    sb.Append($"- **Class Dates**: ");
+                    foreach (var d in c.ClassDates)
+                    {
+                        sb.Append($"{d}, ");
+                    }
+                    sb.AppendLine();
+                    sb.AppendLine($"- **Start Time**:  {TimeOnly.FromDateTime(c.StartTime).ToString()}");
+                    sb.AppendLine($"- **End Time**:  {((c.EndTime != null) ? TimeOnly.FromDateTime(c.EndTime.Value).ToString() : "")}");
+                    sb.AppendLine($"- **Occurs**:  {c.Occurrence.Name}");
+                    sb.AppendLine($"- **Repeats**:  {c.Recurrence ?? term.Duration}");
+                    sb.AppendLine($"- **On Day**:  {c.OnDay.Day}");
+                    sb.AppendLine($"- **Venue**:  {c.Venue.Name}, {c.Venue.Address}");
+                    sb.AppendLine($"- **Occurs**:  {c.OccurrenceText}");
+                    sb.AppendLine($"- **Total Active Students**:  {c.TotalActiveStudents}");
+                    sb.AppendLine($"- **Total Waitlisted Students**:  {c.TotalWaitlistedStudents}");
+                    sb.AppendLine($"- **Participation Rate**:  {c.ParticipationRate.ToString("n2")}");
+                    sb.AppendLine("}");
+
+
+                    //        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                    //        {
+                    //            foreach (var e in c.Course.Enrolments)
+                    //                AssignParticipants(c, people, sc, e);
+                    //        }
+                    //        else
+                    //        {
+                    //            foreach (var e in c.Enrolments)
+                    //                AssignParticipants(c, people, sc, e);
+                    //        }
+                    //        sc.People = sc.People.OrderBy(x => x.SortOrder).ToList();
+                    //    }
+                    //});
+                }
+            }
+            return sb.ToString();
+        }
+
+        private static void GetContactsAsMarkdonw(StringBuilder sb, Class c)
+        {
+            sb.AppendLine($"### Leaders");
+            if (!string.IsNullOrWhiteSpace(c.GuestLeader))
+            {
+                sb.AppendLine($"- **Guest Leader**:  {c.GuestLeader}");
+            }
+            if (c.Leader != null)
+            {
+                sb.AppendLine("#### Leader 1");
+                sb.AppendLine($"- **Name**: {c.Leader.FullName}");
+                sb.AppendLine($"- **Email**: {c.Leader.Email}");
+                sb.AppendLine($"- **Phone**: {c.Leader.AdjustedHomePhone}");
+                sb.AppendLine($"- **Mobile**: {c.Leader.AdjustedMobile}");
+            }
+            if (c.Leader2 != null)
+            {
+                sb.AppendLine("#### Leader 2");
+                sb.AppendLine($"- **Name**: {c.Leader2.FullName}");
+                sb.AppendLine($"- **Email**: {c.Leader2.Email}");
+                sb.AppendLine($"- **Phone**: {c.Leader2.AdjustedHomePhone}");
+                sb.AppendLine($"- **Mobile**: {c.Leader2.AdjustedMobile}");
+            }
+            if (c.Leader3 != null)
+            {
+                sb.AppendLine("#### Leader 2");
+                sb.AppendLine($"- **Name**: {c.Leader3.FullName}");
+                sb.AppendLine($"- **Email**: {c.Leader3.Email}");
+                sb.AppendLine($"- **Phone**: {c.Leader3.AdjustedHomePhone}");
+                sb.AppendLine($"- **Mobile**: {c.Leader3.AdjustedMobile}");
+            }
+            sb.AppendLine($"### Clerks");
+            if (c.Clerks.Count > 0)
+            {
+                var clerkCount = 0;
+                foreach (var clerk in c.Clerks)
+                {
+                    clerkCount++;
+                    sb.AppendLine($"#### Clerk {clerkCount}");
+                    sb.AppendLine($"- **Name**: {clerk.FullName}");
+                    sb.AppendLine($"- **Email**: {clerk.Email}");
+                    sb.AppendLine($"- **Phone**: {clerk.AdjustedHomePhone}");
+                    sb.AppendLine($"- **Mobile**: {clerk.AdjustedMobile}");
+                }
+            }
+            else
+            {
+                sb.AppendLine("- No clerks assigned to this class.");
+            }
+        }
+
         public static async Task<AIChatClassData> GetJsonAIChatClassDataAsync(U3ADbContext dbc,
                                                         TenantDbContext dbcT,
                                                         TenantInfoService tenantService)
@@ -26,7 +217,7 @@ namespace U3A.BusinessRules
             foreach (var p in otherU3APeople)
             {
                 if (people.Find(x => x.ID == p.ID) == null)
-                {                   
+                {
                     people.Add(GetPersonFromMCPerson(p));
                 }
             }
@@ -51,7 +242,7 @@ namespace U3A.BusinessRules
                 // Fast lookup from Schedule cache
                 var classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, true, true);
                 // Get the schedule
-                await getAppointmentsForAiClass(dbc, term, classes);
+                await getCalendarForAiClass(dbc, term, classes);
                 // Transpose to ScheduledClasses
                 data.Classes = classes.Select(x => new ScheduledClass()
                 {
@@ -151,7 +342,7 @@ namespace U3A.BusinessRules
                                 Email = clerk.Email,
                                 Phone = clerk.AdjustedHomePhone,
                                 Mobile = clerk.AdjustedMobile,
-                                Roles = new List<string>() { "Clerk","Student" }
+                                Roles = new List<string>() { "Clerk", "Student" }
                             });
                         }
                         if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
@@ -215,11 +406,11 @@ namespace U3A.BusinessRules
             }
             return result;
         }
-        static async Task getAppointmentsForAiClass(U3ADbContext dbc, Term term,
+        static async Task getCalendarForAiClass(U3ADbContext dbc, Term term,
             IEnumerable<Class> classes)
         {
             var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, term);
-            var range = new DxSchedulerDateTimeRange(term.StartDate, new DateTime(term.Year, 12, 31));
+            var range = new DxSchedulerDateTimeRange(dbc.GetLocalDate(), new DateTime(term.Year, 12, 31));
             Dictionary<Guid, List<DxSchedulerAppointmentItem>> classAppointments = new();
             foreach (var a in dataStorage?.GetAppointments(range))
             {

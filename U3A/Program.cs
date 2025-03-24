@@ -101,7 +101,7 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog(Log.Logger);
 
-Log.Information("Logging started {now}",DateTime.Now);
+Log.Information("Logging started {now}", DateTime.Now);
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.Model.Class).Assembly);
@@ -183,8 +183,8 @@ OpenAIClient openAiClient;
 
 // Azure
 //openAiClient = new AzureOpenAIClient(
-//    new Uri(azureAIuri),
-//    new AzureKeyCredential(azureAIkey));
+//new Uri(azureAIuri),
+//new AzureKeyCredential(azureAIkey));
 
 // OpenAI
 openAiClient = new OpenAI.OpenAIClient(openAIkey);
@@ -195,7 +195,7 @@ builder.Services.AddDevExpressBlazor();
 builder.Services.AddChatClient(aiChatClient);
 builder.Services.AddDevExpressAI(config =>
 {
-    config.RegisterOpenAIAssistants(openAiClient, "gpt-4o-mini");
+    config.RegisterOpenAIAssistants(openAiClient, model);
     config.AddBlazorReportingAIIntegration(options =>
     {
         options.Languages = new List<LanguageItem>() {
