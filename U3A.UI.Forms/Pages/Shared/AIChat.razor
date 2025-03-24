@@ -134,23 +134,29 @@
         {
             var fileName = $"Class Schedule.md";
             byte[] bytes;
-            (string json, string schema) = await GetJsonDataAsync();
-            bytes = Encoding.UTF8.GetBytes(json);
+            // (string json, string schema) = await GetJsonDataAsync();
+            // bytes = Encoding.UTF8.GetBytes(json);
 
             string md = await GetMarkdownDataAsync();
             html = Markdown.ToHtml(md);
             bytes = Encoding.UTF8.GetBytes(md);
-            string prompt = $@"
+            string prompt = @"
         ## Introduction:
-        -- You are a helpful assistant specialized in analyzing the Class Schedule which is a document in markdown format.
-        -- Your role is to assist students by providing reliable and relevant answers to their questions about the Class Schedule.
-
-        ## Tasks:
+        - You are a helpful assistant specialized in analyzing the Class Schedule which is a document in markdown format.
+        - Your role is to assist students by providing reliable and relevant answers to their questions about the Class Schedule.
+        
+        ## The structure of the Class Schedule:
+        - The document begigns with a level 1 heading which is the title of the document.
+        - The document then conatins a summary of the classes offered. 
+        - The summary begins with a level 2 heading and ends with a horizontal rule. '___'
+        - Details of each class are then provided. Each class starts with a level 2 heading with the following form...
+            '## Class: {name}'
+        - Each class ends with a horizontal rule. '___'
+        
+        ## Instructions:
         - Always provide accurate information based only on the file data.
         - Do not provide answers if the data in the file is insufficient for a reliable response.
         - do not attempt to list participants if none available.
-
-        ## Instructions:
         - when searching for classes search in the Name, class Type and Description.
         - Always identify a class by its name, day, time, venue, venue address and term offered.
         - include the day when displaying the time. For example: 'Monday 1:45 pm - 3:00pm'.

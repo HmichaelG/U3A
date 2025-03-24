@@ -93,9 +93,12 @@ namespace U3A.BusinessRules
                     sb.AppendLine($"1. {term.Year} member fees may be paid in full or in two equal instalments due on or before Term 1 and Term 3.");
                 }
                 sb.AppendLine("1. Additional Course fees may apply depending on courses enrolled.");
+                sb.AppendLine("");
+                sb.AppendLine("___");
+                sb.AppendLine("");
+
                 foreach (var c in classes.OrderBy(x => x.Course.Name))
                 {
-                    sb.AppendLine("{");
                     // From Course
                     sb.AppendLine($"## Class: {c.Course.Name}");
                     sb.AppendLine($"### Description:{Environment.NewLine}{RemoveHtmlTags(c.Course.Description)}");
@@ -120,11 +123,7 @@ namespace U3A.BusinessRules
                     sb.AppendLine($"- **Offered Term 3**:  {c.OfferedTerm3}");
                     sb.AppendLine($"- **Offered Term 4**:  {c.OfferedTerm4}");
                     sb.Append($"- **Class Dates**: ");
-                    foreach (var d in c.ClassDates)
-                    {
-                        sb.Append($"{d}, ");
-                    }
-                    sb.AppendLine();
+                    sb.AppendLine(string.Join(", ", c.ClassDates));
                     sb.AppendLine($"- **Start Time**:  {TimeOnly.FromDateTime(c.StartTime).ToString()}");
                     sb.AppendLine($"- **End Time**:  {((c.EndTime != null) ? TimeOnly.FromDateTime(c.EndTime.Value).ToString() : "")}");
                     sb.AppendLine($"- **Occurs**:  {c.Occurrence.Name}");
@@ -135,8 +134,9 @@ namespace U3A.BusinessRules
                     sb.AppendLine($"- **Total Active Students**:  {c.TotalActiveStudents}");
                     sb.AppendLine($"- **Total Waitlisted Students**:  {c.TotalWaitlistedStudents}");
                     sb.AppendLine($"- **Participation Rate**:  {c.ParticipationRate.ToString("n2")}");
-                    sb.AppendLine("}");
-
+                    sb.AppendLine("");
+                    sb.AppendLine("___");
+                    sb.AppendLine("");
 
                     //        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
                     //        {
