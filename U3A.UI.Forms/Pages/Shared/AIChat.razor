@@ -65,7 +65,7 @@
                                   UseStreaming="true"
                                   ResponseContentFormat="ResponseContentFormat.Markdown"
                                   MaxTokens="10000"
-                                  Temperature="0.7f">
+                                  Temperature="0.25f">
                             <MessageContentTemplate>
                                 <div class="my-chat-content">
                                     @ToHtml(context)
@@ -154,10 +154,10 @@
         - Each class ends with a horizontal rule. '___'
         
         ## Instructions:
-        - Always provide accurate information based only on the file data.
-        - Do not provide answers if the data in the file is insufficient for a reliable response.
+        - Always provide accurate information based only on the Class Schedule data.
+        - Do not provide answers if the data in the Class Schedule is insufficient for a reliable response.
         - do not attempt to list participants if none available.
-        - when searching for classes search in the Name, class Type and Description.
+        - when searching for classes search in the Name, Category and Description.
         - Always identify a class by its name, day, time, venue, venue address and term offered.
         - include the day when displaying the time. For example: 'Monday 1:45 pm - 3:00pm'.
         - students, leaders and clerks are participants.
@@ -168,7 +168,7 @@
         - Clerk, administrator and coordinator are interchangeable.
         - Contacts are Leaders and Clerks only.
         - A student is a contact only if also a clerk.
-        - If Total Active Students >= Maximum Students, then the class is full.
+        - If Participation Rate >= 1, then the class is full.
         - A class is closed if the class is full.
         - A class is closed if the class AllowAutoEnroll = false.
         - Always identify whether the class is open or closed giving your reason.

@@ -140,6 +140,7 @@ namespace U3A.BusinessRules
                         int enrolledCount = 0;
                         var key = kvp.Key;
                         var course = kvp.Value;
+                        bool isOnceOnlyClass = IsOnceOnlyCourse(today, course);
                         if (key.Item1 != double.MinValue)
                         {
                             Log.Information("");
@@ -171,7 +172,7 @@ namespace U3A.BusinessRules
                                                         .Include(x => x.Course)
                                                         .Include(x => x.Term)
                                                         .Include(x => x.Person)
-                                                        .Where(x => (x.TermID == SelectedTerm.ID ||
+                                                        .Where(x => (x.TermID == SelectedTerm.ID || isOnceOnlyClass ||
                                                                      (x.Course.AllowMultiCampsuFrom != null &&
                                                                      x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
                                                                         && x.CourseID == course.ID
@@ -201,7 +202,7 @@ namespace U3A.BusinessRules
                                                             .Include(x => x.Course)
                                                             .Include(x => x.Term)
                                                             .Include(x => x.Person)
-                                                            .Where(x => x.TermID == SelectedTerm.ID
+                                                            .Where(x => (x.TermID == SelectedTerm.ID || isOnceOnlyClass)
                                                                             && x.ClassID == courseClass.ID
                                                                             && x.Person.DateCeased == null
                                                                             && !CourseLeaders.Contains(x.Person))
@@ -243,11 +244,12 @@ namespace U3A.BusinessRules
                 }
             }
         }
+
         public static async Task AutoEnrolParticipantsAsync(U3ADbContext dbc, Term SelectedTerm,
                                     IEnumerable<Guid> EnrolmentIdsToProcess)
         {
             List<Enrolment> enrollments = await dbc.Enrolment
-                                    .Include(x => x.Course)
+                                    .Include(x => x.Course).ThenInclude(x => x.Classes)
                                     .Include(x => x.Term)
                                     .Include(x => x.Person)
                                     .Where(x => EnrolmentIdsToProcess.Contains(x.ID))
@@ -269,6 +271,7 @@ namespace U3A.BusinessRules
             foreach (var enrollment in enrollments)
             {
                 var course = enrollment.Course;
+                var isOnceOnlyCourse = IsOnceOnlyCourse(today, course);
                 if (!course.AllowAutoEnrol) { continue; }
                 int enrolledCount = 0;
                 CourseLeaders = new();
@@ -284,7 +287,7 @@ namespace U3A.BusinessRules
                                                 .Include(x => x.Course)
                                                 .Include(x => x.Term)
                                                 .Include(x => x.Person)
-                                                .Where(x => (x.TermID == SelectedTerm.ID ||
+                                                .Where(x => (x.TermID == SelectedTerm.ID || isOnceOnlyCourse ||
                                                              (x.Course.AllowMultiCampsuFrom != null &&
                                                              x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
                                                                 && x.CourseID == course.ID
@@ -312,7 +315,7 @@ namespace U3A.BusinessRules
                                                     .Include(x => x.Course)
                                                     .Include(x => x.Term)
                                                     .Include(x => x.Person)
-                                                    .Where(x => x.TermID == SelectedTerm.ID
+                                                    .Where(x => (x.TermID == SelectedTerm.ID || isOnceOnlyCourse)
                                                                     && x.ClassID == courseClass.ID
                                                                     && x.Person.DateCeased == null
                                                                     && !CourseLeaders.Contains(x.Person))
@@ -339,22 +342,23 @@ namespace U3A.BusinessRules
             // rank courses by popularity
             (double rank, int maxStudents, Guid courseID) key;
             SortedList<(double, int, Guid), Course> rankedCourses = new();
-            var enrolments = await dbc.Enrolment.AsNoTracking().Where(e => e.TermID == term.ID).ToListAsync();
             foreach (var course in await dbc.Course.AsNoTracking()
                                             .Include(x => x.Classes)
                                             .Where(x => x.Year == term.Year
                                                          && x.AllowAutoEnrol)
                                             .ToListAsync())
             {
+                bool isOnceOnlyCourse = IsOnceOnlyCourse(dbc.GetLocalDate(), course);
                 key = new()
                 {
                     courseID = course.ID,
                     maxStudents = course.MaximumStudents,
                     rank = double.MinValue
                 };
-                int waitlisted = enrolments.Count(e => e.CourseID == course.ID
-                                                        && e.TermID == term.ID
-                                                        && e.IsWaitlisted);
+                var enrolments = await dbc.Enrolment.AsNoTracking()
+                                            .Where(e => (e.TermID == term.ID || isOnceOnlyCourse)
+                                                            && e.CourseID == course.ID).ToListAsync();
+                int waitlisted = enrolments.Count(e => e.IsWaitlisted);
                 if (course.MaximumStudents > 0 && waitlisted > 0)
                 {
                     double classes = 1;
@@ -363,8 +367,7 @@ namespace U3A.BusinessRules
                         classes = course.Classes.Count;
                     }
                     double max = (double)course.MaximumStudents * classes;
-                    double requests = enrolments.Count(e => e.CourseID == course.ID
-                                                            && e.TermID == term.ID);
+                    double requests = enrolments.Count();
                     // Calclate the rank. Set rank to MIN_VALUE if requests > 0 & <= max OR once only class
                     // MIN_VALUE courses will be logged but will not be considered popular (constrained).
                     if (requests > max)
@@ -447,7 +450,7 @@ namespace U3A.BusinessRules
             return await ProcessEnrolments(dbc, term, course, enrolments, new List<Guid>(), false,true);
         }
         private static async Task<int> ProcessEnrolments(U3ADbContext dbc,
-                                    Term term,
+                                    Term enrolmentTerm,
                                     Course course,
                                     List<Enrolment> enrolments,
                                     List<Guid> PeoplePreviouslyEnrolled,
@@ -456,19 +459,22 @@ namespace U3A.BusinessRules
 
             int count = 0;
             var today = DateTime.UtcNow.Date;
+            var settings = await dbc.SystemSettings.AsNoTracking()
+                                    .OrderBy(x => x.ID)
+                                    .FirstAsync();
+            if (enrolments.Any(x => IsInFutureRandomAllocationPeriod(x,enrolmentTerm,settings))) { return 0; }
+            bool isOnceOnlyCourse = IsOnceOnlyCourse(today, course);
             var AlreadyEnrolledInCourse = new List<Guid>();
             if (course.EnforceOneStudentPerClass
                 && course.CourseParticipationTypeID == (int?)ParticipationType.DifferentParticipantsInEachClass)
             {
                 AlreadyEnrolledInCourse = await dbc.Enrolment.AsNoTracking().Where(x => x.CourseID == course.ID
-                                                                && x.TermID == term.ID
+                                                                && (x.TermID == enrolmentTerm.ID || isOnceOnlyCourse)
                                                                 && !x.IsWaitlisted)
                                                             .Select(x => x.PersonID).ToListAsync();
             }
+
             // Set the enrolment method
-            var settings = await dbc.SystemSettings.AsNoTracking()
-                                    .OrderBy(x => x.ID)
-                                    .FirstAsync();
             if (string.IsNullOrWhiteSpace(settings.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
             var isRandomEnrol = settings.AutoEnrolRemainderMethod.ToLower() == "random";
 
@@ -476,8 +482,8 @@ namespace U3A.BusinessRules
             // On completion IsClassAllocationFinalised is aet True.
             var DoRandomEnrol = (DisableRandomEnrolment) 
                                     ? false 
-                                    : !term.IsClassAllocationFinalised && isRandomEnrol &&
-                                            today >= GetThisTermAllocationDay(term, settings);
+                                    : !enrolmentTerm.IsClassAllocationFinalised && isRandomEnrol &&
+                                            today >= GetThisTermAllocationDay(enrolmentTerm, settings);
             int enrolled = enrolments.Where(x => !x.IsWaitlisted).Count();
             if (enrolled >= course.MaximumStudents) { return 0; }
             int waitlisted = enrolments.Where(x => x.IsWaitlisted
@@ -486,7 +492,7 @@ namespace U3A.BusinessRules
             if (waitlisted <= course.MaximumStudents - enrolled)
             {
                 Log.Information("All students enrolled because Wautlist: {Waitlist} is less than Maximum Students: {MazStudents}", waitlisted, course.MaximumStudents);
-                foreach (var e in enrolments.Where(x => x.IsWaitlisted && x.TermID == term.ID
+                foreach (var e in enrolments.Where(x => x.IsWaitlisted && (x.TermID == enrolmentTerm.ID || isOnceOnlyCourse)
                                 && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse)))
                 {
                     e.IsWaitlisted = false;
@@ -508,7 +514,7 @@ namespace U3A.BusinessRules
                         Log.Information("----------------------------------");
                         foreach (var e in enrolments
                                             .OrderBy(x => x.Random)
-                                            .Where(x => x.IsWaitlisted && x.Person.DateJoined?.Year >= term.Year - 1
+                                            .Where(x => x.IsWaitlisted && x.Person.DateJoined?.Year >= enrolmentTerm.Year - 1
                                                             && !PeoplePreviouslyEnrolled.Contains(x.PersonID)
                                                             && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse))
                                             .Take(places))
@@ -529,7 +535,7 @@ namespace U3A.BusinessRules
                     {
                         Log.Information("Processing Random Allocations");
                         Log.Information("-----------------------------");
-                        var rankedEnrolments = await GetRankedEnrolments(dbc, enrolments, term);
+                        var rankedEnrolments = await GetRankedEnrolments(isOnceOnlyCourse, dbc, enrolments, enrolmentTerm);
                         foreach (var kvp in rankedEnrolments
                                             .Where(x => x.Value.IsWaitlisted
                                                         && !IsAlreadyEnrolledInCourse(x.Value.PersonID, course, AlreadyEnrolledInCourse))
@@ -584,13 +590,35 @@ namespace U3A.BusinessRules
             return enrolments.Count(e => !e.IsWaitlisted);
         }
 
-        private static async Task<SortedList<(int, long, Guid), Enrolment>> GetRankedEnrolments(U3ADbContext dbc, IEnumerable<Enrolment> enrolments, Term term)
+        private static bool IsOnceOnlyCourse(DateTime today, Course course)
+        {
+            return course.Classes.All(x => x.StartDate != null
+                                            && x.StartDate >= today
+                                            && x.OccurrenceID == (int)OccurrenceType.OnceOnly);
+        }
+
+        private static bool IsInFutureRandomAllocationPeriod(Enrolment enrolment, Term enrolmentTerm, SystemSettings settings)
+        {
+            var randomAllocationPeriod = settings.AutoEnrolAllocationOccurs;
+            var thisTermNumber = enrolment.Term.TermNumber;
+            switch (randomAllocationPeriod)
+            {
+                case AutoEnrollOccurrence.Annually:
+                    return false;
+                case AutoEnrollOccurrence.Semester:
+                    return (enrolmentTerm.TermNumber <= 2 && thisTermNumber > 2) ;
+                case AutoEnrollOccurrence.Term:
+                    return true;
+                default: throw new InvalidOperationException();
+            }
+        }
+        private static async Task<SortedList<(int, long, Guid), Enrolment>> GetRankedEnrolments(bool isOnceOnlyCourse, U3ADbContext dbc, IEnumerable<Enrolment> enrolments, Term term)
         {
             (int courses, long random, Guid personID) key;
             SortedList<(int, long, Guid), Enrolment> rankedEnrolments = new();
             var people = enrolments.Select(x => x.PersonID).ToList();
             var courseCounts = await dbc.Enrolment
-                                .Where(e => e.TermID == term.ID
+                                .Where(e => (e.TermID == term.ID || isOnceOnlyCourse)
                                                 && people.Contains(e.PersonID)
                                                 && !e.IsWaitlisted
                                                 )
