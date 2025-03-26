@@ -33,6 +33,20 @@ HeaderText="Communicate">
                         Your email will be routed through Postmark's servers but members wil not receive it.<br />
                         Please use sparingly, all email delivered or not incurs usage cost.
                     </div>
+                    <div class="alert alert-info text-dark text-center">
+                        @{
+                            var financial = SendTo.Count(x => x.FinancialTo >= term?.Year);
+                            var unFinancial = SendTo.Count(x => x.FinancialTo < term?.Year);
+                        }
+                        <div class="h6">Please Confirm!</div>
+                        Your will be communicating with <b>@(SendTo.Count)</b> participants.
+                        <div class="list-container">
+                            <ul class="centered-list">
+                                <li><b>@financial</b> financial participants, and</li>
+                                <li><b>@unFinancial</b> participants not financial.</li>
+                            </ul>
+                        </div>
+                    </div>
                     <DxFormLayoutGroup Caption="Parameters" CaptionPosition="CaptionPosition.Vertical">
                         <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
                             <DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
@@ -52,7 +66,7 @@ HeaderText="Communicate">
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Email Preheader" ColSpanMd="12" Visible="@IsEmail">
                             <DxTextBox @bind-Text="@SelectedDocumentTemplate.EmailPreheader"
-                                       NullText="A short introduction displayed in the email inbox." />
+                            NullText="A short introduction displayed in the email inbox." />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="From Address" ColSpanMd="12" Visible="@IsEmail">
                             <DxComboBox Data="@emailAddresses" AllowUserInput="true"
@@ -179,6 +193,17 @@ HeaderText="Communicate">
     display: @((isEmailEnabled) ? "block" : "none");
     }
 
+    ul.centered-list {
+        display: inline-block;
+        text-align: left;
+        padding-bottom: 0px;
+        margin-bottom: 0px;
+    }
+
+    div.list-container {
+        text-align: center;
+    }
+
 </style>
 
 @code {
@@ -219,12 +244,15 @@ HeaderText="Communicate">
     byte[] pdfContent;
     Progress? progressBar;
     bool isEmailEnabled;
+    Term term;
 
     TaskCompletionSource<bool>? tcs;
 
     protected override async Task OnInitializedAsync()
     {
         var tInfo = await tenantService.GetTenantInfoAsync();
+        term = await BusinessRule.CurrentEnrolmentTermAsync(dbContext)
+                ?? await BusinessRule.CurrentTermAsync(dbContext);
         isEmailEnabled = tInfo.UsePostmarkTestEnviroment;
         base.OnInitializedAsync();
     }
