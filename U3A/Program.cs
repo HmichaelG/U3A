@@ -33,6 +33,7 @@ using DevExpress.AIIntegration;
 using Serilog.Sinks.SystemConsole.Themes;
 using OpenAI.Assistants;
 using OpenAI;
+using Serilog.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -182,9 +183,9 @@ string model = "gpt-4o-mini";
 OpenAIClient openAiClient;
 
 // Azure
-//openAiClient = new AzureOpenAIClient(
-//new Uri(azureAIuri),
-//new AzureKeyCredential(azureAIkey));
+openAiClient = new AzureOpenAIClient(
+new Uri(azureAIuri),
+new AzureKeyCredential(azureAIkey));
 
 // OpenAI
 openAiClient = new OpenAI.OpenAIClient(openAIkey);
@@ -213,6 +214,7 @@ builder.Services.AddDevExpressAI(config =>
     });
 });
 
+builder.Services.AddSingleton<IAIExceptionHandler>(new AIExceptionHandler());
 
 //**** End local modifications ****
 

@@ -133,7 +133,20 @@ namespace U3A.BusinessRules
                     sb.AppendLine($"- **Occurs**:  {c.OccurrenceText}");
                     sb.AppendLine($"- **Total Active Students**:  {c.TotalActiveStudents}");
                     sb.AppendLine($"- **Total Waitlisted Students**:  {c.TotalWaitlistedStudents}");
-                    sb.AppendLine($"- **Participation Rate**:  {c.ParticipationRate.ToString("n2")}");
+                    sb.AppendLine($"- **Participation Rate**:  {c.ParticipationRate.ToString("p2")}");
+                    sb.Append("- **Status**: ");
+                    if (c.ParticipationRate >= 1)
+                    {
+                        sb.AppendLine("Class is Full. New enrolment requests will be Waitlisted.");
+                    }
+                    else if (!c.Course.AllowAutoEnrol)
+                    {
+                        sb.AppendLine("Class is Closed. New enrolment requestss will be Waitlisted.");
+                    }
+                    else
+                    {
+                        sb.AppendLine("Class is Open. New enrolment requests will be accepted.");
+                    }
                     sb.AppendLine("");
                     sb.AppendLine("___");
                     sb.AppendLine("");

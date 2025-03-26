@@ -61,11 +61,11 @@
                 <DxTabPage Text="AI Chat">
                     <div class="chat-container">
                         <DxAIChat CssClass="chat-box"
-                                  Initialized="Initialized"
-                                  UseStreaming="true"
-                                  ResponseContentFormat="ResponseContentFormat.Markdown"
-                                  MaxTokens="10000"
-                                  Temperature="0.25f">
+                        Initialized="Initialized"
+                        UseStreaming="true"
+                        ResponseContentFormat="ResponseContentFormat.Markdown"
+                        MaxTokens="20000"
+                        Temperature="0.25f">
                             <MessageContentTemplate>
                                 <div class="my-chat-content">
                                     @ToHtml(context)
@@ -86,39 +86,39 @@
 
 <style>
     .chat-container {
-        width: 95%;
-        margin: auto;
-        border: 1px solid #ccc;
-        border-radius: 10px;
+    width: 95%;
+    margin: auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
     }
 
     .chat-box {
-        width: 100%;
-        height: 80dvh;
-        padding: 10px;
+    width: 100%;
+    height: 80dvh;
+    padding: 10px;
     }
 
     .source-box {
-        width: 95%;
-        height: 80dvh;
-        padding: 10px;
-        margin: auto;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        scroll-behavior: smooth;
-        overflow: auto;
+    width: 95%;
+    height: 80dvh;
+    padding: 10px;
+    margin: auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    scroll-behavior: smooth;
+    overflow: auto;
     }
 
     h3 {
-        font-size: clamp(12px,2.5vw,1);
+    font-size: clamp(12px,2.5vw,1);
     }
 
     h4 {
-        font-size: clamp(9px,2vw,1);
+    font-size: clamp(9px,2vw,1);
     }
 
     h1, h2, h3, h4 {
-        margin-top: 10px;
+    margin-top: 10px;
     }
 
 </style>
@@ -142,17 +142,17 @@
             bytes = Encoding.UTF8.GetBytes(md);
             string prompt = @"
         ## Introduction:
-        - You are a helpful assistant specialized in analyzing the Class Schedule which is a document in markdown format.
+        - You are a helpful assistant specialized in analyzing the Class Schedule, a document in markdown format.
         - Your role is to assist students by providing reliable and relevant answers to their questions about the Class Schedule.
-        
-        ## The structure of the Class Schedule:
+
+        ## Structure of the Class Schedule:
         - The document begigns with a level 1 heading which is the title of the document.
         - The document then conatins a summary of the classes offered. 
         - The summary begins with a level 2 heading and ends with a horizontal rule. '___'
         - Details of each class are then provided. Each class starts with a level 2 heading with the following form...
             '## Class: {name}'
         - Each class ends with a horizontal rule. '___'
-        
+
         ## Instructions:
         - Always provide accurate information based only on the Class Schedule data.
         - Do not provide answers if the data in the Class Schedule is insufficient for a reliable response.
@@ -168,10 +168,8 @@
         - Clerk, administrator and coordinator are interchangeable.
         - Contacts are Leaders and Clerks only.
         - A student is a contact only if also a clerk.
-        - If Participation Rate >= 1, then the class is full.
-        - A class is closed if the class is full.
-        - A class is closed if the class AllowAutoEnroll = false.
-        - Always identify whether the class is open or closed giving your reason.
+        - If 'Participation Rate' >= 100%, then the class is full.
+        - Always show class status.
 ";
             using (var ms = new MemoryStream(bytes))
             {
@@ -189,7 +187,6 @@
         var text = message.Content;
         var html = Markdown.ToHtml(ClearAnnotations(text));
         html = ClearParagraphBreakPassOne(html);
-        html = ClearParagraphBreakPassTwo(html);
         Console.WriteLine(html);
         return (MarkupString)html;
     }
@@ -198,13 +195,6 @@
     {
         string pattern = @"<li><p>(.*?)</p>";
         string replacement = @"<br/><li>$1</li>";
-        return Regex.Replace(text, pattern, replacement);
-    }
-
-    string ClearParagraphBreakPassTwo(string text)
-    {
-        string pattern = @"<p>(.*?)</p>";
-        string replacement = @"$1";
         return Regex.Replace(text, pattern, replacement);
     }
 
