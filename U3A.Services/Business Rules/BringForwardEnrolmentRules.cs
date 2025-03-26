@@ -44,6 +44,11 @@ namespace U3A.BusinessRules
             return await dbc.Term
                             .Where(x => x.Year == sourceTerm.Year + 1 && x.TermNumber == 1).FirstOrDefaultAsync();
         }
+        public static async Task<Term?> GetFirstTermThisYearAsync(U3ADbContext dbc, Term? sourceTerm)
+        {
+            return await dbc.Term
+                            .Where(x => x.Year == sourceTerm.Year && x.TermNumber == 1).FirstOrDefaultAsync();
+        }
 
         public static async Task BringForwardEnrolmentsAsync(U3ADbContext dbc,
                     Term? sourceTerm, Term? targetTerm, bool SetCurrentTerm)
