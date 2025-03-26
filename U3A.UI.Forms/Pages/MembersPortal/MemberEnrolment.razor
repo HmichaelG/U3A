@@ -50,7 +50,6 @@ else
         {
             <p class="alert alert-danger text-dark col-12 my-2" align="center">
                 @(enrolmentLockoutText)
-                @(enrolmentLockoutText)
             </p>
         }
         <div class="list-detail mx-auto" hidden=@(isListboxShowingSummary || IsReadOnly)>
@@ -118,9 +117,9 @@ else
                                         @(HighlightSearchText(ClassTitle(c)))
                                         <span>
                                             @(
-                                                (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                                ? $" | {c.Course.OfferedBy}" : "")
-                                                    )
+                                                        (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                        ? $" | {c.Course.OfferedBy}" : "")
+                                                            )
                                         </span>
                                     </div>
                                     @if (IsEnrolmentRequestView)
@@ -592,7 +591,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-
         newEnrolmentGuids = new List<Guid>();
         var listHeightValue = 0;
         if (ws.UseTopMenu) listHeightValue = 4;
@@ -721,8 +719,7 @@ else
         }
         else
         {
-            var style = await localStorage.GetItemAsync<int?>("ClassListStyle");
-            if (style != null) reportStyle = (ReportStyle)style;
+            await SetReportStyle();
             if (Classes != null && QRClassID != null)
             {
                 // We have a class ID passed in via QueryRequest
@@ -740,6 +737,16 @@ else
             }
         }
         ProgressBar?.Close();
+    }
+
+    async Task SetReportStyle()
+    {
+        var style = await localStorage.GetItemAsync<int?>("ClassListStyle");
+        if (style != null) {
+            var thisStyle = (ReportStyle)style;
+            if (thisStyle != reportStyle) { reportStyle = thisStyle; }
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     async Task OnReportStyleChanged(ReportStyle value)
