@@ -33,23 +33,25 @@
     <None Include="wwwroot\favicon\site.webmanifest" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Aspire.Azure.AI.OpenAI" Version="9.1.0-preview.1.25121.10" />
+    <PackageReference Include="Aspire.Hosting.Azure.CognitiveServices" Version="9.1.0" />
     <PackageReference Include="Aspire.Hosting.SqlServer" Version="9.1.0" />
     <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="9.1.0" />
-    <PackageReference Include="Azure.AI.OpenAI" Version="2.2.0-beta.2" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.2.0-beta.4" />
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />
     <PackageReference Include="Azure.Identity" Version="1.14.0-beta.1" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="CommonPasswordsValidator" Version="1.5.0" />
-    <PackageReference Include="DevExpress.AIIntegration.Blazor" Version="24.2.5" />
-    <PackageReference Include="DevExpress.AIIntegration.Blazor.Reporting.Viewer" Version="24.2.5" />
-    <PackageReference Include="DevExpress.AIIntegration.OpenAI" Version="24.2.5" />
-    <PackageReference Include="DevExpress.Blazor" Version="24.2.5" />
-    <PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="24.2.5" />
-    <PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="24.2.5" />
-    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="24.2.5" />
-    <PackageReference Include="DevExpress.Blazor.Themes" Version="24.2.5" />
-    <PackageReference Include="DevExpress.Drawing" Version="24.2.5" />
-    <PackageReference Include="DevExpress.Drawing.Skia" Version="24.2.5" />
+    <PackageReference Include="DevExpress.AIIntegration.Blazor" Version="24.2.6" />
+    <PackageReference Include="DevExpress.AIIntegration.Blazor.Reporting.Viewer" Version="24.2.6" />
+    <PackageReference Include="DevExpress.AIIntegration.OpenAI" Version="24.2.6" />
+    <PackageReference Include="DevExpress.Blazor" Version="24.2.6" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="24.2.6" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="24.2.6" />
+    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="24.2.6" />
+    <PackageReference Include="DevExpress.Blazor.Themes" Version="24.2.6" />
+    <PackageReference Include="DevExpress.Drawing" Version="24.2.6" />
+    <PackageReference Include="DevExpress.Drawing.Skia" Version="24.2.6" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.3" />
@@ -59,13 +61,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.AI" Version="9.3.0-preview.1.25114.11" />
-    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.3.0-preview.1.25114.11" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="9.3.0-preview.1.25161.3" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.3.0-preview.1.25161.3" />
     <PackageReference Include="Serilog" Version="4.2.1-dev-02340" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.1-dev-00046" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.1.1" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.2.0" />
     <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.1.1" />
     <PackageReference Include="System.Numerics.Tensors" Version="9.0.3" />
   </ItemGroup>
