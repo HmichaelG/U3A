@@ -608,9 +608,7 @@ namespace U3A.BusinessRules
         private static bool IsFutureCourse(DateTime today, Course course, DxSchedulerDataStorage calendar)
         {
             bool result = false;
-            result = course.Classes.All(x => x.StartDate != null
-                                            && x.StartDate >= today
-                                            && x.OccurrenceID == (int)OccurrenceType.OnceOnly);
+            result = course.Classes.All(x => x.OccurrenceID == (int)OccurrenceType.OnceOnly);
             if (!result)
             {
                 var start = new DateTime(today.Year, 1, 1);
