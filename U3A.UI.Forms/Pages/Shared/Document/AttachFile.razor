@@ -75,6 +75,8 @@
 @code {
     [Parameter, EditorRequired]
     public List<String>? Attachments { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<IEnumerable<string>> AttachmentsChanged { get; set; }
     bool PopupVisible = false;
 
     int SelectedFilesCount;
@@ -123,7 +125,11 @@
         return tcs.Task;
     }
 
-    void AffirmativeButtonClicked() {
+    async Task AffirmativeButtonClicked() {
+        if (Attachments.Count > 0)
+        {
+            await AttachmentsChanged.InvokeAsync(Attachments);
+        }
         PopupVisible = false;
         tcs?.TrySetResult(true);
     }
