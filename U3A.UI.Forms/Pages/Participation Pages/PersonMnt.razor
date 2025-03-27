@@ -67,237 +67,250 @@
 
         <FullScreen DisplayOffset="@((IsEmbedded) ? 19 : 8)" HideToggle="@IsEmbedded">
             <ContentTemplate>
-                <DxGrid Data="@Persons" @ref=@mainGrid
-                        @bind-SelectedDataItems="@SelectedDataItems"
-                        KeyFieldName="ID"
-                        VirtualScrollingEnabled="true"
-                        PopupEditFormCssClass="popup-width"
-                        EditMode="GridEditMode.PopupEditForm"
-                        UnboundColumnData="Grid_UnboundColumnData"
-                        CustomizeEditModel="Grid_CustomizeEditModel"
-                        EditModelSaving="Grid_EditModelSaving"
-                        PopupEditFormHeaderText="Add/Edit Participant"
-                        DataItemDeleting="Grid_DataItemDeleting">
-                    <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey"
-                                     SpreadsheetHeaderRows="2"
-                                     ToolbarFilterClosed="@(OnToolbarFilterClosed)">
-                            <CustomButtonContent>
-                                <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                                               Visible="@(!IsEmbedded)"
-                                               BeginGroup=true
-                                               Click=@OnCommunicate
-                                               RenderStyle="ButtonRenderStyle.Primary"
-                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                               Alignment="ToolbarItemAlignment.Right"
-                                               Tooltip="Send email and/or SMS to participants">
-                                </DxToolbarItem>
-                                <DxToolbarItem Visible="@IsEmbedded" Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
-                                    <Template>
-                                        <ContextHelpTitle Title="" HelpTopic="Add_Edit-Participants.html"
-                                                          ButtonIconCssClass="bi bi-question-circle-fill help-btn"
-                                                          ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
-                                    </Template>
-                                </DxToolbarItem>
-                            </CustomButtonContent>
-                        </GridToolbar>
-                    </ToolbarTemplate>
-                    <Columns>
-                        <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
-                                               Width="2rem" Visible="@(!IsEmbedded)" />
-                        <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
-                                               Width="6rem" DeleteButtonVisible=@(!IsEmbedded) />
-                        <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
-                                          Caption="ID" FieldName="PersonIdentity" Width="4rem" />
-                        <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
-                                          Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
-                        <DxGridDataColumn Caption="Gender" FieldName="Gender" Width="5rem" />
-                        <DxGridDataColumn Caption="LegacyID" FieldName="ConversionID" Visible=false DisplayFormat="{0:F0}" />
-                        <DxGridBandColumn Caption="Address">
-                            <Columns>
-                                <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
-                                <DxGridDataColumn Caption="City" FieldName="City" Width="9rem" />
-                                <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
-                                <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" />
-                            </Columns>
-                        </DxGridBandColumn>
-                        <DxGridBandColumn Caption="Contact Detail">
-                            <Columns>
-                                <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="15rem" />
-                                <DxGridDataColumn Caption="Domain" FieldName="Domain" Visible=false />
-                                <DxGridDataColumn Caption="Phone" FieldName="HomePhone" Visible=false />
-                                <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="5rem" />
-                                <DxGridDataColumn Caption="Silent?" FieldName="SilentNumberShortDisplayText" Visible=true Width="4rem" />
-                            </Columns>
-                        </DxGridBandColumn>
-                        <DxGridBandColumn Caption="Mail Options">
-                            <Columns>
-                                <DxGridDataColumn Caption="Trx Via" FieldName="@nameof(Person.SendTransactionalEmailVia)" Visible=true Width="5rem" />
-                                <DxGridDataColumn Caption="B'cast Via" FieldName="Communication" Visible=true Width="5rem" />
-                                <DxGridDataColumn Caption="SMS Opt-Out?" FieldName="SMSOptOut" Visible=false Width="6rem" />
-                            </Columns>
-                        </DxGridBandColumn>
-                        <DxGridBandColumn Caption="Leadership Role">
-                            <Columns>
-                                <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="5rem" />
-                                <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Visible="@true" Width="5rem" />
-                                <DxGridDataColumn Caption="Life?" FieldName="IsLifeMember" Visible="@true" Width="5rem" />
-                            </Columns>
-                        </DxGridBandColumn>
-                        <DxGridBandColumn Caption="Emergency Contact" Visible="false">
-                            <Columns>
-                                <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=false />
-                                <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=false />
-                            </Columns>
-                        </DxGridBandColumn>
-                        <DxGridDataColumn Caption="Vax-Cert?" FieldName="VaxCertificateViewed" Visible="@settings.RequireVaxCertificate" Width="4rem" />
-                        <DxGridDataColumn Caption="Occupation" FieldName="Occupation" Visible=false />
-                        <DxGridDataColumn Caption="DOB" FieldName="BirthDate" Visible="false" Width="6rem" />
-                        <DxGridDataColumn Caption="Month Born" FieldName="BirthMonthName" Width="6rem" />
-                        <DxGridDataColumn Caption="Joined" FieldName="DateJoined" Width="6rem" />
-                        <DxGridDataColumn Caption="T&C's Agreed"
-                                          UnboundType="GridUnboundColumnType.DateTime"
-                                          FieldName="TermsLastAgreed" Width="6rem" DisplayFormat="d/M/yy HH:mm" />
-                        <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToBriefText" Width="6rem" SortMode="GridColumnSortMode.Value" />
-                        <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
-                        <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
-                                          DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
-                    </Columns>
-                    <GroupSummary>
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                           FieldName="ID" DisplayText="{0:n0}  Participants"
-                                           FooterColumnName="FullNameAlpha" />
-                    </GroupSummary>
-                    <TotalSummary>
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                           FieldName="ID" DisplayText="{0:n0}  Participants"
-                                           FooterColumnName="FullNameAlpha" />
-                    </TotalSummary>
+                <DxSplitter Orientation="Orientation.Vertical" SeparatorSize="10">
+                    <Panes>
+                        <DxSplitterPane>
+                            <DxGrid Data="@Persons" @ref=@mainGrid CssClass="h-100"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    ShowFilterRow="false"
+                                    ShowSearchBox="false"
+                                    KeyFieldName="ID"
+                                    VirtualScrollingEnabled="true"
+                                    PopupEditFormCssClass="popup-width"
+                                    EditMode="GridEditMode.PopupEditForm"
+                                    UnboundColumnData="Grid_UnboundColumnData"
+                                    CustomizeEditModel="Grid_CustomizeEditModel"
+                                    EditModelSaving="Grid_EditModelSaving"
+                                    PopupEditFormHeaderText="Add/Edit Participant"
+                                    DataItemDeleting="Grid_DataItemDeleting">
+                                <ToolbarTemplate>
+                                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey"
+                                                 SpreadsheetHeaderRows="2"
+                                                 ToolbarFilterClosed="@(OnToolbarFilterClosed)">
+                                        <CustomButtonContent>
+                                            <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+                                                           Visible="@(!IsEmbedded)"
+                                                           BeginGroup=true
+                                                           Click=@OnCommunicate
+                                                           RenderStyle="ButtonRenderStyle.Primary"
+                                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                           Alignment="ToolbarItemAlignment.Right"
+                                                           Tooltip="Send email and/or SMS to participants">
+                                            </DxToolbarItem>
+                                            <DxToolbarItem Visible="@IsEmbedded" Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                                                <Template>
+                                                    <ContextHelpTitle Title="" HelpTopic="Add_Edit-Participants.html"
+                                                                      ButtonIconCssClass="bi bi-question-circle-fill help-btn"
+                                                                      ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                                                </Template>
+                                            </DxToolbarItem>
+                                        </CustomButtonContent>
+                                    </GridToolbar>
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                           Width="2rem" Visible="@(!IsEmbedded)" />
+                                    <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
+                                                           Width="6rem" DeleteButtonVisible=@(!IsEmbedded) />
+                                    <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                      Caption="ID" FieldName="PersonIdentity" Width="4rem" />
+                                    <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                      Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
+                                    <DxGridDataColumn Caption="Gender" FieldName="Gender" Width="5rem" />
+                                    <DxGridDataColumn Caption="LegacyID" FieldName="ConversionID" Visible=false DisplayFormat="{0:F0}" />
+                                    <DxGridBandColumn Caption="Address">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
+                                            <DxGridDataColumn Caption="City" FieldName="City" Width="9rem" />
+                                            <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
+                                            <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Contact Detail">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="15rem" />
+                                            <DxGridDataColumn Caption="Domain" FieldName="Domain" Visible=false />
+                                            <DxGridDataColumn Caption="Phone" FieldName="HomePhone" Visible=false />
+                                            <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="5rem" />
+                                            <DxGridDataColumn Caption="Silent?" FieldName="SilentNumberShortDisplayText" Visible=true Width="4rem" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Mail Options">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Trx Via" FieldName="@nameof(Person.SendTransactionalEmailVia)" Visible=true Width="5rem" />
+                                            <DxGridDataColumn Caption="B'cast Via" FieldName="Communication" Visible=true Width="5rem" />
+                                            <DxGridDataColumn Caption="SMS Opt-Out?" FieldName="SMSOptOut" Visible=false Width="6rem" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Leadership Role">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="5rem" />
+                                            <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Visible="@true" Width="5rem" />
+                                            <DxGridDataColumn Caption="Life?" FieldName="IsLifeMember" Visible="@true" Width="5rem" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Emergency Contact" Visible="false">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=false />
+                                            <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=false />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridDataColumn Caption="Vax-Cert?" FieldName="VaxCertificateViewed" Visible="@settings.RequireVaxCertificate" Width="4rem" />
+                                    <DxGridDataColumn Caption="Occupation" FieldName="Occupation" Visible=false />
+                                    <DxGridDataColumn Caption="DOB" FieldName="BirthDate" Visible="false" Width="6rem" />
+                                    <DxGridDataColumn Caption="Month Born" FieldName="BirthMonthName" Width="6rem" />
+                                    <DxGridDataColumn Caption="Joined" FieldName="DateJoined" Width="6rem" />
+                                    <DxGridDataColumn Caption="T&C's Agreed"
+                                                      UnboundType="GridUnboundColumnType.DateTime"
+                                                      FieldName="TermsLastAgreed" Width="6rem" DisplayFormat="d/M/yy HH:mm" />
+                                    <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToBriefText" Width="6rem" SortMode="GridColumnSortMode.Value" />
+                                    <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
+                                    <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
+                                                      DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
+                                </Columns>
+                                <GroupSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                       FieldName="ID" DisplayText="{0:n0}  Participants"
+                                                       FooterColumnName="FullNameAlpha" />
+                                </GroupSummary>
+                                <TotalSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                       FieldName="ID" DisplayText="{0:n0}  Participants"
+                                                       FooterColumnName="FullNameAlpha" />
+                                </TotalSummary>
 
-                    <EditFormTemplate Context="EditFormContext">
-                        @{
-                            var editItem = (Person)EditFormContext.EditModel;
-                        }
-                        <ValidationSummary Model="editItem" />
-                        <DxFormLayout style="white-space:nowrap">
-                            <div style="white-space:normal" class="m-2 w-100 alert alert-warning text-center" hidden="@(!isEmailEditing)">
-                                <strong>NB:</strong> The recommended way of changing an Email address is via <b>Manage Credentials</b> within the  Member Portal.
-                                <br />Changing an Email address using this procedure should be considered a measure of last resort as it bypasses important validation checks.
-                            </div>
-                            <DxFormLayoutGroup Caption="Personal" ColSpanMd="6">
-                                <DxFormLayoutItem Caption="Title" ColSpanMd="12">
-                                    <DxComboBox TData="string" TValue="string"
-                                                NullText="(Optional) Select or Enter Title"
-                                                Data="@titles"
-                                                @bind-Text="@editItem.Title"
-                                                AllowUserInput="true" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.FirstName" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.LastName" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12">
-                                    <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
-                                               @bind-Text="@editItem.PostNominals" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
-                                    <DxComboBox Data="@gender" @bind-Value="@editItem.Gender" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
-                                    <DxDateEdit @bind-Date="@editItem.BirthDate"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
-                                    <DxMemo @bind-Text="@editItem.Occupation" Rows="3" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                            </DxFormLayoutGroup>
-                            <DxFormLayoutGroup Caption="Address / Contact Information" ColSpanMd="6">
-                                <DxFormLayoutItem Caption="Street" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Address" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="City" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.City" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="State" ColSpanMd="6">
-                                    <DxComboBox Data="@states" @bind-Value="@editItem.State" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
-                                    <DxSpinEdit @bind-Value="@editItem.Postcode" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                                    <ChildContent>
-                                        <div class="d-flex">
-                                            <DxTextBox @bind-Text="@editItem.Email" CssClass="flex-grow-1"
-                                                       onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"
-                                                       autocomplete="new-password"
-                                                       ReadOnly="@(!isEmailEditing)" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                            </DxTextBox>
-                                            <DxButton CssClass="flex-grow-0"
-                                                      IconCssClass="bi bi-pencil"
-                                                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                      Click="@(() => {isEmailEditing = !isEmailEditing;})" />
+                                <EditFormTemplate Context="EditFormContext">
+                                    @{
+                                        var editItem = (Person)EditFormContext.EditModel;
+                                    }
+                                    <ValidationSummary Model="editItem" />
+                                    <DxFormLayout style="white-space:nowrap">
+                                        <div style="white-space:normal" class="m-2 w-100 alert alert-warning text-center" hidden="@(!isEmailEditing)">
+                                            <strong>NB:</strong> The recommended way of changing an Email address is via <b>Manage Credentials</b> within the  Member Portal.
+                                            <br />Changing an Email address using this procedure should be considered a measure of last resort as it bypasses important validation checks.
                                         </div>
-                                    </ChildContent>
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Home Phone" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.HomePhone" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Mobile Phone" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.Mobile" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
-                                    <DxComboBox Data="silentContactList"
-                                                @bind-Value="@editItem.SilentContact"
-                                                ValueFieldName="@nameof(SilentContactWrapper.Type)"
-                                                TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
-                                    </DxComboBox>
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Mail Preference" ColSpanMd="6">
-                                    <DxComboBox Data="@Communication" @bind-Value="@editItem.Communication" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
-                                    <DxCheckBox @bind-Checked="@editItem.SMSOptOut"
-                                                Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                            </DxFormLayoutGroup>
-                            <DxFormLayoutGroup Caption="In Case of Emergency" ColSpanMd="6">
-                                <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.ICEContact" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@editItem.ICEPhone" autocomplete="new-password" />
-                                </DxFormLayoutItem>
-                            </DxFormLayoutGroup>
+                                        <DxFormLayoutGroup Caption="Personal" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Title" ColSpanMd="12">
+                                                <DxComboBox TData="string" TValue="string"
+                                                            NullText="(Optional) Select or Enter Title"
+                                                            Data="@titles"
+                                                            @bind-Text="@editItem.Title"
+                                                            AllowUserInput="true" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.FirstName" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.LastName" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12">
+                                                <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
+                                                           @bind-Text="@editItem.PostNominals" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
+                                                <DxComboBox Data="@gender" @bind-Value="@editItem.Gender" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@editItem.BirthDate"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
+                                                <DxMemo @bind-Text="@editItem.Occupation" Rows="3" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
+                                        <DxFormLayoutGroup Caption="Address / Contact Information" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Street" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.Address" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="City" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.City" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="State" ColSpanMd="6">
+                                                <DxComboBox Data="@states" @bind-Value="@editItem.State" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
+                                                <DxSpinEdit @bind-Value="@editItem.Postcode" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Email" ColSpanMd="12">
+                                                <ChildContent>
+                                                    <div class="d-flex">
+                                                        <DxTextBox @bind-Text="@editItem.Email" CssClass="flex-grow-1"
+                                                                   onblur="@((EventArgs e) => {if (isEmailEditing) isEmailEditing = false;})"
+                                                                   autocomplete="new-password"
+                                                                   ReadOnly="@(!isEmailEditing)" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                        </DxTextBox>
+                                                        <DxButton CssClass="flex-grow-0"
+                                                                  IconCssClass="bi bi-pencil"
+                                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                  Click="@(() => {isEmailEditing = !isEmailEditing;})" />
+                                                    </div>
+                                                </ChildContent>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Home Phone" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.HomePhone" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Mobile Phone" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.Mobile" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
+                                                <DxComboBox Data="silentContactList"
+                                                            @bind-Value="@editItem.SilentContact"
+                                                            ValueFieldName="@nameof(SilentContactWrapper.Type)"
+                                                            TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
+                                                </DxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Mail Preference" ColSpanMd="6">
+                                                <DxComboBox Data="@Communication" @bind-Value="@editItem.Communication" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
+                                                <DxCheckBox @bind-Checked="@editItem.SMSOptOut"
+                                                            Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
+                                        <DxFormLayoutGroup Caption="In Case of Emergency" ColSpanMd="6">
+                                            <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.ICEContact" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@editItem.ICEPhone" autocomplete="new-password" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
 
-                            <DxFormLayoutGroup Caption="Membership" ColSpanMd="6">
-                                <Items>
-                                    <DxFormLayoutItem Caption="Financial To" ColSpanMd="6">
-                                        <DxTextBox Text="@editItem.FinancialToText"
-                                                   TextExpression="@(() => editItem.FinancialToText)"
-                                                   ReadOnly="true" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem Caption="Date Joined" ColSpanMd="6">
-                                        <DxDateEdit @bind-Date="@editItem.DateJoined" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem Caption="Date Ceased" ColSpanMd="6">
-                                        <DxDateEdit @bind-Date="@editItem.DateCeased" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem Caption="Life Member?" ColSpanMd="6">
-                                        <DxCheckBox @bind-Checked="@editItem.IsLifeMember"
-                                                    Alignment="CheckBoxContentAlignment.Right" />
-                                    </DxFormLayoutItem>
-                                    <DxFormLayoutItem Caption="Vax Certificate?" ColSpanMd="6"
-                                                      Visible="@settings.RequireVaxCertificate">
-                                        <DxCheckBox @bind-Checked="@editItem.VaxCertificateViewed"
-                                                    Alignment="CheckBoxContentAlignment.Right" />
-                                    </DxFormLayoutItem>
-                                </Items>
-                            </DxFormLayoutGroup>
-                        </DxFormLayout>
-                    </EditFormTemplate>
-                </DxGrid>
+                                        <DxFormLayoutGroup Caption="Membership" ColSpanMd="6">
+                                            <Items>
+                                                <DxFormLayoutItem Caption="Financial To" ColSpanMd="6">
+                                                    <DxTextBox Text="@editItem.FinancialToText"
+                                                               TextExpression="@(() => editItem.FinancialToText)"
+                                                               ReadOnly="true" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Date Joined" ColSpanMd="6">
+                                                    <DxDateEdit @bind-Date="@editItem.DateJoined" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Date Ceased" ColSpanMd="6">
+                                                    <DxDateEdit @bind-Date="@editItem.DateCeased" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Life Member?" ColSpanMd="6">
+                                                    <DxCheckBox @bind-Checked="@editItem.IsLifeMember"
+                                                                Alignment="CheckBoxContentAlignment.Right" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem Caption="Vax Certificate?" ColSpanMd="6"
+                                                                  Visible="@settings.RequireVaxCertificate">
+                                                    <DxCheckBox @bind-Checked="@editItem.VaxCertificateViewed"
+                                                                Alignment="CheckBoxContentAlignment.Right" />
+                                                </DxFormLayoutItem>
+                                            </Items>
+                                        </DxFormLayoutGroup>
+                                    </DxFormLayout>
+                                </EditFormTemplate>
+                            </DxGrid>
+                        </DxSplitterPane>
+                        <DxSplitterPane Size="10rem" AllowCollapse="true" 
+                                        Collapsed="@isSplitterCollapsed">
+                            <div class="h6">Queued Broadcast Email</div>
+                            <QueuedBroadcastEmailGrid @ref=@queueGrid IsEmbedded="true" />
+                        </DxSplitterPane>
+                    </Panes>
+                </DxSplitter>
             </ContentTemplate>
         </FullScreen>
     }
@@ -319,6 +332,8 @@
     public string gridHeight { get; set; } = "800px";
 
     bool IsReady;
+    QueuedBroadcastEmailGrid queueGrid;
+    bool isSplitterCollapsed = true;
     IReadOnlyList<object> SelectedDataItems { get; set; }
     DateTime selectedDate;
     SystemSettings settings;
@@ -394,7 +409,10 @@
     async Task GetData()
     {
         Persons = await BusinessRule.EditablePersonAsync(dbc);
+        await SetupSplitter();
     }
+
+    async Task SetupSplitter() => isSplitterCollapsed = !(await dbc.DocumentQueue.AnyAsync(x => x.Status == DocumentQueueStatus.ReadyToSend));
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -512,7 +530,7 @@
                     msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                 }
                 result = await messageBox.ShowAsync("Email change failed",
-                                                                $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
+                                                                        $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
             }
         }
@@ -555,7 +573,7 @@
                         msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                     }
                     result = await messageBox.ShowAsync("Email change failed",
-                                                                        $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
+                                                                                $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
                 }
             }
@@ -782,6 +800,8 @@
                 delayedStart);
             await ProgressBar.Close();
             await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
+            await queueGrid.GetData();
+            await SetupSplitter();
         }
     }
 

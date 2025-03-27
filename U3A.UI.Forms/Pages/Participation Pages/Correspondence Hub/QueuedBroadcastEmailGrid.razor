@@ -1,0 +1,189 @@
+﻿@namespace U3A.UI.Forms
+
+@using System
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Logging
+@using Microsoft.EntityFrameworkCore.Query
+@using System.Text.Json
+
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject ILogger<QueuedBroadcastEmail> Logger
+@inject IWebHostEnvironment Environment
+@inject NavigationManager NavigationManager
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxGrid Data=@Queue @ref=@emailGrid CssClass="@gridCss"
+            UnboundColumnData="Grid_CustomUnboundColumnData"
+            DataItemDeleting="Grid_DataItemDeleting">
+        <ToolbarTemplate>
+            <GridToolbar HideGroupPanel=@IsEmbedded
+                         HideSearchBox=@IsEmbedded
+                         LinkedGrid=@emailGrid
+                         LayoutKey="{66C4FC8C-9CE5-4483-AD10-9F4A70048B07}">
+                <CustomButtonContent>
+                    <DxToolbarItem Text="Refresh" IconCssClass="bi bi-arrow-clockwise"
+                                   Click="@GetData" Tooltip="Refresh data"
+                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                   RenderStyle="ButtonRenderStyle.Success" />
+                </CustomButtonContent>
+            </GridToolbar>
+        </ToolbarTemplate>
+        <Columns>
+            <DxGridCommandColumnEx Caption="Delete" EditButtonVisible=false NewButtonVisible=false
+                                   FixedPosition="GridColumnFixedPosition.Right" />
+            <DxGridDataColumn Width="8rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Queued"
+                              UnboundType="GridUnboundColumnType.DateTime"
+                              FieldName="Created" DisplayFormat="{0:dd-MMM-yy hh:mm tt}" />
+            <DxGridDataColumn Caption="Subject" FieldName="Subject" FixedPosition="GridColumnFixedPosition.Left"
+                              UnboundType="GridUnboundColumnType.String" />
+            <DxGridDataColumn Caption="From" FieldName="From"
+                              UnboundType="GridUnboundColumnType.String" />
+            <DxGridDataColumn Width="6rem" Caption="MergeCode #" FieldName="MergeCodeCount"
+                              UnboundType="GridUnboundColumnType.Integer" />
+            <DxGridDataColumn Width="6rem" Caption="Attachment #" FieldName="AttachmnetCount"
+                              UnboundType="GridUnboundColumnType.Integer" />
+            <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
+                              UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
+            <DxGridDataColumn Width="6rem" Caption="Selected #" FieldName="Recipients"
+                              UnboundType="GridUnboundColumnType.Integer" />
+            <DxGridDataColumn Caption="Delay (Hrs)" FieldName=@(nameof(DocumentQueue.DelayInHours)) />
+            <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
+            <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
+                              UnboundType="GridUnboundColumnType.DateTime"
+                              DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+            <DxGridDataColumn Caption="Email #" FieldName="unboundEmailCount"
+                              UnboundType="GridUnboundColumnType.String" />
+            <DxGridDataColumn Caption="Result" FieldName="Result" />
+        </Columns>
+
+    </DxGrid>
+}
+
+@code {
+
+    [Parameter]
+    public bool IsEmbedded { get; set; }
+
+    string gridCss = "";
+
+    bool isReady;
+    List<DocumentQueue> Queue { get; set; }
+    string? messageBoxWidth;
+
+    IGrid? emailGrid { get; set; }
+    GridToolbar? bounceToolbar;
+    LocalTime localTime;
+    TimeSpan timezoneOffset;
+
+    U3ADbContext dbc { get; set; }
+    DocumentServer server;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsEmbedded)
+        {
+            gridCss = "h-100";
+        }
+        // wire up the data
+        dbc = await U3Adbfactory.CreateDbContextAsync();
+        server = new DocumentServer(dbc);
+        await GetData();
+        isReady = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            localTime = new(js);
+            timezoneOffset = await localTime.GetTimezoneOffsetAsync();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async Task GetData()
+    {
+        Queue = await dbc.DocumentQueue
+                    .Include(x => x.DocumentAttachments)
+                    .Where(x => !IsEmbedded || x.Status == DocumentQueueStatus.ReadyToSend)
+                    .OrderByDescending(x => x.CreatedOn).ToListAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+    {
+        DocumentQueue q = e.DataItem as DocumentQueue;
+        var doc = JsonSerializer.Deserialize<DocumentTemplate>(q.DocumentTemplateJSON);
+        if (e.FieldName == "Processed")
+        {
+            e.Value = (q.Status != DocumentQueueStatus.ReadyToSend) ? q.UpdatedOn + timezoneOffset : null;
+        }
+        if (e.FieldName == "Created")
+        {
+            e.Value = q.CreatedOn + timezoneOffset;
+        }
+        if (e.FieldName == "Subject")
+        {
+            e.Value = doc.Subject;
+        }
+        if (e.FieldName == "From")
+        {
+            e.Value = doc.FromEmailAddress;
+        }
+        if (e.FieldName == "MergeCodeCount") { e.Value = server.MergeCodeCount(doc.Content); }
+        if (e.FieldName == "AttachmnetCount") { e.Value = q.DocumentAttachments?.Count(); }
+        if (e.FieldName == "AttachmnetSize")
+        {
+            var size = 0M;
+            foreach (var a in q.DocumentAttachments) { size += a.Attachment.Length; }
+            e.Value = size / 1000000M;
+        }
+        if (e.FieldName == "Recipients")
+        {
+            int count = 0;
+            if (!string.IsNullOrEmpty(q.MemberIdToExport))
+            {
+                var list = JsonSerializer.Deserialize<IEnumerable<Guid>>(q.MemberIdToExport);
+                count = list.Count();
+            }
+            else
+            {
+                count = JsonSerializer.Deserialize<IEnumerable<ExportData>>(q.ExportDataJSON).Count();
+            }
+            e.Value = count;
+        }
+        if (e.FieldName == "unboundEmailCount")
+        {
+            var implemented = new DateTime(2025, 3, 14);
+            if (dbc.GetLocalDate(q.UpdatedOn) < implemented)
+            {
+                e.Value = "N/A";
+            }
+            else
+            {
+                e.Value = q.EmailCount;
+            }
+        }
+    }
+
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var dq = (DocumentQueue)e.DataItem;
+        dbc.Remove(dq);
+        await dbc.SaveChangesAsync();
+        await GetData();
+    }
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
+
+}

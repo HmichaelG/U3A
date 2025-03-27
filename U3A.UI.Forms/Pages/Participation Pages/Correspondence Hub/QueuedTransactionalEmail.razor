@@ -33,12 +33,12 @@ else
     {
         <div class="px-2">
             <CollapsableContent DismissKey="{D46A020E-E4C2-4A3A-A684-80EE7B36AE34}" Visible="@(!IsEmbedded)"
-            AlertText=@($@"<p><strong>Transactional email</strong> is queued &amp; background processed.<br />
+                                AlertText=@($@"<p><strong>Transactional email</strong> is queued &amp; background processed.<br />
                         Cash Receipts and Enrolments are sent hourly, Leader Reports are sent within 48 hours of the next class.<br/>
                         Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.<br />
                         Processed correspondence is deleted after 30 days</p>.")
-            OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
-            OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+                                OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+                                OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
             <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
             <Progress @ref="@ProgressBar" />
@@ -48,44 +48,44 @@ else
             <FullScreen @ref=@fullScreen DisplayOffset="@contentSize" HideToggle="@IsEmbedded">
                 <ContentTemplate>
                     <DxGrid Data="@SendMail" @ref=@mainGrid
-                    @bind-SelectedDataItems="@SelectedDataItems"
-                    UnboundColumnData="Grid_CustomUnboundColumnData"
-                    ShowFilterRow="false"
-                    ShowAllRows="false"
-                    KeyFieldName="ID"
-                    ValidationEnabled="true"
-                    SelectionMode="@((IsEmbedded) ? GridSelectionMode.Single : GridSelectionMode.Multiple)">
+                            @bind-SelectedDataItems="@SelectedDataItems"
+                            UnboundColumnData="Grid_CustomUnboundColumnData"
+                            ShowFilterRow="false"
+                            ShowAllRows="false"
+                            KeyFieldName="ID"
+                            ValidationEnabled="true"
+                            SelectionMode="@((IsEmbedded) ? GridSelectionMode.Single : GridSelectionMode.Multiple)">
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid LayoutKey="{5AC4F74E-C707-4297-8949-A64FB18C0819}">
                                 <CustomButtonContent>
                                     <DxToolbarItem Text="Preview" IconCssClass="bi bi-eyeglasses"
-                                    Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                    Tooltip="Preview the email to be sent to selected participants."
-                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                    RenderStyle="ButtonRenderStyle.Primary" />
+                                                   Click="@OnPreview" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                                   Tooltip="Preview the email to be sent to selected participants."
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   RenderStyle="ButtonRenderStyle.Primary" />
                                     <DxToolbarItem Text="Send Mail" IconCssClass="bi bi-envelope"
-                                    Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                    Tooltip="Send email to selected participants, now."
-                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                    RenderStyle="ButtonRenderStyle.Primary" />
+                                                   Click="@OnCreateMail" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                                   Tooltip="Send email to selected participants, now."
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   RenderStyle="ButtonRenderStyle.Primary" />
                                     <DxToolbarItem Text="Delete" IconCssClass="bi bi-trash" Visible="@(!IsEmbedded)"
-                                    Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
-                                    Tooltip="Delete the selected email."
-                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                    RenderStyle="ButtonRenderStyle.Primary" />
+                                                   Click="@OnDeleteSelection" Enabled="@(SelectedDataItems != null && SelectedDataItems.Any())"
+                                                   Tooltip="Delete the selected email."
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   RenderStyle="ButtonRenderStyle.Primary" />
                                     <DxToolbarItem Text="Refresh" IconCssClass="bi bi-arrow-clockwise" Visible="@(!IsEmbedded)"
-                                    Click="@GetData" Tooltip="Refresh data"
-                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                    RenderStyle="ButtonRenderStyle.Success" />
+                                                   Click="@GetData" Tooltip="Refresh data"
+                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                   RenderStyle="ButtonRenderStyle.Success" />
                                 </CustomButtonContent>
                             </GridToolbar>
                         </ToolbarTemplate>
                         <Columns>
                             <DxGridSelectionColumn Width="2rem" />
                             <DxGridDataColumn Width="10rem" Caption="Email On/After"
-                            UnboundType=GridUnboundColumnType.DateTime
-                            FieldName="CreatedOnLocal"
-                            DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                                              UnboundType=GridUnboundColumnType.DateTime
+                                              FieldName="CreatedOnLocal"
+                                              DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
                             <DxGridDataColumn Width="12rem" Caption="Document" FieldName="DocumentName" />
                             <DxGridDataColumn Width="12rem" Caption="Send To" FieldName="Person.FullName" />
                             <DxGridDataColumn Width="6rem" Caption="Send Via" FieldName="Person.SendTransactionalEmailVia" />
@@ -235,7 +235,7 @@ else
                 {
                     result = $@"<p>An Internet issue is currently preventing you mail from being processed.<br/>
                                         We'll keep trying. If you do not receive your mail withing the hour, contact your U3A.</p>
-                {e.Message}";
+            {e.Message}";
                     await SetStatus(dbc, IdsToSend, ""); // clear the status to allow retry
                 }
                 catch (Exception ex)
@@ -256,7 +256,7 @@ else
     {
         foreach (var id in IdsToSend)
         {
-            var mail = await dbc.SendMail.IgnoreQueryFilters().FirstAsync(x=>x.ID == id);
+            var mail = await dbc.SendMail.IgnoreQueryFilters().FirstAsync(x => x.ID == id);
             mail.Status = Status;
         }
         await dbc.SaveChangesAsync();
@@ -281,7 +281,7 @@ else
                 {
                     result = $@"<p>An Internet issue is currently preventing your report from being processed.<br/>
                                 Wait a while and try again. If the issue persists, contact your U3A.</p>
-            {e.Message}";
+        {e.Message}";
                 }
                 catch (Exception ex)
                 {

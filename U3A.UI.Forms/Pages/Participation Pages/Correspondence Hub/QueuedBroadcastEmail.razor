@@ -12,10 +12,9 @@
 @inject ILogger<QueuedBroadcastEmail> Logger
 @inject IWebHostEnvironment Environment
 @inject NavigationManager NavigationManager
-@implements IDisposable
 
 
-@if (!IsReady)
+@if (!isReady)
 {
     <LoadingIndicator />
 }
@@ -23,53 +22,14 @@ else
 {
     <div class="px-2">
         <CollapsableContent DismissKey="{E580636E-C7CB-45FF-91A4-5AE4E3B0A2CF}"
-                            AlertText=@($@"<p><strong>Broadcast email</strong> queued and processed immediately<br />
+        AlertText=@($@"<p><strong>Broadcast email</strong> queued and processed immediately<br />
                         unless a delayed start has been requested. Processed correspondence is deleted after 14 days.</p>")
-                            OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
-                            OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
-
-        <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
-        <Progress @ref="@ProgressBar" />
-        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+        OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+        OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
         <FullScreen @ref=@fullScreen DisplayOffset=@contentSize>
             <ContentTemplate>
-                <DxGrid Data=@Queue @ref=@bounceGrid
-                        UnboundColumnData="Grid_CustomUnboundColumnData"
-                        DataItemDeleting="Grid_DataItemDeleting">
-                    <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@bounceGrid LayoutKey="{66C4FC8C-9CE5-4483-AD10-9F4A70048B07}" />
-                    </ToolbarTemplate>
-                    <Columns>
-                        <DxGridCommandColumnEx Caption="Delete" EditButtonVisible=false NewButtonVisible=false
-                                               FixedPosition="GridColumnFixedPosition.Right" />
-                        <DxGridDataColumn Width="8rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Queued"
-                                          UnboundType="GridUnboundColumnType.DateTime"
-                                          FieldName="Created" DisplayFormat="{0:dd-MMM-yy hh:mm tt}" />
-                        <DxGridDataColumn Caption="Subject" FieldName="Subject" FixedPosition="GridColumnFixedPosition.Left"
-                                          UnboundType="GridUnboundColumnType.String" />
-                        <DxGridDataColumn Caption="From" FieldName="From"
-                                          UnboundType="GridUnboundColumnType.String" />
-                        <DxGridDataColumn Width="6rem" Caption="MergeCode #" FieldName="MergeCodeCount"
-                                          UnboundType="GridUnboundColumnType.Integer" />
-                        <DxGridDataColumn Width="6rem" Caption="Attachment #" FieldName="AttachmnetCount"
-                                          UnboundType="GridUnboundColumnType.Integer" />
-                        <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
-                                          UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
-                        <DxGridDataColumn Width="6rem" Caption="Selected #" FieldName="Recipients"
-                                          UnboundType="GridUnboundColumnType.Integer" />
-                        <DxGridDataColumn Caption="Delay (Hrs)" FieldName=@(nameof(DocumentQueue.DelayInHours)) />
-                        <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
-                        <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
-                                          
-                                          UnboundType="GridUnboundColumnType.DateTime"
-                                          DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-                        <DxGridDataColumn Caption="Email #" FieldName="unboundEmailCount"
-                                          UnboundType="GridUnboundColumnType.String" />
-                        <DxGridDataColumn Caption="Result" FieldName="Result" />
-                    </Columns>
-
-                </DxGrid>
+                <QueuedBroadcastEmailGrid />
             </ContentTemplate>
         </FullScreen>
     </div>
@@ -77,120 +37,19 @@ else
 
 @code {
     int contentSize;
-    bool IsReady;
-    List<DocumentQueue> Queue { get; set; }
-    MessageBox? messageBox;
-    string? messageBoxWidth;
     FullScreen? fullScreen;
+    bool isReady;
 
-    IGrid? bounceGrid { get; set; }
-    ErrorPopup? ErrorPopup { get; set; }
-    GridToolbar? bounceToolbar;
-    string ErrorHeader;
-    string ErrorMessage;
-    Progress? ProgressBar;
-    LocalTime localTime;
-    TimeSpan timezoneOffset;
-
-    U3ADbContext dbc { get; set; }
-    DocumentServer server;
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        // wire up the data
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        server = new DocumentServer(dbc);
-        await GetData();
-        IsReady = true;
+        base.OnInitialized();
+        isReady = true;
     }
 
     void OnContentChange(bool IsDismissed)
     {
         contentSize = (IsDismissed) ? 8 : 16;
         StateHasChanged();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            localTime = new(js);
-            timezoneOffset = await localTime.GetTimezoneOffsetAsync();
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    async Task GetData()
-    {
-        Queue = await dbc.DocumentQueue.Include(x => x.DocumentAttachments).OrderByDescending(x => x.CreatedOn).ToListAsync();
-    }
-
-    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
-    {
-        DocumentQueue q = e.DataItem as DocumentQueue;
-        var doc = JsonSerializer.Deserialize<DocumentTemplate>(q.DocumentTemplateJSON);
-        if (e.FieldName == "Processed")
-        {
-            e.Value = (q.Status != DocumentQueueStatus.ReadyToSend) ? q.UpdatedOn + timezoneOffset : null;
-        }
-        if (e.FieldName == "Created")
-        {
-            e.Value = q.CreatedOn + timezoneOffset;
-        }
-        if (e.FieldName == "Subject")
-        {
-            e.Value = doc.Subject;
-        }
-        if (e.FieldName == "From")
-        {
-            e.Value = doc.FromEmailAddress;
-        }
-        if (e.FieldName == "MergeCodeCount") { e.Value = server.MergeCodeCount(doc.Content); }
-        if (e.FieldName == "AttachmnetCount") { e.Value = q.DocumentAttachments?.Count(); }
-        if (e.FieldName == "AttachmnetSize")
-        {
-            var size = 0M;
-            foreach (var a in q.DocumentAttachments) { size += a.Attachment.Length; }
-            e.Value = size / 1000000M;
-        }
-        if (e.FieldName == "Recipients")
-        {
-            int count = 0;
-            if (!string.IsNullOrEmpty(q.MemberIdToExport))
-            {
-                var list = JsonSerializer.Deserialize<IEnumerable<Guid>>(q.MemberIdToExport);
-                count = list.Count();
-            }
-            else
-            {
-                count = JsonSerializer.Deserialize<IEnumerable<ExportData>>(q.ExportDataJSON).Count();
-            }
-            e.Value = count;
-        }
-        if (e.FieldName == "unboundEmailCount")
-        {
-            var implemented = new DateTime(2025, 3, 14);
-            if (dbc.GetLocalDate(q.UpdatedOn) < implemented)
-            {
-                e.Value = "N/A";
-            }
-            else
-            {
-                e.Value = q.EmailCount;
-            }
-        }
-    }
-
-    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
-    {
-        var dq = (DocumentQueue)e.DataItem;
-        dbc.Remove(dq);
-        await dbc.SaveChangesAsync();
-        await GetData();
-    }
-    public void Dispose()
-    {
-        dbc?.Dispose();
     }
 
 }

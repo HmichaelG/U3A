@@ -246,7 +246,6 @@ HeaderText="Communicate">
 
     protected override async Task OnInitializedAsync()
     {
-        DelayedStart = 1;
         newAttachments.Clear();
         var tInfo = await tenantService.GetTenantInfoAsync();
         term = await BusinessRule.CurrentEnrolmentTermAsync(dbContext)
@@ -257,6 +256,7 @@ HeaderText="Communicate">
 
     public Task<bool> ShowAsync()
     {
+        DelayedStart = 1;
         attachments = new List<string>();
         newAttachments.Clear();
         selectedAttachments = new List<string>();
