@@ -183,9 +183,9 @@ string model = "gpt-4o-mini";
 OpenAIClient openAiClient;
 
 // Azure
-openAiClient = new AzureOpenAIClient(
-new Uri(azureAIuri),
-new AzureKeyCredential(azureAIkey));
+//openAiClient = new AzureOpenAIClient(
+//new Uri(azureAIuri),
+//new AzureKeyCredential(azureAIkey));
 
 // OpenAI
 openAiClient = new OpenAI.OpenAIClient(openAIkey);
