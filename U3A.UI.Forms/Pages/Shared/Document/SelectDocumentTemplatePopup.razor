@@ -33,14 +33,14 @@ HeaderText="Communicate">
                         Your email will be routed through Postmark's servers but members wil not receive it.<br />
                         Please use sparingly, all email delivered or not incurs usage cost.
                     </div>
-                    <div class="alert alert-info text-dark text-center">
+                    <div class="alert alert-info text-dark text-center" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
                         @{
                             var financial = SendTo.Count(x => x.FinancialTo >= term?.Year);
                             var unFinancial = SendTo.Count(x => x.FinancialTo < term?.Year);
                         }
                         <div class="h6">Please Confirm!</div>
                         Your will be communicating with <b>@(SendTo.Count)</b> participants.
-                        <br/><b>@financial</b> financial participants, and
+                        <br/>There are <b>@financial</b> financial participants, and
                         <b>@unFinancial</b> participants not financial.
                     </div>
                     <DxFormLayoutGroup Caption="Parameters" CaptionPosition="CaptionPosition.Vertical">
