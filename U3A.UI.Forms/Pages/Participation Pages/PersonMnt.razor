@@ -304,7 +304,7 @@
                                 </EditFormTemplate>
                             </DxGrid>
                         </DxSplitterPane>
-                        <DxSplitterPane Size="10rem" AllowCollapse="true" 
+                        <DxSplitterPane Size="10rem" AllowCollapse="@(!IsEmbedded)" 
                                         Collapsed="@isSplitterCollapsed">
                             <div class="h6">Queued Broadcast Email</div>
                             <QueuedBroadcastEmailGrid @ref=@queueGrid IsEmbedded="true" />
@@ -412,7 +412,8 @@
         await SetupSplitter();
     }
 
-    async Task SetupSplitter() => isSplitterCollapsed = !(await dbc.DocumentQueue.AnyAsync(x => x.Status == DocumentQueueStatus.ReadyToSend));
+    async Task SetupSplitter() => 
+        isSplitterCollapsed = IsEmbedded || !(await dbc.DocumentQueue.AnyAsync(x => x.Status == DocumentQueueStatus.ReadyToSend));
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -16,11 +16,11 @@
         <DxFormLayout>
             <DxFormLayoutItem ColSpanXxl="12" Context="formContext">
                 <div class="row"
-                <div id="overviewDropZone" class="col-12 card custom-drop-zone bg-light rounded-3 m-auto">
-                    <span class="bi bi-upload icon-size mb-3"></span>
-                    <span>Drag and Drop <strong>PDF</strong> File Here</span><span class="m-1">or</span>
-                    <button id="overviewSelectButton" class="btn border-primary btn-primary m-1">Select File</button>
-                </div>
+                    <div id="overviewDropZone" class="col-12 card custom-drop-zone bg-light rounded-3 m-auto">
+                        <span class="bi bi-upload icon-size mb-3"></span>
+                        <span>Drag and Drop <strong>PDF</strong> File Here</span><span class="m-1">or</span>
+                        <button id="overviewSelectButton" class="btn border-primary btn-primary m-1">Select File</button>
+                    </div>
                 </div>
                 <DxUpload Name="myFile" @ref="FileUploader"
                           ExternalSelectButtonCssSelector="#overviewSelectButton"
@@ -38,7 +38,7 @@
         </DxFormLayout>
     </BodyContentTemplate>
     <FooterContentTemplate>
-        <DxButton CssClass="popup-button"
+        <DxButton CssClass="popup-button" Enabled="@affirmativeButtonEnabled"
                   RenderStyle="ButtonRenderStyle.Primary"
                   Text="Ok"
                   Click="@AffirmativeButtonClicked" />
@@ -81,6 +81,7 @@
 
     int SelectedFilesCount;
     IEnumerable<UploadFileInfo> UploadedFiles;
+    bool affirmativeButtonEnabled = false;
 
     DxPopup? messageBox;
     DxUpload? FileUploader;
@@ -88,31 +89,41 @@
 
     TaskCompletionSource<bool>? tcs;
 
-    protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files) {
+    protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
+    {
+        affirmativeButtonEnabled = false;
         UploadedFiles = files.ToList();
         SelectedFilesCount = files.ToList().Count;
         InvokeAsync(StateHasChanged);
     }
 
-    public string GetUploadUrl() {
+    public string GetUploadUrl()
+    {
+        affirmativeButtonEnabled = false;
         const string url = "api/Upload/UploadFile/";
         return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
     }
 
-    async void FileUploaded() {
+    async Task FileUploaded()
+    {
         string filename;
-        foreach (var fi in UploadedFiles) {
+        foreach (var fi in UploadedFiles)
+        {
             var sourceFile = Path.Combine("uploads", fi.Name);
-            if (File.Exists(sourceFile)) {
+            if (File.Exists(sourceFile))
+            {
                 var destFile = Path.Combine("uploads", $"{tenant}_{fi.Name}");
                 if (File.Exists(destFile)) File.Delete(destFile);
                 File.Move(sourceFile, destFile);
                 if (!Attachments.Contains(fi.Name)) Attachments.Add(destFile);
             }
         }
+        affirmativeButtonEnabled = true;
+        await InvokeAsync(StateHasChanged);
     }
 
-    public Task<bool> ShowAsync() {
+    public Task<bool> ShowAsync()
+    {
         Attachments.Clear();
         PopupVisible = true;
         using (var dbc = U3Adbfactory.CreateDbContext()) { tenant = dbc.TenantInfo.Identifier; }
@@ -125,7 +136,8 @@
         return tcs.Task;
     }
 
-    async Task AffirmativeButtonClicked() {
+    async Task AffirmativeButtonClicked()
+    {
         if (Attachments.Count > 0)
         {
             await AttachmentsChanged.InvokeAsync(Attachments);
@@ -133,12 +145,14 @@
         PopupVisible = false;
         tcs?.TrySetResult(true);
     }
-    void NegativeButtonClicked() {
+    void NegativeButtonClicked()
+    {
         PopupVisible = false;
         tcs?.TrySetResult(false);
     }
 
-    public async Task Close() {
+    public async Task Close()
+    {
         await Task.Run(() =>
         {
             PopupVisible = false;
