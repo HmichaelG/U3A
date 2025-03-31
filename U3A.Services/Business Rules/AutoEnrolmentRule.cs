@@ -506,7 +506,7 @@ namespace U3A.BusinessRules
             // If available places is less than waitlisted then enroll everyone.
             if (waitlisted <= course.MaximumStudents - enrolled)
             {
-                Log.Information("All students enrolled because Wautlist: {Waitlist} is less than Maximum Students: {MazStudents}", waitlisted, course.MaximumStudents);
+                Log.Information("All students enrolled because Waitlist: {Waitlist} is less than Maximum Students: {MazStudents}", waitlisted, course.MaximumStudents);
                 foreach (var e in enrolments.Where(x => x.IsWaitlisted && (x.TermID == enrolmentTerm.ID || isFutureCourse)
                                 && !IsAlreadyEnrolledInCourse(x.PersonID, course, AlreadyEnrolledInCourse)))
                 {
