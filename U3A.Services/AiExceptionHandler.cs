@@ -1,6 +1,5 @@
 ﻿using DevExpress.AIIntegration;
 using DevExpress.AIIntegration.Extensions;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 public class AIExceptionHandler : IAIExceptionHandler
