@@ -93,7 +93,9 @@
              !PrintClassList &&
              !PrintICEList &&
              !PrintAttendanceRecord &&
-             !PrintAttendanceAnalysis && !PrintMemberBadges)
+             !PrintAttendanceAnalysis && 
+             !PrintMemberBadges &&
+             !PrintCSVFile)
         {
             messageBox.ShowOkOnlyAsync("Select Report", "A report must be selected.");
             return false;
