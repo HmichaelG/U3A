@@ -1,4 +1,8 @@
-﻿using DevExpress.Blazor;
+﻿using AngleSharp.Dom;
+using AngleSharp.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
+using DevExpress.Blazor;
 using DevExpress.XtraRichEdit.Commands.Internal;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -6,170 +10,67 @@ using System.Text;
 using U3A.Database;
 using U3A.Model;
 using U3A.Services;
-using AngleSharp.Dom;
-using AngleSharp.Html;
-using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
 using static Azure.Core.HttpHeader;
 
 namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
-        public static async Task<string> GetMarkdownAIChatDataAsync(U3ADbContext dbc,
-                                                        TenantDbContext dbcT,
-                                                        TenantInfoService tenantService)
+
+        private static void AssignParticipants(Class c, List<Person> people, ScheduledClass? sc, Enrolment e)
         {
-            StringBuilder sb = new();
-            var thisTenant = dbc.TenantInfo.Identifier;
-            var people = await dbc.Person.IgnoreQueryFilters().ToListAsync();
-            var otherU3APeople = await dbcT.MultiCampusPerson.Where(x => x.TenantIdentifier != thisTenant).ToListAsync();
-            foreach (var p in otherU3APeople)
+            if (!e.isLeader && !e.IsCourseClerk)
             {
-                if (people.Find(x => x.ID == p.ID) == null)
+                if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
+                if (e.Person != null)
                 {
-                    people.Add(GetPersonFromMCPerson(p));
+                    sc.People.Add(new ScheduledPerson()
+                    {
+                        Class = c.Course.Name,
+                        SortOrder = e.Person.FullNameAlphaKey,
+                        Name = e.Person.FullName,
+                        Email = e.Person.Email,
+                        Phone = e.Person.AdjustedHomePhone,
+                        Mobile = e.Person.AdjustedMobile,
+                        Roles = (e.IsWaitlisted)
+                            ? new List<string>() { "Waitlisted" }
+                            : new List<string>() { "Student" }
+                    });
                 }
             }
-            var data = new AIChatClassData();
-            // settings
-            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-
-            // Terms
-            var terms = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc);
-
-            // Classes
-            var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
-            if (term == null)
+        }
+        static async Task getCalendarForAiClass(U3ADbContext dbc, Term term,
+            IEnumerable<Class> classes)
+        {
+            var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, term);
+            var range = new DxSchedulerDateTimeRange(dbc.GetLocalDate(), new DateTime(term.Year, 12, 31));
+            Dictionary<Guid, List<DxSchedulerAppointmentItem>> classAppointments = new();
+            foreach (var a in dataStorage?.GetAppointments(range))
             {
-                term = await BusinessRule.CurrentTermAsync(dbc);
-            }
-            if (term != null)
-            {
-
-                var prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
-
-                // Fast lookup from Schedule cache
-                var classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, true, true);
-                // Get the schedule
-                await getCalendarForAiClass(dbc, term, classes);
-                // create the markdown
-                sb.AppendLine($"# Class Schedule for {settings.U3AGroup}");
-
-                sb.AppendLine("## Summary");
-                sb.Append($"In {term.Year}, {settings.U3AGroup} ");
-                sb.AppendLine($"offers a total of {classes.Count} classes categorised as follows...");
-                foreach (var c in classes
-                            .GroupBy(x => new { Name = x.Course.CourseType.Name })
-                            .Select(g => new { Name = g.Key.Name, Total = g.Count() }))
+                Class c = (Class)a.CustomFields["Source"];
+                if (c != null && (int)a.LabelId != 9)
                 {
-                    sb.AppendLine($"- {c.Name}: {c.Total} classes");
-                }
-
-                sb.AppendLine("");
-                sb.Append("Unless otherwise stated, classes are held during during term. ");
-                sb.AppendLine($"For {term.Year} the term dates are... ");
-                foreach (var t in terms)
-                {
-                    sb.AppendLine($"- {t.Name}: {t.StartDate.ToString("d")} to {t.EndDate.ToString("d")}");
-                }
-                sb.AppendLine("### Membership Fees");
-                sb.AppendLine($"- A renewing member or a member that joins in Term 1: {settings.MembershipFee.ToString("c2")}");
-                sb.AppendLine($"- A member that joins in Term 2: {settings.MembershipFeeTerm2.ToString("c2")}");
-                sb.AppendLine($"- A member that joins in Term 3: {settings.MembershipFeeTerm3.ToString("c2")}");
-                sb.AppendLine($"- A member that joins in Term 4: {settings.MembershipFeeTerm4.ToString("c2")}");
-                if (settings.MailSurcharge != 0)
-                {
-                    sb.AppendLine($"- If mail is receive via post rather than email, a mail surcharge of {settings.MailSurcharge.ToString("c2")} applies.");
-                }
-                sb.AppendLine("");
-                sb.AppendLine("*Notes*");
-                if (settings.AllowedMemberFeePaymentTypes == MemberFeePaymentType.PerYearOnly)
-                {
-                    sb.AppendLine($"1. {term.Year} member fees must be paid in full prior to enrolemnt in classes.");
-                }
-                else
-                {
-                    sb.AppendLine($"1. {term.Year} member fees may be paid in full or in two equal instalments due on or before Term 1 and Term 3.");
-                }
-                sb.AppendLine("1. Additional Course fees may apply depending on courses enrolled.");
-                sb.AppendLine("");
-                sb.AppendLine("___");
-                sb.AppendLine("");
-
-                foreach (var c in classes.OrderBy(x => x.Course.Name))
-                {
-                    // From Course
-                    sb.AppendLine($"## Class: {c.Course.Name}");
-                    sb.AppendLine($"### Description:{Environment.NewLine}{RemoveHtmlTags(c.Course.Description)}");
-                    GetContactsAsMarkdonw(sb, c);
-                    sb.AppendLine($"### Details");
-                    sb.AppendLine($"- **Category**:  {c.Course.CourseType.Name}");
-                    sb.AppendLine($"- **Featured Course?**: {c.Course.IsFeaturedCourse}");
-                    sb.AppendLine($"- **Fee Per Year**:  {c.Course.CourseFeePerYear.ToString("c2")}");
-                    sb.AppendLine($"- **Fee Per Year Description**:  {c.Course.CourseFeePerYearDescription}");
-                    sb.AppendLine($"- **Fee Per Term**:  {c.Course.CourseFeePerTerm.ToString("c2")}");
-                    sb.AppendLine($"- **Fee Per Term Description**:  {c.Course.CourseFeePerTermDescription}");
-                    sb.AppendLine($"- **Duration**:  {c.Course.Duration.ToString("n2")}");
-                    sb.AppendLine($"- **Required Students**:  {c.Course.RequiredStudents}");
-                    sb.AppendLine($"- **Maximum Students**:  {c.Course.MaximumStudents}");
-                    sb.AppendLine($"- **Allow Automatic Enrolment**:  {c.Course.AllowAutoEnrol}");
-                    sb.AppendLine($"- **Provided By**:  {((c.Course.OfferedBy == null) ? settings.U3AGroup : c.Course.OfferedBy)}");
-
-                    // From Class
-
-                    sb.AppendLine($"- **Offered Term 1**:  {c.OfferedTerm1}");
-                    sb.AppendLine($"- **Offered Term 2**:  {c.OfferedTerm2}");
-                    sb.AppendLine($"- **Offered Term 3**:  {c.OfferedTerm3}");
-                    sb.AppendLine($"- **Offered Term 4**:  {c.OfferedTerm4}");
-                    sb.Append($"- **Class Dates**: ");
-                    sb.AppendLine(string.Join(", ", c.ClassDates));
-                    sb.AppendLine($"- **Start Time**:  {TimeOnly.FromDateTime(c.StartTime).ToString()}");
-                    sb.AppendLine($"- **End Time**:  {((c.EndTime != null) ? TimeOnly.FromDateTime(c.EndTime.Value).ToString() : "")}");
-                    sb.AppendLine($"- **Occurs**:  {c.Occurrence.Name}");
-                    sb.AppendLine($"- **Repeats**:  {c.Recurrence ?? term.Duration}");
-                    sb.AppendLine($"- **On Day**:  {c.OnDay.Day}");
-                    sb.AppendLine($"- **Venue**:  {c.Venue.Name}, {c.Venue.Address}");
-                    sb.AppendLine($"- **Occurs**:  {c.OccurrenceText}");
-                    sb.AppendLine($"- **Total Active Students**:  {c.TotalActiveStudents}");
-                    sb.AppendLine($"- **Total Waitlisted Students**:  {c.TotalWaitlistedStudents}");
-                    sb.AppendLine($"- **Participation Rate**:  {c.ParticipationRate.ToString("p2")}");
-                    sb.Append("- **Status**: ");
-                    if (c.ParticipationRate >= 1)
+                    if (!classAppointments.ContainsKey(c.ID))
                     {
-                        sb.AppendLine("Class is Full. New enrolment requests will be Waitlisted.");
+                        classAppointments.Add(c.ID, new List<DxSchedulerAppointmentItem>());
                     }
-                    else if (!c.Course.AllowAutoEnrol)
-                    {
-                        sb.AppendLine("Class is Closed. New enrolment requestss will be Waitlisted.");
-                    }
-                    else
-                    {
-                        sb.AppendLine("Class is Open. New enrolment requests will be accepted.");
-                    }
-                    sb.AppendLine("");
-                    sb.AppendLine("___");
-                    sb.AppendLine("");
-
-                    //        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
-                    //        {
-                    //            foreach (var e in c.Course.Enrolments)
-                    //                AssignParticipants(c, people, sc, e);
-                    //        }
-                    //        else
-                    //        {
-                    //            foreach (var e in c.Enrolments)
-                    //                AssignParticipants(c, people, sc, e);
-                    //        }
-                    //        sc.People = sc.People.OrderBy(x => x.SortOrder).ToList();
-                    //    }
-                    //});
+                    classAppointments[c.ID].Add(a);
                 }
             }
-            return sb.ToString();
+            foreach (Class c in classes)
+            {
+                if (classAppointments.ContainsKey(c.ID))
+                {
+                    foreach (var a in classAppointments[c.ID])
+                    {
+                        c.ClassDates.Add(a.Start);
+                    }
+                }
+            }
+
         }
 
-        private static void GetContactsAsMarkdonw(StringBuilder sb, Class c)
+        private static void GetContactsAsMarkdown(StringBuilder sb, Class c)
         {
             sb.AppendLine($"### Leaders");
             if (!string.IsNullOrWhiteSpace(c.GuestLeader))
@@ -218,6 +119,28 @@ namespace U3A.BusinessRules
             {
                 sb.AppendLine("- No clerks assigned to this class.");
             }
+        }
+
+        static IHtmlDocument? ParseHtml(string html)
+        {
+            IHtmlDocument result = null!;
+            var parser = new HtmlParser();
+            try
+            {
+                result = parser.ParseDocument(html);
+            }
+            catch (Exception e) { }
+            return result;
+        }
+
+        static string RemoveHtmlTags(string html)
+        {
+            var result = string.Empty;
+            using (var document = ParseHtml(html))
+            {
+                result = document.Body.TextContent;
+            }
+            return result;
         }
 
         public static async Task<AIChatClassData> GetJsonAIChatClassDataAsync(U3ADbContext dbc,
@@ -374,80 +297,157 @@ namespace U3A.BusinessRules
             }
             return data;
         }
-
-        private static void AssignParticipants(Class c, List<Person> people, ScheduledClass? sc, Enrolment e)
+        public static async Task<string> GetMarkdownAIChatDataAsync(U3ADbContext dbc,
+                                                        TenantDbContext dbcT,
+                                                        TenantInfoService tenantService)
         {
-            if (!e.isLeader && !e.IsCourseClerk)
+            StringBuilder sb = new();
+            var thisTenant = dbc.TenantInfo.Identifier;
+            var people = await dbc.Person.IgnoreQueryFilters().ToListAsync();
+            var otherU3APeople = await dbcT.MultiCampusPerson.Where(x => x.TenantIdentifier != thisTenant).ToListAsync();
+            foreach (var p in otherU3APeople)
             {
-                if (e.Person == null) { e.Person = people.Find(x => x.ID == e.PersonID); }
-                if (e.Person != null)
+                if (people.Find(x => x.ID == p.ID) == null)
                 {
-                    sc.People.Add(new ScheduledPerson()
-                    {
-                        Class = c.Course.Name,
-                        SortOrder = e.Person.FullNameAlphaKey,
-                        Name = e.Person.FullName,
-                        Email = e.Person.Email,
-                        Phone = e.Person.AdjustedHomePhone,
-                        Mobile = e.Person.AdjustedMobile,
-                        Roles = (e.IsWaitlisted)
-                            ? new List<string>() { "Waitlisted" }
-                            : new List<string>() { "Student" }
-                    });
+                    people.Add(GetPersonFromMCPerson(p));
                 }
             }
-        }
+            var data = new AIChatClassData();
+            // settings
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
 
-        static IHtmlDocument? ParseHtml(string html)
-        {
-            IHtmlDocument result = null!;
-            var parser = new HtmlParser();
-            try
-            {
-                result = parser.ParseDocument(html);
-            }
-            catch (Exception e) { }
-            return result;
-        }
+            // Terms
+            var terms = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc);
 
-        static string RemoveHtmlTags(string html)
-        {
-            var result = string.Empty;
-            using (var document = ParseHtml(html))
+            // Classes
+            var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+            if (term == null)
             {
-                result = document.Body.TextContent;
+                term = await BusinessRule.CurrentTermAsync(dbc);
             }
-            return result;
-        }
-        static async Task getCalendarForAiClass(U3ADbContext dbc, Term term,
-            IEnumerable<Class> classes)
-        {
-            var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, term);
-            var range = new DxSchedulerDateTimeRange(dbc.GetLocalDate(), new DateTime(term.Year, 12, 31));
-            Dictionary<Guid, List<DxSchedulerAppointmentItem>> classAppointments = new();
-            foreach (var a in dataStorage?.GetAppointments(range))
+            if (term != null)
             {
-                Class c = (Class)a.CustomFields["Source"];
-                if (c != null && (int)a.LabelId != 9)
+
+                var prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
+
+                // Fast lookup from Schedule cache
+                var classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, true, true);
+                // Get the schedule
+                await getCalendarForAiClass(dbc, term, classes);
+                // create the markdown
+                sb.AppendLine($"# Class Schedule for {settings.U3AGroup}");
+
+                sb.AppendLine("## Summary");
+                sb.Append($"In {term.Year}, {settings.U3AGroup} ");
+                sb.AppendLine($"offers a total of {classes.Count} classes categorised as follows...");
+                foreach (var c in classes
+                            .GroupBy(x => new { Name = x.Course.CourseType.Name })
+                            .Select(g => new { Name = g.Key.Name, Total = g.Count() }))
                 {
-                    if (!classAppointments.ContainsKey(c.ID))
+                    sb.AppendLine($"- {c.Name}: {c.Total} classes");
+                }
+
+                sb.AppendLine(string.Empty);
+                sb.Append("Unless otherwise stated, classes are held during during term. ");
+                sb.AppendLine($"For {term.Year} the term dates are... ");
+                foreach (var t in terms)
+                {
+                    sb.AppendLine($"- {t.Name}: {t.StartDate.ToString("d")} to {t.EndDate.ToString("d")}");
+                }
+                sb.AppendLine("### Membership Fees");
+                sb.AppendLine($"- A renewing member or a member that joins in Term 1: {settings.MembershipFee.ToString("c2")}");
+                sb.AppendLine($"- A member that joins in Term 2: {settings.MembershipFeeTerm2.ToString("c2")}");
+                sb.AppendLine($"- A member that joins in Term 3: {settings.MembershipFeeTerm3.ToString("c2")}");
+                sb.AppendLine($"- A member that joins in Term 4: {settings.MembershipFeeTerm4.ToString("c2")}");
+                if (settings.MailSurcharge != 0)
+                {
+                    sb.AppendLine($"- If mail is receive via post rather than email, a mail surcharge of {settings.MailSurcharge.ToString("c2")} applies.");
+                }
+                sb.AppendLine(string.Empty);
+                sb.AppendLine("*Notes*");
+                if (settings.AllowedMemberFeePaymentTypes == MemberFeePaymentType.PerYearOnly)
+                {
+                    sb.AppendLine($"1. {term.Year} member fees must be paid in full prior to enrolemnt in classes.");
+                }
+                else
+                {
+                    sb.AppendLine($"1. {term.Year} member fees may be paid in full or in two equal instalments due on or before Term 1 and Term 3.");
+                }
+                sb.AppendLine("1. Additional Course fees may apply depending on courses enrolled.");
+                sb.AppendLine(string.Empty);
+                sb.AppendLine("___");
+                sb.AppendLine(string.Empty);
+
+                foreach (var c in classes.OrderBy(x => x.Course.Name))
+                {
+                    // From Course
+                    sb.AppendLine($"## Class: {c.Course.Name}");
+                    sb.AppendLine($"### Description:{Environment.NewLine}{RemoveHtmlTags(c.Course.Description)}");
+                    GetContactsAsMarkdown(sb, c);
+                    sb.AppendLine($"### Details");
+                    sb.AppendLine($"- **Category**:  {c.Course.CourseType.Name}");
+                    sb.AppendLine($"- **Featured Course?**: {c.Course.IsFeaturedCourse}");
+                    sb.AppendLine($"- **Fee Per Year**:  {c.Course.CourseFeePerYear.ToString("c2")}");
+                    sb.AppendLine($"- **Fee Per Year Description**:  {c.Course.CourseFeePerYearDescription}");
+                    sb.AppendLine($"- **Fee Per Term**:  {c.Course.CourseFeePerTerm.ToString("c2")}");
+                    sb.AppendLine($"- **Fee Per Term Description**:  {c.Course.CourseFeePerTermDescription}");
+                    sb.AppendLine($"- **Duration**:  {c.Course.Duration.ToString("n2")}");
+                    sb.AppendLine($"- **Required Students**:  {c.Course.RequiredStudents}");
+                    sb.AppendLine($"- **Maximum Students**:  {c.Course.MaximumStudents}");
+                    sb.AppendLine($"- **Allow Automatic Enrolment**:  {c.Course.AllowAutoEnrol}");
+                    sb.AppendLine($"- **Provided By**:  {((c.Course.OfferedBy == null) ? settings.U3AGroup : c.Course.OfferedBy)}");
+
+                    // From Class
+
+                    sb.AppendLine($"- **Offered Term 1**:  {c.OfferedTerm1}");
+                    sb.AppendLine($"- **Offered Term 2**:  {c.OfferedTerm2}");
+                    sb.AppendLine($"- **Offered Term 3**:  {c.OfferedTerm3}");
+                    sb.AppendLine($"- **Offered Term 4**:  {c.OfferedTerm4}");
+                    sb.Append($"- **Class Dates**: ");
+                    sb.AppendLine(string.Join(", ", c.ClassDates));
+                    sb.AppendLine($"- **Start Time**:  {TimeOnly.FromDateTime(c.StartTime).ToString()}");
+                    sb.AppendLine($"- **End Time**:  {((c.EndTime != null) ? TimeOnly.FromDateTime(c.EndTime.Value).ToString() : string.Empty)}");
+                    sb.AppendLine($"- **Occurs**:  {c.Occurrence.Name}");
+                    sb.AppendLine($"- **Repeats**:  {c.Recurrence ?? term.Duration}");
+                    sb.AppendLine($"- **On Day**:  {c.OnDay.Day}");
+                    sb.AppendLine($"- **Venue**:  {c.Venue.Name}, {c.Venue.Address}");
+                    sb.AppendLine($"- **Occurs**:  {c.OccurrenceText}");
+                    sb.AppendLine($"- **Total Active Students**:  {c.TotalActiveStudents}");
+                    sb.AppendLine($"- **Total Waitlisted Students**:  {c.TotalWaitlistedStudents}");
+                    sb.AppendLine($"- **Participation Rate**:  {c.ParticipationRate.ToString("p2")}");
+                    sb.Append("- **Status**: ");
+                    if (c.ParticipationRate >= 1)
                     {
-                        classAppointments.Add(c.ID, new List<DxSchedulerAppointmentItem>());
+                        sb.AppendLine("Class is Full. New enrolment requests will be Waitlisted.");
                     }
-                    classAppointments[c.ID].Add(a);
-                }
-            }
-            foreach (Class c in classes)
-            {
-                if (classAppointments.ContainsKey(c.ID))
-                {
-                    foreach (var a in classAppointments[c.ID])
+                    else if (!c.Course.AllowAutoEnrol)
                     {
-                        c.ClassDates.Add(a.Start);
+                        sb.AppendLine("Class is Closed. New enrolment requests will be Waitlisted.");
                     }
+                    else
+                    {
+                        sb.AppendLine("Class is Open. New enrolment requests will be accepted.");
+                    }
+                    sb.AppendLine(string.Empty);
+                    sb.AppendLine("___");
+                    sb.AppendLine(string.Empty);
+
+                    //        if (c.Course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+                    //        {
+                    //            foreach (var e in c.Course.Enrolments)
+                    //                AssignParticipants(c, people, sc, e);
+                    //        }
+                    //        else
+                    //        {
+                    //            foreach (var e in c.Enrolments)
+                    //                AssignParticipants(c, people, sc, e);
+                    //        }
+                    //        sc.People = sc.People.OrderBy(x => x.SortOrder).ToList();
+                    //    }
+                    //});
                 }
             }
-
+            return sb.ToString();
         }
 
 
