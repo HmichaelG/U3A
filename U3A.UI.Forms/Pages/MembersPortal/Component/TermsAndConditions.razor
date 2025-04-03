@@ -16,7 +16,10 @@
         </div>
         <div class="input-group">
             <DxButton Text="Click to view our T & C's" SizeMode="SizeMode.Small"
-                      CssClass="flex-grow-1" IconCssClass="bi bi-eyeglasses menu-icon"
+                      CssClass=@((isConfirmationRequired)
+                  ? "flex-grow-1"
+                  : "popup-button mx-auto flex-grow-0")
+                      IconCssClass="bi bi-eyeglasses menu-icon icon-color pe-2"
                       Click="@(e => OnTandCClicked())"
                       RenderStyle="ButtonRenderStyle.Info"
                       RenderStyleMode="ButtonRenderStyleMode.Contained">
@@ -72,6 +75,9 @@
 
     .float-right {
         float: right;
+    }
+    .icon-color {
+        color: white !important;
     }
 </style>
 

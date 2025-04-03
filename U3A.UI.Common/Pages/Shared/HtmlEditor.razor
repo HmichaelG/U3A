@@ -15,10 +15,11 @@
 <DxTabs style="width:100%">
     <DxTabPage Text="Editor">
         <DxHtmlEditor AllowSoftLineBreak="true"
-        TableResizeEnabled="true"
-        MediaResizeEnabled="false"
-        Markup="@Markup" MarkupChanged="@OnMarkupChanged"
-        Width="@Width" Height="@Height">
+                      TableResizeEnabled="true"
+                      MediaResizeEnabled="false"
+                      @bind-Markup="@Markup"
+                      @bind-Markup:after="@OnMarkupChanged"
+                      Width="@Width" Height="@Height">
             <AdditionalItems>
                 @if (!DisableAIExtensions)
                 {
@@ -45,10 +46,10 @@
     <DxTabPage Text="Code" Click="() => {Markup = PrettyPrint(Markup);
                                             isCodeEditable=false;
                                             StateHasChanged();}">
-        <DxMemo @bind-Text="@Markup" @bind-Text:after=@OnEditorTextChanged
-        BindValueMode="BindValueMode.OnLostFocus"
-        Rows="20"
-        ReadOnly="@(!isCodeEditable)" />
+        <DxMemo @bind-Text="@Markup"
+                @bind-Text:after=@OnEditorTextChanged
+                Rows="20"
+                ReadOnly="@(!isCodeEditable)" />
         <DxButton Text="Edit" Click="OnEditClicked" CssClass="mt-1" />
         <div class="text-danger">@errorText</div>
     </DxTabPage>
@@ -56,10 +57,10 @@
 
 <style>
     .key-style {
-    color: cadetblue;
-    padding: 2px;
-    border: 1px solid cadetblue;
-    border-radius: 3px;
+        color: cadetblue;
+        padding: 2px;
+        border: 1px solid cadetblue;
+        border-radius: 3px;
     }
 </style>
 @code {
@@ -99,13 +100,9 @@
         return result;
     }
 
-    async Task OnMarkupChanged(string newValue)
+    async Task OnMarkupChanged()
     {
-        if (!string.IsNullOrWhiteSpace(newValue))
-        {
-            Markup = newValue;
-            await MarkupChanged.InvokeAsync(Markup);
-        }
+        await MarkupChanged.InvokeAsync(Markup);
     }
 
     async Task OnEditorTextChanged()
@@ -160,9 +157,9 @@
     async Task OnEditClicked()
     {
         isCodeEditable = await messageBox!.ShowAsync("Advanced Only",
-                                                                        @"<p>Editing code requires knowledge of HTML programming.
-                Errors in code may render unpredictable results or system errors.</p>
-                Do you wish to continue?");
+                       @"<p>Editing code requires knowledge of HTML programming.
+                    Errors in code may render unpredictable results or system errors.</p>
+                    Do you wish to continue?");
     }
 
 }

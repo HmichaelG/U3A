@@ -36,22 +36,23 @@ else
     <FullScreen>
         <ContentTemplate>
             <DxGrid Data="@DocumentTemplates" @ref=@mainGrid
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    ShowFilterRow="false"
-                    ShowAllRows="true"
-                    KeyFieldName="ID"
-                    ValidationEnabled="true"
-                    PopupEditFormCssClass="popup"
-                    CustomizeEditModel="Grid_CustomizeEditModel"
-                    EditMode="GridEditMode.PopupEditForm"
-                    EditModelSaving="Grid_EditModelSaving"
-                    DataItemDeleting="Grid_DataItemDeleting">
+            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+            ShowFilterRow="false"
+            ShowAllRows="true"
+            KeyFieldName="ID"
+            ValidationEnabled="true"
+            PopupEditFormCssClass="popup"
+            CustomizeEditModel="Grid_CustomizeEditModel"
+            PopupEditFormHeaderText="Edit Document Template"
+            EditMode="GridEditMode.PopupEditForm"
+            EditModelSaving="Grid_EditModelSaving"
+            DataItemDeleting="Grid_DataItemDeleting">
                 <ToolbarTemplate>
                     <GridToolbar LinkedGrid=@mainGrid LayoutKey="{40DFAFB6-C770-484C-B691-BB2D50A3AD2C}" />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridCommandColumnEx @ref="GridCommandColumn" Width="9rem"
-                                           EditButtonVisible="true" DeleteButtonVisible="true" NewButtonVisible="true" />
+                    EditButtonVisible="true" DeleteButtonVisible="true" NewButtonVisible="true" />
                     <DxGridDataColumn Caption="Type" FieldName="DocumentType.Name" />
                     <DxGridDataColumn Caption="Name" FieldName="Name" />
                     <DxGridDataColumn Caption="Subject" FieldName="Subject" />
@@ -65,13 +66,15 @@ else
                         var editItem = (DocumentTemplate)EditFormContext.EditModel;
                     }
                     <DxFormLayout>
-                        <DxFormLayoutGroup Caption="Parameters" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                        <DxFormLayoutGroup Caption="Parameters"
+                                           ExpandedChanged="@(() => areParamsVisible = !areParamsVisible )"
+                        ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                             <DxFormLayoutItem Caption="Template Type" ColSpanMd="12">
                                 <DxComboBox Data="@DocumentTypes" NullText="Select the document Type required..."
-                                            TextFieldName="@nameof(DocumentType.Name)"
-                                            Value="@editItem.DocumentType"
-                                            ValueExpression="@(() => editItem.DocumentType)"
-                                            ValueChanged="@((DocumentType docType) => SelectedDocTypeChanged(docType, editItem))" />
+                                TextFieldName="@nameof(DocumentType.Name)"
+                                Value="@editItem.DocumentType"
+                                ValueExpression="@(() => editItem.DocumentType)"
+                                ValueChanged="@((DocumentType docType) => SelectedDocTypeChanged(docType, editItem))" />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Template Name" ColSpanMd="12">
                                 <DxTextBox @bind-Text="@editItem.Name" />
@@ -81,33 +84,33 @@ else
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="Preheader" ColSpanMd="12" Visible="@IsEmail">
                                 <DxTextBox @bind-Text="@editItem.EmailPreheader"
-                                    NullText="A short introduction displayed in the email inbox."/>
+                                NullText="A short introduction displayed in the email inbox."/>
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption="From Email Address" ColSpanMd="12" Visible="@IsEmail">
                                 <DxComboBox Data="@emailAddresses" AllowUserInput="true"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            NullText="Enter the email address to send from..."
-                                            TData="string"
-                                            TValue="string"
-                                            Text="@editItem.FromEmailAddress"
-                                            TextExpression="@(() => editItem.FromEmailAddress)"
-                                            TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress,editItem))" />
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                NullText="Enter the email address to send from..."
+                                TData="string"
+                                TValue="string"
+                                Text="@editItem.FromEmailAddress"
+                                TextExpression="@(() => editItem.FromEmailAddress)"
+                                TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress,editItem))" />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem Caption=@FromDisplayNameText ColSpanMd="12" Visible="IsEmailOrSMS">
                                 <DxComboBox Data=@displayNames AllowUserInput="true"
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            NullText="Enter the Display Name to send from..."
-                                            TData="string"
-                                            TValue="string"
-                                            @bind-Text=@editItem.FromDisplayName />
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                NullText="Enter the Display Name to send from..."
+                                TData="string"
+                                TValue="string"
+                                @bind-Text=@editItem.FromDisplayName />
                             </DxFormLayoutItem>
                         </DxFormLayoutGroup>
                         <div class="alert-danger text-dark text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
-                        <DxRichEdit DocumentContent="@DocumentContent"
-                                    CheckSpelling=true
-                                    DocumentFormat="DocumentFormat.Rtf"
-                                    DocumentLoaded="OnDocumentLoaded"
-                                    @ref="richEdit" CssClass="w-100">
+                        <DxRichEdit DocumentContent="@DocumentContent"                                    
+                        CheckSpelling=true
+                        DocumentFormat="DocumentFormat.Rtf"
+                        DocumentLoaded="OnDocumentLoaded"
+                        @ref="richEdit" CssClass="document-style">
                             <AdditionalItems>
                                 <SummarizeAIContextMenuItem />
                                 <ExplainAIContextMenuItem />
@@ -133,7 +136,12 @@ else
 
 <style>
     .popup {
-        min-width: 65rem;
+    min-width: 65rem;
+    }
+
+    .document-style {
+    width: 100%;
+    height: @((areParamsVisible) ? "35rem" : "45rem");
     }
 </style>
 
@@ -143,6 +151,7 @@ else
     bool IsEmailOrSMS;
     byte[] DocumentContent = null;
     string AdditionalValidations = string.Empty;
+    bool areParamsVisible = true;
     List<DocumentType> DocumentTypes { get; set; }
     List<DocumentTemplate> DocumentTemplates { get; set; }
     IEnumerable<object> MergeData;
