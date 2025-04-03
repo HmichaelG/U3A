@@ -36,6 +36,13 @@ else
 {
     @if (isInteractive)
     {
+        <DxButton Text="@((IsSmallLayout || IsXtraSmallLayout) ? "" : "Website")"
+                  IconCssClass="h2 bi bi-arrow-left-circle"
+                  CssClass="back-button-style"
+                  Click="@OnClose"
+                  RenderStyle="ButtonRenderStyle.Primary"
+                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+        </DxButton>
         <DxGridLayout>
             <Rows>
                 @if (IsXtraSmallLayout || IsSmallLayout)
@@ -166,13 +173,6 @@ else
 
                                         }
                                         <div class="row">
-                                            <DxButton Text="Return to website"
-                                                      IconCssClass="bi bi-globe-asia-australia menu-icon me-3 h2"
-                                                      CssClass="col-6 mx-auto mt-2"
-                                                      Click="@OnClose"
-                                                      RenderStyle="ButtonRenderStyle.Primary"
-                                                      RenderStyleMode="ButtonRenderStyleMode.Outline">
-                                            </DxButton>
                                             <footer class="footer my-2 text-muted">
                                                 <div align="center">
                                                     &copy; @(DateTime.Today.Year) U3Admin.org.au
@@ -217,6 +217,12 @@ else
     }
 }
 <style>
+    .back-button-style {
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+    }
+
     .box-height {
         height: @((IsXtraSmallLayout || IsSmallLayout) ? "" : (IsLargeLayout || IsXtraLargeLayout) ? "5rem" : "10rem");
     }
