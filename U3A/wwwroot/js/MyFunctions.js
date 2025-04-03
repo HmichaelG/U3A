@@ -103,7 +103,7 @@ function displayNonInteractive() {
         if (element != null) {
             element.style.display = "block";
         }
-    }, 5000);
+    }, 10000);
 };
 function setTheme() {
     // If we pass a theme in a query string then save it to localStorage
