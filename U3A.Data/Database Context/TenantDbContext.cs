@@ -1,6 +1,4 @@
-﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more information.
-
+﻿
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -30,10 +28,6 @@ namespace U3A.Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer(cnnStr);
-            }
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
