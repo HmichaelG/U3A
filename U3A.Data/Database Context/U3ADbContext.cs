@@ -70,6 +70,9 @@ namespace U3A.Database
             var identifier = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);
             using (var dbc = _TenantDbFactory.CreateDbContext())
             {
+                // Redirect console output to null
+                Console.SetOut(TextWriter.Null);
+
                 TenantInfo = dbc.TenantInfo.AsNoTracking()
                     .FirstOrDefault(x => x.Identifier == identifier);
                 if (TenantInfo == null)
@@ -78,6 +81,11 @@ namespace U3A.Database
                         .AsNoTracking()
                         .FirstOrDefault(x => x.Identifier == "demo");
                 }
+
+                // Redirect console output back to standard output
+                var standardConsole = new StreamWriter(Console.OpenStandardOutput());
+                standardConsole.AutoFlush = true;
+                Console.SetOut(standardConsole);
             }
         }
     }
