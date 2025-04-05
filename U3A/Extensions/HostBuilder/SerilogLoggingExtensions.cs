@@ -47,7 +47,9 @@ public static class SerilogLoggingExtensions
                                             columnOptions: columnOptions
                                         )
                 )
-            .WriteTo.Console(formatProvider: new CultureInfo("en-AU"), theme: AnsiConsoleTheme.Literate)
+            .WriteTo.Console(formatProvider: new CultureInfo("en-AU"), 
+                        theme: AnsiConsoleTheme.Sixteen, 
+                        applyThemeToRedirectedOutput: true)
             .WriteTo.OpenTelemetry()
             .WriteTo.MSSqlServer(connectionString: TenantConnectionString,
                                     formatProvider: new CultureInfo("en-AU"),

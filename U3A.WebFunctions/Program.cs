@@ -30,13 +30,14 @@ var host = new HostBuilder()
             .MinimumLevel.Override("Aspire", LogEventLevel.Error)
             .Enrich.FromLogContext()
             .WriteTo.OpenTelemetry()
-                .WriteTo.Console(LogEventLevel.Information, outputTemplate:
-                    "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.File(filePath,
-                            LogEventLevel.Information,
-                            shared: true,
-                            rollingInterval: RollingInterval.Day)
-                .CreateLogger();
+            .WriteTo.Console(formatProvider: new CultureInfo("en-AU"),
+                        theme: AnsiConsoleTheme.Sixteen,
+                        applyThemeToRedirectedOutput: true)
+            .WriteTo.File(filePath,
+                        LogEventLevel.Information,
+                        shared: true,
+                        rollingInterval: RollingInterval.Day)
+            .CreateLogger();
         logging.AddSerilog(Log.Logger, true);
         constants.IS_DEVELOPMENT = hostingContext.HostingEnvironment.IsDevelopment();
     })
