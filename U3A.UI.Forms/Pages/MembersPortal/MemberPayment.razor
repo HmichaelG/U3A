@@ -418,7 +418,7 @@ else
         string sendEmailDisplayName = "";
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            var emailSender = EmailFactory.GetEmailSender(dbc);
+            var emailSender = await EmailFactory.GetEmailSenderAsync(dbc);
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID)
                             .FirstOrDefaultAsync() ?? throw new ArgumentNullException(nameof(SystemSettings));
             if (settings != null)

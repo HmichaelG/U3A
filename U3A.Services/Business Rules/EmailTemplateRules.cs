@@ -16,7 +16,7 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<DocumentTemplate>> SelectableDocumentTemplatesAsync(U3ADbContext dbc)
         {
-            bool hasEmail = (EmailFactory.GetEmailSender(dbc) == null) ? false : true;
+            bool hasEmail = (await EmailFactory.GetEmailSenderAsync(dbc) == null) ? false : true;
             bool hasSMS = (SMSFactory.GetSMSSender(dbc) == null) ? false : true;
             var result = await dbc.DocumentTemplate.AsNoTracking()
                             .Include(x => x.DocumentType)

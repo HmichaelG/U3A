@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -85,10 +86,28 @@ public enum EmailType
 
 public static class EmailFactory
 {
+    public static async Task<IEmailService?> GetEmailSenderAsync(U3ADbContext dbc)
+    {
+        IEmailService? result = null;
+        var settings = await dbc.SystemSettings
+                                    .OrderBy(x => x.ID)
+                                    .FirstOrDefaultAsync();
+        result = GetEmailSender(dbc, result, settings);
+        return result;
+    }
+
     public static IEmailService? GetEmailSender(U3ADbContext dbc)
     {
         IEmailService? result = null;
-        SystemSettings settings = dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefault();
+        var settings = dbc.SystemSettings
+                                    .OrderBy(x => x.ID)
+                                    .FirstOrDefault();
+        result = GetEmailSender(dbc, result, settings);
+        return result;
+    }
+
+    static IEmailService? GetEmailSender(U3ADbContext dbc, IEmailService? result, SystemSettings? settings)
+    {
         var tenantInfo = dbc.TenantInfo;
         if (tenantInfo.PostmarkAPIKey != null && !tenantInfo.UsePostmarkTestEnviroment)
         {
@@ -100,8 +119,10 @@ public static class EmailFactory
             result = new PostmarkEmailSender(tenantInfo.PostmarkSandboxAPIKey,
                             tenantInfo.UsePostmarkTestEnviroment, settings);
         }
+
         return result;
     }
+
 
     public static IEmailService? GetIdentityEmailSender(U3ADbContext dbc)
     {

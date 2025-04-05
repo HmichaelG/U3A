@@ -24,7 +24,7 @@ namespace U3A.WebFunctions.Procedures
                 var msg = await CreateEmailMessage(dbc);
                 if (!string.IsNullOrWhiteSpace(msg))
                 {
-                    var emailSender = EmailFactory.GetEmailSender(dbc);
+                    var emailSender = await EmailFactory.GetEmailSenderAsync(dbc);
                     string sendEmailAddress = "";
                     string sendEmailDisplayName = "";
                     var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync() ?? throw new ArgumentNullException(nameof(SystemSettings));

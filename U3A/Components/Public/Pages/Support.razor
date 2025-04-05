@@ -129,7 +129,7 @@ else
         {
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                var emailSender = EmailFactory.GetEmailSender(dbc);
+                var emailSender = await EmailFactory.GetEmailSenderAsync(dbc);
                 var sendTo = settings!.SupportEmailAddesss ?? settings.SendEmailAddesss;
                 var msg = BuildMessage();
                 var subject = $"!!!HEADS UP!!! {supportModel!.Name} requires your support.";
