@@ -240,7 +240,7 @@ namespace U3A.BusinessRules
                 {
                     var endDate = selectedTerm.StartDate.AddMinutes(-1);
                     Log.Warning("        End Date set to Term Start date minus 1 minute {p0}", endDate);
-                    Log.Warning("        Because clacluated start date is null.");
+                    Log.Warning("        Because calculated start date is null.");
                     return endDate;
                 }
             }
