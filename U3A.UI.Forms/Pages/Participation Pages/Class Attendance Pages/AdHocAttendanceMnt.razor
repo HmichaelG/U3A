@@ -18,12 +18,12 @@
                           @bind-Values="@SelectedPersons">
                     <DxListEditorColumn FieldName="@nameof(Person.FullName)"
                                         Caption="Name" />
-                        <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
-                                            Caption="Mobile" Visible=@IsLargerLayout
-                                            Width="25%" />
-                        <DxListEditorColumn FieldName="@nameof(Person.Email)"
-                                            Caption="Email" Visible=@IsLargerLayout
-                                            Width="25%" />
+                    <DxListEditorColumn FieldName="@nameof(Person.Mobile)"
+                                        Caption="Mobile" Visible=@IsLargerLayout
+                                        Width="25%" />
+                    <DxListEditorColumn FieldName="@nameof(Person.Email)"
+                                        Caption="Email" Visible=@IsLargerLayout
+                                        Width="25%" />
                 </DxTagBox>
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Comment" ColSpanSm="12">
@@ -42,43 +42,49 @@
     </FooterContentTemplate>
 </DxPopup>
 
-                    @code {
+@code {
 
-        [Parameter]
-        public List<Person> AvailablePersons { get; set; }
-        [Parameter]
-        public IEnumerable<Person>? SelectedPersons { get; set; }
-        [Parameter]
-        public bool IsLargerLayout { get; set; }
+    [Parameter]
+    public List<Person> AvailablePersons { get; set; }
+    [Parameter]
+    public IEnumerable<Person>? SelectedPersons { get; set; }
+    [Parameter]
+    public bool IsLargerLayout { get; set; }
 
-        [Parameter]
-        public string AttendanceComment { get; set; } = string.Empty;
+    [Parameter]
+    public string AttendanceComment { get; set; } = string.Empty;
 
 
 
-        bool popupVisible { get; set; }
-        DxPopup? popup;
+    bool popupVisible { get; set; }
+    DxPopup? popup;
 
-        TaskCompletionSource<bool>? tcs;
+    TaskCompletionSource<bool>? tcs;
 
-        public Task<bool> ShowAsync() {
-            SelectedPersons = new List<Person>();
-            popupVisible = true;
-            tcs = new TaskCompletionSource<bool>();
-            tcs.Task.ContinueWith(_ => {
-                popupVisible = false;
-            });
-            StateHasChanged();
-            return tcs.Task;
-        }
-
-        void AffirmativeButtonClicked() {
+    public Task<bool> ShowAsync()
+    {
+        SelectedPersons = new List<Person>();
+        popupVisible = true;
+        tcs = new TaskCompletionSource<bool>();
+        tcs.Task.ContinueWith(_ =>
+        {
             popupVisible = false;
-            tcs?.SetResult(true);
-        }
-        void NegativeButtonClicked() {
-            popupVisible = false;
-            tcs?.SetResult(false);
-        }
+        });
+        StateHasChanged();
+        return tcs.Task;
+    }
+
+    void AffirmativeButtonClicked()
+    {
+        if (tcs?.Task.IsCompleted == true) return;
+        popupVisible = false;
+        tcs?.TrySetResult(true);
+    }
+    void NegativeButtonClicked()
+    {
+        if (tcs?.Task.IsCompleted == true) return;
+        popupVisible = false;
+        tcs?.TrySetResult(false);
+    }
 
 }

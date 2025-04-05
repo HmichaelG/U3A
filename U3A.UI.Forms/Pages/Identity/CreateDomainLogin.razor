@@ -152,19 +152,19 @@
         return $"office{GetDomain()}";
     }
 
-    bool isProcessing;
     async Task AffirmativeButtonClicked() {
-        if (isProcessing) return;
-        isProcessing = true;
+        if (tcs?.Task.IsCompleted == true) return;
         if (await IsDataOk()) {
             await Process();
             popupVisible = false;
             tcs?.SetResult(true);
         }
-        isProcessing = false;
     }
+
     void NegativeButtonClicked() {
+        if (tcs?.Task.IsCompleted == true) return;
         popupVisible = false;
+        tcs?.TrySetResult(false);
     }
 
 }

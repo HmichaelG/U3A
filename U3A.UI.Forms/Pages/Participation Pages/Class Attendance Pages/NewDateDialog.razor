@@ -59,13 +59,15 @@
 
     void AffirmativeButtonClicked()
     {
+        if (tcs?.Task.IsCompleted == true) return;
         popupVisible = false;
-        tcs?.SetResult(true);
+        tcs?.TrySetResult(true);
     }
     void NegativeButtonClicked()
     {
+        if (tcs?.Task.IsCompleted == true) return;
         popupVisible = false;
-        tcs?.SetResult(false);
+        tcs?.TrySetResult(false);
     }
 
 }

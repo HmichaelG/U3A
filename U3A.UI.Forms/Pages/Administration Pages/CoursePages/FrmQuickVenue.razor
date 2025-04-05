@@ -5,11 +5,11 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <DxPopup Visible="@popupVisible" @ref="@popup"
-         Closed="@NegativeButtonClicked"
-         CloseOnEscape="false"
-         CloseOnOutsideClick="false"
-         ShowFooter="true"
-         HeaderText="Add New Venue">
+Closed="@NegativeButtonClicked"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+ShowFooter="true"
+HeaderText="Add New Venue">
     <BodyTemplate Context="PopupContext">
         <DxFormLayout CssClass="m-2">
             <DxFormLayoutItem Caption="Venue" ColSpanMd="12">
@@ -22,12 +22,12 @@
     </BodyTemplate>
     <FooterContentTemplate>
         <DxButton CssClass="popup-button"
-                  RenderStyle="ButtonRenderStyle.Primary"
-                  Text="Ok"
-                  Click="@AffirmativeButtonClicked" />
+        RenderStyle="ButtonRenderStyle.Primary"
+        Text="Ok"
+        Click="@AffirmativeButtonClicked" />
         <DxButton CssClass="popup-button"
-                  RenderStyle="ButtonRenderStyle.Secondary"
-                  Text="Cancel" Click="@NegativeButtonClicked" />
+        RenderStyle="ButtonRenderStyle.Secondary"
+        Text="Cancel" Click="@NegativeButtonClicked" />
     </FooterContentTemplate>
 </DxPopup>
 
@@ -64,6 +64,7 @@
 
     async Task AffirmativeButtonClicked()
     {
+        if (tcs?.Task.IsCompleted == true) return;
         if (string.IsNullOrWhiteSpace(venue.Name)) return;
         if (string.IsNullOrWhiteSpace(venue.Address)) return;
         using (var dbc = U3Adbfactory.CreateDbContext())
@@ -73,12 +74,12 @@
         }
         NewID = venue.ID;
         popupVisible = false;
-        tcs?.SetResult(true);
+        tcs?.TrySetResult(true);
     }
     void NegativeButtonClicked()
     {
         popupVisible = false;
-        tcs?.SetResult(false);
+        tcs?.TrySetResult(false);
     }
 
 }

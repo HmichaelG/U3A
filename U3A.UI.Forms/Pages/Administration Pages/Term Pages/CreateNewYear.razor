@@ -156,18 +156,19 @@
 
     void AffirmativeButtonClicked()
     {
+        if (tcs?.Task.IsCompleted == true) return;
         if (IsDataOK())
         {
             SaveData();
             popupVisible = false;
-            tcs?.SetResult(true);
+            tcs?.TrySetResult(true);
         }
     }
 
     void NegativeButtonClicked()
     {
         popupVisible = false;
-        tcs?.SetResult(false);
+        tcs?.TrySetResult(false);
     }
 
     void SaveData()
