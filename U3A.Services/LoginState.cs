@@ -56,8 +56,14 @@ namespace U3A.Services
                 IsNewMember = (LinkedPeople.Count <= 0) ? true : false;
                 if (!IsNewMember)
                 {
-                    if (OnBehalfOfMember != null) { SelectedPerson = OnBehalfOfMember; }
-                    if (SelectedPerson == null) { SelectedPerson = LinkedPeople.FirstOrDefault(); }
+                    if (OnBehalfOfMember != null) 
+                    { 
+                        SelectedPerson = OnBehalfOfMember; 
+                    }
+                    else 
+                    { 
+                        SelectedPerson = LinkedPeople.FirstOrDefault(); 
+                    }
                 }
             }
         }
