@@ -28,6 +28,11 @@ namespace U3A.Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
+            if (!optionsBuilder.IsConfigured)
+            {
+                // Use the connection string passed in
+                optionsBuilder.UseSqlServer(cnnStr);
+            }
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
