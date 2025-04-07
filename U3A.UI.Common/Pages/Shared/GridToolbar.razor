@@ -370,12 +370,12 @@ ItemClick="OnItemClick">
         }
         catch (NullReferenceException ex)
         {
-            await messageBox.ShowOkOnlyAsync("Export Error",
+            await messageBox!.ShowOkOnlyAsync("Export Error",
             $"{ex.Message}<p>This error will occur when there are no grid rows selected.</p>");
         }
         catch (Exception ex)
         {
-            await messageBox.ShowOkOnlyAsync("Export Error", ex.Message);
+            await messageBox!.ShowOkOnlyAsync("Export Error", ex.Message);
         }
     }
 

@@ -4,7 +4,7 @@
     [Parameter]
     public EventCallback<object> OnDeleteButtonClick { get; set; }
 
-    IGrid MyGrid { get; set; }
+    IGrid? MyGrid;
     protected override bool ShouldRender() => false;
 
     protected override void OnInitialized() {
@@ -54,7 +54,7 @@
         }
         else
         {
-            MyGrid.ShowDataItemDeleteConfirmation(DataItem);
+            MyGrid?.ShowDataItemDeleteConfirmation(DataItem);
         }
     }
 

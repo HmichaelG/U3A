@@ -71,12 +71,9 @@
     private LoginState? loginState { get; set; }
 
     U3ADbContext? dbc { get; set; }
-    bool isReady = false;
     string? currentUrl;
     bool isInteractive = false;
     SizeMode sizeMode;
-
-    private DotNetObjectReference<MainLayout>? dotNetObjectReference;
 
     protected override async Task OnInitializedAsync()
     {
@@ -138,8 +135,6 @@
         ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count();
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
-        isReady = true;
-        await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

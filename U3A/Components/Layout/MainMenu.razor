@@ -243,7 +243,6 @@
     bool isOfficeRole { get; set; }
     string? userName { get; set; }
     string OrganisationName = string.Empty;
-    ContextHelpTitle? help;
     AuthenticationState? authenticationState;
 
     protected override async Task OnInitializedAsync()
@@ -281,11 +280,6 @@
     {
         currentUrl = navMan.ToBaseRelativePath(e.Location);
         StateHasChanged();
-    }
-
-    async Task ShowHelp()
-    {
-        await help!.ShowTopicAsync();
     }
 
     private void OnLogout()

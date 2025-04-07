@@ -8,11 +8,11 @@ CloseOnOutsideClick="false"
 ShowFooter="true"
 AllowDrag=true
 AllowResize=true
-HeaderText=@mCaption>
+HeaderText=@Caption>
     <BodyContentTemplate Context="PopupContext">
         @TextTemplate
         <div class="messagebox-body-height">
-            @(new MarkupString(mMessage))
+            @(new MarkupString(mMessage ?? string.Empty))
         </div>
     </BodyContentTemplate>
     <FooterContentTemplate>
@@ -20,7 +20,7 @@ HeaderText=@mCaption>
         {
             <DxCheckBox @bind-Checked=@dontShowAgain @bind-Checked:after=@SaveDontShowResponse
             Alignment="CheckBoxContentAlignment.Left"
-            LabelPosition="LabelPosition.Right" CssClass="me-2">Don't show agian</DxCheckBox>
+            LabelPosition="LabelPosition.Right" CssClass="me-2">Don't show again</DxCheckBox>
         }
         <DxButton CssClass="popup-button" Visible="@mShowOkButton"
         RenderStyle="ButtonRenderStyle.Primary"
@@ -67,22 +67,13 @@ HeaderText=@mCaption>
     }
 
     [Parameter]
-    public string Caption
-    {
-        get
-        {
-            return mCaption;
-        }
-        set
-        {
-            mCaption = value;
-        }
-    }
+    public string Caption { get; set; } = string.Empty;
+
 
     [Parameter]
-    public string PopupWidth { get; set; }
+    public string PopupWidth { get; set; } = "auto";
     [Parameter]
-    public RenderFragment TextTemplate { get; set; } = default;
+    public RenderFragment? TextTemplate { get; set; } = default;
     [Parameter]
     public EventCallback AffirmativeButtonClicked { get; set; }
     [Parameter]
@@ -100,7 +91,6 @@ HeaderText=@mCaption>
     string? mNoButtonText { get; set; }
     string? mCancelButtonText { get; set; }
     string? mMessage { get; set; }
-    string? mCaption { get; set; }
     string? mLayoutKey { get; set; }
     bool mShowCancelButton { get; set; }
     bool mShowOkButton { get; set; } = true;
@@ -130,7 +120,7 @@ HeaderText=@mCaption>
         mShowCancelButton = args.ShowCancelButton;
         mShowOkButton = args.ShowOkButton;
         mShowNoButton = args.ShowNoButton;
-        mCaption = args.Caption;
+        Caption = args.Caption;
         mMessage = args.Message;
         mLayoutKey = args.LayoutKey;
         if (mLayoutKey != null)
@@ -151,7 +141,7 @@ HeaderText=@mCaption>
         mOKButtonText = "Ok";
         mShowOkButton = true;
         mShowCancelButton = false;
-        mCaption = Caption;
+        this.Caption = Caption;
         mMessage = Message;
         return await ShowAsync();
     }
@@ -162,7 +152,7 @@ HeaderText=@mCaption>
         mCancelButtonText = "Cancel";
         mShowOkButton = true;
         mShowCancelButton = true;
-        mCaption = Caption;
+        this.Caption = Caption;
         mMessage = Message;
         return await ShowAsync();
     }

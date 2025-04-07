@@ -27,7 +27,7 @@
 else
 {
     <PortalHeader NavigateTo="/public" NoU3AGroup="true" />
-    <div class="col mx-1 col-md-10 col-lg-8 col-xl-6 mx-md-auto">
+    <div class="container col mx-1 col-md-10 col-lg-8 col-xl-6 mx-md-auto">
         <div class="h6 pt-2 col-12" align="center">
             @term?.TermSummary
         </div>
@@ -39,28 +39,30 @@ else
         }
         <div class="list-detail mx-auto">
             <DxTextBox @ref=@filterTextBox
-                       CssClass="filter-text-box flex-grow-1"
-                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                       Text="@filterText"
-                       TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
-                       BindValueMode="BindValueMode.OnInput"
-                       InputDelay="500"
-                       NullText="Search">
+            CssClass="filter-text-box flex-grow-1"
+            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+            Text="@filterText"
+            TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
+            BindValueMode="BindValueMode.OnInput"
+            InputDelay="500"
+            NullText="Search">
             </DxTextBox>
         </div>
         <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
-                KeyFieldName="ID"
-                ShowAllRows=true
-                VirtualScrollingEnabled=true
-                AllowSelectRowByClick=false
-                AllowGroup=false
-                AllowSort=false
-                PagerVisible=false
-                CssClass="mt-1 listbox-scroll">
+        KeyFieldName="ID"
+        ShowAllRows=true
+        VirtualScrollingEnabled=true
+        AllowSelectRowByClick=false
+        AllowGroup=false
+        AllowSort=false
+        PagerVisible=false
+        CssClass="mt-1 listbox-scroll">
             <Columns>
                 <DxGridDataColumn Width="100%">
                     <HeaderCaptionTemplate>
-                        <DxTabs @ref="dxTabs" TabClick="@OnTabClick" CssClass="">
+                        <DxTabs @ref="dxTabs" 
+                            TabClick="@OnTabClick" 
+                                @bind-ActiveTabIndex=@activeTabIndex CssClass="">
                             <DxTabPage Text="All" />
                             <DxTabPage Text="Mon" />
                             <DxTabPage Text="Tue" />
@@ -74,85 +76,85 @@ else
                         @{
                             var c = (Class)context.DataItem;
 
-                                <DxFormLayout CssClass="mx-auto list-detail">
-                                    <DxFormLayoutGroup Context="thatContext" HeaderCssClass="">
-                                        <CaptionTemplate>
-                                            <div class="mx-md-1 d-flex w-100">
-                                                <div class="flex-grow-1">
-                                                    @if (c.Course.IsFeaturedCourse)
-                                                    {
-                                                        <div class="badge bg-primary me-1">Featured</div>
-                                                    }
-                                                    @(HighlightSearchText(ClassTitle(c)))
-                                                </div>
+                            <DxFormLayout CssClass="mx-auto list-detail">
+                                <DxFormLayoutGroup Context="thatContext" HeaderCssClass="">
+                                    <CaptionTemplate>
+                                        <div class="mx-md-1 d-flex w-100">
+                                            <div class="flex-grow-1">
+                                                @if (c.Course.IsFeaturedCourse)
+                                                {
+                                                    <div class="badge bg-primary me-1">Featured</div>
+                                                }
+                                                @(HighlightSearchText(ClassTitle(c)))
                                             </div>
-                                        </CaptionTemplate>
-                                        <Items>
-                                            @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
+                                        </div>
+                                    </CaptionTemplate>
+                                    <Items>
+                                        @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
+                                        {
+                                            <div class="row px-2 px-md-3 col-12">
+                                                <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
+                                            </div>
+                                        }
+                                        <div class="w-100 text-center">
+                                            @if (c.Course.CourseFeePerYear != 0)
                                             {
-                                                <div class="row px-2 px-md-3 col-12">
-                                                    <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
+                                                <div class="text-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
+                                            }
+                                            @if (c.Course.CourseFeePerTerm != 0)
+                                            {
+                                                <div class="text-info"><strong>Fee / Term: @($"{c.Course.CourseFeePerTerm.ToString("c2")} {c.Course.CourseFeePerTermDescription}")</strong></div>
+                                            }
+                                        </div>
+
+                                        <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
+                                            @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
+                                        </div>
+
+                                        @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
+                                        {
+                                            <div class="col-small ps-1"><strong>Offered</strong></div>
+                                            <div class="col-large">@c.OfferedSummary</div>
+                                            <div class="col-small ps-1"><strong>Type</strong></div>
+                                            <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
+                                            <div class="col-small ps-1"><strong>Class</strong></div>
+                                            <div class="col-large">@(GetClassDetails(c))</div>
+                                            @if (c.Course.ClassSummaries.Count <= 1)
+                                            {
+                                                <div class="col-small ps-1"><strong>Venue</strong></div>
+                                                <div class="col-large">@HighlightSearchText(c.Venue?.Name)</div>
+                                                <div class="offset-small col-large">@c.Venue?.Address</div>
+                                            }
+                                        }
+                                        <!-- Report Style Detail -->
+
+                                        <div class="row col col-12 mt-2">
+                                            <div class="col-3 px-1 text-center"><strong>Max</strong></div>
+                                            <div class="col-3 px-1 text-center"><strong>Min</strong></div>
+                                            <div class="col-3 px-1 text-center"><strong>Enrolled</strong></div>
+                                            <div class="col-3 px-1 text-center"><strong>Waitlist</strong></div>
+                                            <div class="col-3 px-1 text-center">@c.Course.MaximumStudents</div>
+                                            <div class="col-3 px-1 text-center">@c.Course.RequiredStudents</div>
+                                            <div class="col-3 px-1 text-center">@c.TotalActiveStudents</div>
+                                            <div class="col-3 px-1 text-center">@c.TotalWaitlistedStudents</div>
+                                        </div>
+                                        @{
+                                            string? message = null;
+                                            if (c.TermNumber != term.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
+                                            if (c.TermNumber == prevTerm.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
+                                            if (c.TotalActiveStudents >= c.Course.MaximumStudents) { message = "Class is Full"; }
+                                            if (!c.Course.AllowAutoEnrol) { message = "Class is Closed"; }
+                                            if (message != null)
+                                            {
+                                                <div class="watermark"
+                                                hidden="@(isListboxShowingSummary)">
+                                                    @message
                                                 </div>
                                             }
-                                            <div class="w-100 text-center">
-                                                @if (c.Course.CourseFeePerYear != 0)
-                                                {
-                                                    <div class="text-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
-                                                }
-                                                @if (c.Course.CourseFeePerTerm != 0)
-                                                {
-                                                    <div class="text-info"><strong>Fee / Term: @($"{c.Course.CourseFeePerTerm.ToString("c2")} {c.Course.CourseFeePerTermDescription}")</strong></div>
-                                                }
-                                            </div>
-
-                                            <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
-                                                @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
-                                            </div>
-
-                                            @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
-                                            {
-                                                <div class="col-small ps-1"><strong>Offered</strong></div>
-                                                <div class="col-large">@c.OfferedSummary</div>
-                                                <div class="col-small ps-1"><strong>Type</strong></div>
-                                                <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
-                                                <div class="col-small ps-1"><strong>Class</strong></div>
-                                                <div class="col-large">@(GetClassDetails(c))</div>
-                                                @if (c.Course.ClassSummaries.Count <= 1)
-                                                {
-                                                    <div class="col-small ps-1"><strong>Venue</strong></div>
-                                                    <div class="col-large">@HighlightSearchText(c.Venue?.Name)</div>
-                                                    <div class="offset-small col-large">@c.Venue?.Address</div>
-                                                }
-                                            }
-                                            <!-- Report Style Detail -->
-
-                                            <div class="row col col-12 mt-2">
-                                                <div class="col-3 px-1 text-center"><strong>Max</strong></div>
-                                                <div class="col-3 px-1 text-center"><strong>Min</strong></div>
-                                                <div class="col-3 px-1 text-center"><strong>Enrolled</strong></div>
-                                                <div class="col-3 px-1 text-center"><strong>Waitlist</strong></div>
-                                                <div class="col-3 px-1 text-center">@c.Course.MaximumStudents</div>
-                                                <div class="col-3 px-1 text-center">@c.Course.RequiredStudents</div>
-                                                <div class="col-3 px-1 text-center">@c.TotalActiveStudents</div>
-                                                <div class="col-3 px-1 text-center">@c.TotalWaitlistedStudents</div>
-                                            </div>
-                                            @{
-                                                string? message = null;
-                                                if (c.TermNumber != term.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
-                                                if (c.TermNumber == prevTerm.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
-                                                if (c.TotalActiveStudents >= c.Course.MaximumStudents) { message = "Class is Full"; }
-                                                if (!c.Course.AllowAutoEnrol) { message = "Class is Closed"; }
-                                                if (message != null)
-                                                {
-                                                    <div class="watermark"
-                                                         hidden="@(isListboxShowingSummary)">
-                                                        @message
-                                                    </div>
-                                                }
-                                            }
-                                        </Items>
-                                    </DxFormLayoutGroup>
-                                </DxFormLayout>
+                                        }
+                                    </Items>
+                                </DxFormLayoutGroup>
+                            </DxFormLayout>
                         }
 
                     </CellDisplayTemplate>
@@ -167,40 +169,40 @@ else
 
             <div class="input-group">
                 <DxButton CssClass="flex-grow-1"
-                          IconCssClass="menu-icon bi-door-open"
-                          Text="Return to Portal"
-                          RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
+                IconCssClass="menu-icon bi-door-open"
+                Text="Return to Portal"
+                RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
             </div>
         </div>
     </div>
 }
 <style>
     .filter-text-box {
-        margin: auto;
-        background: url(images/search.svg) no-repeat scroll 5px 5px;
-        padding-left: 30px;
+    margin: auto;
+    background: url(images/search.svg) no-repeat scroll 5px 5px;
+    padding-left: 30px;
     }
 
     .combo-list-box {
-        margin: auto;
-        background: url(images/list-ul.svg) no-repeat scroll 5px 5px;
-        padding-left: 30px;
+    margin: auto;
+    background: url(images/list-ul.svg) no-repeat scroll 5px 5px;
+    padding-left: 30px;
     }
 
     .selected-box {
-        width: 100%;
-        position: relative;
-        border: 1px solid transparent;
-        border-radius: 0.25rem;
+    width: 100%;
+    position: relative;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
     }
 
     .weblink-button {
-        width: 80%;
-        margin: auto
+    width: 80%;
+    margin: auto
     }
 
     .highlight {
-        background-color: yellow !important;
+    background-color: yellow !important;
     }
 
     .listbox-scroll {
@@ -208,79 +210,69 @@ else
     }
 
     .list-detail {
-        width: 98%;
-        margin: auto;
+    width: 98%;
+    margin: auto;
     }
 
     .col-small {
-        -webkit-box-flex: 0;
-        -webkit-flex: 0 0 auto;
-        -ms-flex: 0 0 auto;
-        flex: 0 0 auto;
-        width: 22%;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    width: 22%;
     }
 
     .col-large {
-        -webkit-box-flex: 0;
-        -webkit-flex: 0 0 auto;
-        -ms-flex: 0 0 auto;
-        flex: 0 0 auto;
-        width: 78%;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    width: 78%;
     }
 
     .offset-small {
-        margin-left: 22%;
+    margin-left: 22%;
     }
 
     .watermark {
-        width: 100%;
-        text-align: center;
-        font-size: 2rem;
-        font-weight: 500;
-        opacity: 0.4;
-        color: magenta;
-        position: absolute;
-        bottom: 10%;
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 500;
+    opacity: 0.4;
+    color: magenta;
+    position: absolute;
+    bottom: 10%;
     }
 </style>
 @code {
 
     Term? term;
     Term? prevTerm;
-    List<Class> ListboxData;
+    List<Class>? ListboxData;
     List<Class>? Classes;
     List<Class> selectedClasses = new List<Class>();
     List<Class> deletedClasses = new List<Class>();
-    Class selectedClass;
     List<ReportStyleWrapper> ReportStyleList = new ReportStyleList();
     ReportStyle reportStyle = ReportStyle.Detail;
+    int activeTabIndex = 0;
 
-    DxButton? listboxViewButton;
     DxTabs? dxTabs;
     DxGrid? listGrid;
-    DxTextBox filterTextBox;
-
-    int activeTabIndex;
-    string listHeight;
+    DxTextBox? filterTextBox;
 
     string selectionCountText = string.Empty;
     bool isListboxShowingSummary = true;
     string? googleMapAPIKey;
-    bool showCourseFullWatermark = false;
     bool IsMobileLayout;
 
-    Person person;
     bool isFinancial;
-    bool isAutoEnrolmentRequired = false;
-    string tenant;
     bool isNotInEnrolmentPeriod = false;
     bool IsReady = false;
-    bool isDirty = false;
-    SystemSettings settings;
+    SystemSettings? settings;
     DateTime today;
     MarkupString? enrolmentLockoutText;
-    string selectButtonIcon;
-    List<Guid> newEnrolmentGuids;
+    List<Guid>? newEnrolmentGuids;
 
     // Search filter function
     string? _filterText = null;
@@ -298,15 +290,18 @@ else
 
     private async Task OnFilterTextChanged(string text)
     {
+        if (filterTextBox == null) return;
         await filterTextBox.FocusAsync();
         filterText = text;
     }
 
     List<Class> FilterClassByName()
     {
+        var result = new List<Class>();
+        if (_filterText == null) return ResetFilter();
         if (_filterText.Length < 2) return ResetFilter();
-        if (dxTabs != null) { activeTabIndex = dxTabs.ActiveTabIndex = 0; }
-        var result = Classes.FindAll(x => searchText(x).IndexOf(_filterText, StringComparison.CurrentCultureIgnoreCase) >= 0);
+        if (Classes == null) return ResetFilter();
+        result = Classes.FindAll(x => searchText(x).IndexOf(_filterText, StringComparison.CurrentCultureIgnoreCase) >= 0);
         return result;
     }
 
@@ -465,10 +460,6 @@ else
     }
 
 
-    async Task ReturnToMenu(PortalMenuResult result)
-    {
-    }
-
     async Task GetNextCourseContact(Class context)
     {
         IsReady = false;
@@ -485,7 +476,6 @@ else
     async Task ShowSelectedClasses(bool scrollToTop)
     {
         var savedFilter = filterText;
-        selectedClass = null;
         await GetData();
         isListboxShowingSummary = false;
         filterText = null;
@@ -535,6 +525,7 @@ else
     string ClassTitle(Class c)
     {
         string result = string.Empty;
+        if (c.OccurrenceID == null) { return result; }
         if ((OccurrenceType)c.OccurrenceID == OccurrenceType.Unscheduled)
         {
             result = "Unscheduled";
@@ -543,7 +534,7 @@ else
         return $"{result}: {c.Course.Name}";
     }
 
-    async Task OnReturnToMenu()
+    void OnReturnToMenu()
     {
         NavMan.NavigateTo("/public");
     }

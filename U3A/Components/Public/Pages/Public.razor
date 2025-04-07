@@ -92,7 +92,7 @@ else
                 </DxGridLayoutItem>
                 <DxGridLayoutItem Area="content" CssClass="px-md-4">
                     <Template>
-                        <ErrorBoundary>
+                        <ErrorBoundary @ref=@errorBoundary>
                             <ChildContent>
                                 <DxFormLayout>
                                     <div class="row col col-12 mx-auto">
@@ -244,11 +244,9 @@ else
     string lockoutMessage = string.Empty;
     bool isReady;
     bool isInteractive = false;
-    bool DoPreview;
     Term? currentTerm;
 
     ErrorBoundary? errorBoundary;
-    string? messageText;
     string? tenantId;
 
     protected override async Task OnInitializedAsync()
