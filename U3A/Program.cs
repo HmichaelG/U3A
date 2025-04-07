@@ -21,9 +21,6 @@ if (tenantConnectionString is null)
 }
 var recaptureKey = builder.Configuration.GetValue<String>("GoogleReCAPTCHAv2Key");
 
-// Aspire service defaults
-builder.AddServiceDefaults();
-
 // Add services to the container.
 builder.Services.AddRazorComponents(options =>
     options.DetailedErrors = builder.Environment.IsDevelopment())
@@ -60,6 +57,9 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     {
         options.MinimumSameSitePolicy = SameSiteMode.None;
     });
+
+// Aspire service defaults
+builder.AddServiceDefaults();
 
 builder.Services.AddAntiforgery();
 
