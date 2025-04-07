@@ -179,7 +179,7 @@ namespace U3A.BusinessRules
                 .OrderBy(x => x.Course.Name)
                 .Where(x => IsClassInRemainingYear(dbc, x, term, defaultTerm, terms)).ToList();
             var TotalClassesRemainingInYear = classes.Count();
-            classes = classes.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term,dbc.GetLocalDate())).ToList();
+            classes = classes.Where(x => IsClassInReportingPeriod(settings.ClassScheduleDisplayPeriod, x, term, dbc.GetLocalDate())).ToList();
             var TotalClassesInReportingPeriod = classes.Count();
             foreach (var c in classes)
             {
@@ -272,11 +272,11 @@ namespace U3A.BusinessRules
 
         public static List<Class> GetClassDetails(U3ADbContext dbc,
                                             Term term,
-                                            SystemSettings settings, bool ExludeOffScheduleActivities = false)
+                                            SystemSettings settings, bool ExcludeOffScheduleActivities = false)
         {
             Task<List<Class>> syncTask = Task.Run(async () =>
             {
-                return await GetClassDetailsAsync(dbc, term, settings, ExludeOffScheduleActivities);
+                return await GetClassDetailsAsync(dbc, term, settings, ExcludeOffScheduleActivities);
             });
             syncTask.Wait();
             return syncTask.Result;
@@ -572,7 +572,7 @@ namespace U3A.BusinessRules
             return (Class.OfferedTerm1 || Class.OfferedTerm2 || Class.OfferedTerm3 || Class.OfferedTerm4);
         }
         public static bool IsClassInReportingPeriod(ClassScheduleDisplayPeriod reportPeriod,
-                            Class Class, Term term,DateTime today)
+                            Class Class, Term term, DateTime today)
         {
             List<bool> termsOffered = new();
             termsOffered.Add(Class.OfferedTerm1);
