@@ -1,44 +1,54 @@
-﻿@page "/ExceptionLogPage/{id}"
-
+﻿
 @inject IDbContextFactory<TenantDbContext> tenantDbfactory
 @inject LocalTime lt
 
 
 @if (isReady)
 {
-    <h3>Exception Log</h3>
+    <div class="d-flex">
+        <div class="h3 flex-grow-1">Exception Log</div>
+        <DxButton Text="Close" Click="@(async() => await OnFinished.InvokeAsync())" />
+    </div>
 
     <table class="w-75">
-        <thead>
+            <thead>
+                <tr>
+                    <td>Date</td>
+                    <td>Time</td>
+                    <td>Tenant</td>
+                    <td>User</td>
+                </tr>
+            </thead>
             <tr>
-                <td>Date</td>
-                <td>Time</td>
-                <td>Tenant</td>
-                <td>User</td>
+                <td>@localTime.ToLongDateString()</td>
+                <td>@localTime.ToLongTimeString()</td>
+                <td>@log?.Tenant</td>
+                <td>@log?.User</td>
             </tr>
-        </thead>
-        <tr>
-            <td>@localTime.ToLongDateString()</td>
-            <td>@localTime.ToLongTimeString()</td>
-            <td>@log?.Tenant</td>
-            <td>@log?.User</td>
-        </tr>
-    </table>
+            </table>
 
-    <pre>@log?.Exception</pre>
+    <div class="h6 mt-2">Message</div>
+    <pre>@log?.Message.Trim()</pre>
+    @if (log?.Exception != null)
+    {
+        <div class="h6">Exception</div>
+        <pre>@log?.Exception.Trim()</pre>
+    }
 }
 
 <style>
     pre {
-        margin-top: 0.5rem;
-        font-size: 12px;
-        height: 80%;
+    margin-top: 0.5rem;
+    font-size: 12px;
+    font-family: 'Roboto Mono', monospace;
     }
 </style>
 
 @code {
     [Parameter]
-    public string id { get; set; }
+    public int? Id { get; set; }
+    [Parameter]
+    public EventCallback OnFinished { get; set; }
 
     DateTime localTime;
     LogEvents? log;
@@ -46,12 +56,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrWhiteSpace(id))
+        if (Id != null)
         {
             using (var dbc = tenantDbfactory.CreateDbContext())
             {
-                int key = int.Parse(id);
-                log = await dbc.LogEvents.FindAsync(key);
+                log = await dbc.LogEvents.FindAsync(Id);
                 if (log != null)
                 {
                     localTime = await lt.GetLocalTimeAsync(log.TimeStamp);
@@ -61,4 +70,5 @@
         isReady = true;
         await base.OnInitializedAsync();
     }
+
 }

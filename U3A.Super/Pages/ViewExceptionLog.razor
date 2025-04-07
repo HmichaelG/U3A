@@ -16,75 +16,90 @@
 
 @if (isReady)
 {
-                <div class="w-100 px-4">
-                    <h2>Exceptions</h2>
-                    <div class="pb-2">
-                        <FullScreen DisplayOffset="10" HideToggle="true">
-                            <ContentTemplate>
-                                <DxGrid @ref="grid" Data="@exceptions"
-                                            AutoExpandAllGroupRows="true"
-                                        DataItemDeleting="Grid_DataItemDeleting"
-                                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                        VirtualScrollingEnabled="true"
-                                        ShowSearchBox="true"
-                                        ShowFilterRow="false"
-                                        ShowAllRows="true"
-                                        KeyFieldName="Id"
-                                        ValidationEnabled="true">
-                                    <ToolbarTemplate>
-                                        <GridToolbar LinkedGrid=@grid>
-                                            <CustomButtonContent>
-                                                <DxToolbarItem IconCssClass="bi bi-envelope" Text="Show All"
-                                                               BeginGroup=true
-                                                               Click=@OnShowAllToggle
-                                                               RenderStyle="ButtonRenderStyle.Info"
-                                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                               Alignment="ToolbarItemAlignment.Right"
-                                                               Tooltip="Show/hide non-tenant exceptions" />
-                                                <DxToolbarItem IconCssClass="bi bi-trash" Text="Delete All"
-                                                               BeginGroup=true
-                                                               Click=@OnDeleteAll
-                                                               RenderStyle="ButtonRenderStyle.Primary"
-                                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                               Alignment="ToolbarItemAlignment.Right"
-                                                               Tooltip="Delete all exceptions" />
-                                            </CustomButtonContent>
-                                        </GridToolbar>
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridCommandColumnEx Width="10rem" EditButtonVisible="false" DeleteButtonVisible="true" />
-                            <DxGridDataColumn Width="5rem" Caption="Date" FieldName="TimeStamp" 
-                                            SortOrder="GridColumnSortOrder.Descending" GroupIndex="0" SortMode="GridColumnSortMode.Value">
-                                                <CellDisplayTemplate>
-                                    <div>@(GetLocalTime((DateTime)context.Value).ToShortDateString()) </div>
-                                                </CellDisplayTemplate>
-                                            </DxGridDataColumn>
-                                <DxGridDataColumn Width="5rem" Caption="Time" FieldName="TimeStamp" SortIndex="1" SortMode="GridColumnSortMode.Value" >
-                                                    <CellDisplayTemplate>
+    @if (logId != null)
+    {
+        <ExceptionLogPage Id="@logId"
+                          OnFinished="@(async() =>
+                {
+                    logId = null;
+                    StateHasChanged();
+                })" />
+    }
+    else
+    {
+
+        <div class="w-100 px-4">
+            <h2>Exceptions</h2>
+            <div class="pb-2">
+                <FullScreen DisplayOffset="10" HideToggle="true">
+                    <ContentTemplate>
+                        <DxGrid @ref="grid" Data="@exceptions"
+                                AutoExpandAllGroupRows="true"
+                                DataItemDeleting="Grid_DataItemDeleting"
+                                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                VirtualScrollingEnabled="true"
+                                ShowSearchBox="true"
+                                ShowFilterRow="false"
+                                ShowAllRows="true"
+                                KeyFieldName="Id"
+                                SelectionMode="GridSelectionMode.Single"
+                                SelectedDataItem="selectedLog"
+                                ValidationEnabled="true">
+                            <ToolbarTemplate>
+                                <GridToolbar LinkedGrid=@grid>
+                                    <CustomButtonContent>
+                                        <DxToolbarItem IconCssClass="bi bi-envelope" Text="Show All"
+                                                       BeginGroup=true
+                                                       Click=@OnShowAllToggle
+                                                       RenderStyle="ButtonRenderStyle.Info"
+                                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                       Alignment="ToolbarItemAlignment.Right"
+                                                       Tooltip="Show/hide non-tenant exceptions" />
+                                        <DxToolbarItem IconCssClass="bi bi-trash" Text="Delete All"
+                                                       BeginGroup=true
+                                                       Click=@OnDeleteAll
+                                                       RenderStyle="ButtonRenderStyle.Primary"
+                                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                                       Alignment="ToolbarItemAlignment.Right"
+                                                       Tooltip="Delete all exceptions" />
+                                    </CustomButtonContent>
+                                </GridToolbar>
+                            </ToolbarTemplate>
+                            <Columns>
+                                <DxGridCommandColumnEx Width="10rem" EditButtonVisible="false" DeleteButtonVisible="true" />
+                                <DxGridDataColumn Width="5rem" Caption="Date" FieldName="TimeStamp"
+                                                  SortOrder="GridColumnSortOrder.Descending" GroupIndex="0" SortMode="GridColumnSortMode.Value">
+                                    <CellDisplayTemplate>
+                                        <div>@(GetLocalTime((DateTime)context.Value).ToShortDateString()) </div>
+                                    </CellDisplayTemplate>
+                                </DxGridDataColumn>
+                                <DxGridDataColumn Width="5rem" Caption="Time" FieldName="TimeStamp" SortIndex="1" SortMode="GridColumnSortMode.Value">
+                                    <CellDisplayTemplate>
                                         <div>@(GetLocalTime((DateTime)context.Value).ToShortTimeString()) </div>
-                                                    </CellDisplayTemplate>
-                                                </DxGridDataColumn>
-                                                <DxGridDataColumn Width="10rem" FieldName="Tenant" />
-                                        <DxGridDataColumn Width="10rem" FieldName="User" />
-                                        <DxGridDataColumn FieldName="Message" />
-                                        <DxGridDataColumn Width="8rem" FieldName="Exception" Caption="Exception Detail" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
-                                            <CellDisplayTemplate>
-                                                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
-                                                          RenderStyle="ButtonRenderStyle.Primary" Text=@("Event Details")
-                                                          Click="() => OnLogButtonClick((LogEvents)context.DataItem)"></DxButton>
-                                            </CellDisplayTemplate>
-                                        </DxGridDataColumn>
-                                    </Columns>
+                                    </CellDisplayTemplate>
+                                </DxGridDataColumn>
+                                <DxGridDataColumn Width="10rem" FieldName="Tenant" />
+                                <DxGridDataColumn Width="10rem" FieldName="User" />
+                                <DxGridDataColumn FieldName="Message" />
+                                <DxGridDataColumn Width="8rem" FieldName="Exception" Caption="Exception Detail" AllowGroup="false" FixedPosition="GridColumnFixedPosition.Right">
+                                    <CellDisplayTemplate>
+                                        <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" CssClass="w-100"
+                                                  RenderStyle="ButtonRenderStyle.Primary" Text=@("Event Details")
+                                                  Click="() => OnLogButtonClick((LogEvents)context.DataItem)"></DxButton>
+                                    </CellDisplayTemplate>
+                                </DxGridDataColumn>
+                            </Columns>
 
-                                    <TotalSummary>
-                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Date" FooterColumnName="Date" />
-                                    </TotalSummary>
+                            <TotalSummary>
+                                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Date" FooterColumnName="Date" />
+                            </TotalSummary>
 
-                                </DxGrid>
-                            </ContentTemplate>
-                        </FullScreen>
-                    </div>
-                </div>
+                        </DxGrid>
+                    </ContentTemplate>
+                </FullScreen>
+            </div>
+        </div>
+    }
 }
 
 <style>
@@ -99,6 +114,8 @@
     MessageBox? messageBox;
     bool isReady;
     bool showAll = false;
+    int? logId = null;
+    LogEvents? selectedLog;
 
     protected override async Task OnInitializedAsync()
     {
@@ -132,9 +149,11 @@
         }
     }
 
-    async Task OnLogButtonClick(LogEvents log)
+    void OnLogButtonClick(LogEvents log)
     {
-        navMan.NavigateTo($"ExceptionLogPage/{log.Id.ToString()}");
+        logId = log.Id;
+        selectedLog = log;
+        StateHasChanged();
     }
 
     async Task GetData()
@@ -152,6 +171,7 @@
                             }).ToListAsync();
             if (!showAll) { exceptions = exceptions.Where(x => !string.IsNullOrWhiteSpace(x.Tenant)).ToList(); }
         }
+        selectedLog = null;
     }
 
     async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
