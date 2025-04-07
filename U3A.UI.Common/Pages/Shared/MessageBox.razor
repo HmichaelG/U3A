@@ -45,26 +45,12 @@ HeaderText=@Caption>
 </style>
 
 @code {
-    bool _isInputBox;
 
     [Parameter]
     public bool PopupVisible { get; set; }
+
     [Parameter]
-    public bool IsInputBox
-    {
-        get
-        {
-            return _isInputBox;
-        }
-        set
-        {
-            _isInputBox = true;
-            mOKButtonText = "Ok";
-            mCancelButtonText = "Cancel";
-            mShowOkButton = true;
-            mShowCancelButton = true;
-        }
-    }
+    public bool IsInputBox { get; set; } = false;
 
     [Parameter]
     public string Caption { get; set; } = string.Empty;
@@ -99,6 +85,18 @@ HeaderText=@Caption>
     bool dontShowAgain { get; set; }
 
     TaskCompletionSource<bool>? tcs;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (IsInputBox)
+        {
+            mOKButtonText = "Ok";
+            mCancelButtonText = "Cancel";
+            mShowOkButton = true;
+            mShowCancelButton = true;
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
