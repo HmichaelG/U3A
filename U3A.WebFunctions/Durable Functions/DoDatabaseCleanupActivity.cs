@@ -26,7 +26,7 @@ public partial class DurableFunctions
                 try
                 {
                     await LogStartTime(logger, tenant);
-                    await DatabaseCleanup.Process(tenant, logger);
+                    await DatabaseCleanup.Process(tenant, cn, logger);
                 }
                 catch (Exception ex)
                 {

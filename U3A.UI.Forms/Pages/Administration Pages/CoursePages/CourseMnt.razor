@@ -14,6 +14,7 @@
 @using System.Reflection
 @using System.Text
 @using U3A.Services.APIClient
+@using Serilog
 
 
 @if (!IsReady)
@@ -292,7 +293,8 @@ else
         // }
 
         var client = new APIClient();
-        client.DoBuildSchedule(dbc.TenantInfo.Identifier).SafeFireAndForget();
+        client.DoBuildSchedule(dbc.TenantInfo.Identifier)
+                            .SafeFireAndForget(ex => Log.Error("Error rebuilding cache", ex));
         var msg = "The rebuild of the Class Schedule cache has been scheduled for immediate execution. It will take a few seconds to complete.";
         await messageBox.ShowOkOnlyAsync("Class Schedule Cache", msg);
     }

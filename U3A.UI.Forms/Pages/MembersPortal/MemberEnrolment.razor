@@ -14,6 +14,7 @@
 @using System.Text.RegularExpressions;
 @using Microsoft.Extensions.Logging
 @using System.Diagnostics
+@using Serilog
 @using U3A.Services.APIClient
 
 @implements IAsyncDisposable
@@ -1253,7 +1254,9 @@ else
         {
             try
             {
-                client.DoAutoEnrolment(dbc.TenantInfo.Identifier, newEnrolmentGuids).SafeFireAndForget();
+                client.DoAutoEnrolment(dbc.TenantInfo.Identifier, newEnrolmentGuids)
+                                            .SafeFireAndForget(ex => Log.Error("Error executing Auto Enroll", ex));
+
             }
             finally { }
         };

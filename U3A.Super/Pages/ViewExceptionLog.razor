@@ -126,7 +126,7 @@
         {
             using (var dbc = await tenantDbfactory.CreateDbContextAsync())
             {
-                dbc.LogEvents.ExecuteDelete();
+                await dbc.Database.ExecuteSqlAsync($"TRUNCATE TABLE LogEvents");
             }
             await GetData();
         }

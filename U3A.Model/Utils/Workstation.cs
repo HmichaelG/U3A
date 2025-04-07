@@ -2,6 +2,7 @@
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.JSInterop;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,8 @@ namespace U3A.Model
             if (id == null)
             {
                 id = Guid.NewGuid().ToString();
-                localStorage.SetItemAsync(WORKSTATION_ID, id).SafeFireAndForget();
+                localStorage.SetItemAsync(WORKSTATION_ID, id)
+                    .SafeFireAndForget(ex => Log.Error("Error setting WORKSTATION_ID", ex));
             }
             ID = id;
             // Use top menu
@@ -64,13 +66,17 @@ namespace U3A.Model
         public async Task SetWorkstationDetail(ILocalStorageService localStorage)
         {
             // Use top menu
-            await localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu);
+            localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu)
+                    .SafeFireAndForget(ex => Log.Error("Error setting WORKSTATION_ID", ex));
             // size mode
-            await localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode);
+            localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode)
+                    .SafeFireAndForget(ex => Log.Error("Error setting SIZE_MODE", ex));
             // theme
-            await localStorage.SetItemAsync<String>(THEME, Theme);
+            localStorage.SetItemAsync<String>(THEME, Theme)
+                    .SafeFireAndForget(ex => Log.Error("Error setting THEME", ex));
             // sidebar image
-            await localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage);
+            localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage)
+                    .SafeFireAndForget(ex => Log.Error("Error setting SIDEBAR_IMAGE", ex));
         }
     }
 }
