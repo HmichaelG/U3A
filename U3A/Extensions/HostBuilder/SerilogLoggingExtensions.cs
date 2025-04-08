@@ -11,6 +11,7 @@ using Serilog.Exceptions;
 using Serilog.Filters;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Antiforgery;
+using System.Security.Cryptography;
 
 namespace U3A.Extensions.HostBuilder;
 
@@ -38,6 +39,7 @@ public static class SerilogLoggingExtensions
                     logEvent.Exception is OperationCanceledException ||
                     logEvent.Exception is ObjectDisposedException ||
                     logEvent.Exception is AntiforgeryValidationException ||
+                    logEvent.Exception is CryptographicException ||
                     logEvent.Exception is JSDisconnectedException)
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
