@@ -1255,7 +1255,7 @@ else
         using (U3ADbContext dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             client.DoAutoEnrolment(dbc.TenantInfo.Identifier, newEnrolmentGuids)
-                   .SafeFireAndForget(ex => Log.Error("Error executing Auto Enroll", ex));
+                   .SafeFireAndForget(onException: ex => Log.Error($"Error executing Auto Enroll:{Environment.NewLine} {ex.ToString()}", ex));
 
         }
     }

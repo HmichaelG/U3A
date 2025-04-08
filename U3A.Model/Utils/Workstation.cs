@@ -34,7 +34,7 @@ namespace U3A.Model
             {
                 id = Guid.NewGuid().ToString();
                 localStorage.SetItemAsync(WORKSTATION_ID, id)
-                    .SafeFireAndForget(ex => Log.Error("Error setting WORKSTATION_ID", ex));
+                    .SafeFireAndForget(onException: ex => Log.Error("Error setting WORKSTATION_ID", ex));
             }
             ID = id;
             // Use top menu
@@ -67,16 +67,16 @@ namespace U3A.Model
         {
             // Use top menu
             localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu)
-                    .SafeFireAndForget(ex => Log.Error("Error setting WORKSTATION_ID", ex));
+                    .SafeFireAndForget(onException: ex => Log.Error("Error setting WORKSTATION_ID", ex));
             // size mode
             localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode)
-                    .SafeFireAndForget(ex => Log.Error("Error setting SIZE_MODE", ex));
+                    .SafeFireAndForget(onException: ex => Log.Error("Error setting SIZE_MODE", ex));
             // theme
             localStorage.SetItemAsync<String>(THEME, Theme)
-                    .SafeFireAndForget(ex => Log.Error("Error setting THEME", ex));
+                    .SafeFireAndForget(onException: ex => Log.Error("Error setting THEME", ex));
             // sidebar image
             localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage)
-                    .SafeFireAndForget(ex => Log.Error("Error setting SIDEBAR_IMAGE", ex));
+                    .SafeFireAndForget(onException: ex => Log.Error("Error setting SIDEBAR_IMAGE", ex));
         }
     }
 }

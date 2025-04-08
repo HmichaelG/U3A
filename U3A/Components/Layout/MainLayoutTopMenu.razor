@@ -162,7 +162,7 @@
     {
         if (IsMediumLayout)
         {
-            InvokeAsync(StateHasChanged).SafeFireAndForget();
+            StateHasChanged();
         }
     }
 

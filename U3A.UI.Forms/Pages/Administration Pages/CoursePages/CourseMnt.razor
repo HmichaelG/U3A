@@ -294,7 +294,7 @@ else
 
         var client = new APIClient();
         client.DoBuildSchedule(dbc.TenantInfo.Identifier)
-                            .SafeFireAndForget(ex => Log.Error("Error rebuilding cache", ex));
+                   .SafeFireAndForget(onException: ex => Log.Error($"Error rebuilding cache:{Environment.NewLine}{ex.ToString()}", ex));
         var msg = "The rebuild of the Class Schedule cache has been scheduled for immediate execution. It will take a few seconds to complete.";
         await messageBox.ShowOkOnlyAsync("Class Schedule Cache", msg);
     }
