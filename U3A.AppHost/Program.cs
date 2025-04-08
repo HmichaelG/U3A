@@ -16,4 +16,6 @@ var mainApp = builder.AddProject<Projects.U3A>("u3a")
 
 mainApp.WithEnvironment("aspire-webfunctions-url", api.GetEndpoint("http"));
 
+builder.AddProject<Projects.U3A_Super>("u3a-super");
+
 builder.Build().Run();
