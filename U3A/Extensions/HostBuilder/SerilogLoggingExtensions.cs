@@ -9,6 +9,8 @@ using System.Data;
 using System.Globalization;
 using Serilog.Exceptions;
 using Serilog.Filters;
+using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Antiforgery;
 
 namespace U3A.Extensions.HostBuilder;
 
@@ -31,7 +33,12 @@ public static class SerilogLoggingExtensions
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Error)
-            .MinimumLevel.Override("Microsoft.AspNetCore.Antiforgery", LogEventLevel.Fatal)
+            .Filter
+                  .ByExcluding(logEvent => 
+                    logEvent.Exception is OperationCanceledException ||
+                    logEvent.Exception is ObjectDisposedException ||
+                    logEvent.Exception is AntiforgeryValidationException ||
+                    logEvent.Exception is JSDisconnectedException)
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
             .WriteTo.Logger(lc => lc
