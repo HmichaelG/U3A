@@ -16,9 +16,6 @@ public static class SerilogLoggingExtensions
 {
     public static WebApplicationBuilder UseSerilogLogging(this WebApplicationBuilder builder, string TenantConnectionString)
     {
-        LoggingLevelSwitch levelSwitch
-            = new LoggingLevelSwitch(LogEventLevel.Warning);
-
         var columnOptions = new ColumnOptions
         {
             AdditionalColumns = new Collection<SqlColumn>
@@ -33,7 +30,8 @@ public static class SerilogLoggingExtensions
         };
 
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Override("Microsoft.AspNetCore", levelSwitch)
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Error)
+            .MinimumLevel.Override("Microsoft.AspNetCore.Antiforgery", LogEventLevel.Fatal)
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
             .WriteTo.Logger(lc => lc
