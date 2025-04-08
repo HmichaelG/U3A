@@ -16,13 +16,9 @@ namespace U3A.Database
 {
     public class U3ADbContext : U3ADbContextBase
     {
-
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDbContextFactory<TenantDbContext> _TenantDbFactory;
         private readonly bool useCachedTenantInfo = false;
-
-        public readonly ILoggerFactory loggerFactory;
-                //= LoggerFactory.Create(builder => { builder.AddSerilog(); });
 
         public U3ADbContext(TenantInfo tenantInfo)
         {
@@ -31,14 +27,14 @@ namespace U3A.Database
         }
 
         [ActivatorUtilitiesConstructor] // force DI to use this constructor
-        public U3ADbContext(AuthenticationStateProvider? AuthStateProvider,
-                    ILoggerFactory loggerFactory,
-                    IDbContextFactory<TenantDbContext> TenantDbFactory = default,
-                    IHttpContextAccessor HttpContextAccessor = default,
-                    LocalTime localTime = null)
+        public U3ADbContext(
+            AuthenticationStateProvider? AuthStateProvider,
+            IDbContextFactory<TenantDbContext> TenantDbFactory = default,
+            IHttpContextAccessor HttpContextAccessor = default,
+            LocalTime localTime = null)
         {
-            this.loggerFactory = loggerFactory;
-            if (AuthStateProvider != null) authenticationStateProvider = AuthStateProvider;
+            if(AuthStateProvider != null)
+                authenticationStateProvider = AuthStateProvider;
             _httpContextAccessor = HttpContextAccessor;
             _TenantDbFactory = TenantDbFactory;
             GetTenantInfo();
@@ -47,11 +43,16 @@ namespace U3A.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.EnableSensitiveDataLogging(true);
-            //optionsBuilder.EnableDetailedErrors();
-            optionsBuilder.UseLoggerFactory(loggerFactory);
+            optionsBuilder.EnableSensitiveDataLogging(true);
+            optionsBuilder.EnableDetailedErrors();
+            optionsBuilder.UseLoggerFactory(LoggerFactory.Create(builder =>
+            {
+                builder.AddSerilog();
+                builder.AddConsole();
+                builder.AddDebug();
+            }));
             GetTenantInfo();
-            if (TenantInfo != null)
+            if(TenantInfo != null)
             {
                 // Use the connection string to connect to the per-tenant database.
                 optionsBuilder.UseSqlServer(TenantInfo.ConnectionString);
@@ -60,26 +61,38 @@ namespace U3A.Database
 
         private void GetTenantInfo()
         {
-            if (useCachedTenantInfo) { return; }
+            if(useCachedTenantInfo)
+            {
+                return;
+            }
             HostStrategy hs = new HostStrategy();
 
-            if (_httpContextAccessor == null) { return; }
-            if (_httpContextAccessor.HttpContext == null) { return; }
-            if (_httpContextAccessor.HttpContext.Request == null) { return; }
-            if (_httpContextAccessor.HttpContext.Request.Host == null) { return; }
+            if(_httpContextAccessor == null)
+            {
+                return;
+            }
+            if(_httpContextAccessor.HttpContext == null)
+            {
+                return;
+            }
+            if(_httpContextAccessor.HttpContext.Request == null)
+            {
+                return;
+            }
+            if(_httpContextAccessor.HttpContext.Request.Host == null)
+            {
+                return;
+            }
             var identifier = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);
-            using (var dbc = _TenantDbFactory.CreateDbContext())
+            using(var dbc = _TenantDbFactory.CreateDbContext())
             {
                 // Redirect console output to null
                 Console.SetOut(TextWriter.Null);
 
-                TenantInfo = dbc.TenantInfo.AsNoTracking()
-                    .FirstOrDefault(x => x.Identifier == identifier);
-                if (TenantInfo == null)
+                TenantInfo = dbc.TenantInfo.AsNoTracking().FirstOrDefault(x => x.Identifier == identifier);
+                if(TenantInfo == null)
                 {
-                    TenantInfo = dbc.TenantInfo
-                        .AsNoTracking()
-                        .FirstOrDefault(x => x.Identifier == "demo");
+                    TenantInfo = dbc.TenantInfo.AsNoTracking().FirstOrDefault(x => x.Identifier == "demo");
                 }
 
                 // Redirect console output back to standard output
