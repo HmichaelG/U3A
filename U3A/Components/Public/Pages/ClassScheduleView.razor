@@ -3,7 +3,7 @@
 @using U3A.BusinessRules
 
 @inject IJSRuntime js
-@inject NavigationManager NavManager
+@inject NavigationManager NavMan
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
@@ -13,7 +13,7 @@
 @layout BasicLayout
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-                    @bind-IsActive="@IsMobileLayout" />
+@bind-IsActive="@IsMobileLayout" />
 
 @if (!IsReady)
 {
@@ -25,18 +25,18 @@ else
     <div class="col col-md-10 col-lg-8 mx-auto">
         <p>@message</p>
         <DxReportViewer @ref="@reportViewer" Id="reportViewer"
-                        Report="@rpt" SizeMode="SizeMode.Small"
-                        SinglePagePreview="false"
-                        RootCssClasses="w-100 view-normal"
-                        TabPanelMinWidth="200"
-                        TabPanelMaxWidth="200"
-                        Zoom="1"
-                        OnCustomizeToolbar="@OnCustomizeToolbar" />
+        Report="@rpt" SizeMode="SizeMode.Small"
+        SinglePagePreview="false"
+        RootCssClasses="w-100 view-normal"
+        TabPanelMinWidth="200"
+        TabPanelMaxWidth="200"
+        Zoom="1"
+        OnCustomizeToolbar="@OnCustomizeToolbar" />
     </div>
 }
 <style>
     .view-normal {
-        height: calc(100dvh - 3.5rem) !important;
+    height: calc(100dvh - 3.5rem) !important;
     }
 
 </style>
@@ -60,7 +60,7 @@ else
         if (term != null)
         {
             rpt = new ClassScheduleRpt();
-            (rpt as IXtraReportWithNavManager).NavManager = NavManager;
+            (rpt as IXtraReportWithNavManager).NavManager = NavMan;
             foreach (var prm in rpt.Parameters)
             {
                 prm.Visible = false;
@@ -80,7 +80,7 @@ else
     {
         string[] itemsToRemove = new string[] {"HighlightEditingFields",
                                                 "CancelDocumentCreation"
-                            };
+        };
         foreach (var item in toolbarModel.AllItems)
         {
             if (itemsToRemove.Contains(item.Id))
@@ -89,16 +89,32 @@ else
                 item.Visible = false;
             }
         }
+        toolbarModel.AllItems.Add(new ToolbarItem()
+            {
+                IconCssClass = "fw-bolder text-primary bi bi-door-open",
+                BeginGroup = true,
+                Text = "Close Report",
+                AdaptiveText = "Close Report",
+                AdaptivePriority = 1,
+                Click = async (args) =>
+                {
+                    NavMan.NavigateTo("/public");
+                    await InvokeAsync(StateHasChanged);
+                }
+            });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            reportViewer!.TabPanelModel[TabContentKind.Parameters].Visible = false;
-            reportViewer.TabPanelModel[TabContentKind.Search].Visible = true;
-            reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
-            reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
+            if (reportViewer != null)
+            {
+                reportViewer.TabPanelModel[TabContentKind.Parameters].Visible = false;
+                reportViewer.TabPanelModel[TabContentKind.Search].Visible = true;
+                reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
+                reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
