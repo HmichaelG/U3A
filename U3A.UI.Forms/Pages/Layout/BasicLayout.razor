@@ -4,7 +4,7 @@
 
 <PageTitle>@($"{tenantId} Member Portal")</PageTitle>
 
-<div class="page" >
+<div class="page">
     @Body
 </div>
 @code {
@@ -14,9 +14,11 @@
     {
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            tenantId = dbc.TenantInfo.Identifier;
+            if (dbc.TenantInfo != null)
+            {
+                tenantId = dbc.TenantInfo.Identifier;
+            }
         }
-        await base.OnInitializedAsync();
     }
 
 }
