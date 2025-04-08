@@ -59,7 +59,7 @@ public class IdentityEmailSender : IEmailSender<ApplicationUser>
                                                    settings.SendEmailAddesss,
                                                    settings.SendEmailDisplayName,
                                                    email, email, subject, emailText,
-                                                   emailTemplate);
+                                                   emailText);
         }
     }
 
