@@ -15,7 +15,7 @@
 @inject ILogger<EnableAuthenticator> Logger
 @inject NavigationManager navMan
 
-<PageTitle>Configure authenticator app</PageTitle>
+<PageTitle>Configure Authenticator app</PageTitle>
 
 @if (recoveryCodes is not null)
 {
@@ -24,24 +24,30 @@
 else
 {
     <StatusMessage Message="@message" />
-    <h3>Configure authenticator app</h3>
-    <div>
-        <p>To use an authenticator app go through the following steps:</p>
-        <ol class="list">
+    <h3>Configure an Authenticator app</h3>
+    <div class="text-start">
+        <ol>
             <li>
                 <p>
-                    Download a two-factor authenticator app like Microsoft Authenticator for
+                    If not already installed, download a two-factor authenticator app like Microsoft Authenticator for
                     <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and
                     <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> or
                     Google Authenticator for
                     <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</a> and
-                    <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
+                    <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>
+                    to your mobile device.
                 </p>
             </li>
+            <li>Open the Authenticator app &amp; add a new account.</li>
             <li>
                 <p>Scan the QR Code</p>
-                <QRCode Uri="@authenticatorUri" @rendermode=RenderMode.InteractiveServer />
-                <p>Or, enter this key</p><div class="alert alert-info h5">@sharedKey</div><p>into your two-factor authenticator app. Spaces and casing do not matter.</p>
+                <div class="w-100 d-flex justify-content-center"><QRCode Uri="@authenticatorUri" @rendermode=RenderMode.InteractiveServer /></div>
+                <p>Or, enter this key</p>
+
+                @* Fit text to container *@
+                <svg class="alert alert-info" viewBox="0 0 260 18">
+                    <text x="0" y="15">@sharedKey</text>
+                </svg>
             </li>
             <li>
                 <p>
@@ -108,7 +114,7 @@ else
         var userId = await UserManager.GetUserIdAsync(user);
         Logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", userId);
 
-        message = "Your authenticator app has been verified.";
+        message = "Your authenticator app has been verified and Two-Factor Authentication is now enabled.";
 
         if (await UserManager.CountRecoveryCodesAsync(user) == 0)
         {
