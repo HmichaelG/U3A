@@ -329,7 +329,7 @@ else
                                                 if (c.TermNumber != term.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
                                                 if (c.TermNumber == prevTerm.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
                                                 if (c.TotalActiveStudents >= c.Course.MaximumStudents) { message = "Class is Full"; }
-                                                if (!c.Course.AllowAutoEnrol) { message = "Class is Closed"; }
+                                                if (!c.Course.AllowAutoEnrol) { message = c.Course.AutoEnrolDisabledReason ?? "Class is Closed"; }
                                                 if (message != null)
                                                 {
                                                     <div class="watermark"
@@ -1157,13 +1157,17 @@ else
         if (selectedClass.TotalActiveStudents >= selectedClass.Course.MaximumStudents || !selectedClass.Course.AllowAutoEnrol)
         {
             var reason = "Full";
-            if (!selectedClass.Course.AllowAutoEnrol) reason = "Closed";
             var extendedReason = "Full";
-            if (!selectedClass.Course.AllowAutoEnrol) extendedReason = "Closed.<br/>A closed class is one in which new enrolments are currently suspended";
+            if (!selectedClass.Course.AllowAutoEnrol) 
+            {
+                reason = "Closed";
+                extendedReason = (selectedClass.Course.AutoEnrolDisabledReason == null)
+                                    ? "Closed.<br/>A closed class is one in which new enrolments are currently suspended"
+                                    : $"Closed because...</br><b>{selectedClass.Course.AutoEnrolDisabledReason}</b>";}
             result = $@"<div class='alert alert-danger text-dark text-center'><h5>Class is {reason}</h5>
                         You have requested enrolment in a class that is {extendedReason}.<br/>
                         Your request will be <strong>Waitlisted</strong> meaning you will
-                        be notified should a place become available in the future.
+                        be notified should a place become available in the future.</br>
                         Please do not attend classes in which you are waitlisted.
                         </div>";
         }

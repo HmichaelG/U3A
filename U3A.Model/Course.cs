@@ -96,6 +96,9 @@ namespace U3A.Model
 
         [DefaultValue(true)]
         public bool AllowAutoEnrol { get; set; } = true;
+        
+        [MaxLength(50)]
+        public string? AutoEnrolDisabledReason { get; set; }
 
         [Required]
         public bool ExcludeFromLeaderComplimentaryCount { get; set; }

@@ -44,20 +44,35 @@
                 <DxTextBox @bind-Text="Course.AdditionalInformationURL"
                            NullText="A fully qualified URL: https://example.com.au. Keep it short, use TinyURL." ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="3">
+            <DxFormLayoutItem Caption="Class Duration (Hours)" ColSpanMd="4">
                 <DxMaskedInput @bind-Value="Course.Duration"
                                Mask="n2" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Required Students" ColSpanMd="3">
+            <DxFormLayoutItem Caption="Required Students" ColSpanMd="4">
                 <DxMaskedInput @bind-Value="Course.RequiredStudents"
                                Mask="@NumericMask.WholeNumber" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Maximum Students" ColSpanMd="3">
+            <DxFormLayoutItem Caption="Maximum Students" ColSpanMd="4">
                 <DxMaskedInput @bind-Value="Course.MaximumStudents"
                                Mask="@NumericMask.WholeNumber" />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Allow Auto-Enrol" ColSpanMd="3">
-                <DxCheckBox @bind-Checked="Course.AllowAutoEnrol" />
+            <DxFormLayoutItem Caption="Allow Auto-Enrol" ColSpanMd="4">
+                <DxCheckBox @bind-Checked="Course.AllowAutoEnrol"
+                            @bind-Checked:after=@ResetReason />
+            </DxFormLayoutItem>
+            @{
+                void ResetReason()
+                {
+                    if (Course.AllowAutoEnrol == false)
+                    {
+                        Course.AutoEnrolDisabledReason = null;
+                    }
+                }
+            }
+            <DxFormLayoutItem Caption="Disallowed Reason" ColSpanMd="8">
+                <DxTextBox @bind-Text="Course.AutoEnrolDisabledReason" 
+                           NullText="Eg: Class is Closed (Max 50 characters)"                           
+                           Enabled=@(!Course.AllowAutoEnrol) />
             </DxFormLayoutItem>
 
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" Visible="@showFullDetail">

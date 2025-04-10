@@ -56,7 +56,7 @@
             this.xrTableRow1 = new DevExpress.XtraReports.UI.XRTableRow();
             this.tableCellCourseName = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableRow3 = new DevExpress.XtraReports.UI.XRTableRow();
-            this.xrTableCell11 = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrClosedReason = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableRow10 = new DevExpress.XtraReports.UI.XRTableRow();
             this.xrTableCell3 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableRow2 = new DevExpress.XtraReports.UI.XRTableRow();
@@ -432,27 +432,26 @@
             // xrTableRow3
             // 
             this.xrTableRow3.Cells.AddRange(new DevExpress.XtraReports.UI.XRTableCell[] {
-            this.xrTableCell11});
+            this.xrClosedReason});
             this.xrTableRow3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Iif([TotalActiveStudents]>=[Course].[MaximumStudents] Or (Not [Course].[AllowAuto" +
                     "Enrol]),true ,false )\n")});
             this.xrTableRow3.Name = "xrTableRow3";
             this.xrTableRow3.Weight = 1.4D;
             // 
-            // xrTableCell11
+            // xrClosedReason
             // 
-            this.xrTableCell11.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.xrTableCell11.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif([Course].[AllowAutoEnrol],\'Class is Full\' ,\'Class is Closed\' )")});
-            this.xrTableCell11.Font = new DevExpress.Drawing.DXFont("Times New Roman", 18F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.xrTableCell11.ForeColor = System.Drawing.Color.Magenta;
-            this.xrTableCell11.Name = "xrTableCell11";
-            this.xrTableCell11.StylePriority.UseBackColor = false;
-            this.xrTableCell11.StylePriority.UseFont = false;
-            this.xrTableCell11.StylePriority.UseForeColor = false;
-            this.xrTableCell11.StylePriority.UseTextAlignment = false;
-            this.xrTableCell11.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            this.xrTableCell11.Weight = 3D;
+            this.xrClosedReason.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.xrClosedReason.Font = new DevExpress.Drawing.DXFont("Times New Roman", 18F, DevExpress.Drawing.DXFontStyle.Bold);
+            this.xrClosedReason.ForeColor = System.Drawing.Color.Magenta;
+            this.xrClosedReason.Name = "xrClosedReason";
+            this.xrClosedReason.StylePriority.UseBackColor = false;
+            this.xrClosedReason.StylePriority.UseFont = false;
+            this.xrClosedReason.StylePriority.UseForeColor = false;
+            this.xrClosedReason.StylePriority.UseTextAlignment = false;
+            this.xrClosedReason.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            this.xrClosedReason.Weight = 3D;
+            this.xrClosedReason.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrClosedReason_BeforePrint);
             // 
             // xrTableRow10
             // 
@@ -1256,7 +1255,7 @@
         private DevExpress.XtraReports.UI.XRLabel xrLabel4;
         private DevExpress.XtraReports.Parameters.Parameter prmHideStatistics;
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow3;
-        private DevExpress.XtraReports.UI.XRTableCell xrTableCell11;
+        private DevExpress.XtraReports.UI.XRTableCell xrClosedReason;
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow6;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell12;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell14;
