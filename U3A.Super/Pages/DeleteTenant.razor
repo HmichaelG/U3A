@@ -5,7 +5,6 @@
 @inject NavigationManager NavigationManager
 @inject IDbContextFactory<TenantDbContext> Tenantdbfactory
 @inject IConfiguration config
-@inject DefaultAzureCredential credential
 
 @implements IDisposable
 @inject IJSRuntime js
@@ -100,7 +99,13 @@ else {
         if (await TenantExistsAsync()) {
             try {
                 SetMessage("Processing Started - please do not interrupt");
-                ArmClient armClient = new ArmClient(credential);
+                var opts = new DefaultAzureCredentialOptions
+                    {
+                    // Currently Maitland U3A
+                        TenantId = "31dfc728-889d-46c5-9707-3619e203877a"
+                    };
+                var cr = new DefaultAzureCredential(opts);
+                ArmClient armClient = new ArmClient(cr);
                 SetMessage("Azure connection created");
                 SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
                 SetMessage($"Azure subscription [{subscription.Data.DisplayName}] retrieved");

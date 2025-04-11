@@ -5,7 +5,6 @@
 @inject NavigationManager NavigationManager
 @inject IDbContextFactory<TenantDbContext> Tenantdbfactory
 @inject IConfiguration config
-@inject DefaultAzureCredential credential
 
 @implements IDisposable
 @inject IJSRuntime js
@@ -54,7 +53,7 @@ else
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="U3A Display Name" ColSpanMd="7">
                     <DxTextBox @bind-Text=@details!.TenantName
-                               NullText="Use the form: U3A <myU3Aname> <State>. For example, U3A Newcastle NSW" />
+                    NullText="Use the form: U3A <myU3Aname> <State>. For example, U3A Newcastle NSW" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Website" ColSpanMd="7">
                     <DxTextBox @bind-Text=@details!.website NullText="The U3A public website. Must be FQDN eg. https://myU3Asite.org.au" />
@@ -81,6 +80,7 @@ else
         <ul class="my-2 col-12">
             @(new MarkupString(status!))
         </ul>
+        <div class="h4" hidden="@(!isDone)">Done</div>
     </div>
 }
 
@@ -96,7 +96,8 @@ else
     AUState states = new AUState();
     string? ErrorMessage;
     bool SuccessMessageVisible = false;
-    bool isProcessing;
+    bool isProcessing = false;
+    bool isDone = false;
     string? status;
     PostmarkAdminService? service;
     PostmarkBaseDomain? newEmailDomain;
@@ -109,12 +110,13 @@ else
         details = new Details();
         service = new PostmarkAdminService(config);
         IsReady = true;
-        await base.OnInitializedAsync();
+        
     }
 
-    async void ValidFormSubmitted(EditContext editContext)
+    async Task ValidFormSubmitted(EditContext editContext)
     {
         if (isProcessing) return;
+        isDone = false;
         isProcessing = true;
         ErrorMessage = string.Empty;
         SuccessMessageVisible = false;
@@ -132,11 +134,17 @@ else
                 }
                 else
                 {
-                    SetMessage("Processing Started - please do not interrupt");
-                    ArmClient armClient = new ArmClient(credential);
-                    SetMessage("Azure connection created");
+                    await SetMessage("Processing Started - please do not interrupt");
+                    var opts = new DefaultAzureCredentialOptions
+                        {
+                        // Currently Eastlakes U3A
+                            TenantId = "31dfc728-889d-46c5-9707-3619e203877a"
+                        };
+                    var cr = new DefaultAzureCredential(opts);
+                    ArmClient armClient = new ArmClient(cr);
+                    await SetMessage("Azure connection created");
                     SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
-                    SetMessage($"Azure subscription [{subscription.Data.DisplayName}] retrieved");
+                    await SetMessage($"Azure subscription [{subscription.Data.DisplayName}] retrieved");
                     await CreateUpdateDNSAsync(subscription);
                     await CreateUpdateWebAppCustomDomainAsync(subscription);
                     await CreateTenantAsync(subscription);
@@ -161,6 +169,7 @@ else
         }
 
         isProcessing = false;
+        isDone = true;
         StateHasChanged();
     }
 
@@ -178,8 +187,7 @@ else
 
     async Task CreateTenantAsync(SubscriptionResource subscription)
     {
-        // string rgName = mySecrets!.SQL_RESOURCE_GROUP;
-        // ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
+
         var csTemplate = config.GetConnectionString("TenantConnectionString");
         var key = details!.TenantKey!.ToLower();
         var builder = new SqlConnectionStringBuilder(csTemplate);
@@ -188,9 +196,9 @@ else
 
         // postmark
         var newServer = await service!.CreateServer($"{details.TenantKey} {details.State} U3A Server");
-        SetMessage($"Postmark server [{newServer.Name}] created.");
+        await SetMessage($"Postmark server [{newServer.Name}] created.");
         newEmailDomain = await service.CreateDomain(details.EmailDomain!);
-        SetMessage($"Postmark Email Domain [{newEmailDomain.Name}] created.");
+        await SetMessage($"Postmark Email Domain [{newEmailDomain.Name}] created.");
 
         TenantInfo tenant = new TenantInfo()
             {
@@ -213,67 +221,78 @@ else
             await dbc.AddAsync(tenant);
             await dbc.SaveChangesAsync();
         }
-        SetMessage($"TenantInfo [{key}] record in Tenant database created.");
+        await SetMessage($"TenantInfo [{key}] record in Tenant database created.");
 
-        // var sqlServer = (await resourceGroup.GetSqlServerAsync("u3admin")).Value;
-        // var databases = sqlServer.GetSqlDatabases();
-        // SqlDatabaseData newDb = new(await GetAuEastLocationAsync(resourceGroup))
-        //     {
-        //         Sku = new SqlSku("Basic") { Tier = "Basic" },
-        //         RequestedBackupStorageRedundancy = SqlBackupStorageRedundancy.Local
-        //     };
-        // await databases.CreateOrUpdateAsync(WaitUntil.Completed, key, newDb);
+        await SetMessage($"Creating [{key}] Database. This will take a while...");
+        // Create a ARM client for the database subscription
+        var opts = new DefaultAzureCredentialOptions
+            {
+            // Currently Maitland U3A
+                TenantId = "2f822ef8-99dd-4104-9f3c-4cf6c0baa845"
+            };
+        var cr = new DefaultAzureCredential(opts);
+        var armClient = new ArmClient(cr);
+        var dbSubscription = await armClient.GetDefaultSubscriptionAsync();
+        string rgName = mySecrets!.SQL_RESOURCE_GROUP;
+        ResourceGroupResource resourceGroup = await dbSubscription.GetResourceGroups().GetAsync(rgName);
+        var sqlServer = (await resourceGroup.GetSqlServerAsync("u3admin")).Value;
+        var databases = sqlServer.GetSqlDatabases();
+        SqlDatabaseData newDb = new(await GetAuEastLocationAsync(resourceGroup))
+            {
+                Sku = new SqlSku("Basic") { Tier = "Basic" },
+                RequestedBackupStorageRedundancy = SqlBackupStorageRedundancy.Local
+            };
+        await databases.CreateOrUpdateAsync(WaitUntil.Completed, key, newDb);
 
-        // // Create Roles
-        // string SecurityAdminID = string.Empty;
-        // using (var dbc = new U3ADbContextSeed())
-        // {
-        //     SetMessage($"Createing [{key}] Database. This will take a while...");
-        //     dbc.TenantInfo = tenant;
-        //     dbc.Database.SetCommandTimeout(600);
-        //     await dbc.Database.EnsureCreatedAsync();
-        //     SetMessage($"[{key}] Database schema created.");
-        //     foreach (var name in constants.nameOfRoles)
-        //     {
-        //         if (!await dbc.Roles.AnyAsync(x => x.Name == name))
-        //         {
-        //             IdentityRole role = new()
-        //                 {
-        //                     Id = Guid.NewGuid().ToString(),
-        //                     Name = name,
-        //                     NormalizedName = name.ToUpper(),
-        //                     ConcurrencyStamp = Guid.NewGuid().ToString(),
-        //                 };
-        //             await dbc.Roles.AddAsync(role);
-        //             if (name == constants.nameOfRoles[0]) SecurityAdminID = role.Id;
-        //         }
-        //     }
-        //     SetMessage("Application roles created.");
-        //     if (!await dbc.Users.AnyAsync(x => x.Email == constants.superAdmin))
-        //     {
-        //         ApplicationUser user = new()
-        //             {
-        //                 Id = Guid.NewGuid().ToString(),
-        //                 ConcurrencyStamp = Guid.NewGuid().ToString(),
-        //                 Email = constants.superAdmin,
-        //                 EmailConfirmed = true,
-        //                 NormalizedEmail = constants.superAdmin.ToUpper(),
-        //                 NormalizedUserName = constants.superAdmin.ToUpper(),
-        //                 PasswordHash = "AQAAAAEAACcQAAAAEGO9hnvP8x8fJPlDhs2gGYMhl9koCigXL2PPHidC9luB5nbMxW8fCFahxG/ZCA1OSw==",
-        //                 UserName = constants.superAdmin,
-        //             };
-        //         await dbc.Users.AddAsync(user);
-        //         IdentityUserRole<string> userRole = new()
-        //             {
+        // Create Roles
+        string SecurityAdminID = string.Empty;
+        using (var dbc = new U3ADbContextSeed())
+        {
+            dbc.TenantInfo = tenant;
+            dbc.Database.SetCommandTimeout(600);
+            await dbc.Database.EnsureCreatedAsync();
+            await SetMessage($"[{key}] Database schema created.");
+            foreach (var name in constants.nameOfRoles)
+            {
+                if (!await dbc.Roles.AnyAsync(x => x.Name == name))
+                {
+                    IdentityRole role = new()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Name = name,
+                            NormalizedName = name.ToUpper(),
+                            ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        };
+                    await dbc.Roles.AddAsync(role);
+                    if (name == constants.nameOfRoles[0]) SecurityAdminID = role.Id;
+                }
+            }
+            await SetMessage("Application roles created.");
+            if (!await dbc.Users.AnyAsync(x => x.Email == constants.superAdmin))
+            {
+                ApplicationUser user = new()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        Email = constants.superAdmin,
+                        EmailConfirmed = true,
+                        NormalizedEmail = constants.superAdmin.ToUpper(),
+                        NormalizedUserName = constants.superAdmin.ToUpper(),
+                        PasswordHash = "AQAAAAEAACcQAAAAEGO9hnvP8x8fJPlDhs2gGYMhl9koCigXL2PPHidC9luB5nbMxW8fCFahxG/ZCA1OSw==",
+                        UserName = constants.superAdmin,
+                    };
+                await dbc.Users.AddAsync(user);
+                IdentityUserRole<string> userRole = new()
+                    {
 
-        //                 RoleId = SecurityAdminID,
-        //                 UserId = user.Id
-        //             };
-        //         await dbc.UserRoles.AddAsync(userRole);
-        //     }
-        //     SetMessage($"Application user [{constants.superAdmin}] created.");
-        //     await dbc.SaveChangesAsync();
-        // }
+                        RoleId = SecurityAdminID,
+                        UserId = user.Id
+                    };
+                await dbc.UserRoles.AddAsync(userRole);
+            }
+            await SetMessage($"Application user [{constants.superAdmin}] created.");
+            await dbc.SaveChangesAsync();
+        }
     }
 
     async Task DeleteTXTAsync(SubscriptionResource subscription)
@@ -288,7 +307,7 @@ else
         {
             DnsTxtRecordResource txtRecord = dnsZone.GetDnsTxtRecord($"asuid.{tenant}");
             await txtRecord.DeleteAsync(WaitUntil.Completed);
-            SetMessage($"Deleted TXT validation record [asuid.{tenant}] from DNS");
+            await SetMessage($"Deleted TXT validation record [asuid.{tenant}] from DNS");
         }
         catch (Exception) { }
     }
@@ -307,7 +326,7 @@ else
         DnsCnameRecordData dnsCnameRecordData = new() { Cname = mySecrets.DNS_CNAME, TtlInSeconds = (long)TimeSpan.FromMinutes(60).TotalSeconds, };
         DnsCnameRecordCollection cnameRecordCollection = dnsZone.GetDnsCnameRecords();
         await cnameRecordCollection.CreateOrUpdateAsync(WaitUntil.Completed, cnameName, dnsCnameRecordData);
-        SetMessage($"[Create/Update subdomain [{tenant}.{mySecrets.DNS_NAME}] pointing to [{mySecrets.DNS_CNAME}]");
+        await SetMessage($"[Create/Update subdomain [{tenant}.{mySecrets.DNS_NAME}] pointing to [{mySecrets.DNS_CNAME}]");
         DnsTxtRecordCollection txtRecordCollection = dnsZone.GetDnsTxtRecords();
         DnsTxtRecordResource txtRecord = dnsZone.GetDnsTxtRecord("asuid");
         await txtRecordCollection.CreateOrUpdateAsync(WaitUntil.Completed, $"asuid.{tenant}", txtRecord.Data);
@@ -328,13 +347,13 @@ else
             };
         var hostName = $"{details!.TenantKey!.ToLower()}.{mySecrets.DNS_NAME}";
         var binding = (await hostNameBindings.CreateOrUpdateAsync(Azure.WaitUntil.Completed, hostName, data).ConfigureAwait(false)).Value;
-        SetMessage($"Create/Update custom domain [{hostName}] in web application [{mySecrets.WEBAPP_NAME}]");
+        await SetMessage($"Create/Update custom domain [{hostName}] in web application [{mySecrets.WEBAPP_NAME}]");
 
         var cert = await CreateOrUpdateAppCertificate(resourceGroup);
         data.ThumbprintString = cert.ThumbprintString;
         data.SslState = HostNameBindingSslState.SniEnabled;
         _ = await hostNameBindings.CreateOrUpdateAsync(Azure.WaitUntil.Completed, hostName, data).ConfigureAwait(false);
-        SetMessage($"Custom domain [{hostName}] bound to SSL Certificate [{cert.Name}]");
+        await SetMessage($"Custom domain [{hostName}] bound to SSL Certificate [{cert.Name}]");
     }
 
     async Task<AppCertificateData> CreateOrUpdateAppCertificate(ResourceGroupResource resourceGroup)
@@ -356,7 +375,7 @@ else
         catch (Exception)
         {
         }
-        SetMessage($"Create/Update SSL Certificate [{certificateName}] for subdomain [{canonicalName}]");
+        await SetMessage($"Create/Update SSL Certificate [{certificateName}] for subdomain [{canonicalName}]");
         var count = 0;
         while (count < 20)
         {
@@ -369,7 +388,7 @@ else
             {
                 Thread.Sleep(5000);
                 count++;
-                SetMessage($"Retrieve SSL Certificate [{certificateName}] attempt {count}");
+                await SetMessage($"Retrieve SSL Certificate [{certificateName}] attempt {count}");
             }
         }
         return newCert;
@@ -382,12 +401,12 @@ else
         return (await rg.GetAvailableLocationsAsync()).Value.First(x => x.Name == mySecrets!.LOCATION);
     }
 
-    void SetMessage(string msg)
+    async Task SetMessage(string msg)
     {
         SuccessMessageVisible = false;
         ErrorMessage = null;
         status += $"<li>{msg}</li>";
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
     }
 
     void Close()

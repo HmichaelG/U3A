@@ -63,7 +63,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddMicrosoftIdentityConsentHandler();
 
-builder.Services.AddScoped<DefaultAzureCredential>();
 builder.Services.AddScoped<WorkStation>();
 
 var app = builder.Build();
