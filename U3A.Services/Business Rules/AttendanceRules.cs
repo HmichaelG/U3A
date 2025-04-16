@@ -214,18 +214,22 @@ namespace U3A.BusinessRules
                 var thisClass = a.CustomFields["Source"] as Class;
                 if (BusinessRule.IsClassInTerm(thisClass, selectedTerm.TermNumber))
                 {
-                    var thisStart = a.Start;
+                    // Use a date range from the start (Sunday) to the end of the week (Saturday).
+                    // This allows for changes in class start date & time
+                    var thisWeekStart = a.Start.Date.AddDays(-((int)a.Start.DayOfWeek));
+                    var thisWeekEnd = a.Start.Date.AddDays(7 - (int)a.Start.DayOfWeek);
+
                     var isCancelled = ((int)a.LabelId == 9) ? true : false;
                     var attendanceCount = attendance.Count(x => x.ClassID == thisClass.ID &&
-                                                            x.Date == thisStart);
+                                                            (x.Date >= thisWeekStart && x.Date < thisWeekEnd));
                     var presentCount = attendance.Count(x => x.ClassID == thisClass.ID &&
-                                                            x.Date == thisStart &&
+                                                            (x.Date >= thisWeekStart && x.Date < thisWeekEnd) &&
                                                             (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.Present);
                     var absentWithCount = attendance.Count(x => x.ClassID == thisClass.ID &&
-                                                            x.Date == thisStart &&
+                                                            (x.Date >= thisWeekStart && x.Date < thisWeekEnd) &&
                                                             (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithApology);
                     var absentWithoutCount = attendance.Count(x => x.ClassID == thisClass.ID &&
-                                                            x.Date == thisStart &&
+                                                            (x.Date >= thisWeekStart && x.Date < thisWeekEnd) &&
                                                             (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithoutApology);
                     if ((GetRecorded) ||
                         (!GetRecorded && (attendanceCount == 0 || (attendanceCount > 0 && presentCount == 0))))
@@ -236,7 +240,7 @@ namespace U3A.BusinessRules
                             Present = presentCount,
                             AbsentWithApology = absentWithCount,
                             AbsentWithoutApology = absentWithoutCount,
-                            ClassDate = thisStart,
+                            ClassDate = a.Start,
                             CourseDetail = $"{a.Subject}: {thisClass.LeaderSummary}",
                             CourseName = a.Subject,
                             IsCancelled = isCancelled,
