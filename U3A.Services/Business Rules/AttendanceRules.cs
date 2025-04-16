@@ -79,7 +79,8 @@ namespace U3A.BusinessRules
                         Present = 0
                     });
                 }
-            };
+            }
+            ;
             return result.OrderBy(x => x.WeekEnd).ToList();
         }
         public static List<AttendClassDetailByWeek> GetClassAttendanceDetailByWeek(U3ADbContext dbc, int Year)
@@ -190,9 +191,10 @@ namespace U3A.BusinessRules
         {
 
             // Class attendance this term
-            var attendance = await dbc.AttendClass
+            var attendanceForTerm = await dbc.AttendClass
                 .Include(ac => ac.Class).ThenInclude(c => c.Course)
-                .Where(ac => ac.TermID == selectedTerm.ID)
+                .Where(ac => ac.TermID == selectedTerm.ID && 
+                    (GetRecorded || (!GetRecorded && !ac.Class.Course.IsOffScheduleActivity)))
                 .ToListAsync();
 
             // Class dates this term
@@ -218,36 +220,36 @@ namespace U3A.BusinessRules
                     // This allows for changes in class start date & time
                     var thisWeekStart = a.Start.Date.AddDays(-((int)a.Start.DayOfWeek));
                     var thisWeekEnd = a.Start.Date.AddDays(7 - (int)a.Start.DayOfWeek);
-
-                    var isCancelled = ((int)a.LabelId == 9) ? true : false;
-                    var attendanceCount = attendance.Count(x => x.ClassID == thisClass.ID &&
+                    var attendanceForWeek = attendanceForTerm.Where(x => x.ClassID == thisClass.ID &&
                                                             (x.Date >= thisWeekStart && x.Date < thisWeekEnd));
-                    var presentCount = attendance.Count(x => x.ClassID == thisClass.ID &&
-                                                            (x.Date >= thisWeekStart && x.Date < thisWeekEnd) &&
-                                                            (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.Present);
-                    var absentWithCount = attendance.Count(x => x.ClassID == thisClass.ID &&
-                                                            (x.Date >= thisWeekStart && x.Date < thisWeekEnd) &&
-                                                            (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithApology);
-                    var absentWithoutCount = attendance.Count(x => x.ClassID == thisClass.ID &&
-                                                            (x.Date >= thisWeekStart && x.Date < thisWeekEnd) &&
-                                                            (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithoutApology);
-                    if ((GetRecorded) ||
-                        (!GetRecorded && (attendanceCount == 0 || (attendanceCount > 0 && presentCount == 0))))
+                    var classDatesThisWeek = attendanceForWeek.Select(x => x.Date).Distinct();
+
+                    Parallel.ForEach(classDatesThisWeek, d =>
                     {
-                        var o = new AttendanceRecorded()
+                        var attendanceForDay = attendanceForWeek.Where(x => x.Date == d);
+                        var isCancelled = ((int)a.LabelId == 9) ? true : false;
+                        var attendanceCount = attendanceForDay.Count();
+                        var presentCount = attendanceForDay.Count(x => (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.Present);
+                        var absentWithCount = attendanceForDay.Count(x => (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithApology);
+                        var absentWithoutCount = attendanceForDay.Count(x => (AttendClassStatusType)x.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithoutApology);
+                        if ((GetRecorded) ||
+                            (!GetRecorded && (attendanceCount == 0 || (attendanceCount > 0 && presentCount == 0))))
                         {
-                            ClassID = thisClass.ID,
-                            Present = presentCount,
-                            AbsentWithApology = absentWithCount,
-                            AbsentWithoutApology = absentWithoutCount,
-                            ClassDate = a.Start,
-                            CourseDetail = $"{a.Subject}: {thisClass.LeaderSummary}",
-                            CourseName = a.Subject,
-                            IsCancelled = isCancelled,
-                        };
-                        bag.Add(o);
+                            var o = new AttendanceRecorded()
+                            {
+                                ClassID = thisClass.ID,
+                                Present = presentCount,
+                                AbsentWithApology = absentWithCount,
+                                AbsentWithoutApology = absentWithoutCount,
+                                ClassDate = d,
+                                CourseDetail = $"{a.Subject}: {thisClass.LeaderSummary}",
+                                CourseName = a.Subject,
+                                IsCancelled = isCancelled,
+                            };
+                            bag.Add(o);
+                        }
+                    });
                     }
-                }
             });
 
             return bag.OrderBy(x => x.CourseDetail).ThenBy(x => x.ClassDate).ToList();
