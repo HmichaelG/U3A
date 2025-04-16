@@ -475,7 +475,7 @@ else
 
     async Task SetupGrid()
     {
-        if (selectedCourse.CourseFeePerTerm != 0 || selectedCourse.CourseFeePerYear != 0) { await ProgressBar.ShowSmallSpinnerAsync(); }
+        await ProgressBar.ShowSmallSpinnerAsync();
         ClearSelection();
         mainGrid.BeginUpdate();
         GridCommandColumn.Visible = false;
@@ -495,11 +495,10 @@ else
                 }
             }
         }
-        mainGrid.EndUpdate();
-        mainGrid.AutoFitColumnWidths();
         UpdateStatistics();
         await ProgressBar.Close();
-        await InvokeAsync(StateHasChanged);
+        mainGrid.EndUpdate();
+        mainGrid.AutoFitColumnWidths();
     }
 
     void ClearSelection()
