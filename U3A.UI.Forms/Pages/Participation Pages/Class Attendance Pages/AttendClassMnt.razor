@@ -126,7 +126,10 @@ else
                                     ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))">
                             <Buttons>
                                 <DxEditorButton Tooltip="Add an unscheduled class"
-                                                IconCssClass="bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
+                                                IconCssClass="text-success bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
+                                <DxEditorButton Tooltip="Delete a class and its attendance history"
+                                                Visible="@((selectedDate != null) && (selectedDate.Date.Date <= now.Date))"
+                                                IconCssClass="text-danger bi bi-trash" Click="@(async() => await OnDeleteDateButtonClick())" />
                             </Buttons>
                         </DxComboBox>
                     </DxFormLayoutItem>
@@ -589,7 +592,7 @@ else
         if (ClassDate.Date.Date > now.Date)
         {
             if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                                                                                                            @"The class date you have selected is in the future.<br/>
+                                                                                                                                    @"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
@@ -620,6 +623,21 @@ else
         await ApplyStudentLeaveAsync();
     }
 
+    async Task OnDeleteDateButtonClick()
+    {
+        if (await messageBox.ShowAsync("Delete Class Date",
+                    $@"Do you wish the delete the class detail &amp; attendance history for...<br/>
+                    <b>{selectedDate.ClassDateName}</b>?"))
+        {
+            dbc.AttendClass.RemoveRange(ClassAttendance);
+            await dbc.SaveChangesAsync();
+            ClassAttendance.Clear();
+            selectedDate = null;
+            SetupClassDates();
+            StateHasChanged();
+        }
+    }
+
     async Task OnNewDateButtonClick()
     {
         maxDate = now.Date;
@@ -627,7 +645,7 @@ else
         if (maxDate <= SelectedTerm.StartDate)
         {
             await messageBox.ShowOkOnlyAsync("Re-select term",
-                    @"Today's date is prior to the selected term's start date.<br/>
+                            @"Today's date is prior to the selected term's start date.<br/>
                     Select a term with a start date prior to today.");
             return;
         }
@@ -985,7 +1003,8 @@ else
         foreach (var e in SelectedDataItems.Cast<AttendClass>().ToList())
         {
             SendTo.Add(e.Person);
-        };
+        }
+        ;
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             documentsSent = 0;
