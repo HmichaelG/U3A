@@ -22,21 +22,21 @@
 else
 {
     <DxWindow HeaderText="Open Circuits" Width="800px" ShowFooter="true"
-    ShowCloseButton="true"
-    CloseOnEscape="true"
-    @ref="@circuitDisplay"
-    @bind-Visible=@showPopup>
+              ShowCloseButton="true"
+              CloseOnEscape="true"
+              @ref="@circuitDisplay"
+              @bind-Visible=@showPopup>
         <BodyTemplate>
             <FullScreen DisplayOffset="20" HideToggle="true">
                 <ContentTemplate>
                     <DxGrid Data="@circuitDetails"
-                    ShowGroupPanel="true"
-                    VirtualScrollingEnabled="true"
-                    AutoExpandAllGroupRows="true"
-                    FooterDisplayMode="GridFooterDisplayMode.Always">
+                            ShowGroupPanel="true"
+                            VirtualScrollingEnabled="true"
+                            AutoExpandAllGroupRows="true"
+                            FooterDisplayMode="GridFooterDisplayMode.Always">
                         <Columns>
                             <DxGridDataColumn Fieldname="Status" GroupIndex="0" />
-                            <DxGridDataColumn Fieldname="UpTime" SortIndex="0"/>
+                            <DxGridDataColumn Fieldname="UpTime" SortIndex="0" />
                             <DxGridDataColumn Fieldname="DownTime" />
                             <DxGridDataColumn Fieldname="Name" Caption="Login" />
                             <DxGridDataColumn Fieldname="Tenant" />
@@ -53,7 +53,7 @@ else
         </BodyTemplate>
         <FooterTemplate>
             <DxButton Text="Refresh" CssClass="m-1"
-            Click="() => {GetCircuitData();StateHasChanged();}" />
+                      Click="() => {GetCircuitData();StateHasChanged();}" />
         </FooterTemplate>
     </DxWindow>
     <MessageBox @ref="@messageBox" />
@@ -67,21 +67,24 @@ else
         else
         {
             <PageTitle>@($"{tenantId}: Site Administration")</PageTitle>
-            <div class="@($"input-group d-print-none mt-{ws.SizeMode+2}")">
-                <div class="flex-grow-1 text-start me-2" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
+            <div class="@($"input-group d-print-none align-content-center mt-{ws.SizeMode+2}")">
+                <span class="d-inline-flex flex-grow-1">
+                    <img class="h5 text-primary bi bi-people" />
+                    <div class="text-start mx-1" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
+                </span>
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
-                ButtonIconCssClass="bi bi-check2-circle"
-                HelpTopic=@($"{versionYear}-Version-History.html")
-                ActivationStyle="@HelpActivationStyle.ButtonOnly" />
+                                  ButtonIconCssClass="h5 text-primary bi bi-check2-circle"
+                                  HelpTopic=@($"{versionYear}-Version-History.html")
+                                  ActivationStyle="@HelpActivationStyle.ButtonOnly" />
                 <DxButton Text="Support"
-                RenderStyleMode="ButtonRenderStyleMode.Outline"
-                NavigateUrl="Public/Support"
-                CssClass="ms-1"
-                IconCssClass="bi bi-person" />
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          NavigateUrl="Public/Support"
+                          CssClass="ms-1"
+                          IconCssClass="h5 text-primary bi bi-person-raised-hand" />
                 <ContextHelpTitle Title=""
-                HelpTopic="Introduction.html"
-                IncludeTableOfContents=true
-                ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                                  HelpTopic="Introduction.html"
+                                  IncludeTableOfContents=true
+                                  ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
             </div>
             <DxTabs CssClass="w-100">
                 <DxTabPage Text="Member Summary">
@@ -121,11 +124,11 @@ else
 <style>
 
     .iframe-style {
-    width: 85vw;
-    min-height: 40dvh;
-    height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem") );
-    border-style: none;
-    padding-bottom: 5px;
+        width: 85vw;
+        min-height: 40dvh;
+        height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem") );
+        border-style: none;
+        padding-bottom: 5px;
     }
 
 </style>
