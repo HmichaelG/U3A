@@ -84,13 +84,14 @@ namespace U3A.Database
                 return;
             }
             var identifier = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);
+            if (identifier == "bs-local") identifier = "localhost"; // BrowserStack
             using(var dbc = _TenantDbFactory.CreateDbContext())
             {
                 // Redirect console output to null
                 Console.SetOut(TextWriter.Null);
 
                 TenantInfo = dbc.TenantInfo.AsNoTracking().FirstOrDefault(x => x.Identifier == identifier);
-                if(TenantInfo == null)
+                if (TenantInfo is null)
                 {
                     TenantInfo = dbc.TenantInfo.AsNoTracking().FirstOrDefault(x => x.Identifier == "demo");
                 }
