@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -9,8 +9,7 @@ namespace U3A.WebFunctions.Procedures;
 public static class AutoEnrollParticipants
 {
     public static async Task<bool> Process(TenantInfo tenant,
-                                        string tenantConnectionString,
-                                        ILogger logger)
+                                        string tenantConnectionString)
     {
         bool hasRandomAllocationExecuted = false; //Return value
         using (var dbc = new U3ADbContext(tenant))
@@ -21,7 +20,7 @@ public static class AutoEnrollParticipants
                                 .FirstOrDefaultAsync();
             if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
             {
-                logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
+                Log.Information($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
                 return hasRandomAllocationExecuted;
             }
             var IsClassAllocationFinalised = false;
@@ -44,7 +43,7 @@ public static class AutoEnrollParticipants
                     allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
                     if (BusinessRule.IsPreRandomAllocationDay(currentTerm, settings, today))
                     {
-                        logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
+                        Log.Information($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Date prior to allocation date: {allocationDate?.ToLongDateString()}");
                         return hasRandomAllocationExecuted;
                     }
                     else
@@ -52,7 +51,7 @@ public static class AutoEnrollParticipants
                         IsClassAllocationFinalised = currentTerm.IsClassAllocationFinalised;
                         if (today == allocationDate)
                         {
-                            logger.LogInformation($"!!! [{dbc.TenantInfo.Identifier}]: Random Auto-Allocation Day !!!");
+                            Log.Information($"!!! [{dbc.TenantInfo.Identifier}]: Random Auto-Allocation Day !!!");
                             var utcNow = DateTime.UtcNow;
                             // emailDate will be 3 days from now less two hours to ensure it occurs.
                             emailDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, 0, 0, 0) +
@@ -81,10 +80,10 @@ public static class AutoEnrollParticipants
             await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm,
                                             IsClassAllocationFinalised,
                                             forceEmailQueue, emailDate);
-            logger.LogInformation($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
+            Log.Information($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
             foreach (var log in BusinessRule.AutoEnrolments)
             {
-                logger.LogInformation(log);
+                Log.Information(log);
             }
             BusinessRule.AutoEnrolments.Clear();
 
@@ -99,8 +98,7 @@ public static class AutoEnrollParticipants
     }
     public static async Task ProcessByEnrolment(TenantInfo tenant,
                                         IEnumerable<Guid> EnrollmentIdsToProcess,
-                                        string tenantConnectionString,
-                                        ILogger logger)
+                                        string tenantConnectionString)
     {
         using (var dbc = new U3ADbContext(tenant))
         {
@@ -110,7 +108,7 @@ public static class AutoEnrollParticipants
                                 .FirstOrDefaultAsync();
             if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
             {
-                logger.LogInformation($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
+                Log.Information($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
                 return;
             }
             var today = await Common.GetTodayAsync(dbc);
@@ -136,10 +134,10 @@ public static class AutoEnrollParticipants
             {
                 // process for participants
                 await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm, EnrollmentIdsToProcess);
-                logger.LogInformation($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
+                Log.Information($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
                 foreach (var log in BusinessRule.AutoEnrolments)
                 {
-                    logger.LogInformation(log);
+                    Log.Information(log);
                 }
                 BusinessRule.AutoEnrolments.Clear();
 

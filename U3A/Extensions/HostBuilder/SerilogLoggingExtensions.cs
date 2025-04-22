@@ -31,7 +31,8 @@ public static class SerilogLoggingExtensions
         };
 
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Error)
+            .MinimumLevel.Override(nameof(Microsoft.EntityFrameworkCore), LogEventLevel.Warning)
+            .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Error)
             .Filter
                   .ByExcluding(logEvent =>
                     logEvent.Exception is OperationCanceledException ||

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.Database;
 using U3A.Model;
 
@@ -7,7 +7,7 @@ namespace U3A.WebFunctions.Procedures;
 
 public static class DatabaseCleanup
 {
-    public static async Task Process(TenantInfo tenant, string connectionString, ILogger logger)
+    public static async Task Process(TenantInfo tenant, string connectionString)
     {
         using (var dbc = new U3ADbContext(tenant))
         {
@@ -15,23 +15,23 @@ public static class DatabaseCleanup
             try
             {
                 _ = await dbc.Database.ExecuteSqlRawAsync(@"execute [dbo].[prcDbCleanup]");
-                logger.LogInformation($"[{tenant.Identifier}]: Execute [dbo].[prcDbCleanup] completed.");
+                Log.Information($"[{tenant.Identifier}]: Execute [dbo].[prcDbCleanup] completed.");
             }
             catch (Exception ex)
             {
-                logger.LogError("[{tenant.Identifier}]: Execute [dbo].[prcDbCleanup] failed: " + ex.Message);
+                Log.Error("[{tenant.Identifier}]: Execute [dbo].[prcDbCleanup] failed: " + ex.Message);
             }
         }
         using (var dbc = new TenantDbContext(connectionString))
         {
             var cutOff = DateTime.UtcNow.Date.AddDays(-3);
             var tableName = "LogAutoEnrol";
-            await deleteLogs(tenant, logger, dbc, cutOff, tableName);
+            await deleteLogs(tenant, dbc, cutOff, tableName);
             tableName = "LogEvents";
-            await deleteLogs(tenant, logger, dbc, cutOff, tableName);
+            await deleteLogs(tenant, dbc, cutOff, tableName);
         }
     }
-    static async Task deleteLogs(TenantInfo tenant, ILogger logger, TenantDbContext dbc, DateTime cutOff, string tableName)
+    static async Task deleteLogs(TenantInfo tenant, TenantDbContext dbc, DateTime cutOff, string tableName)
     {
         var total = 0;
         try
@@ -40,14 +40,17 @@ public static class DatabaseCleanup
             {
                 var cmd = $"delete top (5000) from [dbo].[{tableName}] where timestamp < '{cutOff.ToString("dd-MMM-yyyy")}'";
                 var count = await dbc.Database.ExecuteSqlRawAsync(cmd);
-                if (count <= 0) { break; }
                 total += count;
-                logger.LogInformation($"[{tenant.Identifier}]: {total} records deleted from [dbo].[{tableName}]");
+                Log.Information("[{identifier}]: {total} records deleted from [{tableName}]",
+                                    tenant.Identifier,
+                                    total,
+                                    tableName);
+                if (count <= 0) { break; }
             }
         }
         catch (Exception ex)
         {
-            logger.LogError($"[{tenant.Identifier}]: Delete from [dbo].[{tableName}] failed: {ex.Message}");
+            Log.Error($"[{tenant.Identifier}]: Delete from [{tableName}] failed: {ex.Message}");
         }
     }
 }

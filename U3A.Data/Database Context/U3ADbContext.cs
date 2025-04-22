@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using System.ComponentModel;
 using System.Data.Common;
 using U3A.Model;
 using static DevExpress.Office.Utils.HdcOriginModifier;
@@ -48,8 +49,6 @@ namespace U3A.Database
             optionsBuilder.UseLoggerFactory(LoggerFactory.Create(builder =>
             {
                 builder.AddSerilog();
-                builder.AddConsole();
-                builder.AddDebug();
             }));
             GetTenantInfo();
             if (TenantInfo != null)

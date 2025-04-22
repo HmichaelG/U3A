@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Net;
 using System.Text.Json;
 using U3A.BusinessRules;
@@ -16,17 +16,15 @@ namespace U3A.WebFunctions;
 public class DoCreateCorrespondenceAsPdf
 {
     private readonly IConfiguration config;
-    private readonly ILogger log;
-    public DoCreateCorrespondenceAsPdf(IConfiguration config, ILoggerFactory loggerFactory)
+    public DoCreateCorrespondenceAsPdf(IConfiguration config)
     {
         this.config = config;
-        this.log = loggerFactory.CreateLogger<DoCreateCorrespondenceAsPdf>(); ;
     }
 
     [Function("DoCreateCorrespondenceAsPdf")]
     public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
     {
-        log.LogInformation("C# HTTP trigger function processed a request.");
+        Log.Information("C# HTTP trigger function processed a request.");
         var options = new U3AFunctionOptions(req);
         // retrieve SendMail from request body json text
         SendMail? printDoc = null;
@@ -59,7 +57,7 @@ public class DoCreateCorrespondenceAsPdf
         var personEnrolments = new Dictionary<Guid, List<Enrolment>>();
         List<(Guid, Guid, Guid?)> onFile = new();
         (Guid, Guid, Guid?) onFileKey;
-        var reportFactory = new ProFormaReportFactory(tenant, log, IsPreview: true);
+        var reportFactory = new ProFormaReportFactory(tenant, IsPreview: true);
         var enrolments = new List<Enrolment>();
         List<SendMail> mailItems = new();
         using (var dbc = new U3ADbContext(tenant))

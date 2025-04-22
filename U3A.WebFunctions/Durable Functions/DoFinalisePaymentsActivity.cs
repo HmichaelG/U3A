@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.Model;
 using U3A.WebFunctions.Procedures;
 
@@ -15,22 +15,21 @@ public partial class DurableFunctions
     [Function(nameof(DoFinalisePaymentsActivity))]
     public async Task<string> DoFinalisePaymentsActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger(nameof(DoFinalisePaymentsActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
             var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
-                logger.LogInformation($"****** Started {nameof(DoFinalisePaymentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
+                Log.Information($"****** Started {nameof(DoFinalisePaymentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
-                    await LogStartTime(logger, tenant);
-                    await FinaliseOnlinePayment.Process(tenant, logger);
+                    await LogStartTime(tenant);
+                    await FinaliseOnlinePayment.Process(tenant);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, $"Error processing {nameof(DoFinalisePaymentsActivity)} for {tenant.Identifier}");
+                    Log.Error(ex, $"Error processing {nameof(DoFinalisePaymentsActivity)} for {tenant.Identifier}");
                 }
             }
         }

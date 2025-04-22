@@ -16,7 +16,6 @@ public partial class DurableFunctions
     [Function(nameof(DoBuildScheduleActivity))]
     public async Task<string> DoBuildScheduleActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        MS_LOG.ILogger logger = executionContext.GetLogger(nameof(DoBuildScheduleActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
@@ -26,7 +25,7 @@ public partial class DurableFunctions
                 Log.Information($"****** Started {nameof(DoBuildScheduleActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
-                    await LogStartTime(logger, tenant);
+                    await LogStartTime(tenant);
                     using (var dbc = new U3ADbContext(tenant))
                     {
                         dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);

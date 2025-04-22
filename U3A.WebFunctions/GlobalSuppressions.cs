@@ -5,6 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Async/await", "CRR0029:ConfigureAwait(true) is called implicitly", Justification = "<Pending>", Scope = "member", Target = "~M:U3A.WebFunctions.Procedures.DatabaseCleanup.Process(U3A.Model.TenantInfo,System.String,Microsoft.Extensions.Logging.ILogger)~System.Threading.Tasks.Task")]
-[assembly: SuppressMessage("Async/await", "CRR0029:ConfigureAwait(true) is called implicitly", Justification = "<Pending>", Scope = "member", Target = "~M:U3A.WebFunctions.Procedures.CreateAttendance.Process(U3A.Model.TenantInfo,Microsoft.Extensions.Logging.ILogger)~System.Threading.Tasks.Task")]
-[assembly: SuppressMessage("Async/await", "CRR0029:ConfigureAwait(true) is called implicitly", Justification = "<Pending>", Scope = "member", Target = "~M:U3A.WebFunctions.Procedures.CreateAttendance.ApplyStudentLeaveAsync(U3A.Database.U3ADbContext,System.Collections.Generic.List{U3A.Model.AttendClass},U3A.Model.Course)~System.Threading.Tasks.Task")]
+[assembly: SuppressMessage("Async/await", "CRR0029:ConfigureAwait(true) is called implicitly")]
+

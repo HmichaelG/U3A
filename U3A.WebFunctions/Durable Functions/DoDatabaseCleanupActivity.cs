@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.Model;
 using U3A.WebFunctions.Procedures;
 
@@ -15,22 +15,24 @@ public partial class DurableFunctions
     [Function(nameof(DoDatabaseCleanupActivity))]
     public async Task<string> DoDatabaseCleanupActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger(nameof(DoDatabaseCleanupActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
             var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
-                logger.LogInformation($"****** Started {nameof(DoDatabaseCleanupActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
+                Log.Information("****** Started {activity} for {identifier}: {name}. ******",
+                                        nameof(DoDatabaseCleanupActivity),
+                                        tenant.Identifier,
+                                        tenant.Name);
                 try
                 {
-                    await LogStartTime(logger, tenant);
-                    await DatabaseCleanup.Process(tenant, cn, logger);
+                    await LogStartTime(tenant);
+                    await DatabaseCleanup.Process(tenant, cn);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, $"Error processing {nameof(DoDatabaseCleanupActivity)} for {tenant.Identifier}");
+                    Log.Error(ex, $"Error processing {nameof(DoDatabaseCleanupActivity)} for {tenant.Identifier}");
                 }
             }
         }

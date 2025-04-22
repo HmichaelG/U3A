@@ -2,7 +2,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Net;
 using System.Text.Json;
 
@@ -10,13 +10,10 @@ namespace U3A.WebFunctions
 {
     public class GetTenants
     {
-        private readonly ILogger _logger;
         private readonly IConfiguration _config;
 
-        public GetTenants(ILoggerFactory loggerFactory,
-                            IConfiguration config)
+        public GetTenants(IConfiguration config)
         {
-            _logger = loggerFactory.CreateLogger<GetTenants>();
             _config = config;
         }
 
@@ -67,8 +64,7 @@ namespace U3A.WebFunctions
                     }
                     catch (Exception ex)
                     {
-                        var eID = new EventId(10000);
-                        _logger.LogError(eID, ex.Message, "Error reading TenantInfo");
+                        Log.Error(ex.Message, "Error reading TenantInfo");
                     }
                     finally
                     {

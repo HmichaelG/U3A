@@ -18,7 +18,10 @@ var host = new HostBuilder()
                         @"D:\home\LogFiles\Application\log.txt";
 
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
+            // *** Comment to view SQL statements ***
+            .MinimumLevel.Override(nameof(Microsoft.EntityFrameworkCore), LogEventLevel.Warning)
+            .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Error)
+            .MinimumLevel.Override(nameof(Azure.Storage), LogEventLevel.Error)
             .MinimumLevel.Override("Worker", LogEventLevel.Warning)
             .MinimumLevel.Override("Host", LogEventLevel.Warning)
             .MinimumLevel.Override("System", LogEventLevel.Error)

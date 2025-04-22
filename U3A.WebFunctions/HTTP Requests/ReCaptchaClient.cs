@@ -1,19 +1,16 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Net;
 
 namespace U3A.WebFunctions
 {
     public class ReCaptchaClient
     {
-        private readonly ILogger _logger;
         private readonly IConfiguration _config;
-        public ReCaptchaClient(ILoggerFactory loggerFactory,
-                            IConfiguration config)
+        public ReCaptchaClient(IConfiguration config)
         {
-            _logger = loggerFactory.CreateLogger<ReCaptchaClient>();
             _config = config;
         }
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -11,7 +11,7 @@ namespace U3A.WebFunctions.Procedures
     {
 
         static ProFormaReportFactory? reportFactory;
-        public static async Task Process(TenantInfo tenant, ILogger logger)
+        public static async Task Process(TenantInfo tenant)
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
@@ -25,7 +25,7 @@ namespace U3A.WebFunctions.Procedures
                 var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
                 if (settings != null)
                 {
-                    reportFactory = new ProFormaReportFactory(tenant, logger);
+                    reportFactory = new ProFormaReportFactory(tenant);
                     var Classes = await BusinessRule.SelectableClassesAsync(dbc, selectedTerm);
                     var count = 0;
                     foreach (var c in Classes)
@@ -35,13 +35,13 @@ namespace U3A.WebFunctions.Procedures
                         foreach (var p in await BusinessRule.GetLeaderReportRecipients(dbc, settings, selectedTerm, c))
                         {
                             await ProcessReportAsync(dbc, selectedTerm, p, c.Course, c);
-                            logger.LogInformation($"Sent: {p.FullName} for {c.Course.Name}.");
+                            Log.Information($"Sent: {p.FullName} for {c.Course.Name}.");
                             count++;
                         }
                     }
                     if (count > 0)
                     {
-                        logger.LogInformation($">>> {count} Leader's report packs sent at term start <<<<");
+                        Log.Information($">>> {count} Leader's report packs sent at term start <<<<");
                     }
                 }
             }

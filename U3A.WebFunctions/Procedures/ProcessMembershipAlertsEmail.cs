@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using U3A.BusinessRules;
@@ -13,7 +13,7 @@ namespace U3A.WebFunctions.Procedures
     public static class ProcessMembershipAlertsEmail
     {
 
-        public static async Task Process(TenantInfo tenant, ILogger logger)
+        public static async Task Process(TenantInfo tenant)
         {
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
@@ -93,13 +93,13 @@ namespace U3A.WebFunctions.Procedures
                     int days = (int)(allocationDate - today).TotalDays;
                     if (days > 0 && days < 8)
                     {
-                        msg += $"<H3>Reminder: Random Enrolment Allocation Day in {days} days.<h3>";
+                        msg += $"<H3>Reminder: Random Enrollment Allocation Day in {days} days.<h3>";
                         DoEnrolledButUnfinancial |= true;
                     }
-                    if (days == 0) msg += $"<H3>Random Enrolment has been performed! You have {constants.RANDOM_ALLOCATION_PREVIEW} days to review before members are advised.<h3>";
+                    if (days == 0) msg += $"<H3>Random Enrollment has been performed! You have {constants.RANDOM_ALLOCATION_PREVIEW} days to review before members are advised.<h3>";
                     if (days < 0 && Math.Abs(days) < constants.RANDOM_ALLOCATION_PREVIEW)
                     {
-                        msg += $"<H3>Reminder: Random Enrolment has been performed! Member notification emails in {constants.RANDOM_ALLOCATION_PREVIEW + days} days.<h3>";
+                        msg += $"<H3>Reminder: Random Enrollment has been performed! Member notification emails in {constants.RANDOM_ALLOCATION_PREVIEW + days} days.<h3>";
                     }
                 }
             }
@@ -131,7 +131,7 @@ namespace U3A.WebFunctions.Procedures
                 }
             }
 
-            // new members still unfinancial
+            // new members still not financial
 
             var people = await dbc.Person
                                 .Where(x => x.DateCeased == null
@@ -156,7 +156,7 @@ namespace U3A.WebFunctions.Procedures
                 if (people?.Any() == true)
                 {
                     var introduction = $@"<p>The following members have joined the U3A in the last 14 days and are financial.
-                                            <br/>However, they have yet to enrol in a course. Do they need assistance?</p>";
+                                            <br/>However, they have yet to enroll in a course. Do they need assistance?</p>";
                     msg += FormatPeople(people, introduction);
                 }
                 people = await BusinessRule.SelectableNewPersonsWaitlistedOnlyAsync(dbc,
@@ -166,19 +166,19 @@ namespace U3A.WebFunctions.Procedures
                 if (people?.Any() == true)
                 {
                     var introduction = $@"<p>The following members have joined the U3A in the last day and are financial.
-                                            <br/>However, all their course enrolment requests have been waitlisted. Do they understand what this means?</p>";
+                                            <br/>However, all their course enrollment requests have been waitlisted. Do they understand what this means?</p>";
                     msg += FormatPeople(people, introduction);
                 }
                 if (DoEnrolledButUnfinancial)
                 {
-                    // Enrolled but unfinancial
+                    // Enrolled but not financial
 
                     people = BusinessRule.SelectablePersonsWithEnrolments(dbc, term.ID, null)
                                 .Where(x => x.FinancialTo < term.Year).ToList();
                     if (people?.Any() == true)
                     {
-                        var introduction = $@"<p>The following members have requested enrolment in class(es) but are not financial.
-                                            <br/>Their course enrolment requests will remain waitlisted until payment is made.
+                        var introduction = $@"<p>The following members have requested enrollment in class(es) but are not financial.
+                                            <br/>Their course enrollment requests will remain waitlisted until payment is made.
                                             <br>For detail on classes requested review the report, <strong>Course By Participant List</strong>
                                                 and filter by <strong>financial status</strong>.</p>";
                         msg += FormatPeopleAndClasses(people, introduction);

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Serilog;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -9,7 +9,7 @@ namespace U3A.WebFunctions.Procedures
 
     public static class FinaliseOnlinePayment
     {
-        public static async Task Process(TenantInfo tenant, ILogger logger)
+        public static async Task Process(TenantInfo tenant)
         {
             _ = new MemberFeeCalculationService();
             using (var dbc = new U3ADbContext(tenant))
@@ -26,18 +26,18 @@ namespace U3A.WebFunctions.Procedures
                     try
                     {
                         await paymentService.FinaliseEwayPyamentAsync(dbc, payment, term);
-                        logger.LogInformation($"Online payment for {person.FullName} finalised.");
+                        Log.Information($"Online payment for {person.FullName} finalised.");
                     }
                     catch (EwayResponseException ex)
                     {
                         var response = (!string.IsNullOrWhiteSpace(ex.PaymentResult.ResponseCode))
                             ? $"{ex.PaymentResult.ResponseCode} {ex.PaymentResult.ResponseMessage}"
                             : "No response received.";
-                        logger.LogInformation(ex, $"Payment for {person.FullName} not processed: EWAY reason: {response}");
+                        Log.Information(ex, $"Payment for {person.FullName} not processed: EWAY reason: {response}");
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError($"Error processing online payment for {person.FullName}. {ex.Message}");
+                        Log.Error($"Error processing online payment for {person.FullName}. {ex.Message}");
                     }
                 }
             }

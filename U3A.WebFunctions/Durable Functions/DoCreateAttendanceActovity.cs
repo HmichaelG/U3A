@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.Model;
 using U3A.WebFunctions.Procedures;
 
@@ -15,17 +15,16 @@ public partial class DurableFunctions
     [Function(nameof(DoCreateAttendanceActivity))]
     public async Task<string> DoCreateAttendanceActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger(nameof(DoCreateAttendanceActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
             var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
-                logger.LogInformation($"****** Started {nameof(DoCreateAttendanceActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
+                Log.Information($"****** Started {nameof(DoCreateAttendanceActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
-                    await LogStartTime(logger, tenant);
+                    await LogStartTime(tenant);
                     var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
@@ -34,7 +33,7 @@ public partial class DurableFunctions
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, $"Error processing {nameof(DoCreateAttendanceActivity)} for {tenant.Identifier}");
+                    Log.Error(ex, $"Error processing {nameof(DoCreateAttendanceActivity)} for {tenant.Identifier}");
                 }
             }
         }

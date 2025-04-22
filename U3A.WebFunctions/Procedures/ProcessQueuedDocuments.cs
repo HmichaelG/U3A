@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Text.Json;
 using U3A.BusinessRules;
 using U3A.Database;
@@ -11,7 +11,7 @@ namespace U3A.WebFunctions.Procedures
     public static class ProcessQueuedDocuments
     {
 
-        public static async Task Process(TenantInfo tenant, U3AFunctionOptions options, ILogger logger)
+        public static async Task Process(TenantInfo tenant, U3AFunctionOptions options)
         {
             int count = 0;
             List<DocumentQueue> queueItems = new();
@@ -96,7 +96,7 @@ namespace U3A.WebFunctions.Procedures
                             }
                             catch (Exception ex)
                             {
-                                logger.LogError(ex, $"Error Processing: {subject}");
+                                Log.Error(ex, $"Error Processing: {subject}");
                                 queueItem.Status = DocumentQueueStatus.Error;
                                 queueItem.Result = "Processing Error";
                             }
@@ -106,15 +106,15 @@ namespace U3A.WebFunctions.Procedures
                             }
                         }
                     }
-                    logger.LogInformation($"{count} queued documents sent.");
+                    Log.Information($"{count} queued documents sent.");
                 }
-                else { logger.LogInformation("There were no queued documents to send."); }
+                else { Log.Information("There were no queued documents to send."); }
 
                 // Delete expired records
                 int daysToKeep = 14;
                 dbc.Database.SetCommandTimeout(60 * 3);
                 var deleted = dbc.Database.ExecuteSql($"DELETE FROM DocumentQueue WHERE DATEDIFF(DAY, CreatedOn, GETDATE()) > {daysToKeep}");
-                logger.LogInformation($"Deleted {deleted} document queue records because they are more than {daysToKeep} days old.");
+                Log.Information($"Deleted {deleted} document queue records because they are more than {daysToKeep} days old.");
             }
         }
     }

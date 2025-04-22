@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.Database;
 using U3A.Model;
 using U3A.WebFunctions.Procedures;
@@ -17,30 +17,29 @@ public partial class DurableFunctions
     public async Task<bool> DoAutoEnrolmentActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
         bool hasRandomAllocationExecuted = false; //Return value
-        ILogger logger = executionContext.GetLogger(nameof(DoAutoEnrolmentActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
             var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
-                logger.LogInformation($"****** Started {nameof(DoAutoEnrolmentActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
+                Log.Information($"****** Started {nameof(DoAutoEnrolmentActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
-                    await LogStartTime(logger, tenant);
+                    await LogStartTime(tenant);
                     if (options.EnrollmentIdsToProcess.Count > 0)
                     {
-                        await AutoEnrollParticipants.ProcessByEnrolment(tenant, options.EnrollmentIdsToProcess, cn!, logger);
+                        await AutoEnrollParticipants.ProcessByEnrolment(tenant, options.EnrollmentIdsToProcess, cn!);
                         hasRandomAllocationExecuted = false;
                     }
                     else
                     {
-                        hasRandomAllocationExecuted = await AutoEnrollParticipants.Process(tenant, cn!, logger);
+                        hasRandomAllocationExecuted = await AutoEnrollParticipants.Process(tenant, cn!);
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, $"Error processing {nameof(DoAutoEnrolmentActivity)} for {tenant.Identifier}");
+                    Log.Error(ex, $"Error processing {nameof(DoAutoEnrolmentActivity)} for {tenant.Identifier}");
                 }
             }
             else { throw new NullReferenceException("Database connection string is null"); }
@@ -54,7 +53,6 @@ public partial class DurableFunctions
     [DurableClient] DurableTaskClient client,
     FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger(nameof(DoAutoEnrolment));
         var options = new U3AFunctionOptions()
         {
             DurableActivity = DurableActivity.DoAutoEnrolment

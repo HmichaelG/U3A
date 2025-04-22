@@ -1,5 +1,5 @@
 ﻿using DevExpress.Blazor;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -8,7 +8,7 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class BringForwardEnrolments
     {
-        public static async Task Process(TenantInfo tenant, ILogger logger)
+        public static async Task Process(TenantInfo tenant)
         {
             using (var dbc = new U3ADbContext(tenant))
             {
@@ -26,11 +26,11 @@ namespace U3A.WebFunctions.Procedures
                         {
                             await BusinessRule.BringForwardEnrolmentsAsync(dbc, sourceTerm, targetTerm, false);
                             var d = targetTerm.EnrolmentStartDate;
-                            logger.LogInformation($">>>> Enrolments brought forward prior to enrolment start {d.ToShortDateString()} for Term {targetTerm.TermNumber}. <<<<");
-                            logger.LogInformation($"Current Term is unchanged (Term {sourceTerm.TermNumber}).");
+                            Log.Information($">>>> Enrollments brought forward prior to enrollment start {d.ToShortDateString()} for Term {targetTerm.TermNumber}. <<<<");
+                            Log.Information($"Current Term is unchanged (Term {sourceTerm.TermNumber}).");
                         }
 
-                        // make sure we are in the enrolment period before term start
+                        // make sure we are in the enrollment period before term start
                         if (today < targetTerm.EnrolmentStartDate) return;
                         if (today >= targetTerm.StartDate) return;
 
@@ -46,8 +46,8 @@ namespace U3A.WebFunctions.Procedures
                             {
                                 await BusinessRule.BringForwardEnrolmentsAsync(dbc, sourceTerm, targetTerm, true);
                                 var d = targetTerm.StartDate;
-                                logger.LogInformation($">>>> Enrolments brought forward prior to start date {d.ToShortDateString()} for Term {targetTerm.TermNumber}. <<<<");
-                                logger.LogInformation($"Current Term brought forward to Term {targetTerm.TermNumber}.");
+                                Log.Information($">>>> Enrollments brought forward prior to start date {d.ToShortDateString()} for Term {targetTerm.TermNumber}. <<<<");
+                                Log.Information($"Current Term brought forward to Term {targetTerm.TermNumber}.");
                             }
                         }
                     }
@@ -73,7 +73,7 @@ namespace U3A.WebFunctions.Procedures
                                         foreach (var t in dbc.Term.Where(x => x.IsDefaultTerm)) { t.IsDefaultTerm = false; }
                                         trm.IsDefaultTerm = true;
                                         _ = dbc.SaveChanges();
-                                        logger.LogInformation($"Current Term brought forward to Term {targetTerm.TermNumber}.");
+                                        Log.Information($"Current Term brought forward to Term {targetTerm.TermNumber}.");
                                     }
                                 }
                             }

@@ -4,7 +4,7 @@ using DevExpress.XtraReports.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Microsoft.IdentityModel.Logging;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
@@ -27,8 +27,6 @@ namespace U3A.UI.Reports
 {
     public class ProFormaReportFactory : IDisposable
     {
-
-        private readonly ILogger log;
         public List<string> PostalReports { get; set; }
 
         IDbContextFactory<U3ADbContext> U3AdbFactory;
@@ -45,9 +43,8 @@ namespace U3A.UI.Reports
         string u3aName;
 
         //Azure Functions only
-        public ProFormaReportFactory(TenantInfo tenant, ILogger logger, bool IsPreview = false)
+        public ProFormaReportFactory(TenantInfo tenant, bool IsPreview = false)
         {
-            log = logger;
             dbc = new U3ADbContext(tenant);
             isAzureFunction = true;
             isPreview = IsPreview;
@@ -66,12 +63,10 @@ namespace U3A.UI.Reports
         }
 
         // Web app 
-        public ProFormaReportFactory(ILogger logger,
-                                        IWebHostEnvironment env,
+        public ProFormaReportFactory(IWebHostEnvironment env,
                                         IDbContextFactory<U3ADbContext> U3AdbFactory,
                                         bool IsPreview)
         {
-            log = logger;
             this.U3AdbFactory = U3AdbFactory ?? throw new ArgumentNullException(nameof(U3AdbFactory));
             ReportStorage = new CustomReportStorageWebExtension(env, this.U3AdbFactory);
             isPreview = IsPreview;
@@ -132,7 +127,7 @@ namespace U3A.UI.Reports
                 }
                 catch (Exception ex)
                 {
-                    log.LogError(ex, $"Tenant: {tenantID} Receipt: {receipt.ID}");
+                    Log.Error(ex, $"Tenant: {tenantID} Receipt: {receipt.ID}");
                     return "Error";
                 }
             }
@@ -213,7 +208,7 @@ namespace U3A.UI.Reports
                 }
                 catch (Exception ex)
                 {
-                    log.LogError(ex, $"Tenant: {tenantID} Enrolment: {kvp.Key}");
+                    Log.Error(ex, $"Tenant: {tenantID} Enrolment: {kvp.Key}");
                     result.Add(kvp.Key, "Error");
                 }
             }
@@ -242,24 +237,24 @@ namespace U3A.UI.Reports
             {
                 var report = "Leader's Report.pdf";
                 sw.Start();
-                log.LogInformation($"Creating {report} at {sw.Elapsed}");
+                Log.Information($"Creating {report} at {sw.Elapsed}");
                 try
                 {
                     using (var leaderReportProForma = new LeaderReport())
                     {
-                        log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
+                        Log.Information($"Instantiated {report} at {sw.Elapsed}");
                         var filename = await CreateLeaderReportAsync(leaderReportProForma, settings, term, leaderDetails, enrolmentDetails.AsEnumerable());
                         if (!string.IsNullOrWhiteSpace(filename))
                         {
                             createdFilenames.Add(filename);
                             reportNames.Add(report);
                         }
-                        log.LogInformation($"Completed {report} at {sw.Elapsed}");
+                        Log.Information($"Completed {report} at {sw.Elapsed}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
+                    Log.Error(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                 }
             }
             if (Enrolments.Any(x => !x.IsWaitlisted))
@@ -268,12 +263,12 @@ namespace U3A.UI.Reports
                 {
                     var report = "Student Attendance Record.pdf";
                     sw.Start();
-                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
+                    Log.Information($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         using (var leaderAttendanceList = new LeaderAttendanceList())
                         {
-                            log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
+                            Log.Information($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderAttendanceList,
                                                     settings, term, leaderDetails,
                                                     enrolmentDetails.Where(x => !x.EnrolmentIsWaitlisted && !x.EnrolmentIsLeader));
@@ -282,24 +277,24 @@ namespace U3A.UI.Reports
                                 createdFilenames.Add(filename);
                                 reportNames.Add(report);
                             }
-                            log.LogInformation($"Completed {report} at {sw.Elapsed}");
+                            Log.Information($"Completed {report} at {sw.Elapsed}");
                         }
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
+                        Log.Error(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoLeaderClassList)
                 {
                     var report = "Class Contact Listing.pdf";
                     sw.Restart();
-                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
+                    Log.Information($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         using (var leaderClassList = new LeaderClassList())
                         {
-                            log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
+                            Log.Information($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderClassList,
                                                         settings, term, leaderDetails,
                                                         enrolmentDetails.Where(x => !x.EnrolmentIsWaitlisted));
@@ -308,24 +303,24 @@ namespace U3A.UI.Reports
                                 createdFilenames.Add(filename);
                                 reportNames.Add(report);
                             }
-                            log.LogInformation($"Completed {report} at {sw.Elapsed}");
+                            Log.Information($"Completed {report} at {sw.Elapsed}");
                         }
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
+                        Log.Error(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoLeaderICEList)
                 {
                     var report = "Class ICE Listing.pdf";
                     sw.Restart();
-                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
+                    Log.Information($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         using (var leaderICEList = new LeaderICEList())
                         {
-                            log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
+                            Log.Information($"Instantiated {report} at {sw.Elapsed}");
                             var filename = await CreateLeaderReportAsync(leaderICEList,
                                                         settings, term, leaderDetails,
                                                         enrolmentDetails.Where(x => !x.EnrolmentIsWaitlisted));
@@ -333,20 +328,20 @@ namespace U3A.UI.Reports
                             {
                                 createdFilenames.Add(filename);
                                 reportNames.Add(report);
-                                log.LogInformation($"Completed {report} at {sw.Elapsed}");
+                                Log.Information($"Completed {report} at {sw.Elapsed}");
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
+                        Log.Error(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoMemberBadges)
                 {
                     var report = "Member Badges.pdf";
                     sw.Restart();
-                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
+                    Log.Information($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         var fileName = await CreateMemberBadgesReport(Leader,
@@ -356,23 +351,23 @@ namespace U3A.UI.Reports
                             createdFilenames.Add(fileName);
                             reportNames.Add(report);
                         }
-                        log.LogInformation($"Completed {report} at {sw.Elapsed}");
+                        Log.Information($"Completed {report} at {sw.Elapsed}");
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
+                        Log.Error(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoAttendanceAnalysis)
                 {
                     var report = "Attendance Analysis.pdf";
                     sw.Restart();
-                    log.LogInformation($"Creating {report} at {sw.Elapsed}");
+                    Log.Information($"Creating {report} at {sw.Elapsed}");
                     try
                     {
                         using (var AttendanceAnalysis = new AttendanceAnalysis())
                         {
-                            log.LogInformation($"Instantiated {report} at {sw.Elapsed}");
+                            Log.Information($"Instantiated {report} at {sw.Elapsed}");
                             var filename = CreateAttendanceAnalysisReport(AttendanceAnalysis,
                                                     Leader, CourseID);
                             if (!string.IsNullOrWhiteSpace(filename))
@@ -381,11 +376,11 @@ namespace U3A.UI.Reports
                                 reportNames.Add("Attendance Analysis.pdf");
                             }
                         }
-                        log.LogInformation($"Completed {report} at {sw.Elapsed}");
+                        Log.Information($"Completed {report} at {sw.Elapsed}");
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
+                        Log.Error(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
                 if (DoLeaderCSVFile && !isPreview)
@@ -402,7 +397,7 @@ namespace U3A.UI.Reports
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
+                        Log.Error(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Report: {report}");
                     }
                 }
             }
@@ -419,7 +414,7 @@ namespace U3A.UI.Reports
             }
             catch (Exception ex)
             {
-                log.LogError(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Process {ReportName}");
+                Log.Error(ex, $"Tenant: {tenantID} Leader: {Leader.ID} Process {ReportName}");
             }
             return result;
         }
@@ -643,7 +638,7 @@ namespace U3A.UI.Reports
                     return outputFile;
                 }
             }
-            log.LogWarning("No PDF files to merge. The requested reports contained no printed pages usually because there were no enrolments.");
+            Log.Warning("No PDF files to merge. The requested reports contained no printed pages usually because there were no enrolments.");
             return null;
         }
 

@@ -3,7 +3,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
@@ -13,13 +13,10 @@ namespace U3A.WebFunctions
 {
     public class ContactRequest
     {
-        private readonly ILogger _logger;
         private readonly IConfiguration _config;
 
-        public ContactRequest(ILoggerFactory loggerFactory,
-                            IConfiguration config)
+        public ContactRequest(IConfiguration config)
         {
-            _logger = loggerFactory.CreateLogger<ContactRequest>();
             _config = config;
         }
 
@@ -42,7 +39,7 @@ namespace U3A.WebFunctions
             if (phone == null) { phone = string.Empty; }
             if (message == null) { message = string.Empty; }
 
-            _logger.LogInformation($"Request: {name}, Email: {email}, Phone: {phone}, U3A: {u3a}");
+            Log.Information($"Request: {name}, Email: {email}, Phone: {phone}, U3A: {u3a}");
 
             HttpResponseData response = req.CreateResponse();
             bool result = await IsReCaptchaOK(token);
@@ -64,6 +61,7 @@ namespace U3A.WebFunctions
             return response;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Async/await", "CRR0029:ConfigureAwait(true) is called implicitly", Justification = "<Pending>")]
         public async Task SendInitialResponseEmailAsync(string name, string email, string phone, string message, string u3a)
         {
             var postmarkKey = _config.GetValue<string>("PostmarkKey");
@@ -172,19 +170,19 @@ namespace U3A.WebFunctions
             {
                 if (JSONdata.score > 0.5m)
                 {
-                    _logger.LogInformation($"ReCaptcha passed - Score: {JSONdata.score}");
+                    Log.Information($"ReCaptcha passed - Score: {JSONdata.score}");
                     result = true;
                 }
                 else
                 {
-                    _logger.LogInformation($"ReCaptcha failed - Score: {JSONdata.score}");
+                    Log.Information($"ReCaptcha failed - Score: {JSONdata.score}");
                     result = false;
                 }
             }
             else
             {
                 string[] errors = JSONdata["error-codes"];
-                _logger.LogInformation($"ReCaptcha failed - Error: {string.Concat(errors, " | ")}");
+                Log.Information($"ReCaptcha failed - Error: {string.Concat(errors, " | ")}");
                 result = false;
             }
 
@@ -234,8 +232,7 @@ namespace U3A.WebFunctions
                     }
                     catch (Exception ex)
                     {
-                        var eID = new EventId(10000);
-                        _logger.LogError(eID, ex.Message, "Error writing ContactRequest");
+                        Log.Error(ex.Message, "Error writing ContactRequest");
                     }
                     finally
                     {

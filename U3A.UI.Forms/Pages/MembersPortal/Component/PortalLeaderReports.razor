@@ -56,7 +56,7 @@
     {
         await ProgressBar.ShowSmallSpinnerAsync();
         var result = string.Empty;
-        reportFactory = new ProFormaReportFactory(log, Environment, U3Adbfactory, IsPreview);
+        reportFactory = new ProFormaReportFactory(Environment, U3Adbfactory, IsPreview);
         var leader = loginState.SelectedPerson;
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {

@@ -2,7 +2,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.Model;
 using U3A.WebFunctions.Procedures;
 
@@ -11,34 +11,32 @@ namespace U3A.WebFunctions;
 
 public partial class DurableFunctions
 {
-
     [Function(nameof(DoProcessQueuedDocumentsActivity))]
     public async Task<string> DoProcessQueuedDocumentsActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        ILogger logger = executionContext.GetLogger(nameof(DoProcessQueuedDocumentsActivity));
         var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
             var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
-                logger.LogInformation($"****** Started {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
+                Log.Information($"****** Started {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
-                    await LogStartTime(logger, tenant);
+                    await LogStartTime(tenant);
                     var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
-                        await ProcessQueuedDocuments.Process(tenant, options, logger);
+                        await ProcessQueuedDocuments.Process(tenant, options);
                     }
                     else
                     {
-                        logger.LogInformation($"[{tenant.Identifier}]: Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
+                        Log.Information($"[{tenant.Identifier}]: Email not sent because background processing is disabled. Enable via Admin | Organisation Details");
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, $"Error processing {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}");
+                    Log.Error(ex, $"Error processing {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}");
                 }
             }
         }

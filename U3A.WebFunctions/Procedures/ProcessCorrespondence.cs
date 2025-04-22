@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -10,13 +10,12 @@ namespace U3A.WebFunctions.Procedures
     public static class ProcessCorrespondence
     {
         public static async Task Process(TenantInfo tenant,
-            string tenantConnectionString, U3AFunctionOptions options,
-            ILogger logger)
+            string tenantConnectionString, U3AFunctionOptions options)
         {
             bool isAdHocReport = false;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey) && !tenant.UsePostmarkTestEnviroment) return;
             if (string.IsNullOrWhiteSpace(tenant.PostmarkSandboxAPIKey) && tenant.UsePostmarkTestEnviroment) return;
-            var reportFactory = new ProFormaReportFactory(tenant, logger);
+            var reportFactory = new ProFormaReportFactory(tenant);
             var personEnrolments = new Dictionary<Guid, List<Enrolment>>();
             IList<SendMail> mailItems;
             using (var dbc = new U3ADbContext(tenant))
@@ -66,7 +65,7 @@ namespace U3A.WebFunctions.Procedures
                                 if (receipt != null)
                                 {
                                     sm.Status = await reportFactory.CreateCashReceiptProForma(receipt);
-                                    logger.LogInformation($"{sm.DocumentName} sent to: {p.FullName} via {p.Communication}.");
+                                    Log.Information($"{sm.DocumentName} sent to: {p.FullName} via {p.Communication}.");
                                 }
                                 else sm.Status = "Receipt not found";
                                 break;
@@ -95,9 +94,9 @@ namespace U3A.WebFunctions.Procedures
                                         personEnrolments.Add(key, theseEnrolments);
                                     }
                                     theseEnrolments.Add(enrolment);
-                                    logger.LogInformation($"{sm.DocumentName} for {p.FullName} added to queue.");
+                                    Log.Information($"{sm.DocumentName} for {p.FullName} added to queue.");
                                 }
-                                else sm.Status = "Enrolment not found";
+                                else sm.Status = "Enrollment not found";
                                 break;
                             case "Leader Report":
                                 if (options.IsDailyProcedure || isAdHocReport)
@@ -147,16 +146,16 @@ namespace U3A.WebFunctions.Procedures
                                                                     courseName,
                                                                     enrolments.ToArray(),
                                                                     options.HasRandomAllocationExecuted);
-                                                logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
+                                                Log.Information($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
                                             }
                                         }
                                         else
                                         {
-                                            logger.LogInformation($"{sm.DocumentName} already sent to: {leader.FullName}.");
+                                            Log.Information($"{sm.DocumentName} already sent to: {leader.FullName}.");
                                             sm.Status = "Accepted";
                                         }
                                     }
-                                    else { sm.Status = "Enrolments not found."; }
+                                    else { sm.Status = "Enrollments not found."; }
                                 }
                                 break;
                             case "U3A Leaders Reports":
@@ -195,9 +194,9 @@ namespace U3A.WebFunctions.Procedures
                                                   sm.Person, enrolments.OrderBy(x => x.IsWaitlisted)
                                                                               .ThenBy(x => x.Person.LastName)
                                                                               .ThenBy(x => x.Person.FirstName).ToArray());
-                                        logger.LogInformation($"{sm.DocumentName} sent to: {p.FullName} via {p.Communication}.");
+                                        Log.Information($"{sm.DocumentName} sent to: {p.FullName} via {p.Communication}.");
                                     }
-                                    else { sm.Status = "Enrolments not found."; }
+                                    else { sm.Status = "Enrollments not found."; }
                                 }
                                 break;
                             default:
@@ -206,9 +205,9 @@ namespace U3A.WebFunctions.Procedures
                         await dbc.SaveChangesAsync();
                     }
 
-                    // process enrolments because they receive one email per member
+                    // process enrollments because they receive one email per member
                     var enrolmentResults = await reportFactory.CreateEnrolmentProForma(personEnrolments);
-                    logger.LogInformation($"Processed {personEnrolments.Count} Participant Enrolment correspondence.");
+                    Log.Information($"Processed {personEnrolments.Count} Participant Enrollment correspondence.");
                     foreach (var kvp in enrolmentResults)
                     {
                         foreach (var sm in await dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key).ToListAsync())
@@ -227,7 +226,7 @@ namespace U3A.WebFunctions.Procedures
                     if (postalCount > 0)
                     {
                         await reportFactory.CreateAndSendPostalPDF();
-                        logger.LogInformation($"Sent {postalCount} postal report(s) to {reportFactory.SendEmailAddress}.");
+                        Log.Information($"Sent {postalCount} postal report(s) to {reportFactory.SendEmailAddress}.");
                     }
                     // Delete expired records
                     dbc.RemoveRange(dbc.SendMail.AsEnumerable()
@@ -238,7 +237,7 @@ namespace U3A.WebFunctions.Procedures
                     deleted += dbcT.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
                     if (deleted > 0)
                     {
-                        logger.LogInformation($"Deleted {deleted} correspondence queue records because they are more than 30 days old.");
+                        Log.Information($"Deleted {deleted} correspondence queue records because they are more than 30 days old.");
                     }
                     await dbc.SaveChangesAsync();
                     await dbcT.SaveChangesAsync();
