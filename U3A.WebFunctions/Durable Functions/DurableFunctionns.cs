@@ -69,7 +69,10 @@ public partial class DurableFunctions
         {
             var utcOffset = await Common.GetUtcOffsetAsync(dbc);
             dbc.UtcOffset = utcOffset;
-            Log.Information($"[{tenant.Name}] Local Time: {DateTime.UtcNow + utcOffset}. UTC Offset: {utcOffset}");
+            Log.Information("[{name}] Local Time: {localTime}. UTC Offset: {utcOffset} Hours",
+                            tenant.Name,
+                            DateTime.UtcNow + utcOffset,
+                            utcOffset);
         }
     }
 

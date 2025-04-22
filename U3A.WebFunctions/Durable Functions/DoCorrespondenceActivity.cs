@@ -22,7 +22,10 @@ public partial class DurableFunctions
             var tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
-                Log.Information($"****** Started {nameof(DoCorrespondenceActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
+                Log.Information("****** Started {activity} for {identifier}: {name}. ******",
+                                        nameof(DoCorrespondenceActivity),
+                                        tenant.Identifier,
+                                        tenant.Name);
                 try
                 {
                     await LogStartTime(tenant);

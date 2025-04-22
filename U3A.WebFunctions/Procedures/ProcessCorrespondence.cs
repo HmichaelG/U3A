@@ -65,7 +65,10 @@ namespace U3A.WebFunctions.Procedures
                                 if (receipt != null)
                                 {
                                     sm.Status = await reportFactory.CreateCashReceiptProForma(receipt);
-                                    Log.Information($"{sm.DocumentName} sent to: {p.FullName} via {p.Communication}.");
+                                    Log.Information("{documentName} sent to: {fullName} via {communication}.",
+                                                        sm.DocumentName,
+                                                        p.FullName,
+                                                        p.Communication);
                                 }
                                 else sm.Status = "Receipt not found";
                                 break;
@@ -94,7 +97,8 @@ namespace U3A.WebFunctions.Procedures
                                         personEnrolments.Add(key, theseEnrolments);
                                     }
                                     theseEnrolments.Add(enrolment);
-                                    Log.Information($"{sm.DocumentName} for {p.FullName} added to queue.");
+                                    Log.Information("{documentName} for {fullName} added to queue.",
+                                            sm.DocumentName,p.FullName);
                                 }
                                 else sm.Status = "Enrollment not found";
                                 break;
@@ -146,12 +150,14 @@ namespace U3A.WebFunctions.Procedures
                                                                     courseName,
                                                                     enrolments.ToArray(),
                                                                     options.HasRandomAllocationExecuted);
-                                                Log.Information($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
+                                                Log.Information("{documentName} sent to: {fullName} via {communication}.",
+                                                        sm.DocumentName,leader.FullName,leader.Communication);
                                             }
                                         }
                                         else
                                         {
-                                            Log.Information($"{sm.DocumentName} already sent to: {leader.FullName}.");
+                                            Log.Information("{documentName} already sent to: {fullName}.",
+                                                                sm.DocumentName,leader.FullName);
                                             sm.Status = "Accepted";
                                         }
                                     }
@@ -194,7 +200,8 @@ namespace U3A.WebFunctions.Procedures
                                                   sm.Person, enrolments.OrderBy(x => x.IsWaitlisted)
                                                                               .ThenBy(x => x.Person.LastName)
                                                                               .ThenBy(x => x.Person.FirstName).ToArray());
-                                        Log.Information($"{sm.DocumentName} sent to: {p.FullName} via {p.Communication}.");
+                                        Log.Information("{documentName} sent to: {fullName} via {communication}.",
+                                                            sm.DocumentName,p.FullName,p.Communication);
                                     }
                                     else { sm.Status = "Enrollments not found."; }
                                 }
@@ -207,7 +214,8 @@ namespace U3A.WebFunctions.Procedures
 
                     // process enrollments because they receive one email per member
                     var enrolmentResults = await reportFactory.CreateEnrolmentProForma(personEnrolments);
-                    Log.Information($"Processed {personEnrolments.Count} Participant Enrollment correspondence.");
+                    Log.Information("Processed {count} Participant Enrollment correspondence.",
+                                        personEnrolments.Count);
                     foreach (var kvp in enrolmentResults)
                     {
                         foreach (var sm in await dbc.SendMail.IgnoreQueryFilters().Where(x => x.PersonID == kvp.Key).ToListAsync())
@@ -226,7 +234,8 @@ namespace U3A.WebFunctions.Procedures
                     if (postalCount > 0)
                     {
                         await reportFactory.CreateAndSendPostalPDF();
-                        Log.Information($"Sent {postalCount} postal report(s) to {reportFactory.SendEmailAddress}.");
+                        Log.Information("Sent {postalCount} postal report(s) to {sendEmailAddress}.",
+                            postalCount,reportFactory.SendEmailAddress);
                     }
                     // Delete expired records
                     dbc.RemoveRange(dbc.SendMail.AsEnumerable()
@@ -237,7 +246,8 @@ namespace U3A.WebFunctions.Procedures
                     deleted += dbcT.ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Count();
                     if (deleted > 0)
                     {
-                        Log.Information($"Deleted {deleted} correspondence queue records because they are more than 30 days old.");
+                        Log.Information("Deleted {deleted} correspondence queue records because they are more than 30 days old.",
+                                            deleted);
                     }
                     await dbc.SaveChangesAsync();
                     await dbcT.SaveChangesAsync();
