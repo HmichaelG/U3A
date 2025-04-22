@@ -71,7 +71,7 @@ namespace U3A.Services
         async Task<decimal> GetTotalOtherMembershipFees(U3ADbContext dbc, Person person, Term term)
         {
             return await dbc.Fee.AsNoTracking().IgnoreQueryFilters()
-                                    .Where(x => !x.Person.IsDeleted 
+                                    .Where(x => !x.Person.IsDeleted
                                             && x.PersonID == person.ID
                                             && x.IsMembershipFee
                                             && x.ProcessingYear == term.Year)
@@ -81,7 +81,7 @@ namespace U3A.Services
         async Task<decimal> GetTotalReceipts(U3ADbContext dbc, Person person, Term term)
         {
             return await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
-                                .Where(x => !x.Person.IsDeleted 
+                                .Where(x => !x.Person.IsDeleted
                                     && x.PersonID == person.ID
                                     && x.ProcessingYear == term.Year)
                                 .Select(x => x.Amount).SumAsync();
@@ -356,7 +356,7 @@ namespace U3A.Services
         {
             foreach (var r in await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
                                             .OrderBy(x => x.Date)
-                                            .Where(x => !x.IsDeleted 
+                                            .Where(x => !x.IsDeleted
                                                 && x.PersonID == person.ID
                                                 && x.Amount != 0
                                                 && x.ProcessingYear == term.Year).ToArrayAsync())
@@ -387,7 +387,7 @@ namespace U3A.Services
                                     .Include(x => x.Course).ThenInclude(x => x.Classes)
                                     .Include(x => x.Class)
                                     .Include(x => x.Term)
-                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted 
+                                    .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                 && x.PersonID == person.ID
                                                 && x.TermID == t.ID
                                                 && !x.IsWaitlisted).ToArrayAsync())

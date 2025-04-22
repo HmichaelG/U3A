@@ -30,8 +30,8 @@ namespace U3A.WebFunctions.Procedures
                     }
                     catch (EwayResponseException ex)
                     {
-                        var response = (!string.IsNullOrWhiteSpace(ex.PaymentResult.ResponseCode)) 
-                            ? $"{ ex.PaymentResult.ResponseCode} { ex.PaymentResult.ResponseMessage}"
+                        var response = (!string.IsNullOrWhiteSpace(ex.PaymentResult.ResponseCode))
+                            ? $"{ex.PaymentResult.ResponseCode} {ex.PaymentResult.ResponseMessage}"
                             : "No response received.";
                         logger.LogInformation(ex, $"Payment for {person.FullName} not processed: EWAY reason: {response}");
                     }

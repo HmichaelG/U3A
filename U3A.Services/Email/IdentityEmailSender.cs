@@ -33,15 +33,15 @@ public class IdentityEmailSender : IEmailSender<ApplicationUser>
     public async Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode)
     {
         var emailTemplate = ReadEmailTemplate("passwordResetEmail");
-        await SendEmailAsync(email, "U3A Member Portal password reset",emailTemplate, resetCode);
+        await SendEmailAsync(email, "U3A Member Portal password reset", emailTemplate, resetCode);
     }
 
     public async Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink)
     {
         var emailTemplate = ReadEmailTemplate("passwordResetEmail");
-        await SendEmailAsync(email, "U3A Member Portal password reset", emailTemplate,resetLink);
+        await SendEmailAsync(email, "U3A Member Portal password reset", emailTemplate, resetLink);
     }
-    private async Task SendEmailAsync(string email, string subject, string emailTemplate,string identityLink)
+    private async Task SendEmailAsync(string email, string subject, string emailTemplate, string identityLink)
     {
         using (var dbc = await dbFactory.CreateDbContextAsync())
         {

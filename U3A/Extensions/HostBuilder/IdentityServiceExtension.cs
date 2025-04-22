@@ -4,7 +4,6 @@ using U3A.Components.Account;
 using U3A.Data;
 using U3A.Database;
 using U3A.Services;
-using static U3A.Extensions.HostBuilder.AIChatServiceExtension;
 
 namespace U3A.Extensions.HostBuilder;
 

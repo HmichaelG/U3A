@@ -1,13 +1,11 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using U3A.WebFunctions.Procedures;
-using U3A.Model;
-using Serilog.Core;
+using Microsoft.Extensions.Logging;
 using U3A.Database;
-using DevExpress.Xpo;
+using U3A.Model;
+using U3A.WebFunctions.Procedures;
 
 
 namespace U3A.WebFunctions;

@@ -1,11 +1,10 @@
-﻿using Azure.AI.OpenAI;
-using Azure;
+﻿using Azure;
+using Azure.AI.OpenAI;
 using DevExpress.AIIntegration;
+using DevExpress.AIIntegration.Blazor.Reporting.Viewer.Models;
 using DevExpress.Blazor.Reporting;
 using Microsoft.Extensions.AI;
-using Microsoft.Extensions.DependencyInjection;
 using OpenAI;
-using DevExpress.AIIntegration.Blazor.Reporting.Viewer.Models;
 
 namespace U3A.Extensions.HostBuilder;
 

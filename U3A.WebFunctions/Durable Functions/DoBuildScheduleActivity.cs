@@ -1,20 +1,12 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
-using MS_LOG=Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
-using U3A.WebFunctions.Procedures;
-using System.Text.Json;
-using System.ComponentModel;
-using System.Text.Json.Serialization;
-using System.IdentityModel.Tokens.Jwt;
-using Serilog;
-using Serilog.Extensions.Logging;
-using System.Reflection;
+using MS_LOG = Microsoft.Extensions.Logging;
 
 
 namespace U3A.WebFunctions;

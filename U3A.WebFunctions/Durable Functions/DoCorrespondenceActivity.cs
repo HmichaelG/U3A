@@ -1,10 +1,10 @@
 ﻿using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using U3A.WebFunctions.Procedures;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using U3A.Model;
+using U3A.WebFunctions.Procedures;
 
 
 namespace U3A.WebFunctions;
@@ -12,8 +12,8 @@ namespace U3A.WebFunctions;
 public partial class DurableFunctions
 {
     [Function(nameof(DoCorrespondenceActivity))]
-    public async Task<string> DoCorrespondenceActivity([ActivityTrigger] 
-                        U3AFunctionOptions options, 
+    public async Task<string> DoCorrespondenceActivity([ActivityTrigger]
+                        U3AFunctionOptions options,
                         FunctionContext executionContext)
     {
         ILogger logger = executionContext.GetLogger(nameof(DoCorrespondenceActivity));

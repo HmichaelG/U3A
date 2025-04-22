@@ -22,7 +22,7 @@ namespace U3A.Database
         public DateTime GetLocalTime() => DateTime.UtcNow + UtcOffset;
         public DateTime GetLocalDate() => GetLocalTime().Date;
         public DateTime GetLocalDate(DateTime time) => GetLocalTime(time).Date;
-        public DateTime? GetLocalDate(DateTime? time) => (time == null) ? null : GetLocalTime(time.Value).Date; 
+        public DateTime? GetLocalDate(DateTime? time) => (time == null) ? null : GetLocalTime(time.Value).Date;
 
         public DbSet<SystemSettings> SystemSettings { get; set; }
         public DbSet<PublicHoliday> PublicHoliday { get; set; }
@@ -255,7 +255,7 @@ namespace U3A.Database
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Person>()
                 .HasQueryFilter(x => x.IsDeleted == false
-                                        && EF.Property<string>(x,"Discriminator") == "Person");
+                                        && EF.Property<string>(x, "Discriminator") == "Person");
             modelBuilder.Entity<Enrolment>()
                     .HasIndex(x => new { x.TermID, x.CourseID, x.ClassID, x.PersonID })
                     .HasDatabaseName("idxUniqueEnrolments")

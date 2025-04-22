@@ -33,7 +33,7 @@ namespace U3A.Database
             IHttpContextAccessor HttpContextAccessor = default,
             LocalTime localTime = null)
         {
-            if(AuthStateProvider != null)
+            if (AuthStateProvider != null)
                 authenticationStateProvider = AuthStateProvider;
             _httpContextAccessor = HttpContextAccessor;
             _TenantDbFactory = TenantDbFactory;
@@ -52,7 +52,7 @@ namespace U3A.Database
                 builder.AddDebug();
             }));
             GetTenantInfo();
-            if(TenantInfo != null)
+            if (TenantInfo != null)
             {
                 // Use the connection string to connect to the per-tenant database.
                 optionsBuilder.UseSqlServer(TenantInfo.ConnectionString);
@@ -61,31 +61,31 @@ namespace U3A.Database
 
         private void GetTenantInfo()
         {
-            if(useCachedTenantInfo)
+            if (useCachedTenantInfo)
             {
                 return;
             }
             HostStrategy hs = new HostStrategy();
 
-            if(_httpContextAccessor == null)
+            if (_httpContextAccessor == null)
             {
                 return;
             }
-            if(_httpContextAccessor.HttpContext == null)
+            if (_httpContextAccessor.HttpContext == null)
             {
                 return;
             }
-            if(_httpContextAccessor.HttpContext.Request == null)
+            if (_httpContextAccessor.HttpContext.Request == null)
             {
                 return;
             }
-            if(_httpContextAccessor.HttpContext.Request.Host == null)
+            if (_httpContextAccessor.HttpContext.Request.Host == null)
             {
                 return;
             }
             var identifier = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);
             if (identifier == "bs-local") identifier = "localhost"; // BrowserStack
-            using(var dbc = _TenantDbFactory.CreateDbContext())
+            using (var dbc = _TenantDbFactory.CreateDbContext())
             {
                 // Redirect console output to null
                 Console.SetOut(TextWriter.Null);

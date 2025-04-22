@@ -108,9 +108,11 @@ namespace U3A.Super.Services
             LookupClientOptions options = new() { UseCache = false };
             LookupClient dnsLookup = new(options);
             var dnsResult = await dnsLookup.QueryAsync(domain.DKIMPendingHost, QueryType.TXT);
-            if (dnsResult.Answers.Count == 0) { throw new Exception($"Unable to resolve hostname [{domain.DKIMPendingHost}]"); };
+            if (dnsResult.Answers.Count == 0) { throw new Exception($"Unable to resolve hostname [{domain.DKIMPendingHost}]"); }
+            ;
             var answer = dnsResult.Answers[0] as TxtRecord;
-            if (answer!.Text.First() != domain.DKIMPendingTextValue) { throw new Exception($"Hostname [{domain.DKIMPendingHost}] of type TXT found but text values do not match."); };
+            if (answer!.Text.First() != domain.DKIMPendingTextValue) { throw new Exception($"Hostname [{domain.DKIMPendingHost}] of type TXT found but text values do not match."); }
+            ;
             var result = await client.VerifyDomainDkim(domain.ID);
             return result;
         }
@@ -119,10 +121,12 @@ namespace U3A.Super.Services
             LookupClient dnsLookup = new();
             var bouncePath = $"pm-bounces.{domain.Name}";
             var dnsResult = await dnsLookup.QueryAsync(bouncePath, QueryType.CNAME);
-            if (dnsResult.Answers.Count == 0) { throw new Exception($"Unable to resolve hostname [{bouncePath}]"); };
+            if (dnsResult.Answers.Count == 0) { throw new Exception($"Unable to resolve hostname [{bouncePath}]"); }
+            ;
             string canonicalName = (dnsResult.Answers[0] as CNameRecord)!.CanonicalName;
             if (canonicalName.EndsWith(".")) { canonicalName = canonicalName.TrimEnd('.'); }
-            if (canonicalName != domain.ReturnPathDomainCNAMEValue) { throw new Exception($"Hostname [{bouncePath}] of type CNAME found but values do not match."); };
+            if (canonicalName != domain.ReturnPathDomainCNAMEValue) { throw new Exception($"Hostname [{bouncePath}] of type CNAME found but values do not match."); }
+            ;
             var result = await client.VerifyDomainReturnPath(domain.ID);
             return result;
         }

@@ -310,7 +310,7 @@ public static partial class BusinessRule
             .Where(x => !x.IsDeleted && x.TermID == TermID
                         && (WaitlistStatus == null || x.IsWaitlisted == WaitlistStatus))
                         .AsEnumerable().Where(x => IsCourseInTerm(x.Course, x.Term)).ToList();
-        
+
 
         foreach (var e in enrolments)
         {
@@ -385,7 +385,8 @@ public static partial class BusinessRule
                     p.IsCourseLeader = true;
                     if (p.FinancialTo < term.Year) p.FinancialTo = term.Year;
                 }
-            };
+            }
+            ;
             foreach (var l in await dbc.Class.Include(x => x.Course)
                 .Where(x => x.Leader2ID != null && x.Course.Year == term.Year)
                 .Select(x => x.Leader2ID).ToListAsync())
@@ -396,7 +397,8 @@ public static partial class BusinessRule
                     p.IsCourseLeader = true;
                     if (p.FinancialTo < term.Year) p.FinancialTo = term.Year;
                 }
-            };
+            }
+            ;
             foreach (var l in await dbc.Class.Include(x => x.Course)
                 .Where(x => x.Leader3ID != null && x.Course.Year == term.Year)
                 .Select(x => x.Leader3ID).ToListAsync())
@@ -407,13 +409,15 @@ public static partial class BusinessRule
                     p.IsCourseLeader = true;
                     if (p.FinancialTo < term.Year) p.FinancialTo = term.Year;
                 }
-            };
+            }
+            ;
         }
         foreach (var v in await dbc.Volunteer.Select(x => x.PersonID).ToListAsync())
         {
             var p = people.Find(x => x.ID == v);
             if (p != null) p.IsVolunteer = true;
-        };
+        }
+        ;
         foreach (var c in await dbc.Committee.Select(x => x.PersonID).ToListAsync())
         {
             var p = people.Find(x => x.ID == c);
@@ -422,7 +426,8 @@ public static partial class BusinessRule
                 p.IsCommitteeMember = true;
                 if (p.FinancialTo < term.Year) { p.FinancialTo = term.Year; }
             }
-        };
+        }
+        ;
         foreach (var p in people.Where(x => x.IsLifeMember))
         {
             if (p.FinancialTo < term.Year) { p.FinancialTo = term.Year; }

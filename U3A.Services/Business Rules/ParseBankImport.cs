@@ -20,7 +20,7 @@ namespace U3A.BusinessRules
             // removing the identifier stop matches against the group name (eastlakes, maitland etc)
             var info = dbc.TenantInfo;
             var bankDescription = BankDescription;
-            bankDescription = bankDescription.Replace(info.Identifier, String.Empty,StringComparison.InvariantCultureIgnoreCase);
+            bankDescription = bankDescription.Replace(info.Identifier, String.Empty, StringComparison.InvariantCultureIgnoreCase);
 
             // split the description into space-delimited tokens
             var tokens = GetTokens(BankDescription);
@@ -49,7 +49,7 @@ namespace U3A.BusinessRules
             {
                 foreach (var token in tokens)
                 {
-                    if (tokenFirstName == "" && !string.Equals(token,tokenLastName,StringComparison.InvariantCultureIgnoreCase) && token.Length == 1)
+                    if (tokenFirstName == "" && !string.Equals(token, tokenLastName, StringComparison.InvariantCultureIgnoreCase) && token.Length == 1)
                     {
                         tokenFirstInitial =
                             (await dbc.Person.AnyAsync(x => x.FirstName.Substring(0, 1) == token))

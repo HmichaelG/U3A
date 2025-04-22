@@ -101,7 +101,8 @@ namespace U3A.BusinessRules
                                             .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                             && x.CourseID == thisCourse.ID
                                                             && x.TermID == testTerm.ID).ToListAsync();
-            };
+            }
+            ;
             Enrolment? dummy;
             if (enrolments.Count > 0)
             {
@@ -367,7 +368,7 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        public static string GetEnrolmentStatus(Enrolment? enrolment, 
+        public static string GetEnrolmentStatus(Enrolment? enrolment,
             Term term, SystemSettings settings, DateTime localTime)
         {
             var result = "Pending";
@@ -537,7 +538,7 @@ namespace U3A.BusinessRules
                                     x.CourseID == selectedCourse.ID).FirstOrDefaultAsync();
             }
         }
-        
+
         public static async Task<Enrolment?> DuplicateEnrolment(U3ADbContext dbc,
                                         Person selectedPerson, Term selectedTerm,
                                         Course? selectedCourse, Class selectedClass)

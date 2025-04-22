@@ -2,9 +2,9 @@
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -58,7 +58,7 @@ namespace U3A.Model
     public class ScheduledPerson
     {
         public string Class { get; set; }
-        public string Name { get; set; }        
+        public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Mobile { get; set; }

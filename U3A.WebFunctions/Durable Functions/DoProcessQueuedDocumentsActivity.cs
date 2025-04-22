@@ -1,12 +1,10 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using U3A.WebFunctions.Procedures;
+using Microsoft.Extensions.Logging;
 using U3A.Model;
-using Microsoft.DurableTask;
-using System.Net;
+using U3A.WebFunctions.Procedures;
 
 
 namespace U3A.WebFunctions;
@@ -22,7 +20,7 @@ public partial class DurableFunctions
         if (cn != null)
         {
             var tenant = GetTenant(options.TenantIdentifier, cn);
-            if (tenant != null) 
+            if (tenant != null)
             {
                 logger.LogInformation($"****** Started {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
@@ -31,7 +29,7 @@ public partial class DurableFunctions
                     var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
-                        await ProcessQueuedDocuments.Process(tenant,options, logger);
+                        await ProcessQueuedDocuments.Process(tenant, options, logger);
                     }
                     else
                     {

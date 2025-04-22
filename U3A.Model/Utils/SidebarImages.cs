@@ -20,7 +20,7 @@ public class SidebarImageMenuOptions : SidebarImages
         // sort the base list by MenuName
         Sort((a, b) => a.MenuName.CompareTo(b.MenuName));
 
-        Insert(0,new SidebarImage { MenuName = "Random Image", Filename = "" });
+        Insert(0, new SidebarImage { MenuName = "Random Image", Filename = "" });
         Add(new SidebarImage { MenuName = "No Image", Filename = "" });
     }
 }

@@ -150,10 +150,10 @@ namespace U3A.WebFunctions.Procedures
                                                 logger.LogInformation($"{sm.DocumentName} sent to: {leader.FullName} via {leader.Communication}.");
                                             }
                                         }
-                                        else 
+                                        else
                                         {
                                             logger.LogInformation($"{sm.DocumentName} already sent to: {leader.FullName}.");
-                                            sm.Status = "Accepted"; 
+                                            sm.Status = "Accepted";
                                         }
                                     }
                                     else { sm.Status = "Enrolments not found."; }

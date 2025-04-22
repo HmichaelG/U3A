@@ -52,8 +52,8 @@ namespace U3A.BusinessRules
             var enrolmentKeys = await dbc.Enrolment
                                                 .AsNoTracking()
                                                 .Include(x => x.Term)
-                                                .Where(x => x.Term.Year == term.Year || 
-                                                        (x.Term.Year == term.Year-1 && x.Term.TermNumber == 4))
+                                                .Where(x => x.Term.Year == term.Year ||
+                                                        (x.Term.Year == term.Year - 1 && x.Term.TermNumber == 4))
                                                 .Select(x => x.ID).ToListAsync();
             enrolmentKeys.AddRange(await dbcT.MultiCampusEnrolment
                                                 .AsNoTracking()
@@ -100,7 +100,7 @@ namespace U3A.BusinessRules
             var liveKeys = await dbc.Class
                             .AsNoTracking()
                             .Include(x => x.Course)
-                            .Where(x => (x.Course.Year == term.Year || 
+                            .Where(x => (x.Course.Year == term.Year ||
                                                 x.StartDate != null && x.StartDate >= dbc.GetLocalDate()))
                             .Select(x => x.ID).ToListAsync();
             var deletions = new List<Class>();
@@ -274,7 +274,7 @@ namespace U3A.BusinessRules
 
                 // local campus
                 dbc.ChangeTracker.Clear();
-                await UpdateScheduleCache(dbc, schedules,TenantIdentifier);
+                await UpdateScheduleCache(dbc, schedules, TenantIdentifier);
                 await dbc.SaveChangesAsync();
 
                 //multi-campus
@@ -298,7 +298,7 @@ namespace U3A.BusinessRules
                         }
                         catch (Exception ex)
                         {
-                            await dbcT.Database.RollbackTransactionAsync();                           
+                            await dbcT.Database.RollbackTransactionAsync();
                         }
                     }
                 }
@@ -512,7 +512,7 @@ namespace U3A.BusinessRules
                                             .ToListAsync();
             if (currentSchedule != null && currentSchedule.Count > 0)
             {
-                foreach(var s in currentSchedule)
+                foreach (var s in currentSchedule)
                 {
                     if (!NewSchedule.Any(x => x.ClassID == s.ClassID
                                                 && x.TermId == s.TermId)) { deleted.Add(s); }
@@ -534,7 +534,7 @@ namespace U3A.BusinessRules
             }
             if (NewSchedule != null && NewSchedule.Count() > 0)
             {
-                foreach(var s in NewSchedule)
+                foreach (var s in NewSchedule)
                 {
                     if (!currentSchedule.Any(x => x.ClassID == s.ClassID
                                                   && x.TermId == s.TermId))

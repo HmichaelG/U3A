@@ -2,13 +2,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 using System.Globalization;
 using U3A.Model;
-using Serilog.Sinks.SystemConsole.Themes;
-using Microsoft.ApplicationInsights.Extensibility;
-using Serilog.Extensions.Logging;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Azure;
 
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);

@@ -23,7 +23,7 @@ namespace U3A.BusinessRules
             syncTask.Wait();
             return syncTask.Result;
         }
-        public static async  Task<List<EnrolmentDetail>> GetEnrolmentDetailAsync(U3ADbContext dbc, Enrolment enrolment)
+        public static async Task<List<EnrolmentDetail>> GetEnrolmentDetailAsync(U3ADbContext dbc, Enrolment enrolment)
         {
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             var result = new List<EnrolmentDetail>();
@@ -32,10 +32,10 @@ namespace U3A.BusinessRules
                         ?? await BusinessRule.SelectPersonAsync(dbc, enrolment.PersonID) ?? throw new ArgumentNullException(nameof(Person));
             var t = enrolment.Term
                         ?? await dbc.Term.FindAsync(enrolment.TermID) ?? throw new ArgumentNullException(nameof(Term));
-            var enrolmentTerm = await CurrentEnrolmentTermAsync(dbc) 
+            var enrolmentTerm = await CurrentEnrolmentTermAsync(dbc)
                         ?? await CurrentTermAsync(dbc)
                         ?? throw new ArgumentNullException(nameof(Term));
-                    
+
             var cr = await dbc.Course.Where(x => x.ID == enrolment.CourseID).Include(x => x.Enrolments).FirstOrDefaultAsync();
             var pt = await dbc.CourseParticpationType.FindAsync(cr.CourseParticipationTypeID);
             var ct = await dbc.CourseType.FindAsync(cr.CourseTypeID);

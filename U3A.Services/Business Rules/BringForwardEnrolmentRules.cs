@@ -115,7 +115,7 @@ namespace U3A.BusinessRules
                              .Where(x => !x.Person.IsDeleted && x.TermID == targetTerm.ID)
                              .Select(x => new Tuple<Guid, Guid, Guid?>(x.PersonID, x.CourseID, x.ClassID))
                              .ToListAsync();
-            var enrolmentCountAtStart = await dbc.Enrolment.IgnoreQueryFilters() .AsNoTracking()
+            var enrolmentCountAtStart = await dbc.Enrolment.IgnoreQueryFilters().AsNoTracking()
                          .Where(x => !x.IsDeleted && x.TermID == targetTerm.ID && !x.IsWaitlisted)
                            .GroupBy(x => new { x.CourseID, x.ClassID })
                            .Select(x => new
@@ -142,7 +142,7 @@ namespace U3A.BusinessRules
                 if (dropouts.Contains(dropoutKey)) { continue; }
 
                 // set force waitlist if current enrolments greater than maximum allowed.
-                enrolmentKey = new ( e.CourseID, e.ClassID );
+                enrolmentKey = new(e.CourseID, e.ClassID);
                 var enrolledAtStart = enrolmentCountAtStart
                                             .FirstOrDefault(x => x.Key.CourseID == e.CourseID
                                              && x.Key.ClassID.GetValueOrDefault() == e.ClassID.GetValueOrDefault())?.Enrolled ?? 0;
@@ -194,7 +194,7 @@ namespace U3A.BusinessRules
                     && !IsNewlyEnrolled(newEnrolment, addedEnrolments))
             {
                 int totalEnrolments = enrolledAtStart +
-                        addedEnrolments.Where(x => x.CourseID ==  currentEnrolment.CourseID
+                        addedEnrolments.Where(x => x.CourseID == currentEnrolment.CourseID
                                                     && x.ClassID.GetValueOrDefault() == currentEnrolment.ClassID.GetValueOrDefault()
                                                     && !x.IsWaitlisted)
                                        .Count();

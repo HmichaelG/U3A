@@ -1,21 +1,21 @@
 ﻿using DevExpress.Blazor;
+using DevExpress.Utils;
 using DevExpress.Utils.Serializing;
 using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
+using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Twilio.Rest.Trunking.V1;
 using U3A.Database;
 using U3A.Model;
-using Serilog;
-using System.Diagnostics.Eventing.Reader;
-using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
-using System.Globalization;
-using Microsoft.Extensions.Logging;
-using Serilog.Context;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using DevExpress.Utils;
 
 namespace U3A.BusinessRules
 {
@@ -126,7 +126,7 @@ namespace U3A.BusinessRules
                     // get all class dates for the year
                     var term1 = await GetFirstTermThisYearAsync(dbc, SelectedTerm);
                     var calendar = await GetCalendarDataStorageAsync(dbc, term1);
-                    
+
                     // Do part paid first
                     if (await WaitListPartPaidMembers(dbc, SelectedTerm) > 0)
                     {
@@ -140,12 +140,12 @@ namespace U3A.BusinessRules
                     List<Enrolment> enrolmentsToProcess = new();
                     List<Enrolment> waitlistNotFinancial = new();
                     List<Person> CourseLeaders = new();
-                    foreach (var kvp in (await GetRankedCourses(dbc, SelectedTerm,calendar)).Reverse())
+                    foreach (var kvp in (await GetRankedCourses(dbc, SelectedTerm, calendar)).Reverse())
                     {
                         int enrolledCount = 0;
                         var key = kvp.Key;
                         var course = kvp.Value;
-                        bool isFutureCourse = IsFutureCourse(today, course,calendar);
+                        bool isFutureCourse = IsFutureCourse(today, course, calendar);
                         if (key.Item1 != double.MinValue)
                         {
                             Log.Information("");
@@ -282,7 +282,7 @@ namespace U3A.BusinessRules
             foreach (var enrollment in enrollments)
             {
                 var course = enrollment.Course;
-                var isFutureCourse = IsFutureCourse(today, course,calendar);
+                var isFutureCourse = IsFutureCourse(today, course, calendar);
                 if (!course.AllowAutoEnrol) { continue; }
                 int enrolledCount = 0;
                 CourseLeaders = new();
@@ -336,7 +336,7 @@ namespace U3A.BusinessRules
                         enrolmentsToProcess = enrolmentsToProcess.Where(x => IsPersonFinancial(x.Person, SelectedTerm)).ToList();
                         if (enrolmentsToProcess.Any(x => x.IsWaitlisted))
                         {
-                            enrolledCount += await ProcessEnrolments(dbc,calendar,
+                            enrolledCount += await ProcessEnrolments(dbc, calendar,
                                                   SelectedTerm,
                                                   course,
                                                   enrolmentsToProcess);
@@ -357,10 +357,10 @@ namespace U3A.BusinessRules
             foreach (var course in await dbc.Course.AsNoTracking()
                                             .Include(x => x.Classes)
                                             .Where(x => x.Year == term.Year
-                                                         && x.AllowAutoEnrol)   
+                                                         && x.AllowAutoEnrol)
                                             .ToListAsync())
             {
-                bool isFutureCourse = IsFutureCourse(dbc.GetLocalDate(), course,calendar);
+                bool isFutureCourse = IsFutureCourse(dbc.GetLocalDate(), course, calendar);
                 key = new()
                 {
                     courseID = course.ID,
@@ -446,13 +446,15 @@ namespace U3A.BusinessRules
                     t.IsClassAllocationFinalised = IsAllocationDone;
                     dbc.Update(t);
                 }
-            };
+            }
+            ;
             // and for completeness...
             foreach (var t in dbc.Term.Where(x => x.Year < term.Year))
             {
                 t.IsClassAllocationFinalised = IsAllocationDone;
                 dbc.Update(t);
-            };
+            }
+            ;
         }
         private static async Task<int> ProcessEnrolments(U3ADbContext dbc,
                                     DxSchedulerDataStorage calendar,
@@ -460,7 +462,7 @@ namespace U3A.BusinessRules
                                     Course course,
                                     List<Enrolment> enrolments)
         {
-            return await ProcessEnrolments(dbc,calendar, term, course, enrolments, new List<Guid>(), false,true);
+            return await ProcessEnrolments(dbc, calendar, term, course, enrolments, new List<Guid>(), false, true);
         }
         private static async Task<int> ProcessEnrolments(U3ADbContext dbc,
                                     DxSchedulerDataStorage calendar,
@@ -468,7 +470,7 @@ namespace U3A.BusinessRules
                                     Course course,
                                     List<Enrolment> enrolments,
                                     List<Guid> PeoplePreviouslyEnrolled,
-                                    bool ForceEmailQueue, 
+                                    bool ForceEmailQueue,
                                     bool DisableRandomEnrolment = false)
         {
 
@@ -477,7 +479,7 @@ namespace U3A.BusinessRules
             var settings = await dbc.SystemSettings.AsNoTracking()
                                     .OrderBy(x => x.ID)
                                     .FirstAsync();
-            if (enrolments.Any(x => IsInFutureRandomAllocationPeriod(x,enrolmentTerm,settings))) { return 0; }
+            if (enrolments.Any(x => IsInFutureRandomAllocationPeriod(x, enrolmentTerm, settings))) { return 0; }
             bool isFutureCourse = IsFutureCourse(today, course, calendar);
             var AlreadyEnrolledInCourse = new List<Guid>();
             if (course.EnforceOneStudentPerClass
@@ -495,8 +497,8 @@ namespace U3A.BusinessRules
 
             // We will do a random allocation once per allocation period (annual, semester or term)
             // On completion IsClassAllocationFinalised is aet True.
-            var DoRandomEnrol = (DisableRandomEnrolment) 
-                                    ? false 
+            var DoRandomEnrol = (DisableRandomEnrolment)
+                                    ? false
                                     : !enrolmentTerm.IsClassAllocationFinalised && isRandomEnrol &&
                                             today >= GetThisTermAllocationDay(enrolmentTerm, settings);
             int enrolled = enrolments.Where(x => !x.IsWaitlisted).Count();
@@ -632,7 +634,7 @@ namespace U3A.BusinessRules
                 case AutoEnrollOccurrence.Annually:
                     return false;
                 case AutoEnrollOccurrence.Semester:
-                    return (enrolmentTerm.TermNumber <= 2 && thisTermNumber > 2) ;
+                    return (enrolmentTerm.TermNumber <= 2 && thisTermNumber > 2);
                 case AutoEnrollOccurrence.Term:
                     return true;
                 default: throw new InvalidOperationException();

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    [Index(nameof(TenantIdentifier),nameof(TermId),nameof(ClassID),IsUnique = true)]
+    [Index(nameof(TenantIdentifier), nameof(TermId), nameof(ClassID), IsUnique = true)]
     public class MultiCampusSchedule : BaseEntity
     {
         public Guid ID { get; set; }

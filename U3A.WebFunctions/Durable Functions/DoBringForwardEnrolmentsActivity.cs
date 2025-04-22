@@ -1,11 +1,10 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask.Client;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using U3A.WebFunctions.Procedures;
+using Microsoft.Extensions.Logging;
 using U3A.Model;
-using DevExpress.XtraReports.UI;
+using U3A.WebFunctions.Procedures;
 
 
 namespace U3A.WebFunctions;
@@ -21,7 +20,7 @@ public partial class DurableFunctions
         if (cn != null)
         {
             var tenant = GetTenant(options.TenantIdentifier, cn);
-            if (tenant != null) 
+            if (tenant != null)
             {
                 logger.LogInformation($"****** Started {nameof(DoBringForwardEnrolmentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try

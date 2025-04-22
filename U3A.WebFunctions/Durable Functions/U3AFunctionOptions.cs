@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Functions.Worker.Http;
-using System;
+﻿using Microsoft.Azure.Functions.Worker.Http;
 using U3A.Model;
 
 namespace U3A.WebFunctions;

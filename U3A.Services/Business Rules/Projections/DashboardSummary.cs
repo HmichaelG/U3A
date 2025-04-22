@@ -275,7 +275,7 @@ namespace U3A.BusinessRules
                                 });
             var MembershipYearsRangeSummary = membershipYears.GroupBy(x => new
             {
-                Category = (x.MembershipYears == int.MinValue) ? "Unknown" : GetJoiningYearRange(x.MembershipYears,DoExtendedYears:true),
+                Category = (x.MembershipYears == int.MinValue) ? "Unknown" : GetJoiningYearRange(x.MembershipYears, DoExtendedYears: true),
             });
             var genders = didNotRenew.GroupBy(x => new
             {
@@ -303,7 +303,7 @@ namespace U3A.BusinessRules
             result.AddRange(didNotRenew
             .GroupBy(x => new
             {
-                joinYearsRange = (x.DateJoined == null) ? "Unknown" : GetJoiningYearRange(GetAge(x.DateJoined.Value, today),DoExtendedYears:true),
+                joinYearsRange = (x.DateJoined == null) ? "Unknown" : GetJoiningYearRange(GetAge(x.DateJoined.Value, today), DoExtendedYears: true),
                 Gender = x.Gender,
             })
             .Select(x => new SankeyDataPoint
@@ -533,7 +533,7 @@ namespace U3A.BusinessRules
                 return "100+ years";
             }
         }
-        private static string GetJoiningYearRange(int years,bool DoExtendedYears = false)
+        private static string GetJoiningYearRange(int years, bool DoExtendedYears = false)
         {
             if (years == 0)
             {

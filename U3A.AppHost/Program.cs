@@ -1,7 +1,3 @@
-using Aspire.Hosting;
-using Serilog;
-using Serilog.Events;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 var openai = builder.ExecutionContext.IsPublishMode

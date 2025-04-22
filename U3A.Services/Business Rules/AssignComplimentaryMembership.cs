@@ -81,7 +81,8 @@ namespace U3A.BusinessRules
                         result++;
                     }
                 }
-            };
+            }
+            ;
             return result;
         }
         public static async Task<int> AssignVolunteerComplimentaryMembership(U3ADbContext dbc, int FinancialTo, string Activity, DateTime Now)
@@ -126,7 +127,8 @@ namespace U3A.BusinessRules
                     var receipt = await dbc.Receipt.Where(x => x.PersonID == person.ID
                                         && x.FinancialTo >= FinancialTo
                                         && x.Amount == 0).ToListAsync();
-                    if (receipt != null) { 
+                    if (receipt != null)
+                    {
                         dbc.RemoveRange(receipt);
                         if (person.FinancialTo >= FinancialTo) { person.FinancialTo = FinancialTo - 1; }
                         if (person.FinancialTo < constants.START_OF_TIME) { person.FinancialTo = constants.START_OF_TIME; }

@@ -203,9 +203,9 @@ namespace U3A.BusinessRules
             tokens.AddRange(CamelCaseToTokens(tokens));
             List<string> additionalTokens = new();
             // allow for O'Brien, O'Donnell etc
-            for (int i = 0; i < tokens.Count-1; i++)
+            for (int i = 0; i < tokens.Count - 1; i++)
             {
-               var token = tokens[i];
+                var token = tokens[i];
                 if (token == "O")
                 {
                     additionalTokens.Add($"O'{tokens[i + 1]}");

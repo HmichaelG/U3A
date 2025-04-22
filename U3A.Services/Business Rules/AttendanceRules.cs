@@ -193,7 +193,7 @@ namespace U3A.BusinessRules
             // Class attendance this term
             var attendanceForTerm = await dbc.AttendClass
                 .Include(ac => ac.Class).ThenInclude(c => c.Course)
-                .Where(ac => ac.TermID == selectedTerm.ID && 
+                .Where(ac => ac.TermID == selectedTerm.ID &&
                     (GetRecorded || (!GetRecorded && !ac.Class.Course.IsOffScheduleActivity)))
                 .ToListAsync();
 
@@ -249,7 +249,7 @@ namespace U3A.BusinessRules
                             bag.Add(o);
                         }
                     });
-                    }
+                }
             });
 
             return bag.OrderBy(x => x.CourseDetail).ThenBy(x => x.ClassDate).ToList();

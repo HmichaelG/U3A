@@ -112,7 +112,7 @@ namespace U3A.BusinessRules
             var courses = new List<Course>();
             bool isCourseLeader;
             foreach (var course in coursesInTerm)
-            {           
+            {
                 course.Classes = course.Classes.Where(x => !x.IsDeleted).ToList();
                 foreach (var c in course.Classes)
                 {
@@ -151,11 +151,13 @@ namespace U3A.BusinessRules
                                 .Where(c => !c.IsDeleted && c.Enrolments.Any(e => !e.IsDeleted && e.PersonID == Student.ID &&
                                     e.TermID == term.ID &&
                                     e.IsCourseClerk && !e.IsWaitlisted)).ToListAsync();
-            Parallel.ForEach(allCourses, x => {
-                if (CoursesInTerm.Contains(x)) { 
+            Parallel.ForEach(allCourses, x =>
+            {
+                if (CoursesInTerm.Contains(x))
+                {
                     var course = CoursesInTerm.Find(c => c.ID == x.ID);
                     x.Classes = course.Classes;
-                    result.Add(x); 
+                    result.Add(x);
                 }
             });
             return result.ToList();
@@ -220,14 +222,16 @@ namespace U3A.BusinessRules
                        where course.Classes.Any(c => (c.OfferedTerm1 && TermNumber == 1) ||
                                                 (c.OfferedTerm2 && TermNumber == 2) ||
                                                 (c.OfferedTerm3 && TermNumber == 3) ||
-                                                (c.OfferedTerm4 && TermNumber == 4)) select course).ToList();
+                                                (c.OfferedTerm4 && TermNumber == 4))
+                       select course).ToList();
             foreach (var course in courses)
             {
                 course.Classes = (from c in course.Classes
-                                 where (c.OfferedTerm1 && TermNumber == 1) ||
-                                 (c.OfferedTerm2 && TermNumber == 2) ||
-                                 (c.OfferedTerm3 && TermNumber == 3) ||
-                                 (c.OfferedTerm4 && TermNumber == 4) select c).ToList();
+                                  where (c.OfferedTerm1 && TermNumber == 1) ||
+                                  (c.OfferedTerm2 && TermNumber == 2) ||
+                                  (c.OfferedTerm3 && TermNumber == 3) ||
+                                  (c.OfferedTerm4 && TermNumber == 4)
+                                  select c).ToList();
 
             }
             return courses;

@@ -34,7 +34,7 @@ namespace U3A.BusinessRules
                     var term = await CurrentEnrolmentTermAsync(dbc);
                     if (term == null)
                     {
-                        var nextTerm = await NextTermAsync(dbc,dbc.GetLocalTime());
+                        var nextTerm = await NextTermAsync(dbc, dbc.GetLocalTime());
                         result = (nextTerm == null) ? "To Be Advised" : nextTerm.EnrolmentStartDate.ToLongDateString();
                     }
                 }
@@ -94,7 +94,7 @@ namespace U3A.BusinessRules
                         .Where(x => today >= x.EnrolmentStartDate && today <= x.EnrolmentEndDate)
                         .FirstOrDefault();
         }
-        
+
         public static Term? CurrentEnrolmentTerm(U3ADbContext dbc)
         {
             var today = dbc.GetLocalTime().Date;

@@ -17,7 +17,7 @@ public class Contact : Person
         FinancialTo = 9999;
     }
 
-    public IEnumerable<Tag> Tags { get; set; } = new List<Tag>() ;
+    public IEnumerable<Tag> Tags { get; set; } = new List<Tag>();
 
 }
 
@@ -134,15 +134,18 @@ public class Person : BaseEntity, ISoftDelete
     [DefaultValue(constants.START_OF_TIME)]
 
     int _FinancialTo = constants.START_OF_TIME;
-    public int FinancialTo { 
-        get {
+    public int FinancialTo
+    {
+        get
+        {
             int result = _FinancialTo;
             if (this is Contact) result = 9999;
             return result;
-        } 
-        set { 
+        }
+        set
+        {
             _FinancialTo = value;
-        } 
+        }
     }
     public int? FinancialToTerm { get; set; }
     [NotMapped]
@@ -331,7 +334,7 @@ public class Person : BaseEntity, ISoftDelete
     public string ICEContact { get; set; } = string.Empty;
     [RequiredIfPerson]
     [MaxLength(50)]
-    public string ICEPhone { get; set; } = string.Empty ;
+    public string ICEPhone { get; set; } = string.Empty;
     [DefaultValue(false)]
     public string? AdjustedICEPhone
     {
@@ -423,7 +426,7 @@ public class Person : BaseEntity, ISoftDelete
     {
         get
         {
-            return $"{ToTitleText(LastName.Trim()).PadRight(25,'_')}{ToTitleText(FirstName.Trim()).PadRight(25,'_')}{PersonID}";
+            return $"{ToTitleText(LastName.Trim()).PadRight(25, '_')}{ToTitleText(FirstName.Trim()).PadRight(25, '_')}{PersonID}";
         }
     }
 
@@ -602,7 +605,7 @@ public class RequiredIfPerson : ValidationAttribute
         if (!string.IsNullOrWhiteSpace(sValue)) { return ValidationResult.Success; }
         if (validationContext.ObjectType.Name != "Person") { return ValidationResult.Success; }
         ErrorMessage = $"The {validationContext.MemberName} field is required.";
-        return new ValidationResult(ErrorMessage,new List<string>() { validationContext.MemberName});
+        return new ValidationResult(ErrorMessage, new List<string>() { validationContext.MemberName });
     }
 }
 

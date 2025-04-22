@@ -73,7 +73,8 @@ namespace U3A.Services
                 {
                     result = null;
                 }
-            };
+            }
+            ;
             return result;
         }
 

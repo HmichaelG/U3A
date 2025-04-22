@@ -88,7 +88,7 @@ public static partial class BusinessRule
                         .ToListAsync();
         foreach (var c in contacts)
         {
-                people.Add(c as Person); 
+            people.Add(c as Person);
         }
         return people.OrderBy(x => x.FullNameAlphaKey).ToList();
     }
@@ -128,7 +128,7 @@ public static partial class BusinessRule
                         .ToListAsync();
         foreach (var c in contacts)
         {
-                people.Add(c as Person);
+            people.Add(c as Person);
         }
         return people.OrderBy(x => x.FullNameAlphaKey).ToList();
     }

@@ -26,7 +26,7 @@ namespace U3A.Data
             }
         }
 
-        public override string? UserName 
+        public override string? UserName
         {
             get => _userName;
             set

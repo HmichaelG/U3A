@@ -2,14 +2,11 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using U3A.Database;
 using U3A.Model;
-using System.Text.Json;
-using EXTEN = Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Azure.Storage.Queues;
-using System.Net;
 
 
 namespace U3A.WebFunctions;

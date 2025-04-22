@@ -1,18 +1,18 @@
-using PostmarkDotNet.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
+using DevExpress.XtraRichEdit.Model;
+using Microsoft.AspNetCore.Http;
 using Postmark.Model.MessageStreams;
 using Postmark.Model.Suppressions;
+using PostmarkDotNet.Model;
 using PostmarkDotNet.Model.Webhooks;
-using U3A.Model;
-using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Http;
-using DevExpress.XtraRichEdit.Model;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Threading.Tasks;
+using U3A.Model;
 
 namespace U3A.Services.APIClient;
 
@@ -60,7 +60,7 @@ public class APIClient : APIClientBase
     {
         return await DoCreateCorrespondenceAsPdf(tenant, null, printDoc);
     }
-    public async Task<Byte[]> DoCreateCorrespondenceAsPdf(string tenant, 
+    public async Task<Byte[]> DoCreateCorrespondenceAsPdf(string tenant,
                                 IEnumerable<Guid> ProcessID = null, SendMail printDoc = null)
     {
         var functionName = nameof(DoCreateCorrespondenceAsPdf);

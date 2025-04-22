@@ -15,7 +15,7 @@ namespace U3A.Model
         [Required]
         public string Name { get; set; }
         public bool CanLead { get; set; } = false;
-        public bool CanEnrol {  get; set; } = false;
+        public bool CanEnrol { get; set; } = false;
         public IEnumerable<Contact> Contacts { get; set; } = new List<Contact>();
     }
 }

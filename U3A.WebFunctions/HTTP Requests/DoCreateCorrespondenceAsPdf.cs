@@ -1,17 +1,14 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Text.Json;
-using U3A.Model;
-using U3A.Database;
-using U3A.UI.Reports;
-using U3A.Services;
 using U3A.BusinessRules;
-using Serilog.Core;
+using U3A.Database;
+using U3A.Model;
+using U3A.UI.Reports;
 
 
 namespace U3A.WebFunctions;
@@ -139,7 +136,8 @@ public class DoCreateCorrespondenceAsPdf
                                     enrolments.AddRange(scopedMCEnrolments.Where(x => x.CourseID == course.ID && x.ClassID == null
                                                                           && x.TermID == sm.TermID));
                                 }
-                            };
+                            }
+                            ;
                             if (leader != null && enrolments != null && enrolments.Count > 0)
                             {
                                 if (course != null) courseName = course.Name;

@@ -1,16 +1,14 @@
-﻿using Serilog.Core;
-using Serilog.Events;
+﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.JSInterop;
 using Serilog;
-using Serilog.Extensions.Logging;
+using Serilog.Events;
+using Serilog.Exceptions;
+using Serilog.Filters;
 using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
-using Serilog.Exceptions;
-using Serilog.Filters;
-using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Antiforgery;
 using System.Security.Cryptography;
 
 namespace U3A.Extensions.HostBuilder;
@@ -35,7 +33,7 @@ public static class SerilogLoggingExtensions
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Error)
             .Filter
-                  .ByExcluding(logEvent => 
+                  .ByExcluding(logEvent =>
                     logEvent.Exception is OperationCanceledException ||
                     logEvent.Exception is ObjectDisposedException ||
                     logEvent.Exception is AntiforgeryValidationException ||
@@ -54,8 +52,8 @@ public static class SerilogLoggingExtensions
                                             columnOptions: columnOptions
                                         )
                 )
-            .WriteTo.Console(formatProvider: new CultureInfo("en-AU"), 
-                        theme: AnsiConsoleTheme.Sixteen, 
+            .WriteTo.Console(formatProvider: new CultureInfo("en-AU"),
+                        theme: AnsiConsoleTheme.Sixteen,
                         applyThemeToRedirectedOutput: true)
             .WriteTo.OpenTelemetry()
             .WriteTo.MSSqlServer(connectionString: TenantConnectionString,

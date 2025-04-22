@@ -19,11 +19,13 @@ namespace U3A.Services
         private readonly IHttpContextAccessor httpContextAccessor;
 
         private ConcurrentDictionary<string, CircuitDetail> _circuitDetails { get; set; }
-        public IEnumerable<CircuitDetail> CircuitDetails { get 
+        public IEnumerable<CircuitDetail> CircuitDetails
+        {
+            get
             {
-              return _circuitDetails.Values.AsEnumerable()  ; 
-            } 
-        } 
+                return _circuitDetails.Values.AsEnumerable();
+            }
+        }
 
         public event EventHandler CircuitsChanged;
 
@@ -89,10 +91,12 @@ namespace U3A.Services
         public string? Tenant { get; set; }
         public DateTime? Created { get; set; } = DateTime.UtcNow;
         public DateTime? Down { get; set; }
-        public string Status { get 
+        public string Status
+        {
+            get
             {
-                return (Down == null) ? "Active" : "Disconnected" ; 
-            } 
+                return (Down == null) ? "Active" : "Disconnected";
+            }
         }
 
         public string UpTime

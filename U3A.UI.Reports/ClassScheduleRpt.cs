@@ -187,8 +187,8 @@ namespace U3A.UI.Reports
         {
             Class c = (Class)GetCurrentRow();
             if (c == null) { return; }
-            xrClosedReason.Text = (c.Course.AllowAutoEnrol) 
-                                ? "Class is Full" 
+            xrClosedReason.Text = (c.Course.AllowAutoEnrol)
+                                ? "Class is Full"
                                 : c.Course.AutoEnrolDisabledReason ?? "Class is Closed";
         }
     }

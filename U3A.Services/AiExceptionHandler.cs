@@ -6,7 +6,7 @@ public class AIExceptionHandler : IAIExceptionHandler
 {
     public Exception ProcessException(Exception exception)
     {
-        Log.Error(exception,"An error occurred while processing an AI Chat");
+        Log.Error(exception, "An error occurred while processing an AI Chat");
         return new Exception(exception.Message, exception);
     }
 }

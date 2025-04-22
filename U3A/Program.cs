@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using U3A.Components;
 using U3A.Components.Account;
+using U3A.Extensions.HostBuilder;
 using U3A.Model;
 using U3A.Services;
-using U3A.Extensions.HostBuilder;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,5 +1,4 @@
-﻿using DevExpress.CodeParser;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using U3A.BusinessRules;
 using U3A.Database;
@@ -136,7 +135,7 @@ public static class AutoEnrollParticipants
             if (today > allocationDate.AddDays(constants.RANDOM_ALLOCATION_PREVIEW))
             {
                 // process for participants
-                await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm,EnrollmentIdsToProcess);
+                await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm, EnrollmentIdsToProcess);
                 logger.LogInformation($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
                 foreach (var log in BusinessRule.AutoEnrolments)
                 {

@@ -12,7 +12,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-			var sql = @"
+            var sql = @"
 
 /****** Object:  StoredProcedure [dbo].[prcDbCleanup]    Script Date: 3/12/2024 5:28:13 PM ******/
 DROP PROCEDURE [dbo].[prcDbCleanup]

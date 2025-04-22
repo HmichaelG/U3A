@@ -1,5 +1,5 @@
-﻿using DevExpress.Pdf;
-using DevExpress.Drawing;
+﻿using DevExpress.Drawing;
+using DevExpress.Pdf;
 using DevExpress.XtraPrinting;
 using DevExpress.XtraRichEdit;
 using DevExpress.XtraRichEdit.API.Native;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using U3A.BusinessRules;
@@ -14,7 +15,6 @@ using U3A.Database;
 using U3A.Model;
 using U3A.Services;
 using U3A.Services.APIClient;
-using System.Reflection;
 
 namespace U3A.Services;
 
@@ -109,12 +109,13 @@ public partial class DocumentServer : IDisposable
         }
         else if (HasMergeCodes(documentTemplate.Content) || PersonIDsToExport.Count() == 1)
         {
-            await SendEmailToSingleRecipientAsync(documentTemplate, PersonIDsToExport, OverrideCommunicationPreference,DelayedStart);
+            await SendEmailToSingleRecipientAsync(documentTemplate, PersonIDsToExport, OverrideCommunicationPreference, DelayedStart);
         }
         else
         {
             await SendEmailToMultipleRecipients(documentTemplate, PersonIDsToExport, OverrideCommunicationPreference, DelayedStart);
-        };
+        }
+        ;
         s.Stop();
         ElapsedTime = s.Elapsed;
     }
@@ -161,7 +162,7 @@ public partial class DocumentServer : IDisposable
     {
         IsOvernightBatch = true;
         var sendToMultipleRecipients = false;
-        await CreateDocumentQueuedItem(documentTemplate, personIDsToExport, OverrideCommunicationPreference, sendToMultipleRecipients,delayedStart);
+        await CreateDocumentQueuedItem(documentTemplate, personIDsToExport, OverrideCommunicationPreference, sendToMultipleRecipients, delayedStart);
         SuccessTransmissionAttempts = personIDsToExport.Count;
     }
 
@@ -321,7 +322,7 @@ public partial class DocumentServer : IDisposable
         result.PlainText = resultServer.Text;
         if (!string.IsNullOrWhiteSpace(documentTemplate.EmailPreheader))
         {
-            result.HtmlText = resultServer.HtmlText.Replace("<body>", ReadPreheaderTemplate().Replace("{Preheader}",documentTemplate.EmailPreheader));
+            result.HtmlText = resultServer.HtmlText.Replace("<body>", ReadPreheaderTemplate().Replace("{Preheader}", documentTemplate.EmailPreheader));
         }
         else
             result.HtmlText = resultServer.HtmlText;

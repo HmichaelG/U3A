@@ -46,8 +46,10 @@ namespace U3A.Model
         public CourseParticipationType CourseParticipationType { get; set; }
         public bool EnforceOneStudentPerClass { get; set; } = true; // Ooops! One Class Per Student
 
-        public bool OneStudentPerClass { 
-            get {
+        public bool OneStudentPerClass
+        {
+            get
+            {
                 return (((ParticipationType)CourseParticipationTypeID) == ParticipationType.DifferentParticipantsInEachClass && EnforceOneStudentPerClass);
             }
         }
@@ -96,7 +98,7 @@ namespace U3A.Model
 
         [DefaultValue(true)]
         public bool AllowAutoEnrol { get; set; } = true;
-        
+
         [MaxLength(50)]
         public string? AutoEnrolDisabledReason { get; set; }
 
@@ -184,7 +186,7 @@ namespace U3A.Model
 
             var isOffSchedule = (bool)offSchedule.GetValue(validationContext.ObjectInstance);
 
-            if ((bool)value && isOffSchedule )
+            if ((bool)value && isOffSchedule)
                 return new ValidationResult(ErrorMessage);
 
             return ValidationResult.Success;
