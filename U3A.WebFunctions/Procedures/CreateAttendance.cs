@@ -1,5 +1,5 @@
 ﻿using DevExpress.Blazor;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Data;
 using U3A.BusinessRules;
 using U3A.Database;
@@ -9,7 +9,7 @@ namespace U3A.WebFunctions.Procedures
 {
     public static class CreateAttendance
     {
-        public static async Task Process(TenantInfo tenant, ILogger logger)
+        public static async Task Process(TenantInfo tenant)
         {
             using (var dbc = new U3ADbContext(tenant))
             {
@@ -30,17 +30,24 @@ namespace U3A.WebFunctions.Procedures
                                select a.CustomFields["Source"] as Class).ToList();
                 if (classes?.Any() == true)
                 {
-                    logger.LogInformation(">>>> Create today's attendance records <<<");
+                    Log.Information(">>>> Create today's attendance records <<<");
                     foreach (var c in classes)
                     {
                         var course = await dbc.Course.FindAsync(c.CourseID);
                         if (course != null)
                         {
-                            var classDate = new DateTime(today.Year, today.Month, today.Day,
-                                                    c.StartTime.Hour, c.StartTime.Minute, 0);
-                            var attendance = await BusinessRule.EditableAttendanceAsync(dbc, term, c.Course, c, classDate);
-                            await ApplyStudentLeaveAsync(dbc, attendance, course);
-                            logger.LogInformation($"{course.Name} at {c.StartTime.ToShortTimeString()} created.");
+                            if (course.IsOffScheduleActivity)
+                            {
+                                Log.Information($"{course.Name} at {c.StartTime.ToShortTimeString()} not created -  Off Schedule Activity.");
+                            }
+                            else
+                            {
+                                var classDate = new DateTime(today.Year, today.Month, today.Day,
+                                                        c.StartTime.Hour, c.StartTime.Minute, 0);
+                                var attendance = await BusinessRule.EditableAttendanceAsync(dbc, term, c.Course, c, classDate);
+                                await ApplyStudentLeaveAsync(dbc, attendance, course);
+                                Log.Information($"{course.Name} at {c.StartTime.ToShortTimeString()} created.");
+                            }
                         }
                     }
                 }
@@ -57,7 +64,7 @@ namespace U3A.WebFunctions.Procedures
                 if (leave != null)
                 {
                     ac.AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithApology;
-                    ac.AttendClassStatus = await dbc.AttendClassStatus.FindAsync(ac.AttendClassStatusID);
+                    ac.AttendClassStatus = await dbc.AttendClassStatus.FindAsync(ac.AttendClassStatusID) ?? new() ;
                     ac.DateProcessed = now;
                     ac.Comment = leave.Reason;
                 }

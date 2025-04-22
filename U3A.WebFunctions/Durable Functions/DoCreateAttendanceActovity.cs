@@ -29,7 +29,7 @@ public partial class DurableFunctions
                     var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
                     if (isBackgroundProcessingEnabled)
                     {
-                        await CreateAttendance.Process(tenant, logger);
+                        await CreateAttendance.Process(tenant);
                     }
                 }
                 catch (Exception ex)

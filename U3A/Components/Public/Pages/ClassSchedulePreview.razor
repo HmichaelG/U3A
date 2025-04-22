@@ -39,29 +39,29 @@ else
         }
         <div class="list-detail mx-auto">
             <DxTextBox @ref=@filterTextBox
-            CssClass="filter-text-box flex-grow-1"
-            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-            Text="@filterText"
-            TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
-            BindValueMode="BindValueMode.OnInput"
-            InputDelay="500"
-            NullText="Search">
+                       CssClass="filter-text-box flex-grow-1"
+                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                       Text="@filterText"
+                       TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
+                       BindValueMode="BindValueMode.OnInput"
+                       InputDelay="500"
+                       NullText="Search">
             </DxTextBox>
         </div>
         <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
-        KeyFieldName="ID"
-        ShowAllRows=true
-        VirtualScrollingEnabled=true
-        AllowSelectRowByClick=false
-        AllowGroup=false
-        AllowSort=false
-        PagerVisible=false
-        CssClass="mt-1 listbox-scroll">
+                KeyFieldName="ID"
+                ShowAllRows=true
+                VirtualScrollingEnabled=true
+                AllowSelectRowByClick=false
+                AllowGroup=false
+                AllowSort=false
+                PagerVisible=false
+                CssClass="mt-1 listbox-scroll">
             <Columns>
                 <DxGridDataColumn Width="100%">
                     <HeaderCaptionTemplate>
-                        <DxTabs @ref="dxTabs" 
-                            TabClick="@OnTabClick" 
+                        <DxTabs @ref="dxTabs"
+                                TabClick="@OnTabClick"
                                 @bind-ActiveTabIndex=@activeTabIndex CssClass="">
                             <DxTabPage Text="All" />
                             <DxTabPage Text="Mon" />
@@ -122,7 +122,7 @@ else
                                             @if (c.Course.ClassSummaries.Count <= 1)
                                             {
                                                 <div class="col-small ps-1"><strong>Venue</strong></div>
-                                                <div class="col-large">@HighlightSearchText(c.Venue?.Name)</div>
+                                                <div class="col-large">@HighlightSearchText(c!.Venue!.Name)</div>
                                                 <div class="offset-small col-large">@c.Venue?.Address</div>
                                             }
                                         }
@@ -140,14 +140,14 @@ else
                                         </div>
                                         @{
                                             string? message = null;
-                                            if (c.TermNumber != term.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
-                                            if (c.TermNumber == prevTerm.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
+                                            if (c.TermNumber != term!.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
+                                            if (c.TermNumber == prevTerm!.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
                                             if (c.TotalActiveStudents >= c.Course.MaximumStudents) { message = "Class is Full"; }
                                             if (!c.Course.AllowAutoEnrol) { message = c.Course.AutoEnrolDisabledReason ?? "Class is Closed"; }
                                             if (message != null)
                                             {
                                                 <div class="watermark"
-                                                hidden="@(isListboxShowingSummary)">
+                                                     hidden="@(isListboxShowingSummary)">
                                                     @message
                                                 </div>
                                             }
@@ -169,40 +169,40 @@ else
 
             <div class="input-group">
                 <DxButton CssClass="flex-grow-1"
-                IconCssClass="menu-icon bi-door-open"
-                Text="Return to Portal"
-                RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
+                          IconCssClass="menu-icon bi-door-open"
+                          Text="Return to Portal"
+                          RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
             </div>
         </div>
     </div>
 }
 <style>
     .filter-text-box {
-    margin: auto;
-    background: url(images/search.svg) no-repeat scroll 5px 5px;
-    padding-left: 30px;
+        margin: auto;
+        background: url(images/search.svg) no-repeat scroll 5px 5px;
+        padding-left: 30px;
     }
 
     .combo-list-box {
-    margin: auto;
-    background: url(images/list-ul.svg) no-repeat scroll 5px 5px;
-    padding-left: 30px;
+        margin: auto;
+        background: url(images/list-ul.svg) no-repeat scroll 5px 5px;
+        padding-left: 30px;
     }
 
     .selected-box {
-    width: 100%;
-    position: relative;
-    border: 1px solid transparent;
-    border-radius: 0.25rem;
+        width: 100%;
+        position: relative;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
     }
 
     .weblink-button {
-    width: 80%;
-    margin: auto
+        width: 80%;
+        margin: auto
     }
 
     .highlight {
-    background-color: yellow !important;
+        background-color: yellow !important;
     }
 
     .listbox-scroll {
@@ -210,39 +210,39 @@ else
     }
 
     .list-detail {
-    width: 98%;
-    margin: auto;
+        width: 98%;
+        margin: auto;
     }
 
     .col-small {
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 auto;
-    -ms-flex: 0 0 auto;
-    flex: 0 0 auto;
-    width: 22%;
+        -webkit-box-flex: 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+        width: 22%;
     }
 
     .col-large {
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 auto;
-    -ms-flex: 0 0 auto;
-    flex: 0 0 auto;
-    width: 78%;
+        -webkit-box-flex: 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+        width: 78%;
     }
 
     .offset-small {
-    margin-left: 22%;
+        margin-left: 22%;
     }
 
     .watermark {
-    width: 100%;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 500;
-    opacity: 0.4;
-    color: magenta;
-    position: absolute;
-    bottom: 10%;
+        width: 100%;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 500;
+        opacity: 0.4;
+        color: magenta;
+        position: absolute;
+        bottom: 10%;
     }
 </style>
 @code {
@@ -295,7 +295,7 @@ else
         filterText = text;
     }
 
-    List<Class> FilterClassByName()
+    List<Class>? FilterClassByName()
     {
         var result = new List<Class>();
         if (_filterText == null) return ResetFilter();
@@ -332,7 +332,7 @@ else
         return $"{c.Course.ConversionID} {c.Course.Name} {c.Course.CourseType.Name} {c.Leader?.FullName} {c.Venue?.Name} {c.GuestLeader} {c.OnDay.Day} {c.Course.DisplayDescription}";
     }
 
-    List<Class> ResetFilter()
+    List<Class>? ResetFilter()
     {
         if (isListboxShowingSummary)
         {
@@ -346,6 +346,7 @@ else
             }
             else
             {
+                if (Classes == null) return null;
                 if (activeTabIndex < 6)
                 {
                     //Monday - Friday
@@ -376,10 +377,12 @@ else
             {
                 // wire up the data
                 settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+                if (settings == null) { throw new Exception("System settings not found in database."); }
                 term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 if (term == null)
                 {
                     var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+                    if (currentTerm is null) { throw new Exception("The current term is not defined."); }
                     if (dbc.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
                     {
                         SetUnavailable(currentTerm);
@@ -419,9 +422,9 @@ else
 
     void SetUnavailable(Term? term)
     {
-        if (term != null)
+        if (term is not null)
         {
-            var sOpeningTime = term?.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
+            var sOpeningTime = term.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
             enrolmentLockoutText = new MarkupString($@"<h6><strong>{term.Year} Term-{term.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.</h6>");
         }
         isListboxShowingSummary = false;
@@ -488,18 +491,19 @@ else
 
     async Task GetData()
     {
-        List<Class> c = new();
-        if (term != null)
+        List<Class> c = [];
+        if (Classes is null) return;
+        if (term is not null)
         {
-            c = Classes.Where(x => x.TermNumber >= term?.TermNumber).ToList();
-        }
-        // only show this term's classes & inter-term classes from last term.
-        if (prevTerm != null)
-        {
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+            c = Classes.Where(x => x.TermNumber >= term.TermNumber).ToList();
+            // only show this term's classes & inter-term classes from last term.
+            if (prevTerm is not null)
             {
-                c.AddRange(Classes.Where(x => x.TermNumber == prevTerm.TermNumber
-                                                && BusinessRule.IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)).ToList());
+                using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+                {
+                    c.AddRange(Classes.Where(x => x.TermNumber == prevTerm.TermNumber
+                                                    && BusinessRule.IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)).ToList());
+                }
             }
         }
         ListboxData = c.Distinct<Class>().ToList();
