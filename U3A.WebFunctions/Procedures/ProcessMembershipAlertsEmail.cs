@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Serilog;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using U3A.BusinessRules;

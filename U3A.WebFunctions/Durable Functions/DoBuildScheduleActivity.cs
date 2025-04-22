@@ -6,7 +6,6 @@ using Serilog;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
-using MS_LOG = Microsoft.Extensions.Logging;
 
 
 namespace U3A.WebFunctions;

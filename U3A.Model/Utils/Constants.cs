@@ -42,7 +42,7 @@ namespace U3A.Model
 #if DEBUG
         public const bool IS_DEBUG = true;
 #else
-            public const bool IS_DEBUG = false;
+        public const bool IS_DEBUG = false;
 #endif
     }
 

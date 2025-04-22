@@ -3,10 +3,10 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using System.Text.Json;
 using U3A.Database;
 using U3A.Model;
-using Serilog;
 
 
 namespace U3A.WebFunctions;

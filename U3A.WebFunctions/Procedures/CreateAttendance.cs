@@ -64,7 +64,7 @@ namespace U3A.WebFunctions.Procedures
                 if (leave != null)
                 {
                     ac.AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithApology;
-                    ac.AttendClassStatus = await dbc.AttendClassStatus.FindAsync(ac.AttendClassStatusID) ?? new() ;
+                    ac.AttendClassStatus = await dbc.AttendClassStatus.FindAsync(ac.AttendClassStatusID) ?? new();
                     ac.DateProcessed = now;
                     ac.Comment = leave.Reason;
                 }

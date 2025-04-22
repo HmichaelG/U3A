@@ -4,10 +4,9 @@ using DevExpress.XtraReports.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Microsoft.IdentityModel.Logging;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -562,8 +561,8 @@ namespace U3A.UI.Reports
                                     .Replace("{FirstName}", Leader.FirstName)
                                     .Replace("{CourseName}", CourseName)
                                     .Replace("{ReportName}", ReportName)
-                                    .Replace("{RandomAllocationCommentStart}", (RandomAllocationExecuted) ? "" : "<!--")
-                                    .Replace("{RandomAllocationCommentEnd}", (RandomAllocationExecuted) ? "" : "-->")
+                                    .Replace("{RandomAllocationCommentStart}", (RandomAllocationExecuted) ? string.Empty : "<!--")
+                                    .Replace("{RandomAllocationCommentEnd}", (RandomAllocationExecuted) ? string.Empty : "-->")
                                     .Replace("{randomAllocationPreviewDays}", constants.RANDOM_ALLOCATION_PREVIEW.ToString())
                                     .Replace("{copyrightYear}", copyrightYear)
                                     .Replace("{tenantID}", tenantID)

@@ -98,7 +98,7 @@ namespace U3A.WebFunctions.Procedures
                                     }
                                     theseEnrolments.Add(enrolment);
                                     Log.Information("{documentName} for {fullName} added to queue.",
-                                            sm.DocumentName,p.FullName);
+                                            sm.DocumentName, p.FullName);
                                 }
                                 else sm.Status = "Enrollment not found";
                                 break;
@@ -151,13 +151,13 @@ namespace U3A.WebFunctions.Procedures
                                                                     enrolments.ToArray(),
                                                                     options.HasRandomAllocationExecuted);
                                                 Log.Information("{documentName} sent to: {fullName} via {communication}.",
-                                                        sm.DocumentName,leader.FullName,leader.Communication);
+                                                        sm.DocumentName, leader.FullName, leader.Communication);
                                             }
                                         }
                                         else
                                         {
                                             Log.Information("{documentName} already sent to: {fullName}.",
-                                                                sm.DocumentName,leader.FullName);
+                                                                sm.DocumentName, leader.FullName);
                                             sm.Status = "Accepted";
                                         }
                                     }
@@ -201,7 +201,7 @@ namespace U3A.WebFunctions.Procedures
                                                                               .ThenBy(x => x.Person.LastName)
                                                                               .ThenBy(x => x.Person.FirstName).ToArray());
                                         Log.Information("{documentName} sent to: {fullName} via {communication}.",
-                                                            sm.DocumentName,p.FullName,p.Communication);
+                                                            sm.DocumentName, p.FullName, p.Communication);
                                     }
                                     else { sm.Status = "Enrollments not found."; }
                                 }
@@ -235,7 +235,7 @@ namespace U3A.WebFunctions.Procedures
                     {
                         await reportFactory.CreateAndSendPostalPDF();
                         Log.Information("Sent {postalCount} postal report(s) to {sendEmailAddress}.",
-                            postalCount,reportFactory.SendEmailAddress);
+                            postalCount, reportFactory.SendEmailAddress);
                     }
                     // Delete expired records
                     dbc.RemoveRange(dbc.SendMail.AsEnumerable()
