@@ -2,6 +2,7 @@
 using DevExpress.XtraRichEdit.Import.OpenXml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -253,13 +254,14 @@ namespace U3A.BusinessRules
                                                         TenantDbContext dbcT,
                                                         string TenantIdentifier)
         {
+            Log.Information("*** Building schedule for {TenantIdentifier} ***", TenantIdentifier);
             List<MultiCampusSchedule> schedules = new List<MultiCampusSchedule>();
             List<MultiCampusSchedule> multiCampusSchedules = new List<MultiCampusSchedule>();
             var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             if (term != null)
             {
-                var now = dbc.GetLocalTime().Date;
+                var now = dbc.GetLocalDate();
                 var classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings);
                 foreach (var c in classes)
                 {
@@ -276,6 +278,8 @@ namespace U3A.BusinessRules
                 dbc.ChangeTracker.Clear();
                 await UpdateScheduleCache(dbc, schedules, TenantIdentifier);
                 await dbc.SaveChangesAsync();
+                Log.Information("Schedule cache created for {TenantIdentifier}, {classes} active classes.", 
+                                    TenantIdentifier, schedules.Count);
 
                 //multi-campus
                 var tInfo = await dbcT.TenantInfo.FirstOrDefaultAsync(x => x.Identifier == TenantIdentifier);
@@ -284,22 +288,15 @@ namespace U3A.BusinessRules
                     // Multi-campus extensions must be enabled at the tenant & the client level
                     if (tInfo.EnableMultiCampusExtension && settings.AllowMultiCampusExtensions)
                     {
-                        await dbcT.Database.BeginTransactionAsync();
-                        try
-                        {
-                            // Schedule cache
-                            await UpdateMultiCampusScheduleCache(dbcT, multiCampusSchedules, TenantIdentifier);
-                            // Terms
-                            await UpdateTermCache(dbc, dbcT, TenantIdentifier);
-                            // members
-                            await UpdatePersonCache(dbc, dbcT, TenantIdentifier);
-                            await dbcT.SaveChangesAsync();
-                            await dbcT.Database.CommitTransactionAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            await dbcT.Database.RollbackTransactionAsync();
-                        }
+                        // Schedule cache
+                        await UpdateMultiCampusScheduleCache(dbcT, multiCampusSchedules, TenantIdentifier);
+                        // Terms
+                        await UpdateTermCache(dbc, dbcT, TenantIdentifier);
+                        // members
+                        await UpdatePersonCache(dbc, dbcT, TenantIdentifier);
+                        await dbcT.SaveChangesAsync();
+                        Log.Information("Multi-campus schedule cache created for {TenantIdentifier}, {classes} active classes.", 
+                                            TenantIdentifier,multiCampusSchedules.Count);
                     }
                 }
             }

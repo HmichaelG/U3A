@@ -38,7 +38,7 @@ namespace U3A.Model
                 string result = (FinancialTo > constants.START_OF_TIME) ? FinancialTo.ToString("F0") : "";
                 if (TermPaid != null) { result = $"{result} Term {TermPaid}"; }
                 if (FinancialTo == constants.START_OF_TIME) { result = "Pending"; }
-                if (this is Contact) { result = "External"; }
+                if (this is Contact) { result = "Contact"; }
                 return result;
             }
         }

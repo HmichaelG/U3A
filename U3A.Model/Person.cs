@@ -167,7 +167,7 @@ public class Person : BaseEntity, ISoftDelete
             string result = FinancialTo.ToString();
             if (FinancialToTerm != null) { result = $"{result}-T{FinancialToTerm}"; }
             if (FinancialTo == constants.START_OF_TIME) { result = "Pending"; }
-            if (this is Contact) { result = "External"; }
+            if (this is Contact) { result = "Contact"; }
             return result;
         }
     }

@@ -173,13 +173,14 @@ namespace U3A.BusinessRules
                         }
                         if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                         {
-                            enrolmentsToProcess = await dbc.Enrolment
+                            enrolmentsToProcess = await dbc.Enrolment.IgnoreQueryFilters()
                                                         .Include(x => x.Course)
                                                         .Include(x => x.Term)
                                                         .Include(x => x.Person)
-                                                        .Where(x => (x.TermID == SelectedTerm.ID || isFutureCourse ||
-                                                                     (x.Course.AllowMultiCampsuFrom != null &&
-                                                                     x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
+                                                        .Where(x => !x.IsDeleted && !x.Person.IsDeleted &&
+                                                                        (x.TermID == SelectedTerm.ID || isFutureCourse ||
+                                                                        (x.Course.AllowMultiCampsuFrom != null &&
+                                                                        x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
                                                                         && x.CourseID == course.ID
                                                                         && x.Person.DateCeased == null
                                                                         && !CourseLeaders.Contains(x.Person))
@@ -204,11 +205,12 @@ namespace U3A.BusinessRules
                         {
                             foreach (var courseClass in course.Classes)
                             {
-                                enrolmentsToProcess = await dbc.Enrolment
+                                enrolmentsToProcess = await dbc.Enrolment.IgnoreQueryFilters()
                                                             .Include(x => x.Course)
                                                             .Include(x => x.Term)
                                                             .Include(x => x.Person)
-                                                            .Where(x => (x.TermID == SelectedTerm.ID || isFutureCourse)
+                                                            .Where(x => !x.IsDeleted && !x.Person.IsDeleted &&
+                                                                            (x.TermID == SelectedTerm.ID || isFutureCourse)
                                                                             && x.ClassID == courseClass.ID
                                                                             && x.Person.DateCeased == null
                                                                             && !CourseLeaders.Contains(x.Person))
@@ -259,7 +261,7 @@ namespace U3A.BusinessRules
             var term1 = await GetFirstTermThisYearAsync(dbc, SelectedTerm);
             var calendar = await GetCalendarDataStorageAsync(dbc, term1);
 
-            List<Enrolment> enrollments = await dbc.Enrolment
+            List<Enrolment> enrollments = await dbc.Enrolment.IgnoreQueryFilters()
                                     .Include(x => x.Course).ThenInclude(x => x.Classes)
                                     .Include(x => x.Term)
                                     .Include(x => x.Person)
@@ -294,11 +296,12 @@ namespace U3A.BusinessRules
                 }
                 if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                 {
-                    enrolmentsToProcess = await dbc.Enrolment
+                    enrolmentsToProcess = await dbc.Enrolment.IgnoreQueryFilters()
                                                 .Include(x => x.Course)
                                                 .Include(x => x.Term)
                                                 .Include(x => x.Person)
-                                                .Where(x => (x.TermID == SelectedTerm.ID || isFutureCourse ||
+                                                .Where(x =>  !x.IsDeleted && !x.Person.IsDeleted &&
+                                                             (x.TermID == SelectedTerm.ID || isFutureCourse ||
                                                              (x.Course.AllowMultiCampsuFrom != null &&
                                                              x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
                                                                 && x.CourseID == course.ID
@@ -323,11 +326,12 @@ namespace U3A.BusinessRules
                 {
                     foreach (var courseClass in course.Classes)
                     {
-                        enrolmentsToProcess = await dbc.Enrolment
+                        enrolmentsToProcess = await dbc.Enrolment.IgnoreQueryFilters()
                                                     .Include(x => x.Course)
                                                     .Include(x => x.Term)
                                                     .Include(x => x.Person)
-                                                    .Where(x => (x.TermID == SelectedTerm.ID || isFutureCourse)
+                                                    .Where(x => !x.IsDeleted && x.Person.IsDeleted &&
+                                                                    (x.TermID == SelectedTerm.ID || isFutureCourse)
                                                                     && x.ClassID == courseClass.ID
                                                                     && x.Person.DateCeased == null
                                                                     && !CourseLeaders.Contains(x.Person))
