@@ -136,17 +136,15 @@ else
                             else
                             {
                                 <DxFormLayout CssClass="mx-auto list-detail">
-                                    <DxFormLayoutGroup Context="thatContext" HeaderCssClass="h5">
+                                    <DxFormLayoutGroup Context="titleContext">
                                         <CaptionTemplate>
-                                            <div class="mx-1 d-flex w-100 my-auto">
-                                                <div class="flex-gro-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
+                                                <div class="dxbl-group-header flex-grow-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
                                                     @if (c.Course.IsFeaturedCourse)
                                                     {
                                                         <div class="badge bg-primary me-1">Featured</div>
                                                     }
                                                     @(HighlightSearchText(ClassTitle(c)))
                                                 </div>
-                                            </div>
                                         </CaptionTemplate>
                                         <Items>
                                             <div class="mt-2 d-flex justify-content-center w-100">
@@ -180,31 +178,31 @@ else
                                                 }
                                             </div>
 
-                                            <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
+                                            <div class="description-style" hidden="@isListboxShowingSummary">
                                                 @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                             </div>
 
                                             @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
                                             {
-                                                <div class="col-small ps-1"><strong>Offered</strong></div>
+                                                <div class="col-small"><strong>Offered</strong></div>
                                                 <div class="col-large">@c.OfferedSummary</div>
-                                                <div class="col-small ps-1"><strong>Type</strong></div>
+                                                <div class="col-small"><strong>Type</strong></div>
                                                 <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
-                                                <div class="col-small ps-1"><strong>Class</strong></div>
+                                                <div class="col-small"><strong>Class</strong></div>
                                                 <div class="col-large">@(GetClassDetails(c))</div>
                                                 @if (c.Course.ClassSummaries.Count <= 1)
                                                 {
-                                                    <div class="col-small ps-1"><strong>Venue</strong></div>
+                                                    <div class="col-small"><strong>Venue</strong></div>
                                                     <div class="col-large">@HighlightSearchText(c.Venue?.Name)</div>
                                                     <div class="offset-small col-large">@c.Venue?.Address</div>
                                                 }
-                                                <div class="col-small px-1"><strong>Leader</strong></div>
+                                                <div class="col-small"><strong>Leader</strong></div>
                                                 <div class="col-large">@HighlightSearchText(c.PrimaryLeader)</div>
 
                                                 @if (c.CourseContacts.Count > 0)
                                                 {
                                                     var contact = c.SelectedCourseContact;
-                                                    <div class="col-small px-1"><strong>Contact</strong></div>
+                                                    <div class="col-small"><strong>Contact</strong></div>
                                                     var p = contact.Person;
                                                     <div class="col-large">
                                                         @($"({contact.ContactType}) {HighlightSearchText(p.FullNameWithPostNominals)}")
@@ -401,12 +399,23 @@ else
         margin: auto;
     }
 
+    .description-style {
+        margin: 1rem;
+        padding: 0.25rem;
+        width: 100%;
+        border: 1px solid;
+        border-color: gainsboro;
+        border-radius: 0.25rem;
+        box-shadow: 3px 3px whitesmoke;
+    }
+
     .col-small {
         -webkit-box-flex: 0;
         -webkit-flex: 0 0 auto;
         -ms-flex: 0 0 auto;
         flex: 0 0 auto;
         width: 22%;
+        padding-left: 1rem;
     }
 
     .col-large {

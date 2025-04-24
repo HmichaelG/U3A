@@ -77,16 +77,14 @@ else
                             var c = (Class)context.DataItem;
 
                             <DxFormLayout CssClass="mx-auto list-detail">
-                                <DxFormLayoutGroup Context="thatContext" HeaderCssClass="">
+                                <DxFormLayoutGroup Context="titleContext" HeaderCssClass="">
                                     <CaptionTemplate>
-                                        <div class="mx-md-1 d-flex w-100">
-                                            <div class="flex-grow-1">
-                                                @if (c.Course.IsFeaturedCourse)
-                                                {
-                                                    <div class="badge bg-primary me-1">Featured</div>
-                                                }
-                                                @(HighlightSearchText(ClassTitle(c)))
-                                            </div>
+                                        <div class="flex-grow-1 selected-box)">
+                                            @if (c.Course.IsFeaturedCourse)
+                                            {
+                                                <div class="badge bg-primary me-1">Featured</div>
+                                            }
+                                            @(HighlightSearchText(ClassTitle(c)))
                                         </div>
                                     </CaptionTemplate>
                                     <Items>
@@ -107,21 +105,21 @@ else
                                             }
                                         </div>
 
-                                        <div class="py-1 px-1 col-12" hidden="@isListboxShowingSummary">
+                                        <div class="description-style" hidden="@isListboxShowingSummary">
                                             @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                         </div>
 
                                         @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
                                         {
-                                            <div class="col-small ps-1"><strong>Offered</strong></div>
+                                            <div class="col-small"><strong>Offered</strong></div>
                                             <div class="col-large">@c.OfferedSummary</div>
-                                            <div class="col-small ps-1"><strong>Type</strong></div>
+                                            <div class="col-small"><strong>Type</strong></div>
                                             <div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
-                                            <div class="col-small ps-1"><strong>Class</strong></div>
+                                            <div class="col-small"><strong>Class</strong></div>
                                             <div class="col-large">@(GetClassDetails(c))</div>
                                             @if (c.Course.ClassSummaries.Count <= 1)
                                             {
-                                                <div class="col-small ps-1"><strong>Venue</strong></div>
+                                                <div class="col-small"><strong>Venue</strong></div>
                                                 <div class="col-large">@HighlightSearchText(c!.Venue!.Name)</div>
                                                 <div class="offset-small col-large">@c.Venue?.Address</div>
                                             }
@@ -214,12 +212,24 @@ else
         margin: auto;
     }
 
+    .description-style {
+        margin: 1rem;
+        padding: 0.25rem;
+        width: 100%;
+        border: 1px solid;
+        border-color: gainsboro;
+        border-radius: 0.25rem;
+        box-shadow: 3px 3px whitesmoke;
+    }
+
     .col-small {
         -webkit-box-flex: 0;
         -webkit-flex: 0 0 auto;
         -ms-flex: 0 0 auto;
         flex: 0 0 auto;
         width: 22%;
+        padding-left: 1rem;
+        color: var(--bs-primary);
     }
 
     .col-large {
