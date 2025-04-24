@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Serilog;
 using U3A.Database;
 
 namespace U3A.Extensions.HostBuilder;
@@ -18,11 +20,7 @@ public static class DatabaseContextServiceExtension
         }, ServiceLifetime.Scoped);
 
         // U3ADbContextFactory
-
-        builder.Services.AddDbContextFactory<U3ADbContext>(options =>
-        {
-            options.UseSqlServer();
-        }, ServiceLifetime.Scoped);
+        builder.Services.AddDbContextFactory<U3ADbContext>(options => { },ServiceLifetime.Scoped);
 
         // Enrich with Aspire extensions
         builder.EnrichSqlServerDbContext<U3ADbContext>();
