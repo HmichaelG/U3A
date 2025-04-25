@@ -8,6 +8,7 @@ using U3A.Components.Account;
 using U3A.Extensions.HostBuilder;
 using U3A.Model;
 using U3A.Services;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 

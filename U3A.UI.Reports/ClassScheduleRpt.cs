@@ -170,19 +170,6 @@ namespace U3A.UI.Reports
             xrVenueRow.Visible = (c.Course.ClassSummaries.Count <= 1) ? true : false;
         }
 
-        private void xrRichText1_BeforePrint(object sender, CancelEventArgs e)
-        {
-            Class c = (Class)GetCurrentRow();
-            if (c == null) { return; }
-            using (RichEditDocumentServer docServer = new RichEditDocumentServer())
-            {
-                docServer.RtfText = xrRichText1.Rtf;
-                docServer.Document.DefaultCharacterProperties.FontName = "Times New Roman";
-                docServer.Document.DefaultCharacterProperties.FontSize = (float?)10;
-                xrRichText1.Rtf = docServer.RtfText;
-            }
-        }
-
         private void xrClosedReason_BeforePrint(object sender, CancelEventArgs e)
         {
             Class c = (Class)GetCurrentRow();

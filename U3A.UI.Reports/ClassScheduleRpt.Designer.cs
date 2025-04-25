@@ -508,7 +508,7 @@
             this.xrRichText1.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.xrRichText1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Html", "[Course].[DisplayDescription]")});
-            this.xrRichText1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 6F);
+            this.xrRichText1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8F);
             this.xrRichText1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrRichText1.Name = "xrRichText1";
             this.xrRichText1.Padding = new DevExpress.XtraPrinting.PaddingInfo(8, 8, 8, 8, 100F);
@@ -517,7 +517,6 @@
             this.xrRichText1.StylePriority.UseBorders = false;
             this.xrRichText1.StylePriority.UseFont = false;
             this.xrRichText1.StylePriority.UsePadding = false;
-            this.xrRichText1.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrRichText1_BeforePrint);
             // 
             // xrTableCell2
             // 

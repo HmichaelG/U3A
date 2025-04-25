@@ -353,8 +353,8 @@
             this.xrRichText1.SerializableRtfString = resources.GetString("xrRichText1.SerializableRtfString");
             this.xrRichText1.SizeF = new System.Drawing.SizeF(540.6538F, 37.50003F);
             this.xrRichText1.StylePriority.UseFont = false;
+            this.xrRichText1.StylePriority.UseForeColor = false;
             this.xrRichText1.StylePriority.UsePadding = false;
-            this.xrRichText1.BeforePrint += new DevExpress.XtraReports.UI.BeforePrintEventHandler(this.xrRichText1_BeforePrint);
             // 
             // xrTableRow4
             // 

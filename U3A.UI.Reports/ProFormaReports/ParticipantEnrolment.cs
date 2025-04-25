@@ -22,16 +22,7 @@ namespace U3A.UI.Reports
 
         private void xrRichText1_BeforePrint(object sender, CancelEventArgs e)
         {
-            var o = GetCurrentRow();
-            if (o == null) { return; }
 
-            using (RichEditDocumentServer docServer = new RichEditDocumentServer())
-            {
-                docServer.RtfText = xrRichText1.Rtf;
-                docServer.Document.DefaultCharacterProperties.FontName = "Times New Roman";
-                docServer.Document.DefaultCharacterProperties.FontSize = (float?)10;
-                xrRichText1.Rtf = docServer.RtfText;
-            }
         }
     }
 }

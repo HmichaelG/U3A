@@ -1,3 +1,4 @@
+using DevExpress.Drawing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -8,6 +9,12 @@ using U3A.Model;
 
 
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
+DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.Model.Class).Assembly);
+DevExpress.Drawing.Settings.DrawingEngine = DrawingEngine.Skia;
+foreach (var file in Directory.GetFiles(@"fonts"))
+{
+    DXFontRepository.Instance.AddFont(file);
+}
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
