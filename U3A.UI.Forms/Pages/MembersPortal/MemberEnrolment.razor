@@ -43,7 +43,7 @@ else
     <MessageBox @ref="messageBox" />
     <div class=@((IsPreview)
      ? "col-10 mx-auto"
-     : "col col-12 col-md-10 col-lg-7 mx-auto")>
+     : "container mx-1 col col-12 col-md-10 col-lg-7 mx-auto")>
         <div class="h6 pt-2 col-12" align="center">
             @term?.TermSummary
         </div>
@@ -53,7 +53,7 @@ else
                 @(enrolmentLockoutText)
             </p>
         }
-        <div class="list-detail mx-auto" hidden=@(isListboxShowingSummary || IsReadOnly)>
+        <div class="mx-auto" hidden=@(isListboxShowingSummary || IsReadOnly)>
             <div class="d-flex">
                 <DxTextBox @ref=@filterTextBox
                            CssClass="filter-text-box me-2 flex-grow-1"
@@ -70,7 +70,7 @@ else
                             TextFieldName="@nameof(ReportStyleWrapper.ListText)"
                             ValueFieldName="@nameof(ReportStyleWrapper.Type)" />
             </div>
-            <DxTabs @ref="dxTabs" TabClick="@OnTabClick" CssClass="">
+            <DxTabs @ref="dxTabs" TabClick="@OnTabClick">
                 <DxTabPage Text="All" />
                 <DxTabPage Text="Mon" />
                 <DxTabPage Text="Tue" />
@@ -90,7 +90,7 @@ else
                 PagerVisible=false
                 CssClass="mt-1 listbox-scroll">
             <Columns>
-                <DxGridDataColumn Width="100%">
+                <DxGridDataColumn>
                     <HeaderCaptionTemplate>
                         <div class="d-flex my-auto">
                             @if (IsEnrolmentRequestView)
@@ -135,18 +135,16 @@ else
                             }
                             else
                             {
-                                <DxFormLayout CssClass="mx-auto list-detail">
-                                    <DxFormLayoutGroup Context="titleContext">
-                                        <CaptionTemplate>
-                                                <div class="dxbl-group-header flex-grow-1 selected-box @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
-                                                    @if (c.Course.IsFeaturedCourse)
-                                                    {
-                                                        <div class="badge bg-primary me-1">Featured</div>
-                                                    }
-                                                    @(HighlightSearchText(ClassTitle(c)))
-                                                </div>
-                                        </CaptionTemplate>
+                                <DxFormLayout>
+                                    <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
                                         <Items>
+                                            <div class="flex-grow-1 title-style @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
+                                                @if (c.Course.IsFeaturedCourse)
+                                                {
+                                                    <div class="badge bg-primary me-1">Featured</div>
+                                                }
+                                                @(HighlightSearchText(ClassTitle(c)))
+                                            </div>
                                             <div class="mt-2 d-flex justify-content-center w-100">
                                                 @if (IsReadOnly)
                                                 {
@@ -374,13 +372,6 @@ else
         padding-left: 30px;
     }
 
-    .selected-box {
-        width: 100%;
-        position: relative;
-        border: 1px solid transparent;
-        border-radius: 0.25rem;
-    }
-
     .weblink-button {
         width: 80%;
         margin: auto
@@ -394,19 +385,24 @@ else
         height: calc(100dvh - @listHeight );
     }
 
-    .list-detail {
-        width: 98%;
-        margin: auto;
+    .title-style {
+        margin: 0.25rem;
+        padding: 0.5rem;
+        background-color: #F2F2F2;
+        position: relative;
+        line-height: 1.5rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
     }
 
     .description-style {
+        width: 100%;
         margin: 1rem;
         padding: 0.25rem;
-        width: 100%;
         border: 1px solid;
         border-color: gainsboro;
         border-radius: 0.25rem;
-        box-shadow: 3px 3px whitesmoke;
+        background-color: rgb(245,245,245, 0.3);
     }
 
     .col-small {
@@ -415,7 +411,7 @@ else
         -ms-flex: 0 0 auto;
         flex: 0 0 auto;
         width: 22%;
-        padding-left: 1rem;
+        padding-left: 1.5rem;
     }
 
     .col-large {
@@ -433,12 +429,10 @@ else
     .watermark {
         width: 100%;
         text-align: center;
-        font-size: 2rem;
-        font-weight: 500;
+        font-size: 1.5rem;
+        font-weight: 700;
         opacity: 0.4;
         color: magenta;
-        position: absolute;
-        bottom: 10%;
     }
 </style>
 @code {
@@ -1167,12 +1161,13 @@ else
         {
             var reason = "Full";
             var extendedReason = "Full";
-            if (!selectedClass.Course.AllowAutoEnrol) 
+            if (!selectedClass.Course.AllowAutoEnrol)
             {
                 reason = "Closed";
                 extendedReason = (selectedClass.Course.AutoEnrolDisabledReason == null)
                                     ? "Closed.<br/>A closed class is one in which new enrolments are currently suspended"
-                                    : $"Closed because...</br><b>{selectedClass.Course.AutoEnrolDisabledReason}</b>";}
+                                    : $"Closed because...</br><b>{selectedClass.Course.AutoEnrolDisabledReason}</b>";
+            }
             result = $@"<div class='alert alert-danger text-dark text-center'><h5>Class is {reason}</h5>
                         You have requested enrolment in a class that is {extendedReason}.<br/>
                         Your request will be <strong>Waitlisted</strong> meaning you will

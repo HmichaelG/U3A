@@ -58,7 +58,7 @@ else
                 PagerVisible=false
                 CssClass="mt-1 listbox-scroll">
             <Columns>
-                <DxGridDataColumn Width="100%">
+                <DxGridDataColumn>
                     <HeaderCaptionTemplate>
                         <DxTabs @ref="dxTabs"
                                 TabClick="@OnTabClick"
@@ -76,24 +76,24 @@ else
                         @{
                             var c = (Class)context.DataItem;
 
-                            <DxFormLayout CssClass="mx-auto list-detail">
-                                <DxFormLayoutGroup Context="titleContext" HeaderCssClass="">
-                                    <CaptionTemplate>
-                                        <div class="flex-grow-1 selected-box)">
+                            <DxFormLayout>
+                                <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
+                                    <Items>
+                                        <div class="flex-grow-1 selected-box">
                                             @if (c.Course.IsFeaturedCourse)
                                             {
                                                 <div class="badge bg-primary me-1">Featured</div>
                                             }
                                             @(HighlightSearchText(ClassTitle(c)))
                                         </div>
-                                    </CaptionTemplate>
-                                    <Items>
+
                                         @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                         {
                                             <div class="row px-2 px-md-3 col-12">
                                                 <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
                                             </div>
                                         }
+
                                         <div class="w-100 text-center">
                                             @if (c.Course.CourseFeePerYear != 0)
                                             {
@@ -136,6 +136,7 @@ else
                                             <div class="col-3 px-1 text-center">@c.TotalActiveStudents</div>
                                             <div class="col-3 px-1 text-center">@c.TotalWaitlistedStudents</div>
                                         </div>
+                                        
                                         @{
                                             string? message = null;
                                             if (c.TermNumber != term!.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
@@ -150,6 +151,7 @@ else
                                                 </div>
                                             }
                                         }
+
                                     </Items>
                                 </DxFormLayoutGroup>
                             </DxFormLayout>
@@ -187,13 +189,6 @@ else
         padding-left: 30px;
     }
 
-    .selected-box {
-        width: 100%;
-        position: relative;
-        border: 1px solid transparent;
-        border-radius: 0.25rem;
-    }
-
     .weblink-button {
         width: 80%;
         margin: auto
@@ -207,19 +202,24 @@ else
         height: calc(100dvh - 10rem );
     }
 
-    .list-detail {
-        width: 98%;
-        margin: auto;
+    .selected-box {
+        margin: 0.25rem;
+        padding: 0.5rem;
+        background-color: #F2F2F2;
+        position: relative;
+        line-height: 1.5rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
     }
 
     .description-style {
+        width: 100%;
         margin: 1rem;
         padding: 0.25rem;
-        width: 100%;
         border: 1px solid;
         border-color: gainsboro;
         border-radius: 0.25rem;
-        box-shadow: 3px 3px whitesmoke;
+        background-color: rgb(245,245,245, 0.3);
     }
 
     .col-small {
@@ -247,12 +247,10 @@ else
     .watermark {
         width: 100%;
         text-align: center;
-        font-size: 2rem;
-        font-weight: 500;
+        font-size: 1.5rem;
+        font-weight: 700;
         opacity: 0.4;
         color: magenta;
-        position: absolute;
-        bottom: 10%;
     }
 </style>
 @code {
