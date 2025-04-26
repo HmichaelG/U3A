@@ -138,12 +138,14 @@ else
                                 <DxFormLayout>
                                     <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
                                         <Items>
-                                            <div class="flex-grow-1 title-style @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
+                                            <div class="title-style @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
+                                                <div class="d-flex">
                                                 @if (c.Course.IsFeaturedCourse)
                                                 {
-                                                    <div class="badge bg-primary me-1">Featured</div>
+                                                    <div class="me-2 flex-grow-0 badge bg-primary">Featured</div>
                                                 }
-                                                @(HighlightSearchText(ClassTitle(c)))
+                                                <div classe="flex-grow-1">@(HighlightSearchText(ClassTitle(c)))</div>
+                                                </div>
                                             </div>
                                             <div class="mt-2 d-flex justify-content-center w-100">
                                                 @if (IsReadOnly)
@@ -176,7 +178,7 @@ else
                                                 }
                                             </div>
 
-                                            <div class="description-style" hidden="@isListboxShowingSummary">
+                                            <div class="description-style border border-light-subtle" hidden="@isListboxShowingSummary">
                                                 @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                             </div>
 
@@ -386,23 +388,17 @@ else
     }
 
     .title-style {
-        margin: 0.25rem;
-        padding: 0.5rem;
-        background-color: #F2F2F2;
-        position: relative;
-        line-height: 1.5rem;
-        border: 1px solid transparent;
-        border-radius: 0.25rem;
+        width: 100%;
+        padding: 1rem;
+        font-weight: 700;
+        line-height: 1.2;
     }
 
     .description-style {
         width: 100%;
         margin: 1rem;
         padding: 0.25rem;
-        border: 1px solid;
-        border-color: gainsboro;
         border-radius: 0.25rem;
-        background-color: rgb(245,245,245, 0.3);
     }
 
     .col-small {

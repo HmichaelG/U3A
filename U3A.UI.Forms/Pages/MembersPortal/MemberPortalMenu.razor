@@ -45,7 +45,7 @@ else
                                                 IsEnrolmentNotice=true
                                                 OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                         </div>
-                        @if (loginState != null && !loginState.IsAdminOnBehalfOfMember)
+@*                         @if (loginState != null && !loginState.IsAdminOnBehalfOfMember)
                         {
                             <CollapsableContent DismissKey="{E76BA7CB-4922-441F-A4E6-A51FDEA0A710}"
                                                 AlertText=@(@"<h5 class=""text-info mb-3"">What's New</h5>
@@ -55,7 +55,7 @@ else
                                     to request enrolment or withdraw from a class.</p>")
                                                 OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
                         }
-                        <DxButton Text="Request course enrolments" Context="ThisContext"
+ *@                        <DxButton Text="Request course enrolments" Context="ThisContext"
                                   IconCssClass="menu-icon bi bi-mortarboard me-3"
                                   CssClass="col-12 mt-1"
                                   Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoRequestMemberEnrolment))"

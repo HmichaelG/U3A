@@ -79,12 +79,14 @@ else
                             <DxFormLayout>
                                 <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
                                     <Items>
-                                        <div class="flex-grow-1 selected-box">
-                                            @if (c.Course.IsFeaturedCourse)
-                                            {
-                                                <div class="badge bg-primary me-1">Featured</div>
-                                            }
-                                            @(HighlightSearchText(ClassTitle(c)))
+                                        <div class="title-style bg-body-tertiary">
+                                            <div class="d-flex">
+                                                @if (c.Course.IsFeaturedCourse)
+                                                {
+                                                    <div class="me-2 flex-grow-0 badge bg-primary">Featured</div>
+                                                }
+                                                <div classe="flex-grow-1">@(HighlightSearchText(ClassTitle(c)))</div>
+                                            </div>
                                         </div>
 
                                         @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
@@ -105,7 +107,7 @@ else
                                             }
                                         </div>
 
-                                        <div class="description-style" hidden="@isListboxShowingSummary">
+                                        <div class="description-style border border-light-subtle" hidden="@isListboxShowingSummary">
                                             @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                         </div>
 
@@ -202,24 +204,18 @@ else
         height: calc(100dvh - 10rem );
     }
 
-    .selected-box {
-        margin: 0.25rem;
-        padding: 0.5rem;
-        background-color: #F2F2F2;
-        position: relative;
-        line-height: 1.5rem;
-        border: 1px solid transparent;
-        border-radius: 0.25rem;
+    .title-style {
+        width: 100%;
+        padding: 1rem;
+        font-weight: 700;
+        line-height: 1.2;
     }
 
     .description-style {
         width: 100%;
         margin: 1rem;
         padding: 0.25rem;
-        border: 1px solid;
-        border-color: gainsboro;
         border-radius: 0.25rem;
-        background-color: rgb(245,245,245, 0.3);
     }
 
     .col-small {
