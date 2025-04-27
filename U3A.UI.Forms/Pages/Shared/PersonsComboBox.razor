@@ -1,13 +1,13 @@
 ﻿@if (People is not null)
 {
     <DxComboBox Data="@People" Enabled="@Enabled"
-                SearchMode="ListSearchMode.AutoSearch"
-                ListRenderMode="ListRenderMode.Virtual"
-                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                TextFieldName="@((ShowPersonSummary)
+    SearchMode="ListSearchMode.AutoSearch"
+    ListRenderMode="ListRenderMode.Virtual"
+    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+    TextFieldName="@((ShowPersonSummary)
                                 ? nameof(Person.PersonSummary)
                                 : nameof(Person.FullName))"
-                @bind-Value="@SelectedPerson">
+    @bind-Value="@SelectedPerson" @bind-Value:after="@OnSelectedPersonChanged">
         <Columns>
             <DxListEditorColumn FieldName="@nameof(Person.FirstName)" Caption="First Name" Width="10rem" />
             <DxListEditorColumn FieldName="@nameof(Person.LastName)" Caption="Last Name" Width="10rem" />
@@ -21,18 +21,7 @@
 @code {
     Person _person;
     [Parameter, EditorRequired]
-    public Person SelectedPerson
-    {
-        get => _person;
-        set
-        {
-            if (_person == value) { return; }
-            _person = value;
-            SelectedPersonChanged.InvokeAsync(value);
-        }
-    }
-
-
+    public Person SelectedPerson { get; set; }
     [Parameter, EditorRequired]
     public IEnumerable<Person> People { get; set; }
     [Parameter]
@@ -41,5 +30,11 @@
     public EventCallback<Person> SelectedPersonChanged { get; set; }
     [Parameter]
     public bool ShowPersonSummary { get; set; }
+
+    async Task OnSelectedPersonChanged()
+    {
+        await SelectedPersonChanged.InvokeAsync(SelectedPerson);
+        StateHasChanged();
+    }
 
 }

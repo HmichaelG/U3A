@@ -25,7 +25,6 @@
                       RenderStyleMode="ButtonRenderStyleMode.Contained">
             </DxButton>
             <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-danger" hidden="@(!isConfirmationRequired)"
-                        SizeMode="SizeMode.Small"
                         CheckedChanged="@(async (bool value) => await ConfirmationChanged(value))"
                         Alignment="CheckBoxContentAlignment.Right"
                         LabelPosition="LabelPosition.Left">

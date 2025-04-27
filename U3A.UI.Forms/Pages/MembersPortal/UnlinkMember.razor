@@ -6,8 +6,8 @@
 
 <MessageBox @ref="@messageBox" />
 
-<DxFormLayout>
-    <DxFormLayoutGroup Caption="Select person to unlink">
+<DxFormLayout CssClass="w-100 mx-4 my-2">
+    <DxFormLayoutGroup Caption="Select person to unlink" ColSpanMd="12">
         <DxListBox Data="loginState.LinkedPeopleNotLoggedIn" CssClass="mb-2"
                    ShowCheckboxes="true"
                    SelectionMode="ListBoxSelectionMode.Single"

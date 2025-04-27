@@ -112,7 +112,7 @@ namespace U3A.BusinessRules
                         Name = c.Class.Course.Name,
                         StartTime = ((c.Label == 9)
                                     ? "Cancelled"
-                                    : c.Class.StartTime.ToString("hh:mmtt"))
+                                    : c.Class.StartTime.ToString("hh:mm tt"))
                     });
                 }
             }

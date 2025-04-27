@@ -16,7 +16,6 @@
                     <div class="w-100 pt-1 d-flex justify-content-center">
                         <DxCalendar @bind-SelectedDate=@selectedDate CssClass="@CalendarCssClass"
                                     @bind-SelectedDate:after=OnDateChanged
-                                    SizeMode="SizeMode.Small"
                                     ShowClearButton=false
                                     VisibleDate="@today"
                                     MinDate="@today">
@@ -35,7 +34,6 @@
                             AllowGroup=false
                             AllowSort=false
                             PagerVisible=false
-                            SizeMode="SizeMode.Small"
                             CssClass="mt-1 box-style">
                         <Columns>
                             <DxGridDataColumn Width="100%"

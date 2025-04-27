@@ -22,7 +22,7 @@ else
 {
     <Progress @ref=@progress />
     <MessageBox @ref=@messageBox />
-    <div class="col col-12 col-md-10 col-lg-6 mt-2 mx-auto">
+    <div class="col col-12 col-md-10 col-lg-6 mt-2 px-2 mx-auto">
         <div class="text-center alert alert-success text-dark w-100">
             <div class="w-100 pb-2">@welcomeText</div>
             <DxButton Text="Today's Schedule" Click="@SetupClassesToday"
@@ -255,20 +255,17 @@ else
     </div>
     <style>
 
-        table {
+        .schedule-table {
             table-layout: fixed;
-        }
-
-        .table {
             padding-bottom: 0;
             margin-bottom: 0;
         }
 
-        tr {
-            line-height: 0.33rem;
-            min-height: 0.33rem;
-            height: 0.33rem;
-        }
+            .schedule-table > tr {
+                line-height: 0.33rem;
+                min-height: 0.33rem;
+                height: 0.33rem;
+            }
 
     </style>
 }
@@ -392,7 +389,7 @@ else
             if (classesToday?.Count > 0)
             {
                 var txt = new System.Text.StringBuilder();
-                txt.AppendLine("<table class='table'>");
+                txt.AppendLine("<table class='schedule-table'>");
                 txt.AppendLine("<thead><tr><td colspan='5' class='h6'>Today's Schedule</td></tr></thead>");
                 txt.AppendLine("<tbody>");
                 foreach (var item in classesToday)

@@ -38,11 +38,11 @@ else
 
                 case PortalMenuSelection.ShowMenu:
                     <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
-                                      CurrentTerm="term" ShowEnrolmentSubMneu=false />
+                    CurrentTerm="term" ShowEnrolmentSubMneu=false />
                     break;
                 case PortalMenuSelection.DoShowEnrolmentSubmenu:
                     <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
-                                      CurrentTerm="term" ShowEnrolmentSubMneu=true />
+                    CurrentTerm="term" ShowEnrolmentSubMneu=true />
                     break;
                 case PortalMenuSelection.DoMemberMaintenance:
                     <MemberDetails IsNewLinkedMember=false OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
@@ -74,13 +74,13 @@ else
 
                 case PortalMenuSelection.DoRequestMemberEnrolment:
                     <MemberEnrolment IsEnrolmentRequestView=true
-                                     QRClassID=QRClassID
-                                     OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    QRClassID=QRClassID
+                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoWithdrawMemberEnrolment:
                     <MemberEnrolment IsEnrolmentWithdrawalView=true
-                                     OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoViewMemberEnrolment:
@@ -89,25 +89,25 @@ else
 
                 case PortalMenuSelection.DoShowLeaderMenu:
                     <LeaderMenu IsAdminPortal="@IsAdminMemberPortal"
-                                OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoWhatsOn:
                     <CourseSchedule IsPortal=true
-                                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.PrintMemberBadge:
                     <div class="row w-100">
                         <PdfViewer Report="@(GetMemberBadgeReport())"
-                                   DisplayHeightOffset="10"
-                                   OnCloseButtonClick="@(() => menuSelection = PortalMenuSelection.ShowMenu)" />
+                        DisplayHeightOffset="10"
+                        OnCloseButtonClick="@(() => menuSelection = PortalMenuSelection.ShowMenu)" />
                         <DxButton Text="Return to menu"
-                                  IconCssClass="bi-door-closed menu-icon me-3 h2"
-                                  CssClass="mx-auto col-6 mt-4"
-                                  Click="@OnReportComplete"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                        IconCssClass="bi-door-closed menu-icon me-3 h2"
+                        CssClass="mx-auto col-6 mt-4"
+                        Click="@OnReportComplete"
+                        RenderStyle="ButtonRenderStyle.Primary"
+                        RenderStyleMode="ButtonRenderStyleMode.Outline">
                         </DxButton>
                     </div>
                     menuSelection = PortalMenuSelection.ShowMenu;
@@ -121,7 +121,7 @@ else
 }
 <style>
     .report-viewer {
-        height: calc(100dvh - 12rem);
+    height: calc(100dvh - 12rem);
     }
 </style>
 

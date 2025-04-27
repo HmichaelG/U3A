@@ -24,16 +24,14 @@ else
 
         <MessageBox @ref="@messageBox" />
 
-            <DxToolbar CssClass="border-bottom">
+        <div class="container">
+            <DxToolbar>
                 <Items>
-                    <DxToolbarItem Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
-                                   CssClass="me-1 mb-1"
+                    <DxToolbarItem BeginGroup="true" Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
                                    Text="Process Member" IconCssClass="bi bi-person" />
-                    <DxToolbarItem Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
-                                   CssClass="me-1 mb-1"
+                    <DxToolbarItem BeginGroup="true" Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
                                    Text="What's On Today" IconCssClass="bi bi-clock" />
-                    <DxToolbarItem CssClass="me-1 mb-1"
-                                   Text="Attendance" IconCssClass="bi bi-person-check">
+                    <DxToolbarItem BeginGroup=true Text="Attendance" IconCssClass="bi bi-person-check">
                         <Items>
                             <DxToolbarItem Click="@(() => buttonClick = buttonClicks.RecordAttendance)"
                                            RenderStyle="ButtonRenderStyle.Secondary"
@@ -49,178 +47,175 @@ else
                                            Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
                         </Items>
                     </DxToolbarItem>
-                    <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
-                                   CssClass="me-1 mb-1"
+                    <DxToolbarItem BeginGroup="true" Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
                                    Text="Leader Report" IconCssClass="bi bi-printer" />
-                    <DxToolbarItem Click="@(() => isDrawerOpen = !isDrawerOpen)"
-                                   CssClass="mb-1"
+                    <DxToolbarItem BeginGroup="true" Click="OnRefresh"
+                                   Text="Refresh" IconCssClass="bi bi-arrow-clockwise"
+                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                   Tooltip="Click to refresh lookup data"
+                                   Alignment="ToolbarItemAlignment.Right" />
+                    <DxToolbarItem BeginGroup="true" Click="@(() => isDrawerOpen = !isDrawerOpen)"
                                    Text="Calendar" IconCssClass="bi bi-calendar"
                                    Alignment="ToolbarItemAlignment.Right" />
                 </Items>
             </DxToolbar>
-        
-        <DxDrawer @bind-IsOpen="@isDrawerOpen"
-                  CssClass="drawer-style"
-                  Mode="DrawerMode.Shrink"
-                  Position="DrawerPosition.Right"
-                  PanelWidth="20rem">
-            <TargetContent>
-                <DxLoadingPanel @bind-Visible="isProcessing"
-                                IsContentBlocked="true"
-                                ApplyBackgroundShading="true"
-                                IndicatorAreaVisible="false"
-                                Text="Processing Eway receipts...">
-                    @switch (buttonClick)
-                    {
-                        case buttonClicks.ProcessOnBehalfOf:
-                            <DxFormLayout CssClass="my-2">
-                                <div hidden="@(isSelected)" class="col col-12 @((isDrawerOpen) ? "" : "col-lg-6 mx-auto")">
-                                    <div class="h3 text-center">Member Portal (Administration)</div>
-                                    <div class="h6 text-center">This procedure is intended for administration to process enrolments and/or membership fees on behalf of members.</div>
-                                    <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
-                                                       ColSpanMd="12" Context="groupContext">
-                                        <Items>
-                                            <div class="input-group">
-                                                <DxFormLayoutItem Caption="Process on behalf of" CssClass="flex-grow-1">
-                                                    <PersonsComboBox People="@people" SelectedPerson="@selectedPerson"
-                                                                     SelectedPersonChanged="(Person newValue) => OnSelectedPersonChanged(newValue)" />
-                                                </DxFormLayoutItem>
-                                                <div class="flex-grow-0 mt-2 me-2">
-                                                    <DxButton Text="Refresh" Click="OnRefresh" IconCssClass="bi bi-arrow-clockwise" Tooltip="Click to refresh lookup data" />
-                                                </div>
-                                            </div>
-                                        </Items>
-                                    </DxFormLayoutGroup>
-                                </div>
-                                @if (isSelected)
-                                {
-                                    <div class="w-100">
-                                        <MemberPortal IsAdminMemberPortal="true"
-                                                      OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
+
+            <DxDrawer @bind-IsOpen="@isDrawerOpen"
+                      CssClass="drawer-style mt-1 border-top"
+                      Mode="DrawerMode.Shrink"
+                      Position="DrawerPosition.Right"
+                      PanelWidth="20rem">
+                <TargetContent>
+                    <DxLoadingPanel @bind-Visible="isProcessing"
+                                    IsContentBlocked="true"
+                                    ApplyBackgroundShading="true"
+                                    IndicatorAreaVisible="false"
+                                    Text="Processing Eway receipts...">
+                        @switch (buttonClick)
+                        {
+                            case buttonClicks.ProcessOnBehalfOf:
+                                <DxFormLayout CssClass="my-2">
+                                    <div class="mx-auto col col-12 @((isDrawerOpen) ? "col-xl-6" : "col-lg-6")">
+                                        <div class="text-center" hidden="@(isSelected)">
+                                            <div class="h3 text-center">Member Portal (Administration)</div>
+                                            <div class="h6">Process enrolments and/or membership fees on behalf of members.</div>
+                                        </div>
+                                            <DxFormLayoutItem Caption="Process on behalf of" ColSpanMd="12">
+                                                <PersonsComboBox People="@people" SelectedPerson="@selectedPerson"
+                                                                 SelectedPersonChanged="(Person newValue) => OnSelectedPersonChanged(newValue)" />
+                                            </DxFormLayoutItem>
                                     </div>
-                                }
-                                else
-                                {
-                                    <div class="@((isDrawerOpen) ? formWidthCalendarOpen : formWidthCalendarClosed)">
-                                        <DxTabs>
-                                            <DxTabPage Text="Received">
-                                                <FullScreen DisplayOffset="18" HideToggle="true">
-                                                    <ContentTemplate>
-                                                        <DxGrid @ref=@receiptGrid Data="@ReceivedToday" CssClass="m-2"
-                                                                UnboundColumnData="Grid_UnboundColumnData"
-                                                                TextWrapEnabled="false"
-                                                                ShowFilterRow="false"
-                                                                ShowAllRows="true"
-                                                                KeyFieldName="ID">
-                                                            <ToolbarTemplate>
-                                                                <GridToolbar LinkedGrid=@receiptGrid LayoutKey="{F36AB5B1-AC75-4141-8FF9-0CA7E7B17002}">
-                                                                    <CustomButtonContent>
-                                                                        <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
-                                                                            <Template>
-                                                                                <div class="d-flex">
-                                                                                    <div class="flex-grow-0 pt-1 pe-2 text-primary fw-bold">From:</div>
-                                                                                    <DxDateEdit Date=@startDate DateChanged="@((DateTime newValue) => OnStartDateChanged(newValue))" CssClass="flex-grow-1" />
-                                                                                </div>
-                                                                            </Template>
-                                                                        </DxToolbarItem>
-                                                                        <DxToolbarItem Context="a" Alignment="ToolbarItemAlignment.Right">
-                                                                            <Template>
-                                                                                <div class="d-flex">
-                                                                                    <div class="flex-grow-0 pt-1 px-2 text-primary fw-bold">To:</div>
-                                                                                    <DxDateEdit Date=@endDate DateChanged="@((DateTime newValue) => OnEndDateChanged(newValue))" CssClass="flex-grow-1" />
-                                                                                </div>
-                                                                            </Template>
-                                                                        </DxToolbarItem>
-                                                                    </CustomButtonContent>
-                                                                </GridToolbar>
-                                                            </ToolbarTemplate>
-                                                            <Columns>
-                                                                <DxGridDataColumn Width="8rem" Caption="Time"
-                                                                                  FieldName="CreatedTime"
-                                                                                  DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
-                                                                                  UnboundType="GridUnboundColumnType.DateTime" />
-                                                                <DxGridDataColumn Width="10rem" Caption="Name" FieldName="Person.FullName" />
-                                                                <DxGridDataColumn Width="14rem" Caption="Description" FieldName="Description" />
-                                                                <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
-                                                                <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="Person.FinancialToBriefText" DisplayFormat="f0" />
-                                                                <DxGridDataColumn Width="8rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
-                                                            </Columns>
-                                                            <TotalSummary>
-                                                                <DxGridSummaryItem FieldName="Amount"
-                                                                                   SummaryType="GridSummaryItemType.Sum"
-                                                                                   FooterColumnName="Amount"
-                                                                                   ValueDisplayFormat="c2" />
-                                                            </TotalSummary>
-                                                        </DxGrid>
-                                                    </ContentTemplate>
-                                                </FullScreen>
-                                            </DxTabPage>
-                                            <DxTabPage Text="Online Payment Status">
-                                                <div class="m-1">
-                                                <ReviewOnlinePaymentStatus IsEmbedded="true" />
-                                                </div>
-                                            </DxTabPage>
-                                            <DxTabPage Text="Email Status">
-                                                <div class="m-1">
-                                                <div class="bi bi-question-circle-fill text-info"><small>&nbsp;Cash Receipt/Enrolment reports sent within the hour. Leader reports within 48 hours of next class</small></div>
-                                                <QueuedTransactionalEmail IsEmbedded="true" />
-                                                </div>
-                                            </DxTabPage>
-                                            <DxTabPage Text="Add/Edit Member Details">
-                                                <div class="m-1">
-                                                <div class="bi bi-question-circle-fill text-info"><small>&nbsp;Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
-                                                <PersonMnt IsEmbedded="true" GridLayoutKey="{1F6F77E7-6276-48FC-A1D3-E3A8959DA561}" />
-                                                </div>
-                                            </DxTabPage>
-                                            <DxTabPage Text="Review Logins">
-                                                <div class="m-1">
-                                                    <div class="bi bi-question-circle-fill text-info">
-                                                        <small>&nbsp;  <b>Note: </b>Deleting a login will require the member to re-register.
-                                                            Otherwise, it is a safe measure of last resort.
-                                                        </small>
+                                    @if (isSelected)
+                                    {
+                                        <div class="w-100">
+                                            <MemberPortal IsAdminMemberPortal="true"
+                                                          OnReturnToAdminPortal="@(async() => await OnReturnFormPortal())" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="@((isDrawerOpen) ? formWidthCalendarOpen : formWidthCalendarClosed)">
+                                            <DxTabs>
+                                                <DxTabPage Text="Received">
+                                                    <FullScreen DisplayOffset="18" HideToggle="true">
+                                                        <ContentTemplate>
+                                                            <DxGrid @ref=@receiptGrid Data="@ReceivedToday" CssClass="m-2"
+                                                                    UnboundColumnData="Grid_UnboundColumnData"
+                                                                    TextWrapEnabled="false"
+                                                                    ShowFilterRow="false"
+                                                                    ShowAllRows="true"
+                                                                    KeyFieldName="ID">
+                                                                <ToolbarTemplate>
+                                                                    <GridToolbar LinkedGrid=@receiptGrid LayoutKey="{F36AB5B1-AC75-4141-8FF9-0CA7E7B17002}">
+                                                                        <CustomButtonContent>
+                                                                            <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                                                                                <Template>
+                                                                                    <div class="d-flex">
+                                                                                        <div class="flex-grow-0 pt-1 pe-2 text-primary fw-bold">From:</div>
+                                                                                        <DxDateEdit Date=@startDate DateChanged="@((DateTime newValue) => OnStartDateChanged(newValue))" CssClass="flex-grow-1" />
+                                                                                    </div>
+                                                                                </Template>
+                                                                            </DxToolbarItem>
+                                                                            <DxToolbarItem Context="a" Alignment="ToolbarItemAlignment.Right">
+                                                                                <Template>
+                                                                                    <div class="d-flex">
+                                                                                        <div class="flex-grow-0 pt-1 px-2 text-primary fw-bold">To:</div>
+                                                                                        <DxDateEdit Date=@endDate DateChanged="@((DateTime newValue) => OnEndDateChanged(newValue))" CssClass="flex-grow-1" />
+                                                                                    </div>
+                                                                                </Template>
+                                                                            </DxToolbarItem>
+                                                                        </CustomButtonContent>
+                                                                    </GridToolbar>
+                                                                </ToolbarTemplate>
+                                                                <Columns>
+                                                                    <DxGridDataColumn Width="8rem" Caption="Time"
+                                                                                      FieldName="CreatedTime"
+                                                                                      DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
+                                                                                      UnboundType="GridUnboundColumnType.DateTime" />
+                                                                    <DxGridDataColumn Width="10rem" Caption="Name" FieldName="Person.FullName" />
+                                                                    <DxGridDataColumn Width="14rem" Caption="Description" FieldName="Description" />
+                                                                    <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
+                                                                    <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="Person.FinancialToBriefText" DisplayFormat="f0" />
+                                                                    <DxGridDataColumn Width="8rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
+                                                                </Columns>
+                                                                <TotalSummary>
+                                                                    <DxGridSummaryItem FieldName="Amount"
+                                                                                       SummaryType="GridSummaryItemType.Sum"
+                                                                                       FooterColumnName="Amount"
+                                                                                       ValueDisplayFormat="c2" />
+                                                                </TotalSummary>
+                                                            </DxGrid>
+                                                        </ContentTemplate>
+                                                    </FullScreen>
+                                                </DxTabPage>
+                                                <DxTabPage Text="Online Payment Status">
+                                                    <div class="m-1">
+                                                        <ReviewOnlinePaymentStatus IsEmbedded="true" />
                                                     </div>
-                                                    <IdentityUserMnt IsEmbedded="true" />
-                                                </div>
-                                            </DxTabPage>
-                                        </DxTabs>
-                                    </div>
-                                }
-                            </DxFormLayout>
-                            break;
+                                                </DxTabPage>
+                                                <DxTabPage Text="Email Status">
+                                                    <div class="m-1">
+                                                        <div class="bi bi-question-circle-fill text-info"><small>&nbsp;Cash Receipt/Enrolment reports sent within the hour. Leader reports within 48 hours of next class</small></div>
+                                                        <QueuedTransactionalEmail IsEmbedded="true" />
+                                                    </div>
+                                                </DxTabPage>
+                                                <DxTabPage Text="Add/Edit Member Details">
+                                                    <div class="m-1">
+                                                        <div class="bi bi-question-circle-fill text-info"><small>&nbsp;Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
+                                                        <PersonMnt IsEmbedded="true" GridLayoutKey="{1F6F77E7-6276-48FC-A1D3-E3A8959DA561}" />
+                                                    </div>
+                                                </DxTabPage>
+                                                <DxTabPage Text="Review Logins">
+                                                    <div class="m-1">
+                                                        <div class="bi bi-question-circle-fill text-info">
+                                                            <small>
+                                                                &nbsp;  <b>Note: </b>Deleting a login will require the member to re-register.
+                                                                Otherwise, it is a safe measure of last resort.
+                                                            </small>
+                                                        </div>
+                                                        <IdentityUserMnt IsEmbedded="true" />
+                                                    </div>
+                                                </DxTabPage>
+                                            </DxTabs>
+                                        </div>
+                                    }
+                                </DxFormLayout>
+                                break;
 
-                        case buttonClicks.WhatsOnToday:
-                            <CourseSchedule IsPortal=false />
-                            break;
+                            case buttonClicks.WhatsOnToday:
+                                <CourseSchedule IsPortal=false />
+                                break;
 
-                        case buttonClicks.RecordAttendance:
-                            <div class="mt-2">
-                                <AttendClassMnt IsAdminPortal="true" />
-                            </div>
-                            break;
+                            case buttonClicks.RecordAttendance:
+                                <div class="mt-2">
+                                    <AttendClassMnt IsAdminPortal="true" />
+                                </div>
+                                break;
 
-                        case buttonClicks.AttendanceNotRecorded:
-                            <AttendanceNotRecordedSummary />
-                            break;
+                            case buttonClicks.AttendanceNotRecorded:
+                                <AttendanceNotRecordedSummary />
+                                break;
 
-                        case buttonClicks.AttendanceSummary:
-                            <CourseAttendanceSummary />
-                            break;
+                            case buttonClicks.AttendanceSummary:
+                                <CourseAttendanceSummary />
+                                break;
 
-                        case buttonClicks.AttendanceAnalysis:
-                            <AttendanceAnalysis />
-                            break;
+                            case buttonClicks.AttendanceAnalysis:
+                                <AttendanceAnalysis />
+                                break;
 
-                        case buttonClicks.AdminLeaderReport:
-                            <LeaderReport Title="Print/Email Leader Reports" AllowPrintAndEmail="true" AllowMultipleSelection="false"  />
-                            break;
-                    }
+                            case buttonClicks.AdminLeaderReport:
+                                <LeaderReport Title="Print/Email Leader Reports" AllowPrintAndEmail="true" AllowMultipleSelection="false" />
+                                break;
+                        }
 
-                </DxLoadingPanel>
-            </TargetContent>
-            <BodyTemplate>
-                <ClassCalendar DisplayOffset="@((ws.UseTopMenu) ? 6.7 : 4.7)" />
-            </BodyTemplate>
-        </DxDrawer>
+                    </DxLoadingPanel>
+                </TargetContent>
+                <BodyTemplate>
+                    <ClassCalendar DisplayOffset="@((ws.UseTopMenu) ? 6.7 : 4.7)" />
+                </BodyTemplate>
+            </DxDrawer>
+        </div>
     </CascadingValue>
 }
 <style>
@@ -230,7 +225,7 @@ else
     }
 
     .drawer-style {
-        max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "3rem") );
+        max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
     }
 
     .tabs-style {
@@ -305,7 +300,6 @@ else
                     .OrderByDescending(x => x.CreatedOn).ToListAsync())
                     .Where(x => dbc.GetLocalDate(x.CreatedOn.Value) >= startDate &&
                                 dbc.GetLocalDate(x.CreatedOn.Value) <= endDate);
-        await InvokeAsync(StateHasChanged);
     }
 
 
@@ -332,7 +326,6 @@ else
             if (hasUnprocessedPayments)
             {
                 isProcessing = true;
-                await InvokeAsync(StateHasChanged);
                 var term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
                 if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
                 foreach (var payment in (await BusinessRule.GetUnprocessedOnlinePayment(dbc)))
@@ -373,7 +366,6 @@ else
         isSelected = false;
         selectedPerson = null;
         isProcessing = false;
-        await InvokeAsync(StateHasChanged);
     }
 
     async Task OnProcess()
@@ -388,7 +380,6 @@ else
             selectedPerson = await dbc.Person.FindAsync(selectedPerson.ID);
             LoginState = new LoginState(authEmail, selectedPerson, U3Adbfactory);
             isSelected = true;
-            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -396,7 +387,6 @@ else
     {
         isSelected = false;
         selectedPerson = null;
-        await InvokeAsync(StateHasChanged);
     }
 
     void Grid_UnboundColumnData(GridUnboundColumnDataEventArgs e)
