@@ -24,8 +24,7 @@ else
 
         <MessageBox @ref="@messageBox" />
 
-        <div class="my-2">
-            <DxToolbar style="border-bottom:solid; border-color:whitesmoke;">
+            <DxToolbar CssClass="border-bottom">
                 <Items>
                     <DxToolbarItem Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
                                    CssClass="me-1 mb-1"
@@ -59,7 +58,7 @@ else
                                    Alignment="ToolbarItemAlignment.Right" />
                 </Items>
             </DxToolbar>
-        </div>
+        
         <DxDrawer @bind-IsOpen="@isDrawerOpen"
                   CssClass="drawer-style"
                   Mode="DrawerMode.Shrink"
@@ -78,24 +77,18 @@ else
                                 <div hidden="@(isSelected)" class="col col-12 @((isDrawerOpen) ? "" : "col-lg-6 mx-auto")">
                                     <div class="h3 text-center">Member Portal (Administration)</div>
                                     <div class="h6 text-center">This procedure is intended for administration to process enrolments and/or membership fees on behalf of members.</div>
-                                    <DxFormLayoutGroup Caption="Process Member Enrolments / Renewals"
-                                                       Visible="@(!isAccordianShowingMemberDetails)"
+                                    <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
                                                        ColSpanMd="12" Context="groupContext">
-                                        <HeaderContentTemplate>
-                                            <div class="d-flex input-group">
-                                                <div class="text-start flex-grow-1">
-                                                    Process Member
-                                                </div>
-                                                <div class="flex-grow-0">
+                                        <Items>
+                                            <div class="input-group">
+                                                <DxFormLayoutItem Caption="Process on behalf of" CssClass="flex-grow-1">
+                                                    <PersonsComboBox People="@people" SelectedPerson="@selectedPerson"
+                                                                     SelectedPersonChanged="(Person newValue) => OnSelectedPersonChanged(newValue)" />
+                                                </DxFormLayoutItem>
+                                                <div class="flex-grow-0 mt-2 me-2">
                                                     <DxButton Text="Refresh" Click="OnRefresh" IconCssClass="bi bi-arrow-clockwise" Tooltip="Click to refresh lookup data" />
                                                 </div>
                                             </div>
-                                        </HeaderContentTemplate>
-                                        <Items>
-                                            <DxFormLayoutItem Caption="Process on behalf of" CssClass="member-selection-width">
-                                                <PersonsComboBox People="@people" SelectedPerson="@selectedPerson"
-                                                                 SelectedPersonChanged="(Person newValue) => OnSelectedPersonChanged(newValue)" />
-                                            </DxFormLayoutItem>
                                         </Items>
                                     </DxFormLayoutGroup>
                                 </div>
