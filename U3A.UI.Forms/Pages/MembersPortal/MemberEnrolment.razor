@@ -126,7 +126,8 @@ else
                                     {
                                         <DxButton Text="@GetBriefStatus(c)" CssClass="flex-grow-0"
                                                   IconCssClass="@($"menu-icon bi {selectButtonIcon}")"
-                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                  RenderStyle="@ButtonRenderStyle.Primary"
+                                                  RenderStyleMode="ButtonRenderStyleMode.Contained"
                                                   Click="@(async () => await SelectedDataItemChanged(c))" />
                                     }
                                 </div>
@@ -137,26 +138,31 @@ else
                                     <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
                                         <Items>
                                             <div class="title-style @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
-                                                <div class="d-flex">
-                                                @if (c.Course.IsFeaturedCourse)
-                                                {
-                                                    <div class="me-2 flex-grow-0 badge bg-primary">Featured</div>
-                                                }
-                                                <div classe="flex-grow-1">@(HighlightSearchText(ClassTitle(c)))</div>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2 d-flex justify-content-center w-100">
-                                                @if (IsReadOnly)
-                                                {
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-grow-1">
+                                                        <span>
+                                                            @if (c.Course.IsFeaturedCourse)
+                                                            {
+                                                                <div class="me-2 badge bg-primary">Featured</div>
+                                                            }
+                                                            <div classe="">@(HighlightSearchText(ClassTitle(c)))</div>
+                                                        </span>
+                                                    </div>
+                                                    <div class="flex-grow-0">
+                                                        @if (IsReadOnly)
+                                                        {
                                                     <div class="h6 text-primary">@GetStatus(c)</div>
-                                                }
-                                                else
-                                                {
-                                                    <DxButton Text="@GetStatus(c)"
-                                                              IconCssClass="@($"menu-icon bi {selectButtonIcon}")"
-                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                              Click="@(async () => await SelectedDataItemChanged(c))" />
-                                                }
+                                                        }
+                                                        else
+                                                        {
+                                                            <DxButton Text="@((IsMobileLayout) ? GetBriefStatus(c) : GetStatus(c))"
+                                                                      IconCssClass="@($"bi {selectButtonIcon}")"
+                                                                      RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                      RenderStyle="ButtonRenderStyle.Primary"
+                                                                      Click="@(async () => await SelectedDataItemChanged(c))" />
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
                                             @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                             {
@@ -819,7 +825,7 @@ else
     string GetBriefStatus(Class context)
     {
         var status = GetStatus(context);
-        return (status.ToLower().Contains("select")) ? "Select" : "Withdraw";
+        return (status.ToLower().Contains("Request")) ? "Request" : "Withdraw";
     }
 
     string GetStatus(Class context)
@@ -837,7 +843,7 @@ else
             }
             else
             {
-                result = "Click to select";
+                result = "Click to Request";
                 selectButtonIcon = "bi-check-circle";
             }
         }
@@ -862,21 +868,10 @@ else
         var c = context;
         var result = string.Empty;
         DateTime? classEndDate = null;
-        string status;
         Enrolment? e = c.IsSelectedByEnrolment;
         // Enrolled in class - display the status
-        status = BusinessRule.GetMemberPortalEnrolmentStatus(c, e, term, settings, today);
+        result = BusinessRule.GetMemberPortalEnrolmentStatus(c, e, term, settings, today);
         classEndDate = term.EndDate;
-        if (c.TermNumber != term.TermNumber)
-        {
-            result = $"Term {c.TermNumber}: {status}";
-        }
-        else
-        {
-            result = status;
-        }
-        ;
-
         return (result, classEndDate);
     }
 
