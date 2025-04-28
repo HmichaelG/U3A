@@ -137,32 +137,29 @@ else
                                 <DxFormLayout>
                                     <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
                                         <Items>
-                                            <div class="container mt-2 py-1 border @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-grow-1">
-                                                        <span>
-                                                            @if (c.Course.IsFeaturedCourse)
-                                                            {
-                                                                <div class="badge bg-primary">Featured</div>
-                                                            }
-                                                            <div class="h6">@(HighlightSearchText(ClassTitle(c)))</div>
-                                                        </span>
+                                            <div class="container mt-2 mb-1 py-1 border @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
+                                                <div class="d-flex flex-row align-items-center my-auto">
+                                                    <div class="flex-grow-1 pt-2 h6">
+                                                        <div hidden="@(!c.Course.IsFeaturedCourse)" class="badge bg-primary">Featured</div>
+                                                        <div>@(HighlightSearchText(ClassTitle(c)))</div>
                                                     </div>
-                                                    <div class="flex-grow-0">
-                                                        @if (IsReadOnly)
-                                                        {
-                                                    <div class="h6 text-primary">@GetStatus(c)</div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <DxButton Text="@((IsMobileLayout) ? GetBriefStatus(c) : GetStatus(c))"
-                                                                      IconCssClass="@($"bi {selectButtonIcon}")"
-                                                                      RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                                                      RenderStyle="ButtonRenderStyle.Primary"
-                                                                      Click="@(async () => await SelectedDataItemChanged(c))" />
-                                                        }
+                                                    <div hidden="@IsMobileLayout" class="flex-grow-0">
+                                                        <div hidden="@(!IsReadOnly)" class="h6 text-primary">@GetStatus(c)</div>
+                                                        <DxButton Text="@GetStatus(c)" Visible="@(!IsReadOnly)"
+                                                                  IconCssClass="@($"bi {selectButtonIcon}")"
+                                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                  RenderStyle="ButtonRenderStyle.Primary"
+                                                                  Click="@(async () => await SelectedDataItemChanged(c))" />
                                                     </div>
                                                 </div>
+                                            </div>
+                                            <div hidden="@(!IsMobileLayout)" class="mx-auto">
+                                                <div hidden="@(!IsReadOnly)" class="h6 text-primary">@GetStatus(c)</div>
+                                                <DxButton Text="@GetStatus(c)" Visible="@(!IsReadOnly)"
+                                                          IconCssClass="@($"bi {selectButtonIcon}")"
+                                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                          RenderStyle="ButtonRenderStyle.Primary"
+                                                          Click="@(async () => await SelectedDataItemChanged(c))" />
                                             </div>
                                             @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                             {
@@ -305,7 +302,7 @@ else
 
                                             <DxButton CssClass="w-100 mb-1" IconCssClass="menu-icon bi bi-globe2"
                                                       Visible=@(!string.IsNullOrWhiteSpace(c.Course.AdditionalInformationURL))
-                                                      Text="Additional Information" RenderStyle="@ButtonRenderStyle.Primary"
+                                                      Text="Additional Information" RenderStyle="@ButtonRenderStyle.Link"
                                                       RenderStyleMode="ButtonRenderStyleMode.Outline"
                                                       Click="async () => await OnAddnInfoURLClick(c)" />
                                             <div class="px-2 pt-2 w-100" hidden="@(!IsReadOnly || !c.ShowMap)">
@@ -392,7 +389,7 @@ else
 
     .description-style {
         width: 100%;
-        margin: 1rem;
+        margin: 0.25rem 1rem;
         padding: 0.25rem;
         border-radius: 0.25rem;
     }
@@ -818,7 +815,7 @@ else
     string GetBriefStatus(Class context)
     {
         var status = GetStatus(context);
-        return (status.ToLower().Contains("Request")) ? "Request" : "Withdraw";
+        return (status.ToLower().Contains("request")) ? "Request" : "Withdraw";
     }
 
     string GetStatus(Class context)
