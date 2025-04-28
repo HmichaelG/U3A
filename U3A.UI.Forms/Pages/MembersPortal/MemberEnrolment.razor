@@ -137,15 +137,15 @@ else
                                 <DxFormLayout>
                                     <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
                                         <Items>
-                                            <div class="title-style @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
+                                            <div class="container mt-2 py-1 border @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
                                                 <div class="d-flex align-items-center">
                                                     <div class="flex-grow-1">
                                                         <span>
                                                             @if (c.Course.IsFeaturedCourse)
                                                             {
-                                                                <div class="me-2 badge bg-primary">Featured</div>
+                                                                <div class="badge bg-primary">Featured</div>
                                                             }
-                                                            <div classe="">@(HighlightSearchText(ClassTitle(c)))</div>
+                                                            <div class="h6">@(HighlightSearchText(ClassTitle(c)))</div>
                                                         </span>
                                                     </div>
                                                     <div class="flex-grow-0">
@@ -388,13 +388,6 @@ else
 
     .listbox-scroll {
         height: calc(100dvh - @listHeight );
-    }
-
-    .title-style {
-        width: 100%;
-        padding: 1rem;
-        font-weight: 700;
-        line-height: 1.2;
     }
 
     .description-style {

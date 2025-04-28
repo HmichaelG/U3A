@@ -79,13 +79,13 @@ else
                             <DxFormLayout>
                                 <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
                                     <Items>
-                                        <div class="title-style bg-body-tertiary">
+                                        <div class="container mt-2 py-1 border bg-body-tertiary">
                                             <div class="d-flex">
                                                 @if (c.Course.IsFeaturedCourse)
                                                 {
                                                     <div class="me-2 flex-grow-0 badge bg-primary">Featured</div>
                                                 }
-                                                <div classe="flex-grow-1">@(HighlightSearchText(ClassTitle(c)))</div>
+                                                <div class="flex-grow-1 h6">@(HighlightSearchText(ClassTitle(c)))</div>
                                             </div>
                                         </div>
 
