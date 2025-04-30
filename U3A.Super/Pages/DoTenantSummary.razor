@@ -151,11 +151,18 @@
         // wire up the data
         using (var dbc = await tenantDbfactory.CreateDbContextAsync())
         {
+            try
+            {
             tenantInfo = dbc.TenantInfo.AsEnumerable()
                         .OrderBy(x => x.IsUsingPostmarkSandbox)
                         .ThenBy(x => x.Identifier).ToList();
+            }
+            catch (Exception)
+            {
+                navMan.NavigateTo("/DatabaseUpdate");
+            }
         }
-        foreach (var tenant in tenantInfo.Where(x => !x.UsePostmarkTestEnviroment))
+        foreach (var tenant in tenantInfo!.Where(x => !x.UsePostmarkTestEnviroment))
         {
             using (var dbc = new U3ADbContext(tenant))
             {

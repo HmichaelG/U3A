@@ -16,14 +16,14 @@
 else
 {
 
-    <div class="col-md-6">
+    <div class="col-md-12">
         <div class="row  align-content-start">
             <h2>Tenant Details</h2>
         </div>
 
         <DxFormLayout>
-            <DxFormLayoutGroup Caption="Select Tenant">
-                <DxFormLayoutItem Caption="Tenant to edit" ColSpanMd="12">
+            <DxFormLayoutGroup Caption="Select Tenant" ColSpanMd="12">
+                <DxFormLayoutItem Caption="Tenant to edit" ColSpanMd="6">
                     <DxComboBox Data="@tenants"
                                 TextFieldName="@nameof(TenantInfo.Identifier)"
                                 ValueChanged="@((TenantInfo tenant) => OnTenantChanged(tenant))">
@@ -39,8 +39,8 @@ else
             <EditForm Model="@selectedTenant" OnValidSubmit=@ValidFormSubmitted Context="editContext">
                 <DataAnnotationsValidator />
                 <DxFormLayout>
-                    <DxFormLayoutGroup Caption="Tenant Details" ColSpanLg="12">
-                        <DxFormLayoutItem Caption="Host Name" ColSpanMd="12">
+                    <DxFormLayoutGroup Caption="Tenant Details" ColSpanMd="6">
+                        <DxFormLayoutItem Caption="Host Name" ColSpanMd="6">
                             <DxTextBox @bind-Text=@selectedTenant.Identifier ReadOnly=true />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Organisation Name" ColSpanMd="12">
@@ -59,7 +59,7 @@ else
                             <DxCheckBox @bind-Checked=@selectedTenant.EnableMultiCampusExtension Enabled=@IsEditEnabled />
                         </DxFormLayoutItem>
                     </DxFormLayoutGroup>
-                    <DxFormLayoutGroup Caption="Eway Payments">
+                    <DxFormLayoutGroup Caption="Eway Payments" ColSpanMd="6">
                         <DxFormLayoutItem Caption="Eway API Key" ColSpanMd="12">
                             <DxTextBox @bind-Text=@selectedTenant.EwayAPIKey Enabled=@IsEditEnabled />
                         </DxFormLayoutItem>
@@ -70,7 +70,7 @@ else
                             <DxCheckBox @bind-Checked=@selectedTenant.UseEwayTestEnviroment Enabled=@IsEditEnabled />
                         </DxFormLayoutItem>
                     </DxFormLayoutGroup>
-                    <DxFormLayoutGroup Caption="Postmark Email">
+                    <DxFormLayoutGroup Caption="Postmark Email" ColSpanMd="6">
                         <DxFormLayoutItem Caption="Postmark API Key" ColSpanMd="12">
                             <DxTextBox @bind-Text=@selectedTenant.PostmarkAPIKey Enabled=@IsEditEnabled />
                         </DxFormLayoutItem>
@@ -81,7 +81,7 @@ else
                             <DxCheckBox @bind-Checked=@selectedTenant.UsePostmarkTestEnviroment Enabled=@IsEditEnabled />
                         </DxFormLayoutItem>
                     </DxFormLayoutGroup>
-                    <DxFormLayoutGroup Caption="Twilio SMS">
+                    <DxFormLayoutGroup Caption="Twilio SMS" ColSpanMd="6">
                         <DxFormLayoutItem Caption="Twilio Account SID" ColSpanMd="12">
                             <DxTextBox @bind-Text=@selectedTenant.TwilioAccountSID Enabled=@IsEditEnabled />
                         </DxFormLayoutItem>
@@ -90,6 +90,11 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Twilio Phone Number" ColSpanMd="12">
                             <DxTextBox @bind-Text=@selectedTenant.TwilioPhoneNo Enabled=@IsEditEnabled />
+                        </DxFormLayoutItem>
+                    </DxFormLayoutGroup>
+                    <DxFormLayoutGroup Caption="Two Factor Authentication" ColSpanMd="6">
+                        <DxFormLayoutItem Caption="2FA Not Required?" ColSpanMd="12">
+                            <DxCheckBox @bind-Checked=@selectedTenant.IsTwoFactorNotRequired Enabled=@IsEditEnabled />
                         </DxFormLayoutItem>
                     </DxFormLayoutGroup>
                     <DxFormLayoutItem ColSpanMd="12">

@@ -43,11 +43,11 @@
     {
         result = string.Empty;
         msgComplete = string.Empty;
-        using (var dbc = await Tenantdbfactory.CreateDbContextAsync())
+        using (var dbT = await Tenantdbfactory.CreateDbContextAsync())
         {
-            tenantInfo = await dbc.TenantInfo.OrderBy(x => x.Identifier).ToListAsync();
-            await dbc.Database.MigrateAsync();
+            await dbT.Database.MigrateAsync();
             result += $"<li>Database schema for [Tenant] has been updated</li>";
+            tenantInfo = await dbT.TenantInfo.OrderBy(x => x.Identifier).ToListAsync();
         }
         foreach (var tenant in tenantInfo)
         {

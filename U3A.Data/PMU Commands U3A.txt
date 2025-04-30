@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_DocumentTemplate_EmailPreheader
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_AutoEnrolDisabledReason
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_AutoEnrolDisabledReason
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args AppUser_TwoFactor
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_AutoEnrolDisabledReason
+add-migration -context U3ADbContextSeed -project U3A.Database AppUser_TwoFactor
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

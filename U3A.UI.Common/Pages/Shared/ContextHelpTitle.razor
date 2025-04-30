@@ -1,9 +1,12 @@
 ﻿@using System.IO
 @using System.Globalization
+@using Microsoft.Extensions.Configuration
+@using U3A.Services
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
 @inject NavigationManager navMan
+@inject IConfiguration config
 
 @if (isReady)
 {
@@ -19,22 +22,24 @@
                 {
                     <div class="mx-2 mt-2 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
                 }
+                if (TwoFactorWarningMessage is not null)
+                {
+                    <div class="mx-2 mt-2 alert-style alert alert-warning text-center">@TwoFactorWarningMessage</div>
+                }
                 if (!string.IsNullOrWhiteSpace(informationMessage))
                 {
-                    {
-                        <div class="mx-2 mt-2 alert-style alert alert-info text-center">
-                            @informationMessage
-                        </div>
-                    }
+                    <div class="mx-2 mt-2 alert-style alert alert-info text-center">
+                        @informationMessage
+                    </div>
                 }
             }
             <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
-            RenderStyleMode="ButtonRenderStyleMode.Outline"
-            RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly)
+                      RenderStyleMode="ButtonRenderStyleMode.Outline"
+                      RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly)
                                             ?   ButtonRenderStyle.Primary
                                             :   ButtonRenderStyle.None)"
-            CssClass="@ButtonCssClass"
-            Click="ShowTopicAsync" Id="helpButton" />
+                      CssClass="@ButtonCssClass"
+                      Click="ShowTopicAsync" Id="helpButton" />
             break;
         case HelpActivationStyle.StandardButtonAndTitle:
         case HelpActivationStyle.ButtonAndTitleNoMessages:
@@ -42,42 +47,44 @@
             <div class="d-flex">
                 <h1 class="@TitleCssClass title-color h3">
                     <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
-                    RenderStyleMode="ButtonRenderStyleMode.Outline"
-                    RenderStyle="ButtonRenderStyle.None"
-                    Click="ShowTopicAsync" Id="helpButton" />
+                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                              RenderStyle="ButtonRenderStyle.None"
+                              Click="ShowTopicAsync" Id="helpButton" />
                     @Title
                 </h1>
                 @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
                 {
-                    if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
+                    @if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
                     {
-                        <div class="flex-grow-1 mx-4 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
+                        <div class="mx-2 mt-2 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
                     }
-                    if (!string.IsNullOrWhiteSpace(informationMessage))
+                    @if (TwoFactorWarningMessage is not null)
                     {
-                        {
-                            <div class="flex-grow-1 mx-4 alert-style alert alert-info text-center">
-                                @informationMessage
-                            </div>
-                        }
+                        <div class="mx-2 mt-2 alert-style alert alert-warning text-center">@TwoFactorWarningMessage</div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(informationMessage))
+                    {
+                        <div class="mx-2 mt-2 alert-style alert alert-info text-center">
+                            @informationMessage
+                        </div>
                     }
                 }
             </div>
             break;
     }
     <DxWindow @ref=@helpWindow Width="@windowWidth"
-    Visible=false
-    Closed="OnClosed"
-    HorizontalAlignment="HorizontalAlignment.Right"
-    VerticalAlignment="VerticalAlignment.Center"
-    Height="100vh"
-    AllowResize="true"
-    Context="windowContext"
-    CloseOnEscape=true
-    ShowCloseButton=true
-    ShowFooter=true
-    Scrollable=true
-    HeaderText="Help">
+              Visible=false
+              Closed="OnClosed"
+              HorizontalAlignment="HorizontalAlignment.Right"
+              VerticalAlignment="VerticalAlignment.Center"
+              Height="100vh"
+              AllowResize="true"
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              HeaderText="Help">
         <BodyTextTemplate>
             <iframe src="@helpFile" class="iframe-size p-1"></iframe>
         </BodyTextTemplate>
@@ -86,46 +93,48 @@
 
 <style>
     .iframe-size {
-    height: 100%;
-    width: 100%;
-    padding-bottom: 5px;
+        height: 100%;
+        width: 100%;
+        padding-bottom: 5px;
     }
 
     .alert-style {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-    margin-bottom: 0.5dvh !important;
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+        margin-bottom: 0.5dvh !important;
     }
 
     .help-btn {
-    color: var(--dxbl-client-component-palette-info);
-    font-weight: 900;
+        color: var(--dxbl-client-component-palette-info);
+        font-weight: 900;
     }
 
     .title-color {
-    color: var(--dxbl-client-component-palette-primary);
+        color: var(--dxbl-client-component-palette-primary);
     }
 </style>
 
 
 @code {
 
-    [Parameter]
-    [EditorRequired]
-    public string? Title { get; set; }
-    [Parameter]
-    [EditorRequired]
-    public string? HelpTopic { get; set; }
-    [Parameter]
-    public HelpActivationStyle ActivationStyle { get; set; }
-    [Parameter]
-    public string? ButtonCssClass { get; set; }
-    [Parameter]
-    public string TitleCssClass { get; set; } = "flex-grow-0";
-    [Parameter]
-    public string ButtonIconCssClass { get; set; } = "h2 bi bi-question-circle-fill help-btn";
-    [Parameter]
-    public bool IncludeTableOfContents { get; set; } = false;
+        [CascadingParameter]
+        public LoginState? LoginState { get; set; }
+        [Parameter]
+        [EditorRequired]
+        public string? Title { get; set; }
+        [Parameter]
+        [EditorRequired]
+        public string? HelpTopic { get; set; }
+        [Parameter]
+        public HelpActivationStyle ActivationStyle { get; set; }
+        [Parameter]
+        public string? ButtonCssClass { get; set; }
+        [Parameter]
+        public string TitleCssClass { get; set; } = "flex-grow-0";
+        [Parameter]
+        public string ButtonIconCssClass { get; set; } = "h2 bi bi-question-circle-fill help-btn";
+        [Parameter]
+        public bool IncludeTableOfContents { get; set; } = false;
 
     public string? windowWidth { get; set; }
 
@@ -137,6 +146,7 @@
     bool isReady;
     string? inMaintenanceMessage = default;
     string? informationMessage = default;
+    MarkupString? TwoFactorWarningMessage = default;
     string? tenantId;
 
     const string IN_MAINTENANCE = "Warning: You are in Member Portal Maintenance Mode";
@@ -177,6 +187,21 @@
                 if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
                 {
                     informationMessage = $"Reminder: Enrolment email blackout until {dbc.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
+                }
+            }
+            if (LoginState is not null)
+            {
+                if (await BusinessRule.IsTwoFactorRequiredAsync(dbc, config, LoginState.LoginEmail))
+                {
+                    var days = await BusinessRule.TwoFactorGracePeriodRemainingAsync(dbc, LoginState.LoginEmail);
+                    if (days > 0)
+                    {
+                        TwoFactorWarningMessage = new MarkupString($"Reminder: Two Factor Authentication is required in <b>{days}</b> days.");
+                    }
+                    else
+                    {
+                        navMan.NavigateTo("Account/Manage/TwoFactorAuthentication", forceLoad: true);
+                    }
                 }
             }
         }
