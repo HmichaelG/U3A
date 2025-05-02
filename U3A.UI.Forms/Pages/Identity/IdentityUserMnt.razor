@@ -11,6 +11,8 @@
 @using Microsoft.AspNetCore.Identity
 @using System.Collections.Concurrent
 @using U3A.Data
+@using Serilog;
+
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
 
@@ -37,7 +39,7 @@ else
                 <DxTextBox @ref=@testPasswordTextBox @bind-Text=testPassword
                 Password="@(!showTestPassword)" autocomplete="new-password">
                     <Buttons>
-                        <DxEditorButton IconCssClass="bi bi-eye"                        
+                        <DxEditorButton IconCssClass="bi bi-eye"
                         Tooltip="Show/hide password"
                         Click="@(() => showTestPassword = !showTestPassword)" />
                     </Buttons>
@@ -154,6 +156,9 @@ else
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption=" Confirm Password" ColSpanMd="12">
                             <DxTextBox @bind-Text=editItem.ConfirmPassword Password="@(!showPassword)" autocomplete="new-password" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="" ColSpanMd="12">
+                            <DxButton Text="Reset 2FA" Enabled=@editItem.TwoFactorEnabled Click="@(async () => OnReset2FA(editItem))" />
                         </DxFormLayoutItem>
                     </DxFormLayout>
                 </EditFormTemplate>
@@ -429,6 +434,37 @@ else
             await UserManager.DeleteAsync(appUser);
             AppUsers.Remove(appUser);
             e.Reload = true;
+        }
+    }
+
+    async Task OnReset2FA(ApplicationUser editItem)
+    {
+        var msg =
+                @"<p>This procedure will set Two-Factor Authentication to disabled.
+                <p>Do you wish to continue?";
+
+        if (await messageBox.ShowAsync("Reset 2FA", msg))
+        {
+            var u = await UserManager.FindByIdAsync(editItem.Id);
+            editItem.CopyTo(u);
+            var disable2faResult = await UserManager.SetTwoFactorEnabledAsync(u, false);
+            if (!disable2faResult.Succeeded)
+            {
+                msg = "An unexpected error occurred disabling 2FA. Refer to logs for details";
+                foreach (var err in disable2faResult.Errors)
+                {
+                    Log.Error("Error disabling 2FA", err);
+                }
+            }
+            else
+            {
+                u.TwoFactorEnabled = false;
+                u.TwoFactorGracePeriodStart = null;
+                await dbc.SaveChangesAsync();
+                u.CopyTo(editItem);
+                msg = "Two-Factor Authentication status has been reset to disabled.";
+            }
+            await messageBox.ShowOkOnlyAsync("Reset 2FA", msg);
         }
     }
 

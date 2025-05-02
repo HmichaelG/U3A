@@ -45,7 +45,7 @@
             <form style="display: inline-block" @formname="forget-browser" @onsubmit="OnSubmitForgetBrowserAsync" method="post">
                 <AntiforgeryToken />
                 <button type="submit" class=" mb-4 col col-12 btn btn-outline-primary">
-                    <div class="h5">Remove 'Remember Me'</div>
+                    <div class="h5">Remove 'Remember this device'</div>
                     Require 2FA token entry on next &amp; future logins
                 </button>
             </form>
@@ -54,7 +54,7 @@
         <form style="display: inline-block" @formname="disable-2fa" @onsubmit="OnSubmitDisable2faAsync" method="post">
             <AntiforgeryToken />
             <button type="submit" class=" mb-4 col col-12 btn btn-outline-primary">
-                <div class="h5">Disable 2FA</div>
+                <div class="h5">Discontinue using 2FA</div>
                 Discontinue Two-Factor Authentication &amp; remove enhanced security.
             </button>
         </form>
@@ -122,7 +122,7 @@ else
         await SignInManager.ForgetTwoFactorClientAsync();
 
         RedirectManager.RedirectToCurrentPageWithStatus(
-            "'Remember Me' has been removed from this browser. When you login again from this browser you will not be prompted for your 2FA code.",
+            "'Remember this device' has been removed from this browser. When you login again from this browser you will not be prompted for your 2FA code.",
             HttpContext);
     }
     private async Task OnSubmitDisable2faAsync()

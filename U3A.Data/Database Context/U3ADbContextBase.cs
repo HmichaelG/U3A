@@ -83,6 +83,10 @@ namespace U3A.Database
             {
                 SetLeaderNull((entity as Person).ID);
             }
+            if (entity is Contact)
+            {
+                SetLeaderNull((entity as Contact).ID);
+            }
             if (entity is Course)
             {
                 base.RemoveRange(Class.Where(x => x.CourseID == (entity as Course).ID));
@@ -93,16 +97,17 @@ namespace U3A.Database
 
         public override void RemoveRange(IEnumerable<object> entities)
         {
-            if (entities is IEnumerable<Person>)
+            foreach (var entity in entities)
             {
-                foreach (var entity in entities)
+                if (entity is Person)
                 {
                     SetLeaderNull((entity as Person).ID);
                 }
-            }
-            if (entities is IEnumerable<Enrolment>)
-            {
-                foreach (var entity in entities)
+                if (entity is Contact)
+                {
+                    SetLeaderNull((entity as Contact).ID);
+                }
+                if (entity is Enrolment)
                 {
                     CreateDropout(entity);
                 }

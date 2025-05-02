@@ -73,6 +73,7 @@ else
                     <div class="text-start mx-1" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
                 </span>
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
+                                  IsVersionButton=true
                                   ButtonIconCssClass="h5 text-primary bi bi-check2-circle"
                                   HelpTopic=@($"{versionYear}-Version-History.html")
                                   ActivationStyle="@HelpActivationStyle.ButtonOnly" />

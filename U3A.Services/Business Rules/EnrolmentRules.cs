@@ -775,19 +775,6 @@ namespace U3A.BusinessRules
             return result;
         }
 
-        static int? GetFirstTermNumber(Term currentTerm, Class requestedClass)
-        {
-            int? result = null;
-            var termNumber = currentTerm.TermNumber;
-            var numbers = new List<int>();
-            if (requestedClass.OfferedTerm1 && termNumber == 1) numbers.Add(1);
-            if (requestedClass.OfferedTerm2 && termNumber <= 2) numbers.Add(2);
-            if (requestedClass.OfferedTerm3 && termNumber <= 3) numbers.Add(3);
-            if (requestedClass.OfferedTerm4 && termNumber <= 4) numbers.Add(4);
-            if (numbers.Any()) result = numbers.Min();
-            return result;
-        }
-
         public static async Task<string> GetEnrolmentStatusMarkup(U3ADbContext dbc,
                 Enrolment enrolment, Term term, SystemSettings settings)
         {

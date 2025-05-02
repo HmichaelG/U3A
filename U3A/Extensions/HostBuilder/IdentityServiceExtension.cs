@@ -22,7 +22,8 @@ public static class IdentityServiceExtension
             options.DefaultScheme = IdentityConstants.ApplicationScheme;
             options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
         })
-        .AddIdentityCookies();
+        .AddIdentityCookies(options =>
+            options.TwoFactorRememberMeCookie!.Configure(a => a.ExpireTimeSpan = TimeSpan.FromDays(30)));
 
         builder.Services.AddIdentityCore<ApplicationUser>(options =>
         {
@@ -41,7 +42,6 @@ public static class IdentityServiceExtension
             .AddSignInManager()
             .AddUserManager<UserManager<ApplicationUser>>()
             .AddDefaultTokenProviders();
-
 
         builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
 
