@@ -156,7 +156,7 @@ else
                     HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
                     HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
                         <CustomButtonContent>
-                            <DxToolbarItem Text="Communicate" Visible="@(IsLargeLayout || IsXtraLargeLayout)"
+                            <DxToolbarItem Text="Communicate" Visible="@((IsLargeLayout || IsXtraLargeLayout) && !IsMemberPortal)"
                             Tooltip="Send email and/or SMS to students"
                             Click="@OnCommunicate"
                             RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0 ms-2" />
