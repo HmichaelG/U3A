@@ -110,11 +110,18 @@ else
                                     <CustomButtonContent>
                                         <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
                                                        BeginGroup=true
-                                                       Click=@OnCommunicate
                                                        RenderStyle="ButtonRenderStyle.Primary"
                                                        RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                       Alignment="ToolbarItemAlignment.Right"
-                                                       Tooltip="Send email and/or SMS to participants">
+                                                       Alignment="ToolbarItemAlignment.Right">
+                                            <Items>
+                                                <DxToolbarItem IconCssClass="bi bi-envelope" Name="EmailStudentsOnly" Text="Selected Students Only"
+                                                               Click=@(() => OnCommunicate(false))
+                                                               Tooltip="Send email and/or SMS to students only" />
+                                                <DxToolbarItem IconCssClass="bi bi-envelope" Name="EmailStudentsAndLeaders" Text="Selected Students & Leaders"
+                                                               BeginGroup=true
+                                                               Click=@(() => OnCommunicate(true))
+                                                               Tooltip="Send email and/or SMS to selected students & leaders" />
+                                            </Items>
                                         </DxToolbarItem>
                                     </CustomButtonContent>
                                 </GridToolbar>
@@ -545,7 +552,7 @@ else
     {
         selectedClass = null;
         classComboNullText = null;
-        if (selectedCourse.CourseParticipationTypeID == 
+        if (selectedCourse.CourseParticipationTypeID ==
             (int?)ParticipationType.SameParticipantsInAllClasses || selectedCourse.Classes.Count == 1)
         {
             if (selectedCourse.Classes.Count == 1)
@@ -1017,7 +1024,7 @@ else
         IsFlyoutOpen = true;
     }
 
-    async Task OnCommunicate()
+    async Task OnCommunicate(bool includeLeaders)
     {
 
         if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
@@ -1030,7 +1037,16 @@ else
         {
             SendTo.Add(e.Person);
         }
-        ;
+        if (includeLeaders)
+        {
+            if (CourseLeaders != null)
+            {
+                foreach (var l in CourseLeaders)
+                {
+                    if (!SendTo.Contains(l)) { SendTo.Add(l); }
+                }
+            }
+        }
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             documentsSent = 0;
