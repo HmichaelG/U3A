@@ -18,8 +18,8 @@
     <BodyTemplate Context="PopupContext">
         <DxFormLayout CssClass="m-2">
             <div class="m-2">
-                A domain-level login is one not usually associated with a Participant.<br />
-                It is most often used to grant a group of users common access to the administrative portal.
+                A domain-level login is used to grant a user access to the administrative portal,
+                in addition to their normal login used to access the Member Portal.
                 For example, @GetExampleEmail().
             </div>
             <DxFormLayoutItem Caption="Login" ColSpanSm="6">
@@ -149,7 +149,7 @@
         return $"@{splits?[1]}";
     }
     string GetExampleEmail() {
-        return $"office{GetDomain()}";
+        return $"admin{GetDomain()}";
     }
 
     async Task AffirmativeButtonClicked() {
