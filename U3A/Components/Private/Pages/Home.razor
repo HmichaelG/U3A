@@ -12,6 +12,8 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject CircuitHandler circuitHandler
 @inject WorkStation ws
+@inject IJSRuntime js
+
 
 @implements IDisposable
 
@@ -21,6 +23,16 @@
 }
 else
 {
+    <DxFlyout @bind-IsOpen=@isFlyoutOpen
+              CloseOnOutsideClick="false"
+              PositionTarget="#helpButton"
+              Position="FlyoutPosition.Bottom"
+              Width="15rem"
+              HeaderVisible="true"
+              HeaderText="🎁 A New Software Update"
+              BodyText="Our software has changed. Click the button above to see what has changed."
+              CssClass="text-info" />
+
     <DxWindow HeaderText="Open Circuits" Width="800px" ShowFooter="true"
               ShowCloseButton="true"
               CloseOnEscape="true"
@@ -74,6 +86,7 @@ else
                 </span>
                 <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                   IsVersionButton=true
+                                  ShowNewSoftwareUpdateFlyout=@((value) => isFlyoutOpen = value)
                                   ButtonIconCssClass="h5 text-primary bi bi-check2-circle"
                                   HelpTopic=@($"{versionYear}-Version-History.html")
                                   ActivationStyle="@HelpActivationStyle.ButtonOnly" />
@@ -154,6 +167,7 @@ else
     List<CircuitDetail>? circuitDetails;
     bool showPopup;
     string tenantId;
+    bool isFlyoutOpen;
 
     protected override async Task OnInitializedAsync()
     {
@@ -183,7 +197,6 @@ else
             GetCircuitData();
             StateHasChanged();
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task ParseQueryString()

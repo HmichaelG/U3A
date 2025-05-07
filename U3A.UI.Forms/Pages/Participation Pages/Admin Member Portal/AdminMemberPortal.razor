@@ -75,15 +75,15 @@ else
                         {
                             case buttonClicks.ProcessOnBehalfOf:
                                 <DxFormLayout CssClass="my-2">
-                                    <div class="mx-auto mb-2 col col-12 @((isDrawerOpen) ? "col-xl-6" : "col-lg-6")">
+                                    <div class="mx-auto col col-12 @((isDrawerOpen) ? "col-xl-6" : "col-lg-6")">
                                         <div class="text-center" hidden="@(isSelected)">
                                             <div class="h3 text-center">Member Portal (Administration)</div>
                                             <div class="h6">Process enrolments and/or membership fees on behalf of members.</div>
-                                        </div>
-                                            <DxFormLayoutItem Caption="Process on behalf of" ColSpanMd="12">
+                                            <DxFormLayoutItem Caption="Process on behalf of" ColSpanMd="12" CssClass="mb-2">
                                                 <PersonsComboBox People="@people" SelectedPerson="@selectedPerson"
                                                                  SelectedPersonChanged="(Person newValue) => OnSelectedPersonChanged(newValue)" />
                                             </DxFormLayoutItem>
+                                        </div>
                                     </div>
                                     @if (isSelected)
                                     {
@@ -380,6 +380,7 @@ else
             selectedPerson = await dbc.Person.FindAsync(selectedPerson.ID);
             LoginState = new LoginState(authEmail, selectedPerson, U3Adbfactory);
             isSelected = true;
+            StateHasChanged();
         }
     }
 

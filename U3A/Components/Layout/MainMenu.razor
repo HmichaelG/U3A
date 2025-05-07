@@ -39,7 +39,7 @@
                         if (isAuthenticated)
                         {
 
-                            <DxMenuItem Text="@((isVertical) ? "Home" : "")" IconCssClass="menu-icon bi bi-house" NavigateUrl="./" />
+                            <DxMenuItem @ref="homeButton" id="home-button" Text="@((isVertical) ? "Home" : "")" IconCssClass="menu-icon bi bi-house" NavigateUrl="./" />
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
@@ -244,6 +244,7 @@
     string? userName { get; set; }
     string OrganisationName = string.Empty;
     AuthenticationState? authenticationState;
+    DxMenuItem? homeButton;
 
     protected override async Task OnInitializedAsync()
     {
@@ -268,7 +269,6 @@
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
         navMan.LocationChanged += OnLocationChanged;
     }
-
 
     protected override void OnParametersSet()
     {
