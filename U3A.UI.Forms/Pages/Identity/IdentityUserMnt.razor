@@ -362,7 +362,7 @@ else
             if (appUser.Password != appUser.ConfirmPassword)
             {
                 await messageBox.ShowOkOnlyAsync("Passwords must match",
-                            "The password and confirm password fields fo not match!");
+                            "The password and confirm password fields do not match!");
                 e.Cancel = true;
                 return;
             }
