@@ -110,12 +110,15 @@
 
     async Task ApplyFix(U3ADbContextSeed dbc)
     {
-        foreach (var c in dbc.Course.ToArray())
-        {
-            //c.Description = HtmlEditor.RemoveStyle(c.Description!);
-            //c.DisplayDescription = HtmlEditor.AdjustAndMinifyHtml(c.Description!);
-        }
-        await dbc.SaveChangesAsync();
+        await dbc.Database.ExecuteSqlRawAsync(
+                  @"update enrolment set ClassID = null
+            where id in 
+            (
+            select e.id from Enrolment e
+            inner join course c on e.CourseID = c.ID
+            where c.CourseParticipationTypeID = 0 and e.ClassID is not null
+            )"
+        );
     }
 
     void DoCancel() { NavMan.NavigateTo("/"); }

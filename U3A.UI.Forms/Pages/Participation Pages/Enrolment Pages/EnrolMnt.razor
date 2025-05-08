@@ -553,23 +553,23 @@ else
         selectedClass = null;
         classComboNullText = null;
         if (selectedCourse.CourseParticipationTypeID ==
-            (int?)ParticipationType.SameParticipantsInAllClasses || selectedCourse.Classes.Count == 1)
+            (int?)ParticipationType.SameParticipantsInAllClasses)
         {
-            if (selectedCourse.Classes.Count == 1)
-            {
-                selectedClass = classes[0];
-                classComboEnabled = true;
-            }
-            else
-            {
                 classComboNullText = selectedCourse.CourseParticipationType.Name;
                 classComboEnabled = false;
-            }
         }
         else
         {
-            classComboNullText = "Select the Class to enroll...";
-            classComboEnabled = true;
+            if (selectedCourse.Classes.Count() == 1)
+            {
+                selectedClass = classes[0];
+                classComboEnabled = false;
+            }
+            else
+            {
+                classComboNullText = "Select the Class to enroll...";
+                classComboEnabled = true;
+            }
         }
     }
 
