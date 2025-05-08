@@ -524,6 +524,15 @@ public class Person : BaseEntity, ISoftDelete
     public bool IsDeleted { get; set; }
     public DateTime? DeletedAt { get; set; }
     public DateTime? DateTermsLastAgreed { get; set; }
+
+    // *** Carer's Details ***
+    public string? CarerName { get; set; }
+    public string? CarerPhone { get; set; }
+
+    [MaxLength(256)]
+    [EmailAddressAllowNull]
+    public string? CarerEmail { get; set; }
+    public string? CarerCompany { get; set; }
 }
 public class PersonList : BindingList<Person> { }
 

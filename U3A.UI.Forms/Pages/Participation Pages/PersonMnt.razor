@@ -135,6 +135,20 @@
                                             <DxGridDataColumn Caption="Silent?" FieldName="SilentNumberShortDisplayText" Visible=true Width="4rem" />
                                         </Columns>
                                     </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Carer's Detail" Visible="false">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Name" FieldName=@nameof(Person.CarerName) Width="15rem" />
+                                            <DxGridDataColumn Caption="Company" FieldName=@nameof(Person.CarerCompany) Width="15rem" />
+                                            <DxGridDataColumn Caption="Phone" FieldName=@nameof(Person.CarerPhone) Width="8rem" />
+                                            <DxGridDataColumn Caption="Email" FieldName=@nameof(Person.CarerEmail) Width="15rem" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Emergency Contact" Visible="false">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=true />
+                                            <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=true />
+                                        </Columns>
+                                    </DxGridBandColumn>
                                     <DxGridBandColumn Caption="Mail Options">
                                         <Columns>
                                             <DxGridDataColumn Caption="Trx Via" FieldName="@nameof(Person.SendTransactionalEmailVia)" Visible=true Width="5rem" />
@@ -147,12 +161,6 @@
                                             <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="5rem" />
                                             <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Visible="@true" Width="5rem" />
                                             <DxGridDataColumn Caption="Life?" FieldName="IsLifeMember" Visible="@true" Width="5rem" />
-                                        </Columns>
-                                    </DxGridBandColumn>
-                                    <DxGridBandColumn Caption="Emergency Contact" Visible="false">
-                                        <Columns>
-                                            <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Visible=false />
-                                            <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Visible=false />
                                         </Columns>
                                     </DxGridBandColumn>
                                     <DxGridDataColumn Caption="Vax-Cert?" FieldName="VaxCertificateViewed" Visible="@settings.RequireVaxCertificate" Width="4rem" />
@@ -267,14 +275,34 @@
                                                             Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
                                             </DxFormLayoutItem>
                                         </DxFormLayoutGroup>
-                                        <DxFormLayoutGroup Caption="In Case of Emergency" ColSpanMd="6">
-                                            <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@editItem.ICEContact" autocomplete="new-password" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@editItem.ICEPhone" autocomplete="new-password" />
-                                            </DxFormLayoutItem>
-                                        </DxFormLayoutGroup>
+                                        <DxTabs CssClass="col col-6">
+                                            <DxTabPage Text="In Case of Emergency">
+                                                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+                                                    <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@editItem.ICEContact" autocomplete="new-password" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@editItem.ICEPhone" autocomplete="new-password" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                            </DxTabPage>
+                                            <DxTabPage Text="Carer's Details">
+                                                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+                                                    <DxFormLayoutItem Caption="Carer's Name" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@editItem.CarerName" autocomplete="new-password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Company" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@editItem.CarerCompany" autocomplete="new-password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Phone" ColSpanMd="5">
+                                                        <DxTextBox @bind-Text="@editItem.CarerPhone" autocomplete="new-password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Email" ColSpanMd="7">
+                                                        <DxTextBox @bind-Text="@editItem.CarerEmail" autocomplete="new-password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayoutGroup>
+                                            </DxTabPage>
+                                        </DxTabs>
 
                                         <DxFormLayoutGroup Caption="Membership" ColSpanMd="6">
                                             <Items>
@@ -304,7 +332,7 @@
                                 </EditFormTemplate>
                             </DxGrid>
                         </DxSplitterPane>
-                        <DxSplitterPane Size="10rem" AllowCollapse="@(!IsEmbedded)" 
+                        <DxSplitterPane Size="10rem" AllowCollapse="@(!IsEmbedded)"
                                         Collapsed="@isSplitterCollapsed">
                             <div class="h6">Queued Broadcast Email</div>
                             <QueuedBroadcastEmailGrid @ref=@queueGrid IsEmbedded="true" />
@@ -412,7 +440,7 @@
         await SetupSplitter();
     }
 
-    async Task SetupSplitter() => 
+    async Task SetupSplitter() =>
         isSplitterCollapsed = IsEmbedded || !(await dbc.DocumentQueue.AnyAsync(x => x.Status == DocumentQueueStatus.ReadyToSend));
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -531,7 +559,7 @@
                     msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                 }
                 result = await messageBox.ShowAsync("Email change failed",
-                                                                        $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
+                                                                            $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
             }
         }
@@ -574,7 +602,7 @@
                         msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                     }
                     result = await messageBox.ShowAsync("Email change failed",
-                                                                                $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
+                                                                                    $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
                 }
             }

@@ -16,15 +16,15 @@ else
 {
 
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-                        @bind-IsActive="@IsMobileLayout" />
+    @bind-IsActive="@IsMobileLayout" />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" />
 
     <div class="col col-12 col-md-10 col-lg-8 mx-auto mt-2">
         <EditForm Model="@person"
-                  OnSubmit="@OnValidateForm"
-                  Context="editContext">
+        OnSubmit="@OnValidateForm"
+        Context="editContext">
             <DataAnnotationsValidator />
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
                 @if (loginState.SelectedPerson == null)
@@ -53,91 +53,92 @@ else
                                 <DxTextBox @bind-Text="@City" />
                             </DxFormLayoutItem>
                             <DxButton CssClass="mt-2 ms-2" IconCssClass="bi bi-search"
-                                      Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
+                            Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
                         </DxFormLayoutGroup>
                     </div>
                 }
                 <div hidden="@(IsNewLinkedMember && !isDatabaseCheckDone)">
-                    <DxFormLayoutGroup Caption="Personal">
-                        <DxFormLayoutItem Caption="Identity" ColSpanMd="12" Visible="@(!isNew)">
-                            <DxTextBox Text="@person.PersonIdentity"
-                                       TextExpression="@(() => person.PersonIdentity)" ReadOnly="true" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Title" ColSpanMd="12">
-                            <DxComboBox TData="string" TValue="string"
-                                        NullText="(Optional) Select or Enter Title"
-                                        Data="@titles"
-                                        @bind-Text="@person.Title"
-                                        AllowUserInput="true" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@person.FirstName" ReadOnly="@(isDatabaseCheckDone)" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@person.LastName" ReadOnly="@(isDatabaseCheckDone)" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12" Visible=@systemSettings.AllowPostNominalLetters>
-                            <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
-                                       @bind-Text="@person.PostNominals" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
-                            <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
-                            <DxDateEdit @bind-Date="@person.BirthDate"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Optional It helps to know you." />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
-                            <DxMemo @bind-Text="@person.Occupation" Rows="3"
+                    <DxTabs CssClass="w-100 px-4 mx-auto">
+                        <DxTabPage Text="Your Details">
+                            <DxFormLayoutGroup Caption="Personal">
+                                <DxFormLayoutItem Caption="Identity" ColSpanMd="12" Visible="@(!isNew)">
+                                    <DxTextBox Text="@person.PersonIdentity"
+                                    TextExpression="@(() => person.PersonIdentity)" ReadOnly="true" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Title" ColSpanMd="12">
+                                    <DxComboBox TData="string" TValue="string"
+                                    NullText="(Optional) Select or Enter Title"
+                                    Data="@titles"
+                                    @bind-Text="@person.Title"
+                                    AllowUserInput="true" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@person.FirstName" ReadOnly="@(isDatabaseCheckDone)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Last Name" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@person.LastName" ReadOnly="@(isDatabaseCheckDone)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12" Visible=@systemSettings.AllowPostNominalLetters>
+                                    <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
+                                    @bind-Text="@person.PostNominals" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
+                                    <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
+                                    <DxDateEdit @bind-Date="@person.BirthDate"
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                    NullText="Optional It helps to know you." />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
+                                    <DxMemo @bind-Text="@person.Occupation" Rows="3"
                                     NullText="Tinker, tailor, soldier, spy? Your skills may be useful to us. Enter one per line." />
-                        </DxFormLayoutItem>
-                    </DxFormLayoutGroup>
+                                </DxFormLayoutItem>
+                            </DxFormLayoutGroup>
 
-                    <DxFormLayoutGroup Caption="Address / Contact Information">
-                        <DxFormLayoutItem Caption="Street" ColSpanXl="12">
-                            <DxTextBox @bind-Text="@person.Address" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="City" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@person.City" ReadOnly="@(isDatabaseCheckDone)" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="State" ColSpanMd="6">
-                            <DxComboBox Data="@states" @bind-Value="@person.State" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
-                            <DxSpinEdit @bind-Value="@person.Postcode" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Email" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@person.Email" ReadOnly="true">
-                                <Buttons>
-                                    <DxEditorButton Text="Help" CssClass="text-info"
-                                                    IconCssClass="bi bi-question"
-                                                    Click="@(async () => await messageBox?
-                                                            .ShowOkOnlyAsync("Email Address",
+                            <DxFormLayoutGroup Caption="Address / Contact Information">
+                                <DxFormLayoutItem Caption="Street" ColSpanXl="12">
+                                    <DxTextBox @bind-Text="@person.Address" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="City" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@person.City" ReadOnly="@(isDatabaseCheckDone)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="State" ColSpanMd="6">
+                                    <DxComboBox Data="@states" @bind-Value="@person.State" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Postcode" ColSpanMd="6">
+                                    <DxSpinEdit @bind-Value="@person.Postcode" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Email" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@person.Email" ReadOnly="true">
+                                        <Buttons>
+                                            <DxEditorButton Text="Help" CssClass="text-info"
+                                            IconCssClass="bi bi-question"
+                                            Click="@(async () => await messageBox.ShowOkOnlyAsync("Email Address",
                                 @"<div class='text-center alert alert-info text-dark col-12'>
                                 <p>Your email address and password is the key to access your U3A details.
                                     It must be protected and kept secure at all times.
                                 <p>To change your email address or password, return to the menu and click <strong>Manage Credentials</strong>.
                                 <p>Select <strong>Change your email address</strong>. The system will request your new address and send an email for confirmation.
                                     Once, confirmed, you will be able to login with the new email address."))" />
-                                </Buttons>
-                            </DxTextBox>
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Home Phone" ColSpanMd="6">
-                            <DxTextBox @bind-Text="@person.HomePhone" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Mobile Phone" ColSpanMd="6">
-                            <DxTextBox @bind-Text="@person.Mobile" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
-                            <DxComboBox Data="silentContactList"
-                                        @bind-Value="@person.SilentContact"
-                                        ValueFieldName="@nameof(SilentContactWrapper.Type)"
-                                        TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
-                                <Buttons>
-                                    <DxEditorButton Text="Help" CssClass="text-info"
-                                                    IconCssClass="bi bi-question"
-                                                    Click="@(async () => await messageBox?
+                                        </Buttons>
+                                    </DxTextBox>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Home Phone" ColSpanMd="6">
+                                    <DxTextBox @bind-Text="@person.HomePhone" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Mobile Phone" ColSpanMd="6">
+                                    <DxTextBox @bind-Text="@person.Mobile" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
+                                    <DxComboBox Data="silentContactList"
+                                    @bind-Value="@person.SilentContact"
+                                    ValueFieldName="@nameof(SilentContactWrapper.Type)"
+                                    TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
+                                        <Buttons>
+                                            <DxEditorButton Text="Help" CssClass="text-info"
+                                            IconCssClass="bi bi-question"
+                                            Click="@(async () => await messageBox?
                                                             .ShowOkOnlyAsync("Silent Contacts",
                                 @"<div class='text-center alert alert-info text-dark col-12'>
                                 <p>Silent phone numbers are not visible to leaders, clerks or students.
@@ -145,28 +146,51 @@ else
                                 <p>A <strong>student's</strong> silent email remains visible to leaders/clerks so that communication is possible.
                                     <p><em>If not silent, your course leader and clerk has access to your contact details and you have access to theirs. Students do not have access to other students’ details.</em>
                                     "))" />
-                                </Buttons>
-                            </DxComboBox>
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
-                            <DxCheckBox @bind-Checked="@person.SMSOptOut"
-                                        Alignment="CheckBoxContentAlignment.Right" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Mail preference" ColSpanMd="6">
-                            <DxComboBox Data="@Communication" @bind-Value="@person.Communication" />
-                        </DxFormLayoutItem>
+                                        </Buttons>
+                                    </DxComboBox>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
+                                    <DxCheckBox @bind-Checked="@person.SMSOptOut"
+                                    Alignment="CheckBoxContentAlignment.Right" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Mail preference" ColSpanMd="6">
+                                    <DxComboBox Data="@Communication" @bind-Value="@person.Communication" />
+                                </DxFormLayoutItem>
 
-                    </DxFormLayoutGroup>
-                    <DxFormLayoutGroup Caption="In Case of Emergency">
-                        <DxFormLayoutItem Id="ICEContact" Caption="Contact" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@person.ICEContact" />
-                            <ValidationMessage For="@(() => person.ICEContact)" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem id="ICEPhone" Caption="Phone" ColSpanMd="12">
-                            <DxTextBox @bind-Text="@person.ICEPhone" />
-                            <ValidationMessage For="@(() => person.ICEPhone)" />
-                        </DxFormLayoutItem>
-                    </DxFormLayoutGroup>
+                            </DxFormLayoutGroup>
+                            <DxFormLayoutGroup Caption="In Case of Emergency">
+                                <DxFormLayoutItem Id="ICEContact" Caption="Contact" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@person.ICEContact" />
+                                    <ValidationMessage For="@(() => person.ICEContact)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem id="ICEPhone" Caption="Phone" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@person.ICEPhone" />
+                                    <ValidationMessage For="@(() => person.ICEPhone)" />
+                                </DxFormLayoutItem>
+                            </DxFormLayoutGroup>
+                        </DxTabPage>
+                        <DxTabPage Text="Your Carer's Details">
+                            <DxFormLayout CssClass="container m-1 p-2 mx-auto">
+                                <DxFormLayoutGroup Caption="Your Carer's Details">
+                                    <div class="text-info text-wrap m-2">Please complete if you wish your carer to attend class with you.</div>
+                                    <DxFormLayoutItem Caption="Carer's Name" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@person.CarerName"
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Company/Organisation" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@person.CarerCompany" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@person.CarerPhone" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem Caption="Email" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@person.CarerEmail" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                    </DxFormLayoutItem>
+                                </DxFormLayoutGroup>
+                            </DxFormLayout>
+                        </DxTabPage>
+                    </DxTabs>
+
                 </div>
             </DxFormLayout>
             <footer id="footer">
@@ -182,15 +206,15 @@ else
 
 <style>
     .scrollable {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        display: block;
-        width: 100%;
-        min-width: 1px;
-        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "10rem" : "8rem" : "8rem") );
-        overflow-y: auto;
-        border-bottom: thin;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: 100%;
+    min-width: 1px;
+    height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "10rem" : "8rem" : "8rem") );
+    overflow-y: auto;
+    border-bottom: thin;
     }
 
 </style>
@@ -315,7 +339,7 @@ else
                 if (IsNewLinkedMember)
                 {
                     await messageBox.ShowOkOnlyAsync("Link Succeeded", "You must now re-login for the change to take affect.<br>" +
-                                                        "Click Ok to logout");
+                    "Click Ok to logout");
                     loginState.SelectedPerson = null;
                     await OnCancel();
                 }
@@ -348,10 +372,10 @@ else
         if (person.Communication != Communication[0] && systemSettings.MailSurcharge > 0)
         {
             msg += "<div class='text-center alert alert-danger text-dark col-12'>" +
-                      $"A Post mail preference incurs an additional <strong>{surcharge}</strong> postal surcharge per year.<br />" +
-                      "Click <strong>Cancel</strong> and change to <strong>Email</strong> which is free, or<br />" +
-                      "Click <strong>Ok</strong> again to confirm your choice." +
-                      "</div>";
+            $"A Post mail preference incurs an additional <strong>{surcharge}</strong> postal surcharge per year.<br />" +
+            "Click <strong>Cancel</strong> and change to <strong>Email</strong> which is free, or<br />" +
+            "Click <strong>Ok</strong> again to confirm your choice." +
+            "</div>";
         }
         if (msg != "") { result = await messageBox.ShowAsync("Please Note ...", msg); }
         return result;
@@ -361,8 +385,8 @@ else
     {
         var result = PortalMenuResult.MenuOptionCompleted;
         var msg = @"<p>Thank you for sharing your details with us.<br/>
-                    Only financial members may participate in U3A courses.</p>
-                    <p>Would you like to pay the membership fee now?</p>";
+                            Only financial members may participate in U3A courses.</p>
+                            <p>Would you like to pay the membership fee now?</p>";
         MessageBoxArgs args = new MessageBoxArgs()
             {
                 CancelButtonText = "No thanks, I'll do it later",
@@ -391,9 +415,9 @@ else
         var firstName = FirstName.ToLower().Trim();
         var city = City.ToLower().Trim();
         if (dbc.Person.Any(x => x.LastName.ToLower().Trim() == lastName &&
-                                    x.FirstName.ToLower().Trim() == firstName &&
-                                    x.City.ToLower().Trim() == city &&
-                                    !x.DateCeased.HasValue))
+        x.FirstName.ToLower().Trim() == firstName &&
+        x.City.ToLower().Trim() == city &&
+        !x.DateCeased.HasValue))
         {
             await messageBox.ShowOkOnlyAsync("Already on file", "A person with First Name, Last Name and City already exists in our database.");
         }
@@ -423,5 +447,4 @@ else
     {
         dbc?.Dispose();
     }
-
 }
