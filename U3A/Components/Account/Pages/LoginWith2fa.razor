@@ -55,7 +55,7 @@
     private string? ReturnUrl { get; set; }
 
     [SupplyParameterFromQuery]
-    private bool RememberMe { get; set; }
+    private bool RememberMe { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,6 +96,6 @@
         public string? TwoFactorCode { get; set; }
 
         [Display(Name = "Remember this machine")]
-        public bool RememberMachine { get; set; }
+        public bool RememberMachine { get; set; } = true;
     }
 }
