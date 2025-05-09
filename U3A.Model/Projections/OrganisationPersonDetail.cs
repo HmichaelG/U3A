@@ -59,6 +59,7 @@ namespace U3A.Model
         public Boolean PersonIsCourseLeader { get; set; }
         public Boolean PersonIsCommitteeMember { get; set; }
         public Boolean PersonIsVolunteer { get; set; }
+        public string PersonCarerSummary { get; set; }
 
         //Current Term
         public int CurrentTermYear { get; set; }

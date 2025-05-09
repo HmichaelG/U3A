@@ -141,6 +141,7 @@
                                             <DxGridDataColumn Caption="Company" FieldName=@nameof(Person.CarerCompany) Width="15rem" />
                                             <DxGridDataColumn Caption="Phone" FieldName=@nameof(Person.CarerPhone) Width="8rem" />
                                             <DxGridDataColumn Caption="Email" FieldName=@nameof(Person.CarerEmail) Width="15rem" />
+                                            <DxGridDataColumn Caption="Copy Email?" FieldName=@nameof(Person.CarerGetsEmailCopy) Width="5rem" />
                                         </Columns>
                                     </DxGridBandColumn>
                                     <DxGridBandColumn Caption="Emergency Contact" Visible="false">
@@ -294,12 +295,18 @@
                                                     <DxFormLayoutItem Caption="Company" ColSpanMd="12">
                                                         <DxTextBox @bind-Text="@editItem.CarerCompany" autocomplete="new-password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Phone" ColSpanMd="5">
+                                                    <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
                                                         <DxTextBox @bind-Text="@editItem.CarerPhone" autocomplete="new-password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Email" ColSpanMd="7">
+                                                    <DxFormLayoutItem Caption="Email" ColSpanMd="12">
                                                         <DxTextBox @bind-Text="@editItem.CarerEmail" autocomplete="new-password" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                     </DxFormLayoutItem>
+                                                    <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None">
+                                                        <DxFormLayoutItem Caption="Receives Email Copy?" ColSpanMd="12">
+                                                            <DxCheckBox @bind-Checked="@editItem.CarerGetsEmailCopy"
+                                                                        Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
+                                                        </DxFormLayoutItem>
+                                                    </DxFormLayoutGroup>
                                                 </DxFormLayoutGroup>
                                             </DxTabPage>
                                         </DxTabs>
@@ -559,7 +566,7 @@
                     msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                 }
                 result = await messageBox.ShowAsync("Email change failed",
-                                                                            $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
+                                                                                    $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
             }
         }
@@ -602,7 +609,7 @@
                         msg += $"&nbsp;&nbsp;{err.Description}<br/>";
                     }
                     result = await messageBox.ShowAsync("Email change failed",
-                                                                                    $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
+                                                                                            $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
                         <p>Are you sure you wish to continue?</p>");
                 }
             }

@@ -38,6 +38,8 @@ namespace U3A.BusinessRules
                                  P_Communication = p.Communication,
                                  P_IsLifeMember = p.IsLifeMember,
                                  P_FullName = $"{p.FirstName} {p.LastName}",
+                                 P_CarerName = p.CarerName ?? "",
+                                 P_CarerSendToEmail = p.CarerSendToEmail,
 
                                  // System Settings data
 

@@ -211,6 +211,11 @@ public partial class DocumentServer : IDisposable
         {
             toAddressList.Add(mergeItem.P_Email);
             toDisplayNameList.Add(mergeItem.P_FullName);
+            if (!string.IsNullOrWhiteSpace(mergeItem.P_CarerSendToEmail))
+            {
+                toAddressList.Add(mergeItem.P_CarerSendToEmail);
+                toDisplayNameList.Add(mergeItem.P_CarerName);
+            }
         }
     }
 

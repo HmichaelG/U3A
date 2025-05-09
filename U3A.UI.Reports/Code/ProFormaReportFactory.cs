@@ -178,6 +178,27 @@ namespace U3A.UI.Reports
                     }
                     var pdfFilename = CreateMergedPDF(personsFiles);
                     if (string.IsNullOrWhiteSpace(pdfFilename)) { continue; }
+                    if (!isPreview && !string.IsNullOrWhiteSpace(person.CarerSendToEmail))
+                    {
+                        var emailText = emailTemplate
+                                            .Replace("{u3aName}", u3aName)
+                                            .Replace("{FirstName}", person.FirstName)
+                                            .Replace("{copyrightYear}", copyrightYear)
+                                            .Replace("{tenantID}", tenantID)
+                                            .Replace("{sendEmailDisplayName}", sendEmailDisplayName);
+                        result.Add(kvp.Key, await emailSender.SendEmailAsync(
+                                       EmailType.Transactional,
+                                       SendEmailAddress,
+                                       sendEmailDisplayName,
+                                       person.CarerSendToEmail,
+                                       person.CarerName,
+                                       $"U3A Enrolment (Carer's Copy): {person.FullName}",
+                                       emailText,
+                                       string.Empty,
+                                       new List<string>() { pdfFilename },
+                                       new List<string>() { "Enrolment Details.pdf" }
+                                       )); ;
+                    }
                     if (!isPreview && !string.IsNullOrWhiteSpace(person.Email))
                     {
                         var emailText = emailTemplate

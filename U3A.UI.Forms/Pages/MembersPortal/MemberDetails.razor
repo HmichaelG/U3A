@@ -16,15 +16,15 @@ else
 {
 
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-    @bind-IsActive="@IsMobileLayout" />
+                        @bind-IsActive="@IsMobileLayout" />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" />
 
     <div class="col col-12 col-md-10 col-lg-8 mx-auto mt-2">
         <EditForm Model="@person"
-        OnSubmit="@OnValidateForm"
-        Context="editContext">
+                  OnSubmit="@OnValidateForm"
+                  Context="editContext">
             <DataAnnotationsValidator />
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
                 @if (loginState.SelectedPerson == null)
@@ -53,7 +53,7 @@ else
                                 <DxTextBox @bind-Text="@City" />
                             </DxFormLayoutItem>
                             <DxButton CssClass="mt-2 ms-2" IconCssClass="bi bi-search"
-                            Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
+                                      Click="OnSearch" Text="Search" RenderStyle="@ButtonRenderStyle.Primary" />
                         </DxFormLayoutGroup>
                     </div>
                 }
@@ -63,14 +63,14 @@ else
                             <DxFormLayoutGroup Caption="Personal">
                                 <DxFormLayoutItem Caption="Identity" ColSpanMd="12" Visible="@(!isNew)">
                                     <DxTextBox Text="@person.PersonIdentity"
-                                    TextExpression="@(() => person.PersonIdentity)" ReadOnly="true" />
+                                               TextExpression="@(() => person.PersonIdentity)" ReadOnly="true" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Title" ColSpanMd="12">
                                     <DxComboBox TData="string" TValue="string"
-                                    NullText="(Optional) Select or Enter Title"
-                                    Data="@titles"
-                                    @bind-Text="@person.Title"
-                                    AllowUserInput="true" />
+                                                NullText="(Optional) Select or Enter Title"
+                                                Data="@titles"
+                                                @bind-Text="@person.Title"
+                                                AllowUserInput="true" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="First Name" ColSpanMd="12">
                                     <DxTextBox @bind-Text="@person.FirstName" ReadOnly="@(isDatabaseCheckDone)" />
@@ -80,19 +80,19 @@ else
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Post-Nominals" ColSpanMd="12" Visible=@systemSettings.AllowPostNominalLetters>
                                     <DxTextBox NullText="(Optional) PhD, BComm, RN etc"
-                                    @bind-Text="@person.PostNominals" />
+                                               @bind-Text="@person.PostNominals" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
                                     <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
                                     <DxDateEdit @bind-Date="@person.BirthDate"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    NullText="Optional It helps to know you." />
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                NullText="Optional It helps to know you." />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                                     <DxMemo @bind-Text="@person.Occupation" Rows="3"
-                                    NullText="Tinker, tailor, soldier, spy? Your skills may be useful to us. Enter one per line." />
+                                            NullText="Tinker, tailor, soldier, spy? Your skills may be useful to us. Enter one per line." />
                                 </DxFormLayoutItem>
                             </DxFormLayoutGroup>
 
@@ -113,8 +113,8 @@ else
                                     <DxTextBox @bind-Text="@person.Email" ReadOnly="true">
                                         <Buttons>
                                             <DxEditorButton Text="Help" CssClass="text-info"
-                                            IconCssClass="bi bi-question"
-                                            Click="@(async () => await messageBox.ShowOkOnlyAsync("Email Address",
+                                                            IconCssClass="bi bi-question"
+                                                            Click="@(async () => await messageBox.ShowOkOnlyAsync("Email Address",
                                 @"<div class='text-center alert alert-info text-dark col-12'>
                                 <p>Your email address and password is the key to access your U3A details.
                                     It must be protected and kept secure at all times.
@@ -132,13 +132,13 @@ else
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Silent Contacts" ColSpanMd="12">
                                     <DxComboBox Data="silentContactList"
-                                    @bind-Value="@person.SilentContact"
-                                    ValueFieldName="@nameof(SilentContactWrapper.Type)"
-                                    TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
+                                                @bind-Value="@person.SilentContact"
+                                                ValueFieldName="@nameof(SilentContactWrapper.Type)"
+                                                TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
                                         <Buttons>
                                             <DxEditorButton Text="Help" CssClass="text-info"
-                                            IconCssClass="bi bi-question"
-                                            Click="@(async () => await messageBox?
+                                                            IconCssClass="bi bi-question"
+                                                            Click="@(async () => await messageBox?
                                                             .ShowOkOnlyAsync("Silent Contacts",
                                 @"<div class='text-center alert alert-info text-dark col-12'>
                                 <p>Silent phone numbers are not visible to leaders, clerks or students.
@@ -151,7 +151,7 @@ else
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="SMS Opt-Out?" ColSpanMd="6">
                                     <DxCheckBox @bind-Checked="@person.SMSOptOut"
-                                    Alignment="CheckBoxContentAlignment.Right" />
+                                                Alignment="CheckBoxContentAlignment.Right" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Mail preference" ColSpanMd="6">
                                     <DxComboBox Data="@Communication" @bind-Value="@person.Communication" />
@@ -175,7 +175,7 @@ else
                                     <div class="text-info text-wrap m-2">Please complete if you wish your carer to attend class with you.</div>
                                     <DxFormLayoutItem Caption="Carer's Name" ColSpanMd="12">
                                         <DxTextBox @bind-Text="@person.CarerName"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem Caption="Company/Organisation" ColSpanMd="12">
                                         <DxTextBox @bind-Text="@person.CarerCompany" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -186,6 +186,13 @@ else
                                     <DxFormLayoutItem Caption="Email" ColSpanMd="12">
                                         <DxTextBox @bind-Text="@person.CarerEmail" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                     </DxFormLayoutItem>
+                                    <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None">
+                                        <DxFormLayoutItem Caption="Carer Receives Email Copy?" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@person.CarerGetsEmailCopy"
+                                                        Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password">
+                                            </DxCheckBox>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayoutGroup>
                                 </DxFormLayoutGroup>
                             </DxFormLayout>
                         </DxTabPage>
@@ -206,15 +213,15 @@ else
 
 <style>
     .scrollable {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: block;
-    width: 100%;
-    min-width: 1px;
-    height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "10rem" : "8rem" : "8rem") );
-    overflow-y: auto;
-    border-bottom: thin;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        width: 100%;
+        min-width: 1px;
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "10rem" : "8rem" : "8rem") );
+        overflow-y: auto;
+        border-bottom: thin;
     }
 
 </style>

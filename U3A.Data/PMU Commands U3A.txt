@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args AppUser_TwoFactor
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_CarerDetails
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Person_CarerDetails
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Person_CarerGetsEmailCopy
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Person_CarerDetails
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Person_CarerGetsEmailCopy
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

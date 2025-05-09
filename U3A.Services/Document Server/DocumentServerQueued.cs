@@ -67,6 +67,19 @@ namespace U3A.Services
                                             bodyText.PlainText,
                                             PDFFileContents, filenames);
                 docsSent++;
+                if (!string.IsNullOrWhiteSpace( mergeItem.P_CarerSendToEmail))
+                {
+                    response = await IEmailSender.SendEmailAsync(EmailType.Broadcast,
+                                                documentTemplate.FromEmailAddress,
+                                                documentTemplate.FromDisplayName,
+                                                mergeItem.P_CarerSendToEmail,
+                                                mergeItem.P_CarerName,
+                                                $"{documentTemplate.Subject} (Carer's Copy)",
+                                                bodyText.HtmlText,
+                                                bodyText.PlainText,
+                                                PDFFileContents, filenames);
+                    docsSent++;
+                }
             }
             return docsSent;
         }

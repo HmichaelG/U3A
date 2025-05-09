@@ -23,13 +23,15 @@
 }
 else
 {
+    <DxLayoutBreakpoint MaxWidth="1200"
+    @bind-IsActive="@IsMobileLayout" />
 
     <MessageBox @ref="@messageBox" />
 
     <Progress @ref=@ProgressBar />
 
     <div class="mt-1 col col-12 mx-auto row">
-        <DxFormLayout SizeMode="SizeMode.Medium">
+        <DxFormLayout>
             @switch (menuSelection)
             {
                 case PortalMenuSelection.DoSelectLinkedMember:
@@ -145,6 +147,7 @@ else
     bool IsReady;
     bool IsProcessing;
     bool IsNewLinkedMember;
+    bool IsMobileLayout;
     U3ADbContext? dbc;
     SystemSettings? settings;
     Term? term;

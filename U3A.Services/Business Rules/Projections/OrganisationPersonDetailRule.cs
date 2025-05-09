@@ -112,6 +112,7 @@ namespace U3A.BusinessRules
             opd.PersonIsCourseLeader = person.IsCourseLeader;
             opd.PersonIsCommitteeMember = person.IsCommitteeMember;
             opd.PersonIsVolunteer = person.IsVolunteer;
+            opd.PersonCarerSummary = person.CarerSummaryHtml;
 
             opd.CurrentTermYear = t.Year;
             opd.CurrentTermNumber = t.TermNumber;

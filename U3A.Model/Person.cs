@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using U3A.Model;
 
 namespace U3A.Model;
@@ -263,8 +264,9 @@ public class Person : BaseEntity, ISoftDelete
         string? result = null;
         if (phoneNo != null && !IsPhoneSilent)
         {
-            result = phoneNo.Replace(" ", "").Replace("+61", "0");
-            if (result.Length == 9 && !result.StartsWith("0")) { result = "0" + result; }
+            string pattern = @"^(\+?\d{1,3}\s?|00\d{1,3}\s?)"; // Matches +61 or 0061
+            result = Regex.Replace(phoneNo, pattern, "").Trim().Replace(" ", "");
+            if (!result.StartsWith("0")) { result = $"0{result}"; }
         }
         return result;
     }
@@ -533,7 +535,51 @@ public class Person : BaseEntity, ISoftDelete
     [EmailAddressAllowNull]
     public string? CarerEmail { get; set; }
     public string? CarerCompany { get; set; }
-}
+    public bool CarerGetsEmailCopy { get; set; }
+    public string CarerSummaryHtml
+    {
+        get
+        {
+            var result = string.Empty;
+            if (!string.IsNullOrWhiteSpace(CarerName))
+            {
+                result = $"<b>Carer:</b> {CarerName.Trim()}";
+                if (!string.IsNullOrWhiteSpace(CarerCompany)) { result = $"{result}, {CarerCompany.Trim()}</br>"; }
+                if (!string.IsNullOrWhiteSpace(CarerPhone)) { result = $"{result} <b>Phone:</b> {adjustPhone(CarerPhone.Trim())}"; }
+                if (!string.IsNullOrWhiteSpace(CarerEmail)) { result = $"{result} <b>Email:</b> {CarerEmail.Trim()}"; }
+            }
+            return result;
+        }
+    }
+
+    public string CarerSendToMobile
+    {
+        get
+        {
+            var result = string.Empty;
+            if (!string.IsNullOrWhiteSpace(CarerName) && CarerGetsEmailCopy)
+            {
+                var ph = adjustPhone(CarerPhone);
+                if (ph.StartsWith("04") || ph.StartsWith("05")) { result = ph; }
+            }
+            return result;
+        }
+    }
+    public string CarerSendToEmail
+    {
+        get
+        {
+            var result = string.Empty;
+            if (!string.IsNullOrWhiteSpace(CarerName) 
+                && !string.IsNullOrWhiteSpace(CarerEmail) && CarerGetsEmailCopy)
+            {
+                result = CarerEmail;
+            }
+            return result;
+        }
+    }
+
+} // End of Person class 
 public class PersonList : BindingList<Person> { }
 
 public class PersonTitles : List<string>
