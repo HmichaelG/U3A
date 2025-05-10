@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DevExpress.XtraRichEdit.Model;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -264,9 +265,12 @@ public class Person : BaseEntity, ISoftDelete
         string? result = null;
         if (phoneNo != null && !IsPhoneSilent)
         {
-            string pattern = @"^(\+?\d{1,3}\s?|00\d{1,3}\s?)"; // Matches +61 or 0061
-            result = Regex.Replace(phoneNo, pattern, "").Trim().Replace(" ", "");
-            if (!result.StartsWith("0")) { result = $"0{result}"; }
+            result = phoneNo.Trim().Replace(" ", "");
+            if (result.StartsWith("+"))
+            {
+                result = result.Remove(0, 3);   //remove country code
+                if (!result.StartsWith("0")) { result = $"0{result}"; }
+            }
         }
         return result;
     }
