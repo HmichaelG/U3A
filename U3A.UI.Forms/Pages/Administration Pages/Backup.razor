@@ -5,7 +5,7 @@
 @using Microsoft.Data.SqlClient
 @using ClosedXML.Excel
 @using Serilog;
-@using System.IO.Compression
+@using ICSharpCode.SharpZipLib.Zip;
 
 @inject IJSRuntime js;
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
@@ -30,17 +30,33 @@
     <h3>Database Backup</h3>
     <p>
         This procedure will create a dump of your database and download it
-        as an Excel spreadsheet workbook. It is intended as an aid to transition to another 
+        as an Excel workbook. Each worksheet within the workbook is a table in the database. It is intended as an aid to transition to another
         software application rather than a formal backup. Formal backups are securely maintained within Microsoft's Azure datacenters.
     </p>
-    <p>The spreadsheet downloaded contains your member's private information. Please treat with care and in accordance with privacy legislation in your state.</p>
+    <p>The downloaded spreadsheet contains your member's private information. It is password protected with the password entered below. Please treat with care and in accordance with privacy legislation in your State.</p>
 
-    <DxButton Text="Do Backup" Click="@DoBackup" />
-    <div class="m-4 card overflow-auto h-75">@(new MarkupString(state))</div>
+    <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
+    Caption="File Password"
+    CaptionPosition="CaptionPosition.Horizontal">
+        <DxTextBox @bind-Text="@password" Password=true autocomplete="new-password" />
+    </DxFormLayoutItem>
+
+    <DxButton Text="Do Backup" CssClass="mt-2"
+    Click="@DoBackup"
+    Enabled="@(!string.IsNullOrWhiteSpace(password))" />
+
+    <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
+    Caption="Status" Visible="@(!string.IsNullOrWhiteSpace(state))"
+    CaptionPosition="CaptionPosition.Vertical">
+        <DxMemo @bind-Text="@state" ReadOnly="true" Rows="15" />
+    </DxFormLayoutItem>
+    <div>@(new MarkupString(finishText))</div>
 </div>
 
 @code {
     string state;
+    string finishText;
+    string password;
 
     private async Task DoBackup()
     {
@@ -56,7 +72,7 @@
             con.Open();
 
             // Get all table names
-            DataTable tables = con.GetSchema("Tables", new string[] { null, null, null, "BASE TABLE" }); 
+            DataTable tables = con.GetSchema("Tables", new string[] { null, null, null, "BASE TABLE" });
             DataView dv = tables.DefaultView;
             dv.Sort = "TABLE_NAME";
 
@@ -65,7 +81,7 @@
                 foreach (DataRowView row in dv)
                 {
                     string tableName = row["TABLE_NAME"].ToString();
-                    state += $"Exporting table: {tableName}<br/>";
+                    state += $"Exporting table: {tableName}\n";
                     StateHasChanged();
                     using (SqlCommand cmd = new SqlCommand($"SELECT * FROM {tableName}", con))
                     {
@@ -80,8 +96,8 @@
                                 }
                             }
                         }
-                       var ws = wb.Worksheets.Add(dt, tableName);
-                       ws.Columns().AdjustToContents();
+                        var ws = wb.Worksheets.Add(dt, tableName);
+                        ws.Columns().AdjustToContents();
                     }
                 }
 
@@ -91,32 +107,39 @@
                     wb.SaveAs(stream);
                     stream.Position = 0;
                     var fileName = "DatabaseExport.xlsx";
-                    var fileStream = new DotNetStreamReference(new MemoryStream(CompressMemoryStream(stream,fileName)));
+                    var fileStream = new DotNetStreamReference(new MemoryStream(await CompressMemoryStream(stream, fileName)));
                     var zipName = "DatabaseExport.zip";
                     await js.InvokeVoidAsync("downloadFileFromStream", zipName, fileStream);
-                    state += $"File {fileName} download successfully initiated.<br/>";
+                    finishText= $"File: <b>{fileName}</b> download successfully initiated.";
                 }
             }
         }
         StateHasChanged();
     }
 
-    public static byte[] CompressMemoryStream(MemoryStream inputStream, string fileNameInZip)
+    public async Task<byte[]> CompressMemoryStream(MemoryStream inputStream, string fileNameInZip)
     {
-        using (var zipStream = new MemoryStream())
+        byte[] result;
+        inputStream.Position = 0; // Reset the position of the input stream to the beginning
+        using (var outStream = new MemoryStream())
         {
-            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+            using (ZipOutputStream zipStream = new ZipOutputStream(outStream))
             {
-                var zipEntry = archive.CreateEntry(fileNameInZip, CompressionLevel.Optimal);
-                using (var entryStream = zipEntry.Open())
-                {
-                    inputStream.Position = 0; // Reset the position of the input stream
-                    inputStream.CopyTo(entryStream);
-                }
+                zipStream.Password = password;
+                zipStream.SetLevel(9);
+                ZipEntry entry = new ZipEntry(fileNameInZip);
+                zipStream.PutNextEntry(entry);
+                await inputStream.CopyToAsync(zipStream);
+                await zipStream.CloseEntryAsync(new CancellationToken());
+                zipStream.IsStreamOwner = false; // Do not close the underlying stream
+                await zipStream.FinishAsync(new CancellationToken());
+                outStream.Position = 0;
+                result = outStream.ToArray();
             }
-            return zipStream.ToArray(); // Return the ZIP as a byte array
         }
+        return result; // Return the ZIP as a byte array
     }
+
     public static async Task<DataTable> FillDataTableAsync(SqlCommand cmd)
     {
         DataTable dt = null;
