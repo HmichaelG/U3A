@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-04-09T07:57:01.643+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-05-12T16:40:47.445+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Add/Edit Courses</title>
   <body>
     <header>
@@ -30,7 +30,13 @@
     <para styleclass="Normal"><text style="font-weight:bold;">Some Notes</text></para>
     <list id="1" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:11pt; color:#000000;">
       <li styleclass="Normal">A view is persisted with course data. That means the view that was active at the time a course record is written to the database will be used when that data is subsequently retrieved from the database.</li>
-      <li styleclass="Normal">Views are organised via a tabset at the top of the edit form. A view can be changed at any time by clicking the tab desired. The exception to this is a course with multiple classes which is always displayed as a <text style="font-style:italic;">Detail</text> view.</li>
+      <li styleclass="Normal">Views are organised via a tabset at the top of the edit form. A view can be changed at any time by clicking the tab desired. The two exceptions to this are </li>
+      <list id="1" level="1" type="ul" listtype="bullet" formatstring="&#111;" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Courier New&apos;; font-size:11pt; color:#000000;">
+        <li styleclass="Normal">a course with multiple classes which is always displayed as a <text style="font-style:italic;">Detail</text> view.</li>
+        <li styleclass="Normal">If a course is created in Simple or Activity view it cannot be changed to Detail view until after the course is saved.</li>
+      </list>
+    </list>
+    <list id="1" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:11pt; color:#000000;">
       <li styleclass="Normal">A view is simply a means of displaying course data. All course records have the same data structure &quot;under the hood&quot;. It is therefore permissible to select and/or change the best view for the course you are implementing.</li>
       <li styleclass="Normal">The <text style="font-style:italic;">Simple</text> and <text style="font-style:italic;">Activity</text> views contain a <text style="font-weight:bold;">Show Details</text> checkbox on the Class group of fields. Ticking this field will display all fields for the class.</li>
     </list>

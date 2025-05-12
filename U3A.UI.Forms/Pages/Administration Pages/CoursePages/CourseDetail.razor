@@ -39,7 +39,11 @@ else
                 </DxFormLayoutItem>
             </DxTabPage>
 
-            <DxTabPage Text="Detail View">
+            @* 
+                If a course is created in Simple or Activity view it cannot be changed to 
+                Detail view until after the course is saved. 
+            *@
+            <DxTabPage Text="Detail View" Visible="@(!(Course.ID == Guid.Empty && CourseViewType != CourseEditViewType.Detail))">
                 <FrmCourseDetail @ref="@frmCourseDetail" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
                                  IsReadOnly="@IsReadOnly"
                                  Settings=@Settings
