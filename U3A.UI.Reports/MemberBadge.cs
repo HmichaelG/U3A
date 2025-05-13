@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -80,8 +81,11 @@ namespace U3A.UI.Reports
 
         private void MaillingLabels_DataSourceDemanded(object sender, EventArgs e)
         {
+            List<Person> carers = new();
             if (_people is not null)
             {
+                carers = GetCarers(_people);
+                _people.AddRange(carers);
                 DataSource = _people;
                 return;
             }
@@ -107,7 +111,9 @@ namespace U3A.UI.Reports
                     persons = persons.Where(x => x.DateJoined >= (DateTime)prmStartDate.Value).ToList();
                 }
             }
-            DataSource = persons;
+            carers = GetCarers(persons);
+            persons.AddRange(carers);
+            DataSource = persons.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
         }
 
         List<Person> GetPeople()
@@ -127,6 +133,28 @@ namespace U3A.UI.Reports
             syncTask.Wait();
             return syncTask.Result;
         }
+
+        private static List<Person> GetCarers(List<Person> people)
+        {
+            List<Person> carers = new();
+            foreach (var person in people)
+            {
+                if (!string.IsNullOrWhiteSpace(person.CarerName))
+                {
+                    var carer = new Person()
+                    {
+                        FirstName = person.CarerName,
+                        LastName = "\t",
+                        ICEContact = person.CarerCompany,
+                        ICEPhone = person.CarerPhone,
+                    };
+                    carers.Add(carer);
+                }
+            }
+
+            return carers;
+        }
+
         List<Person> GetPerson()
         {
             Task<List<Person>> syncTask = Task.Run(async () =>
@@ -154,6 +182,7 @@ namespace U3A.UI.Reports
                 if (person.IsCommitteeMember) { xrTitle.Text = $"Committee Member {_term.Year}"; }
             }
             if (person.IsLifeMember) { xrTitle.Text = "Life Member"; }
+            if (person.LastName == "\t") { xrTitle.Text = $"Carer, {person.ICEContact}"; }
         }
 
         private void xrU3AName_BeforePrint(object sender, CancelEventArgs e)
