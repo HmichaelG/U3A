@@ -36,18 +36,26 @@
     <p>The downloaded spreadsheet contains your member's private information. It is password protected with the password entered below. Please treat with care and in accordance with privacy legislation in your State.</p>
 
     <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
-    Caption="File Password"
-    CaptionPosition="CaptionPosition.Horizontal">
-        <DxTextBox @bind-Text="@password" Password=true autocomplete="new-password" />
+                      Caption="File Password"
+                      CaptionPosition="CaptionPosition.Horizontal">
+        <DxTextBox @bind-Text="@password"
+                   NullText="Enter a password of at least 5 characters"
+                   Password="@(!showPassword)" autocomplete="new-password">
+            <Buttons>
+                <DxEditorButton IconCssClass="bi bi-eye"
+                                Tooltip="Show/hide password"
+                                Click="@(() => showPassword = !showPassword)" />
+            </Buttons>
+        </DxTextBox>
     </DxFormLayoutItem>
 
     <DxButton Text="Do Backup" CssClass="mt-2"
-    Click="@DoBackup"
-    Enabled="@(!string.IsNullOrWhiteSpace(password))" />
+              Click="@DoBackup"
+              Enabled="@(!string.IsNullOrWhiteSpace(password) && password.Length >= 5)" />
 
     <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
-    Caption="Status" Visible="@(!string.IsNullOrWhiteSpace(state))"
-    CaptionPosition="CaptionPosition.Vertical">
+                      Caption="Status" Visible="@(!string.IsNullOrWhiteSpace(state))"
+                      CaptionPosition="CaptionPosition.Vertical">
         <DxMemo @bind-Text="@state" ReadOnly="true" Rows="15" />
     </DxFormLayoutItem>
     <div>@(new MarkupString(finishText))</div>
@@ -57,6 +65,8 @@
     string state;
     string finishText;
     string password;
+    bool showPassword = false;
+
 
     private async Task DoBackup()
     {
@@ -81,6 +91,10 @@
                 foreach (DataRowView row in dv)
                 {
                     string tableName = row["TABLE_NAME"].ToString();
+                    if (tableName.StartsWith("AspNet") || tableName.StartsWith("__EF"))
+                    {
+                        continue; // Skip AspNet and EF Core migrations tables
+                    };
                     state += $"Exporting table: {tableName}\n";
                     StateHasChanged();
                     using (SqlCommand cmd = new SqlCommand($"SELECT * FROM {tableName}", con))
@@ -110,7 +124,7 @@
                     var fileStream = new DotNetStreamReference(new MemoryStream(await CompressMemoryStream(stream, fileName)));
                     var zipName = "DatabaseExport.zip";
                     await js.InvokeVoidAsync("downloadFileFromStream", zipName, fileStream);
-                    finishText= $"File: <b>{fileName}</b> download successfully initiated.";
+                    finishText = $"File: <b>{fileName}</b> download successfully initiated.";
                 }
             }
         }
