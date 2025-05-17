@@ -9,6 +9,7 @@
 
 @inject IJSRuntime js;
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject LocalTime localTime;
 
 <HeadContent>
     <script>
@@ -36,26 +37,26 @@
     <p>The downloaded spreadsheet contains your member's private information. It is password protected with the password entered below. Please treat with care and in accordance with privacy legislation in your State.</p>
 
     <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
-                      Caption="File Password"
-                      CaptionPosition="CaptionPosition.Horizontal">
+    Caption="File Password"
+    CaptionPosition="CaptionPosition.Horizontal">
         <DxTextBox @bind-Text="@password"
-                   NullText="Enter a password of at least 5 characters"
-                   Password="@(!showPassword)" autocomplete="new-password">
+        NullText="Enter a password of at least 5 characters"
+        Password="@(!showPassword)" autocomplete="new-password">
             <Buttons>
                 <DxEditorButton IconCssClass="bi bi-eye"
-                                Tooltip="Show/hide password"
-                                Click="@(() => showPassword = !showPassword)" />
+                Tooltip="Show/hide password"
+                Click="@(() => showPassword = !showPassword)" />
             </Buttons>
         </DxTextBox>
     </DxFormLayoutItem>
 
     <DxButton Text="Do Backup" CssClass="mt-2"
-              Click="@DoBackup"
-              Enabled="@(!string.IsNullOrWhiteSpace(password) && password.Length >= 5)" />
+    Click="@DoBackup"
+    Enabled="@(!string.IsNullOrWhiteSpace(password) && password.Length >= 5)" />
 
     <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
-                      Caption="Status" Visible="@(!string.IsNullOrWhiteSpace(state))"
-                      CaptionPosition="CaptionPosition.Vertical">
+    Caption="Status" Visible="@(!string.IsNullOrWhiteSpace(state))"
+    CaptionPosition="CaptionPosition.Vertical">
         <DxMemo @bind-Text="@state" ReadOnly="true" Rows="15" />
     </DxFormLayoutItem>
     <div>@(new MarkupString(finishText))</div>
@@ -70,7 +71,7 @@
 
     private async Task DoBackup()
     {
-        state = "";
+        state = finishText = "";
         string connectionString;
         using (var db = await U3Adbfactory.CreateDbContextAsync())
         {
@@ -94,22 +95,13 @@
                     if (tableName.StartsWith("AspNet") || tableName.StartsWith("__EF"))
                     {
                         continue; // Skip AspNet and EF Core migrations tables
-                    };
+                    }
+                    ;
                     state += $"Exporting table: {tableName}\n";
                     StateHasChanged();
                     using (SqlCommand cmd = new SqlCommand($"SELECT * FROM {tableName}", con))
                     {
                         DataTable dt = await FillDataTableAsync(cmd);
-                        foreach (DataRow r in dt.Rows)
-                        {
-                            foreach (DataColumn c in dt.Columns)
-                            {
-                                if (r[c.ColumnName].ToString().Length >= Int16.MaxValue)
-                                {
-                                    r[c.ColumnName] = null;
-                                }
-                            }
-                        }
                         var ws = wb.Worksheets.Add(dt, tableName);
                         ws.Columns().AdjustToContents();
                     }
@@ -120,9 +112,11 @@
                 {
                     wb.SaveAs(stream);
                     stream.Position = 0;
-                    var fileName = "DatabaseExport.xlsx";
+                    var now = await localTime.GetLocalTimeAsync();
+                    var strNow = now.ToString("yyyy-MMM-dd HHmmss");
+                    var fileName = $"DatabaseExport {strNow}.xlsx";
                     var fileStream = new DotNetStreamReference(new MemoryStream(await CompressMemoryStream(stream, fileName)));
-                    var zipName = "DatabaseExport.zip";
+                    var zipName = $"DatabaseExport {strNow}.zip";
                     await js.InvokeVoidAsync("downloadFileFromStream", zipName, fileStream);
                     finishText = $"File: <b>{fileName}</b> download successfully initiated.";
                 }
@@ -162,15 +156,38 @@
 
             DataTable schemaTable = await reader.GetSchemaTableAsync();
             dt = new DataTable();
+            List<string> byteColumns = new();
             foreach (DataRow row in schemaTable.Rows)
-                dt.Columns.Add(row.Field<string>("ColumnName"), row.Field<Type>("DataType"));
-
+            {
+                Type type = row.Field<Type>("DataType");
+                string columnName = row.Field<string>("ColumnName");
+                if (type == typeof(byte[]))
+                {
+                    type = typeof(string);
+                    byteColumns.Add(columnName);
+                }
+                dt.Columns.Add(columnName, type);
+            }
 
             while (await reader.ReadAsync())
             {
                 DataRow dr = dt.Rows.Add();
                 foreach (DataColumn col in dt.Columns)
-                    dr[col.ColumnName] = reader[col.ColumnName];
+                {
+                    if (byteColumns.Contains(col.ColumnName))
+                    {
+                        var bytes = reader[col.ColumnName] as byte[];
+                        dr[col.ColumnName] = bytes != null ? System.Text.Encoding.UTF8.GetString(bytes) : null;
+                    }
+                    else
+                    {
+                        dr[col.ColumnName] = reader[col.ColumnName];
+                    }
+                    if (dr[col.ColumnName].ToString().Length >= Int16.MaxValue)
+                    {
+                        dr[col.ColumnName] = null;
+                    }
+                }
             }
         }
         return dt;
