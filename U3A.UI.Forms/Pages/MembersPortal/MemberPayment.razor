@@ -47,16 +47,21 @@ else
                         @if (showFeesDueToggle)
                         {
                             <div class="h-25 overflow-auto">
-                            <DxGrid Data="memberFees" VirtualScrollingEnabled=true CssClass="mb-2 grid-style">
-                                <Columns>
-                                    <DxGridDataColumn FieldName="@nameof(MemberFee.Description)" Caption="Description" />
-                                    <DxGridDataColumn FieldName="@nameof(MemberFee.Amount)" Caption="Amount" DisplayFormat="c2" Width="75px"/>
-                                </Columns>
-                                <TotalSummary>
-                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Description" />
-                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
-                                </TotalSummary>
-                            </DxGrid>
+                                <DxGrid Data="memberFees"
+                                        AllowSorting=false
+                                        AllowFiltering=false
+                                        AllowGrouping=false
+                                        VirtualScrollingEnabled=true
+                                        CssClass="mb-2 grid-style">
+                                    <Columns>
+                                        <DxGridDataColumn FieldName="@nameof(MemberFee.Description)" Caption="Description" />
+                                        <DxGridDataColumn FieldName="@nameof(MemberFee.Amount)" Caption="Amount" DisplayFormat="c2" Width="75px" />
+                                    </Columns>
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Description" />
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
+                                    </TotalSummary>
+                                </DxGrid>
                             </div>
                         }
                         else
@@ -174,7 +179,7 @@ else
 }
 <style>
     .grid-style {
-        max-height: 20rem !important; 
+        max-height: 20rem !important;
     }
 </style>
 
