@@ -46,23 +46,18 @@ else
                     <DxFormLayoutGroup Caption="@($"Membership Fees for: {loginState.SelectedPerson.FullName}")" HeaderCssClass="h4">
                         @if (showFeesDueToggle)
                         {
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Description</th>
-                                        <th scope="col" style="text-align: right">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var fee in memberFees)
-                                    {
-                                        <tr>
-                                            <td>@fee.Description</td>
-                                            <td style="text-align: right">@(fee.Amount.ToString("c2"))</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                            <div class="h-25 overflow-auto">
+                            <DxGrid Data="memberFees" VirtualScrollingEnabled=true CssClass="mb-2 grid-style">
+                                <Columns>
+                                    <DxGridDataColumn FieldName="@nameof(MemberFee.Description)" Caption="Description" />
+                                    <DxGridDataColumn FieldName="@nameof(MemberFee.Amount)" Caption="Amount" DisplayFormat="c2" Width="75px"/>
+                                </Columns>
+                                <TotalSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Description" />
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
+                                </TotalSummary>
+                            </DxGrid>
+                            </div>
                         }
                         else
                         {
@@ -75,7 +70,7 @@ else
                             </div>
                         }
                         <div class="m-auto">
-                            <TermsAndConditions RequireConfirmation="true" 
+                            <TermsAndConditions RequireConfirmation="true"
                                                 Participant="@loginState?.SelectedPerson"
                                                 OnConfirmationChanged="@((bool value) => areTermsConfirmed = value)"
                                                 SystemSettings="@settings"
@@ -177,6 +172,11 @@ else
     </div>
 
 }
+<style>
+    .grid-style {
+        max-height: 20rem !important; 
+    }
+</style>
 
 @code {
 
