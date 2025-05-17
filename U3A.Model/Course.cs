@@ -59,6 +59,7 @@ namespace U3A.Model
         [DefaultValue(0.00)]
         [Comment("Optional once-only course enrolment fee")]
         public decimal CourseFeePerYear { get; set; }
+        public DateOnly? CourseFeePerYearDueDate { get; set; }
 
         [DefaultValue(" ")]
         public string? CourseFeePerYearDescription { get; set; }
@@ -72,6 +73,7 @@ namespace U3A.Model
         [DefaultValue(0.00)]
         [Comment("Optional fee per term)")]
         public decimal CourseFeePerTerm { get; set; }
+        public int? CourseFeePerTermDueWeeks { get; set; }
 
         [DefaultValue(" ")]
         public string? CourseFeePerTermDescription { get; set; }

@@ -87,6 +87,11 @@ else
             <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
                 <DxTextBox @bind-Text="Course.CourseFeePerYearDescription" />
             </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Date Due" ColSpanMd="12">
+                <DxDateEdit @bind-Date="Course.CourseFeePerYearDueDate"
+                            NullText="if blank, immediately payable."
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+            </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
                 <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerYearFee" />
             </DxFormLayoutItem>
@@ -101,6 +106,11 @@ else
             <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
                 <DxTextBox @bind-Text="Course.CourseFeePerTermDescription" />
             </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Date Due Adjust (weeks)" ColSpanMd="7">
+                <DxSpinEdit @bind-Value="Course.CourseFeePerTermDueWeeks"
+                            MinValue="-12" MaxValue="12" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="@(BusinessRule.TermDueDateText(Course.CourseFeePerTermDueWeeks))" ColSpanMd="5" />
             <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
                 <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerTermFee" />
             </DxFormLayoutItem>
@@ -139,6 +149,7 @@ else
     string contactOrderNullText;
     bool isDifferentParticipantsInEachClass = false;
     bool isReady;
+    string? termDueMessage = "";
 
     protected override void OnInitialized()
     {
@@ -160,7 +171,7 @@ else
         if (AnyEnrolmentsInYear)
         {
             if (await messageBox.ShowAsync("Participation Type is changing",
-                                        @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
+                                                @"<p>The course participation type is chnaging to <strong>Different perticipants in each class</strong> and enrolments
                    have already been assigned to it in the current year.</p>
                    <p>If you continue, all enrolments will be assigned to the first class in the course.
                     You will be responsible for transfering enrolemnts between classes, if necessary.</p>

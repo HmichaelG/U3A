@@ -57,6 +57,23 @@ namespace U3A.BusinessRules
             return Courses;
         }
 
+        public static string TermDueDateText(int? CourseFeePerTermDueWeeks)
+        {
+            if (CourseFeePerTermDueWeeks == null || CourseFeePerTermDueWeeks == 0)
+            {
+                return "As at start of term";
+            }
+            else
+            if (CourseFeePerTermDueWeeks >= 1)
+            {
+                return $"{CourseFeePerTermDueWeeks} week(s) after start of term";
+            }
+            else
+            {
+                return $"{-CourseFeePerTermDueWeeks} week(s) before start of term";
+            }
+        }
+
         public static async Task<List<Course>> SelectableCoursesAsync(U3ADbContext dbc, int Year)
         {
             var Courses = await dbc.Course.IgnoreQueryFilters().AsNoTracking()

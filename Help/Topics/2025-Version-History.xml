@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-05-13T11:29:39.319+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-05-16T13:12:53.789+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>2025 Version History</title>
   <body>
     <header>
       <para styleclass="Heading1">2025 Version History</para>
     </header>
-    <para styleclass="Heading2"><text style="font-weight:bold;">Version 2025.5.Current</text></para>
+    <para styleclass="Heading2"><text style="font-weight:bold;">Version 2025.5.16</text></para>
     <para styleclass="Heading3">Database Backup</para>
     <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">A new menu option <text style="font-weight:bold;">Admin | Database Backup</text> has been added. This will create a dump of your database as an Excel workbook, password protect it and download it to your PC.</li>
@@ -18,6 +18,8 @@
     <para styleclass="Heading3">Add/Edit Courses</para>
     <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">If a course is created in either the Simple or Activity view, then it must now be completed in either the Simple or Activity view. You cannot change to Detail view while creating that course. Once the course is created and saved, you may select any view you require.</li>
+      <li styleclass="Normal">The field, <text style="font-style:italic;">Due Date</text> has been added to the Course Fees group. If left blank, fees will be due and payable immediately. Otherwise, they will fall due on the date entered.</li>
+      <li styleclass="Normal">The field, <text style="font-style:italic;">Due Date Adjustment</text> has been added to the Term Fees group. Normally, term fees fall due as at the start of term. This will be adjusted by the number of weeks entered into this field. </li>
     </list>
     <para styleclass="Heading2"><text style="font-weight:bold;">Version 2025.5.9</text></para>
     <para styleclass="Normal">In this update, support for a person&apos;s carer has been added. The carer&apos;s details will be added to the various reports available to leaders. Optionally, a carer may receive a copy of email/SMS sent to the participant. </para>

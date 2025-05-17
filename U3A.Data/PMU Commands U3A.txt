@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_CarerDetails
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_CourseFeeDueDate
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Person_CarerGetsEmailCopy
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_CourseFeePerTermDueWeeks
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Person_CarerGetsEmailCopy
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_CourseFeePerTermDueWeeks
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

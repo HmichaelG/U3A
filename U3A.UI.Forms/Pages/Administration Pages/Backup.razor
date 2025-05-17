@@ -174,14 +174,21 @@
                 DataRow dr = dt.Rows.Add();
                 foreach (DataColumn col in dt.Columns)
                 {
-                    if (byteColumns.Contains(col.ColumnName))
+                    object value = reader[col.ColumnName];
+                    switch (value)
                     {
-                        var bytes = reader[col.ColumnName] as byte[];
-                        dr[col.ColumnName] = bytes != null ? System.Text.Encoding.UTF8.GetString(bytes) : null;
-                    }
-                    else
-                    {
-                        dr[col.ColumnName] = reader[col.ColumnName];
+                        case DBNull _:
+                            dr[col.ColumnName] = DBNull.Value;
+                            break;
+                        case byte[] bytes:
+                            dr[col.ColumnName] = bytes.Length >= Int16.MaxValue ? null : System.Text.Encoding.UTF8.GetString(bytes);
+                            break;
+                        case DateTime d when d.Year == 1:
+                            dr[col.ColumnName] = new DateTime(1900,d.Month,d.Day,d.Hour,d.Minute,d.Second,d.Microsecond) ;
+                            break;
+                        default:
+                            dr[col.ColumnName] = value;
+                            break;
                     }
                     if (dr[col.ColumnName].ToString().Length >= Int16.MaxValue)
                     {

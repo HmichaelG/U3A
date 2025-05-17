@@ -70,8 +70,8 @@
                 }
             }
             <DxFormLayoutItem Caption="Disallowed Reason" ColSpanMd="8">
-                <DxTextBox @bind-Text="Course.AutoEnrolDisabledReason" 
-                           NullText="Eg: Class is Closed (Max 50 characters)"                           
+                <DxTextBox @bind-Text="Course.AutoEnrolDisabledReason"
+                           NullText="Eg: Class is Closed (Max 50 characters)"
                            Enabled=@(!Course.AllowAutoEnrol) />
             </DxFormLayoutItem>
 
@@ -96,6 +96,11 @@
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
                             <DxTextBox @bind-Text="Course.CourseFeePerYearDescription" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Date Due" ColSpanMd="12">
+                            <DxDateEdit @bind-Date="Course.CourseFeePerYearDueDate"
+                                        NullText="if blank, immediately payable."
+                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
                             <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerYearFee" />
@@ -126,6 +131,11 @@
                         <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
                             <DxTextBox @bind-Text="Course.CourseFeePerTermDescription" />
                         </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="Date Due Adjust (weeks)" ColSpanMd="7">
+                            <DxSpinEdit @bind-Value="Course.CourseFeePerTermDueWeeks"
+                                        MinValue="-12" MaxValue="12" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem Caption="@(BusinessRule.TermDueDateText(Course.CourseFeePerTermDueWeeks))" ColSpanMd="5" />
                         <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
                             <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerTermFee" />
                         </DxFormLayoutItem>

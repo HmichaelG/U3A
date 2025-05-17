@@ -15,6 +15,7 @@ using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
 using U3A.Model;
+using Serilog;
 
 namespace U3A.Services
 {
@@ -378,42 +379,50 @@ namespace U3A.Services
                                 SystemSettings settings,
                                 bool IsComplimentary)
         {
+            DateOnly today = DateOnly.FromDateTime(dbc.GetLocalDate());
             var terms = await dbc.Term.AsNoTracking()
-                                .Where(x => x.Year == term.Year && x.TermNumber <= term.TermNumber).ToArrayAsync();
+                                .Where(x => x.Year == term.Year)
+                                .OrderBy(x => x.TermNumber)
+                                .ToArrayAsync();
             var courseFeeAdded = new List<Guid>();
-            foreach (var t in terms.OrderBy(x => x.TermNumber))
+            foreach (var t in terms)
             {
                 foreach (var e in await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                                     .Include(x => x.Course).ThenInclude(x => x.Classes)
                                     .Include(x => x.Class)
-                                    .Include(x => x.Term)
                                     .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                 && x.PersonID == person.ID
                                                 && x.TermID == t.ID
                                                 && !x.IsWaitlisted).ToArrayAsync())
                 {
-                    if (e.Course.CourseFeePerYear != 0 && !courseFeeAdded.Contains(e.CourseID))
+                    DateOnly dueDate = e.Course.CourseFeePerYearDueDate ?? new DateOnly(1, 1, 1);
+                    if (dueDate <= today)
                     {
-                        var description = $"{e.Course.Name} course fee";
-                        var amount = e.Course.CourseFeePerYear;
-                        var includeInComplimentary = settings.IncludeCourseFeePerYearInComplimentary;
-                        if (e.Course.OverrideComplimentaryPerYearFee) includeInComplimentary = false;
-                        if (IsComplimentary && includeInComplimentary)
+                        if (e.Course.CourseFeePerYear != 0 && !courseFeeAdded.Contains(e.CourseID))
                         {
-                            amount = 0;
+                            var description = $"{e.Course.Name} course fee";
+                            var amount = e.Course.CourseFeePerYear;
+                            var includeInComplimentary = settings.IncludeCourseFeePerYearInComplimentary;
+                            if (e.Course.OverrideComplimentaryPerYearFee) includeInComplimentary = false;
+                            if (IsComplimentary && includeInComplimentary)
+                            {
+                                amount = 0;
+                            }
+                            if (!string.IsNullOrWhiteSpace(e.Course.CourseFeePerYearDescription))
+                            {
+                                description += $": {e.Course.CourseFeePerYearDescription}";
+                            }
+                            AddFee(person.ID,
+                                MemberFeeSortOrder.CourseFee, ConvertDateOnlyToDateTime(dueDate),
+                                $"{t.Year}: {description}", amount);
+                            if (PersonWithFinancialStatus != null)
+                                PersonWithFinancialStatus.CourseFeesPerYear += amount;
+                            courseFeeAdded.Add(e.CourseID);
                         }
-                        if (!string.IsNullOrWhiteSpace(e.Course.CourseFeePerYearDescription))
-                        {
-                            description += $": {e.Course.CourseFeePerYearDescription}";
-                        }
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.CourseFee, null,
-                            $"{t.Year}: {description}", amount);
-                        if (PersonWithFinancialStatus != null)
-                            PersonWithFinancialStatus.CourseFeesPerYear += amount;
-                        courseFeeAdded.Add(e.CourseID);
                     }
-                    if (e.Course.CourseFeePerTerm != 0)
+                    var dueDateAdjustment = e.Course.CourseFeePerTermDueWeeks ?? 0;
+                    dueDate = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
+                    if (e.Course.CourseFeePerTerm != 0 && dueDate <= today)
                     {
                         bool isTermFeeDue = false;
                         if (e.Class != null)
@@ -443,7 +452,7 @@ namespace U3A.Services
                                 description += $": {e.Course.CourseFeePerTermDescription}";
                             }
                             AddFee(person.ID,
-                                MemberFeeSortOrder.TermFee, null,
+                                MemberFeeSortOrder.TermFee, ConvertDateOnlyToDateTime(dueDate),
                                 $"{t.Name}: {description}", amount);
                             if (PersonWithFinancialStatus != null)
                                 PersonWithFinancialStatus.CourseFeesPerTerm += amount;
@@ -458,8 +467,11 @@ namespace U3A.Services
                                 Term term,
                                 SystemSettings settings)
         {
+            DateOnly today = DateOnly.FromDateTime(dbc.GetLocalDate());
             var terms = await dbc.Term.AsNoTracking()
-                                .Where(x => x.Year == term.Year && x.TermNumber <= term.TermNumber).ToArrayAsync();
+                                .Where(x => x.Year == term.Year)
+                                .OrderBy(x => x.TermNumber)
+                                .ToArrayAsync();
             var courseFeeAdded = new List<Guid>();
             var classesLead = await dbc.Class
                                     .Include(x => x.Course)
@@ -471,24 +483,33 @@ namespace U3A.Services
             foreach (var c in classesLead)
             {
                 //Fees per year
-                if (c.Course.CourseFeePerYear != 0 && c.Course.LeadersPayYearFee && !courseFeeAdded.Contains(c.CourseID))
+                DateOnly dueDate = c.Course.CourseFeePerYearDueDate ?? new DateOnly(1, 1, 1);
+                if (dueDate <= today)
                 {
-                    var description = $"{c.Course.Name} course fee";
-                    var amount = c.Course.CourseFeePerYear;
-                    if (!string.IsNullOrWhiteSpace(c.Course.CourseFeePerYearDescription))
+                    if (c.Course.CourseFeePerYear != 0 && c.Course.LeadersPayYearFee && !courseFeeAdded.Contains(c.CourseID))
                     {
-                        description += $": {c.Course.CourseFeePerYearDescription}";
+                        var description = $"{c.Course.Name} course fee";
+                        var amount = c.Course.CourseFeePerYear;
+                        if (!string.IsNullOrWhiteSpace(c.Course.CourseFeePerYearDescription))
+                        {
+                            description += $": {c.Course.CourseFeePerYearDescription}";
+                        }
+                        AddFee(person.ID, MemberFeeSortOrder.TermFee, ConvertDateOnlyToDateTime(dueDate),
+                                    $"{term.Year}: {description}", amount);
+                        if (PersonWithFinancialStatus != null)
+                            PersonWithFinancialStatus.CourseFeesPerYear += amount;
+                        courseFeeAdded.Add(c.CourseID);
                     }
-                    AddFee(person.ID, MemberFeeSortOrder.TermFee, null,
-                                $"{term.Year}: {description}", amount);
-                    if (PersonWithFinancialStatus != null)
-                        PersonWithFinancialStatus.CourseFeesPerYear += amount;
-                    courseFeeAdded.Add(c.CourseID);
                 }
 
-                foreach (var t in terms.OrderBy(x => x.TermNumber))
+                //Fees per term
+                foreach (var t in terms)
                 {
-                    if (c.Course.CourseFeePerTerm != 0 && c.Course.LeadersPayTermFee)
+                    var dueDateAdjustment = c.Course.CourseFeePerTermDueWeeks ?? 0;
+                    dueDate = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
+                    Log.Information($"{c.Course.Name} {t.TermNumber} {dueDate}");
+                    if (c.Course.CourseFeePerTerm != 0
+                            && c.Course.LeadersPayTermFee && dueDate <= today)
                     {
                         if (isClassHeldThisTerm(c, t))
                         {
@@ -498,7 +519,7 @@ namespace U3A.Services
                             {
                                 description += $": {c.Course.CourseFeePerTermDescription}";
                             }
-                            AddFee(person.ID, MemberFeeSortOrder.TermFee, null,
+                            AddFee(person.ID, MemberFeeSortOrder.TermFee, ConvertDateOnlyToDateTime(dueDate),
                                 $"{t.Name}: {description}", amount);
                             if (PersonWithFinancialStatus != null)
                                 PersonWithFinancialStatus.CourseFeesPerTerm += amount;
@@ -536,6 +557,10 @@ namespace U3A.Services
             }
         }
 
+        public DateTime ConvertDateOnlyToDateTime(DateOnly date)
+        {
+            return new DateTime(date.Year, date.Month, date.Day);
+        }
         private static async Task<int> ActiveCourseCountAsync(U3ADbContext dbc, Person person, Term SelectedTerm)
         {
             return (await dbc.Enrolment.Include(x => x.Course)
