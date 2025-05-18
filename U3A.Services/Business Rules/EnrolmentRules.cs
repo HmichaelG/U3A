@@ -49,6 +49,40 @@ namespace U3A.BusinessRules
 
         }
 
+        public static async Task<List<Dropout>> GetDropoutsAsync(U3ADbContext dbc, Term SelectedTerm,
+                              Course SelectedCourse, Class SelectedClass)
+        {
+            List<Dropout> dropouts = null;
+            if (SelectedClass == null || SelectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+            {
+                dropouts = await dbc.Dropout.IgnoreQueryFilters()
+                                    .Include(x => x.Term)
+                                    .Include(x => x.Course)
+                                    .Include(x => x.Person)
+                                    .Where(x => !x.Person.IsDeleted
+                                                        && !x.IsWaitlisted
+                                                        && x.CourseID == SelectedCourse.ID
+                                                        && x.TermID == SelectedTerm.ID
+                                                        && x.Person.DateCeased == null).ToListAsync();
+            }
+            else
+            {
+                dropouts = await dbc.Dropout.IgnoreQueryFilters()
+                                    .Include(x => x.Term)
+                                    .Include(x => x.Course)
+                                    .Include(x => x.Person)
+                                    .Where(x => !x.Person.IsDeleted
+                                                    && !x.IsWaitlisted
+                                                    && x.ClassID == SelectedClass.ID
+                                                    && x.TermID == SelectedTerm.ID
+                                                    && x.Person.DateCeased == null).ToListAsync();
+            }
+            return dropouts.OrderBy(x => x.Person.LastName)
+                                         .ThenBy(x => x.Person.FirstName)
+                                    .ToList();
+
+        }
+
         //call AllEnrolmentsForDifferentParticipantsInEachClassAsync synchronously using Task.Run
         public static List<(Guid CourseID, Guid PersonID, string ClassStart)> AllEnrolmentsForDifferentParticipantsInEachClass(U3ADbContext dbc, Term SelectedTerm)
         {

@@ -117,7 +117,7 @@ else
                                     Value="@SelectedClass"
                                     ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Class Date" ColSpanMd="4">
+                    <DxFormLayoutItem Caption="Date" ColSpanMd="4">
                         <DxComboBox @ref="@DateComboBox" Data="@ClassDates"
                                     Enabled="@dateComboEnabled"
                                     NullText="@dateComboNullText"
@@ -215,7 +215,7 @@ else
                     <DxGridDataColumn Caption="Mobile" FieldName="Person.AdjustedMobile" Visible=false />
                     <DxGridDataColumn Caption="Email" FieldName="Person.Email" Visible=false />
                     <DxGridDataColumn Caption="ICE Phone" FieldName="Person.AdjustedICEPhone" Visible=false />
-                    <DxGridDataColumn Caption="ICE Contect" FieldName="Person.ICEContact" Visible=false />
+                    <DxGridDataColumn Caption="ICE Contact" FieldName="Person.ICEContact" Visible=false />
                 </Columns>
 
                 <EditFormTemplate Context="EditFormContext">

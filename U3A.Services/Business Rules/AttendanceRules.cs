@@ -314,6 +314,7 @@ namespace U3A.BusinessRules
             await dbc.SaveChangesAsync();
             List<AttendClass> attendance = await GetAttendanceAsync(dbc, SelectedTerm, SelectedClass, ClassDate);
             var enrolments = await BusinessRule.EditableEnrolmentsAsync(dbc, SelectedTerm, SelectedCourse, SelectedClass);
+            var dropouts = await BusinessRule.GetDropoutsAsync(dbc, SelectedTerm, SelectedCourse, SelectedClass);
             AttendClass? a;
             foreach (var e in enrolments.Where(x => !x.IsWaitlisted))
             {
@@ -332,34 +333,56 @@ namespace U3A.BusinessRules
                                             && a.Date == ClassDate
                                             && a.PersonID == e.PersonID).FirstOrDefault();
                 }
-                if (a == null)
+                if (a == null) { await CreateAttendance(dbc, SelectedTerm, SelectedClass, ClassDate, attendance, e.PersonID); }
+            }
+            foreach (var d in dropouts.Where(x => !x.IsWaitlisted))
+            {
+                if (dbc.GetLocalDate(d.DateEnrolled) > ClassDate) { continue; }
+                if (dbc.GetLocalDate(d.DropoutDate) < ClassDate.Date) { continue; }
+                if (SelectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
                 {
-                    a = new AttendClass()
-                    {
-                        TermID = SelectedTerm.ID,
-                        Term = await dbc.Term.FindAsync(SelectedTerm.ID),
-                        ClassID = SelectedClass.ID,
-                        Class = await dbc.Class.FindAsync(SelectedClass.ID),
-                        Date = ClassDate,
-                        Person = await dbc.Person.FindAsync(e.PersonID),
-                        PersonID = e.PersonID,
-                        AttendClassStatus = await dbc.AttendClassStatus.FindAsync((int)AttendClassStatusType.AbsentFromClassWithoutApology),
-                        AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithoutApology,
-                        Comment = String.Empty
-                    };
-                    a.Class.Venue = await dbc.Venue.FindAsync(a.Class.VenueID);
-                    a.Class.Leader = await dbc.Person.FindAsync(a.Class.LeaderID);
-                    a.Class.OnDay = await dbc.WeekDay.FindAsync(a.Class.OnDayID);
-                    a.Class.Occurrence = await dbc.Occurrence.FindAsync(a.Class.OccurrenceID);
-                    a.Class.Course = await dbc.Course.FindAsync(a.Class.CourseID);
-                    a.Class.Course.CourseType = await dbc.CourseType.FindAsync(a.Class.Course.CourseTypeID);
-                    a.Class.Course.CourseParticipationType = await dbc.CourseParticpationType.FindAsync(a.Class.Course.CourseParticipationTypeID);
-                    attendance.Add(a);
-                    await dbc.AttendClass.AddAsync(a);
+                    a = attendance.Where(a => a.TermID == d.TermID
+                                            && d.CourseID == SelectedCourse.ID
+                                            && a.Date == ClassDate
+                                            && a.PersonID == d.PersonID).FirstOrDefault();
                 }
+                else
+                {
+                    a = attendance.Where(a => a.TermID == d.TermID
+                                            && a.ClassID == d.ClassID
+                                            && a.Date == ClassDate
+                                            && a.PersonID == d.PersonID).FirstOrDefault();
+                }
+                if (a == null) { await CreateAttendance(dbc, SelectedTerm, SelectedClass, ClassDate, attendance, d.PersonID); }
             }
             await dbc.SaveChangesAsync();
             return await GetAttendanceAsync(dbc, SelectedTerm, SelectedClass, ClassDate);
+        }
+
+        private static async Task CreateAttendance(U3ADbContext dbc, Term SelectedTerm, Class SelectedClass, DateTime ClassDate, List<AttendClass> attendance, Guid PersonID)
+        {
+                var attendClass = new AttendClass()
+                {
+                    TermID = SelectedTerm.ID,
+                    Term = await dbc.Term.FindAsync(SelectedTerm.ID),
+                    ClassID = SelectedClass.ID,
+                    Class = await dbc.Class.FindAsync(SelectedClass.ID),
+                    Date = ClassDate,
+                    Person = await dbc.Person.FindAsync(PersonID),
+                    PersonID = PersonID,
+                    AttendClassStatus = await dbc.AttendClassStatus.FindAsync((int)AttendClassStatusType.AbsentFromClassWithoutApology),
+                    AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithoutApology,
+                    Comment = String.Empty
+                };
+                attendClass.Class.Venue = await dbc.Venue.FindAsync(attendClass.Class.VenueID);
+                attendClass.Class.Leader = await dbc.Person.FindAsync(attendClass.Class.LeaderID);
+                attendClass.Class.OnDay = await dbc.WeekDay.FindAsync(attendClass.Class.OnDayID);
+                attendClass.Class.Occurrence = await dbc.Occurrence.FindAsync(attendClass.Class.OccurrenceID);
+                attendClass.Class.Course = await dbc.Course.FindAsync(attendClass.Class.CourseID);
+                attendClass.Class.Course.CourseType = await dbc.CourseType.FindAsync(attendClass.Class.Course.CourseTypeID);
+                attendClass.Class.Course.CourseParticipationType = await dbc.CourseParticpationType.FindAsync(attendClass.Class.Course.CourseParticipationTypeID);
+                attendance.Add(attendClass);
+                await dbc.AttendClass.AddAsync(attendClass);
         }
 
         private static async Task<List<AttendClass>> GetAttendanceAsync(U3ADbContext dbc,
