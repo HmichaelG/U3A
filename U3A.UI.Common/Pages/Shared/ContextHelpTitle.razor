@@ -239,7 +239,7 @@
         standardWidth = (IncludeTableOfContents) ? "max(60vw, 400px)" : "max(40vw, 400px)";
         if (string.IsNullOrWhiteSpace(windowWidth)) { windowWidth = standardWidth; }
         if (helpWindow!.Visible) { await helpWindow.CloseAsync(); }
-        helpFile = $"help/index.html?{HelpTopic}";
+        helpFile = $"{navMan.BaseUri}/help/index.html?{HelpTopic}";
         await helpWindow.ShowAsync();
     }
 
