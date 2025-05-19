@@ -1,0 +1,63 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+<DxFormLayoutGroup Caption="@($"Enrolment History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
+    <div class="h-25 overflow-auto">
+        <DxGrid Data="@enrolments" @ref="@grid"         
+                TextWrapEnabled=false
+                ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                AllowSorting=false
+                AllowFiltering=false
+                AllowResize="true"
+                AllowGrouping=true
+                AutoExpandAllGroupRows=true
+                VirtualScrollingEnabled=true
+                CssClass="@CssClass">
+            <Columns>
+                <DxGridDataColumn FieldName="Term" Caption="Term" GroupIndex="0" />
+                <DxGridDataColumn FieldName="IsWaitlisted" Caption="Waitlist?" Width="4rem" />
+                <DxGridDataColumn FieldName="Course" Caption="Course" Width="20rem" />
+                <DxGridDataColumn FieldName="Class" Caption="Class" />
+            </Columns>
+            <GroupSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                   DisplayText="Term Sub-Total"
+                                   FooterColumnName="Course" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                   DisplayText="{0:c2}"
+                                   FooterColumnName="Class" />
+            </GroupSummary>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Course" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:c2}" FieldName="Class" />
+            </TotalSummary>
+        </DxGrid>
+    </div>
+
+</DxFormLayoutGroup>
+
+@code {
+
+    [Parameter]
+    public Term SelectedTerm { get; set; }
+
+    [Parameter]
+    public Person SelectedPerson { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    List<StudentClassSummary> enrolments = new();
+    DxGrid? grid;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SelectedPerson != null && SelectedTerm != null)
+        {
+            using (var dbc = U3Adbfactory.CreateDbContext())
+            {
+                enrolments = await BusinessRule.GetAllEnrolmentsForStudent(dbc, SelectedTerm, SelectedPerson);
+            }
+        }
+    }
+
+}

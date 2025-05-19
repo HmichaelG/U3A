@@ -22,12 +22,12 @@ else
     <MessageBox @ref="@messageBox" />
 
     <CollapsableContent DismissKey="{1DEB1DEF-F91A-4228-B947-28020E9A9E16}"
-        AlertText="<p><strong>Fees Due</strong> includes all fees outstanding not just fees for the selected course. Click a member row to view their statement of account.</p>"
-                        OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
-                        OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
+    AlertText="<p><strong>Fees Due</strong> includes all fees outstanding not just fees for the selected course. Click a member row to view their statement of account.</p>"
+    OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+    OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
     <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-                                 DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+    DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
     <Progress @ref="@ProgressBar" />
 
     <DxFormLayout>
@@ -35,31 +35,31 @@ else
             <DxFormLayoutGroup Caption="Enrolment Details">
                 <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
                     <TermsComboBox Terms="@terms"
-                                   @bind-SelectedTerm="@selectedTerm"
-                                   @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+                    @bind-SelectedTerm="@selectedTerm"
+                    @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Course" ColSpanMd="6">
                     <DxComboBox Data="@courses"
-                                Enabled="@courseComboEnabled"
-                                NullText="@courseComboNullText"
-                                SearchMode="ListSearchMode.AutoSearch"
-                                ListRenderMode="ListRenderMode.Virtual"
-                                TextFieldName="@nameof(Course.Name)"
-                                Value="@selectedCourse"
-                                ValueChanged="@((Course course) => SelectedCourseChanged(course))">
+                    Enabled="@courseComboEnabled"
+                    NullText="@courseComboNullText"
+                    SearchMode="ListSearchMode.AutoSearch"
+                    ListRenderMode="ListRenderMode.Virtual"
+                    TextFieldName="@nameof(Course.Name)"
+                    Value="@selectedCourse"
+                    ValueChanged="@((Course course) => SelectedCourseChanged(course))">
                         <DxListEditorColumn FieldName="@nameof(Course.ConversionID)"
-                                            Caption="No"
-                                            Width="25%" />
+                        Caption="No"
+                        Width="25%" />
                         <DxListEditorColumn FieldName="@nameof(Course.Name)"
-                                            Caption="Course"
-                                            Width="75%" />
+                        Caption="Course"
+                        Width="75%" />
                     </DxComboBox>
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Class" ColSpanMd="6">
                     <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
-                                TextFieldName="@nameof(Class.ClassSummary)"
-                                Value="@selectedClass"
-                                ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
+                    TextFieldName="@nameof(Class.ClassSummary)"
+                    Value="@selectedClass"
+                    ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
                 </DxFormLayoutItem>
             </DxFormLayoutGroup>
 
@@ -73,30 +73,30 @@ else
             <FullScreen @ref=@fullScreen DisplayOffset="@contentSize">
                 <ContentTemplate>
                     <DxGrid Data="@Enrolments" @ref=@mainGrid
-                            ShowAllRows="true"
-                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                            KeyFieldName="ID"
-                            SelectionMode="GridSelectionMode.Multiple"
-                            @bind-SelectedDataItems="SelectedDataItems"
-                            ValidationEnabled="true"
-                            UnboundColumnData="Grid_CustomUnboundColumnData"
-                            CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
-                            CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
-                            FocusedRowEnabled="true"
-                            FocusedRowChanged="OnFocusedRowChanged"
-                            AllowSelectRowByClick="true">
+                    ShowAllRows="true"
+                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    KeyFieldName="ID"
+                    SelectionMode="GridSelectionMode.Multiple"
+                    @bind-SelectedDataItems="SelectedDataItems"
+                    ValidationEnabled="true"
+                    UnboundColumnData="Grid_CustomUnboundColumnData"
+                    CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
+                    CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
+                    FocusedRowEnabled="true"
+                    FocusedRowChanged="OnFocusedRowChanged"
+                    AllowSelectRowByClick="true">
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid LayoutKey="{6ABCA6AF-CA53-43EE-8974-71F06823B10A}" >
-                                                                    <CustomButtonContent>
-                                        <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                                        BeginGroup=true
-                                        Click=@OnCommunicate
-                                        RenderStyle="ButtonRenderStyle.Primary"
-                                        RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                        Alignment="ToolbarItemAlignment.Right"
-                                        Tooltip="Send email and/or SMS to participants">
-                                        </DxToolbarItem>
-                                    </CustomButtonContent>
+                                <CustomButtonContent>
+                                    <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+                                    BeginGroup=true
+                                    Click=@OnCommunicate
+                                    RenderStyle="ButtonRenderStyle.Primary"
+                                    RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                    Alignment="ToolbarItemAlignment.Right"
+                                    Tooltip="Send email and/or SMS to participants">
+                                    </DxToolbarItem>
+                                </CustomButtonContent>
                             </GridToolbar>
                         </ToolbarTemplate>
                         <Columns>
@@ -108,8 +108,8 @@ else
                             <DxGridDataColumn Caption="Home" FieldName="Person.AdjustedHome" Width="6rem" />
                             <DxGridDataColumn Caption="Email" FieldName="Person.Email" Width="12rem" />
                             <DxGridDataColumn Caption="Fees Due" Width="5rem" FieldName="Due"
-                                              DisplayFormat="c2"
-                                              UnboundType="GridUnboundColumnType.Decimal" />
+                            DisplayFormat="c2"
+                            UnboundType="GridUnboundColumnType.Decimal" />
                         </Columns>
                         <GroupSummary>
                             <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
@@ -125,31 +125,7 @@ else
         </div>
 
         <div class="col col-12 col-md-4 p-2">
-            <DxFormLayoutGroup Caption="@($"Statement of Account for: {selectedPerson?.FullName}")" HeaderCssClass="h4">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col">Description</th>
-                            <th scope="col" style="text-align: right">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var fee in memberFees)
-                        {
-                            <tr>
-                                <td>@fee.Description</td>
-                                <td style="text-align: right">@(fee.Amount.ToString("c2"))</td>
-                            </tr>
-                        }
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th scope="col">Outstanding</th>
-                            <th scope="col" style="text-align: right">@(totalFees.ToString("c2"))</th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </DxFormLayoutGroup>
+            <StatementOfAccount SelectedPerson="@selectedPerson" SelectedTerm="@selectedTerm" />
         </div>
     </DxFormLayout>
 
@@ -379,9 +355,12 @@ else
         FeeDue = new Dictionary<Guid, decimal>();
         foreach (var e in Enrolments)
         {
-            var person = e.Person;
-            var due = await service.CalculateFeeAsync(U3Adbfactory, person,selectedTerm);
-            FeeDue.Add(person.ID, due);
+            if (!FeeDue.ContainsKey(e.Person.ID))
+            {
+                var person = e.Person;
+                var due = await service.CalculateFeeAsync(U3Adbfactory, person, selectedTerm);
+                FeeDue.Add(person.ID, due);
+            }
         }
     }
 
@@ -424,8 +403,6 @@ else
         if (enrolment != null)
         {
             selectedPerson = enrolment.Person;
-            totalFees = await service.CalculateFeeAsync(U3Adbfactory, selectedPerson,selectedTerm);
-            memberFees = service.GetMemberFees(selectedPerson.ID);
             InvokeAsync(StateHasChanged);
         }
     }

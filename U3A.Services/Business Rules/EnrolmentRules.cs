@@ -3,6 +3,7 @@ using DevExpress.Pdf.ContentGeneration.Interop;
 using DevExpress.XtraRichEdit.Import.Rtf;
 using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -423,6 +424,60 @@ namespace U3A.BusinessRules
             }
             return result;
         }
+
+        public static async Task<List<StudentClassSummary>> GetAllEnrolmentsForStudent(U3ADbContext dbc, Term term, Person Student)
+        {
+            ConcurrentBag<StudentClassSummary> result = new();
+            var enrolments = await dbc.Enrolment
+                                    .Include(x => x.Term)
+                                    .Include(x => x.Course)
+                                    .Include(x => x.Class)
+                                    .Where(x => x.Term.Year == term.Year
+                                                && x.PersonID == Student.ID)
+                                    .ToListAsync();
+            var classes = await dbc.Class
+                                    .Include(x => x.Course)
+                                    .Include(x => x.OnDay)
+                                    .Include(x => x.Venue)
+                                    .Include(x => x.Occurrence)
+                                    .Where(x => enrolments.Select(e => e.CourseID).Contains(x.CourseID))
+                                    .ToListAsync();
+            foreach (var e in enrolments)
+            {
+                var course = e.Course;
+                if (course.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+                {
+                    foreach (var c in classes.Where(x => x.CourseID == course.ID))
+                    {
+                        result.Add(new StudentClassSummary()
+                        {
+                            Course = course.Name,
+                            Class = c.OccurrenceText,
+                            Term = e.Term.Name,
+                            IsWaitlisted = e.IsWaitlisted
+                        }
+                        );
+                    }
+                }
+                else
+                {
+                    var c = classes.Where(x => x.ID == e.ClassID).FirstOrDefault();
+                    if (c is not null)
+                    {
+                        result.Add(new StudentClassSummary()
+                        {
+                            Course = course.Name,
+                            Class = c.OccurrenceText,
+                            Term = e.Term.Name,
+                            IsWaitlisted = e.IsWaitlisted
+                        }
+                        );
+                    }
+                }
+            }
+            return result.OrderBy(x => x.Term).ThenBy(x => x.Course).ToList();
+        }
+
         public static string GetMemberPortalEnrolmentStatus(Class Class, Enrolment? enrolment, Term term, SystemSettings settings, DateTime localTime)
         {
             var result = "Pending";

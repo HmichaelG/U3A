@@ -1,0 +1,51 @@
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+<DxFormLayoutGroup Caption="@($"Statement of Account for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
+    <div class="h-25 overflow-auto">
+        <DxGrid Data="@memberFees"
+        AllowSorting=false
+        AllowFiltering=false
+        AllowGrouping=false
+        VirtualScrollingEnabled=true
+        CssClass="@CssClass">
+            <Columns>
+                <DxGridDataColumn FieldName="@nameof(MemberFee.Description)" Caption="Description" />
+                <DxGridDataColumn FieldName="@nameof(MemberFee.Amount)" Caption="Amount" DisplayFormat="c2" Width="75px" />
+            </Columns>
+            <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Description" />
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
+            </TotalSummary>
+        </DxGrid>
+    </div>
+
+</DxFormLayoutGroup>
+
+@code {
+
+    [Parameter]
+    public Term SelectedTerm { get; set; }
+
+    [Parameter]
+    public Person SelectedPerson { get; set; } 
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+
+    List<MemberFee> memberFees = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SelectedPerson != null)
+        {
+            using (var dbContext = U3Adbfactory.CreateDbContext())
+            {
+                var service = new MemberFeeCalculationService();
+                var totalFees = await service.CalculateFeeAsync(U3Adbfactory, SelectedPerson, SelectedTerm);
+                memberFees = service.GetMemberFees(SelectedPerson.ID);
+            }
+        }
+    }
+
+}
