@@ -53,7 +53,7 @@ else
               CssClass="drawer-style"
               Mode="DrawerMode.Overlap"
               Position="DrawerPosition.Right"
-              PanelWidth="40rem">
+              PanelWidth="min(40rem, 100%)" >
         <TargetContent>
             <DxFormLayout>
 
@@ -175,7 +175,7 @@ else
                                     <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                         <CellDisplayTemplate>
                                             <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
-                                                      RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-info bi bi-zoom-in" Text=""
+                                                      RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
                                                       Click="() => {selectedPerson = ((Enrolment)context.DataItem).Person;
                                                                     isDrawerOpen = true; StateHasChanged(); }">
                                             </DxButton>
@@ -286,6 +286,10 @@ else
     </DxDrawer>
 }
 <style>
+    .drawer-style {
+        max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
+    }
+
     .drawer-content-style {
         max-height: 75dvh;
     }
@@ -293,10 +297,6 @@ else
     .leader-height {
         min-height: 3dvh;
         height: auto;
-    }
-
-    .drawer-style {
-        max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
     }
 
 </style>
