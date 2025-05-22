@@ -79,6 +79,29 @@ namespace U3A.Model
             }
         }
         [NotMapped]
+        public bool Present
+        {
+            get
+            {
+                return (AttendClassStatusID == 0) ? true : false;
+            }
+        }
+        public bool AbsentWithApology
+        {
+            get
+            {
+                return (AttendClassStatusID == 2) ? true : false;
+            }
+        }
+        public bool AbsentWithoutApology
+        {
+            get
+            {
+                return (AttendClassStatusID == 1) ? true : false;
+            }
+        }
+
+        [NotMapped]
         public int Actual
         {
             get

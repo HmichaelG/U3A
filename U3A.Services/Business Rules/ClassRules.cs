@@ -190,7 +190,7 @@ public static partial class BusinessRule
         classes = GetClassSummaries(classes, dbc.GetLocalTime()).ToList();
         Log.Information("");
         Log.Information("{p1} Total classes retrieved", totalClasses);
-        Log.Information("{p1} Total classes remaing in year", TotalClassesRemainingInYear);
+        Log.Information("{p1} Total classes remaining in year", TotalClassesRemainingInYear);
         Log.Information("{p1} Total classes in reporting period", TotalClassesRemainingInYear);
 
         classes = EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)

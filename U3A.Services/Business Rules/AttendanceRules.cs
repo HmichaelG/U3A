@@ -1,5 +1,6 @@
 ﻿using DevExpress.Blazor;
 using DevExpress.Data.Linq;
+using DevExpress.XtraRichEdit.Model;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -435,6 +436,22 @@ namespace U3A.BusinessRules
                             .Include(x => x.Person)
                             .Include(x => x.AttendClassStatus)
                             .Where(x => peopleID.Contains(x.PersonID));
+        }
+        public static async Task<List<AttendClass>> GetAttendanceHistoryForStudentAsync(U3ADbContext dbc, int Year, Guid PersonID)
+        {
+            return await dbc.AttendClass.IgnoreQueryFilters()
+                            .Include(x => x.Term)
+                            .Include(x => x.Class)
+                            .Include(x => x.Class).ThenInclude(x => x.Venue)
+                            .Include(x => x.Class).ThenInclude(x => x.Leader)
+                            .Include(x => x.Class).ThenInclude(x => x.OnDay)
+                            .Include(x => x.Class).ThenInclude(x => x.Occurrence)
+                            .Include(x => x.Class).ThenInclude(x => x.Course).ThenInclude(x => x.CourseType)
+                            .Include(x => x.Class).ThenInclude(x => x.Course).ThenInclude(x => x.CourseParticipationType)
+                            .Include(x => x.AttendClassStatus)
+                            .Where(x => x.PersonID == PersonID && x.Term.Year == Year)
+                            .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber).ThenBy(x => x.Class.Course.Name).ThenBy(x => x.Date)
+                            .ToListAsync();
         }
 
         public static async Task<List<AttendClass>> GetAttendanceAsync(U3ADbContext dbc,
