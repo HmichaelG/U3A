@@ -141,6 +141,8 @@
     public bool IsVersionButton { get; set; } = false;
     [Parameter]
     public EventCallback<bool> ShowNewSoftwareUpdateFlyout { get; set; }
+    [Parameter]
+    public EventCallback Closed { get; set; }
 
     public string? windowWidth { get; set; }
 
@@ -254,9 +256,10 @@
         }
     }
 
-    void OnClosed()
+    async Task OnClosed()
     {
         standardWidth = windowWidth;
+        await Closed.InvokeAsync();
     }
 
 
