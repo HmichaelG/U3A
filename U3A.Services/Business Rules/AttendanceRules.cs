@@ -439,7 +439,13 @@ namespace U3A.BusinessRules
         }
         public static async Task<List<AttendClass>> GetAttendanceHistoryForStudentAsync(U3ADbContext dbc, int Year, Guid PersonID)
         {
-            return await dbc.AttendClass.IgnoreQueryFilters()
+            var publicHolidays = await dbc.PublicHoliday
+                                        .Where(x => x.Date.Year == Year)
+                                        .ToListAsync();
+            var cancelledClass = await dbc.CancelClass
+                                        .Where(x => x.StartDate.Year == Year || x.EndDate.Year == Year)
+                                        .ToListAsync();
+            var attendance = await dbc.AttendClass.IgnoreQueryFilters()
                             .Include(x => x.Term)
                             .Include(x => x.Class)
                             .Include(x => x.Class).ThenInclude(x => x.Venue)
@@ -452,8 +458,24 @@ namespace U3A.BusinessRules
                             .Where(x => x.PersonID == PersonID && x.Term.Year == Year)
                             .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber).ThenBy(x => x.Class.Course.Name).ThenBy(x => x.Date)
                             .ToListAsync();
+                Parallel.ForEach(attendance, a =>
+                {
+                    if (cancelledClass.Any(x => x.ClassID == a.ClassID && a.AttendanceDate >= x.StartDate && a.AttendanceDate <= x.EndDate))
+                    {
+                        a.AttendClassStatusID = -1;
+                        a.Comment = "Cancelled Class";
+                    }
+                    if (publicHolidays.Select(x => x.Date).Contains(a.AttendanceDate))
+                    {
+                        a.AttendClassStatusID = -1;
+                        a.Comment = publicHolidays
+                            .Where(x => x.Date == a.AttendanceDate)
+                            .Select(x => x.Name).FirstOrDefault();
+                    }
+                });
+            return attendance;
         }
-
+        
         public static async Task<List<AttendClass>> GetAttendanceAsync(U3ADbContext dbc,
                                 Term SelectedTerm, DateTime PeriodEndDate)
         {

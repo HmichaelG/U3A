@@ -79,6 +79,15 @@ namespace U3A.Model
             }
         }
         [NotMapped]
+        public DateTime AttendanceDate
+        {
+            get
+            {
+                return new DateTime(Date.Year,Date.Month,Date.Day);
+            }
+        }
+
+        [NotMapped]
         public bool Present
         {
             get
@@ -86,6 +95,7 @@ namespace U3A.Model
                 return (AttendClassStatusID == 0) ? true : false;
             }
         }
+        [NotMapped]
         public bool AbsentWithApology
         {
             get
@@ -93,6 +103,7 @@ namespace U3A.Model
                 return (AttendClassStatusID == 2) ? true : false;
             }
         }
+        [NotMapped]
         public bool AbsentWithoutApology
         {
             get
