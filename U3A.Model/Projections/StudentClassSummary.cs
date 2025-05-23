@@ -11,5 +11,6 @@ namespace U3A.Model
         public string Course { get; set; }
         public string Class { get; set; }
         public bool IsWaitlisted { get; set; }
+        public DateTime? DateEnrolled { get; set; }
     }
 }

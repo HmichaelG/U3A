@@ -454,7 +454,8 @@ namespace U3A.BusinessRules
                             Course = course.Name,
                             Class = c.OccurrenceText,
                             Term = e.Term.Name,
-                            IsWaitlisted = e.IsWaitlisted
+                            IsWaitlisted = e.IsWaitlisted,
+                            DateEnrolled = e.DateEnrolled
                         }
                         );
                     }
@@ -469,7 +470,8 @@ namespace U3A.BusinessRules
                             Course = course.Name,
                             Class = c.OccurrenceText,
                             Term = e.Term.Name,
-                            IsWaitlisted = e.IsWaitlisted
+                            IsWaitlisted = e.IsWaitlisted,
+                            DateEnrolled = e.DateEnrolled
                         }
                         );
                     }
