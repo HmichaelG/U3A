@@ -534,4 +534,11 @@ public static partial class BusinessRule
         if (person.FinancialToTerm >= currentTerm.TermNumber) return true;
         return false;
     }
+    public static async Task<List<LeaderHistory>> GetLeaderHistoryForPersonAsync(U3ADbContext dbc, Guid PersonID)
+    {
+        return await dbc.LeaderHistory
+                    .Where(x => x.PersonID == PersonID)
+                    .OrderByDescending(x => x.Year).ThenBy(x => x.Course).ThenBy(x => x.Term)
+                    .ToListAsync();
+    }
 }

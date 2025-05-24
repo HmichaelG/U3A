@@ -72,12 +72,12 @@
             if (!await dbc.Roles.AnyAsync(x => x.Name == name))
             {
                 IdentityRole role = new()
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = name,
-                        NormalizedName = name.ToUpper(),
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                    };
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = name,
+                    NormalizedName = name.ToUpper(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                };
                 await dbc.Roles.AddAsync(role);
             }
         }
@@ -85,40 +85,133 @@
         if (!await dbc.Users.AnyAsync(x => x.Email == constants.superAdmin))
         {
             ApplicationUser user = new()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString(),
-                    Email = constants.superAdmin,
-                    EmailConfirmed = true,
-                    NormalizedEmail = constants.superAdmin.ToUpper(),
-                    NormalizedUserName = constants.superAdmin.ToUpper(),
-                    PasswordHash = "AQAAAAEAACcQAAAAEGO9hnvP8x8fJPlDhs2gGYMhl9koCigXL2PPHidC9luB5nbMxW8fCFahxG/ZCA1OSw==",
-                    UserName = constants.superAdmin,
-                };
+            {
+                Id = Guid.NewGuid().ToString(),
+                ConcurrencyStamp = Guid.NewGuid().ToString(),
+                Email = constants.superAdmin,
+                EmailConfirmed = true,
+                NormalizedEmail = constants.superAdmin.ToUpper(),
+                NormalizedUserName = constants.superAdmin.ToUpper(),
+                PasswordHash = "AQAAAAEAACcQAAAAEGO9hnvP8x8fJPlDhs2gGYMhl9koCigXL2PPHidC9luB5nbMxW8fCFahxG/ZCA1OSw==",
+                UserName = constants.superAdmin,
+            };
             await dbc.Users.AddAsync(user);
             SecurityAdminID = (await dbc.Roles.FirstAsync(r => r.Name == constants.nameOfRoles[0])).Id;
             IdentityUserRole<string> userRole = new()
-                {
+            {
 
-                    RoleId = SecurityAdminID,
-                    UserId = user.Id
-                };
+                RoleId = SecurityAdminID,
+                UserId = user.Id
+            };
             await dbc.UserRoles.AddAsync(userRole);
         }
         await dbc.SaveChangesAsync();
     }
 
+    List<Term> terms = new();
+    List<Class> classes = new();
+    List<string> keys = new();
     async Task ApplyFix(U3ADbContextSeed dbc)
     {
-        await dbc.Database.ExecuteSqlRawAsync(
-                  @"update enrolment set ClassID = null
-            where id in 
-            (
-            select e.id from Enrolment e
-            inner join course c on e.CourseID = c.ID
-            where c.CourseParticipationTypeID = 0 and e.ClassID is not null
-            )"
-        );
+        await dbc.Database.ExecuteSqlRawAsync("Truncate table [LeaderHistory]");
+        terms = await dbc.Term.ToListAsync();
+        keys = await dbc.LeaderHistory.Select(x => $"{x.PersonID}_{x.TermID}_{x.ClassID}").ToListAsync();
+        // Leaders History
+        classes = await dbc.Class
+                            .Include(x => x.OnDay)
+                            .Include(x => x.Occurrence)
+                            .Include(x => x.Course)
+                            .Include(x => x.Leader)
+                            .Include(x => x.Leader2)
+                            .Include(x => x.Leader3)
+                            .Where(x => !x.Course.IsOffScheduleActivity)
+                            .ToListAsync();
+        foreach (var c in classes)
+        {
+            if (c.OfferedTerm1)
+            {
+                if (c.Leader != null) { await AddLeaderHistory(dbc, c, 1, c.Leader); }
+                if (c.Leader2 != null) { await AddLeaderHistory(dbc, c, 1, c.Leader2); }
+                if (c.Leader3 != null) { await AddLeaderHistory(dbc, c, 1, c.Leader3); }
+            }
+            if (c.OfferedTerm2)
+            {
+                if (c.Leader != null) { await AddLeaderHistory(dbc, c, 2, c.Leader); }
+                if (c.Leader2 != null) { await AddLeaderHistory(dbc, c, 2, c.Leader2); }
+                if (c.Leader3 != null) { await AddLeaderHistory(dbc, c, 2, c.Leader3); }
+            }
+            if (c.OfferedTerm3)
+            {
+                if (c.Leader != null) { await AddLeaderHistory(dbc, c, 3, c.Leader); }
+                if (c.Leader2 != null) { await AddLeaderHistory(dbc, c, 3, c.Leader2); }
+                if (c.Leader3 != null) { await AddLeaderHistory(dbc, c, 3, c.Leader3); }
+            }
+            if (c.OfferedTerm4)
+            {
+                if (c.Leader != null) { await AddLeaderHistory(dbc, c, 4, c.Leader); }
+                if (c.Leader2 != null) { await AddLeaderHistory(dbc, c, 4, c.Leader2); }
+                if (c.Leader3 != null) { await AddLeaderHistory(dbc, c, 4, c.Leader3); }
+            }
+        }
+        //Clerks History
+        var enrolments = await dbc.Enrolment
+            .Include(x => x.Course)
+            .Include(x => x.Class).ThenInclude(x => x.OnDay)
+            .Include(x => x.Class).ThenInclude(x => x.Occurrence)
+            .Include(x => x.Person)
+            .Where(x => x.IsCourseClerk && !x.Course.IsOffScheduleActivity)
+            .ToListAsync();
+        foreach (var e in enrolments)
+        {
+            if (e.Class == null)
+            {
+                var CourseClasses = classes.Where(x => x.CourseID == e.CourseID).ToList();
+                if (CourseClasses.Count == 1) { e.Class = CourseClasses.First(); e.ClassID = e.Class.ID; }
+            }
+            var key = $"{e.PersonID}_{e.TermID}_{(e.ClassID == null ? Guid.Empty : e.ClassID)}";
+            if (keys.Contains(key)) { continue; }
+            keys.Add(key);
+            LeaderHistory history = new()
+            {
+                ID = Guid.NewGuid(),
+                PersonID = e.PersonID,
+                Person = e.Person,
+                Year = e.Term.Year,
+                Term = e.Term.TermNumber,
+                ClassID = (e.ClassID.HasValue) ? e.ClassID.Value : Guid.Empty,
+                Course = e.Course.Name,
+                Class = (e.Class is not null) ? e.Class.OccurrenceTextBrief : "All classes",
+                TermID = e.TermID,
+                Type = LeaderType.Clerk,
+            };
+            await dbc.LeaderHistory.AddAsync(history);
+        }
+        await dbc.SaveChangesAsync();
+    }
+
+    async Task AddLeaderHistory(U3ADbContextSeed dbc, Class c, int termNumber, Person person)
+    {
+        Term term = terms!.FirstOrDefault(x => x.Year == c.Course.Year && x.TermNumber == termNumber);
+        if (term == null) { return; }
+        Term currentTerm = terms.FirstOrDefault(x => x.IsDefaultTerm);
+        if (term.Comparer > currentTerm.Comparer) { return; }
+        var key = $"{person.ID}_{term.ID}_{c.ID}";
+        if (keys.Contains(key)) { return; }
+        keys.Add(key);
+        LeaderHistory history = new()
+        {
+            ID = Guid.NewGuid(),
+            PersonID = person.ID,
+            Person = person,
+            Year = term.Year,
+            Term = term.TermNumber,
+            ClassID = c.ID,
+            Course = c.Course.Name,
+            Class = c.OccurrenceTextBrief,
+            TermID = term.ID,
+            Type = LeaderType.Leader,
+        };
+        await dbc.LeaderHistory.AddAsync(history);
     }
 
     void DoCancel() { NavMan.NavigateTo("/"); }
