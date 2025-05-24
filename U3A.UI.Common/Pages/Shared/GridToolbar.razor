@@ -174,6 +174,7 @@ ItemClick="OnItemClick">
         if (LinkedGrid != null)
         {
             LinkedGrid.BeginUpdate();
+            LinkedGrid.HighlightRowOnHover = true;
             LinkedGrid.ShowGroupPanel = !HideGroupPanel;
             LinkedGrid.ShowSearchBox = !HideSearchBox;
             LinkedGrid.SelectAllCheckboxMode = GridSelectAllCheckboxMode.AllPages;
