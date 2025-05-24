@@ -16,7 +16,29 @@
             <Columns>
                 <DxGridDataColumn FieldName="Term.Name" Caption="Term" GroupIndex="0" />
                 <DxGridDataColumn FieldName="CourseName" Caption="Course" Width="40%" GroupIndex="1" />
-                <DxGridDataColumn FieldName="Date" Caption="Date" />
+                <DxGridDataColumn FieldName="Date" Caption="Date" >
+                    <GroupFooterTemplate>
+                        @{
+                            var summaryItems = context.SummaryItems;
+                            if (summaryItems.Any())
+                            {
+                                foreach (var item in summaryItems)
+                                {
+                                    string groupName = "";
+                                    var rowLevel = context.Grid.GetRowLevel(context.GroupRowVisibleIndex);
+                                    if (rowLevel == 0)
+                                        groupName = (string)context.Grid.GetRowValue(context.GroupRowVisibleIndex, "Term.Name");
+                                    else
+                                        groupName = "Course Sub-Total";
+
+                                    <span>
+                                        @groupName
+                                    </span>
+                                }
+                            }
+                        }
+                    </GroupFooterTemplate>                    
+                </DxGridDataColumn>
                 <DxGridDataColumn FieldName="Present" Caption="Present" />
                 <DxGridDataColumn FieldName="AbsentWithApology" Caption="Apology" />
                 <DxGridDataColumn FieldName="AbsentWithoutApology" Caption="W/out Apology" />
@@ -40,8 +62,8 @@
                                    FooterColumnName="AbsentWithoutApology" />
             </GroupSummary>
             <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom"
-                                   DisplayText="Total"
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                   DisplayText="Total Year-To-Date"
                                    FooterColumnName="Date" />
                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
                                    DisplayText="{0:n0}"
