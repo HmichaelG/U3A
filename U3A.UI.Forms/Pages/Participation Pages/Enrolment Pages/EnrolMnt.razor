@@ -284,7 +284,11 @@ else
                                        SelectedTerm="@currentTerm"
                                        CssClass="drawer-content-style" />
                 </DxTabPage>
-            </DxTabs>
+                    <DxTabPage Text="Leadership History">
+                        <LeadershipHistory SelectedPerson="@selectedPerson"
+                                          CssClass="drawer-content-style" />
+                    </DxTabPage>
+             </DxTabs>
             <DxButton Text="Close"
                       Click="@(() => { isDrawerOpen = false; StateHasChanged(); })" />
         </BodyTemplate>

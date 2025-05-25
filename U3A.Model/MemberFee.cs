@@ -10,11 +10,14 @@ namespace U3A.Model
     [NotMapped]
     public class MemberFee
     {
+        public Guid ID { get; set; } = Guid.NewGuid();
         public Guid PersonID { get; set; }
         public MemberFeeSortOrder SortOrder { get; set; }
         public DateTime? Date { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
+        public decimal? Balance { get; set; }
+        public bool IsNotAllocated { get; set; } = false;
     }
 
     public enum MemberFeeSortOrder
