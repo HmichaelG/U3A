@@ -28,6 +28,7 @@ namespace U3A.Model
         CourseFee,
         TermFee,
         AdditionalFee,
+        Refund,
         Receipt
     }
 

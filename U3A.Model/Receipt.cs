@@ -16,7 +16,6 @@ namespace U3A.Model
         [Required]
         public int ProcessingYear { get; set; }
         [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "You must enter a positive Amount.")]
         [Precision(precision: 18, 2)]
         public decimal Amount { get; set; }
         [Required]

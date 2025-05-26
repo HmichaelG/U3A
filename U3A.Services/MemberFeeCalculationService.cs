@@ -361,8 +361,14 @@ public class MemberFeeCalculationService
                                             && x.Amount != 0
                                             && x.ProcessingYear == term.Year).ToArrayAsync())
         {
-            AddFee(person.ID,
-                    MemberFeeSortOrder.Receipt, r.Date,"Payment received - thank you", -r.Amount);
+                var description = "Payment received - thank you";
+                var sortOrder = MemberFeeSortOrder.Receipt;
+            if (r.Amount < 0)
+            {
+                sortOrder = MemberFeeSortOrder.Refund;
+                description = $"Refund: {r.Description}";
+            }
+            AddFee(person.ID,sortOrder, r.Date, description, -r.Amount);
             if (PersonWithFinancialStatus != null)
             {
                 PersonWithFinancialStatus.AmountReceived += r.Amount;

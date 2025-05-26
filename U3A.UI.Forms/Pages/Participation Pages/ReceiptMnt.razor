@@ -251,7 +251,7 @@ else
     async Task OnPersonOrAmountChanged(Receipt editItem)
     {
         if (editItem == null) { return; }
-        if (editItem.Person == null || editItem.Amount <= 0) { return; }
+        if (editItem.Person == null) { return; }
         if (originalReceipt is not null)
         {
             var personChange = string.Empty;
@@ -400,7 +400,12 @@ else
                 {
                     await ResetFinancialToDetails(dataItem);
                 }
-                if (dataItem.EmailCashReceipt) { BusinessRule.CreateReceiptSendMailAsync(dbc); }
+                if (dataItem.EmailCashReceipt) 
+                {
+                    dataItem.Identifier += " "; // force a change to the document
+                    BusinessRule.CreateReceiptSendMailAsync(dbc);
+                    dataItem.Identifier.Trim();
+                }
                 if (await SaveChangesAsync()) await RefreshData();
             }
         }
