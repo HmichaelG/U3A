@@ -11,17 +11,29 @@
         </DxDropDownButton>
     </div>
     <div class="h-25 overflow-auto">
-        <DxGrid Data="@memberFees" 
+        <DxGrid Data="@memberFees"
                 AllowSorting=false
                 AllowFiltering=false
                 AllowGrouping=false
-                TextWrapEnabled=false               
+                TextWrapEnabled=false
                 VirtualScrollingEnabled=true
                 CssClass="@CssClass">
             <Columns>
                 <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Date)" Caption="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="5rem" />
                 <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Description)" Caption="Description" />
-                <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Amount)" Caption="Amount" DisplayFormat="c2" Width="5rem" />
+                <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Amount)"
+                                  Caption="Amount" DisplayFormat="c2" Width="5rem">
+                    <CellDisplayTemplate>
+                        @if (context.Value is decimal amount && amount < 0)
+                        {
+                            <span class="text-danger">@context.Value</span>
+                        }
+                        else
+                        {
+                            <span>@context.Value</span>
+                        }
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
                 <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Balance)"
                                   Visible="@showBalance"
                                   Caption="Balance" DisplayFormat="c2" Width="75px" />

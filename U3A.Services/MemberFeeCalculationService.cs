@@ -35,9 +35,8 @@ public class MemberFeeCalculationService
 
     public List<MemberFee> GetMemberFees(Guid PersonID) => MemberFees
                                                   .Where(x => x.PersonID == PersonID)
-                                                  .OrderBy(x => x.SortOrder)
-                                                  .ThenBy(x => x.Date)
-                                                  .ThenBy(x => x.Description)
+                                                  .OrderBy(x => x.Date)
+                                                  .ThenBy(x => x.SortOrder)
                                                   .ToList();
     public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(U3ADbContext dbc, Person person)
     {
@@ -540,10 +539,6 @@ public class MemberFeeCalculationService
     private void AddFee(Guid personID, MemberFeeSortOrder sortOrder, DateTime? date, string description, decimal amount)
     {
         var value = decimal.Round(amount, 2);
-        if (!MemberFees.Any(x => x.PersonID == personID
-                                    && x.Description == description
-                                    && x.Amount == value))
-        {
             MemberFees.Add(new MemberFee
             {
                 PersonID = personID,
@@ -552,7 +547,6 @@ public class MemberFeeCalculationService
                 Description = description,
                 Amount = value
             });
-        }
     }
 
     public DateTime ConvertDateOnlyToDateTime(DateOnly date)

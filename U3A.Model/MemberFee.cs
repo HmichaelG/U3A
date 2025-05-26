@@ -25,9 +25,9 @@ namespace U3A.Model
         MemberFee,
         Complimentary,
         MailSurcharge,
-        AdditionalFee,
         CourseFee,
         TermFee,
+        AdditionalFee,
         Receipt
     }
 
