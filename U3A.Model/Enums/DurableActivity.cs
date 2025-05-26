@@ -33,7 +33,9 @@ namespace U3A.Model
         [Display(Name = "Database Cleanup")]
         DoDatabaseCleanup,
         [Display(Name = "Membership Alert Email")]
-        DoMembershipAlertsEmail
+        DoMembershipAlertsEmail,
+        [Display(Name = "Create/Update Leader History")]
+        DoCreateUpdateLeaderHistory
     }
 
     [NotMapped]

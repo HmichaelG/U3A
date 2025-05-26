@@ -113,7 +113,6 @@
     List<string> keys = new();
     async Task ApplyFix(U3ADbContextSeed dbc)
     {
-        await dbc.Database.ExecuteSqlRawAsync("Truncate table [LeaderHistory]");
         terms = await dbc.Term.ToListAsync();
         keys = await dbc.LeaderHistory.Select(x => $"{x.PersonID}_{x.TermID}_{x.ClassID}").ToListAsync();
         // Leaders History

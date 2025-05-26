@@ -60,6 +60,9 @@ public partial class DurableFunctions
             case DurableActivity.DoDatabaseCleanup:
                 result = await context.CallActivityAsync<string>(nameof(DoDatabaseCleanupActivity), options);
                 break;
+            case DurableActivity.DoCreateUpdateLeaderHistory:
+                result = await context.CallActivityAsync<string>(nameof(DoCreateUpdateLeaderHistory), options);
+                break;
         }
     }
 
@@ -126,7 +129,7 @@ public partial class DurableFunctions
     public async Task DoHourlyProcedures(
         [TimerTrigger("0 0 22-23,0-11 * * *"
     #if DEBUG
-               //, RunOnStartup=true
+               , RunOnStartup=true
     #endif            
                 )]
                 TimerInfo myTimer,
@@ -146,6 +149,7 @@ public partial class DurableFunctions
             instanceId = await ScheduleTimerFunction(tenant.Identifier!, DurableActivity.DoAutoEnrolment, client, false);
             instanceId = await ScheduleTimerFunction(tenant.Identifier!, DurableActivity.DoProcessQueuedDocuments, client, false);
             instanceId = await ScheduleTimerFunction(tenant.Identifier!, DurableActivity.DoBuildSchedule, client, false);
+            instanceId = await ScheduleTimerFunction(tenant.Identifier!, DurableActivity.DoCreateUpdateLeaderHistory, client, false);
         }
     }
 
