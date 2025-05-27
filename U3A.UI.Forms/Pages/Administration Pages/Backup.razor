@@ -37,26 +37,26 @@
     <p>The downloaded spreadsheet contains your member's private information. It is password protected with the password entered below. Please treat with care and in accordance with privacy legislation in your State.</p>
 
     <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
-    Caption="File Password"
-    CaptionPosition="CaptionPosition.Horizontal">
+                      Caption="File Password"
+                      CaptionPosition="CaptionPosition.Horizontal">
         <DxTextBox @bind-Text="@password"
-        NullText="Enter a password of at least 5 characters"
-        Password="@(!showPassword)" autocomplete="new-password">
+                   NullText="Enter a password of at least 5 characters"
+                   Password="@(!showPassword)" autocomplete="new-password">
             <Buttons>
                 <DxEditorButton IconCssClass="bi bi-eye"
-                Tooltip="Show/hide password"
-                Click="@(() => showPassword = !showPassword)" />
+                                Tooltip="Show/hide password"
+                                Click="@(() => showPassword = !showPassword)" />
             </Buttons>
         </DxTextBox>
     </DxFormLayoutItem>
 
     <DxButton Text="Do Backup" CssClass="mt-2"
-    Click="@DoBackup"
-    Enabled="@(!string.IsNullOrWhiteSpace(password) && password.Length >= 5)" />
+              Click="@DoBackup"
+              Enabled="@(!string.IsNullOrWhiteSpace(password) && password.Length >= 5)" />
 
     <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
-    Caption="Status" Visible="@(!string.IsNullOrWhiteSpace(state))"
-    CaptionPosition="CaptionPosition.Vertical">
+                      Caption="Status" Visible="@(!string.IsNullOrWhiteSpace(state))"
+                      CaptionPosition="CaptionPosition.Vertical">
         <DxMemo @bind-Text="@state" ReadOnly="true" Rows="15" />
     </DxFormLayoutItem>
     <div>@(new MarkupString(finishText))</div>
@@ -163,6 +163,10 @@
                 string columnName = row.Field<string>("ColumnName");
                 if (type == typeof(byte[]))
                 {
+                    if (columnName == "Version")
+                    {
+                        continue;
+                    }
                     type = typeof(string);
                     byteColumns.Add(columnName);
                 }
@@ -181,10 +185,11 @@
                             dr[col.ColumnName] = DBNull.Value;
                             break;
                         case byte[] bytes:
-                            dr[col.ColumnName] = bytes.Length >= Int16.MaxValue ? null : System.Text.Encoding.UTF8.GetString(bytes);
+                            if (col.ColumnName != "Version")
+                            { dr[col.ColumnName] = bytes.Length >= Int16.MaxValue ? null : System.Text.Encoding.UTF8.GetString(bytes); }
                             break;
                         case DateTime d when d.Year == 1:
-                            dr[col.ColumnName] = new DateTime(1900,d.Month,d.Day,d.Hour,d.Minute,d.Second,d.Microsecond) ;
+                            dr[col.ColumnName] = new DateTime(1900, d.Month, d.Day, d.Hour, d.Minute, d.Second, d.Microsecond);
                             break;
                         default:
                             dr[col.ColumnName] = value;
