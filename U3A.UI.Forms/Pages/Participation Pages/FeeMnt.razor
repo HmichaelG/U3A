@@ -62,6 +62,15 @@ else
                     <DxGridDataColumn Caption="Description" FieldName="Description" />
                     <DxGridDataColumn Caption="Membership Fee?" FieldName="IsMembershipFee" Width="10rem" />
                     <DxGridDataColumn Caption="Amount" FieldName="Amount" DisplayFormat="{0:c2}" />
+                    <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
+                        <CellDisplayTemplate>
+                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
+                                        RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
+                                        Click="async() => {var selectedPerson = (((Fee)context.DataItem)).Person;
+                                            await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
+                            </DxButton>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
                 </Columns>
                 <GroupSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
@@ -112,6 +121,9 @@ else
 </style>
 
 @code {
+    [Parameter]
+    public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+
     bool IsReady;
     List<Fee>? Fees { get; set; }
     IEnumerable<Person>? Persons { get; set; }
@@ -131,6 +143,7 @@ else
     string? ErrorMessage;
     U3ADbContext? dbc { get; set; }
     MemberFeeCalculationService service;
+    Term? currentTerm;
 
     protected override async Task OnInitializedAsync()
     {
@@ -270,11 +283,22 @@ else
 
     async Task RefreshData()
     {
-        if (yearComponent == null) { return; }
-        ProcessingYear = yearComponent.Year;
-        if (Persons == null) Persons = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
-        Fees = await BusinessRule.EditableFeesForYearAsync(dbc, ProcessingYear);
-        StateHasChanged();
+        if (yearComponent != null)
+        {
+            currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+            if (currentTerm == null)
+            {
+                currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+            }
+            ProcessingYear = yearComponent.Year;
+            if (currentTerm.Year != ProcessingYear)
+            {
+                currentTerm = await dbc.Term.FirstOrDefaultAsync(x => x.Year == ProcessingYear && x.TermNumber == 4);
+            }
+            Persons = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
+            Fees = await BusinessRule.EditableFeesForYearAsync(dbc, ProcessingYear);
+            StateHasChanged();
+        }
     }
 
     public void Dispose()

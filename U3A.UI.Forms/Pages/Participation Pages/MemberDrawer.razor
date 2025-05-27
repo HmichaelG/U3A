@@ -1,5 +1,7 @@
 ﻿@page "/MemberDrawer/{TargetName}"
 
+@inject WorkStation ws
+
 <DxDrawer @bind-IsOpen="@isDrawerOpen"
           CssClass="drawer-style"
           Mode="DrawerMode.Overlap"
@@ -19,6 +21,12 @@
                     break;
                 case "EnrolMnt":
                     <EnrolMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+                    break;
+                case "ReceiptMnt":
+                    <ReceiptMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+                    break;
+                case "FeeMnt":
+                    <FeeMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
                     break;
             }
         }
@@ -50,6 +58,16 @@
                   Click="@(() => { isDrawerOpen = false; StateHasChanged(); })" />
     </BodyTemplate>
 </DxDrawer>
+
+<style>
+    .drawer-style {
+        max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
+    }
+
+    .drawer-content-style {
+        max-height: 75dvh;
+    }
+</style>
 
 @code {
 
