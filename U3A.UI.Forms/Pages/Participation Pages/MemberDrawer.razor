@@ -1,0 +1,69 @@
+﻿@page "/MemberDrawer/{TargetName}"
+
+<DxDrawer @bind-IsOpen="@isDrawerOpen"
+          CssClass="drawer-style"
+          Mode="DrawerMode.Overlap"
+          Position="DrawerPosition.Right"
+          PanelWidth="min(40rem, 100%)">
+    <TargetContent>
+
+        @{
+            switch (TargetName)
+            {
+                case "PersonMnt":
+                    <PersonMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+                    break;
+                case "PersonMntEmbedded":
+                    <PersonMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))"
+                               IsEmbedded=true GridLayoutKey="{1F6F77E7-6276-48FC-A1D3-E3A8959DA561}" />
+                    break;
+                case "EnrolMnt":
+                    <EnrolMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+                    break;
+            }
+        }
+        
+    </TargetContent>
+    <BodyTemplate>
+        <DxTabs>
+            <DxTabPage Text="Statement of Account">
+                <StatementOfAccount SelectedPerson="@selectedPerson"
+                                    SelectedTerm="@currentTerm"
+                                    CssClass="drawer-content-style" />
+            </DxTabPage>
+            <DxTabPage Text="Enrolment History">
+                <EnrolmentHistory SelectedPerson="@selectedPerson"
+                                  SelectedTerm="@currentTerm"
+                                  CssClass="drawer-content-style" />
+            </DxTabPage>
+            <DxTabPage Text="Attendance History">
+                <AttendanceHistory SelectedPerson="@selectedPerson"
+                                   SelectedTerm="@currentTerm"
+                                   CssClass="drawer-content-style" />
+            </DxTabPage>
+            <DxTabPage Text="Leadership History">
+                <LeadershipHistory SelectedPerson="@selectedPerson"
+                                   CssClass="drawer-content-style" />
+            </DxTabPage>
+        </DxTabs>
+        <DxButton Text="Close"
+                  Click="@(() => { isDrawerOpen = false; StateHasChanged(); })" />
+    </BodyTemplate>
+</DxDrawer>
+
+@code {
+
+    [Parameter]
+    public string TargetName { get; set; }
+
+    bool isDrawerOpen { get; set; }
+    Person? selectedPerson { get; set; }
+    Term? currentTerm { get; set; }
+
+    void OnMemberDrawerRequested(Person person,Term term)
+    {
+        selectedPerson = person;
+        currentTerm = term;
+        isDrawerOpen = true;
+    }
+}

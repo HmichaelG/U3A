@@ -1,6 +1,5 @@
 ﻿@page "/PersonMnt"
 
-
 @using System.Diagnostics
 @using DevExpress.Data.Filtering;
 @using Microsoft.AspNetCore.Hosting
@@ -29,13 +28,6 @@
     }
     else
     {
-        <DxDrawer @bind-IsOpen="@isDrawerOpen"
-                  CssClass="drawer-style"
-                  Mode="DrawerMode.Overlap"
-                  Position="DrawerPosition.Right"
-                  PanelWidth="min(40rem, 100%)">
-            <TargetContent>
-
                 <div class="row" hidden="@IsEmbedded">
                     <ContextHelpTitle Title="Participants" HelpTopic="Add_Edit-Participants.html" />
                 </div>
@@ -187,8 +179,8 @@
                                                 <CellDisplayTemplate>
                                                     <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
                                                               RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
-                                                              Click="() => {selectedPerson = ((Person)context.DataItem);
-                                                                    isDrawerOpen = true; StateHasChanged(); }">
+                                                              Click="async() => {selectedPerson = ((Person)context.DataItem);
+                                                                    await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
                                                     </DxButton>
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
@@ -364,34 +356,6 @@
                         </DxSplitter>
                     </ContentTemplate>
                 </FullScreen>
-            </TargetContent>
-            <BodyTemplate>
-                <DxTabs>
-                    <DxTabPage Text="Statement of Account">
-                        <StatementOfAccount SelectedPerson="@selectedPerson"
-                                            SelectedTerm="@currentTerm"
-                                            CssClass="drawer-content-style" />
-                    </DxTabPage>
-                    <DxTabPage Text="Enrolment History">
-                        <EnrolmentHistory SelectedPerson="@selectedPerson"
-                                          SelectedTerm="@currentTerm"
-                                          CssClass="drawer-content-style" />
-                    </DxTabPage>
-                    <DxTabPage Text="Attendance History">
-                        <AttendanceHistory SelectedPerson="@selectedPerson"
-                                          SelectedTerm="@currentTerm"
-                                          CssClass="drawer-content-style" />
-                    </DxTabPage>
-                    <DxTabPage Text="Leadership History">
-                        <LeadershipHistory SelectedPerson="@selectedPerson"
-                                          CssClass="drawer-content-style" />
-                    </DxTabPage>
-                </DxTabs>
-                <DxButton Text="Close"
-                          Click="@(() => { isDrawerOpen = false; StateHasChanged(); })" />
-            </BodyTemplate>
-        </DxDrawer>
-
     }
 </form>
 
@@ -411,6 +375,9 @@
 
 
 @code {
+    [Parameter]
+    public EventCallback<(Person,Term)> MemberDrawerRequested { get; set; }
+
     [Parameter]
     public bool IsEmbedded { get; set; }
     [Parameter]
@@ -454,7 +421,6 @@
     int emailsSent;
     bool isGridFilterSet;
     bool isEmailEditing;
-    bool isDrawerOpen;
     string monthName;
 
     MessageBox? messageBox { get; set; }

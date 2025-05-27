@@ -49,12 +49,6 @@ else
         </BodyTemplate>
     </DxFlyout>
 
-    <DxDrawer @bind-IsOpen="@isDrawerOpen"
-              CssClass="drawer-style"
-              Mode="DrawerMode.Overlap"
-              Position="DrawerPosition.Right"
-              PanelWidth="min(40rem, 100%)" >
-        <TargetContent>
             <DxFormLayout>
 
                 <div class="col col-12 col-lg-9 mt-2">
@@ -174,11 +168,11 @@ else
                                                       UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
                                     <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                         <CellDisplayTemplate>
-                                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
-                                                      RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
-                                                      Click="() => {selectedPerson = ((Enrolment)context.DataItem).Person;
-                                                                    isDrawerOpen = true; StateHasChanged(); }">
-                                            </DxButton>
+                                                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
+                                                              RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
+                                                              Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
+                                                                    await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
+                                                    </DxButton>
                                         </CellDisplayTemplate>
                                     </DxGridDataColumn>
                                 </Columns>
@@ -266,33 +260,6 @@ else
                     </DxFormLayoutGroup>
                 </div>
             </DxFormLayout>
-        </TargetContent>
-        <BodyTemplate>
-            <DxTabs>
-                <DxTabPage Text="Statement of Account">
-                    <StatementOfAccount SelectedPerson="@selectedPerson"
-                                        SelectedTerm="@selectedTerm"
-                                        CssClass="drawer-content-style" />
-                </DxTabPage>
-                <DxTabPage Text="Enrolment History">
-                    <EnrolmentHistory SelectedPerson="@selectedPerson"
-                                      SelectedTerm="@selectedTerm"
-                                      CssClass="drawer-content-style" />
-                </DxTabPage>
-                <DxTabPage Text="Attendance History">
-                    <AttendanceHistory SelectedPerson="@selectedPerson"
-                                       SelectedTerm="@currentTerm"
-                                       CssClass="drawer-content-style" />
-                </DxTabPage>
-                    <DxTabPage Text="Leadership History">
-                        <LeadershipHistory SelectedPerson="@selectedPerson"
-                                          CssClass="drawer-content-style" />
-                    </DxTabPage>
-             </DxTabs>
-            <DxButton Text="Close"
-                      Click="@(() => { isDrawerOpen = false; StateHasChanged(); })" />
-        </BodyTemplate>
-    </DxDrawer>
 }
 <style>
     .drawer-style {
@@ -312,6 +279,9 @@ else
 
 
 @code {
+    [Parameter]
+    public EventCallback<(Person,Term)> MemberDrawerRequested { get; set; }
+
     bool IsReady;
     int ShowEnrolmentType;
     SystemSettings? settings;
@@ -386,7 +356,6 @@ else
     internal Progress? ProgressBar;
     MemberFeeCalculationService service;
     bool hasMultiCampusVisitors = false;
-    bool isDrawerOpen = false;
 
     List<(Guid CourseID, Guid PersonID, string ClassStart)> AllEnrolmentsForDifferentParticipantsInEachClass;
 

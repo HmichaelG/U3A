@@ -108,11 +108,11 @@
                                                 <DxMenuItem Text="Course Fees Due Enquiry" NavigateUrl="CourseFeesDueEnquiry" />
                                             </Items>
                                         </DxMenuItem>
-                                        <DxMenuItem Text="Add/Edit Participants" NavigateUrl="PersonMnt" />
+                                            <DxMenuItem Text="Add/Edit Participants" NavigateUrl="@($"MemberDrawer/PersonMnt")" />
                                         <DxMenuItem Text="Add/Edit Contacts" NavigateUrl="ContactMnt" />
                                         <DxMenuItem Text="Add/Edit Committee" NavigateUrl="CommitteeMnt" />
                                         <DxMenuItem Text="Add/Edit Volunteers" NavigateUrl="VolunteerMnt" />
-                                        <DxMenuItem Text="Enrol Participants" NavigateUrl="EnrolMnt" />
+                                            <DxMenuItem Text="Enrol Participants" NavigateUrl="@($"MemberDrawer/EnrolMnt")" />
                                         <DxMenuItem Text="Review Class Dropouts" NavigateUrl="ReviewDropouts" />
                                         <DxMenuItem Text="Class Attendance" NavigateUrl="AttendClassMnt" />
                                         <DxMenuItem BeginGroup=true Text="Bring Forward Enrolments" NavigateUrl="BringForwardEnrolments" Enabled="@(isSystemAdminRole)" />
