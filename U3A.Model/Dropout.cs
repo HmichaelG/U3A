@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class Dropout
+    public class Dropout : BaseEntity
     {
         public Dropout() { DropoutDate = DateTime.UtcNow; }
 

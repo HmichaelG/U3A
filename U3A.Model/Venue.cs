@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class Venue
+    public class Venue : BaseEntity
     {
         public override int GetHashCode()
         {

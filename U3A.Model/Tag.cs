@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class Tag
+    public class Tag : BaseEntity
     {
         public Guid Id { get; set; }
 

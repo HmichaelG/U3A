@@ -7,7 +7,7 @@ using System.Text;
 namespace U3A.Model
 {
     [Index(nameof(Name), IsUnique = true)]
-    public class DocumentTemplate
+    public class DocumentTemplate : BaseEntity
     {
         [Key]
         public Guid ID { get; set; }

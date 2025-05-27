@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class Report
+    public class Report : BaseEntity
     {
         public Guid ID { get; set; }
         public string Name { get; set; }

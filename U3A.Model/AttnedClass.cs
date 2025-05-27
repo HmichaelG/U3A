@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace U3A.Model
 {
     [Index(new string[] { nameof(TermID), nameof(ClassID), nameof(Date) }, IsUnique = false)]
-    public class AttendClass
+    public class AttendClass : BaseEntity
     {
 
         [Key]

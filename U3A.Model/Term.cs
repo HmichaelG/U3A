@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class Term : INotifyPropertyChanged
+    public class Term : BaseEntity, INotifyPropertyChanged
     {
 
         public event PropertyChangedEventHandler? PropertyChanged;

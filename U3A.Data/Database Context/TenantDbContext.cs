@@ -52,8 +52,27 @@ namespace U3A.Database
                             CancellationToken cancellationToken = default(CancellationToken))
         {
             OnBeforeSaving();
-            return (await base.SaveChangesAsync(acceptAllChangesOnSuccess,
+            int result = 0;
+            try
+            {
+                result = (await base.SaveChangesAsync(acceptAllChangesOnSuccess,
                           cancellationToken));
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // Use safe last write wins strategy for concurrency
+                foreach (var entry in ex.Entries)
+                {
+                    var currentValues = entry.CurrentValues;
+                    var databaseValues = await entry.GetDatabaseValuesAsync(cancellationToken);
+                    if (databaseValues != null)
+                    {
+                        entry.OriginalValues.SetValues(databaseValues);
+                    }
+                }
+                result = await base.SaveChangesAsync(cancellationToken); // Retry with latest data
+            }
+            return result;
         }
 
         private void OnBeforeSaving()

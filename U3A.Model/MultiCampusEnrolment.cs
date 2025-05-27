@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace U3A.Model
 {
-    public class MultiCampusEnrolment
+    public class MultiCampusEnrolment : BaseEntity
     {
         public MultiCampusEnrolment() { Created = DateTime.UtcNow; }
 

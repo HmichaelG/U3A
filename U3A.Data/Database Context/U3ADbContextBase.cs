@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using DevExpress.Office.Utils;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -63,15 +64,57 @@ namespace U3A.Database
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             OnBeforeSaving();
-            return base.SaveChanges(acceptAllChangesOnSuccess);
+            int result = 0;
+            try
+            {
+                result = base.SaveChanges(acceptAllChangesOnSuccess);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // Use safe last write wins strategy for concurrency for objects of BaseEntity type
+                // using the version column as the concurrency token.
+                foreach (var entry in ex.Entries)
+                {
+                    var currentValues = entry.CurrentValues;
+                    var databaseValues = entry.GetDatabaseValues();
+
+                    if (databaseValues != null)
+                    {
+                        entry.OriginalValues.SetValues(databaseValues);
+                        entry.CurrentValues.SetValues(databaseValues);
+                    }
+                }
+
+                result = base.SaveChanges(); // Retry with latest data
+            }
+            return result;
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
                                     CancellationToken cancellationToken = default(CancellationToken))
         {
             OnBeforeSaving();
-            return (await base.SaveChangesAsync(acceptAllChangesOnSuccess,
+            int result = 0;
+            try
+            {
+                result = (await base.SaveChangesAsync(acceptAllChangesOnSuccess,
                           cancellationToken));
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // Use safe last write wins strategy for concurrency.
+                foreach (var entry in ex.Entries)
+                {
+                    var currentValues = entry.CurrentValues;
+                    var databaseValues = await entry.GetDatabaseValuesAsync(cancellationToken);
+                    if (databaseValues != null)
+                    {
+                        entry.OriginalValues.SetValues(databaseValues);
+                    }
+                }
+                result = await base.SaveChangesAsync(cancellationToken); // Retry with latest data
+            }
+            return result;
         }
 
         public override EntityEntry<TEntity> Remove<TEntity>(TEntity entity)

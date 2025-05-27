@@ -3,7 +3,7 @@
 namespace U3A.Model
 {
     [NotMapped]
-    public class DuplicatePerson
+    public class DuplicatePerson : BaseEntity
     {
         public string LastName { get; set; }
         public string FirstName { get; set; }

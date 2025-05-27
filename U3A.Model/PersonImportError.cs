@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace U3A.Model
 {
-    public class PersonImportError
+    public class PersonImportError : BaseEntity
     {
         public Guid ID { get; set; }
         public string Filename { get; set; }

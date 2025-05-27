@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class MultiCampusTerm
+    public class MultiCampusTerm : BaseEntity
     {
         [Key]
         public Guid ID { get; set; }

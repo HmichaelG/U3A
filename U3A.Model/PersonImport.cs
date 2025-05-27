@@ -12,7 +12,7 @@ namespace U3A.Model
 {
     [Index(new string[] { nameof(LastName), nameof(FirstName), nameof(IsNewPerson) }, IsUnique = false)]
     [Index(nameof(Timestamp))]
-    public class PersonImport
+    public class PersonImport : BaseEntity
     {
         [Key]
         public Guid ID { get; set; }

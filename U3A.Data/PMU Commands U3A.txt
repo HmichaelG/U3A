@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_CourseFeePerTermDueWeeks
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_LeaderHistory
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_LeaderHistory
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_RowVersioning
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_LeaderHistory
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_RowVersioning
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

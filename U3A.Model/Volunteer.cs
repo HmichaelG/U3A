@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace U3A.Model
 {
     [Index(nameof(Activity), nameof(PersonID), IsUnique = true)]
-    public class Volunteer
+    public class Volunteer : BaseEntity
     {
         public Guid ID { get; set; }
 

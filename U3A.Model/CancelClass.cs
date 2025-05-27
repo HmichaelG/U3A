@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class CancelClass
+    public class CancelClass : BaseEntity
     {
         public Guid ID { get; set; }
         public Guid ClassID { get; set; }

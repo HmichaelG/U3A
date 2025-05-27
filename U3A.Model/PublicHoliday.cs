@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
-    public class PublicHoliday
+    public class PublicHoliday : BaseEntity
     {
         public Guid ID { get; set; }
         [Required]

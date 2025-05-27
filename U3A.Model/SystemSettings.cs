@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace U3A.Model
 {
-    public class SystemSettings
+    public class SystemSettings : BaseEntity
     {
         [Key]
         public Guid ID { get; set; }

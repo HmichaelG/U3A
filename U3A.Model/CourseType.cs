@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 namespace U3A.Model
 {
     [Index(nameof(Name), IsUnique = true)]
-    public class CourseType
+    public class CourseType : BaseEntity
     {
         [Key]
         public Guid ID { get; set; }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace U3A.Model
 {
-    public class ReceiptDataImport
+    public class ReceiptDataImport : BaseEntity
     {
         public Guid ID { get; set; }
         public DateTime Date { get; set; }
