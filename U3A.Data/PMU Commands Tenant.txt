@@ -1,8 +1,8 @@
-﻿update-database -cont TenantDbContext -project U3A.Database TdB_MCSchedule_AddIndex
+﻿update-database -cont TenantDbContext -project U3A.Database TdB_Tenant_TwoFactor
 
-remove-migration -cont TenantDbContext -project U3A.Database -args TdB_Tenant_TwoFactor
+remove-migration -cont TenantDbContext -project U3A.Database -args TdB_RowVersion
 
-add-migration -cont TenantDbContext -project U3A.Database TdB_Tenant_TwoFactor
+add-migration -cont TenantDbContext -project U3A.Database TdB_RowVersion
 
 update-database -cont TenantDbContext -project U3A.Database
 

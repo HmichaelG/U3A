@@ -32,7 +32,7 @@ namespace U3A.Database
                     optionsBuilder.EnableSensitiveDataLogging(true);
                 }
                 else { cnstr = TenantInfo.ConnectionString; }
-                optionsBuilder.UseSqlServer(cnstr);
+                optionsBuilder.UseSqlServer(cnstr, sqlServerOptions => sqlServerOptions.CommandTimeout(120));
             }
         }
     }
