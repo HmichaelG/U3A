@@ -258,35 +258,28 @@ public static partial class BusinessRule
     public static async Task<List<ClassDate>> SelectableAttendanceDatesAsync(U3ADbContext dbc,
                 Term selectedTerm, Class selectedClass, DateTime Today)
     {
-        var cutoffDate = Today.Date.AddDays(1).AddSeconds(-1);
+        var startDate = selectedTerm.StartDate;
         List<ClassDate> result = new();
 
         // a list of attendance records already created up till today's date
         List<ClassDate> onFileDates = await dbc.AttendClass
                                                 .Where(x => x.TermID == selectedTerm.ID
                                                             && x.ClassID == selectedClass.ID
-                                                            && x.Date <= cutoffDate)
+                                                            && x.Date <= startDate)
                                                 .Select(x => new ClassDate()
                                                 {
                                                     Date = x.Date,
                                                     TermStart = selectedTerm.StartDate
                                                 }).Distinct().ToListAsync();
-
+        
         // Calculate the date range for class schedule calculation ( start & end)
 
         // the last class date for term
-        var lastAllowedClassDate = await BusinessRule.GetLastAllowedClassDateForTermAsync(dbc, selectedTerm);
+        var endDate = await BusinessRule.GetLastAllowedClassDateForTermAsync(dbc, selectedTerm);
         var storage = await GetCourseScheduleDataStorageAsync(dbc, selectedTerm);
-        // set the start date to the cutoff date
-        DateTime start = cutoffDate;
-        // if there are no classes between startof term & cutoff, set start to start of term.
-        // this accounts for a change in term start date.
-        if (!onFileDates.Any(x => x.Date >= selectedTerm.StartDate && x.Date < cutoffDate)) { start = selectedTerm.StartDate; }
-        DateTime end = start.AddDays(700); // an arbitarially large number
-        end = (end > start && end <= lastAllowedClassDate) ? end : lastAllowedClassDate;
 
         // calculate class dates
-        DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(start, end);
+        DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(startDate, endDate);
         result = (from a in storage.GetAppointments(range)
                   where (a.CustomFields["Source"] != null
                             && (int)a.LabelId != 9    // Cancelled/Postponed
