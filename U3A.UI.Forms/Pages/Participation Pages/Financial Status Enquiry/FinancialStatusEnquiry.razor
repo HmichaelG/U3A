@@ -130,6 +130,15 @@
                         <DxGridDataColumn Caption="Received" FieldName="AmountReceived" DisplayFormat="c2" Width="5rem" />
                         <DxGridDataColumn Caption="Total" FieldName="TotalFees" DisplayFormat="c2" Width="5rem" />
                         <DxGridDataColumn Caption="Fin-To" FieldName=FinancialToBriefText />
+                    <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
+                        <CellDisplayTemplate>
+                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
+                                        RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
+                                        Click="async() => {var selectedPerson = (((PersonFinancialStatus)context.DataItem).PersonBase);
+                                            await MemberDrawerRequested.InvokeAsync((selectedPerson,selectedTerm)); }">
+                            </DxButton>
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
                     </Columns>
                     <GroupSummary>
                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsComplimentary" />
@@ -168,8 +177,10 @@
 </form>
 
 @code {
+    [Parameter]
+    public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+
     bool IsReady;
-    Term? currentTerm;
 
     List<PersonFinancialStatus>? Persons { get; set; }
     List<Person>? people { get; set; }

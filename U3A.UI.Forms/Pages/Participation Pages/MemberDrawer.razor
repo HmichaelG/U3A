@@ -1,4 +1,5 @@
 ﻿@page "/MemberDrawer/{TargetName}"
+@using U3A.UI.Forms.Pages.Participation_Pages.Financial_Status_Enquiry
 
 @inject WorkStation ws
 
@@ -28,9 +29,12 @@
                 case "FeeMnt":
                     <FeeMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
                     break;
+                case "FinancialStatusEnquiry":
+                    <FinancialStatusEnquiry MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+                    break;
             }
         }
-        
+
     </TargetContent>
     <BodyTemplate>
         <DxTabs>
@@ -78,7 +82,7 @@
     Person? selectedPerson { get; set; }
     Term? currentTerm { get; set; }
 
-    void OnMemberDrawerRequested(Person person,Term term)
+    void OnMemberDrawerRequested(Person person, Term term)
     {
         selectedPerson = person;
         currentTerm = term;
