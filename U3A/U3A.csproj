@@ -311,7 +311,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY &quot;$(SolutionDir)\U3A\wwwroot\help&quot; &quot;$(TargetDir)\wwwroot\help\&quot; /S /Y" />
-  </Target>
 </Project>

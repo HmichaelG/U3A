@@ -150,3 +150,33 @@ h1:focus {
 .grid-height {
     height: inherit;
 }
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70dvh;
+    flex-direction: column;
+    text-align: center;
+}
+
+.winner-style {
+    font-size: 5rem;
+    font-weight: bold;
+}
+
+.winner-animation {
+    animation: flash 0.5s infinite alternate;
+}
+
+@keyframes flash {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}

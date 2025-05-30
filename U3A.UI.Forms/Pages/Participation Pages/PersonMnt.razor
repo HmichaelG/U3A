@@ -28,15 +28,16 @@
     }
     else
     {
-                <div class="row" hidden="@IsEmbedded">
+            <div hidden="@(IsEmbedded || IsSelectionList)">
+                <div class="row">
                     <ContextHelpTitle Title="Participants" HelpTopic="Add_Edit-Participants.html" />
                 </div>
-                <div class="row" hidden="@IsEmbedded">
+                <div class="row">
                     <div class="d-none col-lg-11 d-lg-inline">
                         Participants are any persons participating in your U3A. This may include students, staff, volunteers, course leaders etc.
                     </div>
                 </div>
-
+            </div>
 
                 <MessageBox @ref="@messageBox" />
                 <Progress @ref="@ProgressBar" />
@@ -64,13 +65,14 @@
                     </DxTabs>
                 </div>
 
-                <FullScreen DisplayOffset="@((IsEmbedded) ? 19 : 9)" HideToggle="@IsEmbedded">
+                <FullScreen DisplayOffset="@GridDisplayOffset" HideToggle="@IsEmbedded">
                     <ContentTemplate>
                         <DxSplitter Orientation="Orientation.Vertical">
                             <Panes>
                                 <DxSplitterPane>
                                     <DxGrid Data="@Persons" @ref=@mainGrid CssClass="h-100"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            SelectedDataItems="@SelectedParticipants"
+                                            SelectedDataItemsChanged="@OnSelectedParticipantsChanged"
                                             ShowFilterRow="false"
                                             ShowSearchBox="false"
                                             KeyFieldName="ID"
@@ -88,7 +90,7 @@
                                                          ToolbarFilterClosed="@(OnToolbarFilterClosed)">
                                                 <CustomButtonContent>
                                                     <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                                                                   Visible="@(!IsEmbedded)"
+                                                                   Visible="@(!(IsEmbedded || IsSelectionList))"
                                                                    BeginGroup=true
                                                                    Click=@OnCommunicate
                                                                    RenderStyle="ButtonRenderStyle.Primary"
@@ -109,7 +111,8 @@
                                         <Columns>
                                             <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
                                                                    Width="2rem" Visible="@(!IsEmbedded)" />
-                                            <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
+                                            <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left" 
+                                                                   Visible="@(!IsSelectionList)"
                                                                    Width="6rem" DeleteButtonVisible=@(!IsEmbedded) />
                                             <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
                                                               Caption="ID" FieldName="PersonIdentity" Width="4rem" />
@@ -348,7 +351,7 @@
                                     </DxGrid>
                                 </DxSplitterPane>
                         <DxSplitterPane Size="10rem" AllowCollapse="@(!IsEmbedded)"
-                                                Collapsed="@isSplitterCollapsed">
+                                                Collapsed="@isSplitterCollapsed" Visible="@(!IsSelectionList)">
                                     <div class="h6">Queued Broadcast Email</div>
                                     <QueuedBroadcastEmailGrid @ref=@queueGrid IsEmbedded="true" />
                                 </DxSplitterPane>
@@ -372,16 +375,23 @@
     public EventCallback<(Person,Term)> MemberDrawerRequested { get; set; }
 
     [Parameter]
+    public double GridDisplayOffset { get; set; } = 9;
+
+    [Parameter]
     public bool IsEmbedded { get; set; }
+    [Parameter]
+    public bool IsSelectionList { get; set; }
     [Parameter]
     public string GridLayoutKey { get; set; } = "{CCDCC0AB-5B0D-40D5-BB06-7A21E3EDCAFA}";
     [Parameter]
     public string gridHeight { get; set; } = "800px";
+    [Parameter]
+    public EventCallback<IEnumerable<Person>> SelectedParticipantsChanged { get; set; }
+    public IReadOnlyList<object> SelectedParticipants { get; set; }
 
     bool IsReady;
     QueuedBroadcastEmailGrid queueGrid;
     bool isSplitterCollapsed = true;
-    IReadOnlyList<object> SelectedDataItems { get; set; }
     DateTime selectedDate;
     SystemSettings settings;
     Communication Communication;
@@ -829,12 +839,12 @@
 
     async Task OnCommunicate()
     {
-        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+        if (SelectedParticipants == null || SelectedParticipants.Count <= 0)
         {
             await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
             return;
         }
-        SendTo = SelectedDataItems.Cast<Person>().OrderBy(x => x.FullNameAlpha).ToList();
+        SendTo = SelectedParticipants.Cast<Person>().OrderBy(x => x.FullNameAlpha).ToList();
         if (await selectDocumentTemplatePopup.ShowAsync())
         {
             emailsSent = 0;
@@ -855,9 +865,10 @@
     }
 
 
-    void OnEmailChanged(string newValue)
-    {
-
+ async Task OnSelectedParticipantsChanged(IReadOnlyList<object> newSelection) {
+     SelectedParticipants = newSelection;
+     var selected = newSelection.Cast<Person>().ToList();
+     await SelectedParticipantsChanged.InvokeAsync(selected);
     }
 
     public void Dispose()

@@ -60,6 +60,7 @@ namespace U3A.Database
         public DbSet<DocumentQueueAttachment> DocumentQueueAttachment { get; set; }
         public DbSet<MultiCampusSchedule> Schedule { get; set; }
         public DbSet<LeaderHistory> LeaderHistory { get; set; }
+        public DbSet<LuckyMemberDraw> LuckyMemberDraw { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
