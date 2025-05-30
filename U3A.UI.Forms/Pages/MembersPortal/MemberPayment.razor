@@ -1,6 +1,5 @@
 ﻿@attribute [Authorize]
 
-@inject ILogger<MemberPayment> Logger
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject TenantInfoService tenantService
@@ -15,7 +14,7 @@
 @using Eway.Rapid.Abstractions.Response
 @using Eway.Rapid.Abstractions.Models
 @using Eway.Rapid.Abstractions.Interfaces
-@using Microsoft.Extensions.Logging;
+@using Serilog;
 
 
 
@@ -54,6 +53,7 @@ else
                                         VirtualScrollingEnabled=true
                                         CssClass="mb-2 grid-style">
                                     <Columns>
+                                        <DxGridDataColumn FieldName="@nameof(MemberFee.Date)" Caption="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="5rem" />
                                         <DxGridDataColumn FieldName="@nameof(MemberFee.Description)" Caption="Description" />
                                         <DxGridDataColumn FieldName="@nameof(MemberFee.Amount)" Caption="Amount" DisplayFormat="c2" Width="75px" />
                                     </Columns>
@@ -289,7 +289,7 @@ else
             if (!AmountDueText.EndsWith(clickText)) AmountDueText += clickText;
             showFeesDueToggle = false;
         }
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
@@ -325,7 +325,8 @@ else
 
     async Task<decimal> CalculateFeeAsync()
     {
-        decimal result = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson, term);
+        feeService = new();
+        decimal  result = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson, term);
         feeAsString = GetFeeAsString(result);
         return result;
     }
