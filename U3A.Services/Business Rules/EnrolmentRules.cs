@@ -119,16 +119,7 @@ namespace U3A.BusinessRules
                                             && x.TermNumber == termNumber);
             }
             if (testTerm == null) { return enrolments; }
-            if (await dbc.Enrolment.AnyAsync(x => x.ClassID == thisClass.ID && x.TermID == testTerm.ID))
-            {
-                enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
-                                          .Include(x => x.Person)
-                                          .Include(x => x.Course)
-                                          .Where(x => !x.IsDeleted && !x.Person.IsDeleted
-                                                    && x.ClassID == thisClass.ID
-                                                    && x.TermID == testTerm.ID).ToListAsync();
-            }
-            else
+            if (thisCourse.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
             {
                 enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                                             .Include(x => x.Person)
@@ -136,6 +127,15 @@ namespace U3A.BusinessRules
                                             .Where(x => !x.IsDeleted && !x.Person.IsDeleted
                                                             && x.CourseID == thisCourse.ID
                                                             && x.TermID == testTerm.ID).ToListAsync();
+            }
+            else
+            {
+                enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
+                                          .Include(x => x.Person)
+                                          .Include(x => x.Course)
+                                          .Where(x => !x.IsDeleted && !x.Person.IsDeleted
+                                                    && x.ClassID == thisClass.ID
+                                                    && x.TermID == testTerm.ID).ToListAsync();
             }
             ;
             Enrolment? dummy;
