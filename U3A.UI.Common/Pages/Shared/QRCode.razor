@@ -6,14 +6,18 @@
 <div id="qrCodeData" data-url="@Uri"></div>
 
 @code {
-    [Parameter][EditorRequired]
+    [Parameter]
+    [EditorRequired]
     public string? Uri { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public int Width { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await js.InvokeVoidAsync("setQRCode");
+            await js.InvokeVoidAsync("setQRCode",Width);
         }
         await base.OnAfterRenderAsync(firstRender);
     }

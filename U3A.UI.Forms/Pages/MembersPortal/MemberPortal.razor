@@ -184,7 +184,7 @@ else
             }
             else
             {
-                await GetQRRequestedClass();
+                await GetQRRequestedClassOrPage();
                 if (QRClassID != null)
                 {
                     menuSelection = PortalMenuSelection.DoRequestMemberEnrolment;
@@ -225,7 +225,7 @@ else
         return report;
     }
 
-    async Task GetQRRequestedClass()
+    async Task GetQRRequestedClassOrPage()
     {
         string classID;
         Guid result = default;
@@ -233,11 +233,26 @@ else
         {
             var queryStringCollection = HttpUtility.ParseQueryString(new Uri(navMan.Uri).Query);
             var page = queryStringCollection.GetValues("Page");
-            if (page != null && page.Length > 0 && page[0].StartsWith("/EnrolClass="))
+            if (page != null && page.Length > 0)
             {
-                classID = queryStringCollection.GetValues("Page")[0].Remove(0, "/EnrolClass=".Length);
-                Guid.TryParse(classID, out result);
-                QRClassID = (result == default) ? null : result;
+                if (page[0].StartsWith("/EnrolClass="))
+                {
+                    classID = queryStringCollection.GetValues("Page")[0].Remove(0, "/EnrolClass=".Length);
+                    Guid.TryParse(classID, out result);
+                    QRClassID = (result == default) ? null : result;
+                }
+                else
+                {
+                    var path = page[0];
+                    if (path != "/~/" && path != "~/")
+                    {
+                        navMan.NavigateTo(path);
+                    }
+                    else
+                    {
+                        navMan.NavigateTo("/");
+                    }
+                }
             }
         }
     }

@@ -71,6 +71,7 @@
                             <Panes>
                                 <DxSplitterPane>
                                     <DxGrid Data="@Persons" @ref=@mainGrid CssClass="h-100"
+                                            SelectionMode="GridSelectionMode.Multiple"
                                             SelectedDataItems="@SelectedParticipants"
                                             SelectedDataItemsChanged="@OnSelectedParticipantsChanged"
                                             ShowFilterRow="false"
@@ -386,7 +387,10 @@
     [Parameter]
     public string gridHeight { get; set; } = "800px";
     [Parameter]
-    public EventCallback<IEnumerable<Person>> SelectedParticipantsChanged { get; set; }
+    public EventCallback SelectedParticipantsChanged { get; set; }
+    [Parameter]
+    public EventCallback PageHasRendered { get; set; }
+
     public IReadOnlyList<object> SelectedParticipants { get; set; }
 
     bool IsReady;
@@ -486,6 +490,7 @@
             {
                 selectedTab = (IsEmbedded) ? Tabs.AllRecords : Tabs.Participants;
                 await SetupTab();
+                await PageHasRendered.InvokeAsync();
             }
         }
         await base.OnAfterRenderAsync(firstRender);
@@ -865,10 +870,9 @@
     }
 
 
- async Task OnSelectedParticipantsChanged(IReadOnlyList<object> newSelection) {
-     SelectedParticipants = newSelection;
-     var selected = newSelection.Cast<Person>().ToList();
-     await SelectedParticipantsChanged.InvokeAsync(selected);
+    async Task OnSelectedParticipantsChanged(IReadOnlyList<object> newSelection) {
+         SelectedParticipants = newSelection;
+         await SelectedParticipantsChanged.InvokeAsync();
     }
 
     public void Dispose()

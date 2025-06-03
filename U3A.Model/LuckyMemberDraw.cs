@@ -10,9 +10,14 @@ namespace U3A.Model
         public Guid ID { get; set; }
         [Required]
         public string Name { get; set; } = "Lucky Member Draw";
-        [Required]
-        public List<Guid> PersonID { get; set; } = new();
 
-        public bool IsComplete {get; set; }  
+        public bool IsComplete {get; set; }
+
+        [Timestamp]
+        public byte[] Version { get; set; }
+
+        //Navigation properties
+        public List<LuckyMemberDrawEntrant> LuckyMemberDrawEntrants { get; set; } = new List<LuckyMemberDrawEntrant>();
+
     }
 }

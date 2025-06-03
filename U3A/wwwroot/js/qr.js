@@ -11,7 +11,7 @@
     }
 });
 
-function setQRCode() {
+function setQRCode(requiredWidth) {
     var element = document.getElementById("qrCodeData");
     if (element != null) {
         const uri = document.getElementById("qrCodeData").getAttribute('data-url');
@@ -19,8 +19,8 @@ function setQRCode() {
         new QRCode(document.getElementById("qrCode"),
             {
                 text: uri,
-                width: 150,
-                height: 150
+                width: requiredWidth,
+                height: requiredWidth
             });
     }
 }

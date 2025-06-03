@@ -1,0 +1,45 @@
+﻿@page "/LuckyMemberDrawQRCode"
+
+@using U3A.UI.Common
+@using U3A.UI.Forms.Pages.Layout
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager navMan
+
+
+
+    @layout MinimalLayout
+    <main role="main" align="center" class="w-100">
+
+        <h1 class="text-dark" align: center>@title</h1>
+        @if (!string.IsNullOrWhiteSpace(uri))
+        {
+            <div class="center-container">
+                <h2 class="text-dark">Scan the QR code to enter the draw</h2>
+                <div class="m-4"><QRCode Uri="@uri" Width="300" /></div>
+            <h3 class="text-info">@uri</h3>
+            </div>
+        }
+    </main>
+
+@code {
+    string uri;
+    string title = string.Empty;
+
+    override protected async Task OnInitializedAsync()
+    {
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+        {
+            var draw = await dbc.LuckyMemberDraw.FirstAsync(x => !x.IsComplete);
+            uri = $"{navMan.BaseUri}LMDEnter";
+            title = draw.Name;
+        }
+        else
+        {
+            uri = string.Empty;
+            title = "No draw is in progress";
+        }
+    }
+
+}

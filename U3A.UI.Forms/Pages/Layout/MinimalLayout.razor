@@ -1,12 +1,29 @@
 ﻿@inherits LayoutComponentBase
+
 @layout BasicLayout
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+@using Microsoft.AspNetCore.Components.Authorization
 @using U3A.Database
 
 
-<PortalHeader NavigateTo="/" />
-<DxFormLayout SizeMode="SizeMode.Small" CssClass="col col-12 p-4">
-    @Body
-</DxFormLayout>
+<CascadingValue Value="@loginState">
+    <PortalHeader NavigateTo="/" />
+    <DxFormLayout SizeMode="SizeMode.Small" CssClass="col col-12 p-4">
+        @Body
+    </DxFormLayout>
+</CascadingValue>
 
+@code {
+    private LoginState? loginState { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authEmail = authenticationState.User.Identity!.Name;
+        loginState = new LoginState(authEmail!, U3Adbfactory);
+    }
+
+}

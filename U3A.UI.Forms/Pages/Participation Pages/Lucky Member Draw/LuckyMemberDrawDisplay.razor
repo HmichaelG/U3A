@@ -16,11 +16,11 @@ else
     @layout MinimalLayout
     <main role="main" align="center" class="w-100">
 
-        <h2 align: center>@title</h2>
+        <h1 class="text-dark" align: center>@title</h1>
         <div class="center-container card">
-            <h1 class="@($"text-primary")">@prizeNumber</h1>
-            <h1 class="@($"text-primary {winnerStyle}")">@winner</h1>
-            <h3 class="@($"text-primary")">@location</h3>
+            <h1 class="@($"text-dark")">@prizeNumber</h1>
+            <h1 class="@($"text-dark {winnerStyle}")">@winner</h1>
+            <h3 class="@($"text-dark")">@location</h3>
         </div>
         <div class="d-flex flex-row-reverse gap-1">
             <DxButton Click="PickWinner" Text="Pick a Winner" Enabled=@(!isProcessing) />
@@ -40,9 +40,9 @@ else
 
 @code {
 
-    private List<Person> people = new();
-    private List<Guid> winners = new();
-    private string winner;
+    List<Guid> winners = new();
+    LuckyMemberDraw? draw = new();
+    string winner;
     string location = string.Empty;
     bool isReady = false;
     bool isProcessing = false;
@@ -76,8 +76,9 @@ else
             using var dbc = await U3Adbfactory.CreateDbContextAsync();
             if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
             {
-                var draw = await dbc.LuckyMemberDraw.FirstAsync(x => !x.IsComplete);
-                people = await dbc.Person.Where(p => draw.PersonID.Contains(p.ID)).ToListAsync();
+                draw = await dbc.LuckyMemberDraw
+                                .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
+                                .FirstAsync(x => !x.IsComplete);
                 title = draw.Name;
                 cts.Cancel(); // Stop the timer once we have the data
                 isProcessing = false;
@@ -98,8 +99,8 @@ else
         location = string.Empty;
         prizeNumber = string.Empty;
         isProcessing = true;
-        if (people.Count == 0) return;
-        if (winners.Count >= people.Count)
+        if (draw.LuckyMemberDrawEntrants.Count == 0) return;
+        if (winners.Count >= draw.LuckyMemberDrawEntrants.Count)
         {
             winnerStyle = "winner-style";
             winner = "All participants are winners!!";
@@ -113,7 +114,7 @@ else
         winnerStyle = "winner-style winner-animation";
         for (int i = 0; i < 10; i++)
         {
-            winner = people[new Random().Next(people.Count)].FirstName;
+            winner = draw.LuckyMemberDrawEntrants[new Random().Next(draw.LuckyMemberDrawEntrants.Count)].Person.FirstName;
             StateHasChanged();
             await Task.Delay(1000); // Simulated suspense
         }
@@ -122,7 +123,7 @@ else
         Person person = null;
         do
         {
-            person = people[new Random().Next(people.Count)];
+            person = draw.LuckyMemberDrawEntrants[new Random().Next(draw.LuckyMemberDrawEntrants.Count)].Person;
         }
         while (winners.Contains(person.ID)); // Ensure unique winners
         winners.Add(person.ID);

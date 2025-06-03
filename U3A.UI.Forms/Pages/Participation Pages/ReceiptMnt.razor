@@ -342,6 +342,7 @@ else
         var startTime = DateTime.UtcNow;
         var currentTerm = await BusinessRule.CurrentTermAsync(dbc, receipt.Date);
         if (currentTerm == null) { currentTerm = await BusinessRule.CurrentTermAsync(dbc); }
+        service = new MemberFeeCalculationService();
         var totalDue = await service.CalculateFeeAsync(dbc, receipt.Person, currentTerm);
         var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, receipt.PersonID, ProcessingYear, startTime);
         var minFullMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, receipt.Person);

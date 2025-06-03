@@ -1,0 +1,91 @@
+﻿@page "/LMDEnter"
+
+@attribute [Authorize]
+
+@using U3A.UI.Common
+@using U3A.UI.Forms.Pages.Layout
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager navMan
+
+@layout MinimalLayout
+
+<main role="main" align="center" class="w-100">
+
+    <h1 class="text-dark" align: center>@title</h1>
+    <div class="center-container">
+        <h2 class="text-dark">@message</h2>
+        <div>@timeoutMessage</div>
+    </div>
+</main>
+
+@code {
+    [CascadingParameter]
+    private LoginState? loginState { get; set; }
+
+    string title = string.Empty;
+    string message = string.Empty;
+    string timeoutMessage = string.Empty;
+    LuckyMemberDraw? draw = null;
+    int secondsToClose = 10;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await EnterDraw();
+            StateHasChanged();
+            using PeriodicTimer timer = new(TimeSpan.FromSeconds(secondsToClose));
+            using CancellationTokenSource cts = new();
+            await timer.WaitForNextTickAsync(cts.Token);
+            cts.Cancel(); // Stop the timer
+            navMan.NavigateTo("javascript:document.getElementById('logout-form').submit();");
+        }
+            ;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+    }
+
+    async Task EnterDraw()
+    {
+        timeoutMessage = $"This page will automatically close in {secondsToClose} seconds.";
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+        {
+            draw = await dbc.LuckyMemberDraw
+                                .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
+                                .FirstAsync(x => !x.IsComplete);
+            title = draw.Name;
+            if (loginState != null && loginState.SelectedPerson != null)
+            {
+                if (!draw.LuckyMemberDrawEntrants.Any(x => x.PersonID == loginState.SelectedPerson.ID))
+                {
+                    var entrant = new LuckyMemberDrawEntrant
+                    {
+                        PersonID = loginState.SelectedPerson.ID,
+                        LuckyMemberDrawID = draw.ID
+                    };
+                    dbc.LuckyMemberDrawEntrant.Add(entrant);
+                    await dbc.SaveChangesAsync();
+                    message = $"Thank you {loginState.SelectedPerson.FirstName}. You are entered in the draw!";
+                }
+                else
+                {
+                    message = $"You are already entered in the draw, {loginState.SelectedPerson.FirstName}.";
+                }
+            }
+            else
+            {
+                message = "You must be logged in to view this page.";
+            }
+        }
+        else
+        {
+            title = "No draw is in progress";
+            message = "There is no Member Draw in progress at this time. Please come back later.";
+        }
+    }
+
+}

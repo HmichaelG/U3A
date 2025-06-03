@@ -560,6 +560,7 @@ else
             {
                 if (!feesDue.ContainsKey(e.PersonID))
                 {
+                    service = new MemberFeeCalculationService();
                     feesDue.Add(e.PersonID, await service.CalculateFeeAsync(dbc, e.Person, selectedTerm));
                 }
             }

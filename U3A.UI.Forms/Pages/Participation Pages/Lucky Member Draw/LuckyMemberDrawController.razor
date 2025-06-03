@@ -1,0 +1,169 @@
+﻿@page "/LuckyMemberDrawController"
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager navMan
+
+<MessageBox @ref="@messageBox" />
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <main role="main" class="w-100">
+        <div class="d-flex flex-row">
+            <ContextHelpTitle Title="Lucky Member Draw Controller" HelpTopic="Add_Edit-Participants.html" />
+        </div>
+        <div class="d-flex flex-row-reverse  align-items-center gap-1">
+            <DxButton Text="Scan QR Code" Click="@OnScanQRCode" />
+            <DxButton Text="Reset Selection" Click="@OnResetSelection"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline" />
+            <div class="text-info"><b>@($"There are {selectedCount} participants in this draw.")</b></div>
+        </div>
+        <PersonMnt @ref=@selectionList GridDisplayOffset="10" IsSelectionList="true"
+                   PageHasRendered="OnPersonSelectionListRendered"
+                   SelectedParticipantsChanged="@OnParticipantsChanged" />
+    </main>
+}
+
+@code {
+    bool isReady = false;
+    int selectedCount = 0;
+    LuckyMemberDraw? draw = new();
+    PersonMnt? selectionList;
+    MessageBox? messageBox;
+    string drawName = "Lucky Member Draw";
+
+    protected override async Task OnInitializedAsync()
+    {
+        isReady = true;
+    }
+
+    async Task OnPersonSelectionListRendered()
+    {
+        await GetData();
+        await selectionList.mainGrid.WaitForDataLoadAsync();
+        selectionList.mainGrid.BeginUpdate();
+        for (int i = 0; i < selectionList.mainGrid.GetVisibleRowCount(); i++)
+        {
+            var personID = selectionList.mainGrid.GetRowValue(i, nameof(Person.ID)) as Guid?;
+            if (personID.HasValue && draw.LuckyMemberDrawEntrants.Any(x => x.PersonID == personID))
+            {
+                selectionList.mainGrid.SelectRow(i, true);
+            }
+        }
+        selectionList.mainGrid.EndUpdate();
+    }
+
+    async Task GetData()
+    {
+        draw = new();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+        {
+            draw = await dbc.LuckyMemberDraw
+                            .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
+                            .FirstAsync(x => !x.IsComplete);
+            selectedCount = draw.LuckyMemberDrawEntrants.Count();
+        }
+    }
+
+    async Task OnParticipantsChanged()
+    {
+        selectedCount = selectionList.SelectedParticipants.Count();
+        await SaveDataAsync();
+    }
+
+    async Task OnResetSelection()
+    {
+        if (!await messageBox.ShowAsync("Reset Selection", "Are you sure you want to reset the selection? This will remove all selected participants from the current draw."))
+        {
+            return;
+        }
+
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+        {
+            var draw = await dbc.LuckyMemberDraw
+                                .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
+                                .FirstAsync(x => !x.IsComplete);
+            dbc.RemoveRange(draw.LuckyMemberDrawEntrants);
+            selectedCount = 0;
+        }
+        else
+        {
+            // delete all previous draws
+            var previousDraws = await dbc.LuckyMemberDraw.ToListAsync();
+            dbc.LuckyMemberDraw.RemoveRange(previousDraws);
+            selectedCount = 0;
+        }
+        await dbc.SaveChangesAsync();
+        draw = new();
+        selectionList.mainGrid.ClearSelection();
+        StateHasChanged();
+    }
+
+    async Task OnScanQRCode()
+    {
+        await SaveDataAsync();
+        navMan.NavigateTo("/LuckyMemberDrawQRCode");
+    }
+
+    async Task SaveDataAsync()
+    {
+        if (selectionList.SelectedParticipants is null || selectionList.SelectedParticipants.Count == 0) return;
+        var participants = selectionList.SelectedParticipants.Cast<Person>().ToList();
+        var entrants = participants.Select(x => x.ID).ToList();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+        {
+            draw = await dbc.LuckyMemberDraw
+                            .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
+                            .FirstAsync(x => !x.IsComplete);
+            AddParticipantsToDraw(participants);
+            draw.Name = drawName;
+            draw.IsComplete = false;
+        }
+        else
+        {
+            // delete all previous draws
+            var previousDraws = await dbc.LuckyMemberDraw.ToListAsync();
+            dbc.LuckyMemberDraw.RemoveRange(previousDraws);
+
+            LuckyMemberDraw draw = new()
+            {
+                IsComplete = false,
+                Name = drawName,
+            };
+            dbc.LuckyMemberDraw.Add(draw);
+            AddParticipantsToDraw(participants);
+        }
+        dbc.SaveChanges();
+    }
+
+    void AddParticipantsToDraw(List<Person> participants)
+    {
+        if (draw == null) return;
+        foreach (var p in participants)
+        {
+            if (!draw.LuckyMemberDrawEntrants.Any(x => x.PersonID == p.ID))
+            {
+                var entrant = new LuckyMemberDrawEntrant
+                {
+                    PersonID = p.ID,
+                    Person = p,
+                    LuckyMemberDrawID = draw.ID
+                };
+                draw.LuckyMemberDrawEntrants.Add(entrant);
+            }
+        }
+        // remove any entrants that are not in the current selection
+        var entrantsToRemove = draw.LuckyMemberDrawEntrants.Where(x => !participants.Any(p => p.ID == x.PersonID)).ToList();
+        foreach (var entrant in entrantsToRemove)
+        {
+            draw.LuckyMemberDrawEntrants.Remove(entrant);
+        }
+    }
+
+}

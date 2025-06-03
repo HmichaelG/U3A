@@ -523,6 +523,7 @@ else
 
     async Task CalcculateFinancialTo(U3ADbContext dbc, ReceiptDataImport importItem, DateTime startTime)
     {
+        service = new();
         var totalDue = await service.CalculateFeeAsync(dbc, importItem.Person, currentTerm);
         var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, importItem.PersonID, ProcessingYear, startTime);
         var minFullMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, importItem.Person);
