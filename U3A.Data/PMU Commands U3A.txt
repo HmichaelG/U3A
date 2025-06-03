@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_LuckyMemberDraw
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_LuckyMemberDrawEntrant
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_LuckyMemberDraw_IsComplete
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_LuckyMemberDraw_removePersonID
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_LuckyMemberDraw_IsComplete
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_LuckyMemberDraw_removePersonID
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
