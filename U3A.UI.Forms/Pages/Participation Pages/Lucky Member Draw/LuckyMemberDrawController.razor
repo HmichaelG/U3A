@@ -1,5 +1,9 @@
 ﻿@page "/LuckyMemberDrawController"
 
+@implements IAsyncDisposable
+
+@using Serilog
+
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager navMan
 
@@ -15,11 +19,18 @@ else
         <div class="d-flex flex-row">
             <ContextHelpTitle Title="Lucky Member Draw Controller" HelpTopic="Add_Edit-Participants.html" />
         </div>
-        <div class="d-flex flex-row-reverse  align-items-center gap-1">
-            <DxButton Text="Scan QR Code" Click="@OnScanQRCode" />
-            <DxButton Text="Reset Selection" Click="@OnResetSelection"
-                      RenderStyleMode="ButtonRenderStyleMode.Outline" />
-            <div class="text-info"><b>@($"There are {selectedCount} participants in this draw.")</b></div>
+        <div class="d-flex flex-row gap-1">
+            <div class="flex-grow-1">
+            <DxFormLayoutItem Caption="Draw Name">
+                <DxTextBox @bind-Text="@drawName" />
+            </DxFormLayoutItem>
+            </div>
+            <div class="d-flex flex-grow-0 flex-row-reverse align-items-center gap-1 mt-2">
+                <DxButton Text="Scan QR Code" Click="@OnScanQRCode" />
+                <DxButton Text="Reset Selection" Click="@OnResetSelection"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline" />
+                <div class="text-info"><b>@($"There are {selectedCount} participants in this draw.")</b></div>
+            </div>
         </div>
         <PersonMnt @ref=@selectionList GridDisplayOffset="10" IsSelectionList="true"
                    PageHasRendered="OnPersonSelectionListRendered"
@@ -34,10 +45,41 @@ else
     PersonMnt? selectionList;
     MessageBox? messageBox;
     string drawName = "Lucky Member Draw";
+    bool isProcessing = false;
+    private PeriodicTimer? autoSaveTimer;
 
     protected override async Task OnInitializedAsync()
     {
         isReady = true;
+        autoSaveTimer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+        _ = AutoSaveLoop();
+    }
+
+    private async Task AutoSaveLoop()
+    {
+        try
+        {
+            if (autoSaveTimer is null) return;
+
+            while (await autoSaveTimer.WaitForNextTickAsync())
+            {
+                if (!isProcessing && selectionList?.SelectedParticipants?.Count > 0)
+                {
+                    try
+                    {
+                        await SaveDataAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Error during auto-save in Lucky Member Draw Controller");
+                    }
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Timer was disposed
+        }
     }
 
     async Task OnPersonSelectionListRendered()
@@ -58,7 +100,6 @@ else
 
     async Task GetData()
     {
-        draw = new();
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
         if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
         {
@@ -67,12 +108,22 @@ else
                             .FirstAsync(x => !x.IsComplete);
             selectedCount = draw.LuckyMemberDrawEntrants.Count();
         }
+        else
+        {
+            LuckyMemberDraw draw = new()
+            {
+                IsComplete = false,
+                Name = drawName,
+            };
+            dbc.LuckyMemberDraw.Add(draw);
+            await dbc.SaveChangesAsync();
+        }
+        drawName = draw.Name;
     }
 
     async Task OnParticipantsChanged()
     {
         selectedCount = selectionList.SelectedParticipants.Count();
-        await SaveDataAsync();
     }
 
     async Task OnResetSelection()
@@ -81,68 +132,83 @@ else
         {
             return;
         }
-
-        using var dbc = await U3Adbfactory.CreateDbContextAsync();
-        if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+        isProcessing = true;
+        try
         {
-            var draw = await dbc.LuckyMemberDraw
-                                .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
-                                .FirstAsync(x => !x.IsComplete);
-            dbc.RemoveRange(draw.LuckyMemberDrawEntrants);
+            using var dbc = await U3Adbfactory.CreateDbContextAsync();
+            if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+            {
+                var draw = await dbc.LuckyMemberDraw
+                                    .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
+                                    .FirstAsync(x => !x.IsComplete);
+                dbc.RemoveRange(draw.LuckyMemberDrawEntrants);
+                await dbc.SaveChangesAsync();
+            }
             selectedCount = 0;
+            selectionList.mainGrid.ClearSelection();
+            StateHasChanged();
         }
-        else
+        catch (Exception ex)
         {
-            // delete all previous draws
-            var previousDraws = await dbc.LuckyMemberDraw.ToListAsync();
-            dbc.LuckyMemberDraw.RemoveRange(previousDraws);
-            selectedCount = 0;
+            Log.Information(ex, "Error resetting selection in Lucky Member Draw Controller");
         }
-        await dbc.SaveChangesAsync();
-        draw = new();
-        selectionList.mainGrid.ClearSelection();
-        StateHasChanged();
+        finally
+        {
+            isProcessing = false;
+        }
     }
 
     async Task OnScanQRCode()
     {
-        await SaveDataAsync();
-        navMan.NavigateTo("/LuckyMemberDrawQRCode");
+        if (isProcessing) return;
+        isProcessing = true;
+        try
+        {
+            await SaveDataAsync();
+            navMan.NavigateTo("/LuckyMemberDrawQRCode", true);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error navigating to Lucky Member Draw QR Code page");
+        }
+        finally
+        {
+            isProcessing = false;
+        }
     }
 
+    static SemaphoreSlim? sem = new(1);
     async Task SaveDataAsync()
     {
-        if (selectionList.SelectedParticipants is null || selectionList.SelectedParticipants.Count == 0) return;
-        var participants = selectionList.SelectedParticipants.Cast<Person>().ToList();
-        var entrants = participants.Select(x => x.ID).ToList();
-        using var dbc = await U3Adbfactory.CreateDbContextAsync();
-        if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+        await sem.WaitAsync();
+        try
         {
-            draw = await dbc.LuckyMemberDraw
-                            .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
-                            .FirstAsync(x => !x.IsComplete);
-            AddParticipantsToDraw(participants);
+            using var dbc = await U3Adbfactory.CreateDbContextAsync();
+            List<Person> participants = new();
+            if (selectionList.SelectedParticipants is not null && selectionList.SelectedParticipants.Count > 0)
+            {
+                participants = selectionList.SelectedParticipants.Cast<Person>().ToList();
+            }
+            if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
+            {
+                draw = await dbc.LuckyMemberDraw
+                                .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
+                                .FirstAsync(x => !x.IsComplete);
+                AddParticipantsToDraw(participants);
+            }
             draw.Name = drawName;
             draw.IsComplete = false;
+            dbc.LuckyMemberDraw.Update(draw);
+            dbc.SaveChanges();
         }
-        else
+        finally
         {
-            // delete all previous draws
-            var previousDraws = await dbc.LuckyMemberDraw.ToListAsync();
-            dbc.LuckyMemberDraw.RemoveRange(previousDraws);
-
-            LuckyMemberDraw draw = new()
-            {
-                IsComplete = false,
-                Name = drawName,
-            };
-            dbc.LuckyMemberDraw.Add(draw);
-            AddParticipantsToDraw(participants);
+            sem.Release();
         }
-        dbc.SaveChanges();
     }
 
-    void AddParticipantsToDraw(List<Person> participants)
+    void AddParticipantsToDraw(List<Person>
+    participants)
     {
         if (draw == null) return;
         foreach (var p in participants)
@@ -152,7 +218,6 @@ else
                 var entrant = new LuckyMemberDrawEntrant
                 {
                     PersonID = p.ID,
-                    Person = p,
                     LuckyMemberDrawID = draw.ID
                 };
                 draw.LuckyMemberDrawEntrants.Add(entrant);
@@ -166,4 +231,23 @@ else
         }
     }
 
+    public async ValueTask DisposeAsync()
+    {
+        if (autoSaveTimer is not null)
+        {
+            autoSaveTimer.Dispose();
+            autoSaveTimer = null;
+        }
+        if (!isProcessing)
+        {
+            try
+            {
+                await SaveDataAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error during final save in Lucky Member Draw Controller dispose");
+            }
+        }
+    }
 }

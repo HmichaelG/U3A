@@ -28,25 +28,30 @@
     string timeoutMessage = string.Empty;
     LuckyMemberDraw? draw = null;
     int secondsToClose = 10;
+    int remainingSeconds = 0;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender) 
         {
             await EnterDraw();
-            StateHasChanged();
-            using PeriodicTimer timer = new(TimeSpan.FromSeconds(secondsToClose));
-            using CancellationTokenSource cts = new();
-            await timer.WaitForNextTickAsync(cts.Token);
-            cts.Cancel(); // Stop the timer
-            navMan.NavigateTo("javascript:document.getElementById('logout-form').submit();");
+            await countdownLoop(); 
         }
-            ;
     }
 
-    protected override async Task OnParametersSetAsync()
+    private async Task countdownLoop()
     {
+        remainingSeconds = secondsToClose;
+        while (remainingSeconds > 0)
+        {
+            await Task.Delay(1000);
+            remainingSeconds--;
+            timeoutMessage = $"This page will automatically close in {remainingSeconds} seconds.";
+            StateHasChanged();
+        }
+        navMan.NavigateTo("javascript:document.getElementById('logout-form').submit();");
     }
+
 
     async Task EnterDraw()
     {
@@ -78,7 +83,7 @@
             }
             else
             {
-                message = "You must be logged in to view this page.";
+                message = "You must be a non-administrative user to enter the draw.";
             }
         }
         else

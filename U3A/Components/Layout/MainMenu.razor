@@ -45,11 +45,6 @@
                             {
                                 <DxMenuItem Text="Admin" IconCssClass="menu-icon bi bi-gear" NavigateUrl="AdminIntroduction">
                                     <Items>
-                                        @if (constants.IS_DEBUG)
-                                        {
-                                            <DxMenuItem Text="Controller" NavigateUrl="LuckyMemberDrawController" />
-                                            <DxMenuItem Text="Display" NavigateUrl="LuckyMemberDraw" />
-                                        }
                                         @if (isSecurityAdminRole)
                                         {
                                             <DxMenuItem Text="Login &amp; Role Assignment" NavigateUrl="IdentityUserMnt" />
@@ -112,9 +107,15 @@
                                         <DxMenuItem Text="Add/Edit Contacts" NavigateUrl="ContactMnt" />
                                         <DxMenuItem Text="Add/Edit Committee" NavigateUrl="CommitteeMnt" />
                                         <DxMenuItem Text="Add/Edit Volunteers" NavigateUrl="VolunteerMnt" />
-                                            <DxMenuItem Text="Enrol Participants" NavigateUrl="@($"MemberDrawer/EnrolMnt")" />
+                                        <DxMenuItem Text="Enrol Participants" NavigateUrl="@($"MemberDrawer/EnrolMnt")" />
                                         <DxMenuItem Text="Review Class Dropouts" NavigateUrl="ReviewDropouts" />
                                         <DxMenuItem Text="Class Attendance" NavigateUrl="AttendClassMnt" />
+                                        <DxMenuItem Text="Lucky Member Draw">
+                                            <Items>
+                                                <DxMenuItem Text="Draw Controller" NavigateUrl="LuckyMemberDrawController" />
+                                                <DxMenuItem Text="Draw Display" NavigateUrl="LuckyMemberDraw" />
+                                            </Items>
+                                        </DxMenuItem>
                                         <DxMenuItem BeginGroup=true Text="Bring Forward Enrolments" NavigateUrl="BringForwardEnrolments" Enabled="@(isSystemAdminRole)" />
                                         <DxMenuItem Text="Auto-Enrol Participants" NavigateUrl="AutoEnrolParticipants" Enabled="@(isSystemAdminRole)" />
                                         <DxMenuItem Text="Correspondence Hub" NavigateUrl="CorrespondenceHub" />

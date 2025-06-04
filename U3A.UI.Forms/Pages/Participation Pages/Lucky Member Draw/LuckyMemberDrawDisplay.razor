@@ -1,7 +1,7 @@
 ﻿@page "/LuckyMemberDraw"
-@implements IDisposable
 
 @using U3A.UI.Forms.Pages.Layout
+@using Serilog
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager navMan
@@ -23,16 +23,19 @@ else
             <h3 class="@($"text-dark")">@location</h3>
         </div>
         <div class="d-flex flex-row-reverse gap-1">
-            <DxButton Click="PickWinner" Text="Pick a Winner" Enabled=@(!isProcessing) />
+            <DxButton Click="PickWinner" Text="Pick a Winner" Enabled=@(canDraw) />
             <DxButton Click="@OnNewDraw" RenderStyleMode="ButtonRenderStyleMode.Outline"
                       Text="New Draw"
-                      Enabled=@(!isProcessing) />
+                      Enabled=@(canDraw) />
             <DxButton Click="@OnRefreshData" RenderStyleMode="ButtonRenderStyleMode.Outline"
                       Text="Refresh Data"
-                      Enabled=@(!isProcessing) />
+                      Enabled=@(canDraw) />
             <DxButton Click="@OnClose" RenderStyleMode="ButtonRenderStyleMode.Outline"
                       Text="Finalise & Close"
-                      Enabled=@(!isProcessing) />
+                      Enabled=@(canDraw) />
+            <DxButton Click="@OnRefreshData" RenderStyle="ButtonRenderStyle.Primary"
+                      Text="Refresh"
+                      Visible=@(!canDraw) />
         </div>
 
     </main>
@@ -45,12 +48,11 @@ else
     string winner;
     string location = string.Empty;
     bool isReady = false;
+    bool canDraw = false;
     bool isProcessing = false;
     string winnerStyle = "winner-style winner-animation";
     string title = "Lucky Member Draw";
     string prizeNumber;
-    PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
-    CancellationTokenSource cts = new();
 
     override protected async Task OnInitializedAsync()
     {
@@ -62,53 +64,62 @@ else
         winner = string.Empty;
         location = string.Empty;
         prizeNumber = string.Empty;
-        cts.Cancel(); // Cancel the current timer
-        cts = new CancellationTokenSource(); // Create a new token source
-        timer = new PeriodicTimer(TimeSpan.FromSeconds(1)); // Reset the timer
+        StateHasChanged();
         await GetDate();
     }
 
     async Task GetDate()
     {
-        isProcessing = true;
-        while (await timer.WaitForNextTickAsync(cts.Token))
+        if (isProcessing) return;
+        try
         {
+            canDraw = true;
             using var dbc = await U3Adbfactory.CreateDbContextAsync();
+            canDraw = false;
+            winnerStyle = "winner-style";
+            title = "No draw in process";
+            winner = "Please use the Controller to enroll entrants";
             if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
             {
                 draw = await dbc.LuckyMemberDraw
                                 .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
                                 .FirstAsync(x => !x.IsComplete);
-                title = draw.Name;
-                cts.Cancel(); // Stop the timer once we have the data
-                isProcessing = false;
+                if (draw.LuckyMemberDrawEntrants.Count > 0)
+                {
+                    title = draw.Name;
+                    winner = string.Empty;
+                    canDraw = true;
+                }
             }
-            else
-            {
-                title = "Waiting for Controller...";
-            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error retrieving Lucky Member Draw data");
+        }
+        finally
+        {
             isReady = true;
+            isProcessing = false;
             StateHasChanged();
         }
-        StateHasChanged();
     }
 
     private async Task PickWinner()
     {
+        canDraw = false;
+        StateHasChanged();
         winner = null;
         location = string.Empty;
         prizeNumber = string.Empty;
-        isProcessing = true;
         if (draw.LuckyMemberDrawEntrants.Count == 0) return;
         if (winners.Count >= draw.LuckyMemberDrawEntrants.Count)
         {
             winnerStyle = "winner-style";
             winner = "All participants are winners!!";
-            isProcessing = false;
+            canDraw = true;
             StateHasChanged();
             return;
-        };
-        StateHasChanged();
+        }
 
         // Suspense animation with delays
         winnerStyle = "winner-style winner-animation";
@@ -139,7 +150,7 @@ else
         winnerStyle = "winner-style";
         winner = $"{person.FirstName} {person.LastName}";
         location = person.City;
-        isProcessing = false;
+        canDraw = true;
         StateHasChanged();
     }
 
@@ -150,7 +161,6 @@ else
         location = string.Empty;
         prizeNumber = string.Empty;
         winnerStyle = "winner-style winner-animation";
-        isProcessing = false;
         StateHasChanged();
     }
 
@@ -166,10 +176,4 @@ else
         navMan.NavigateTo("/");
     }
 
-    public void Dispose()
-    {
-        cts?.Cancel();
-        cts?.Dispose();
-        timer?.Dispose();
-    }
 }
