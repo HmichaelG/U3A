@@ -32,7 +32,7 @@
         if (dbc.LuckyMemberDraw.Any(x => !x.IsComplete))
         {
             var draw = await dbc.LuckyMemberDraw.FirstAsync(x => !x.IsComplete);
-            uri = $"{navMan.BaseUri}LMDEnter";
+            uri = $"{navMan.BaseUri}LMDEnter/{draw.Secret}";
             title = draw.Name;
         }
         else

@@ -1,4 +1,4 @@
-﻿@page "/LMDEnter"
+﻿@page "/LMDEnter/{Secret}"
 
 @attribute [Authorize]
 
@@ -22,6 +22,8 @@
 @code {
     [CascadingParameter]
     private LoginState? loginState { get; set; }
+    [Parameter]
+    public string Secret { get; set; }
 
     string title = string.Empty;
     string message = "Loading ... please wait";
@@ -62,6 +64,12 @@
             draw = await dbc.LuckyMemberDraw
                                 .Include(x => x.LuckyMemberDrawEntrants).ThenInclude(x => x.Person)
                                 .FirstAsync(x => !x.IsComplete);
+            if (draw.Secret != Secret)
+            {
+                title = "Draw is closed";
+                message = "Entry into this draw is no longer available.";
+                return;
+            }
             title = draw.Name;
             if (loginState != null && loginState.SelectedPerson != null)
             {
