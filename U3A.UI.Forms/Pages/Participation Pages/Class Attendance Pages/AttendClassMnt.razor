@@ -45,9 +45,16 @@ else
               FitToRestriction=false
               CloseMode="FlyoutCloseMode.Close"
               HeaderVisible="true"
-              HeaderText="@HeaderContent"
               Width="max(25vw, 250px)"
               PreventCloseOnPositionTargetClick="false">
+        <HeaderTemplate>
+            <div class="d-flex m-1 justify-content-between align-items-center">
+                <span>@HeaderContent</span>
+                <DxButton IconCssClass="bi bi-x-lg" Click="@(() => IsFlyoutOpen = false)"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          RenderStyle="ButtonRenderStyle.Primary" />
+            </div>
+        </HeaderTemplate>
         <BodyTemplate>
             <div class="card">
                 <div class="card-body">
@@ -96,7 +103,7 @@ else
                     <DxFormLayoutItem Caption="Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms"
                                        @bind-SelectedTerm="@SelectedTerm"
-                                       @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(SelectedTerm)) />
+                                       @bind-SelectedTerm:after="@(async() => await SelectedTermChanged(SelectedTerm))" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Course" ColSpanMd="12">
                         <DxComboBox Data="@courses"
@@ -107,7 +114,7 @@ else
                                     ListRenderMode="ListRenderMode.Virtual"
                                     TextFieldName="@nameof(Course.Name)"
                                     Value="@SelectedCourse"
-                                    ValueChanged="@((Course course) => SelectedCourseChanged(course))">
+                                    ValueChanged="@(async(Course course) => await SelectedCourseChanged(course))">
                         </DxComboBox>
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Class" ColSpanMd="8">
@@ -115,7 +122,7 @@ else
                                     AllowUserInput=false
                                     TextFieldName="@nameof(Class.ClassSummary)"
                                     Value="@SelectedClass"
-                                    ValueChanged="@((Class selectedClass) => SelectedClassChanged(selectedClass))" />
+                                    ValueChanged="@(async(Class selectedClass) => await SelectedClassChanged(selectedClass))" />
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Date" ColSpanMd="4">
                         <DxComboBox @ref="@DateComboBox" Data="@ClassDates"
@@ -123,7 +130,7 @@ else
                                     NullText="@dateComboNullText"
                                     TextFieldName="@nameof(ClassDate.ClassDateName)"
                                     Value="@selectedDate"
-                                    ValueChanged="@((ClassDate selectedDate) => SelectedDateChanged(selectedDate))">
+                                    ValueChanged="@(async(ClassDate selectedDate) => await SelectedDateChanged(selectedDate))">
                             <Buttons>
                                 <DxEditorButton Tooltip="Add an unscheduled class"
                                                 IconCssClass="text-success bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
@@ -277,14 +284,14 @@ else
                     <DxButton Text="Set Selection" CssClass="col-12 mt-1"
                               Id="SetSelectionStatus"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@SetSelectionStatusAsync" />
+                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionStatusAsync())" />
                     <DxButton Text="Apply Student Leave" CssClass="col-12 mt-1"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
+                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await OnApplyStudentLeaveClicked())" />
                     <DxButton Text="Reset Selection" CssClass="col-12 mt-1"
                               Id="ResetSelection"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@OnResetSelection" />
+                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await OnResetSelection())" />
                 </div>
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
@@ -294,11 +301,11 @@ else
                     <DxButton Text="Add Ad Hoc Attendee(s)" CssClass="col-12 mt-1"
                               Id="AddAdHocAttendee"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
+                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => AddAdHocAttendee())" />
                     <DxButton Text="Delete Ad Hoc Attendee(s)" CssClass="col-12 mt-1"
                               Id="DeleteAdHocAttendee"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
+                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await DeleteAdHocAttendee())" />
                 </div>
             </DxFormLayoutGroup>
         </div>
@@ -335,7 +342,7 @@ else
                               Id="SetSelected"
                               IconCssClass="bi bi-mortarboard menu-icon"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="SetSmallScreenSelectionStatusAsync" />
+                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSmallScreenSelectionStatusAsync())" />
                 </div>
             </div>
             <div class="input-group px-2">
@@ -343,16 +350,16 @@ else
                           Id="AddAdHoc"
                           IconCssClass="bi bi-person-add menu-icon"
                           RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          RenderStyle="ButtonRenderStyle.Primary" Click="@AddAdHocAttendee" />
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await AddAdHocAttendee())" />
                 <DxButton Text="- Ad Hoc" CssClass="flex-grow-1"
                           Id="DeleteAdHoc"
                           IconCssClass="bi bi-person-dash menu-icon"
                           RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          RenderStyle="ButtonRenderStyle.Primary" Click="@DeleteAdHocAttendee" />
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await DeleteAdHocAttendee())" />
                 <DxButton Text="Apply Leave" CssClass="flex-grow-1"
                           IconCssClass="bi bi-airplane menu-icon"
                           RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          RenderStyle="ButtonRenderStyle.Primary" Click="@OnApplyStudentLeaveClicked" />
+                          RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await OnApplyStudentLeaveClicked())" />
             </div>
         }
     </DxFormLayout>
