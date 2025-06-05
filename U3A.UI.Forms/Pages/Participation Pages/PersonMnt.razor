@@ -179,9 +179,9 @@
                                             <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
                                             <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
                                                               DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
-                                            <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
+                                            <DxGridDataColumn Visible="@(!IsSelectionList)" Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                                 <CellDisplayTemplate>
-                                                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
+                                                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"                                                              
                                                               RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
                                                               Click="async() => {selectedPerson = ((Person)context.DataItem);
                                                                     await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">

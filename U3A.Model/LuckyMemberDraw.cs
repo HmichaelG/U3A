@@ -19,8 +19,10 @@ namespace U3A.Model
                 string result = string.Empty;
                 if (CreatedOn.HasValue)
                 {
-                    var value = CreatedOn.Value.Millisecond * 1000 + CreatedOn.Value.Nanosecond;
-                    result = $"{value.ToString("0000000")}";
+                    var value = CreatedOn.Value.Ticks;
+                    // get right most 6 digits
+                    value = value % 1000000;
+                    result = $"{value.ToString("0")}";
                 }
                 return result;
             } 
