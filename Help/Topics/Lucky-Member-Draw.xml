@@ -1,29 +1,29 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-06-05T13:09:56.963+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-06-06T13:59:29.981+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Lucky Member Draw</title>
   <body>
     <header>
       <para styleclass="Heading1">Lucky Member Draw</para>
     </header>
     <para styleclass="Normal">Lucky Member Draw allows you to create a list of entrants from which one or more are randomly selected as winners. The procedure consists of three modules...</para>
-    <para styleclass="Normal"><text style="font-weight:bold;">Lucky Member Draw Controller</text></para>
+    <para styleclass="Normal"><text style="font-weight:bold;">Module 1: Draw Controller</text></para>
     <para styleclass="Normal">The controller allows you to create a new draw, name the draw and manually enter entrants into the draw. In addition, the following buttons are available...</para>
     <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal"><text style="font-weight:bold;">Reset Draw</text>. This will clear all current entrants from the draw.</li>
       <li styleclass="Normal"><text style="font-weight:bold;">Scan QR Code</text>. See below.</li>
     </list>
     <para styleclass="Normal">Note that only one draw may be active at any time. The number of entrants is limited only by the size of your membership.</para>
-    <para styleclass="Normal"><text style="font-weight:bold;"> Scan QR Code</text></para>
+    <para styleclass="Normal"><text style="font-weight:bold;">Module 2: Scan QR Code</text></para>
     <para styleclass="Normal">When the <text style="font-style:italic;">Scan QR Code</text> button is clicked from the Controller module, a QR code will be displayed on the screen. Members with a mobile device will be able to enter the draw by scanning the code. The intention is that the QR code will be displayed at an event to be held by your U3A. Members arriving at the event will be able to scan the code and automatically be entered into the draw.</para>
     <para styleclass="Normal">After scanning the code, the member will be required to login. The system will record the entrant and then automatically logout after 10 seconds.</para>
     <para styleclass="Normal">Only member logins that access the <text style="font-style:italic;">Member Portal</text> are allowed entry into the draw. Administrative logins will be rejected. A member may only enter once into any one draw.</para>
     <para styleclass="Normal">The QR code is designed to be printed. To print, press CTRL-P or select <text style="font-style:italic;">Print</text> from your browser menu when the QR code is displayed. It is permissible to print multiple pages and scan simultaneously.</para>
-    <para styleclass="Normal"><text style="font-weight:bold;">Draw Display</text></para>
+    <para styleclass="Normal"><text style="font-weight:bold;">Module 3: Draw Display</text></para>
     <para styleclass="Normal">This module performs the random prize selection. It is designed to be projected to a large screen device such as a television or overhead projection system. The following buttons are available...</para>
     <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
       <li styleclass="Normal">&#32;<text style="font-weight:bold;">Pick a Winner</text>. Click to randomly select and display a prize winner on screen. You may pick as many winners as there are prizes by repeating this process. Once a prize is won the winner will be removed from the pool of entrants meaning they will not be able to win another prize.</li>
-      <li styleclass="Normal"><text style="font-weight:bold;">New Draw</text>. Each winner is numbered sequentially as First Prize, Prize #2, Prize #3 etc. Click this button to reset the number back to 1 and all winners will be returned to the pool of available entrants.</li>
+      <li styleclass="Normal"><text style="font-weight:bold;">New Draw</text>. Each winner is numbered sequentially as First Prize, Prize #2, Prize #3 etc. Click this button to reset the number back to 1a All winners will be returned to the pool of available entrants.</li>
       <li styleclass="Normal"><text style="font-weight:bold;">Refresh Data</text>. Refreshes the list of entrants from which to pick a winner. This button should not be clicked while a draw is in progress. You may wish to refresh before a <text style="font-style:italic;">New Draw.</text></li>
       <li styleclass="Normal"><text style="font-weight:bold;">Finalise &amp; Close</text>. This button will finalise the draw and return you to the administration home page. </li>
     </list>
@@ -40,6 +40,9 @@
         <li styleclass="Normal">Enter <text style="font-style:italic;">Draw Display</text> and when ready click <text style="font-weight:bold;">Pick a Winner</text> to randomly select prize winners.</li>
         <li styleclass="Normal">When all is complete, click the <text style="font-weight:bold;">Finalise &amp; Close</text> button to close the draw.</li>
       </list>
+    </list>
+    <list id="2" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">Destroy any printed QR Codes. They cannot be used to enter another draw but, if kept may lead to confusion.</li>
     </list>
     <para styleclass="Normal"></para>
   </body>
