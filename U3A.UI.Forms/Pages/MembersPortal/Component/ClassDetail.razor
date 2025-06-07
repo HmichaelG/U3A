@@ -19,10 +19,10 @@
                 <div class="col-small"><strong>Course Fee:</strong></div>
                 <div class="col-large">@($"{Class.Course.CourseFeePerYear.ToString("c2")} {Class.Course.CourseFeePerYearDescription}")</div>
             }
-            @if (Class.Course.CourseFeePerTerm != 0)
+            @if (!string.IsNullOrWhiteSpace(Class.Course.TermFeesTextNoTitle))
             {
                 <div class="col-small"><strong>Term Fee:</strong></div>
-                <div class="col-large">@($"{Class.Course.CourseFeePerTerm.ToString("c2")} {Class.Course.CourseFeePerTermDescription}")</div>
+                <div class="col-large">@($"{Class.Course.TermFeesTextNoTitle} {Class.Course.CourseFeePerTermDescription}")</div>
             }
             <div class="col-small"><strong>Type:</strong></div>
         <div class="col-large">@Class.Course.CourseType.Name</div>

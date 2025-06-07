@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_LuckyMemberDraw_removePersonID
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_LuckyMemberDraw_BaseEntity
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_LuckyMemberDraw_BaseEntity
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_seperate_TermFees
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_LuckyMemberDraw_BaseEntity
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_seperate_TermFees
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

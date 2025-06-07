@@ -78,7 +78,11 @@ else
                         CustomizeEditModel="Grid_CustomizeEditModel"
                         DataItemDeleting="Grid_DataItemDeleting">
                     <ToolbarTemplate>
-                        <GridToolbar @ref="Toolbar" LinkedGrid=@mainGrid IsMasterDetail=true LayoutKey="{2A9D0137-5DD2-4290-A9B7-4C4F5676F224}">
+                        <GridToolbar @ref="Toolbar"
+                                     LinkedGrid=@mainGrid
+                                     SpreadsheetHeaderRows="2"
+                                     IsMasterDetail=true
+                                     LayoutKey="{2A9D0137-5DD2-4290-A9B7-4C4F5676F224}">
                             <CustomButtonContent>
                                 <DxToolbarItem CssClass="w-100 mx-1" IconCssClass="bi bi-database"
                                                Text="Rebuild Cache"
@@ -129,24 +133,42 @@ else
                             </CellDisplayTemplate>
                         </DxGridDataColumn>
 
-                        <DxGridDataColumn Caption="Type" FieldName="CourseType.ShortName" Width="6rem" />
-                        <DxGridDataColumn Caption="Course Type" FieldName="CourseType.Name" Width="6rem" Visible="false" />
-                        <DxGridDataColumn Caption="Featured?" FieldName="IsFeaturedCourse" Width="7rem" />
-                        <DxGridDataColumn Caption="Off Schedule?" FieldName="IsOffScheduleActivity" Width="7rem" />
-                        <DxGridDataColumn Caption="1 per Student?" FieldName="@nameof(Course.OneStudentPerClass)" Width="7rem" />
-                        <DxGridDataColumn Caption="Enrol In" FieldName="CourseParticipationType.ShortName" Width="5rem" />
-                        <DxGridDataColumn Caption="Addn-Info?" FieldName="Weblink" UnboundType="GridUnboundColumnType.Boolean" Width="6rem" />
-                        <DxGridDataColumn Caption="Reports To" FieldName="SendReportsTo" UnboundType="GridUnboundColumnType.String" Width="6rem" />
-                        <DxGridDataColumn FieldName="ContactOrder" UnboundType="GridUnboundColumnType.String" Width="7rem" />
-                        <DxGridDataColumn Caption="Course Fee" FieldName="CourseFeePerYear" DisplayFormat="{0:c}" Width="6rem" />
-                        <DxGridDataColumn Caption="Fee / Term" FieldName="CourseFeePerTerm" DisplayFormat="{0:c}" Width="6rem" />
-                        <DxGridDataColumn Caption="Duration" FieldName="Duration" DisplayFormat="{0:n2}" Width="6rem" />
-                        <DxGridDataColumn Caption="Required #" FieldName="RequiredStudents" DisplayFormat="{0:n0}" Width="6rem" />
-                        <DxGridDataColumn Caption="Maximum #" FieldName="MaximumStudents" DisplayFormat="{0:n0}" Width="6rem" />
-                        <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" Width="6rem" />
+                        <DxGridBandColumn Caption="Details">
+                            <Columns>
+                                <DxGridDataColumn Caption="Type" FieldName="CourseType.ShortName" Width="6rem" />
+                                <DxGridDataColumn Caption="Course Type" FieldName="CourseType.Name" Width="6rem" Visible="false" />
+                                <DxGridDataColumn Caption="Featured?" FieldName="IsFeaturedCourse" Width="7rem" />
+                                <DxGridDataColumn Caption="Off Schedule?" FieldName="IsOffScheduleActivity" Width="7rem" />
+                                <DxGridDataColumn Caption="1 per Student?" FieldName="@nameof(Course.OneStudentPerClass)" Width="7rem" />
+                                <DxGridDataColumn Caption="Enrol In" FieldName="CourseParticipationType.ShortName" Width="5rem" />
+                                <DxGridDataColumn Caption="Addn-Info?" FieldName="Weblink" UnboundType="GridUnboundColumnType.Boolean" Width="6rem" />
+                                <DxGridDataColumn Caption="Reports To" FieldName="SendReportsTo" UnboundType="GridUnboundColumnType.String" Width="6rem" />
+                                <DxGridDataColumn FieldName="ContactOrder" UnboundType="GridUnboundColumnType.String" Width="7rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Fees">
+                            <Columns>
+                                <DxGridDataColumn Caption="Course" FieldName="CourseFeePerYear" DisplayFormat="{0:c}" Width="6rem" />
+                                <DxGridDataColumn Caption="Term 1" FieldName="CourseFeeTerm1" DisplayFormat="{0:c}" Width="6rem" />
+                                <DxGridDataColumn Caption="Term 2" FieldName="CourseFeeTerm2" DisplayFormat="{0:c}" Width="6rem" />
+                                <DxGridDataColumn Caption="Term 3" FieldName="CourseFeeTerm3" DisplayFormat="{0:c}" Width="6rem" />
+                                <DxGridDataColumn Caption="Term 4" FieldName="CourseFeeTerm4" DisplayFormat="{0:c}" Width="6rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Class">
+                            <Columns>
+                                <DxGridDataColumn Caption="Duration" FieldName="Duration" DisplayFormat="{0:n2}" Width="6rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Students">
+                            <Columns>
+                                <DxGridDataColumn Caption="Maximum" FieldName="MaximumStudents" DisplayFormat="{0:n0}" Width="6rem" />
+                                <DxGridDataColumn Caption="Required" FieldName="RequiredStudents" DisplayFormat="{0:n0}" Width="6rem" />
+`                                <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" Width="6rem" />
+                            </Columns>
+                        </DxGridBandColumn>
                         <DxGridDataColumn Caption="Multi-Campus" FieldName=@nameof(Course.AllowMultiCampsuFrom) Width="8rem" />
                     </Columns>
-
                     <DetailRowTemplate>
                         <FrmClassDetailPopup Course="(Course)context.DataItem" AllowEdit="false" />
                     </DetailRowTemplate>
@@ -193,7 +215,7 @@ else
         <BodyTextTemplate>
             <DxLoadingPanel Visible="@(!isPreviewReady)" ApplyBackgroundShading="true">
                 <div class="overflow-hidden">
-                    <MemberEnrolment OneReadyStatusChanged="@((bool value) => {isPreviewReady = value; StateHasChanged();})"
+                    <MemberEnrolment OneReadyStatusChanged="@((bool value) => { isPreviewReady = value; StateHasChanged(); })"
                                      IsPreview=true PreviewTerm="previewTerm" />
                 </div>
             </DxLoadingPanel>
@@ -316,7 +338,8 @@ else
                     await GetData();
                 }
             }
-        };
+        }
+        ;
     }
 
     bool inPreview;
@@ -527,7 +550,8 @@ else
             else
             {
                 await BusinessRule.ReassignCourseParticipationEnrolments(dbc, dataItem);
-            };
+            }
+            ;
             if (await SaveChangesAsync())
             {
                 await GetData();

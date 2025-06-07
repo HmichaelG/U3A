@@ -191,7 +191,7 @@ namespace U3A.BusinessRules
                     Featured = x.Course.IsFeaturedCourse,
                     FeePerYear = x.Course.CourseFeePerYear,
                     FeePerYearDescription = x.Course.CourseFeePerYearDescription,
-                    FeePerTerm = x.Course.CourseFeePerTerm,
+                    FeePerTerm = x.Course.TermFeesText,
                     FeePerTermDescription = x.Course.CourseFeePerTermDescription,
                     Duration = x.Course.Duration,
                     RequiredStudents = x.Course.RequiredStudents,
@@ -389,7 +389,7 @@ namespace U3A.BusinessRules
                     sb.AppendLine($"- **Featured Course?**: {c.Course.IsFeaturedCourse}");
                     sb.AppendLine($"- **Fee Per Year**:  {c.Course.CourseFeePerYear.ToString("c2")}");
                     sb.AppendLine($"- **Fee Per Year Description**:  {c.Course.CourseFeePerYearDescription}");
-                    sb.AppendLine($"- **Fee Per Term**:  {c.Course.CourseFeePerTerm.ToString("c2")}");
+                    sb.AppendLine($"- **Fee Per Term**:  {c.Course.TermFeesText}");
                     sb.AppendLine($"- **Fee Per Term Description**:  {c.Course.CourseFeePerTermDescription}");
                     sb.AppendLine($"- **Duration**:  {c.Course.Duration.ToString("n2")}");
                     sb.AppendLine($"- **Required Students**:  {c.Course.RequiredStudents}");

@@ -100,8 +100,17 @@ else
             </DxFormLayoutItem>
         </DxFormLayoutGroup>
         <DxFormLayoutGroup Caption="Term Fees" ColSpanMd="6">
-            <DxFormLayoutItem Caption="Course Fee / Term" ColSpanMd="12">
-                <DxMaskedInput @bind-Value="Course.CourseFeePerTerm" Mask="@NumericMask.Currency" />
+            <DxFormLayoutItem Caption="Term 1" ColSpanMd="3" CaptionPosition="CaptionPosition.Vertical">
+                <DxMaskedInput @bind-Value="Course.CourseFeeTerm1" Mask="@NumericMask.Currency" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Term 2" ColSpanMd="3" CaptionPosition="CaptionPosition.Vertical">
+                <DxMaskedInput @bind-Value="Course.CourseFeeTerm2" Mask="@NumericMask.Currency" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Term 3" ColSpanMd="3" CaptionPosition="CaptionPosition.Vertical">
+                <DxMaskedInput @bind-Value="Course.CourseFeeTerm3" Mask="@NumericMask.Currency" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Term 4" ColSpanMd="3" CaptionPosition="CaptionPosition.Vertical">
+                <DxMaskedInput @bind-Value="Course.CourseFeeTerm4" Mask="@NumericMask.Currency" />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Fee Description" ColSpanMd="12">
                 <DxTextBox @bind-Text="Course.CourseFeePerTermDescription" />

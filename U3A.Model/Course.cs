@@ -73,6 +73,69 @@ namespace U3A.Model
         [DefaultValue(0.00)]
         [Comment("Optional fee per term)")]
         public decimal CourseFeePerTerm { get; set; }
+        
+        [Required]
+        [Precision(precision: 18, 2)]
+        [DefaultValue(0.00)]
+        [Comment("Optional fee per term)")]
+        public decimal CourseFeeTerm1 { get; set; }
+        [Required]
+        [Precision(precision: 18, 2)]
+        [DefaultValue(0.00)]
+        [Comment("Optional fee per term)")]
+        public decimal CourseFeeTerm2 { get; set; }
+        [Required]
+        [Precision(precision: 18, 2)]
+        [DefaultValue(0.00)]
+        [Comment("Optional fee per term)")]
+        public decimal CourseFeeTerm3 { get; set; }
+        [Required]
+        [Precision(precision: 18, 2)]
+        [DefaultValue(0.00)]
+        [Comment("Optional fee per term)")]
+        public decimal CourseFeeTerm4 { get; set; }
+
+        [NotMapped]
+        public string TermFeesText
+        {
+            get
+            {
+                string result = TermFeesTextNoTitle;
+                if (result.Length > 0)
+                {
+                    result = "Term Fees: " + result;
+                }
+                return result;
+            }
+        }
+        [NotMapped]
+        public string TermFeesTextNoTitle
+        {
+            get
+            {
+                var sb = new StringBuilder();
+                decimal[] fees = { CourseFeeTerm1, CourseFeeTerm2, CourseFeeTerm3, CourseFeeTerm4 };
+                if (fees.Any(x => x > 0))
+                {
+                    //special case for all fees are equal
+                    if (fees.All(x => x == fees[0]) && fees[0] > 0)
+                    {
+                        sb.Append($"{fees[0]:C} per term");
+                        return sb.ToString();
+                    }
+
+                    for (int i = 0; i < fees.Length; i++)
+                    {
+                        if (fees[i] > 0)
+                        {
+                                sb.Append($"Term {i + 1}: {fees[i]:C} ");
+                        }
+                    }
+                }
+                return sb.ToString().Trim();
+            }
+        }
+
         public int? CourseFeePerTermDueWeeks { get; set; }
 
         [DefaultValue(" ")]

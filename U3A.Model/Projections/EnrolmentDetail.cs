@@ -19,7 +19,7 @@ namespace U3A.Model
         public string CourseParticipationType { get; set; }
         public decimal CourseFeePerYear { get; set; }
         public string? CourseFeePerYearDescription { get; set; }
-        public decimal CourseFeePerTerm { get; set; }
+        public string? CourseFeePerTerm { get; set; }
         public string? CourseFeePerTermDescription { get; set; }
         public decimal CourseDuration { get; set; }
         public int CourseRequiredStudents { get; set; }

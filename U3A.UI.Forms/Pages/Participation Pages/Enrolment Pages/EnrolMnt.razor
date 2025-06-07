@@ -172,7 +172,7 @@ else
                                               DisplayFormat="{0:dd-MMM-yy HH:mm:ss}" Width="8rem" Visible="false" />
                             <DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
                             <DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
-                                              Visible=@(selectedCourse?.CourseFeePerTerm > 0 || selectedCourse?.CourseFeePerYear > 0)
+                                              Visible=@(selectedCourse?.TermFeesTextNoTitle.Length > 0 || selectedCourse?.CourseFeePerYear > 0)
                                               UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
                             <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                 <CellDisplayTemplate>

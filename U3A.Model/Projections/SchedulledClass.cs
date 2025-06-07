@@ -25,7 +25,7 @@ namespace U3A.Model
         public bool Featured { get; set; }
         public decimal FeePerYear { get; set; }
         public string? FeePerYearDescription { get; set; }
-        public decimal FeePerTerm { get; set; }
+        public string FeePerTerm { get; set; }
         public string? FeePerTermDescription { get; set; }
         public decimal Duration { get; set; }
         public int RequiredStudents { get; set; }

@@ -87,7 +87,7 @@ namespace U3A.BusinessRules
                     CourseParticipationType = pt.Name,
                     CourseFeePerYear = cr.CourseFeePerYear,
                     CourseFeePerYearDescription = cr.CourseFeePerYearDescription ?? String.Empty,
-                    CourseFeePerTerm = cr.CourseFeePerTerm,
+                    CourseFeePerTerm = cr.TermFeesTextNoTitle,
                     CourseFeePerTermDescription = cr.CourseFeePerTermDescription ?? String.Empty,
                     CourseDuration = cr.Duration,
                     CourseRequiredStudents = cr.RequiredStudents,

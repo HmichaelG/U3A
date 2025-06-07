@@ -172,9 +172,9 @@ else
                                                 {
                                                     <div class="text-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
                                                 }
-                                                @if (c.Course.CourseFeePerTerm != 0)
+                                                @if (c.Course.TermFeesText.Length > 0)
                                                 {
-                                                    <div class="text-info"><strong>Fee / Term: @($"{c.Course.CourseFeePerTerm.ToString("c2")} {c.Course.CourseFeePerTermDescription}")</strong></div>
+                                                    <div class="text-info"><strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong></div>
                                                 }
                                             </div>
 
