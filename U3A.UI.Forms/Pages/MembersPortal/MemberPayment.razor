@@ -74,7 +74,7 @@ else
                                 </ul>
                             </div>
                         }
-                        <div class="m-auto">
+                        <div class="m-auto" hidden="@(loginState?.IsAdminOnBehalfOfMember)">
                             <TermsAndConditions RequireConfirmation="true"
                                                 Participant="@loginState?.SelectedPerson"
                                                 OnConfirmationChanged="@((bool value) => areTermsConfirmed = value)"

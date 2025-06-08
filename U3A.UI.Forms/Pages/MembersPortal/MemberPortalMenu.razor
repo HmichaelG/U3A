@@ -37,7 +37,7 @@ else
                 @if (ShowEnrolmentSubMneu)
                 {
                     <DxFormLayoutGroup Caption="Manage Course Enrolments" CssClass="px-1">
-                        <div class="p-2 mx-auto">
+                        <div class="p-2 mx-auto" hidden="@(loginState?.IsAdminOnBehalfOfMember)">
                             <TermsAndConditions RequireConfirmation="true"
                                                 Participant="@loginState?.SelectedPerson"
                                                 OnConfirmationChanged="@((bool value) => areTermsConfirmed = value)"
