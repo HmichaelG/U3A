@@ -62,7 +62,7 @@ namespace U3A.Services
                             decimal TotalFee,
                             int? TermsPaid)
         {
-
+            var settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
             string? result = null;
             CreateResponsiveSharedRequest request = new CreateResponsiveSharedRequest();
             request.HeaderText = "U3Admin.org.au";
@@ -85,11 +85,44 @@ namespace U3A.Services
             request.Customer = Customer;
             request.CustomerReadOnly = true;
 
+            int U3AFee = (int)(TotalFee * 100M);
+            int merchantFee = 0;
+            request.Options = new();
+
+            if (settings.SeparateMerchantFeeAndU3AFee)
+            {
+                int baseFee = (int)(settings.MerchantFeeFixed * 100M);
+                int percentageFee = (int)(TotalFee * settings.MerchantFeePercentage / 100 * 100M);
+                merchantFee = baseFee + percentageFee;
+
+                request.Items = new();
+                request.Items.Add(
+                    new LineItem()
+                    {
+                        Description = "U3A Fees",
+                        Quantity = 1,
+                        UnitCost = U3AFee,
+                        Total = U3AFee
+                    }
+                );
+                request.Items.Add(
+                    new LineItem()
+                    {
+                        Description = "Merchant Fee",
+                        Quantity = 1,
+                        UnitCost = merchantFee,
+                        Total = merchantFee // Eway expects amount in cents
+                    }
+                );
+
+                request.Options.Add(new Option() { Value = merchantFee.ToString("0")});
+            }
+
             if (request.TransactionType == TransactionTypes.Purchase)
             {
                 request.Payment = new Payment()
                 {
-                    TotalAmount = (int)(TotalFee * 100M),
+                    TotalAmount = U3AFee + merchantFee,
                     InvoiceDescription = InvoiceDescription,
                     InvoiceNumber = InvoiceNumber,
                     InvoiceReference = InvoiceReference
