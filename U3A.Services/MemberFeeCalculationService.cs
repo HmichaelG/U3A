@@ -361,14 +361,14 @@ public class MemberFeeCalculationService
                                             && x.Amount != 0
                                             && x.ProcessingYear == term.Year).ToArrayAsync())
         {
-                var description = "Payment received - thank you";
-                var sortOrder = MemberFeeSortOrder.Receipt;
+            var description = "Payment received - thank you";
+            var sortOrder = MemberFeeSortOrder.Receipt;
             if (r.Amount < 0)
             {
                 sortOrder = MemberFeeSortOrder.Refund;
                 description = $"Refund: {r.Description}";
             }
-            AddFee(person.ID,sortOrder, r.Date, description, -r.Amount);
+            AddFee(person.ID, sortOrder, r.Date, description, -r.Amount);
             if (PersonWithFinancialStatus != null)
             {
                 PersonWithFinancialStatus.AmountReceived += r.Amount;
@@ -399,8 +399,9 @@ public class MemberFeeCalculationService
                                             && x.TermID == t.ID
                                             && !x.IsWaitlisted).ToArrayAsync())
             {
-                DateOnly dueDate = e.Course.CourseFeePerYearDueDate ?? DateOnly.FromDateTime(e.DateEnrolled.Value);
-                if (dueDate <= today)
+                DateOnly dateEnrolled = DateOnly.FromDateTime(e.DateEnrolled.Value);
+                DateOnly dateDue = e.Course.CourseFeePerYearDueDate ?? dateEnrolled;
+                if (dateDue <= today)
                 {
                     if (e.Course.CourseFeePerYear != 0 && !courseFeeAdded.Contains(e.CourseID))
                     {
@@ -417,15 +418,16 @@ public class MemberFeeCalculationService
                             description += $": {e.Course.CourseFeePerYearDescription}";
                         }
                         AddFee(person.ID,
-                            MemberFeeSortOrder.CourseFee, ConvertDateOnlyToDateTime(dueDate),description,amount);
+                            MemberFeeSortOrder.CourseFee, ConvertDateOnlyToDateTime(dateDue), description, amount);
                         if (PersonWithFinancialStatus != null)
                             PersonWithFinancialStatus.CourseFeesPerYear += amount;
                         courseFeeAdded.Add(e.CourseID);
                     }
                 }
                 var dueDateAdjustment = e.Course.CourseFeePerTermDueWeeks ?? 0;
-                dueDate = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
-                if (e.Course.CourseFeePerTerm != 0 && dueDate <= today)
+                dateDue = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
+                if (dateDue < dateEnrolled) dateDue = dateEnrolled;
+                if (e.Course.HasTermFees && dateDue <= today)
                 {
                     bool isTermFeeDue = false;
                     if (e.Class != null)
@@ -443,7 +445,24 @@ public class MemberFeeCalculationService
                     if (isTermFeeDue)
                     {
                         var description = $"{e.Course.Name} fee";
-                        var amount = e.Course.CourseFeePerTerm;
+                        var amount = 0M;
+                        switch (t.TermNumber)
+                        {
+                            case 1:
+                                amount = e.Course.CourseFeeTerm1;
+                                break;
+                            case 2:
+                                amount = e.Course.CourseFeeTerm2;
+                                break;
+                            case 3:
+                                amount = e.Course.CourseFeeTerm3;
+                                break;
+                            case 4:
+                                amount = e.Course.CourseFeeTerm4;
+                                break;
+                            default:
+                                break;
+                        }
                         var includeInComplimentary = settings.IncludeCourseFeePerTermInComplimentary;
                         if (e.Course.OverrideComplimentaryPerTermFee) includeInComplimentary = false;
                         if (IsComplimentary && includeInComplimentary)
@@ -455,7 +474,7 @@ public class MemberFeeCalculationService
                             description += $": {e.Course.CourseFeePerTermDescription}";
                         }
                         AddFee(person.ID,
-                            MemberFeeSortOrder.TermFee, ConvertDateOnlyToDateTime(dueDate),
+                            MemberFeeSortOrder.TermFee, ConvertDateOnlyToDateTime(dateDue),
                             $"{t.Name}: {description}", amount);
                         if (PersonWithFinancialStatus != null)
                             PersonWithFinancialStatus.CourseFeesPerTerm += amount;
@@ -486,7 +505,7 @@ public class MemberFeeCalculationService
         foreach (var c in classesLead)
         {
             //Fees per year
-            DateOnly dueDate = c.Course.CourseFeePerYearDueDate ?? new DateOnly(term.Year,1,1);
+            DateOnly dueDate = c.Course.CourseFeePerYearDueDate ?? new DateOnly(term.Year, 1, 1);
             if (dueDate <= today)
             {
                 if (c.Course.CourseFeePerYear != 0 && c.Course.LeadersPayYearFee && !courseFeeAdded.Contains(c.CourseID))
@@ -545,14 +564,14 @@ public class MemberFeeCalculationService
     private void AddFee(Guid personID, MemberFeeSortOrder sortOrder, DateTime? date, string description, decimal amount)
     {
         var value = decimal.Round(amount, 2);
-            MemberFees.Add(new MemberFee
-            {
-                PersonID = personID,
-                SortOrder = sortOrder,
-                Date = date,
-                Description = description,
-                Amount = value
-            });
+        MemberFees.Add(new MemberFee
+        {
+            PersonID = personID,
+            SortOrder = sortOrder,
+            Date = date,
+            Description = description,
+            Amount = value
+        });
     }
 
     public DateTime ConvertDateOnlyToDateTime(DateOnly date)

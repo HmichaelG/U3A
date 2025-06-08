@@ -96,6 +96,20 @@ namespace U3A.Model
         public decimal CourseFeeTerm4 { get; set; }
 
         [NotMapped]
+        public bool HasTermFees
+        {
+            get
+            {
+                bool result = false;
+                if (CourseFeeTerm1 != 0) result = true;
+                if (CourseFeeTerm2 != 0) result = true;
+                if (CourseFeeTerm3 != 0) result = true;
+                if (CourseFeeTerm4 != 0) result = true;
+                return result;
+            }
+        }
+
+        [NotMapped]
         public string TermFeesText
         {
             get

@@ -88,7 +88,7 @@ namespace U3A.BusinessRules
             bool result = false;
             if (settings.AllowMultiCampusExtensions)
             {
-                if (course.CourseFeePerYear == 0 && string.IsNullOrWhiteSpace(course.TermFeesText))
+                if (course.CourseFeePerYear == 0 && !course.HasTermFees)
                 {
                     if (course.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
                     {

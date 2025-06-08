@@ -19,7 +19,7 @@
                 <div class="col-small"><strong>Course Fee:</strong></div>
                 <div class="col-large">@($"{Class.Course.CourseFeePerYear.ToString("c2")} {Class.Course.CourseFeePerYearDescription}")</div>
             }
-            @if (!string.IsNullOrWhiteSpace(Class.Course.TermFeesTextNoTitle))
+            @if (Class.Course.HasTermFees)
             {
                 <div class="col-small"><strong>Term Fee:</strong></div>
                 <div class="col-large">@($"{Class.Course.TermFeesTextNoTitle} {Class.Course.CourseFeePerTermDescription}")</div>

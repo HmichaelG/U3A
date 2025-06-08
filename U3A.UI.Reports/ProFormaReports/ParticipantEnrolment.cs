@@ -20,9 +20,5 @@ namespace U3A.UI.Reports
             InitializeComponent();
         }
 
-        private void xrRichText1_BeforePrint(object sender, CancelEventArgs e)
-        {
-
-        }
     }
 }

@@ -139,7 +139,7 @@ else
         if (Enrolments != null && Enrolments.Count > 0)
         {
             var course = Enrolments.First().Course;
-            AreFeesPayable = (!string.IsNullOrWhiteSpace(course.TermFeesText) || course.CourseFeePerYear > 0);
+            AreFeesPayable = (course.HasTermFees || course.CourseFeePerYear > 0);
             if (AreFeesPayable)
             {
                 foreach (var e in Enrolments)
