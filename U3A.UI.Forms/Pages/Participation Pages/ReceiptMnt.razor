@@ -70,7 +70,8 @@ else
                     <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
                     <DxGridDataColumn Caption="Receipt Fin-To" FieldName="FinancialToText" Width="8rem" TextAlignment="GridTextAlignment.Right" />
                     <DxGridDataColumn Caption="Current Fin-To" FieldName="Person.FinancialToText" Width="8rem" TextAlignment="GridTextAlignment.Right" />
-                    <DxGridDataColumn Caption="Amount" FieldName="Amount" DisplayFormat="{0:c2}" Width="8rem" />
+                    <DxGridDataColumn Caption="Amount" FieldName="Amount" DisplayFormat="{0:c2}" Width="6rem" />
+                    <DxGridDataColumn Caption="Fee" FieldName="MerchantFee" DisplayFormat="{0:c2}" Width="6rem" />
                     <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" Visible=false />
                     <DxGridDataColumn Caption="Updated By" FieldName="User" Visible=false />
                     <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
@@ -91,10 +92,15 @@ else
                                        DisplayText="{0:c2}"
                                        FieldName="Amount"
                                        FooterColumnName="Amount" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
+                                       DisplayText="{0:c2}"
+                                       FieldName="MerchantFee"
+                                       FooterColumnName="MerchantFee" />
                 </GroupSummary>
                 <TotalSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:n0} Receipts" FieldName="ID" FooterColumnName="Identifier" />
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="MerchantFee" />
                 </TotalSummary>
 
                 <EditFormTemplate Context="EditFormContext">

@@ -94,28 +94,8 @@ namespace U3A.Services
                 int baseFee = (int)(settings.MerchantFeeFixed * 100M);
                 int percentageFee = (int)(TotalFee * settings.MerchantFeePercentage / 100 * 100M);
                 merchantFee = baseFee + percentageFee;
-
-                request.Items = new();
-                request.Items.Add(
-                    new LineItem()
-                    {
-                        Description = "U3A Fees",
-                        Quantity = 1,
-                        UnitCost = U3AFee,
-                        Total = U3AFee
-                    }
-                );
-                request.Items.Add(
-                    new LineItem()
-                    {
-                        Description = "Merchant Fee",
-                        Quantity = 1,
-                        UnitCost = merchantFee,
-                        Total = merchantFee // Eway expects amount in cents
-                    }
-                );
-
-                request.Options.Add(new Option() { Value = merchantFee.ToString("0")});
+                request.Options.Add(new Option() { Value = merchantFee.ToString("0") });
+                InvoiceDescription += $" {TotalFee.ToString("c2")} + merchant fee {(merchantFee / 100M).ToString("c2")}";
             }
 
             if (request.TransactionType == TransactionTypes.Purchase)
@@ -201,6 +181,14 @@ namespace U3A.Services
                     ResponseCode = eWayResponse.ResponseCode ?? "",
                     ResponseMessage = eWayResponse.ResponseMessage ?? ""
                 };
+                if (eWayResponse.Options != null && eWayResponse.Options.Any())
+                {
+                    result.MerchantFee = (decimal.Parse(eWayResponse.Options.First().Value) / 100.00M);
+                }
+                else
+                {
+                    result.MerchantFee = null;
+                }
                 if (!CanSetPaymentStatusProcessed(result.ResponseCode, result.Date))
                 {
                     throw new EwayResponseException(@"The processing of your payment is incomplete.
@@ -244,13 +232,21 @@ namespace U3A.Services
             {
                 var receipt = new Receipt()
                 {
-                    Amount = result.Amount,
                     Date = result.Date,
                     Description = $"Eway online payment Auth: {result.AuthorizationCode}",
                     Identifier = $"TransID: {result.TransactionID}",
                     Person = person
                 };
-
+                if (result.MerchantFee.HasValue)
+                {
+                    receipt.MerchantFee = result.MerchantFee.Value;
+                    receipt.Amount = result.Amount - result.MerchantFee.Value; // Merchant fee is separate, so amount is total minus fee
+                }
+                else
+                {
+                    receipt.MerchantFee = null;
+                    receipt.Amount = result.Amount; // No merchant fee, so amount is total
+                }
                 var processingYear = term.Year;
                 var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(dbc, person);
 
@@ -347,6 +343,7 @@ namespace U3A.Services
         public string AuthorizationCode { get; set; }
         public int TransactionID { get; set; }
         public decimal Amount { get; set; }
+        public decimal? MerchantFee { get; set; }
         public int? TermsPaid { get; set; }
         public string ResponseCode { get; set; }
         public string ResponseMessage { get; set; }

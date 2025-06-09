@@ -18,6 +18,7 @@ namespace U3A.Model
         [Required]
         [Precision(precision: 18, 2)]
         public decimal Amount { get; set; }
+        public decimal? MerchantFee { get; set; }
         [Required]
         public string Description { get; set; }
         public string? Identifier { get; set; }

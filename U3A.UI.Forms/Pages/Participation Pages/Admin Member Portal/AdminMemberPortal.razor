@@ -136,13 +136,18 @@ else
                                                                     <DxGridDataColumn Width="14rem" Caption="Description" FieldName="Description" />
                                                                     <DxGridDataColumn Caption="Identifier" FieldName="Identifier" />
                                                                     <DxGridDataColumn Width="6rem" Caption="Financial To" FieldName="Person.FinancialToBriefText" DisplayFormat="f0" />
-                                                                    <DxGridDataColumn Width="8rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
+                                                                    <DxGridDataColumn Width="5rem" Caption="Amount" FieldName="Amount" DisplayFormat="c2" />
+                                                                    <DxGridDataColumn Width="5rem" Caption="Fee" FieldName="MerchantFee" DisplayFormat="c2" />
                                                                 </Columns>
                                                                 <TotalSummary>
                                                                     <DxGridSummaryItem FieldName="Amount"
+                                                                                       DisplayText="{0:c2}"
                                                                                        SummaryType="GridSummaryItemType.Sum"
-                                                                                       FooterColumnName="Amount"
-                                                                                       ValueDisplayFormat="c2" />
+                                                                                       FooterColumnName="Amount" />
+                                                                    <DxGridSummaryItem FieldName="MerchantFee"
+                                                                                       DisplayText="{0:c2}"
+                                                                                       SummaryType="GridSummaryItemType.Sum"
+                                                                                       FooterColumnName="MerchantFee" />
                                                                 </TotalSummary>
                                                             </DxGrid>
                                                         </ContentTemplate>

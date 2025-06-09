@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-04-25T16:27:28.218+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-06-09T10:49:22.234+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Membership Fees</title>
   <body>
     <header>
@@ -59,6 +59,43 @@
         </td>
         <td style="width:910px;">
           <para styleclass="Normal">Optional. The fee charged if the participant chooses postal correspondence rather than email.</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Heading2">Eway Merchant Fee Parameters</para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="4" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal"><text style="font-weight:bold;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal">Separate merchant fee from U3A Fee?</para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal">Tick if you require the member to be charged merchant fees in addition to the U3A fee.</para>
+          <para styleclass="Normal">Leave un-ticked if merchant fees are to be included in the U3A fee.</para>
+          <para styleclass="Normal">For example, member fees are $50 and the merchant is $1. If ticked, the member will be charged $51.00, otherwise the member is charged $50 only.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal">Merchant Fee fixed amount</para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal">The base fee charged by Eway. At the time of writing this is $0.25.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:343px;">
+          <para styleclass="Normal">Merchant Fee percent amount</para>
+        </td>
+        <td style="width:910px;">
+          <para styleclass="Normal">The percent of the amount charged by Eway. At the time of writing this was 1.5%.</para>
         </td>
       </tr>
     </table></para>
