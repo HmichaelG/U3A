@@ -35,13 +35,13 @@
                     </div>
                 }
             }
-            <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
-            RenderStyleMode="ButtonRenderStyleMode.Outline"
-            RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly)
-                                            ?   ButtonRenderStyle.Primary
-                                            :   ButtonRenderStyle.None)"
-            CssClass="@ButtonCssClass"
-            Click="ShowTopicAsync" Id="helpButton" />
+    <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
+              RenderStyleMode="ButtonRenderStyleMode.Outline"
+              RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly)
+                                                          ? ButtonRenderStyle.Primary
+                                                          : ButtonRenderStyle.None)"
+          CssClass="@ButtonCssClass"
+          Click="ShowTopicAsync" Id="helpButton" />
             break;
         case HelpActivationStyle.StandardButtonAndTitle:
         case HelpActivationStyle.ButtonAndTitleNoMessages:
@@ -49,9 +49,9 @@
             <div class="d-flex">
                 <h1 class="@TitleCssClass title-color h3">
                     <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
-                    RenderStyleMode="ButtonRenderStyleMode.Outline"
-                    RenderStyle="ButtonRenderStyle.None"
-                    Click="ShowTopicAsync" Id="helpButton" />
+                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                              RenderStyle="ButtonRenderStyle.None"
+                              Click="ShowTopicAsync" Id="helpButton" />
                     @Title
                 </h1>
                 @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
@@ -75,18 +75,18 @@
             break;
     }
     <DxWindow @ref=@helpWindow Width="@windowWidth"
-    Visible=false
-    Closed="OnClosed"
-    HorizontalAlignment="HorizontalAlignment.Right"
-    VerticalAlignment="VerticalAlignment.Center"
-    Height="100vh"
-    AllowResize="true"
-    Context="windowContext"
-    CloseOnEscape=true
-    ShowCloseButton=true
-    ShowFooter=true
-    Scrollable=true
-    HeaderText="Help">
+              Visible=false
+              Closed="OnClosed"
+              HorizontalAlignment="HorizontalAlignment.Right"
+              VerticalAlignment="VerticalAlignment.Center"
+              Height="100vh"
+              AllowResize="true"
+              Context="windowContext"
+              CloseOnEscape=true
+              ShowCloseButton=true
+              ShowFooter=true
+              Scrollable=true
+              HeaderText="Help">
         <BodyTextTemplate>
             <iframe src="@helpFile" class="iframe-size p-1"></iframe>
         </BodyTextTemplate>
@@ -95,24 +95,24 @@
 
 <style>
     .iframe-size {
-    height: 100%;
-    width: 100%;
-    padding-bottom: 5px;
+        height: 100%;
+        width: 100%;
+        padding-bottom: 5px;
     }
 
     .alert-style {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-    margin-bottom: 0.5dvh !important;
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+        margin-bottom: 0.5dvh !important;
     }
 
     .help-btn {
-    color: var(--dxbl-client-component-palette-info);
-    font-weight: 900;
+        color: var(--dxbl-client-component-palette-info);
+        font-weight: 900;
     }
 
     .title-color {
-    color: var(--dxbl-client-component-palette-primary);
+        color: var(--dxbl-client-component-palette-primary);
     }
 </style>
 
@@ -200,21 +200,6 @@
                     informationMessage = $"Reminder: Enrolment email blackout until {dbc.GetLocalTime(settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault()).ToString(constants.SHORT_DAY_AND_TIME_FORMAT)}";
                 }
             }
-            if (LoginState is not null)
-            {
-                if (await BusinessRule.IsTwoFactorRequiredAsync(dbc, config, LoginState.LoginEmail))
-                {
-                    var days = await BusinessRule.TwoFactorGracePeriodRemainingAsync(dbc, LoginState.LoginEmail);
-                    if (days > 0)
-                    {
-                        TwoFactorWarningMessage = new MarkupString($"Reminder: Two Factor Authentication is required in <b>{days}</b> days.");
-                    }
-                    else
-                    {
-                        navMan.NavigateTo("Account/Manage/TwoFactorAuthentication", forceLoad: true);
-                    }
-                }
-            }
         }
         isReady = true;
     }
@@ -223,9 +208,41 @@
     {
         if (firstRender)
         {
+            await Check2FA();
             savedVersion = await localStorage.GetItemAsync<string>(versionDetails);
             isFlyoutOpen = (IsVersionButton && (string.IsNullOrEmpty(savedVersion) || savedVersion != Title));
             await ShowNewSoftwareUpdateFlyout.InvokeAsync(isFlyoutOpen);
+        }
+    }
+
+    async Task Check2FA()
+    {
+        if (LoginState is not null)
+        {
+            bool isDesktop = false;
+            using var dbc = await U3Adbfactory.CreateDbContextAsync();
+            var value = await js.InvokeAsync<string?>("GetSessionState", "isU3ADesktop");
+            if (!string.IsNullOrWhiteSpace(value) && bool.TryParse(value, out bool isDesktopValue))
+            {
+                isDesktop = isDesktopValue;
+            }
+            if (isDesktop)
+            {
+                // Desktop app does not require 2FA, so skip this check
+                return;
+            }
+            if (await BusinessRule.IsTwoFactorRequiredAsync(dbc, config, LoginState.LoginEmail))
+            {
+                var days = await BusinessRule.TwoFactorGracePeriodRemainingAsync(dbc, LoginState.LoginEmail);
+                if (days > 0)
+                {
+                    TwoFactorWarningMessage = new MarkupString($"Reminder: Two Factor Authentication is required in <b>{days}</b> days.");
+                }
+                else
+                {
+                    navMan.NavigateTo("Account/Manage/TwoFactorAuthentication", forceLoad: true);
+                }
+            }
         }
     }
 

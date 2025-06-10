@@ -111,6 +111,13 @@
     async Task ApplyFix(U3ADbContextSeed dbc)
     {
         // Apply any specific fixes needed for the database schema here.
+        await dbc.Database.ExecuteSqlRawAsync(
+            @"update SystemSettings
+                set MerchantFeeFixed = 0.25,
+	                MerchantFeePercentage = 1.50
+                where MerchantFeeFixed = 0 and MerchantFeePercentage = 0
+"
+        );
     }
 
 

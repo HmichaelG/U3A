@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using DevExpress.Logify;
+using DevExpress.Utils.Serializing;
 using Eway.Rapid;
 using Eway.Rapid.Abstractions;
 using Eway.Rapid.Abstractions.Interfaces;
@@ -92,7 +93,7 @@ namespace U3A.Services
             if (settings.SeparateMerchantFeeAndU3AFee)
             {
                 int baseFee = (int)(settings.MerchantFeeFixed * 100M);
-                int percentageFee = (int)(TotalFee * settings.MerchantFeePercentage / 100 * 100M);
+                int percentageFee = (int) System.Math.Round(TotalFee * settings.MerchantFeePercentage / 100M * 100M,0,MidpointRounding.AwayFromZero);
                 merchantFee = baseFee + percentageFee;
                 request.Options.Add(new Option() { Value = merchantFee.ToString("0") });
                 InvoiceDescription += $" {TotalFee.ToString("c2")} + merchant fee {(merchantFee / 100M).ToString("c2")}";

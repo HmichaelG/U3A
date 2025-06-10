@@ -294,8 +294,8 @@ else
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
     {
-        if (!await AreThereFeesToBePaid()) return;
-        if (!await AreTermsConfirmed()) return;
+            if (!await AreThereFeesToBePaid()) return;
+            if (!await AreTermsConfirmed()) return;
         menuSelection = selection;
         StateHasChanged();
     }
@@ -333,6 +333,7 @@ else
 
     async Task<bool> AreTermsConfirmed()
     {
+        if (loginState.IsAdminOnBehalfOfMember) return true;
         if (!areTermsConfirmed)
         {
             await messageBox.ShowOkOnlyAsync("Confirm Terms & Conditions", "Please confirm you have read and agree to our terms & conditions.");

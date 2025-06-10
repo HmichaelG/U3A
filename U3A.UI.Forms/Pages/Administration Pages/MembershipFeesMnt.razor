@@ -64,7 +64,7 @@ else {
                         <DxMaskedInput @bind-Value="@systemSettings.MerchantFeePercentage" Mask="@NumericMask.Percentage" />
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
-                <DxFormLayoutGroup Caption="Complimentary Membership Parameters" ColSpanLg="7" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                <DxFormLayoutGroup Caption="Complimentary Membership Parameters" ColSpanLg="6" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                     <DxFormLayoutItem Caption="Include Membership Fee In Complimentary?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@systemSettings.IncludeMembershipFeeInComplimentary" />
                     </DxFormLayoutItem>
@@ -77,7 +77,7 @@ else {
                     <DxFormLayoutItem Caption="Include Course Fees Per Term In Complimentary?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@systemSettings.IncludeCourseFeePerTermInComplimentary" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Maximum Leader Enrolments In Complimentary (0 = No max; all leaders complimentary)?" CaptionPosition=CaptionPosition.Vertical ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Maximum Leader Enrolments In Complimentary?" ColSpanMd="12">
                         <DxSpinEdit @bind-Value="@systemSettings.LeaderMaxComplimentaryCourses" />
                         <div>(0 = No max; all leaders complimentary)</div>
                     </DxFormLayoutItem>
