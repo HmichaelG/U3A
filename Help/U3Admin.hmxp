@@ -16,7 +16,7 @@
           <export-task name="Publish as PDF" format="PDF">
             <task-config-group name="settings">
               <task-config-value name="outputfile">U3Admin.pdf</task-config-value>
-              <task-config-value name="template">$(HMSYS)Templates\PDF\Classic_manual_short.mnl</task-config-value>
+              <task-config-value name="template">$(HMSYS)Templates\PDF\Classic_manual.mnl</task-config-value>
               <task-config-value name="highlighthotspots">0</task-config-value>
               <task-config-value name="exportcomments">0</task-config-value>
               <task-config-value name="exportcommentsdate">36526</task-config-value>
@@ -128,7 +128,7 @@
       <config-value name="copyright" translate="true">&lt;%COPYRIGHT%&gt;</config-value>
       <config-value name="copyrightpublicdomain">0</config-value>
       <config-value name="outputfile">U3Admin.pdf</config-value>
-      <config-value name="template">$(HMSYS)Templates\PDF\Classic_manual_short.mnl</config-value>
+      <config-value name="template">$(HMSYS)Templates\PDF\Classic_manual.mnl</config-value>
       <config-value name="highlighthotspots">0</config-value>
       <config-value name="exportcomments">0</config-value>
       <config-value name="exportcommentsdate">36526</config-value>
@@ -518,7 +518,6 @@
     <config-group name="print">
       <config-value name="tocname">Table of Contents</config-value>
       <config-value name="include">PRINT</config-value>
-      <config-value name="defaultprinter">Microsoft XPS Document Writer</config-value>
       <config-value name="template">$(HMSYS)Templates\pdf\standard_manual.mnl</config-value>
       <config-value name="colortext">0</config-value>
       <config-value name="insertseealso">0</config-value>
