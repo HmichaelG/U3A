@@ -79,15 +79,6 @@ public class MemberFeeCalculationService
                                 .Select(x => x.Amount).SumAsync();
     }
 
-    async Task<decimal> GetTotalReceipts(U3ADbContext dbc, Person person, Term term)
-    {
-        return await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
-                            .Where(x => !x.Person.IsDeleted
-                                && x.PersonID == person.ID
-                                && x.ProcessingYear == term.Year)
-                            .Select(x => x.Amount).SumAsync();
-    }
-
     /// <summary>
     /// Calculate fees for an individual. Used for Member Portal calculations
     /// </summary>
@@ -164,7 +155,7 @@ public class MemberFeeCalculationService
                 }
                 else
                 {
-                    PersonWithFinancialStatus.MembershipFees = await CalculateMembershipFeeAsync(dbc, person.DateJoined.GetValueOrDefault(), term, person);
+                    PersonWithFinancialStatus.MembershipFees = await CalculateMembershipFeeAsync(dbc, term, person);
                     var fee = PersonWithFinancialStatus.MembershipFees;
                     if (fee != 0)
                     {
@@ -255,25 +246,25 @@ public class MemberFeeCalculationService
         return result;
     }
     public async Task<decimal> CalculateMinimumFeePayableAsync(U3ADbContext dbc,
-                                    Person person, int? CalclateForTerm = null)
+                                    Person person, int? CalculateForTerm = null)
     {
         var result = decimal.Zero;
         var term = await GetBillingTermAsync(dbc);
         if (term != null && !await IsComplimentaryMembership(dbc, person, term.Year))
         {
-            result = await CalculateMembershipFeeAsync(dbc, person.DateJoined.GetValueOrDefault(), term, person);
+            result = await CalculateMembershipFeeAsync(dbc, term, person);
             result += dbc.Fee.IgnoreQueryFilters()
                                         .Where(x => !x.Person.IsDeleted
                                          && x.PersonID == person.ID
                                          && x.Amount != 0
                                          && x.IsMembershipFee
                                          && x.ProcessingYear == term.Year).Select(x => x.Amount).Sum();
-            if (CalclateForTerm.HasValue) { result = decimal.Round(result / 4m * (decimal)CalclateForTerm, 2); }
+            if (CalculateForTerm.HasValue) { result = decimal.Round(result / 4m * (decimal)CalculateForTerm, 2); }
         }
         return result;
     }
 
-    private async Task<decimal> CalculateMembershipFeeAsync(U3ADbContext dbc, DateTime DateJoined, Term term, Person person)
+    private async Task<decimal> CalculateMembershipFeeAsync(U3ADbContext dbc, Term term, Person person)
     {
         if (person is Contact) { return 0; }
         decimal result = 0;
@@ -283,7 +274,7 @@ public class MemberFeeCalculationService
         {
             result = settings.MembershipFee; // set the default
             DateTime? feeDueDate = null;
-            if (DateJoined.Year == term.Year) feeDueDate = DateJoined; // New member; use join date
+            if (person.DateJoined?.Year == term.Year) feeDueDate = person.DateJoined; // New member; use join date
             if (feeDueDate == null) // Renewing member
             {
                 var firstReceiptDate = await GetFirstReceiptDateAsync(dbc, term, person);
@@ -323,7 +314,7 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private async Task<DateTime?> GetFirstReceiptDateAsync(U3ADbContext  dbc, Term term, Person person)
+    private async Task<DateTime?> GetFirstReceiptDateAsync(U3ADbContext dbc, Term term, Person person)
     {
         DateTime? result = null;
         var receipt = await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
