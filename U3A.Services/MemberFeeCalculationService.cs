@@ -282,40 +282,58 @@ public class MemberFeeCalculationService
         if (settings != null)
         {
             result = settings.MembershipFee; // set the default
-            if (DateJoined.Year == term.Year)
+            DateTime? feeDueDate = null;
+            if (DateJoined.Year == term.Year) feeDueDate = DateJoined; // New member; use join date
+            if (feeDueDate == null) // Renewing member
             {
-                var terms = await dbc.Term.Where(x => x.Year == term.Year).OrderBy(x => x.TermNumber).ToArrayAsync();
-                if (terms.Length > 1)
+                var firstReceiptDate = await GetFirstReceiptDateAsync(dbc, term, person);
+                feeDueDate = firstReceiptDate ?? dbc.GetLocalDate();
+            }
+            var terms = await dbc.Term.Where(x => x.Year == term.Year).OrderBy(x => x.TermNumber).ToArrayAsync();
+            if (terms.Length > 1)
+            {
+                // Ues the term fee if fee due date is within term enrollment period
+                for (int i = 1; i < terms.Length; i++)
+                { // for terms 2 thru 4
+                    var lastTerm = terms[i - 1];
+                    var thisTerm = terms[i];
+                    if (feeDueDate > lastTerm.EnrolmentEndDate && feeDueDate <= thisTerm.EnrolmentEndDate)
+                    {
+                        result = GetTermFee(settings, thisTerm.TermNumber);
+                        foundTerm = true;
+                        break; // exit for
+                    }
+                }
+                // otherwise, use the term fee if date is within the current term.
+                if (!foundTerm)
                 {
-                    // current enrolment term has precedence
                     for (int i = 1; i < terms.Length; i++)
                     { // for terms 2 thru 4
                         var lastTerm = terms[i - 1];
                         var thisTerm = terms[i];
-                        if (DateJoined > lastTerm.EnrolmentEndDate && DateJoined <= thisTerm.EnrolmentEndDate)
+                        if (feeDueDate > lastTerm.EndDate && feeDueDate <= thisTerm.EndDate)
                         {
                             result = GetTermFee(settings, thisTerm.TermNumber);
-                            foundTerm = true;
                             break; // exit for
-                        }
-                    }
-                    // otherwise, use current term
-                    if (!foundTerm)
-                    {
-                        for (int i = 1; i < terms.Length; i++)
-                        { // for terms 2 thru 4
-                            var lastTerm = terms[i - 1];
-                            var thisTerm = terms[i];
-                            if (DateJoined > lastTerm.EndDate && DateJoined <= thisTerm.EndDate)
-                            {
-                                result = GetTermFee(settings, thisTerm.TermNumber);
-                                break; // exit for
-                            }
                         }
                     }
                 }
             }
         }
+        return result;
+    }
+
+    private async Task<DateTime?> GetFirstReceiptDateAsync(U3ADbContext  dbc, Term term, Person person)
+    {
+        DateTime? result = null;
+        var receipt = await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
+                                        .OrderBy(x => x.Date)
+                                        .Where(x => !x.IsDeleted
+                                            && x.PersonID == person.ID
+                                            && x.Amount != 0
+                                            && x.ProcessingYear == term.Year)
+                                        .FirstOrDefaultAsync();
+        if (receipt != null) { result = receipt.Date; }
         return result;
     }
 
