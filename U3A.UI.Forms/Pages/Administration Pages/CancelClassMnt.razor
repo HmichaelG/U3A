@@ -122,7 +122,7 @@ else
                     <ChildContent>
                         <FullScreen>
                             <ContentTemplate>
-                                <DxGrid @ref="displayGrid" Data="@CancellationsThisTerm"
+                                <DxGrid @ref="displayGrid" Data="@CancellationsThisYear"
                                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                                         ValidationEnabled="true"
                                         ShowFilterRow="false"
@@ -177,7 +177,7 @@ else
 @code {
     bool IsReady;
     private List<CancelClass>? Cancellations { get; set; }
-    private List<CancelClass>? CancellationsThisTerm { get; set; }
+    private List<CancelClass>? CancellationsThisYear { get; set; }
 
     private List<Term>? terms { get; set; }
     private Term? selectedTerm { get; set; }
@@ -251,7 +251,7 @@ else
         if (Cancellations != null) { Cancellations.Clear(); }
         StateHasChanged();
         courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
-        await GetCancellationsForTermAsync();
+        await GetCancellationsForRemainingYearAsync();
         courseComboEnabled = true;
         StateHasChanged();
     }
@@ -291,10 +291,10 @@ else
         SelectedDataItems = null;
     }
 
-    async Task GetCancellationsForTermAsync()
+    async Task GetCancellationsForRemainingYearAsync()
     {
         if (selectedTerm == null) return;
-        CancellationsThisTerm = await BusinessRule.CancelledClassForTermAsync(dbc, selectedTerm);
+        CancellationsThisYear = await BusinessRule.CancelledClassForRemainingYearAsync(dbc, selectedTerm);
     }
     async Task GetCancellationsAsync()
     {
@@ -373,7 +373,7 @@ else
                     }
                     await SetupGrid();
                 }
-                await GetCancellationsForTermAsync();
+                await GetCancellationsForRemainingYearAsync();
                 await GetCancellationsAsync();
             }
             else { e.Cancel = true; }
@@ -409,7 +409,7 @@ else
         //physically remove, override soft delete
         await dbc.Database.ExecuteSqlAsync($"Delete CancelClass where ID = {c.ID}");
         dbc.ChangeTracker.Clear();
-        await GetCancellationsForTermAsync();
+        await GetCancellationsForRemainingYearAsync();
         await GetCancellationsAsync();
     }
 

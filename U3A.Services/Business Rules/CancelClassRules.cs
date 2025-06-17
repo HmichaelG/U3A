@@ -29,16 +29,18 @@ public static partial class BusinessRule
                     .ToListAsync();
     }
 
-    public static async Task<List<CancelClass>> CancelledClassForTermAsync(U3ADbContext dbc, Term selectedTerm)
+    public static async Task<List<CancelClass>> CancelledClassForRemainingYearAsync(U3ADbContext dbc, Term selectedTerm)
     {
+        var lastDayOfYear = new DateTime(selectedTerm.Year, 12, 31);
         var Cancellations = (await dbc.CancelClass.AsNoTracking()
                     .Include(x => x.Class).ThenInclude(c => c.Course)
                     .Include(x => x.Class).ThenInclude(c => c.OnDay)
                     .Include(x => x.Class).ThenInclude(c => c.Venue)
                     .Include(x => x.Class).ThenInclude(c => c.Occurrence)
+                    .Where(x => x.StartDate >= selectedTerm.StartDate)
                     .OrderBy(x => x.Class.Course.Name).ThenBy(x => x.StartDate)
-                    .ToListAsync()).Where(x => DoDatesOverlap(x.StartDate, x.EndDate, selectedTerm.StartDate, selectedTerm.EndDate));
-        return Cancellations.ToList();
+                    .ToListAsync());
+        return Cancellations;
     }
 
     static bool DoDatesOverlap(DateTime xStart, DateTime xEnd, DateTime yStart, DateTime yEnd)
