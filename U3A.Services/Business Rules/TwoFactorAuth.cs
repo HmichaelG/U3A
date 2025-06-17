@@ -20,6 +20,7 @@ public static partial class BusinessRule
         if (user.TwoFactorGracePeriodStart == null)
         {
             user.TwoFactorGracePeriodStart = DateOnly.FromDateTime(DateTime.UtcNow);
+            dbc.Update(user);
             await dbc.SaveChangesAsync();
         }
 
