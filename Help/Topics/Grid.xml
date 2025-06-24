@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2024-09-29T11:58:58.594+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-06-24T15:07:05.277+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Grid</title>
   <body>
     <header>
@@ -108,11 +108,12 @@
     <para styleclass="Normal"><table styleclass="Default" rowcount="1" colcount="1">
       <tr style="vertical-align:top">
         <td>
-          <para styleclass="Normal"><image src="grid selection.png" imagestyleclass="Default" scale="100.00%" styleclass="Image Caption" figurelistinclude="0"></image></para>
+          <para styleclass="Normal"><image src="clip0003.png" imagestyleclass="Default" scale="100.00%" styleclass="Image Caption" figurelistinclude="0"></image></para>
         </td>
       </tr>
     </table></para>
-    <para styleclass="Normal">If provided, rows can be selected by clicking the selection check box usually located as the left most column on the grid. Use the check box located on the column header to select/un-select all rows. A range of rows may be selected by using SHIFT-Click.</para>
+    <para styleclass="Normal">If provided, rows can be selected by clicking the selection check box usually located as the left most column on the grid. Use the check box located on the column header to select/deselect all rows. A range of rows may be selected by using SHIFT-Click on the row.</para>
+    <para styleclass="Normal">A grid toolbar button, <text style="font-style:italic;">Selected Only?</text> will be displayed when a grid has a selection column. It will display selected records only when clicked. If clicked again, all records will be displayed.</para>
     <para styleclass="Heading2">Export</para>
     <para styleclass="Normal">Click the <text style="font-style:italic;">Export</text><text style="font-weight:bold; font-style:italic;">&#32;</text>button on the toolbar to export the grid to Microsoft Excel. If selection is available you may choose to export all rows or the selected rows. The export will preserve all filtering, column ordering, grouping and sorting.</para>
     <para styleclass="Normal">The export will be downloaded as an Excel file and placed in the Downloads folder on your PC. </para>
