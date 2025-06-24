@@ -195,7 +195,6 @@ namespace U3A.BusinessRules
                 if (IsClassInTerm(thisClass, term.TermNumber))
                 {
                     result = term;
-                    break;
                 }
             }
             if (result == null)

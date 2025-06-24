@@ -54,8 +54,9 @@ namespace U3A.UI.Reports
             {
                 case 1: // Summary
                     ClassSubReport.Visible = true;
-                    rowDescription.Visible = false;
-                    rowDetail.BackColor = Color.White;
+                    rowDescription.Visible = true;
+                    xrRichText1.Visible = false;
+                    //rowDetail.BackColor = Color.White;
                     reportStyle = "Summary";
                     break;
                 case 2: // Abbreviated
@@ -67,6 +68,7 @@ namespace U3A.UI.Reports
                 default: // Detail
                     ClassSubReport.Visible = true;
                     rowDescription.Visible = true;
+                    xrRichText1.Visible = true;
                     rowDetail.BackColor = Color.WhiteSmoke;
                     reportStyle = "Detail";
                     break;
