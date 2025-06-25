@@ -364,12 +364,20 @@ else
                 var settings = await dbc.SystemSettings.FirstOrDefaultAsync();
                 string[]? defaultSplits = settings?.SendEmailAddesss.Split("@");
                 string[]? fromSplits = editItem.FromEmailAddress?.Split("@");
-                if (fromSplits?.Count() > 0 && defaultSplits?.Count() > 0)
+                if (defaultSplits != null && defaultSplits.Length == 2)
                 {
-                    if (fromSplits[1].ToLower().Trim() != defaultSplits[1].ToLower().Trim())
+                    if (fromSplits == null || fromSplits.Length != 2)
                     {
-                        _ = await messageBox.ShowOkOnlyAsync("Invalid Domain", $"Your From Email address must end: @{defaultSplits[1]}.");
+                        _ = await messageBox.ShowOkOnlyAsync("Invalid Email", $"From Email address must be of the form: [sender]@{defaultSplits[1]}.");
                         result = false;
+                    }
+                    if (fromSplits?.Count() > 1 && defaultSplits?.Count() > 1)
+                    {
+                        if (fromSplits[1] != defaultSplits[1] && fromSplits[1] != constants.SYSTEM_DOMAIN)
+                        {
+                            _ = await messageBox.ShowOkOnlyAsync("Invalid Domain", $"From Email address must end: @{defaultSplits[1]}.");
+                            result = false;
+                        }
                     }
                 }
             }

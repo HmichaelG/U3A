@@ -333,12 +333,20 @@
             var settings = await dbContext.SystemSettings.FirstOrDefaultAsync();
             string[]? defaultSplits = settings?.SendEmailAddesss.ToLower().Trim().Split("@");
             string[]? fromSplits = SelectedDocumentTemplate.FromEmailAddress?.ToLower().Trim().Split("@");
-            if (fromSplits?.Count() > 0 && defaultSplits?.Count() > 0)
+            if (defaultSplits != null && defaultSplits.Length == 2)
             {
-                if (fromSplits[1] != defaultSplits[1] && fromSplits[1] != constants.SYSTEM_DOMAIN)
+                if (fromSplits == null || fromSplits.Length != 2)
                 {
-                    _ = await messageBox.ShowOkOnlyAsync("Invalid Domain", $"Your From Email address must end: @{defaultSplits[1]}.");
+                    _ = await messageBox.ShowOkOnlyAsync("Invalid Email", $"From Email address must be of the form: [sender]@{defaultSplits[1]}.");
                     result = false;
+                }
+                if (fromSplits?.Count() > 1 && defaultSplits?.Count() > 1)
+                {
+                    if (fromSplits[1] != defaultSplits[1] && fromSplits[1] != constants.SYSTEM_DOMAIN)
+                    {
+                        _ = await messageBox.ShowOkOnlyAsync("Invalid Domain", $"From Email address must end: @{defaultSplits[1]}.");
+                        result = false;
+                    }
                 }
             }
             var msg = string.Empty;
