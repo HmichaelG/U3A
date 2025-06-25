@@ -208,7 +208,6 @@
         {
             LinkedGrid.BeginUpdate();
             LinkedGrid.HighlightRowOnHover = true;
-            LinkedGrid.AllowSelectRowByClick = true;
             LinkedGrid.ShowGroupPanel = !HideGroupPanel;
             LinkedGrid.ShowSearchBox = !HideSearchBox;
             LinkedGrid.SelectAllCheckboxMode = GridSelectAllCheckboxMode.AllPages;
@@ -234,6 +233,7 @@
                 if (col is DxGridSelectionColumn)
                 {
                     areRowsSelectable = true;
+                    if (!LinkedGrid.AllowSelectRowByClick) { LinkedGrid.AllowSelectRowByClick = true; }
                 }
             }
             LinkedGrid.EndUpdate();

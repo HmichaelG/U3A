@@ -37,5 +37,16 @@ namespace U3A.BusinessRules
                                 x.StartDate.Date <= classDate &&
                                 x.EndDate.Date.AddDays(1) > classDate);
         }
+        public static async Task<List<Leave>> GetLeaveForCourseForClass(U3ADbContext dbc,
+                                    Course course,
+                                    DateTime classDate)
+        {
+            return await dbc.Leave
+                            .Include(x => x.Person)
+                            .Where(x => 
+                                (x.CourseID == null || x.CourseID == course.ID) &&
+                                x.StartDate.Date <= classDate &&
+                                x.EndDate.Date.AddDays(1) > classDate).ToListAsync();
+        }
     }
 }

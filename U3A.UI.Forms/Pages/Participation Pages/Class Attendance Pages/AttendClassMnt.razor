@@ -810,19 +810,17 @@ else
         else
         {
             count = SelectedDataItems.Count;
-            foreach (var c in SelectedDataItems.Cast<AttendClass>())
+            foreach (var ac in SelectedDataItems.Cast<AttendClass>())
             {
-                //physically remove, override soft delete
-                await dbc.Database.ExecuteSqlAsync($"Delete AttendClass where ID = {c.ID}");
+                ac.AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithoutApology;
             }
-            if (await SaveChangesAsync())
-            {
-                dbc.ChangeTracker.Clear();
-                await messageBox.ShowOkOnlyAsync("Reset selecteion", "The selected attendance records have been reset.");
-                await GetClassAttendance();
-            }
+            await ApplyStudentLeaveAsync();
+            await dbc.SaveChangesAsync();
+            await messageBox.ShowOkOnlyAsync("Reset selection", "The selected attendance records have been reset.");
+            await GetClassAttendance();
         }
         UpdateStatistics();
+        mainGrid?.ClearSelection();
     }
 
     async Task DeleteAdHocAttendee()
@@ -938,8 +936,6 @@ else
                     ac.DateProcessed = DateTime.UtcNow;
                 }
             }
-            // apply leave
-            await ApplyStudentLeaveAsync();
             if (await SaveChangesAsync())
             {
                 mainGrid?.ClearSelection();
@@ -971,9 +967,10 @@ else
             var attendance = (ForceAcceptLeave)
                                 ? ClassAttendance
                                 : ClassAttendance.Where(x => x.DateProcessed == null);
+            var classLeave = await BusinessRule.GetLeaveForCourseForClass(dbc, SelectedCourse, selectedDate.Date);
             foreach (var ac in attendance)
             {
-                var leave = await BusinessRule.GetLeaveForPersonForCourseForClass(dbc, ac.Person, SelectedCourse, selectedDate.Date);
+                var leave = classLeave.FirstOrDefault(x => x.PersonID == ac.PersonID);
                 if (leave != null)
                 {
                     ac.AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithApology;
@@ -983,6 +980,7 @@ else
                     result++;
                 }
             }
+            mainGrid?.ClearSelection();
         }
         finally { isLeaveBusy = false; }
         return result;
