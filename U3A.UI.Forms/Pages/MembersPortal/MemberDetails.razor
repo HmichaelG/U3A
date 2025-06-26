@@ -280,7 +280,7 @@ else
         if (loginState != null)
         {
             if (loginState.SelectedPerson != null) { person = loginState.SelectedPerson; }
-            if (person == null || IsNewLinkedMember)
+            if (person == null || person.ID == Guid.Empty)
             {
                 person = new Person()
                     {
