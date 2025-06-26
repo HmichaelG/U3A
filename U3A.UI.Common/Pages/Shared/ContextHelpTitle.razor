@@ -231,16 +231,19 @@
                 // Desktop app does not require 2FA, so skip this check
                 return;
             }
-            if (await BusinessRule.IsTwoFactorRequiredAsync(dbc, config, LoginState.LoginEmail))
+            if (!string.IsNullOrWhiteSpace(LoginState.LoginEmail))
             {
-                var days = await BusinessRule.TwoFactorGracePeriodRemainingAsync(dbc, LoginState.LoginEmail);
-                if (days > 0)
+                if (await BusinessRule.IsTwoFactorRequiredAsync(dbc, config, LoginState.LoginEmail))
                 {
-                    TwoFactorWarningMessage = new MarkupString($"Reminder: Two Factor Authentication is required in <b>{days}</b> days.");
-                }
-                else
-                {
-                    navMan.NavigateTo("Account/Manage/TwoFactorAuthentication", forceLoad: true);
+                    var days = await BusinessRule.TwoFactorGracePeriodRemainingAsync(dbc, LoginState.LoginEmail);
+                    if (days > 0)
+                    {
+                        TwoFactorWarningMessage = new MarkupString($"Reminder: Two Factor Authentication is required in <b>{days}</b> days.");
+                    }
+                    else
+                    {
+                        navMan.NavigateTo("Account/Manage/TwoFactorAuthentication", forceLoad: true);
+                    }
                 }
             }
         }
