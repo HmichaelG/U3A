@@ -48,6 +48,11 @@
 
                 <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
+                <FullScreen DisplayOffset="@GridDisplayOffset" HideToggle="@IsEmbedded">
+                    <ContentTemplate>
+                        <DxSplitter Orientation="Orientation.Vertical">
+                            <Panes>
+                                <DxSplitterPane>
                 <div hidden="@IsEmbedded">
                     <DxTabs @ref="@dxTabs" TabClick="@OnTabClick">
                         <DxTabPage Text="Participants" Click="@(() => selectedTab = Tabs.Participants)" />
@@ -64,13 +69,7 @@
                         <DxTabPage Text="All" Click="@(() => selectedTab = Tabs.AllRecords)" />
                     </DxTabs>
                 </div>
-
-                <FullScreen DisplayOffset="@GridDisplayOffset" HideToggle="@IsEmbedded">
-                    <ContentTemplate>
-                        <DxSplitter Orientation="Orientation.Vertical">
-                            <Panes>
-                                <DxSplitterPane>
-                                    <DxGrid Data="@Persons" @ref=@mainGrid CssClass="h-100"
+                                    <DxGrid Data="@Persons" @ref=@mainGrid CssClass="grid-style"
                                             SelectionMode="GridSelectionMode.Multiple"
                                             SelectedDataItems="@SelectedParticipants"
                                             SelectedDataItemsChanged="@OnSelectedParticipantsChanged"
@@ -364,7 +363,9 @@
 </form>
 
 <style>
-
+    .grid-style {
+        height: calc(100% - 2.5rem);
+    }
     .popup-width {
         min-width: min(65rem, 100%);
     }
@@ -376,7 +377,7 @@
     public EventCallback<(Person,Term)> MemberDrawerRequested { get; set; }
 
     [Parameter]
-    public double GridDisplayOffset { get; set; } = 9;
+    public double GridDisplayOffset { get; set; } = 5;
 
     [Parameter]
     public bool IsEmbedded { get; set; }
