@@ -20,16 +20,16 @@
 @{
     <MessageBox @ref=@messageBox />
     <div class="@((IsTopMenu)
-                ? "card shadow-sm w-100"
-                : "sidebar")">
-        <div class="d-print-none">
-            <DxMenu CssClass="menu-item menu"
-            DropDownActionMode="MenuDropDownActionMode.Click"
-            ItemsPosition="ItemPosition.End"
-            Orientation="@((IsTopMenu) ? Orientation.Horizontal : Orientation.Vertical)"
-            CollapseItemsToHamburgerMenu="@true">
-                <TitleTemplate>
-                    @if (IsTopMenu)
+                         ? "card shadow-sm w-100"
+                         : "sidebar")">
+    <div class="d-print-none">
+        <DxMenu CssClass="menu-item menu"
+                DropDownActionMode="MenuDropDownActionMode.Click"
+                ItemsPosition="ItemPosition.End"
+                Orientation="@((IsTopMenu) ? Orientation.Horizontal : Orientation.Vertical)"
+                CollapseItemsToHamburgerMenu="@true">
+            <TitleTemplate>
+                @if (IsTopMenu)
                     {
                         <span class="h5"><img src="images/U3ALogo.png">&nbsp;@OrganisationName</span>
                     }
@@ -39,7 +39,8 @@
                         if (isAuthenticated)
                         {
 
-                            <DxMenuItem @ref="homeButton" id="home-button" Text="@((isVertical) ? "Home" : "")" IconCssClass="menu-icon bi bi-house" NavigateUrl="./" />
+                            <DxMenuItem @ref="homeButton" id="home-button" Text="@((isVertical) ? "Home" : "")" 
+                                        Tooltip="Home" IconCssClass="menu-icon bi bi-house" NavigateUrl="./" />
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
@@ -103,7 +104,7 @@
                                                 <DxMenuItem Text="Financial Status Enquiry" NavigateUrl="@($"MemberDrawer/FinancialStatusEnquiry")" />
                                             </Items>
                                         </DxMenuItem>
-                                            <DxMenuItem Text="Add/Edit Participants" NavigateUrl="@($"MemberDrawer/PersonMnt")" />
+                                        <DxMenuItem Text="Add/Edit Participants" NavigateUrl="@($"MemberDrawer/PersonMnt")" />
                                         <DxMenuItem Text="Add/Edit Contacts" NavigateUrl="ContactMnt" />
                                         <DxMenuItem Text="Add/Edit Committee" NavigateUrl="CommitteeMnt" />
                                         <DxMenuItem Text="Add/Edit Volunteers" NavigateUrl="VolunteerMnt" />
@@ -128,8 +129,8 @@
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole | isOfficeRole)
                             {
                                 <DxMenuItem Text="Portal (Admin)"
-                                IconCssClass="menu-icon bi bi-window-desktop"
-                                NavigateUrl="AdminMemberPortal" />
+                                            IconCssClass="menu-icon bi bi-window-desktop"
+                                            NavigateUrl="AdminMemberPortal" />
                             }
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole)
@@ -180,36 +181,36 @@
                                 </DxMenuItem>
                             }
 
-                            <DxMenuItem Text="@((isVertical) ? "Settings" : "")"
-                            IconCssClass="menu-icon bi bi-palette" NavigateUrl="ThemeIntroduction">
+                            <DxMenuItem Text="@((isVertical) ? "Settings" : "")" Tooltip="Theme and Settings"
+                                        IconCssClass="menu-icon bi bi-palette" NavigateUrl="ThemeIntroduction">
                                 <Items>
                                     <DxMenuItem Text="Theme & Settings" NavigateUrl="Settings" />
                                     <DxMenuItem Text="Reset Factory Defaults"
-                                    Click="OnResetDefaults" />
+                                                Click="OnResetDefaults" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")"
-                            IconCssClass="menu-icon bi bi-shield" NavigateUrl="SecurityIntroduction">
+                            <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")" Tooltip="Manage Credentials and Logout"
+                                        IconCssClass="menu-icon bi bi-shield" NavigateUrl="SecurityIntroduction">
                                 <Items>
                                     @if (IsTopMenu)
                                     {
                                         <DxMenuItem Click="OnLogout"
-                                        Text="Logout"
-                                        IconCssClass="menu-icon bi bi-door-open" />
+                                                    Text="Logout"
+                                                    IconCssClass="menu-icon bi bi-door-open" />
                                     }
                                     <DxMenuItem Text="Change Email Address" IconCssClass="menu-icon bi bi-shield"
-                                    NavigateUrl="Account/Manage/Email" />
+                                                NavigateUrl="Account/Manage/Email" />
                                     <DxMenuItem Text="Change Your Password" IconCssClass="menu-icon bi bi-shield"
-                                    NavigateUrl="Account/Manage/ChangePassword" />
+                                                NavigateUrl="Account/Manage/ChangePassword" />
                                     <DxMenuItem Text="Two-Factor Authentication" IconCssClass="menu-icon bi bi-shield"
-                                    NavigateUrl="Account/Manage/TwoFactorAuthentication" />
+                                                NavigateUrl="Account/Manage/TwoFactorAuthentication" />
                                 </Items>
                             </DxMenuItem>
                             @if (!IsTopMenu)
                             {
                                 <DxMenuItem Click="OnLogout"
-                                Text="Logout"
-                                IconCssClass="menu-icon bi bi-door-open" />
+                                            Text="Logout"
+                                            IconCssClass="menu-icon bi bi-door-open" />
                             }
                         }
                     }
@@ -221,7 +222,7 @@
 }
 <style>
     .sidebar {
-    height: 100% !important;
+        height: 100% !important;
     }
 </style>
 

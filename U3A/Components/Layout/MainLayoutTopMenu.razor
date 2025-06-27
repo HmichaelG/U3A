@@ -5,7 +5,7 @@
 @using U3A.Services
 @using U3A.Model
 
- @implements IDisposable;
+@implements IDisposable;
 
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
@@ -15,15 +15,15 @@
 
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-@bind-IsActive="@IsXtraSmallLayout" />
+                    @bind-IsActive="@IsXtraSmallLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
-@bind-IsActive="@IsSmallLayout" />
+                    @bind-IsActive="@IsSmallLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Medium"
-@bind-IsActive="@IsMediumLayout" />
+                    @bind-IsActive="@IsMediumLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
-@bind-IsActive="@IsLargeLayout" />
+                    @bind-IsActive="@IsLargeLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
-@bind-IsActive="@IsXtraLargeLayout" />
+                    @bind-IsActive="@IsXtraLargeLayout" />
 
 <DxGridLayout CssClass="">
     <Rows>
@@ -47,7 +47,12 @@
         }
     </Columns>
     <Items>
-        <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none vh-100">
+        <DxGridLayoutItem Area="Left-Blank">
+            <Template>
+                <div style="background-color: red;">
+                    <img src="images/U3ALogo.png">
+                </div>
+            </Template>
         </DxGridLayoutItem>
         <DxGridLayoutItem Area="header" CssClass="py-1">
             <Template>
@@ -67,7 +72,7 @@
             <Template>
                 <ErrorBoundary @ref="@errorBoundary">
                     <ChildContent>
-                        <div class="@((hasRole) ? "content-padding" : "" )">
+                        <div class="@((hasRole) ? "content-padding" : "")">
                             @if (!string.IsNullOrWhiteSpace(messageText))
                             {
                                 <div class="alert alert-danger text-danger text-center mx-auto">
@@ -98,7 +103,7 @@
 
 <style>
     .content-padding {
-    padding-top: 3rem !important;
+        padding-top: 3rem !important;
     }
 </style>
 
