@@ -3,6 +3,7 @@
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Identity
 @using U3A.Services
+@using U3A.Model
 
 @implements IDisposable;
 
@@ -11,67 +12,140 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject LocalTime lt
-@inject WorkStation ws
 
-<div class="page">
-    <DxGridLayout CssClass="page-layout">
-        <Rows>
-            <DxGridLayoutRow Areas="navigation header" Height="auto"></DxGridLayoutRow>
-            <DxGridLayoutRow Areas="navigation content"></DxGridLayoutRow>
-            <DxGridLayoutRow Areas="navigation footer" Height="auto"></DxGridLayoutRow>
-        </Rows>
-        <Columns>
-            <DxGridLayoutColumn Width="auto" />
-            <DxGridLayoutColumn />
-        </Columns>
-        <Items>
-            <DxGridLayoutItem Area="header" CssClass="vw-100 d-print-none" />
-            <DxGridLayoutItem Area="footer" CssClass="vw-100 d-print-none" />
-            <DxGridLayoutItem Area="navigation"
-                              CssClass="d-print-none layout-sidebar">
-                <Template>
-                    <SideBar />
-                </Template>
-            </DxGridLayoutItem>
-            <DxGridLayoutItem Area="content" CssClass="container-fluid content">
-                <Template>
-                    <ErrorBoundary @ref="@errorBoundary">
-                        <ChildContent>
-                            @if (!string.IsNullOrWhiteSpace(messageText))
-                            {
-                                <div class="alert alert-danger text-danger text-center mx-auto">
-                                    @(new MarkupString(messageText))
+
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+                    @bind-IsActive="@IsXtraSmallLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
+                    @bind-IsActive="@IsSmallLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Medium"
+                    @bind-IsActive="@IsMediumLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
+                    @bind-IsActive="@IsLargeLayout" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
+                    @bind-IsActive="@IsXtraLargeLayout" />
+
+<DxButton Visible="true"
+          Click="@(() => isDrawerOpen = !isDrawerOpen)"
+          tooltip="Click to show/hide menu"
+          CssClass="sidebar-toggle-button menu-icon"
+          IconCssClass="bi bi-list"
+          RenderStyle="ButtonRenderStyle.Secondary" />
+
+<style>
+    .sidebar-toggle-button {
+        z-index: 1040;
+        left: 0;
+        top: 0;
+        margin: 0.5rem;
+        position: absolute;
+    }
+</style>
+
+<DxDrawer @bind-IsOpen="@isDrawerOpen"
+          CssClass="drawer-style"
+          Mode="@drawerMode"
+          Position="DrawerPosition.Left"
+          PanelWidth="15.5rem">
+    <BodyTemplate>
+        <SideBar />
+    </BodyTemplate>
+    <TargetContent>
+        <DxGridLayout CssClass="">
+            <Rows>
+                <DxGridLayoutRow Areas="Left-Blank content Right-Blank" Height="auto" />
+            </Rows>
+            <Columns>
+                @{
+                    if (IsXtraLargeLayout)
+                    {
+                        <DxGridLayoutColumn Width="@((isDrawerOpen) ? "1%" : "5%")" />
+                        <DxGridLayoutColumn Width="@((isDrawerOpen) ? "99%" : "90%")" />
+                        <DxGridLayoutColumn Width="@((isDrawerOpen) ? "1%" : "5%")" />
+                    }
+                    else
+                    {
+                        <DxGridLayoutColumn Width="0%" />
+                        <DxGridLayoutColumn Width="100%" />
+                        <DxGridLayoutColumn Width="0%" />
+                    }
+                }
+            </Columns>
+            <Items>
+                <DxGridLayoutItem Area="Left-Blank" />
+                <DxGridLayoutItem Area="content" CssClass="mt-1 main">
+                    <Template>
+                        <ErrorBoundary @ref="@errorBoundary">
+                            <ChildContent>
+                                <div class="pt-1">
+                                    @if (!string.IsNullOrWhiteSpace(messageText))
+                                    {
+                                        <div class="alert alert-danger text-danger text-center mx-auto">
+                                            @(new MarkupString(messageText))
+                                        </div>
+                                    }
+                                    @Body
                                 </div>
-                            }
-                            @Body
-                         </ChildContent>
-                        <ErrorContent>
-                            <p class="u3admin-error-boundary mt-5">
-                                @if (constants.IS_DEVELOPMENT)
-                                {
-                                    <div class="w-50">@context.ToString()</div>
-                                }
-                                Oops! Something went wrong. An unexpected error has occurred.<br />
-                                When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(lt.GetLocalTimeAsync()) Local ).
-                                <button class="btn btn-warning" @onclick="ResetError">Reset</button>
-                            </p>
-                        </ErrorContent>
-                    </ErrorBoundary>
-                </Template>
-            </DxGridLayoutItem>
-        </Items>
-    </DxGridLayout>
-</div>
-
+                            </ChildContent>
+                            <ErrorContent>
+                                <p class="u3admin-error-boundary mt-5">
+                                    @if (constants.IS_DEVELOPMENT)
+                                    {
+                                        <div class="w-50">@context.ToString()</div>
+                                    }
+                                    Oops! Something went wrong. An unexpected error has occurred.<br />
+                                    When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(lt.GetLocalTimeAsync()) Local ).
+                                    <button class="btn btn-warning" @onclick="ResetError">Reset</button>
+                                </p>
+                            </ErrorContent>
+                        </ErrorBoundary>
+                    </Template>
+                </DxGridLayoutItem>
+                <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none vh-100" />
+            </Items>
+        </DxGridLayout>
+    </TargetContent>
+</DxDrawer>
 
 @code {
-
     [Parameter]
     public RenderFragment? Body { get; set; } = null;
+    [CascadingParameter(Name = "HasRole")]
+    public bool hasRole { get; set; }
 
     ErrorBoundary? errorBoundary;
+    IEnumerable<IdentityRole>? Roles { get; set; }
+    bool IsXtraSmallLayout { get; set; }
+    bool IsSmallLayout { get; set; }
+    bool IsMediumLayout { get; set; }
+    bool IsLargeLayout { get; set; }
+    bool IsXtraLargeLayout { get; set; }
     U3ADbContext? dbc { get; set; }
     string? messageText;
+    bool isDrawerOpen = true;
+    DrawerMode drawerMode = DrawerMode.Shrink;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            Roles = dbc.Roles.ToList();
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            foreach (var r in Roles)
+            {
+                if (authenticationState.User.IsInRole(r.Name!))
+                {
+                    hasRole = true;
+                    break;
+                }
+            }
+            var authEmail = authenticationState.User.Identity!.Name;
+            if (authEmail == constants.superAdmin) hasRole = true;
+        }
+        NavigationManager.LocationChanged += OnLocationChanged;
+        await base.OnInitializedAsync();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -91,8 +165,17 @@
         NavigationManager.NavigateTo("/", true);
     }
 
+    void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (IsMediumLayout)
+        {
+            StateHasChanged();
+        }
+    }
+
     public void Dispose()
     {
+        NavigationManager.LocationChanged -= OnLocationChanged;
         dbc?.Dispose();
     }
 

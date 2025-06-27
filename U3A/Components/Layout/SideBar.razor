@@ -1,56 +1,33 @@
 ﻿@inject WorkStation ws
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-<div id="minimiseButton" class="p-1 minimise-button-container">
-    <DxButton Click="OnToggleMinimised" Visible=@IsMinimised
-    IconCssClass="bi bi-list"
-    SizeMode="SizeMode.Large"
-    RenderStyleMode="ButtonRenderStyleMode.Text"
-    RenderStyle="ButtonRenderStyle.Secondary" />
-</div>
-
-<div id="sidebar" class="@(IsMinimised ? "d-none": "")">
-
-    <DxGridLayout RowSpacing="0rem">
-        <Rows>
-            <DxGridLayoutRow Areas="header menu-button" Height="auto"></DxGridLayoutRow>
-            <DxGridLayoutRow Areas="navigation navigation"></DxGridLayoutRow>
-        </Rows>
-        <Columns>
-            <DxGridLayoutColumn />
-            <DxGridLayoutColumn Width="auto" />
-        </Columns>
-        <Items>
-            <DxGridLayoutItem Area="header" CssClass="sidebar-header">
-                <Template>
-                    <span class="minimise-button-container">
-                        <DxButton Click="OnToggleMinimised"
-                        IconCssClass="bi bi-list menu-icon"
-                        SizeMode="SizeMode.Large"
-                        RenderStyle="ButtonRenderStyle.Secondary" 
-                        RenderStyleMode="ButtonRenderStyleMode.Text" />
-                        <img src="images/U3ALogo.png" />
-                    </span>
-                    <div class="h5 menu-title w-100">@OrganisationName</div>
-                    <SidebarImageComponent />
-                </Template>
-            </DxGridLayoutItem>
-            <DxGridLayoutItem Area="menu-button" CssClass="sidebar-header menu-button-container">
-                <Template>
-                    <div class="menu-button" onclick="document.getElementById('sidebar').classList.toggle('expanded')"></div>
-                </Template>
-            </DxGridLayoutItem>
-            <DxGridLayoutItem Area="navigation" CssClass="layout-item">
-                <Template>
-                    <MainMenu IsTopMenu=false />
-                </Template>
-            </DxGridLayoutItem>
-        </Items>
-    </DxGridLayout>
-</div>
+<DxGridLayout>
+    <Rows>
+        <DxGridLayoutRow Areas="blank" Height="2.5rem"></DxGridLayoutRow>
+        <DxGridLayoutRow Areas="header" Height="auto"></DxGridLayoutRow>
+        <DxGridLayoutRow Areas="navigation"></DxGridLayoutRow>
+    </Rows>
+    <Columns>
+        <DxGridLayoutColumn />
+        <DxGridLayoutColumn Width="auto" />
+    </Columns>
+    <Items>
+        <DxGridLayoutItem Area="header" CssClass="d-flex-column sidebar-header">
+            <Template>
+                <img src="images/U3ALogo.png" />
+                <div class="h5 menu-title w-100">@OrganisationName</div>
+                <SidebarImageComponent />
+            </Template>
+        </DxGridLayoutItem>
+        <DxGridLayoutItem Area="navigation" CssClass="layout-item">
+            <Template>
+                <MainMenu IsTopMenu=false />
+            </Template>
+        </DxGridLayoutItem>
+    </Items>
+</DxGridLayout>
 
 @code {
-    public bool IsMinimised { get; set; } = false;
     string OrganisationName = string.Empty;
 
     protected override void OnInitialized()
@@ -61,7 +38,5 @@
             OrganisationName = dbc.TenantInfo.Name!;
         }
     }
-
-    void OnToggleMinimised() =>  IsMinimised = !IsMinimised;
 
 }
