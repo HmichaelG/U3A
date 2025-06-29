@@ -6,6 +6,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,8 +27,8 @@ namespace U3A.Model
         public int SizeMode { get; set; }
         public ScreenSizes ScreenSize { get; set; }
         public bool IsSmallScreen => ScreenSize == ScreenSizes.XSmall || ScreenSize == ScreenSizes.Small;
-        public bool IsMediumScreen => ScreenSize == ScreenSizes.Medium;
-        public bool IsLargeScreen => ScreenSize == ScreenSizes.Large || ScreenSize == ScreenSizes.XLarge;
+        public bool IsMediumScreen => ScreenSize == ScreenSizes.Medium || ScreenSize == ScreenSizes.Large;
+        public bool IsLargeScreen => ScreenSize == ScreenSizes.XLarge;
 
         public string Theme;
         public string SidebarImage;
@@ -38,7 +39,7 @@ namespace U3A.Model
         const string THEME = "theme";
         const string SIDEBAR_IMAGE = "sidebar-image";
 
-        public async Task GetWorkstationDetail(ILocalStorageService localStorage,ScreenSizes actualScreenSize)
+        public async Task GetWorkstationDetail(ILocalStorageService localStorage, int screenWidth)
         {
             //workstation ID
             var id = await localStorage.GetItemAsync<string>(WORKSTATION_ID);
@@ -77,8 +78,32 @@ namespace U3A.Model
                 SidebarImage = await localStorage.GetItemAsync<string>(SIDEBAR_IMAGE);
             }
 
-            // Screen size
-            ScreenSize = actualScreenSize;
+            // screen size
+            SetScreenSize(screenWidth);
+        }
+
+        public void SetScreenSize(int screenWidth)
+        {
+            if (screenWidth <= 576)
+            {
+                ScreenSize = ScreenSizes.XSmall;
+            }
+            else if (screenWidth <= 767)
+            {
+                ScreenSize = ScreenSizes.Small;
+            }
+            else if (screenWidth <= 992)
+            {
+                ScreenSize = ScreenSizes.Medium;
+            }
+            else if (screenWidth <= 1199)
+            {
+                ScreenSize = ScreenSizes.Large;
+            }
+            else
+            {
+                ScreenSize = ScreenSizes.XLarge;
+            }
         }
 
         public async Task SetWorkstationDetail(ILocalStorageService localStorage)
