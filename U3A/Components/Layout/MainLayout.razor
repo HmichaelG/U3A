@@ -21,6 +21,19 @@
     <div class="container-fluid">
         <DxFormLayout SizeMode="@sizeMode">
 
+
+            <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+                                @bind-IsActive="@isXSmall" />
+            <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
+                                @bind-IsActive="@isSmall" />
+            <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
+                                @bind-IsActive="@isMedium" />
+            <DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
+                                @bind-IsActive="@isLarge" />
+            <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
+                                @bind-IsActive="@isXLarge" />
+
+
             <CascadingValue Value=@openCircuits Name="OpenCircuits">
                 <CascadingValue Value="@loginState">
                     <CascadingValue Value="@hasRole" Name="HasRole">
@@ -73,7 +86,13 @@
     U3ADbContext? dbc { get; set; }
     string? currentUrl;
     bool isInteractive = false;
+    bool isXSmall = false;
+    bool isSmall = false;
+    bool isMedium = false;
+    bool isLarge = false;
+    bool isXLarge = false;
     SizeMode sizeMode;
+    ScreenSizes? screenSize;
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,11 +121,11 @@
                 if (sAdmin == null)
                 {
                     sAdmin = new ApplicationUser()
-                        {
-                            Email = constants.superAdmin,
-                            UserName = constants.superAdmin,
-                            EmailConfirmed = true,
-                        };
+                    {
+                        Email = constants.superAdmin,
+                        UserName = constants.superAdmin,
+                        EmailConfirmed = true,
+                    };
                     sAdmin.PasswordHash = hasher.HashPassword(sAdmin, "U3A Rocks!!");
                     await UserManager.CreateAsync(sAdmin);
                 }
@@ -139,10 +158,20 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        isInteractive = RendererInfo.IsInteractive;
+        await GetWorkstationDetails();
+    }
+
+    private async Task GetWorkstationDetails()
+    {
+        if (isXSmall) screenSize = ScreenSizes.XSmall;
+        if (isSmall) screenSize = ScreenSizes.Small;
+        if (isMedium) screenSize = ScreenSizes.Medium;
+        if (isLarge) screenSize = ScreenSizes.Large;
+        if (isXLarge) screenSize = ScreenSizes.XLarge;
+        if (screenSize != null)
         {
-            isInteractive = RendererInfo.IsInteractive;
-            await ws.GetWorkstationDetail(localStorage);
+            await ws.GetWorkstationDetail(localStorage, screenSize.Value);
             useTopMenu = ws.UseTopMenu;
             switch (ws.SizeMode)
             {
@@ -158,7 +187,6 @@
             }
             await InvokeAsync(StateHasChanged);
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)

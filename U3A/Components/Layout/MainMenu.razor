@@ -44,7 +44,7 @@
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
-                                <DxMenuItem Text="Admin" IconCssClass="menu-icon bi bi-gear" NavigateUrl="AdminIntroduction">
+                                <DxMenuItem Text="Admin" IconCssClass="menu-icon bi bi-gear" NavigateUrl="@((!isSmallScreen) ? "AdminIntroduction" : null)">
                                     <Items>
                                         @if (isSecurityAdminRole)
                                         {
@@ -69,7 +69,7 @@
 
                             if (isSystemAdminRole | isCourseAdminRole)
                             {
-                                <DxMenuItem Text="Course" IconCssClass="menu-icon bi bi-person-workspace" NavigateUrl="CourseIntroduction">
+                                <DxMenuItem Text="Course" IconCssClass="menu-icon bi bi-person-workspace" NavigateUrl=@(!isSmallScreen ? "CourseIntroduction" : null)>
                                     <Items>
                                         <DxMenuItem Text="Enter/Exit Maintenance Mode" NavigateUrl="EnterExitMaintenance" />
                                         <DxMenuItem Text="Add/Edit Course Types" NavigateUrl="CourseTypeMnt" />
@@ -89,9 +89,9 @@
 
                             if (isSystemAdminRole | isClericalRole)
                             {
-                                <DxMenuItem Text="Participation" IconCssClass="menu-icon bi bi-people" NavigateUrl="ParticipationIntroduction">
+                                <DxMenuItem Text="Participation" IconCssClass="menu-icon bi bi-people" NavigateUrl=@(!isSmallScreen ? "ParticipationIntroduction" : null)>
                                     <Items>
-                                        <DxMenuItem Text="Fees &amp; Receipting" NavigateUrl="CashIntroduction">
+                                        <DxMenuItem Text="Fees &amp; Receipting" NavigateUrl=@(!isSmallScreen ? "CashIntroduction" : null)>
                                             <Items>
                                                 <DxMenuItem Text="Bank Data Import" NavigateUrl="BankDataImport" Enabled="@(isSystemAdminRole | isAccountingRole)" />
                                                 <DxMenuItem Text="Add/Edit Receipts & Refunds" NavigateUrl="@($"MemberDrawer/ReceiptMnt")" />
@@ -135,7 +135,7 @@
 
                             if (isSystemAdminRole | isCourseAdminRole | isClericalRole | isReportViewRole)
                             {
-                                <DxMenuItem Text="Reports" IconCssClass="menu-icon bi bi-printer" NavigateUrl="ReportsIntroduction">
+                                <DxMenuItem Text="Reports" IconCssClass="menu-icon bi bi-printer" NavigateUrl=@(!isSmallScreen ? "ReportsIntroduction" : null)>
                                     <Items>
                                         <DxMenuItem Text="Listings">
                                             <Items>
@@ -182,7 +182,7 @@
                             }
 
                             <DxMenuItem Text="@((isVertical) ? "Settings" : "")" Tooltip="Theme and Settings"
-                                        IconCssClass="menu-icon bi bi-palette" NavigateUrl="ThemeIntroduction">
+                                        IconCssClass="menu-icon bi bi-palette" NavigateUrl=@(!isSmallScreen ? "ThemeIntroduction" : null)>
                                 <Items>
                                     <DxMenuItem Text="Theme & Settings" NavigateUrl="Settings" />
                                     <DxMenuItem Text="Reset Factory Defaults"
@@ -190,7 +190,7 @@
                                 </Items>
                             </DxMenuItem>
                             <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")" Tooltip="Manage Credentials and Logout"
-                                        IconCssClass="menu-icon bi bi-shield" NavigateUrl="SecurityIntroduction">
+                                        IconCssClass="menu-icon bi bi-shield" NavigateUrl=@(!isSmallScreen ? "SecurityIntroduction" : null)>
                                 <Items>
                                     @if (IsTopMenu)
                                     {
@@ -227,8 +227,7 @@
 </style>
 
 @code {
-    [Parameter]
-    public bool IsTopMenu { get; set; } = true;
+    [Parameter] public bool IsTopMenu { get; set; } = true;
 
     bool isVertical = false;
 
@@ -250,6 +249,7 @@
     string OrganisationName = string.Empty;
     AuthenticationState? authenticationState;
     DxMenuItem? homeButton;
+    bool isSmallScreen;
 
     protected override async Task OnInitializedAsync()
     {
@@ -273,7 +273,9 @@
         }
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
         navMan.LocationChanged += OnLocationChanged;
+        isSmallScreen = !ws.IsLargeScreen;   
     }
+
 
     protected override void OnParametersSet()
     {

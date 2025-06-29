@@ -11,11 +11,23 @@ using System.Threading.Tasks;
 
 namespace U3A.Model
 {
+    public enum ScreenSizes
+    {
+        XSmall,
+        Small,
+        Medium,
+        Large,
+        XLarge
+    }
     public class WorkStation
     {
         public bool UseTopMenu { get; set; }
         public string ID { get; private set; }
         public int SizeMode { get; set; }
+        public ScreenSizes ScreenSize { get; set; }
+        public bool IsSmallScreen => ScreenSize == ScreenSizes.XSmall || ScreenSize == ScreenSizes.Small;
+        public bool IsMediumScreen => ScreenSize == ScreenSizes.Medium;
+        public bool IsLargeScreen => ScreenSize == ScreenSizes.Large || ScreenSize == ScreenSizes.XLarge;
 
         public string Theme;
         public string SidebarImage;
@@ -26,7 +38,7 @@ namespace U3A.Model
         const string THEME = "theme";
         const string SIDEBAR_IMAGE = "sidebar-image";
 
-        public async Task GetWorkstationDetail(ILocalStorageService localStorage)
+        public async Task GetWorkstationDetail(ILocalStorageService localStorage,ScreenSizes actualScreenSize)
         {
             //workstation ID
             var id = await localStorage.GetItemAsync<string>(WORKSTATION_ID);
@@ -43,18 +55,21 @@ namespace U3A.Model
             {
                 UseTopMenu = await localStorage.GetItemAsync<bool>(USE_TOP_MENU_KEY);
             }
+            
             // size mode
             SizeMode = 0;
             if (await localStorage.ContainKeyAsync(SIZE_MODE))
             {
                 SizeMode = await localStorage.GetItemAsync<int>(SIZE_MODE);
             }
+            
             // theme
             Theme = "blazing-berry";
             if (await localStorage.ContainKeyAsync(THEME))
             {
                 Theme = await localStorage.GetItemAsync<string>(THEME);
             }
+            
             // sidebar image
             SidebarImage = "Random Image";
             if (await localStorage.ContainKeyAsync(SIDEBAR_IMAGE))
@@ -62,7 +77,10 @@ namespace U3A.Model
                 SidebarImage = await localStorage.GetItemAsync<string>(SIDEBAR_IMAGE);
             }
 
+            // Screen size
+            ScreenSize = actualScreenSize;
         }
+
         public async Task SetWorkstationDetail(ILocalStorageService localStorage)
         {
             // Use top menu

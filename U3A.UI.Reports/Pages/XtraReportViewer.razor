@@ -39,16 +39,16 @@
 else
 {
     <DxReportViewer @ref="@reportViewer"
-    Report="@Report"
-    SinglePagePreview="false"
-    Zoom="1"
-    CssClass="w-100"
-    OnCustomizeToolbar="OnCustomizeToolbar"
-    RootCssClasses="@RootCssClass" />
+                    Report="@Report"
+                    SinglePagePreview="false"
+                    Zoom="1"
+                    CssClass="w-100"
+                    OnCustomizeToolbar="OnCustomizeToolbar"
+                    RootCssClasses="@RootCssClass" />
 }
 <style>
     .view-normal {
-    height: @viewerHeight
+        height: @viewerHeight
     }
 
 </style>
@@ -160,24 +160,24 @@ else
     void OnCustomizeToolbar(ToolbarModel toolbarModel)
     {
         toolbarModel.AllItems.Add(new ToolbarItem()
+        {
+            IconCssClass = "fw-bol text-primary bi bi-door-open",
+            BeginGroup = true,
+            Text = "Close Report",
+            AdaptiveText = "Close Report",
+            AdaptivePriority = 1,
+            Click = async (args) =>
             {
-                IconCssClass = "fw-bol text-primary bi bi-door-open",
-                BeginGroup = true,
-                Text = "Close Report",
-                AdaptiveText = "Close Report",
-                AdaptivePriority = 1,
-                Click = async (args) =>
+                if (OnCloseButtonClick.HasDelegate)
                 {
-                    if (OnCloseButtonClick.HasDelegate)
-                    {
-                        await OnCloseButtonClick.InvokeAsync();
-                    }
-                    else
-                    {
-                        NavMan.NavigateTo("/");
-                    }
+                    await OnCloseButtonClick.InvokeAsync();
                 }
-            });
+                else
+                {
+                    NavMan.NavigateTo("/");
+                }
+            }
+        });
     }
 
     public void Dispose()

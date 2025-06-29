@@ -5,6 +5,27 @@ function IsApple() {
     return (/iP(hone|od|ad)/.test(navigator.platform));
 }
 
+function registerResizeCallback(dotnetHelper) {
+    let threshold = 50; // Minimum pixel change to trigger resize event 
+    let lastWidth = window.innerWidth;
+    let lastHeight = window.innerHeight;
+    function reportSize() {
+        const newWidth = window.innerWidth;
+        const newHeight = window.innerHeight;
+
+        const widthDiff = Math.abs(newWidth - lastWidth);
+        const heightDiff = Math.abs(newHeight - lastHeight);
+
+        if (widthDiff >= threshold || heightDiff >= threshold) {
+            lastWidth = newWidth;
+            lastHeight = newHeight;
+            dotnetHelper.invokeMethodAsync('OnResize', newWidth, newHeight);
+        }
+    }
+    window.addEventListener('resize', reportSize);
+    window.addEventListener('load', reportSize);
+};
+
 window.getWindowDimensions = function () {
     return {
         width: window.innerWidth,

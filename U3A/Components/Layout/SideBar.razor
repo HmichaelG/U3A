@@ -3,7 +3,7 @@
 
 <DxGridLayout>
     <Rows>
-        <DxGridLayoutRow Areas="blank" Height="2.5rem"></DxGridLayoutRow>
+        <DxGridLayoutRow Areas="blank" Height="2.6rem"></DxGridLayoutRow>
         <DxGridLayoutRow Areas="header" Height="auto"></DxGridLayoutRow>
         <DxGridLayoutRow Areas="navigation"></DxGridLayoutRow>
     </Rows>
@@ -28,6 +28,9 @@
 </DxGridLayout>
 
 @code {
+
+    [Parameter] public EventCallback MenuItemClick { get; set; }
+
     string OrganisationName = string.Empty;
 
     protected override void OnInitialized()
