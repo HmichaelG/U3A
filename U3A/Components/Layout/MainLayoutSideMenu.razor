@@ -58,8 +58,8 @@ else
                     @{
                         if (isSmallScreen)
                         {
-                            <DxGridLayoutColumn Width="@((isDrawerOpen) ? "1%" : "7%")" />
-                            <DxGridLayoutColumn Width="@((isDrawerOpen) ? "99%" : "93%")" />
+                            <DxGridLayoutColumn Width= "1%" />
+                            <DxGridLayoutColumn Width="99%" />
                             <DxGridLayoutColumn Width="0%" />
                         }
                         else
@@ -140,8 +140,7 @@ else
             var authEmail = authenticationState.User.Identity!.Name;
             if (authEmail == constants.superAdmin) hasRole = true;
         }
-        isSmallScreen = !ws.IsLargeScreen;
-        isDrawerOpen = (isSmallScreen) ? false : true;
+        setupMenu();
         NavigationManager.LocationChanged += OnLocationChanged;
         isReady = true;
     }
@@ -155,7 +154,10 @@ else
         {
             messageText = await File.ReadAllTextAsync(file);
         }
-        OnLocationChanged(null, null);
+        if (firstRender)
+        {
+            setupMenu();
+        }
     }
 
     private void ResetError()
@@ -164,15 +166,20 @@ else
         NavigationManager.NavigateTo("/", true);
     }
 
-    async void OnLocationChanged(object? sender, LocationChangedEventArgs? args)
+    void OnLocationChanged(object? sender, LocationChangedEventArgs? args)
     {
         if (args != null)
         {
-            isSmallScreen = !ws.IsLargeScreen;
-            isDrawerOpen = (isSmallScreen) ? false : true;
-            drawerMode = (isSmallScreen) ? DrawerMode.Overlap : DrawerMode.Shrink;
-            StateHasChanged();
+            setupMenu();
         }
+    }
+
+    private void setupMenu()
+    {
+        isSmallScreen = !ws.IsLargeScreen;
+        isDrawerOpen = (isSmallScreen) ? false : true;
+        drawerMode = (isSmallScreen) ? DrawerMode.Overlap : DrawerMode.Shrink;
+        StateHasChanged();
     }
 
     public void Dispose()
