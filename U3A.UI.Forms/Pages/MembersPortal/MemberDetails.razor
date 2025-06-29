@@ -27,7 +27,7 @@ else
                   Context="editContext">
             <DataAnnotationsValidator />
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
-                @if (loginState.SelectedPerson == null)
+                @if (loginState?.SelectedPerson == null)
                 {
                     <span class="text-center alert alert-success text-dark w-100 mt-2">
                         <div>
