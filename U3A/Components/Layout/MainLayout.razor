@@ -21,19 +21,6 @@
     <div class="container-fluid">
         <DxFormLayout SizeMode="@sizeMode">
 
-
-            <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-                                @bind-IsActive="@isXSmall" />
-            <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
-                                @bind-IsActive="@isSmall" />
-            <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
-                                @bind-IsActive="@isMedium" />
-            <DxLayoutBreakpoint DeviceSize="DeviceSize.Large"
-                                @bind-IsActive="@isLarge" />
-            <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge"
-                                @bind-IsActive="@isXLarge" />
-
-
             <CascadingValue Value=@openCircuits Name="OpenCircuits">
                 <CascadingValue Value="@loginState">
                     <CascadingValue Value="@hasRole" Name="HasRole">
@@ -86,13 +73,7 @@
     U3ADbContext? dbc { get; set; }
     string? currentUrl;
     bool isInteractive = false;
-    bool isXSmall = false;
-    bool isSmall = false;
-    bool isMedium = false;
-    bool isLarge = false;
-    bool isXLarge = false;
     SizeMode sizeMode;
-    ScreenSizes? screenSize;
 
     protected override async Task OnInitializedAsync()
     {
@@ -154,39 +135,44 @@
         ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count();
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
+        navMan.LocationChanged += async (sender, args) =>
+        {
+            if (args != null)
+            {
+                int width = await Window.GetWidth(js);
+                ws.SetScreenSize(width);
+                await InvokeAsync(StateHasChanged);
+            }
+        };
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         isInteractive = RendererInfo.IsInteractive;
-        await GetWorkstationDetails();
+        if (firstRender)
+        {
+            await GetWorkstationDetails();
+        }
     }
 
     private async Task GetWorkstationDetails()
     {
-        if (isXSmall) screenSize = ScreenSizes.XSmall;
-        if (isSmall) screenSize = ScreenSizes.Small;
-        if (isMedium) screenSize = ScreenSizes.Medium;
-        if (isLarge) screenSize = ScreenSizes.Large;
-        if (isXLarge) screenSize = ScreenSizes.XLarge;
-        if (screenSize != null)
+        int width = await Window.GetWidth(js);
+        await ws.GetWorkstationDetail(localStorage, width);
+        useTopMenu = ws.UseTopMenu;
+        switch (ws.SizeMode)
         {
-            await ws.GetWorkstationDetail(localStorage, screenSize.Value);
-            useTopMenu = ws.UseTopMenu;
-            switch (ws.SizeMode)
-            {
-                case 1:
-                    sizeMode = SizeMode.Medium;
-                    break;
-                case 2:
-                    sizeMode = SizeMode.Large;
-                    break;
-                default:
-                    sizeMode = SizeMode.Small;
-                    break;
-            }
-            await InvokeAsync(StateHasChanged);
+            case 1:
+                sizeMode = SizeMode.Medium;
+                break;
+            case 2:
+                sizeMode = SizeMode.Large;
+                break;
+            default:
+                sizeMode = SizeMode.Small;
+                break;
         }
+        await InvokeAsync(StateHasChanged);
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)
