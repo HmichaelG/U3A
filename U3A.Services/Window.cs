@@ -29,6 +29,10 @@ namespace U3A.Services
             var dimension = await GetWindowSize(js);
             return $"{dimension.Width - Offset}px";
         }
+        public static async Task<int> GetWidth(IJSRuntime js)
+        {
+            return (await GetWindowSize(js)).Width;
+        }
         public static async Task<string> GetWidth(IJSRuntime js, double OffsetPercent)
         {
             var dimension = await GetWindowSize(js);
