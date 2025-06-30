@@ -12,6 +12,7 @@
 @inject TenantInfoService TenantService
 @inject WorkStation ws
 @inject IConfiguration config
+@inject IJSRuntime js
 
 @implements IDisposable
 
@@ -38,19 +39,30 @@
 }
 else
 {
-    <DxReportViewer @ref="@reportViewer"
-                    Report="@Report"
-                    SinglePagePreview="false"
-                    Zoom="1"
-                    CssClass="w-100"
-                    OnCustomizeToolbar="OnCustomizeToolbar"
-                    RootCssClasses="@RootCssClass" />
+    <div class="@containerClass">
+        <DxReportViewer @ref="@reportViewer"
+                        Report="@Report"
+                        SinglePagePreview="false"
+                        Zoom="1"
+                        CssClass="w-100"
+                        OnCustomizeToolbar="OnCustomizeToolbar"
+                        RootCssClasses="@RootCssClass" />
+    </div>
 }
 <style>
     .view-normal {
         height: @viewerHeight
     }
-
+    .view-smallScreen{
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--bs-body-bg);
+        position: fixed;
+        z-index: 2000;
+        opacity: 1;
+        height: @viewerHeight
+    }
 </style>
 
 @code {
@@ -74,6 +86,7 @@ else
     string? tenantId;
     bool isReady;
     string googleFontsAPIKey;
+    string containerClass = "view-normal";
 
     protected override async Task OnInitializedAsync()
     {
@@ -152,9 +165,10 @@ else
             EditingFieldModelFactory.RegisterMaskEditor("Day", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|([1-2][0-9])|(3[0-1])" });
             EditingFieldModelFactory.RegisterMaskEditor("Month", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|(1[0-2])" });
             EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
+            containerClass = (ws.IsLargeScreen) ? "view-normal" : "view-smallScreen";
+            StateHasChanged();
         }
         if (reportViewer != null) { reportViewer.LoadingPanelVisible = true; }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     void OnCustomizeToolbar(ToolbarModel toolbarModel)

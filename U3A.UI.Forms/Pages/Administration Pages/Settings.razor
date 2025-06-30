@@ -36,6 +36,12 @@ else
                                       ValueFieldName="@nameof(MenuType.Key)"
                                       @bind-Value="@ws!.UseTopMenu" />
                     </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Menu Behavior" ColSpanMd="12">
+                        <DxRadioGroup Items="@menuBehaviors"
+                                      TextFieldName="@nameof(MenuBehavior.Title)"
+                                      ValueFieldName="@nameof(MenuBehavior.Key)"
+                                      @bind-Value="@ws!.MenuBehaviour" />
+                    </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Theme" ColSpanMd="12">
                     <DxRadioGroup Items="@themes"
                                     TextFieldName="@nameof(Theme.Title)"
@@ -82,6 +88,11 @@ else
         public int Key;
         public string Title;
     }
+    public struct MenuBehavior
+    {
+        public string Key;
+        public string Title;
+    }
     IEnumerable<MenuType> menuTypes = new[] { new MenuType() { Key = false, Title = "Use Sidebar" }, new MenuType() { Key = true, Title = "Use Top Menu" } };
     IEnumerable<Theme> themes = new[]
         {
@@ -99,6 +110,14 @@ else
             new FontSize() { Key = 2, Title = "Large" },
         };
     string selectedTheme;
+    IEnumerable<MenuBehavior> menuBehaviors = new[]
+        {
+            new MenuBehavior() { Key = "Auto", Title = "Use System Size" },
+            new MenuBehavior() { Key = "Small", Title = "Phones & smaller screens" },
+            new MenuBehavior() { Key = "Medium", Title = "Laptops & smaller monitors" },
+            new MenuBehavior() { Key = "Large", Title = "Desktops & larger monitors" },
+        };
+    string selectedBehavior;
 
     IEnumerable<SidebarImage> sidebarImageMenu = new SidebarImageMenuOptions();
 

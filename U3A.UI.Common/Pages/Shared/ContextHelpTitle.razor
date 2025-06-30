@@ -9,6 +9,7 @@
 @inject NavigationManager navMan
 @inject IConfiguration config
 @inject ILocalStorageService localStorage
+@inject WorkStation ws
 
 @if (isReady)
 {
@@ -35,18 +36,16 @@
                     </div>
                 }
             }
-    <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
-              RenderStyleMode="ButtonRenderStyleMode.Outline"
-              RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly)
-                                                          ? ButtonRenderStyle.Primary
-                                                          : ButtonRenderStyle.None)"
-          CssClass="@ButtonCssClass"
-          Click="ShowTopicAsync" Id="helpButton" />
+            <DxButton IconCssClass="@ButtonIconCssClass" Text="@Title"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline"
+                      RenderStyle="@((ActivationStyle == HelpActivationStyle.ButtonOnly) ? ButtonRenderStyle.Primary : ButtonRenderStyle.None)"
+                      CssClass="@ButtonCssClass"
+                      Click="ShowTopicAsync" Id="helpButton" />
             break;
         case HelpActivationStyle.StandardButtonAndTitle:
         case HelpActivationStyle.ButtonAndTitleNoMessages:
             <PageTitle>@($"{tenantId}: {Title}")</PageTitle>
-            <div class="d-flex">
+            <div class="w-100 d-flex flex-row title-style">
                 <h1 class="@TitleCssClass title-color h3">
                     <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -114,6 +113,10 @@
     .title-color {
         color: var(--dxbl-client-component-palette-primary);
     }
+
+    .title-style {
+        justify-content: @justifyContent;
+    }
 </style>
 
 
@@ -159,6 +162,7 @@
     string versionDetails = "version-details";
     string? savedVersion;
     bool isFlyoutOpen;
+    string justifyContent = "start";
 
     const string IN_MAINTENANCE = "Warning: You are in Member Portal Maintenance Mode";
 
@@ -212,6 +216,8 @@
             savedVersion = await localStorage.GetItemAsync<string>(versionDetails);
             isFlyoutOpen = (IsVersionButton && (string.IsNullOrEmpty(savedVersion) || savedVersion != Title));
             await ShowNewSoftwareUpdateFlyout.InvokeAsync(isFlyoutOpen);
+            justifyContent = (ws.IsLargeScreen) ? "start" : "center";
+            StateHasChanged();
         }
     }
 

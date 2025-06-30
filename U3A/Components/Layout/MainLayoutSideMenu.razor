@@ -7,7 +7,7 @@
 
 @implements IDisposable;
 
-@inject NavigationManager NavigationManager
+@inject NavigationManager navMan
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
@@ -22,14 +22,14 @@
           tooltip="Click to show/hide menu"
           CssClass="sidebar-toggle-button menu-icon"
           IconCssClass="bi bi-list"
-          RenderStyle="ButtonRenderStyle.Secondary" />
+          RenderStyle="ButtonRenderStyle.None" />
 
 <style>
     .sidebar-toggle-button {
         z-index: 1040;
         left: 0;
         top: 0;
-        margin: 0.1rem;
+        margin: 0.2rem;
         position: absolute;
     }
 </style>
@@ -45,7 +45,7 @@ else
               Mode=@drawerMode
               CloseOnTargetContentClick="true"
               Position="DrawerPosition.Left"
-              PanelWidth="15rem">
+              PanelWidth="17.5rem">
         <BodyTemplate>
             <SideBar />
         </BodyTemplate>
@@ -141,7 +141,13 @@ else
             if (authEmail == constants.superAdmin) hasRole = true;
         }
         setupMenu();
-        NavigationManager.LocationChanged += OnLocationChanged;
+        navMan.LocationChanged += (sender, args) =>
+        {
+            if (args != null)
+            {
+                setupMenu();
+            }
+        };
         isReady = true;
     }
 
@@ -163,15 +169,7 @@ else
     private void ResetError()
     {
         errorBoundary?.Recover();
-        NavigationManager.NavigateTo("/", true);
-    }
-
-    void OnLocationChanged(object? sender, LocationChangedEventArgs? args)
-    {
-        if (args != null)
-        {
-            setupMenu();
-        }
+        navMan.NavigateTo("/", true);
     }
 
     private void setupMenu()
@@ -184,7 +182,6 @@ else
 
     public void Dispose()
     {
-        NavigationManager.LocationChanged -= OnLocationChanged;
         dbc?.Dispose();
     }
 

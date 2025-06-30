@@ -26,18 +26,20 @@ namespace U3A.Model
         public string ID { get; private set; }
         public int SizeMode { get; set; }
         public ScreenSizes ScreenSize { get; set; }
-        public bool IsSmallScreen => ScreenSize == ScreenSizes.XSmall || ScreenSize == ScreenSizes.Small;
-        public bool IsMediumScreen => ScreenSize == ScreenSizes.Medium || ScreenSize == ScreenSizes.Large;
-        public bool IsLargeScreen => ScreenSize == ScreenSizes.XLarge;
+        public bool IsSmallScreen => MenuBehaviour == "Small" || (MenuBehaviour == "Auto" && (ScreenSize == ScreenSizes.XSmall || ScreenSize == ScreenSizes.Small));
+        public bool IsMediumScreen => MenuBehaviour == "Medium" || (MenuBehaviour == "Auto" && (ScreenSize == ScreenSizes.Medium || ScreenSize == ScreenSizes.Large));
+        public bool IsLargeScreen => MenuBehaviour == "Large" || (MenuBehaviour == "Auto" &&  ScreenSize == ScreenSizes.XLarge);
 
         public string Theme;
         public string SidebarImage;
+        public string MenuBehaviour;
 
         const string WORKSTATION_ID = "WorkstationID";
         const string USE_TOP_MENU_KEY = "use-topmenu";
         const string SIZE_MODE = "size-mode";
         const string THEME = "theme";
         const string SIDEBAR_IMAGE = "sidebar-image";
+        const string MENU_BEHAVIOUR = "menu-behaviour";
 
         public async Task GetWorkstationDetail(ILocalStorageService localStorage, int screenWidth)
         {
@@ -70,12 +72,19 @@ namespace U3A.Model
             {
                 Theme = await localStorage.GetItemAsync<string>(THEME);
             }
-            
+
             // sidebar image
             SidebarImage = "Random Image";
             if (await localStorage.ContainKeyAsync(SIDEBAR_IMAGE))
             {
                 SidebarImage = await localStorage.GetItemAsync<string>(SIDEBAR_IMAGE);
+            }
+
+            // menu behaviour
+            MenuBehaviour = "Auto";
+            if (await localStorage.ContainKeyAsync(MENU_BEHAVIOUR))
+            {
+                MenuBehaviour = await localStorage.GetItemAsync<string>(MENU_BEHAVIOUR);
             }
 
             // screen size
@@ -108,18 +117,16 @@ namespace U3A.Model
 
         public async Task SetWorkstationDetail(ILocalStorageService localStorage)
         {
+            // Menu behaviour
+            await localStorage.SetItemAsync<String>(MENU_BEHAVIOUR, MenuBehaviour);
             // Use top menu
-            localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu)
-                    .SafeFireAndForget(onException: ex => Log.Error("Error setting WORKSTATION_ID", ex));
+            await localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu);
             // size mode
-            localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode)
-                    .SafeFireAndForget(onException: ex => Log.Error("Error setting SIZE_MODE", ex));
+            await localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode);
             // theme
-            localStorage.SetItemAsync<String>(THEME, Theme)
-                    .SafeFireAndForget(onException: ex => Log.Error("Error setting THEME", ex));
+            await localStorage.SetItemAsync<String>(THEME, Theme);
             // sidebar image
-            localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage)
-                    .SafeFireAndForget(onException: ex => Log.Error("Error setting SIDEBAR_IMAGE", ex));
+            await localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage);
         }
     }
 }
