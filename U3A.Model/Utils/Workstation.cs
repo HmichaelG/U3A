@@ -24,7 +24,7 @@ namespace U3A.Model
     public class WorkStation
     {
         // size Changed event
-        public event Action<object, EventArgs> ScreenSizeChanged;
+        public event EventHandler ScreenSizeChanged;
 
         public bool UseTopMenu { get; set; }
         public string ID { get; private set; }
@@ -93,12 +93,15 @@ namespace U3A.Model
 
         }
 
-        public void SetScreenSize(ScreenSizes size)
+        public async Task SetScreenSizeAsync(ScreenSizes size)
         {
+            ScreenSizes currentSize = ScreenSize;
             if (ScreenSize != size)
             {
                 ScreenSize = size;
-                ScreenSizeChanged?.Invoke(this, new());
+                ScreenSizeChanged?.Invoke(this, EventArgs.Empty);
+                Log.Information($"W/S Screen size changed from {currentSize} to: {size}");
+                currentSize = size;
             }
         }
 
