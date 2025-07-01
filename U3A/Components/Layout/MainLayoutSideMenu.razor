@@ -17,11 +17,11 @@
 
 @rendermode InteractiveServer
 
-<DxButton Visible="true"
+<DxButton Visible="true" Text="@((!isDrawerOpen) ? "Menu" : "")"
           Click="@(() => isDrawerOpen = !isDrawerOpen)"
           tooltip="Click to show/hide menu"
-          CssClass="sidebar-toggle-button menu-icon"
-          IconCssClass="bi bi-list"
+          CssClass="sidebar-toggle-button"
+          IconCssClass="bi bi-list menu-icon"
           RenderStyle="ButtonRenderStyle.None" />
 
 <style>
@@ -58,7 +58,7 @@ else
                     @{
                         if (isSmallScreen)
                         {
-                            <DxGridLayoutColumn Width= "1%" />
+                            <DxGridLayoutColumn Width="1%" />
                             <DxGridLayoutColumn Width="99%" />
                             <DxGridLayoutColumn Width="0%" />
                         }
@@ -141,12 +141,10 @@ else
             if (authEmail == constants.superAdmin) hasRole = true;
         }
         setupMenu();
-        navMan.LocationChanged += (sender, args) =>
+        navMan.LocationChanged += (s, e) =>
         {
-            if (args != null)
-            {
-                setupMenu();
-            }
+            isDrawerOpen = (isSmallScreen) ? false : isDrawerOpen;
+            StateHasChanged();
         };
         isReady = true;
     }
@@ -154,16 +152,15 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        setupMenu();
+        if (firstRender) isDrawerOpen = (isSmallScreen) ? false : true;
         var file = $"{System.IO.Directory.GetCurrentDirectory()}{@"\wwwroot\message.html"}";
         messageText = string.Empty;
         if (File.Exists(file))
         {
             messageText = await File.ReadAllTextAsync(file);
         }
-        if (firstRender)
-        {
-            setupMenu();
-        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private void ResetError()
@@ -172,12 +169,13 @@ else
         navMan.NavigateTo("/", true);
     }
 
+    bool? saveSize;
     private void setupMenu()
     {
         isSmallScreen = !ws.IsLargeScreen;
-        isDrawerOpen = (isSmallScreen) ? false : true;
         drawerMode = (isSmallScreen) ? DrawerMode.Overlap : DrawerMode.Shrink;
         StateHasChanged();
+        saveSize = isSmallScreen;
     }
 
     public void Dispose()

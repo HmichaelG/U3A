@@ -20,8 +20,8 @@
 @{
     <MessageBox @ref=@messageBox />
     <div class="@((IsTopMenu)
-                         ? "card shadow-sm w-100"
-                         : "sidebar")">
+                                           ? "card shadow-sm w-100"
+                                           : "sidebar")">
     <div class="d-print-none">
         <DxMenu CssClass="menu-item menu"
                 DropDownActionMode="MenuDropDownActionMode.Click"
@@ -39,7 +39,7 @@
                         if (isAuthenticated)
                         {
 
-                            <DxMenuItem @ref="homeButton" id="home-button" Text="@((isVertical) ? "Home" : "")" 
+                            <DxMenuItem @ref="homeButton" id="home-button" Text="@((isVertical) ? "Home" : "")"
                                         Tooltip="Home" IconCssClass="menu-icon bi bi-house" NavigateUrl="./" />
 
                             if (isSystemAdminRole || isSecurityAdminRole)
@@ -231,8 +231,6 @@
 
     bool isVertical = false;
 
-    private string? currentUrl;
-
     U3ADbContext? dbc { get; set; }
     MessageBox? messageBox;
 
@@ -271,22 +269,25 @@
                             user.IsInRole("Accounting");
             isOfficeRole = user.IsInRole("Office");
         }
-        currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
-        navMan.LocationChanged += OnLocationChanged;
-        isSmallScreen = !ws.IsLargeScreen;   
+        isSmallScreen = !ws.IsLargeScreen;
+        navMan.LocationChanged += (s, e) =>
+        {
+            isSmallScreen = !ws.IsLargeScreen;
+            StateHasChanged();
+        };
     }
 
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        isSmallScreen = !ws.IsLargeScreen;
+        base.OnAfterRender(firstRender);
+    }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         isVertical = !IsTopMenu;
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        currentUrl = navMan.ToBaseRelativePath(e.Location);
-        StateHasChanged();
     }
 
     private void OnLogout()
@@ -329,7 +330,6 @@
 
     public void Dispose()
     {
-        navMan.LocationChanged -= OnLocationChanged;
         dbc?.Dispose();
     }
 }

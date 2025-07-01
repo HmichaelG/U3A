@@ -79,31 +79,33 @@ else
         else
         {
             <PageTitle>@($"{tenantId}: Site Administration")</PageTitle>
-            <div class="@($"w-100 d-flex flex-row-reverse d-print-none mt-{ws.SizeMode + 2}")" >
-                @if (ws.IsSmallScreen)
-                {<div class="mt-2" /> }
+            <div class="@($"w-100 d-flex flex-row-reverse d-print-none mt-{ws.SizeMode + 2}")">
+                @if (isSmallScreen)
+                {
+                    <div class="mt-2" />
+                }
                 else
                 {
                     <ContextHelpTitle Title=""
-                    HelpTopic="Introduction.html"
-                    IncludeTableOfContents=true
-                    ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
+                                      HelpTopic="Introduction.html"
+                                      IncludeTableOfContents=true
+                                      ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
                     <DxButton Text="Support"
-                    RenderStyleMode="ButtonRenderStyleMode.Outline"
-                    NavigateUrl="Public/Support"
-                    CssClass="ms-1"
-                    IconCssClass="h5 text-primary bi bi-person-raised-hand" />
+                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                              NavigateUrl="Public/Support"
+                              CssClass="ms-1"
+                              IconCssClass="h5 text-primary bi bi-person-raised-hand" />
                     <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
-                    IsVersionButton=true
-                    ShowNewSoftwareUpdateFlyout=@((value) => {isFlyoutOpen = value;})
-                    ButtonIconCssClass="h5 text-primary bi bi-check2-circle"
-                    HelpTopic=@($"{versionYear}-Version-History.html")
-                    ActivationStyle="@HelpActivationStyle.ButtonOnly"
-                    Closed="() => isFlyoutOpen=false" />
+                                      IsVersionButton=true
+                                      ShowNewSoftwareUpdateFlyout=@((value) => {isFlyoutOpen = value;})
+                                      ButtonIconCssClass="h5 text-primary bi bi-check2-circle"
+                                      HelpTopic=@($"{versionYear}-Version-History.html")
+                                      ActivationStyle="@HelpActivationStyle.ButtonOnly"
+                                      Closed="() => isFlyoutOpen=false" />
                     <span class="d-flex flex-row align-items-center">
                         <img class="h5 text-primary bi bi-people" />
-                    <div class="text-start mx-1" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
-                </span>
+                        <div class="text-start mx-1" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
+                    </span>
                 }
             </div>
             <DxTabs CssClass="w-100">
@@ -174,7 +176,7 @@ else
     bool showPopup;
     string tenantId;
     bool isFlyoutOpen;
-    bool isSmallScreen; 
+    bool isSmallScreen = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -183,17 +185,16 @@ else
         tenantId = textInfo.ToTitleCase(dbc.TenantInfo.Identifier!);
         now = dbc.GetLocalTime();
         homePage = dbc.TenantInfo.Website;
-        await base.OnInitializedAsync();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        await base.OnParametersSetAsync();
         await ParseQueryString();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        isSmallScreen = (ws.ScreenSize == ScreenSizes.XSmall);
         if (qrMessage != null)
         {
             await messageBox!.ShowOkOnlyAsync("Not Available", qrMessage);
@@ -204,11 +205,7 @@ else
             GetCircuitData();
             StateHasChanged();
         }
-        if (firstRender)
-        {
-            isSmallScreen = ws.IsSmallScreen;
-            StateHasChanged();
-        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task ParseQueryString()

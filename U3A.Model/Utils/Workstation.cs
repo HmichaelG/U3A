@@ -18,7 +18,8 @@ namespace U3A.Model
         Small,
         Medium,
         Large,
-        XLarge
+        XLarge,
+        Unknown
     }
     public class WorkStation
     {
@@ -39,9 +40,9 @@ namespace U3A.Model
         const string SIZE_MODE = "size-mode";
         const string THEME = "theme";
         const string SIDEBAR_IMAGE = "sidebar-image";
-        const string MENU_BEHAVIOUR = "menu-behaviour";
+        const string MENU_BEHAVIOR = "menu-behavior";
 
-        public async Task GetWorkstationDetail(ILocalStorageService localStorage, int screenWidth)
+        public async Task GetWorkstationDetail(ILocalStorageService localStorage)
         {
             //workstation ID
             var id = await localStorage.GetItemAsync<string>(WORKSTATION_ID);
@@ -80,45 +81,24 @@ namespace U3A.Model
                 SidebarImage = await localStorage.GetItemAsync<string>(SIDEBAR_IMAGE);
             }
 
-            // menu behaviour
+            // menu behavior
             MenuBehaviour = "Auto";
-            if (await localStorage.ContainKeyAsync(MENU_BEHAVIOUR))
+            if (await localStorage.ContainKeyAsync(MENU_BEHAVIOR))
             {
-                MenuBehaviour = await localStorage.GetItemAsync<string>(MENU_BEHAVIOUR);
+                MenuBehaviour = await localStorage.GetItemAsync<string>(MENU_BEHAVIOR);
             }
 
-            // screen size
-            SetScreenSize(screenWidth);
         }
 
-        public void SetScreenSize(int screenWidth)
+        public void SetScreenSize(ScreenSizes size)
         {
-            if (screenWidth <= 576)
-            {
-                ScreenSize = ScreenSizes.XSmall;
-            }
-            else if (screenWidth <= 767)
-            {
-                ScreenSize = ScreenSizes.Small;
-            }
-            else if (screenWidth <= 992)
-            {
-                ScreenSize = ScreenSizes.Medium;
-            }
-            else if (screenWidth <= 1199)
-            {
-                ScreenSize = ScreenSizes.Large;
-            }
-            else
-            {
-                ScreenSize = ScreenSizes.XLarge;
-            }
+                ScreenSize = size;
         }
 
         public async Task SetWorkstationDetail(ILocalStorageService localStorage)
         {
             // Menu behaviour
-            await localStorage.SetItemAsync<String>(MENU_BEHAVIOUR, MenuBehaviour);
+            await localStorage.SetItemAsync<String>(MENU_BEHAVIOR, MenuBehaviour);
             // Use top menu
             await localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu);
             // size mode

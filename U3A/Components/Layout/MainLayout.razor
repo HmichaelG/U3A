@@ -18,6 +18,12 @@
 
 @if (isInteractive)
 {
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" IsActive="isXSmall" IsActiveChanged="OnXSmallChanged" />
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.Small" IsActive="isSmall" IsActiveChanged="OnSmallChanged" />
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.Medium" IsActive="isMedium" IsActiveChanged="OnMediumChanged" />
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.Large" IsActive="isLarge" IsActiveChanged="OnLargeChanged" />
+    <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge" IsActive="isXLarge" IsActiveChanged="OnXLargeChanged" />
+
     <div class="container-fluid">
         <DxFormLayout SizeMode="@sizeMode">
 
@@ -65,10 +71,16 @@
 
 @code {
 
-    private int openCircuits { get; set; }
-    private bool hasRole { get; set; }
-    private bool? useTopMenu = null; // default is sidebar
-    private LoginState? loginState { get; set; }
+    int openCircuits { get; set; }
+    bool hasRole { get; set; }
+    bool? useTopMenu = null; // default is sidebar
+    LoginState? loginState { get; set; }
+
+    bool isXSmall;
+    bool isSmall;
+    bool isMedium;
+    bool isLarge;
+    bool isXLarge;
 
     U3ADbContext? dbc { get; set; }
     string? currentUrl;
@@ -135,15 +147,6 @@
         ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count();
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
-        navMan.LocationChanged += async (sender, args) =>
-        {
-            if (args != null)
-            {
-                int width = await Window.GetWidth(js);
-                ws.SetScreenSize(width);
-                await InvokeAsync(StateHasChanged);
-            }
-        };
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -152,13 +155,25 @@
         if (firstRender)
         {
             await GetWorkstationDetails();
+            StateHasChanged();
         }
+    }
+
+
+    void OnXSmallChanged(bool isActive) => processSizeChange(ScreenSizes.XSmall);
+    void OnSmallChanged(bool isActive) => processSizeChange(ScreenSizes.Small);
+    void OnMediumChanged(bool isActive) => processSizeChange(ScreenSizes.Medium);
+    void OnLargeChanged(bool isActive) => processSizeChange(ScreenSizes.Large);
+    void OnXLargeChanged(bool isActive) => processSizeChange(ScreenSizes.XLarge);
+    
+    void processSizeChange(ScreenSizes size) {
+        ws.SetScreenSize(size);
+        StateHasChanged();
     }
 
     private async Task GetWorkstationDetails()
     {
-        int width = await Window.GetWidth(js);
-        await ws.GetWorkstationDetail(localStorage, width);
+        await ws.GetWorkstationDetail(localStorage);
         useTopMenu = ws.UseTopMenu;
         switch (ws.SizeMode)
         {
