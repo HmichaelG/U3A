@@ -206,6 +206,7 @@
             }
         }
         isReady = true;
+        ws.ScreenSizeChanged += (s, e) => justifyTitle();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -216,10 +217,16 @@
             savedVersion = await localStorage.GetItemAsync<string>(versionDetails);
             isFlyoutOpen = (IsVersionButton && (string.IsNullOrEmpty(savedVersion) || savedVersion != Title));
             await ShowNewSoftwareUpdateFlyout.InvokeAsync(isFlyoutOpen);
-            justifyContent = (ws.IsLargeScreen) ? "start" : "center";
-            StateHasChanged();
+            justifyTitle();
         }
     }
+
+    void justifyTitle()
+    {
+        justifyContent = (ws.IsLargeScreen) ? "start" : "center"; 
+        StateHasChanged();
+    }
+    
 
     async Task Check2FA()
     {
