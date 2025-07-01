@@ -94,15 +94,9 @@ h1:focus {
 
 .menu-icon {
     color: var(--bs-primary);
-    font-size: calc(1rem + 1vw);
+    font-size: calc(0.75rem + 0.5vw);
     font-weight: 500;
-    line-height: 1.2;
-}
-
-@media (min-width: 1200px) {
-    .menu-icon {
-        font-size: 1.2rem;
-    }
+    line-height: 2;
 }
 
 .flex-grow-1 {
@@ -179,4 +173,10 @@ h1:focus {
         opacity: 1;
         transform: scale(1.2);
     }
+}
+
+.exit-icon {
+    background-image: url('../images/exit.svg');
+    background-size: cover;
+    font-weight: bold;
 }
