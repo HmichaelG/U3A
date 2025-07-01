@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using U3A.Data
+@using Serilog
 
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
@@ -86,6 +87,9 @@
     string? currentUrl;
     bool isInteractive = false;
     SizeMode sizeMode;
+    private DotNetObjectReference<MainLayout>? objRef;
+    string Orientation { get; set; } = "unknown";
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -155,20 +159,30 @@
         if (firstRender)
         {
             await GetWorkstationDetails();
-            StateHasChanged();
+            objRef = DotNetObjectReference.Create(this);
+            await js.InvokeVoidAsync("registerOrientationChange", objRef);
         }
     }
 
+    [JSInvokable]
+    public void OnOrientationChanged(string orientation)
+    {
+        navMan.NavigateTo(navMan.Uri, forceLoad: true);
+    }
 
-    void OnXSmallChanged(bool isActive) => processSizeChange(ScreenSizes.XSmall);
-    void OnSmallChanged(bool isActive) => processSizeChange(ScreenSizes.Small);
-    void OnMediumChanged(bool isActive) => processSizeChange(ScreenSizes.Medium);
-    void OnLargeChanged(bool isActive) => processSizeChange(ScreenSizes.Large);
-    void OnXLargeChanged(bool isActive) => processSizeChange(ScreenSizes.XLarge);
-    
-    void processSizeChange(ScreenSizes size) {
-        ws.SetScreenSize(size);
-        StateHasChanged();
+    async Task OnXSmallChanged(bool isActive) => await processSizeChange(ScreenSizes.XSmall);
+    async Task OnSmallChanged(bool isActive) => await processSizeChange(ScreenSizes.Small);
+    async Task OnMediumChanged(bool isActive) => await processSizeChange(ScreenSizes.Medium);
+    async Task OnLargeChanged(bool isActive) => await processSizeChange(ScreenSizes.Large);
+    async Task OnXLargeChanged(bool isActive) => await processSizeChange(ScreenSizes.XLarge);
+
+    int seq = 0;
+    async Task processSizeChange(ScreenSizes size)
+    {
+            await ws.SetScreenSizeAsync(size);
+            StateHasChanged();
+            seq++;
+            Log.Information($"{seq}: Screen size changed to: {size}", size);
     }
 
     private async Task GetWorkstationDetails()
@@ -198,6 +212,7 @@
 
     public void Dispose()
     {
+        objRef?.Dispose();
         (circuitHandler as CircuitHandlerService)!.CircuitsChanged -= HandleCircuitsChanged!;
         dbc?.Dispose();
     }
