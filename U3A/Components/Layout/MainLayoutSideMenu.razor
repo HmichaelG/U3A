@@ -141,6 +141,11 @@ else
             if (authEmail == constants.superAdmin) hasRole = true;
         }
         setupMenu();
+        ws.ScreenSizeChanged += (s, e) =>
+        {
+            setupMenu();
+            StateHasChanged();
+        };
         navMan.LocationChanged += (s, e) =>
         {
             isDrawerOpen = (isSmallScreen) ? false : isDrawerOpen;
@@ -152,9 +157,8 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        setupMenu();
-        if (firstRender) isDrawerOpen = (isSmallScreen) ? false : true;
-        var file = $"{System.IO.Directory.GetCurrentDirectory()}{@"\wwwroot\message.html"}";
+        var wwwroot = @"\wwwroot\message.html";
+        var file = $"{System.IO.Directory.GetCurrentDirectory()}{wwwroot}";
         messageText = string.Empty;
         if (File.Exists(file))
         {
@@ -169,13 +173,12 @@ else
         navMan.NavigateTo("/", true);
     }
 
-    bool? saveSize;
     private void setupMenu()
     {
         isSmallScreen = !ws.IsLargeScreen;
+        isDrawerOpen = (isSmallScreen) ? false : true;
         drawerMode = (isSmallScreen) ? DrawerMode.Overlap : DrawerMode.Shrink;
         StateHasChanged();
-        saveSize = isSmallScreen;
     }
 
     public void Dispose()

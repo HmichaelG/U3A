@@ -270,18 +270,11 @@
             isOfficeRole = user.IsInRole("Office");
         }
         isSmallScreen = !ws.IsLargeScreen;
-        navMan.LocationChanged += (s, e) =>
+        ws.ScreenSizeChanged += (s, e) =>
         {
             isSmallScreen = !ws.IsLargeScreen;
             StateHasChanged();
         };
-    }
-
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        isSmallScreen = !ws.IsLargeScreen;
-        base.OnAfterRender(firstRender);
     }
 
     protected override void OnParametersSet()

@@ -82,7 +82,7 @@ else
             <div class="@($"w-100 d-flex flex-row-reverse d-print-none mt-{ws.SizeMode + 2}")">
                 @if (isSmallScreen)
                 {
-                    <div class="mt-2" />
+                    <div class="mt-3" />
                 }
                 else
                 {
@@ -184,6 +184,12 @@ else
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
         tenantId = textInfo.ToTitleCase(dbc.TenantInfo.Identifier!);
         now = dbc.GetLocalTime();
+        isSmallScreen = (ws.ScreenSize == ScreenSizes.XSmall);
+        ws.ScreenSizeChanged += (s, e) =>
+            {
+                isSmallScreen = (ws.ScreenSize == ScreenSizes.XSmall);
+                StateHasChanged();
+            };
         homePage = dbc.TenantInfo.Website;
     }
 
@@ -205,7 +211,6 @@ else
             GetCircuitData();
             StateHasChanged();
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task ParseQueryString()

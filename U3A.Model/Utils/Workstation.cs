@@ -23,17 +23,20 @@ namespace U3A.Model
     }
     public class WorkStation
     {
+        // size Changed event
+        public event Action<object, EventArgs> ScreenSizeChanged;
+
         public bool UseTopMenu { get; set; }
         public string ID { get; private set; }
         public int SizeMode { get; set; }
         public ScreenSizes ScreenSize { get; set; }
-        public bool IsSmallScreen => MenuBehaviour == "Small" || (MenuBehaviour == "Auto" && (ScreenSize == ScreenSizes.XSmall || ScreenSize == ScreenSizes.Small));
-        public bool IsMediumScreen => MenuBehaviour == "Medium" || (MenuBehaviour == "Auto" && (ScreenSize == ScreenSizes.Medium || ScreenSize == ScreenSizes.Large));
-        public bool IsLargeScreen => MenuBehaviour == "Large" || (MenuBehaviour == "Auto" &&  ScreenSize == ScreenSizes.XLarge);
+        public bool IsSmallScreen => MenuBehavior == "Small" || (MenuBehavior == "Auto" && (ScreenSize == ScreenSizes.XSmall || ScreenSize == ScreenSizes.Small));
+        public bool IsMediumScreen => MenuBehavior == "Medium" || (MenuBehavior == "Auto" && (ScreenSize == ScreenSizes.Medium || ScreenSize == ScreenSizes.Large));
+        public bool IsLargeScreen => MenuBehavior == "Large" || (MenuBehavior == "Auto" && ScreenSize == ScreenSizes.XLarge);
 
         public string Theme;
         public string SidebarImage;
-        public string MenuBehaviour;
+        public string MenuBehavior;
 
         const string WORKSTATION_ID = "WorkstationID";
         const string USE_TOP_MENU_KEY = "use-topmenu";
@@ -59,14 +62,14 @@ namespace U3A.Model
             {
                 UseTopMenu = await localStorage.GetItemAsync<bool>(USE_TOP_MENU_KEY);
             }
-            
+
             // size mode
             SizeMode = 0;
             if (await localStorage.ContainKeyAsync(SIZE_MODE))
             {
                 SizeMode = await localStorage.GetItemAsync<int>(SIZE_MODE);
             }
-            
+
             // theme
             Theme = "blazing-berry";
             if (await localStorage.ContainKeyAsync(THEME))
@@ -82,23 +85,27 @@ namespace U3A.Model
             }
 
             // menu behavior
-            MenuBehaviour = "Auto";
+            MenuBehavior = "Auto";
             if (await localStorage.ContainKeyAsync(MENU_BEHAVIOR))
             {
-                MenuBehaviour = await localStorage.GetItemAsync<string>(MENU_BEHAVIOR);
+                MenuBehavior = await localStorage.GetItemAsync<string>(MENU_BEHAVIOR);
             }
 
         }
 
         public void SetScreenSize(ScreenSizes size)
         {
+            if (ScreenSize != size)
+            {
                 ScreenSize = size;
+                ScreenSizeChanged?.Invoke(this, new());
+            }
         }
 
         public async Task SetWorkstationDetail(ILocalStorageService localStorage)
         {
-            // Menu behaviour
-            await localStorage.SetItemAsync<String>(MENU_BEHAVIOR, MenuBehaviour);
+            // Menu behavior
+            await localStorage.SetItemAsync<String>(MENU_BEHAVIOR, MenuBehavior);
             // Use top menu
             await localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu);
             // size mode
