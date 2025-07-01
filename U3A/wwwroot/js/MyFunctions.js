@@ -1,10 +1,11 @@
 ﻿
 // Full screen / normal screen functions
 
-window.addEventListener("orientationchange", () => {
-    location.reload();
-});
-
+function registerOrientationChange(dotNetHelper) {
+    window.addEventListener("orientationchange", () => {
+        dotNetHelper.invokeMethodAsync("OnOrientationChanged", screen.orientation.type);
+    });
+}
 function IsApple() {
     return (/iP(hone|od|ad)/.test(navigator.platform));
 }
