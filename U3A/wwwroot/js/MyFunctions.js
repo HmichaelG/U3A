@@ -1,6 +1,10 @@
 ﻿
 // Full screen / normal screen functions
 
+window.addEventListener("orientationchange", () => {
+    location.reload();
+});
+
 function IsApple() {
     return (/iP(hone|od|ad)/.test(navigator.platform));
 }
