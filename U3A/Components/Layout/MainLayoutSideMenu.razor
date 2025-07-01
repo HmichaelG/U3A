@@ -121,7 +121,9 @@ else
     DrawerMode drawerMode;
     bool isSmallScreen;
     bool isReady;
-
+    private DotNetObjectReference<MainLayoutSideMenu>? objRef;
+    public string Orientation { get; set; } = "unknown";
+    bool screenSizeChanged;
 
     protected override async Task OnInitializedAsync()
     {
@@ -143,11 +145,13 @@ else
         setupMenu();
         ws.ScreenSizeChanged += (s, e) =>
         {
+            screenSizeChanged = true;
             setupMenu();
-            StateHasChanged();
+            screenSizeChanged = false;
         };
         navMan.LocationChanged += (s, e) =>
         {
+            setupMenu();
             isDrawerOpen = (isSmallScreen) ? false : isDrawerOpen;
             StateHasChanged();
         };
@@ -173,12 +177,20 @@ else
         navMan.NavigateTo("/", true);
     }
 
+    bool? currentDrawerState;
+    DrawerMode? currentDrawerMode;
     private void setupMenu()
     {
+        bool hasChanges = false;
         isSmallScreen = !ws.IsLargeScreen;
-        isDrawerOpen = (isSmallScreen) ? false : true;
+        isDrawerOpen = (isSmallScreen) ? screenSizeChanged : true;
         drawerMode = (isSmallScreen) ? DrawerMode.Overlap : DrawerMode.Shrink;
-        StateHasChanged();
+        if (currentDrawerMode == null || currentDrawerState == null) hasChanges = true;
+        if (currentDrawerMode != null && currentDrawerMode.Value != drawerMode) hasChanges = true;
+        if (currentDrawerState != null && currentDrawerState.Value != isDrawerOpen) hasChanges = true;
+        if (hasChanges) StateHasChanged();
+        currentDrawerMode = drawerMode;
+        currentDrawerState = isDrawerOpen;
     }
 
     public void Dispose()
