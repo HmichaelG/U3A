@@ -1,6 +1,14 @@
 ﻿
-<div class="w-100 ms-4"><DxWaitIndicator Visible=true /><em>Loading...</em></div>
+<div class="indicator-style"><DxWaitIndicator Visible=true /><em>Loading...</em></div>
 
-@code {
-
-}
+<style>
+    .indicator-style {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        margin-top: 0.5rem;
+        margin-left: 3.5rem;
+        gap: 0.5rem;
+    }
+</style>
