@@ -88,12 +88,16 @@ namespace U3A.BusinessRules
                         .Where(x => !x.IsDeleted && x.Year == Year)
                         .OrderBy(x => x.Name)
                         .ToListAsync();
+            List<Class> activeClasses = new();
+            activeClasses = Courses.SelectMany(x => x.Classes)
+                                        .Where(x => !x.IsDeleted)
+                                        .ToList();
+            // replace Courses with Courses.Classes with activeClasses
             foreach (var course in Courses)
             {
-                if (course.Classes.Count > 1)
-                {
-                    course.Classes = course.Classes.OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime).ToList();
-                }
+                course.Classes = activeClasses.Where(x => x.CourseID == course.ID)
+                                    .OrderBy(x => x.StartDate).ThenBy(x => x.OnDayID).ThenBy(x => x.StartTime)
+                                    .ToList();
             }
             return Courses;
         }

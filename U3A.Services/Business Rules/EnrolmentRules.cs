@@ -38,7 +38,7 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
                                     .Where(x => !x.IsDeleted && !x.Person.IsDeleted
-                                                    && x.ClassID == SelectedClass.ID
+                                                    && x.ClassID == SelectedClass.ID && !SelectedClass.IsDeleted
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null).ToListAsync();
             }
@@ -74,7 +74,7 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Person)
                                     .Where(x => !x.Person.IsDeleted
                                                     && !x.IsWaitlisted
-                                                    && x.ClassID == SelectedClass.ID
+                                                    && x.ClassID == SelectedClass.ID && !SelectedClass.IsDeleted
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null).ToListAsync();
             }
@@ -283,7 +283,7 @@ namespace U3A.BusinessRules
                                     .Include(x => x.Course)
                                     .Include(x => x.Person)
                                     .Where(x => !x.IsDeleted && !x.Person.IsDeleted
-                                                    && x.ClassID == SelectedClass.ID
+                                                    && x.ClassID == SelectedClass.ID && !SelectedClass.IsDeleted
                                                     && x.TermID == SelectedTerm.ID
                                                     && x.Person.DateCeased == null)
                                     .OrderBy(x => x.IsWaitlisted)
