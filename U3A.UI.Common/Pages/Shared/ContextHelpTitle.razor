@@ -45,8 +45,8 @@
         case HelpActivationStyle.StandardButtonAndTitle:
         case HelpActivationStyle.ButtonAndTitleNoMessages:
             <PageTitle>@($"{tenantId}: {Title}")</PageTitle>
-            <div class="w-100 d-flex flex-row title-style">
-                <h1 class="@TitleCssClass title-color h3">
+            <div class="w-100 flex-row title-style">
+                <h1 class="@TitleCssClass h3">
                     <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
                               RenderStyle="ButtonRenderStyle.None"
@@ -110,12 +110,10 @@
         font-weight: 900;
     }
 
-    .title-color {
-        color: var(--dxbl-client-component-palette-primary);
-    }
-
     .title-style {
+        color: var(--dxbl-client-component-palette-primary);
         justify-content: @justifyContent;
+        display: @titleDisplay;
     }
 </style>
 
@@ -133,7 +131,7 @@
     [Parameter]
     public HelpActivationStyle ActivationStyle { get; set; }
     [Parameter]
-    public string ButtonCssClass { get; set; } = "ms-4 ms-xl-1";
+    public string ButtonCssClass { get; set; } = "";
     [Parameter]
     public string TitleCssClass { get; set; } = "flex-grow-0";
     [Parameter]
@@ -163,6 +161,7 @@
     string? savedVersion;
     bool isFlyoutOpen;
     string justifyContent = "initial";
+    string titleDisplay = "none";
 
     const string IN_MAINTENANCE = "Warning: You are in Member Portal Maintenance Mode";
 
@@ -223,6 +222,7 @@
 
     void justifyTitle()
     {
+        titleDisplay = "flex";
         justifyContent = (ws.IsLargeScreen) ? "start" : "center"; 
         StateHasChanged();
     }
