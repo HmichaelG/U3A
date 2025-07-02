@@ -142,7 +142,7 @@ else
             var authEmail = authenticationState.User.Identity!.Name;
             if (authEmail == constants.superAdmin) hasRole = true;
         }
-        setupMenu();
+        setupMenuOnLocationChange();
         ws.ScreenSizeChanged += (s, e) =>
         {
             screenSizeChanged = true;
@@ -151,9 +151,7 @@ else
         };
         navMan.LocationChanged += (s, e) =>
         {
-            setupMenu();
-            isDrawerOpen = (isSmallScreen) ? false : isDrawerOpen;
-            StateHasChanged();
+            setupMenuOnLocationChange();
         };
         isReady = true;
     }
@@ -191,6 +189,12 @@ else
         if (hasChanges) StateHasChanged();
         currentDrawerMode = drawerMode;
         currentDrawerState = isDrawerOpen;
+    }
+    private void setupMenuOnLocationChange()
+    {
+        setupMenu();
+        isDrawerOpen = (isSmallScreen) ? false : isDrawerOpen;
+        StateHasChanged();
     }
 
     public void Dispose()
