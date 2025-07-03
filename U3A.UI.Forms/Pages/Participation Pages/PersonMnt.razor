@@ -29,14 +29,8 @@
     else
     {
             <div hidden="@(IsEmbedded || IsSelectionList)">
-                <div class="row">
-                    <ContextHelpTitle Title="Participants" HelpTopic="Add_Edit-Participants.html" />
-                </div>
-                <div class="row">
-                    <div class="d-none col-lg-11 d-lg-inline">
-                        Participants are any persons participating in your U3A. This may include students, staff, volunteers, course leaders etc.
-                    </div>
-                </div>
+                    <ContextHelpTitle Title="Participants" HelpTopic="Add_Edit-Participants.html"
+                        Subtitle="Participants are people participating in your U3A. This may include students, staff, volunteers, course leaders etc."/>
             </div>
 
                 <MessageBox @ref="@messageBox" />

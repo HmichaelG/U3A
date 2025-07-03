@@ -13,14 +13,8 @@
 else
 {
 
-    <div class="row align-content-start">
-        <ContextHelpTitle Title="Volunteer Activities" HelpTopic="add_edit-volunteers.html" />
-    </div>
-    <div class="row">
-        <div class="col-12 d-none d-md-inline">
-            Select the required voluntary activity from the toolbar. Enter/Edit the participants who have offered to perform that activity.
-        </div>
-    </div>
+    <ContextHelpTitle Title="Volunteer Activities" HelpTopic="add_edit-volunteers.html"
+                      Subtitle="Select the required voluntary activity from the toolbar. Enter/Edit the participants who have offered to perform that activity." />
 
     <Progress @ref="@ProgressBar" />
     <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
@@ -53,12 +47,12 @@ else
                                            Alignment="ToolbarItemAlignment.Right">
                                 <Template Context="templateContext">
                                     <DxFormLayout>
-                                    <DxFormLayoutItem Caption="Activity" Context="layoutContext" ColSpanMd="12">
-                                        <DxComboBox Data="@Activities" NullText="Select Voluntary Activity"
-                                                    SearchMode="ListSearchMode.AutoSearch"
-                                                    Value="@selectedActivity"
-                                                    ValueChanged="@((string activity) => SelectedActivityChanged(activity))" />
-                                    </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Activity" Context="layoutContext" ColSpanMd="12">
+                                            <DxComboBox Data="@Activities" NullText="Select Voluntary Activity"
+                                                        SearchMode="ListSearchMode.AutoSearch"
+                                                        Value="@selectedActivity"
+                                                        ValueChanged="@((string activity) => SelectedActivityChanged(activity))" />
+                                        </DxFormLayoutItem>
                                     </DxFormLayout>
                                 </Template>
                             </DxToolbarItem>
@@ -90,8 +84,8 @@ else
                     }
                     <DxFormLayout>
                         <DxFormLayoutItem Caption="Volunteer" ColSpanMd="12">
-                                    <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person"
-                                             @bind-SelectedPerson:after="async() => OnPersonChangedAsync(editItem)"/>
+                            <PersonsComboBox People="@Persons" @bind-SelectedPerson="@editItem.Person"
+                                             @bind-SelectedPerson:after="async () => OnPersonChangedAsync(editItem)" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
                             <DxTextBox @bind-Text="@editItem.Comment" />

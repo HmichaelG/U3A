@@ -4,6 +4,8 @@
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
 @inject NavigationManager NavigationManager
+@inject WorkStation ws
+
 @implements IDisposable
 
 
@@ -16,47 +18,45 @@
 else
 {
 
-    <div class="container-md py-2">
-        <CollapsableContent DismissKey="{63BDF361-E40E-4B15-9A12-736AAF535B74}"
-                        AlertText=@($@"<p><strong>Bring Forward Enrolments</strong> is now an automated procedure.<br />
-                             {automationMsg}.</p>")
-                          OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
-        <div class="row">
-            <div class="col col-md-2" />
-            <div class="col col-md-8 border border-primary py-2">
-                <ContextHelpTitle Title="Bring Forward Enrolments" 
-                    ActivationStyle="HelpActivationStyle.ButtonAndTitleNoMessages"
-                    HelpTopic="Bring-Forward-Enrolments.html" />
-                <p>
-                    This procedure will bring forward enrolments into a new term.
-                    It is intended to be used prior to the start of terms 2, 3 and 4 where participants continue with courses from the previous term.
-                </p>
-                <p>
-                    The procedure can be executed at any time and may be re-executed if required. It should however be executed twice at end of term...
-                    <ol>
-                        <li>Immediately prior to the new term's enrolment start date - leave <strong>Set New Term to Current Term?</strong> unchecked.</li>
-                        <li>Immediately prior to the new term's start date - ensure <strong>Set New Term to Current Term?</strong> is checked.</li>
-                    </ol>
-                    Note that <strong>Set New Term to Current Term?</strong> is automatically checked if the procedure
-                    is executed within one week of the of the new term's start date.
-                </p>
-                <p>Enrolments will be brought forward if...</p>
-                <ul>
-                    <li>
-                        the class Start Date and Occurence fields are blank and
-                        and new term is ticked on the class record.
-                    </li>
-                    <li>
-                        the class Start Date or Occurence fields are non-blank and
-                        the calculated class ending date is greater than the new term's start date.
-                        The term checkboxes on the class record are ignored.
-                    </li>
-                </ul>
-                <p>
-                    Courses are normally brought forward from
-                    the current term into the new term. If the course is not offered in the
-                    current term then the most recent term will be brought forward, if available.
-                </p>
+    <div class="mt-4 d-flex flex-column box-position">
+        <div class="col col-md-8 border border-primary p-2">
+            <ContextHelpTitle Title="Bring Forward Enrolments"
+                              ActivationStyle="HelpActivationStyle.ButtonAndTitleNoMessages"
+                              HelpTopic="Bring-Forward-Enrolments.html" />
+            <CollapsableContent DismissKey="{63BDF361-E40E-4B15-9A12-736AAF535B74}"
+                                AlertText=@($@"<p><strong>Bring Forward Enrolments</strong> is now an automated procedure.<br />
+                                                        {automationMsg}.</p>")
+                            OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+        <p>
+                This procedure will bring forward enrolments into a new term.
+                It is intended to be used prior to the start of terms 2, 3 and 4 where participants continue with courses from the previous term.
+            </p>
+            <p>
+                The procedure can be executed at any time and may be re-executed if required. It should however be executed twice at end of term...
+                <ol>
+                    <li>Immediately prior to the new term's enrolment start date - leave <strong>Set New Term to Current Term?</strong> unchecked.</li>
+                    <li>Immediately prior to the new term's start date - ensure <strong>Set New Term to Current Term?</strong> is checked.</li>
+                </ol>
+                Note that <strong>Set New Term to Current Term?</strong> is automatically checked if the procedure
+                is executed within one week of the of the new term's start date.
+            </p>
+            <p>Enrolments will be brought forward if...</p>
+            <ul>
+                <li>
+                    the class Start Date and Occurrence fields are blank and
+                    and new term is ticked on the class record.
+                </li>
+                <li>
+                    the class Start Date or Occurrence fields are non-blank and
+                    the calculated class ending date is greater than the new term's start date.
+                    The term checkboxes on the class record are ignored.
+                </li>
+            </ul>
+            <p>
+                Courses are normally brought forward from
+                the current term into the new term. If the course is not offered in the
+                current term then the most recent term will be brought forward, if available.
+            </p>
 
                 <MessageBox @ref="@messageBox" />
 
@@ -77,8 +77,8 @@ else
                             <DxButton Visible=@(!IsProcessing) Text="Process" RenderStyle="@ButtonRenderStyle.Primary" Click="@Process" />
                             <DxButton Visible=@(!IsProcessing) Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
                             <DxButton Context="buttonContext" Visible=@(IsProcessing)
-                                  RenderStyle="ButtonRenderStyle.Success" CssClass="col col-12"
-                                  RenderStyleMode="ButtonRenderStyleMode.Contained">
+                                      RenderStyle="ButtonRenderStyle.Success" CssClass="col col-12"
+                                      RenderStyleMode="ButtonRenderStyleMode.Contained">
                                 <span class="spinner-border spinner-border-sm" role="status" />&nbsp;Processing
                             </DxButton>
                         </Template>
@@ -86,12 +86,14 @@ else
                 </DxFormLayout>
 
             </div>
-            <div class="col col-md-2" />
         </div>
-
-    </div>
-
 }
+<style>
+    .box-position {
+        align-items: @((ws.IsLargeScreen) ? "start" : "center");
+    }
+</style>
+
 @code {
     bool IsReady;
     bool IsProcessing;

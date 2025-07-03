@@ -23,43 +23,25 @@ else
 
     if (!IsPortal)
     {
-        <div class="row  align-content-start">
-            <ContextHelpTitle Title="Course Schedule" HelpTopic="course-schedule.html"></ContextHelpTitle>
-            <div class="col-4">Review your Course and Class schedule.</div>
-            <div class="col-7 mb-1">
-                <DxFormLayout>
-                    <DxFormLayoutItem Caption="Filter By Venue" ColSpanMd="12">
-                        <DxTagBox Data="@AvailableVenues"
-                                  ClearButtonDisplayMode="default"
-                                  TextFieldName="@nameof(Venue.Name)"
-                                  NullText="Optionally filter by one or more venue locations."
-                                  @bind-Values="@VenuesToFilter">
-                        </DxTagBox>
-                    </DxFormLayoutItem>
-                </DxFormLayout>
-            </div>
-            <div class="col-1" />
+        <ContextHelpTitle Title="Course Schedule" HelpTopic="course-schedule.html" />
+        <div class="d-flex flex-row-reverse w-100 px-4 px-auto mb-2">
+            <DxButton RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" Text="Process"
+                      RenderStyleMode="ButtonRenderStyleMode.Contained" Click="@ProcessButtonClicked">
+            </DxButton>
+            <DxFormLayoutItem Caption="Filter By Venue" Cssclass="flex-grow-1">
+                <DxTagBox Data="@AvailableVenues"
+                          ClearButtonDisplayMode="default"
+                          TextFieldName="@nameof(Venue.Name)"
+                          NullText="Optionally filter by one or more venue locations."
+                          @bind-Values="@VenuesToFilter">
+                </DxTagBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="4">
+                <TermsComboBox Terms="@terms"
+                               @bind-SelectedTerm="@selectedTerm"
+                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+            </DxFormLayoutItem>
         </div>
-        <div class="row">
-            <div class="col-4" />
-            <div class="col-7">
-                <DxFormLayout>
-                    <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
-                        <TermsComboBox Terms="@terms"
-                                       @bind-SelectedTerm="@selectedTerm"
-                                       @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
-                    </DxFormLayoutItem>
-                </DxFormLayout>
-            </div>
-            <div class="col-1">
-                <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                          RenderStyleMode="ButtonRenderStyleMode.Contained" Click="@ProcessButtonClicked">
-                    <span style="visibility: @SpinnerVisibility"
-                          class="spinner-border spinner-border-sm" role="status" />&nbsp;@ProcessButtonText
-                </DxButton>
-            </div>
-        </div>
-        <br />
     }
     <div class="schedule-height" id="mySchedule">
         <DxScheduler StartDate="@StartDate"
@@ -118,7 +100,7 @@ else
 <style>
     .schedule-height {
         overflow: auto;
-        height: calc(100dvh - @((IsPortal) ? "7rem" : (ws.UseTopMenu) ? "15rem" : "12rem"));
+        height: calc(100dvh - @((IsPortal) ? "7rem" : (ws.UseTopMenu) ? "10rem" : "7rem") );
     }
 
 </style>
@@ -199,7 +181,7 @@ else
             if (VenuesToFilter == null) { VenuesToFilter = new List<Venue>(); }
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter,IncludeOffScheduleActivities: !IsPortal);
+                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IncludeOffScheduleActivities: !IsPortal);
             }
         }
         if (!IsPortal)

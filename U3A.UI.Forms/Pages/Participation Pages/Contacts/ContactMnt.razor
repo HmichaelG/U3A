@@ -27,14 +27,8 @@
     else
     {
 
-        <div class="row">
-            <ContextHelpTitle Title="Contacts" HelpTopic="Add_Edit-Contacts.html" />
-        </div>
-        <div class="row">
-            <div class="d-none col-lg-11 d-lg-inline">
-                People associated with your U3A that are <b>not</b> Participants.
-            </div>
-        </div>
+        <ContextHelpTitle Title="Contacts" HelpTopic="Add_Edit-Contacts.html"
+                          Subtitle="People associated with your U3A that are <b>not</b> Participants." />
 
         <MessageBox @ref=@tagSelectionMessageBox>
             <TextTemplate>
@@ -101,47 +95,47 @@
                                     </ContactToolbar>
                                 </ToolbarTemplate>
                                 <Columns>
-                                        <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
-                                                               Width="2rem" />
-                                        <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
-                                                               Width="6rem" />
-                                        <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
-                                                          Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
-                                        <DxGridBandColumn Caption="Address" Visible="false">
-                                            <Columns>
-                                                <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
-                                                <DxGridDataColumn Caption="City" FieldName="City" Width="8rem" />
-                                                <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
-                                                <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" Visible="false" />
-                                            </Columns>
-                                        </DxGridBandColumn>
-                                        <DxGridBandColumn Caption="Contact Detail">
-                                            <Columns>
-                                                <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="12rem" />
-                                                <DxGridDataColumn Caption="Phone" FieldName="AdjustedHomePhone" Width="5rem" />
-                                                <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="5rem" />
-                                            </Columns>
-                                        </DxGridBandColumn>
-                                        <DxGridBandColumn Caption="Emergency Contact">
-                                            <Columns>
-                                                <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Width="12rem" />
-                                                <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Width="5rem" />
-                                            </Columns>
-                                        </DxGridBandColumn>
-                                        <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
-                                                          DisplayFormat="d/M/yy HH:mm" Visible="false" />
-                                        <DxGridDataColumn Caption="Tags" FieldName="UnboundTags" AllowGroup="false" MInWidth="400"
-                                                          UnboundType="GridUnboundColumnType.String">
-                                            <CellDisplayTemplate>
-                                                @{
-                                                    var contactTags = context.Value.ToString().Split(";\t");
-                                                }
+                                    <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                           Width="2rem" />
+                                    <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
+                                                           Width="6rem" />
+                                    <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
+                                                      Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
+                                    <DxGridBandColumn Caption="Address" Visible="false">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Street" FieldName="Address" Visible=true Width="12rem" />
+                                            <DxGridDataColumn Caption="City" FieldName="City" Width="8rem" />
+                                            <DxGridDataColumn Caption="State" FieldName="State" Visible=false />
+                                            <DxGridDataColumn Caption="P'code" FieldName="Postcode" DisplayFormat="{0:D}" Width="5rem" Visible="false" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Contact Detail">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Email" FieldName="Email" Visible=true Width="12rem" />
+                                            <DxGridDataColumn Caption="Phone" FieldName="AdjustedHomePhone" Width="5rem" />
+                                            <DxGridDataColumn Caption="Mobile" FieldName="AdjustedMobile" Visible=true Width="5rem" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridBandColumn Caption="Emergency Contact">
+                                        <Columns>
+                                            <DxGridDataColumn Caption="Contact" FieldName="ICEContact" Width="12rem" />
+                                            <DxGridDataColumn Caption="Phone" FieldName="ICEPhone" Width="5rem" />
+                                        </Columns>
+                                    </DxGridBandColumn>
+                                    <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
+                                                      DisplayFormat="d/M/yy HH:mm" Visible="false" />
+                                    <DxGridDataColumn Caption="Tags" FieldName="UnboundTags" AllowGroup="false" MInWidth="400"
+                                                      UnboundType="GridUnboundColumnType.String">
+                                        <CellDisplayTemplate>
+                                            @{
+                                                var contactTags = context.Value.ToString().Split(";\t");
+                                            }
                                             <DxTagBox Data="@contactTags"
-                                                          TData="string" TValue="string"
-                                                          Values="@contactTags"
-                                                          ReadOnly="true" />
-                                            </CellDisplayTemplate>
-                                        </DxGridDataColumn>
+                                                      TData="string" TValue="string"
+                                                      Values="@contactTags"
+                                                      ReadOnly="true" />
+                                        </CellDisplayTemplate>
+                                    </DxGridDataColumn>
                                 </Columns>
                                 <GroupSummary>
                                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
@@ -251,7 +245,7 @@
                             <ContactByTag />
                             break;
                         case 2:
-                            <TagMont TagListChanged="async() => await GetData()" />
+                            <TagMont TagListChanged="async () => await GetData()" />
                             break;
                     }
                 }

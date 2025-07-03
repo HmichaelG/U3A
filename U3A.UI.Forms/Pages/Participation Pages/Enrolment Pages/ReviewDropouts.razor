@@ -16,16 +16,9 @@ else
 {
 
     <DxFormLayout>
-        <div class="col col-12 p-2 m-auto">
-            <div class="row align-content-start">
-                <ContextHelpTitle Title="Review Class Dropouts" HelpTopic="Review-Class-Dropouts.html" />
-            </div>
-            <div class="row">
-                <div class="d-none col-lg-8 d-lg-inline pb-2">
-                    Review / Reinstate deleted class enrolments.
-                </div>
-            </div>
-
+        <div class="w-100 p-2 m-auto">
+                <ContextHelpTitle Title="Class Dropouts" HelpTopic="Review-Class-Dropouts.html"
+                                  Subtitle="Review / Reinstate deleted class enrolments." />
             <MessageBox @ref="@messageBox" />
             <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 

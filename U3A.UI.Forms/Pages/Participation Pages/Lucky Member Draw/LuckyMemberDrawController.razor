@@ -16,14 +16,12 @@
 else
 {
     <main role="main" class="w-100">
-        <div class="d-flex flex-row">
-            <ContextHelpTitle Title="Lucky Member Draw Controller" HelpTopic="Lucky-Member-Draw.html" />
-        </div>
+        <ContextHelpTitle Title="Lucky Member Draw Controller" HelpTopic="Lucky-Member-Draw.html" />
         <div class="d-flex flex-row gap-1">
             <div class="flex-grow-1">
-            <DxFormLayoutItem Caption="Draw Name">
-                <DxTextBox @bind-Text="@drawName" />
-            </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Draw Name" ColSpanMd="10" ColSpanXl="6">
+                    <DxTextBox @bind-Text="@drawName" />
+                </DxFormLayoutItem>
             </div>
             <div class="d-flex flex-grow-0 flex-row-reverse align-items-center gap-1 mt-2">
                 <DxButton Text="Scan QR Code" Click="@OnScanQRCode" />

@@ -89,12 +89,8 @@ else
             }
             else
             {
-                <div class="row align-content-start">
-                    <ContextHelpTitle Title="Class Attendance" HelpTopic="Class-Attendance.html" />
-                </div>
-                <div class="rwo w-100 ms-4">
-                    Mark the class attendance roll.
-                </div>
+                    <ContextHelpTitle Title="Class Attendance" HelpTopic="Class-Attendance.html"
+                        Subtitle="Mark the class attendance roll."/>
                 <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
                                    ExpandedChanged="@(async () => {areDetailsExpanded = !areDetailsExpanded;

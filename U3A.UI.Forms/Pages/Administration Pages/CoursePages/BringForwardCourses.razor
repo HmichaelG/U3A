@@ -15,15 +15,13 @@
 else
 {
 
-    <div class="row">
-        <div class="col col-lg-10">
-            <ContextHelpTitle Title="Bring Forward Courses" HelpTopic="Bring-Forward-Courses.html"></ContextHelpTitle>
-            <p>
-                Create Courses for the new year by copying selected course details from the current year.<br />
-                This procedure may be executed as often as required. Course details will only be copied if they do not already exist in the new year.
-            </p>
+    <div class="d-flex flex-row">
+        <div class="flex-grow-1">
+            <ContextHelpTitle Title="Bring Forward Courses" HelpTopic="Bring-Forward-Courses.html"
+                              Subtitle="<div>Create Courses for the new year by copying selected course details from the current year.</div>
+                                        <div>This procedure may be executed as often as required. Course details will only be copied if they do not already exist in the new year.</div>" />
         </div>
-        <div class="card col col-lg-2 text-center">
+        <div class="card col col-lg-2 flex-grow-0 text-center">
             <h3>@SetYear()</h3>
             <DxButton Text="Create Courses" RenderStyle="ButtonRenderStyle.Primary" Click="OnCreateClick" CssClass="mb-2" />
         </div>

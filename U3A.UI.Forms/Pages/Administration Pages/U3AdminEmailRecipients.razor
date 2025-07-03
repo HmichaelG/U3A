@@ -15,20 +15,13 @@ else
 {
 
     <div class="container h-100">
-        <div class="row  align-content-start">
             <ContextHelpTitle Title="U3Admin Email Recipients" 
                 HelpTopic="U3Admin Email Recipients.html" 
-                ActivationStyle="HelpActivationStyle.ButtonAndTitleNoMessages"/>
-        </div>
-        <div class="row">
-            <div class="d-none d-md-inline">
-                <p>A list of email recipients that receive the occasional email from U3Admin.org.au developers/managers.
-                    <br />Please enter one email address per line.
-                </p>
-                <p>Keep the number of recipients to a maximum of 5.<br/> 
-                    The email sent is intended for system administrators and not for general membership.</p>
-            </div>
-        </div>
+                ActivationStyle="HelpActivationStyle.ButtonAndTitleNoMessages"
+                              Subtitle="<div>A list of email recipients that receive the occasional email from U3Admin.org.au developers/managers.</dvi>
+                                        <div>Please enter one email address per line.</div>
+                                        <div>Keep the number of recipients to a maximum of 5.</div>
+                                        <div>The email sent is intended for system administrators and not for general membership.</div>"/>
 
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 

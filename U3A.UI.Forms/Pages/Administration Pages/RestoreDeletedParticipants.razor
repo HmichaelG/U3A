@@ -14,66 +14,59 @@
 else
 {
 
-    <div class="row">
-        <ContextHelpTitle Title="Restore Deleted Participants" HelpTopic="Restore-Deleted-Participants.html"></ContextHelpTitle>
-    </div>
-    <div class="row">
-        <div class="col-11 d-none d-md-inline">
-            Restore participants previously deleted.
-        </div>
+<ContextHelpTitle Title="Restore Deleted Participants" HelpTopic="Restore-Deleted-Participants.html"
+                  Subtitle="Restore participants previously deleted." />
 
-    </div>
-    <br />
 
-    <MessageBox @ref="@messageBox" />
+        <MessageBox @ref="@messageBox" />
 
-    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <FullScreen>
-        <ContentTemplate>
-            <DxGrid Data="@Participants" @ref=@mainGrid
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    ShowFilterRow="false"
-                    ShowAllRows="true"
-                    KeyFieldName="ID"
-                    ValidationEnabled="true"
-                    @bind-SelectedDataItems=@SelectedDataItems
-                    SelectionMode="GridSelectionMode.Multiple"
-                    UnboundColumnData="Grid_CustomUnboundColumnData">
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{38693BD5-D0CB-4C85-9B52-F4D12E3F93EC}">
-                        <CustomButtonContent>
-                            <DxToolbarItem IconCssClass="bi bi-recycle" Text="Restore Participants"
-                                           BeginGroup=true
-                                           Click=@OnRestore
-                                           Enabled="@(SelectedDataItems?.Count > 0)"
-                                           RenderStyle="ButtonRenderStyle.Primary"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           Alignment="ToolbarItemAlignment.Right"
-                                           Tooltip="Restore the selected Participants">
-                            </DxToolbarItem>
-                        </CustomButtonContent>
-                    </GridToolbar>
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridSelectionColumn Caption="Select" />
-                    <DxGridDataColumn Caption="Name" FieldName="FullNameAlpha" />
-                    <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToText" />
-                    <DxGridDataColumn FieldName="Email" />
-                    <DxGridDataColumn FieldName="Address" />
-                    <DxGridDataColumn FieldName="City" />
-                    <DxGridDataColumn FieldName="Postcode" DisplayFormat="f0" />
-                    <DxGridDataColumn FieldName="Mobile" />
-                    <DxGridDataColumn FieldName="HomePhone" />
-                    <DxGridDataColumn Caption="Deleted At"
-                                      UnboundType="GridUnboundColumnType.String" FieldName="DeletedAsAt" />
-                    <DxGridDataColumn Caption="Deleted By" FieldName="User" />
-                </Columns>
+        <FullScreen>
+            <ContentTemplate>
+                <DxGrid Data="@Participants" @ref=@mainGrid
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        ShowFilterRow="false"
+                        ShowAllRows="true"
+                        KeyFieldName="ID"
+                        ValidationEnabled="true"
+                        @bind-SelectedDataItems=@SelectedDataItems
+                        SelectionMode="GridSelectionMode.Multiple"
+                        UnboundColumnData="Grid_CustomUnboundColumnData">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="{38693BD5-D0CB-4C85-9B52-F4D12E3F93EC}">
+                            <CustomButtonContent>
+                                <DxToolbarItem IconCssClass="bi bi-recycle" Text="Restore Participants"
+                                               BeginGroup=true
+                                               Click=@OnRestore
+                                               Enabled="@(SelectedDataItems?.Count > 0)"
+                                               RenderStyle="ButtonRenderStyle.Primary"
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               Alignment="ToolbarItemAlignment.Right"
+                                               Tooltip="Restore the selected Participants">
+                                </DxToolbarItem>
+                            </CustomButtonContent>
+                        </GridToolbar>
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridSelectionColumn Caption="Select" />
+                        <DxGridDataColumn Caption="Name" FieldName="FullNameAlpha" />
+                        <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToText" />
+                        <DxGridDataColumn FieldName="Email" />
+                        <DxGridDataColumn FieldName="Address" />
+                        <DxGridDataColumn FieldName="City" />
+                        <DxGridDataColumn FieldName="Postcode" DisplayFormat="f0" />
+                        <DxGridDataColumn FieldName="Mobile" />
+                        <DxGridDataColumn FieldName="HomePhone" />
+                        <DxGridDataColumn Caption="Deleted At"
+                                          UnboundType="GridUnboundColumnType.String" FieldName="DeletedAsAt" />
+                        <DxGridDataColumn Caption="Deleted By" FieldName="User" />
+                    </Columns>
 
-            </DxGrid>
-        </ContentTemplate>
-    </FullScreen>
-}
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
+        }
 
 @code {
     bool IsReady;
@@ -100,7 +93,7 @@ else
     async Task GetDataAsync()
     {
         currentTerm = await BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
-        Participants = await BusinessRule.EditableDeletedPersonsAsync(dbc,currentTerm.Year);
+        Participants = await BusinessRule.EditableDeletedPersonsAsync(dbc, currentTerm.Year);
     }
 
     async Task OnRestore()
@@ -122,11 +115,11 @@ else
             foreach (var e in PersonToRestore.Enrolments.OrderByDescending(e => e.DeletedAt))
             {
                 var restoreItem = dbc.Enrolment.IgnoreQueryFilters()
-                                            .OrderByDescending(x => x.CreatedOn)
-                                            .FirstOrDefault(x => x.TermID == e.TermID
-                                            && x.CourseID == e.CourseID
-                                            && (x.ClassID == null || x.ClassID == e.ClassID)
-                                            && x.PersonID == e.PersonID);
+                .OrderByDescending(x => x.CreatedOn)
+                .FirstOrDefault(x => x.TermID == e.TermID
+                && x.CourseID == e.CourseID
+                && (x.ClassID == null || x.ClassID == e.ClassID)
+                && x.PersonID == e.PersonID);
                 if (restoreItem != null && restoreItem.IsDeleted)
                 {
                     (restoreItem as ISoftDelete).Undo();

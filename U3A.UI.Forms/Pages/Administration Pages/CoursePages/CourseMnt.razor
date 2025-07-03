@@ -26,11 +26,9 @@ else
 
     <div class="row">
         <div class="col col-lg-10">
-            <ContextHelpTitle Title="Courses" HelpTopic="Add_Edit-Courses.html" />
-            <p>
-                Courses are studies and/or activities undertaken by participants.
-                <strong>Note:</strong> A course must have at least one class to enable enrolments.
-            </p>
+            <ContextHelpTitle Title="Courses" HelpTopic="Add_Edit-Courses.html"
+                              Subtitle="<div>Courses are studies and/or activities undertaken by participants.</div>
+                                        <div><b>Note:</b> A course must have at least one class to enable enrolments.</div>"/>
         </div>
         <div class="col col-lg-2">
             <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" />

@@ -4,6 +4,8 @@
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService tenantService
 @inject NavigationManager NavigationManager
+@inject WorkStation ws
+
 @implements IDisposable
 
 
@@ -16,11 +18,9 @@
 else
 {
 
-    <div class="container-md py-md-5">
-        <div class="row">
-            <div class="col col-md-2" />
-            <div class="col col-md-8 border border-primary py-2">
-                <ContextHelpTitle Title="Auto-Enrol Participants"
+    <div class="mt-4 d-flex flex-column box-position">
+        <div class="col col-md-8 border border-primary p-2">
+            <ContextHelpTitle Title="Auto-Enrol Participants"
                                   ActivationStyle="HelpActivationStyle.ButtonAndTitleNoMessages"
                                   HelpTopic="Auto-Enrol-Participants.html" />
                 <CollapsableContent DismissKey="{B89FB2B1-3559-4A94-A6B2-9E19CDA285F7}"
@@ -89,12 +89,14 @@ else
                 </DxFormLayout>
 
             </div>
-            <div class="col col-md-2" />
         </div>
-
-    </div>
-
 }
+<style>
+    .box-position {
+        align-items: @((ws.IsLargeScreen) ? "start" : "center");
+    }
+</style>
+
 @code {
     bool IsReady;
     bool IsProcessing;

@@ -3,6 +3,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager NavigationManager
 @inject IJSRuntime js
+@inject WorkStation ws
 @implements IDisposable
 
 
@@ -13,10 +14,8 @@
 }
 else {
 
-    <div class="container-md py-md-5">
-        <div class="row">
-            <div class="col col-md-2" />
-            <div class="col col-md-8 border border-primary py-2">
+    <div class="mt-4 d-flex flex-column box-position">
+            <div class="col col-md-8 border border-primary p-2">
                 <ContextHelpTitle Title="Assign / Remove Complimentary Membership" HelpTopic="Complimentary-Membership.html" />
 
                 <ul>
@@ -107,12 +106,13 @@ else {
                 </DxFormLayout>
 
             </div>
-            <div class="col col-md-2" />
         </div>
-
-    </div>
-
 }
+<style>
+    .box-position {
+        align-items: @((ws.IsLargeScreen) ? "start" : "center");
+    }
+</style>
 @code {
     bool IsReady;
     bool IsProcessing;

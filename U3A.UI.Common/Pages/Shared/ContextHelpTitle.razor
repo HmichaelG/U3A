@@ -71,6 +71,7 @@
                     }
                 }
             </div>
+            <div class="subtitle-style">@(new MarkupString(Subtitle))</div>
             break;
     }
     <DxWindow @ref=@helpWindow Width="@windowWidth"
@@ -112,8 +113,16 @@
 
     .title-style {
         color: var(--dxbl-client-component-palette-primary);
-        justify-content: @justifyContent;
-        display: @titleDisplay;
+        text-align: @((ws.IsLargeScreen) ? "start" : "center"); 
+        justify-content: @((ws.IsLargeScreen) ? "start" : "center");
+    }
+
+    .subtitle-style {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        flex-direction: column;
+        text-align: @((ws.IsLargeScreen) ? "start" : "center");
+        justify-content: @((ws.IsLargeScreen) ? "start" : "center");
     }
 </style>
 
@@ -125,6 +134,8 @@
     [Parameter]
     [EditorRequired]
     public string? Title { get; set; }
+    [Parameter]
+    public string Subtitle { get; set; } = string.Empty;
     [Parameter]
     [EditorRequired]
     public string? HelpTopic { get; set; }
@@ -160,8 +171,6 @@
     string versionDetails = "version-details";
     string? savedVersion;
     bool isFlyoutOpen;
-    string justifyContent = "initial";
-    string titleDisplay = "none";
 
     const string IN_MAINTENANCE = "Warning: You are in Member Portal Maintenance Mode";
 
@@ -205,7 +214,6 @@
             }
         }
         isReady = true;
-        ws.ScreenSizeChanged += (s, e) => justifyTitle();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -216,17 +224,9 @@
             savedVersion = await localStorage.GetItemAsync<string>(versionDetails);
             isFlyoutOpen = (IsVersionButton && (string.IsNullOrEmpty(savedVersion) || savedVersion != Title));
             await ShowNewSoftwareUpdateFlyout.InvokeAsync(isFlyoutOpen);
-            justifyTitle();
         }
     }
 
-    void justifyTitle()
-    {
-        titleDisplay = "flex";
-        justifyContent = (ws.IsLargeScreen) ? "start" : "center"; 
-        StateHasChanged();
-    }
-    
 
     async Task Check2FA()
     {

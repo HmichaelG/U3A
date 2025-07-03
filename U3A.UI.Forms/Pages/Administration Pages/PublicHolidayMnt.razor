@@ -12,26 +12,16 @@
 }
 else {
 
-        <div class="row  align-content-start">
-        <ContextHelpTitle Title="Public Holidays" HelpTopic="add_edit-public-holidays.html"></ContextHelpTitle>
-        </div>
-        <div class="row d-print-none">
-            <div class="col-9  d-none d-md-inline">
-                <p>
-                    This Public Holiday list is retrieved from a database maintained by the 
-                    <a target="_blank" rel="noopener noreferrer" href="https://www.australia.gov.au/public-holidays">Australian Government</a>.
-                    You should rebuild it once per year and rarely need to edit it.
-                </p>
-            </div>
-            <div class="col-3 d-none d-md-inline-flex justify-content-end">
+        <ContextHelpTitle Title="Public Holidays" HelpTopic="add_edit-public-holidays.html"
+                Subtitle="<div>This Public Holiday list is retrieved from a database maintained by the Australian Government.</div>
+                    <div>You should rebuild it once per year and rarely need to edit it.</div>"/>
+            <div class="w-100 col-3 d-none d-md-inline-flex justify-content-end mb-1">
                 <DxButton RenderStyle="ButtonRenderStyle.Primary" style="height: 2rem"
                       RenderStyleMode="ButtonRenderStyleMode.Contained" Click="@ProcessButtonClicked">
                     <span style="visibility: @SpinnerVisibility"
                       class="spinner-border spinner-border-sm" role="status" />&nbsp;@ProcessButtonText
                 </DxButton>
             </div>
-        </div>
-        <br />
 
         <MessageBox @ref="@messageBox" />
 

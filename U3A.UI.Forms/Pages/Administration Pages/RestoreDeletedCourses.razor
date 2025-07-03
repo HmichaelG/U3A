@@ -14,63 +14,55 @@
 else
 {
 
-    <div class="row">
-        <ContextHelpTitle Title="Restore Deleted Courses" HelpTopic="Restore-Deleted-Courses.html"></ContextHelpTitle>
-    </div>
-    <div class="row">
-        <div class="col-11 d-none d-md-inline">
-            Restore courses previously deleted.
-        </div>
+    <ContextHelpTitle Title="Restore Deleted Courses" HelpTopic="Restore-Deleted-Courses.html"
+                      Subtitle="Restore courses previously deleted." />
 
-    </div>
-    <br />
+        <MessageBox @ref="@messageBox" />
 
-    <MessageBox @ref="@messageBox" />
+        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+        <FullScreen>
+            <ContentTemplate>
+                <DxGrid Data="@Courses" @ref=@mainGrid
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        ShowFilterRow="false"
+                        ShowAllRows="true"
+                        KeyFieldName="ID"
+                        ValidationEnabled="true"
+                        @bind-SelectedDataItems=@SelectedDataItems
+                        SelectionMode="GridSelectionMode.Multiple"
+                        UnboundColumnData="Grid_CustomUnboundColumnData">
+                    <ToolbarTemplate>
+                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="{7EBD5EA4-D3F1-414F-85C3-D9E9A3346B1B}">
+                            <CustomButtonContent>
+                                <DxToolbarItem IconCssClass="bi bi-recycle" Text="Restore Courses"
+                                               BeginGroup=true
+                                               Click=@OnRestore
+                                               Enabled="@(SelectedDataItems?.Count > 0)"
+                                               RenderStyle="ButtonRenderStyle.Primary"
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               Alignment="ToolbarItemAlignment.Right"
+                                               Tooltip="Restore the selected courses">
+                                </DxToolbarItem>
+                            </CustomButtonContent>
+                        </GridToolbar>
+                    </ToolbarTemplate>
+                    <Columns>
+                        <DxGridSelectionColumn Caption="Select" />
+                        <DxGridDataColumn Caption="Name" FieldName="Name" />
+                        <DxGridDataColumn Caption="Deleted At"
+                                          UnboundType="GridUnboundColumnType.String" FieldName="DeletedAsAt" />
+                        <DxGridDataColumn Caption="Deleted By" FieldName="User" />
+                        <DxGridDataColumn Caption="@($"Term {currentTerm?.TermNumber}: Enrolled")"
+                                          UnboundType="GridUnboundColumnType.Integer" FieldName="EnrolmentCount" />
+                        <DxGridDataColumn Caption="@($"Term {currentTerm?.TermNumber}: Waitlisted")"
+                                          UnboundType="GridUnboundColumnType.Integer" FieldName="WaitlistCount" />
+                    </Columns>
 
-    <FullScreen>
-        <ContentTemplate>
-            <DxGrid Data="@Courses" @ref=@mainGrid
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    ShowFilterRow="false"
-                    ShowAllRows="true"
-                    KeyFieldName="ID"
-                    ValidationEnabled="true"
-                    @bind-SelectedDataItems=@SelectedDataItems
-                    SelectionMode="GridSelectionMode.Multiple"
-                    UnboundColumnData="Grid_CustomUnboundColumnData">
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{7EBD5EA4-D3F1-414F-85C3-D9E9A3346B1B}">
-                        <CustomButtonContent>
-                            <DxToolbarItem IconCssClass="bi bi-recycle" Text="Restore Courses"
-                                           BeginGroup=true
-                                           Click=@OnRestore
-                                           Enabled="@(SelectedDataItems?.Count > 0)"
-                                           RenderStyle="ButtonRenderStyle.Primary"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           Alignment="ToolbarItemAlignment.Right"
-                                           Tooltip="Restore the selected courses">
-                            </DxToolbarItem>
-                        </CustomButtonContent>
-                    </GridToolbar>
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridSelectionColumn Caption="Select" />
-                    <DxGridDataColumn Caption="Name" FieldName="Name" />
-                    <DxGridDataColumn Caption="Deleted At"
-                                      UnboundType="GridUnboundColumnType.String" FieldName="DeletedAsAt"/>
-                    <DxGridDataColumn Caption="Deleted By" FieldName="User" />
-                    <DxGridDataColumn Caption="@($"Term {currentTerm?.TermNumber}: Enrolled")" 
-                                      UnboundType="GridUnboundColumnType.Integer" FieldName="EnrolmentCount" />
-                    <DxGridDataColumn Caption="@($"Term {currentTerm?.TermNumber}: Waitlisted")"
-                                      UnboundType="GridUnboundColumnType.Integer" FieldName="WaitlistCount" />
-                </Columns>
-
-            </DxGrid>
-        </ContentTemplate>
-    </FullScreen>
-}
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
+        }
 
 @code {
     bool IsReady;
@@ -96,7 +88,7 @@ else
 
     async Task GetDataAsync()
     {
-        currentTerm =await  BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
+        currentTerm = await BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
         Courses = await BusinessRule.EditableDeletedCoursesAsync(dbc, currentTerm.Year);
     }
 
@@ -115,7 +107,7 @@ else
                 (e as ISoftDelete).Undo();
             }
         }
-        var result= await dbc.SaveChangesAsync();
+        var result = await dbc.SaveChangesAsync();
         await messageBox.ShowOkOnlyAsync("Restore Courses", "The selected courses have been restored.");
         await GetDataAsync();
     }
