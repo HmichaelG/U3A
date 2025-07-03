@@ -79,22 +79,17 @@ else
         else
         {
             <PageTitle>@($"{tenantId}: Site Administration")</PageTitle>
-            <div class="@($"w-100 d-flex flex-row-reverse d-print-none mt-{ws.SizeMode + 2}")">
+            <div class="@($"w-100 d-flex flex-row justify-content-end d-print-none mt-{ws.SizeMode + 2}")">
                 @if (isSmallScreen)
                 {
                     <div class="mt-3" />
                 }
                 else
                 {
-                    <ContextHelpTitle Title=""
-                                      HelpTopic="Introduction.html"
-                                      IncludeTableOfContents=true
-                                      ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
-                    <DxButton Text="Support"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              NavigateUrl="Public/Support"
-                              CssClass="ms-1"
-                              IconCssClass="h5 text-primary bi bi-person-raised-hand" />
+                    <span class="d-flex flex-row align-items-center">
+                        <img class="h5 text-primary bi bi-people" />
+                        <div class="text-start mx-1" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
+                    </span>
                     <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                       IsVersionButton=true
                                       ShowNewSoftwareUpdateFlyout=@((value) => {isFlyoutOpen = value;})
@@ -102,10 +97,15 @@ else
                                       HelpTopic=@($"{versionYear}-Version-History.html")
                                       ActivationStyle="@HelpActivationStyle.ButtonOnly"
                                       Closed="() => isFlyoutOpen=false" />
-                    <span class="d-flex flex-row align-items-center">
-                        <img class="h5 text-primary bi bi-people" />
-                        <div class="text-start mx-1" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
-                    </span>
+                    <DxButton Text="Support"
+                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                              NavigateUrl="Public/Support"
+                              CssClass="ms-1"
+                              IconCssClass="h5 text-primary bi bi-person-raised-hand" />
+                    <ContextHelpTitle Title=""
+                                      HelpTopic="Introduction.html"
+                                      IncludeTableOfContents=true
+                                      ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
                 }
             </div>
             <DxTabs CssClass="w-100">

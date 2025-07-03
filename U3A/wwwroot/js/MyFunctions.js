@@ -6,6 +6,59 @@ function registerOrientationChange(dotNetHelper) {
         dotNetHelper.invokeMethodAsync("OnOrientationChanged", screen.orientation.type);
     });
 }
+
+// menu button hover click
+window.hoverClickMenu = (() => {
+    let lastClickTime = 0;
+    let hoverTimer = null;
+    const CLICK_THRESHOLD = 500; // Minimum time between clicks
+
+    return {
+        attachHoverHandler: function (elementId) {
+            menu = document.getElementById(elementId);
+            if (!menu) return;
+
+            // Intercept manual double clicks
+            menu.addEventListener('click', (e) => {
+                const now = Date.now();
+                if (now - lastClickTime < CLICK_THRESHOLD) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    return false;
+                }
+                lastClickTime = now;
+            });
+
+            menu.addEventListener('mouseenter', () => {
+                hoverTimer = setTimeout(() => {
+                    const now = Date.now();
+                    if (now - lastClickTime >= CLICK_THRESHOLD) {
+                        menu.click();
+                        lastClickTime = now;
+                    }
+                }, 250);
+            });
+
+            menu.addEventListener('mouseleave', () => {
+                clearTimeout(hoverTimer);
+            });
+        }
+    };
+})();
+
+// activate menu on HOME button click
+window.hoverClickMenu = window.hoverClickMenu || {};
+window.hoverClickMenu.attachHomeKeyHandler = function (elementId) {
+    document.addEventListener('keydown', function (event) {
+        if (event.code === 'Escape') {
+            const menu = document.getElementById(elementId);
+            if (menu) {
+                menu.click();
+            }
+        }
+    });
+};
+
 function IsApple() {
     return (/iP(hone|od|ad)/.test(navigator.platform));
 }

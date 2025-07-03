@@ -17,7 +17,7 @@
 
 @rendermode InteractiveServer
 
-<DxButton Visible="true" Text="@((!isDrawerOpen) ? "Menu" : "")"
+<DxButton id="main-menu-button" Visible="true" Text="@((!isDrawerOpen) ? "Menu" : "")"
           Click="@(() => isDrawerOpen = !isDrawerOpen)"
           tooltip="Click to show/hide menu"
           CssClass="sidebar-toggle-button"
@@ -158,6 +158,8 @@ else
     {
         if (firstRender)
         {
+            await js.InvokeVoidAsync("hoverClickMenu.attachHoverHandler", "main-menu-button");
+            await js.InvokeVoidAsync("hoverClickMenu.attachHomeKeyHandler", "main-menu-button");
             setupMenuOnLocationChange();
         }
         var wwwroot = @"\wwwroot\message.html";
