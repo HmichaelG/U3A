@@ -358,7 +358,7 @@
 
 <style>
     .grid-style {
-        height: calc(100% - 2.5rem);
+        height: calc(100% - @((IsEmbedded) ? "-0.75rem" : "2rem"));
     }
     .popup-width {
         min-width: min(65rem, 100%);

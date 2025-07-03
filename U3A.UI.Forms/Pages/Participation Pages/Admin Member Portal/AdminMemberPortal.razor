@@ -24,42 +24,43 @@ else
 
         <MessageBox @ref="@messageBox" />
 
-        <div class="container">
-            <DxToolbar>
-                <Items>
-                    <DxToolbarItem BeginGroup="true" Click=@(() => navMan.NavigateTo("AdminMemberPortal",true))
-                                   Text="Process Member" IconCssClass="bi bi-person" />
-                    <DxToolbarItem BeginGroup="true" Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
-                                   Text="What's On Today" IconCssClass="bi bi-clock" />
-                    <DxToolbarItem BeginGroup=true Text="Attendance" IconCssClass="bi bi-person-check">
-                        <Items>
-                            <DxToolbarItem Click="@(() => buttonClick = buttonClicks.RecordAttendance)"
-                                           RenderStyle="ButtonRenderStyle.Secondary"
-                                           Text="Record Attendance" IconCssClass="bi bi-emoji-smile" />
-                            <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceNotRecorded)"
-                                           RenderStyle="ButtonRenderStyle.Secondary"
-                                           Text="Attendance Not Recorded" IconCssClass="bi bi-emoji-angry" />
-                            <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceSummary)"
-                                           RenderStyle="ButtonRenderStyle.Secondary"
-                                           Text="Attendance Summary" IconCssClass="bi bi-columns" />
-                            <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceAnalysis)"
-                                           RenderStyle="ButtonRenderStyle.Secondary"
-                                           Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
-                        </Items>
-                    </DxToolbarItem>
-                    <DxToolbarItem BeginGroup="true" Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
-                                   Text="Leader Report" IconCssClass="bi bi-printer" />
-                    <DxToolbarItem BeginGroup="true" Click="OnRefresh"
-                                   Text="Refresh" IconCssClass="bi bi-arrow-clockwise"
-                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                   Tooltip="Click to refresh lookup data"
-                                   Alignment="ToolbarItemAlignment.Right" />
-                    <DxToolbarItem BeginGroup="true" Click="@(() => isDrawerOpen = !isDrawerOpen)"
-                                   Text="Calendar" IconCssClass="bi bi-calendar"
-                                   Alignment="ToolbarItemAlignment.Right" />
-                </Items>
-            </DxToolbar>
-
+        <div class="container-lg mt-1">
+            <div class="left-align-style">
+                <DxToolbar>
+                    <Items>
+                        <DxToolbarItem BeginGroup="true" Click=@(() => navMan.NavigateTo("AdminMemberPortal", true))
+                                       Text="Process Member" IconCssClass="bi bi-person" />
+                        <DxToolbarItem BeginGroup="true" Click="@(() => buttonClick = buttonClicks.WhatsOnToday)"
+                                       Text="What's On Today" IconCssClass="bi bi-clock" />
+                        <DxToolbarItem BeginGroup=true Text="Attendance" IconCssClass="bi bi-person-check">
+                            <Items>
+                                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.RecordAttendance)"
+                                               RenderStyle="ButtonRenderStyle.Secondary"
+                                               Text="Record Attendance" IconCssClass="bi bi-emoji-smile" />
+                                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceNotRecorded)"
+                                               RenderStyle="ButtonRenderStyle.Secondary"
+                                               Text="Attendance Not Recorded" IconCssClass="bi bi-emoji-angry" />
+                                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceSummary)"
+                                               RenderStyle="ButtonRenderStyle.Secondary"
+                                               Text="Attendance Summary" IconCssClass="bi bi-columns" />
+                                <DxToolbarItem Click="@(() => buttonClick = buttonClicks.AttendanceAnalysis)"
+                                               RenderStyle="ButtonRenderStyle.Secondary"
+                                               Text="Attendance Analysis" IconCssClass="bi bi-columns-gap" />
+                            </Items>
+                        </DxToolbarItem>
+                        <DxToolbarItem BeginGroup="true" Click="@(() => buttonClick = buttonClicks.AdminLeaderReport)"
+                                       Text="Leader Report" IconCssClass="bi bi-printer" />
+                        <DxToolbarItem BeginGroup="true" Click="OnRefresh"
+                                       Text="Refresh" IconCssClass="bi bi-arrow-clockwise"
+                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                       Tooltip="Click to refresh lookup data"
+                                       Alignment="ToolbarItemAlignment.Right" />
+                        <DxToolbarItem BeginGroup="true" Click="@(() => isDrawerOpen = !isDrawerOpen)"
+                                       Text="Calendar" IconCssClass="bi bi-calendar"
+                                       Alignment="ToolbarItemAlignment.Right" />
+                    </Items>
+                </DxToolbar>
+            </div>
             <DxDrawer @bind-IsOpen="@isDrawerOpen"
                       CssClass="drawer-style mt-1 border-top"
                       Mode="DrawerMode.Shrink"
@@ -97,7 +98,7 @@ else
                                         <div class="@((isDrawerOpen) ? formWidthCalendarOpen : formWidthCalendarClosed)">
                                             <DxTabs>
                                                 <DxTabPage Text="Received">
-                                                    <FullScreen DisplayOffset="18" HideToggle="true">
+                                                    <FullScreen DisplayOffset="12" HideToggle="true">
                                                         <ContentTemplate>
                                                             <DxGrid @ref=@receiptGrid Data="@ReceivedToday" CssClass="m-2"
                                                                     UnboundColumnData="Grid_UnboundColumnData"
@@ -224,6 +225,9 @@ else
     </CascadingValue>
 }
 <style>
+    .left-align-style {
+        padding-left: @((ws.IsLargeScreen) ? "0" : "5rem");
+    }
 
     .member-selection-width {
         width: 98%;

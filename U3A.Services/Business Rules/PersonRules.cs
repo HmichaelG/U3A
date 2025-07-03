@@ -367,15 +367,14 @@ public static partial class BusinessRule
         if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
         if (term != null)
         {
-            foreach (var e in await dbc.Enrolment
-                                        .Include(x => x.Term)
+            foreach (var e in await dbc.Enrolment.AsNoTracking()
                                         .Where(x => x.Term.Year == term.Year &&
                                                 x.IsCourseClerk && !x.IsWaitlisted).ToListAsync())
             {
                 var p = people.Find(x => x.ID == e.PersonID);
                 if (p != null) p.IsCourseClerk = true;
             }
-            foreach (var l in await dbc.Class.Include(x => x.Course)
+            foreach (var l in await dbc.Class.AsNoTracking()
                 .Where(x => x.LeaderID != null && x.Course.Year == term.Year)
                 .Select(x => x.LeaderID).ToListAsync())
             {
@@ -387,7 +386,7 @@ public static partial class BusinessRule
                 }
             }
             ;
-            foreach (var l in await dbc.Class.Include(x => x.Course)
+            foreach (var l in await dbc.Class.AsNoTracking()
                 .Where(x => x.Leader2ID != null && x.Course.Year == term.Year)
                 .Select(x => x.Leader2ID).ToListAsync())
             {
@@ -399,7 +398,7 @@ public static partial class BusinessRule
                 }
             }
             ;
-            foreach (var l in await dbc.Class.Include(x => x.Course)
+            foreach (var l in await dbc.Class.AsNoTracking()
                 .Where(x => x.Leader3ID != null && x.Course.Year == term.Year)
                 .Select(x => x.Leader3ID).ToListAsync())
             {
