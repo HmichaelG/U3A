@@ -27,9 +27,11 @@
 <div>
     <form @formname="reset-authenticator" @onsubmit="OnSubmitAsync" method="post">
         <AntiforgeryToken />
-        <div class="row p-2">
-            <button class="w-50 btn btn-danger" type="submit">Reset authenticator key</button>
-            <a type="button" href="@navMan.BaseUri" class="w-50 btn btn-secondary">Cancel</a>
+        <div class="button-container">
+            <DxButton CssClass="w-50" SubmitFormOnClick='true' Text="Reset authenticator key" RenderStyle="ButtonRenderStyle.Primary" />
+            <NavLink href="/" class="button-link w-50">
+                <DxButton Text="Cancel" CssClass="w-100" RenderStyle="ButtonRenderStyle.Secondary" />
+            </NavLink>
         </div>
     </form>
 </div>

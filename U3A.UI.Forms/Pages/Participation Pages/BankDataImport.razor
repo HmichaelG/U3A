@@ -41,10 +41,12 @@ else
             <div id="overviewDemoDropZone" class="card custom-drop-zone bg-light rounded-3 m-0" hidden="@(SelectedFilesCount > 0)">
                 <span class="bi bi-upload icon-size mb-3"></span>
                 <span>Drag and Drop <b>OFX</b> or <b>QIF</b> File Here</span><span class="m-1">or</span>
-                <button id="overviewDemoSelectButton" class="btn border-primary btn-primary m-1">Select File</button>
+                <div class="button-container w-25">
+                    <DxButton id="fileSelectButton" CssClass="w-100" SubmitFormOnClick='true' Text="Select file" RenderStyle="ButtonRenderStyle.Primary" />
+                </div>
             </div>
             <DxUpload Name="myFile" @ref="FileUploader"
-                      ExternalSelectButtonCssSelector="#overviewDemoSelectButton"
+                      ExternalSelectButtonCssSelector="#fileSelectButton"
                       ExternalDropZoneCssSelector="#overviewDemoDropZone"
                       ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
                       UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
@@ -61,19 +63,22 @@ else
             <div class="row">
                 <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" CssClass="col" />
             </div>
-            <div class="fs-6 text-center mb-2">@FinancialToMessage</div>
+            <div class="my-1 text-center mb-2">@FinancialToMessage</div>
             <div class="d-flex">
                 <DxButton Text="Apply Payments to the Participant Records" CssClass="flex-grow-1"
                           Click="@ProcessRequests" Enabled="@(importData.Where(x => x.Person != null).Any())"
                           RenderStyle="ButtonRenderStyle.Primary" />
             </div>
-            <div class="d-flex mt-2">
-                <DxButton Text="@ShowAllButtonText" CssClass="me-1 flex-grow-1"
+            <div class="button-container">
+                <DxButton Text="@ShowAllButtonText" CssClass="w-50 me-1 flex-grow-1"
                           Click="@ShowAllButtonClicked"
                           RenderStyle="ButtonRenderStyle.Primary" />
-                <DxButton Text="Clear Bank Import File" CssClass="ms-1 flex-grow-1"
+                <DxButton Text="Clear Bank Import File" CssClass="w-50 ms-1 flex-grow-1"
                           Click="@ClearAllBankData"
                           RenderStyle="ButtonRenderStyle.Primary" />
+            </div>
+
+            <div class="d-flex mt-2">
             </div>
         </div>
     </div> @*row*@
@@ -126,7 +131,7 @@ else
                                 var importData = (ReceiptDataImport)context.EditModel;
                             }
                             <PersonsComboBox People="@People" @bind-SelectedPerson="@currentPerson"
-                                             @bind-SelectedPerson:after="async() => await OnPersonChanged(currentPerson,importData)" />
+                                             @bind-SelectedPerson:after="async () => await OnPersonChanged(currentPerson, importData)" />
                         </CellEditTemplate>
                     </DxGridDataColumn>
                     <DxGridDataColumn Caption="Amount" Width="10rem"
@@ -134,7 +139,7 @@ else
                     <DxGridDataColumn Caption="Financial-To" DisplayFormat="{0:f0}"
                                       FieldName="FinancialTo" Width="10rem">
                         <EditSettings>
-                            <DxSpinEditSettings MaxValue="@(yearComponent?.Year+1)"
+                            <DxSpinEditSettings MaxValue="@(yearComponent?.Year + 1)"
                                                 MinValue="@(yearComponent?.Year-1)" />
                         </EditSettings>
                     </DxGridDataColumn>
@@ -304,13 +309,13 @@ else
         if (!result)
         {
             var args = new MessageBoxArgs()
-                {
-                    OKButtonText = "Yes, I'm Ok with that!",
-                    Caption = "Unexpected date range in Bank import file",
-                    Message = $"<div class='text-center alert alert-danger alert text-dark p-2'><p>The Bank date range <strong>{firstImportDate?.ToShortDateString()}</strong> to <strong>{lastImportDate?.ToShortDateString()}</strong>.<br>" +
+            {
+                OKButtonText = "Yes, I'm Ok with that!",
+                Caption = "Unexpected date range in Bank import file",
+                Message = $"<div class='text-center alert alert-danger alert text-dark p-2'><p>The Bank date range <strong>{firstImportDate?.ToShortDateString()}</strong> to <strong>{lastImportDate?.ToShortDateString()}</strong>.<br>" +
                                                                                                                                                                         $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
                                                                                                                                                                             "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
-                };
+            };
             result = await messageBox.ShowAsync(args);
             hideReceiptDateRangeMessage = true;
         }
@@ -426,7 +431,7 @@ else
         {
             var description = trx.Memo;
             // CBA uses payee
-            if (string.IsNullOrWhiteSpace(description)) { description = trx.Payee; } 
+            if (string.IsNullOrWhiteSpace(description)) { description = trx.Payee; }
             await ProcessReceiptData(trx.Amount, trx.Date, description, trx.Category, IdAlreadyUsed);
         }
     }
@@ -459,8 +464,8 @@ else
             foreach (var trx in statement.TransactionList.Transactions)
             {
                 await ProcessReceiptData((trx.TxType == OfxTransactionType.DEBIT)
-                                                ? (decimal) -trx.Amount
-                                                : (decimal) trx.Amount,
+                                                ? (decimal)-trx.Amount
+                                                : (decimal)trx.Amount,
                                                 trx.DatePosted.Date,
                                                 trx.Memo,
                                                 trx.ReferenceNumber,
@@ -469,19 +474,19 @@ else
         }
     }
 
-    async Task ProcessReceiptData(decimal amount, 
-                        DateTime date, 
-                        string description, 
+    async Task ProcessReceiptData(decimal amount,
+                        DateTime date,
+                        string description,
                         string identifier,
                         List<Guid> IdAlreadyUsed)
     {
         var receiptImport = new ReceiptDataImport()
-            {
-                Amount = amount,
-                Date = date,
-                Description = description,
-                Identifier = identifier,
-            };
+        {
+            Amount = amount,
+            Date = date,
+            Description = description,
+            Identifier = identifier,
+        };
         receiptImport.IsOnFile = await BusinessRule.IsReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
         if (receiptImport.IsOnFile)
         {
@@ -631,14 +636,14 @@ else
 
                 // Now, create the receipt
                 var receipt = new Receipt()
-                    {
-                        Amount = importItem.Amount,
-                        Date = importItem.Date,
-                        Description = importItem.Description,
-                        Identifier = importItem.Identifier,
-                        Person = importItem.Person,
-                        ProcessingYear = ProcessingYear
-                    };
+                {
+                    Amount = importItem.Amount,
+                    Date = importItem.Date,
+                    Description = importItem.Description,
+                    Identifier = importItem.Identifier,
+                    Person = importItem.Person,
+                    ProcessingYear = ProcessingYear
+                };
 
                 if (receipt.Person.DateJoined == null)
                 {
@@ -878,17 +883,17 @@ else
         var half = decimal.Round(importToSplit.Amount / 2.0m, 2);
         importToSplit.Amount = importToSplit.Amount - half;
         var newImport = new ReceiptDataImport()
-            {
-                PersonID = null,
-                Person = null,
-                Amount = half,
-                Date = importToSplit.Date,
-                Description = importToSplit.Description,
-                FinancialTo = null,
-                Identifier = importToSplit.Identifier,
-                ImportIssues = null,
-                IsOnFile = importToSplit.IsOnFile
-            };
+        {
+            PersonID = null,
+            Person = null,
+            Amount = half,
+            Date = importToSplit.Date,
+            Description = importToSplit.Description,
+            FinancialTo = null,
+            Identifier = importToSplit.Identifier,
+            ImportIssues = null,
+            IsOnFile = importToSplit.IsOnFile
+        };
         dbc.Update(importToSplit);
         await dbc.AddAsync(newImport);
         await dbc.SaveChangesAsync();

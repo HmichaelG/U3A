@@ -39,7 +39,9 @@
                 <label for="email" class="form-label">Email</label>
                 <ValidationMessage For="() => Input.Email" />
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            <div class="button-container">
+                <DxButton CssClass="w-100" SubmitFormOnClick='true' Text="Register" RenderStyle="ButtonRenderStyle.Primary" />
+            </div>
         </EditForm>
     </div>
 </div>

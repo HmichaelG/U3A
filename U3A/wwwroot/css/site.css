@@ -1,5 +1,18 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+.button-link {
+    text-decoration: unset;
+}
+
+.button-container {
+    display: flex;
+    gap: 5px;
+    padding: 0.5rem 1rem;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+}
+
 .primary-color {
     color: var(--dxbl-accent-color);
 }

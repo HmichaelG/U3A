@@ -14,14 +14,8 @@
     <base href="/" />
     @DxResourceManager.RegisterTheme(DxThemes.Bootstrap)
     @DxResourceManager.RegisterTheme(ThemesService.ActiveTheme)
-    @DxResourceManager.RegisterScripts((config) => {
-        var maxScriptPosition = config.Resources.OrderBy(o => o.Position).Last().Position;
-    config.Register(new DxResource("MyFunctions.js", maxScriptPosition + 1));
-    config.Register(new DxResource("qr.js", maxScriptPosition + 1));
-    config.Register(new DxResource("reCaptcha.js", maxScriptPosition + 1));
-    config.Register(new DxResource("site.js", maxScriptPosition + 1));
-    config.Register(new DxResource("timeout.js", maxScriptPosition + 1));
-        })
+    @DxResourceManager.RegisterScripts()
+
     <link href=@AppendVersion("_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.css") rel="stylesheet" />
     <link href=@AppendVersion("_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css") rel="stylesheet" />
 

@@ -6,7 +6,7 @@ namespace U3A.Services;
 public static class DxThemes {
     public static readonly ITheme FluentLight = Themes.Fluent.Clone(properties => {
         properties.Mode = ThemeMode.Light;
-        properties.SetCustomAccentColor("magenta");
+        properties.SetCustomAccentColor("green");
         AddFluentTheme(properties);
     });
     public static readonly ITheme FluentDark = Themes.Fluent.Clone(properties => {
