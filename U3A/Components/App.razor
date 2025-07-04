@@ -2,16 +2,26 @@
 
 @inject IFileVersionProvider FileVersionProvider
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject DxThemesService ThemesService
+
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="@(ThemesService.IsBootstrapDarkActive ? "dark" : null)" data-fluent-darkmode="@(ThemesService.IsFluentDarkModeActive ? "" : null)">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
     <base href="/" />
-
-    <link id="theme" href=@AppendVersion("_content/DevExpress.Blazor.Themes/office-white.bs5.min.css") rel="stylesheet" />
+    @DxResourceManager.RegisterTheme(DxThemes.Bootstrap)
+    @DxResourceManager.RegisterTheme(ThemesService.ActiveTheme)
+    @DxResourceManager.RegisterScripts((config) => {
+        var maxScriptPosition = config.Resources.OrderBy(o => o.Position).Last().Position;
+    config.Register(new DxResource("MyFunctions.js", maxScriptPosition + 1));
+    config.Register(new DxResource("qr.js", maxScriptPosition + 1));
+    config.Register(new DxResource("reCaptcha.js", maxScriptPosition + 1));
+    config.Register(new DxResource("site.js", maxScriptPosition + 1));
+    config.Register(new DxResource("timeout.js", maxScriptPosition + 1));
+        })
     <link href=@AppendVersion("_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.css") rel="stylesheet" />
     <link href=@AppendVersion("_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css") rel="stylesheet" />
 
@@ -33,7 +43,7 @@
 
 </head>
 
-<body>
+<body class="@(ThemesService.IsFluentActive ? "dxbl-theme-fluent" : null)">
 
     @* For logout *@
     <form id="logout-form" action="Account/Logout" @formname="logout" method="post">

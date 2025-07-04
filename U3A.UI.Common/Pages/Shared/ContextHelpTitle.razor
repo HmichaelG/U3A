@@ -45,14 +45,14 @@
         case HelpActivationStyle.StandardButtonAndTitle:
         case HelpActivationStyle.ButtonAndTitleNoMessages:
             <PageTitle>@($"{tenantId}: {Title}")</PageTitle>
-            <div class="w-100 flex-row title-style">
-                <h1 class="@TitleCssClass h3">
+            <div class="w-100 flex flex-row align-items-center">
+                <div class="title-style">
                     <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
                               RenderStyle="ButtonRenderStyle.None"
                               Click="ShowTopicAsync" Id="helpButton" />
                     @Title
-                </h1>
+                </div>
                 @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
                 {
                     @if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
@@ -106,20 +106,22 @@
         margin-bottom: 0.5dvh !important;
     }
 
-    .help-btn {
-        color: var(--dxbl-client-component-palette-info);
-        font-weight: 900;
-    }
-
     .title-style {
-        color: var(--dxbl-client-component-palette-primary);
-        text-align: @((ws.IsLargeScreen) ? "start" : "center"); 
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+        max-height: 1.75rem;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--dxbl-accent-color);
+        text-align: @((ws.IsLargeScreen) ? "start" : "center");
         justify-content: @((ws.IsLargeScreen) ? "start" : "center");
     }
 
     .subtitle-style {
         width: 100%;
-        margin-bottom: 0.5rem;
+        margin-top: 0rem;
+        margin-bottom: 0.1rem;
         flex-direction: column;
         text-align: @((ws.IsLargeScreen) ? "start" : "center");
         justify-content: @((ws.IsLargeScreen) ? "start" : "center");
@@ -146,7 +148,7 @@
     [Parameter]
     public string TitleCssClass { get; set; } = "flex-grow-0";
     [Parameter]
-    public string ButtonIconCssClass { get; set; } = "h2 bi bi-question-circle-fill help-btn";
+    public string ButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill primary-color";
     [Parameter]
     public bool IncludeTableOfContents { get; set; } = false;
     [Parameter]

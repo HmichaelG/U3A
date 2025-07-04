@@ -43,7 +43,7 @@ else
     <MessageBox @ref="messageBox" />
     <div class=@((IsPreview)
      ? "col-10 mx-auto"
-     : "container mx-1 col col-12 col-md-10 col-lg-7 mx-auto")>
+     : "container mx-1 col col-12 col-lg-10 col-xxl-8 mx-auto")>
         <div class="h6 pt-2 col-12" align="center">
             @term?.TermSummary
         </div>
@@ -139,12 +139,12 @@ else
                                         <Items>
                                             <div class="container mt-2 mb-1 py-1 border @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
                                                 <div class="d-flex flex-row align-items-center my-auto">
-                                                    <div class="flex-grow-1 pt-2 h6">
+                                                    <div class="flex-grow-1">
                                                         <div hidden="@(!c.Course.IsFeaturedCourse)" class="badge bg-primary">Featured</div>
-                                                        <div>@(HighlightSearchText(ClassTitle(c)))</div>
+                                                        <div><b>@(HighlightSearchText(ClassTitle(c)))</b></div>
                                                     </div>
                                                     <div hidden="@IsMobileLayout" class="flex-grow-0">
-                                                        <div hidden="@(!IsReadOnly)" class="h6 text-primary">@GetStatus(c)</div>
+                                                        <div hidden="@(!IsReadOnly)" class="text-primary">@GetStatus(c)</div>
                                                         <DxButton Text="@GetStatus(c)" Visible="@(!IsReadOnly)"
                                                                   IconCssClass="@($"bi {selectButtonIcon}")"
                                                                   RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -154,7 +154,7 @@ else
                                                 </div>
                                             </div>
                                             <div hidden="@(!IsMobileLayout)" class="mx-auto">
-                                                <div hidden="@(!IsReadOnly)" class="h6 text-primary">@GetStatus(c)</div>
+                                                <div hidden="@(!IsReadOnly)" class="text-primary">@GetStatus(c)</div>
                                                 <DxButton Text="@GetStatus(c)" Visible="@(!IsReadOnly)"
                                                           IconCssClass="@($"bi {selectButtonIcon}")"
                                                           RenderStyleMode="ButtonRenderStyleMode.Outline"

@@ -20,18 +20,19 @@
 @{
     <MessageBox @ref=@messageBox />
     <div class="@((IsTopMenu)
-                                           ? "card shadow-sm w-100"
-                                           : "sidebar")">
+        ? "card shadow-sm w-100"
+        : "sidebar")">
     <div class="d-print-none">
-        <DxMenu CssClass="menu-item menu"
+        <DxMenu CssClass="menu" HamburgerIconCssClass="menu-icon bi bi-list" 
+                CollapseItemToIconMode="MenuCollapseItemToIconMode.Sequentially"
                 DropDownActionMode="MenuDropDownActionMode.Click"
                 ItemsPosition="ItemPosition.End"
                 Orientation="@((IsTopMenu) ? Orientation.Horizontal : Orientation.Vertical)"
-                CollapseItemsToHamburgerMenu="@true">
+                CollapseItemsToHamburgerMenu=true>
             <TitleTemplate>
                 @if (IsTopMenu)
                     {
-                        <span class="h5"><img src="images/U3ALogo.png">&nbsp;@OrganisationName</span>
+                        <span><img src="images/U3ALogo.png">&nbsp;@OrganisationName</span>
                     }
                 </TitleTemplate>
                 <Items>
@@ -39,12 +40,15 @@
                         if (isAuthenticated)
                         {
 
-                            <DxMenuItem @ref="homeButton" id="home-button" Text="@((isVertical) ? "Home" : "")"
+                            <DxMenuItem @ref="homeButton" id="home-button" Text="Home"
+                                        AdaptivePriority="100"
                                         Tooltip="Home" IconCssClass="menu-icon bi bi-house" NavigateUrl="./" />
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
-                                <DxMenuItem Text="Admin" IconCssClass="menu-icon bi bi-gear" NavigateUrl="@((!isSmallScreen) ? "AdminIntroduction" : null)">
+                                <DxMenuItem Text="Admin" 
+                                        AdaptivePriority="100"
+                                        IconCssClass="menu-icon bi bi-gear" NavigateUrl="@((!isSmallScreen) ? "AdminIntroduction" : null)">
                                     <Items>
                                         @if (isSecurityAdminRole)
                                         {
@@ -181,7 +185,7 @@
                                 </DxMenuItem>
                             }
 
-                            <DxMenuItem Text="@((isVertical) ? "Settings" : "")" Tooltip="Theme and Settings"
+                            <DxMenuItem Text="Settings" Tooltip="Theme and Settings"
                                         IconCssClass="menu-icon bi bi-palette" NavigateUrl=@(!isSmallScreen ? "ThemeIntroduction" : null)>
                                 <Items>
                                     <DxMenuItem Text="Theme & Settings" NavigateUrl="Settings" />
@@ -189,15 +193,9 @@
                                                 Click="OnResetDefaults" />
                                 </Items>
                             </DxMenuItem>
-                            <DxMenuItem Text="@((isVertical) ? "Manage Credentials" : "")" Tooltip="Manage Credentials and Logout"
+                            <DxMenuItem Text="Credentials" Tooltip="Manage Credentials and Logout"
                                         IconCssClass="menu-icon bi bi-shield" NavigateUrl=@(!isSmallScreen ? "SecurityIntroduction" : null)>
                                 <Items>
-                                    @if (IsTopMenu)
-                                    {
-                                        <DxMenuItem Click="OnLogout"
-                                                    Text="Logout"
-                                                    IconCssClass="menu-icon bi bi-door-open" />
-                                    }
                                     <DxMenuItem Text="Change Email Address" IconCssClass="menu-icon bi bi-shield"
                                                 NavigateUrl="Account/Manage/Email" />
                                     <DxMenuItem Text="Change Your Password" IconCssClass="menu-icon bi bi-shield"
@@ -206,13 +204,12 @@
                                                 NavigateUrl="Account/Manage/TwoFactorAuthentication" />
                                 </Items>
                             </DxMenuItem>
-                            @if (!IsTopMenu)
-                            {
-                                <DxMenuItem Click="OnLogout"
-                                            Text="Logout"
-                                            IconCssClass="menu-icon bi bi-door-open" />
-                            }
+                            <DxMenuItem Click="OnLogout"
+                                        AdaptivePriority="0"
+                                        Text="Logout"
+                                        IconCssClass="menu-icon bi bi-door-open" />
                         }
+                    
                     }
                 </Items>
             </DxMenu>
