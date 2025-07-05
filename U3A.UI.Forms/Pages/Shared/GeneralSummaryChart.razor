@@ -7,7 +7,7 @@
 }
 else
 {
-    <DxToolbar CssClass="my-1 d-print-none">
+    <DxToolbar CssClass="my-1 d-print-none w-100">
         <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
                        Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
                        IconCssClass="bi bi-filetype-png">
@@ -62,9 +62,7 @@ else
                 <div style="margin: 0.75rem">
                     <div class="fw-bold">@context.Point.Argument</div>
                     <div>
-                        @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+                        @($"{context.Point.Value:#,0.}")
                     </div>
                 </div>
             </DxChartTooltip>
@@ -122,9 +120,7 @@ else
                 <div style="margin: 0.75rem">
                     <div class="fw-bold">@context.Point.Argument</div>
                     <div>
-                        @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+                        @($"{context.Point.Value:#,0.}")
                     </div>
                 </div>
             </DxChartTooltip>
@@ -158,8 +154,8 @@ else
                     <div class="fw-bold">@context.Point.Argument</div>
                     <div>
                         @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+                                            $"{context.Point.Value:#,0.}"
+                                            )
                     </div>
                 </div>
             </DxChartTooltip>
@@ -191,8 +187,8 @@ else
                     <div class="fw-bold">@context.Point.Argument</div>
                     <div>
                         @(
-                            $"{context.Point.Value:#,0.}"
-                            )
+                                            $"{context.Point.Value:#,0.}"
+                                            )
                     </div>
                 </div>
             </DxChartTooltip>
@@ -224,19 +220,18 @@ else
                     <div class="fw-bold">@context.Point.Argument</div>
                     <div>
                         @(
-                            $"{context.Point.Value:#,0.}"
-                            )
-                    </div>
+                                            $"{context.Point.Value:#,0.}"
+                                            )
                 </div>
-            </DxChartTooltip>
-            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
-                           VerticalAlignment="VerticalEdge.Top"
-                           Position="RelativePosition.Outside"
-                           Orientation="Orientation.Vertical" />
-        </DxPieChart>
-    </div>
+            </div>
+        </DxChartTooltip>
+        <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                       VerticalAlignment="VerticalEdge.Top"
+                       Position="RelativePosition.Outside"
+                       Orientation="Orientation.Vertical" />
+    </DxPieChart>
+</div>
 }
-
 
 @code {
     IEnumerable<MemberSummary> memberData;
@@ -262,21 +257,21 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+        {
+            term = await BusinessRule.CurrentTermAsync(dbc);
+            if (term != null)
             {
-                term = await BusinessRule.CurrentTermAsync(dbc);
-                if (term != null)
-                {
-                    memberData = await BusinessRule.GetMemberSummaryByGender(dbc, term);
-                    enrolmentData = await BusinessRule.GetEnrolmentSummary(dbc, term);
-                    waitlistData = await BusinessRule.GetWaitlistSummary(dbc, term);
-                    attritionData = await BusinessRule.GetAttritionSummary(dbc, term);
-                    membershipLengthData = BusinessRule.GetMemberSummaryByMshipLength(dbc, term);
-                    membershipDOBData = BusinessRule.GetMemberSummaryByDOB(dbc, term);
-                }
+                memberData = await BusinessRule.GetMemberSummaryByGender(dbc, term);
+                enrolmentData = await BusinessRule.GetEnrolmentSummary(dbc, term);
+                waitlistData = await BusinessRule.GetWaitlistSummary(dbc, term);
+                attritionData = await BusinessRule.GetAttritionSummary(dbc, term);
+                membershipLengthData = BusinessRule.GetMemberSummaryByMshipLength(dbc, term);
+                membershipDOBData = BusinessRule.GetMemberSummaryByDOB(dbc, term);
             }
-            IsReady = true;
         }
+        IsReady = true;
+    }
 
     private void CustomizeGenderSeriesPoint(ChartSeriesPointCustomizationSettings settings)
     {
