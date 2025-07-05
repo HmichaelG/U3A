@@ -20,10 +20,10 @@
 @{
     <MessageBox @ref=@messageBox />
     <div class="@((IsTopMenu)
-        ? "card shadow-sm w-100"
-        : "sidebar")">
+                 ? "card shadow-sm w-100"
+                : "sidebar")">
     <div class="d-print-none">
-        <DxMenu CssClass="menu" HamburgerIconCssClass="menu-icon bi bi-list" 
+        <DxMenu CssClass="menu" HamburgerIconCssClass="menu-icon bi bi-list"
                 CollapseItemToIconMode="MenuCollapseItemToIconMode.Sequentially"
                 DropDownActionMode="MenuDropDownActionMode.Click"
                 ItemsPosition="ItemPosition.End"
@@ -46,9 +46,9 @@
 
                             if (isSystemAdminRole || isSecurityAdminRole)
                             {
-                                <DxMenuItem Text="Admin" 
-                                        AdaptivePriority="100"
-                                        IconCssClass="menu-icon bi bi-gear" NavigateUrl="@((!isSmallScreen) ? "AdminIntroduction" : null)">
+                                <DxMenuItem Text="Admin"
+                                            AdaptivePriority="100"
+                                            IconCssClass="menu-icon bi bi-gear" NavigateUrl="@((!isSmallScreen) ? "AdminIntroduction" : null)">
                                     <Items>
                                         @if (isSecurityAdminRole)
                                         {
@@ -209,7 +209,7 @@
                                         Text="Logout"
                                         IconCssClass="menu-icon bi bi-door-open" />
                         }
-                    
+
                     }
                 </Items>
             </DxMenu>
@@ -221,6 +221,21 @@
     .sidebar {
         height: 100% !important;
     }
+
+    .menu {
+        --dxbl-menu-bottom-left-border-radius: 0;
+        --dxbl-menu-bottom-right-border-radius: 0;
+        --dxbl-menu-top-left-border-radius: 0;
+        --dxbl-menu-top-right-border-radius: 0;
+        background-color: inherit;
+    }
+
+
+    .menu .dxbl-menu-item-list {
+        --dxbl-menu-item-line-height: 1.5rem;
+        gap: 0.5rem;
+    }
+
 </style>
 
 @code {
