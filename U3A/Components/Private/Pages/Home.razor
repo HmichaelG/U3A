@@ -87,14 +87,13 @@ else
                 else
                 {
                     <span class="d-flex flex-row align-items-center">
-                        <i class="text-accent bi bi-people fs-4"></i>
-                        <div class="mx-2" ondblclick="@(() => OnCircuitClick())">@($"{openCircuits} users logged in.")</div>
+                        <img class="h5 text-primary bi bi-people" />
+                        <div class="text-start mx-1" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
                     </span>
-
                     <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                       IsVersionButton=true
                                       ShowNewSoftwareUpdateFlyout=@((value) => {isFlyoutOpen = value;})
-                                      ButtonIconCssClass="fs-4 text-accent bi bi-check2-circle"
+                                      ButtonIconCssClass="h5 text-primary bi bi-check2-circle"
                                       HelpTopic=@($"{versionYear}-Version-History.html")
                                       ActivationStyle="@HelpActivationStyle.ButtonOnly"
                                       Closed="() => isFlyoutOpen=false" />
@@ -102,7 +101,7 @@ else
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
                               NavigateUrl="Public/Support"
                               CssClass="ms-1"
-                              IconCssClass="fs-4 text-accent bi bi-person-raised-hand" />
+                              IconCssClass="h5 text-primary bi bi-person-raised-hand" />
                     <ContextHelpTitle Title=""
                                       HelpTopic="Introduction.html"
                                       IncludeTableOfContents=true
@@ -145,12 +144,9 @@ else
 }
 
 <style>
-    .tab-style {
-        width: 100dvw;
-    }
 
     .iframe-style {
-        width: @((ws.IsLargeScreen) ? "82dvw" : "97dvw");
+        width: 85vw;
         min-height: 40dvh;
         height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem") );
         border-style: none;

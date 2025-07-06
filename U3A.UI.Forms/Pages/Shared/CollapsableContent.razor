@@ -2,10 +2,10 @@
 
 @if (!IsDismissed && Visible)
 {
-    <section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
-        <button class="dismiss-button btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
+    <section class="@($"{CssClass} alert-section {alertRender} text-center")" hidden="@isHidden">
+        <button class="dismis-button btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
         @ContentTemplate
-        <div class="@($"{AlertTextRender}")">
+        <div class="@($"strong {AlertTextRender}")">
             @(new MarkupString(AlertText))
             @if (!string.IsNullOrWhiteSpace(DismissKey))
             {
@@ -18,7 +18,7 @@
         </div>
     </section>
     <div class="w-100 bg-primary muted" hidden="@(!isHidden || !ShowCollapseButton)">
-        <button class="dismiss-button btn btn-close" onclick="@onOpenButtonClick" />
+        <button class="dismis-button btn btn-close" onclick="@onOpenButtonClick" />
     </div>
 }
 
@@ -36,7 +36,7 @@
         margin: 0.5rem;
     }
 
-    .dismiss-button {
+    .dismis-button {
         float: right;
     }
 
@@ -45,7 +45,7 @@
 @code {
     [Parameter] public bool Visible { get; set; } = true;
     [Parameter] public bool ShowCollapseButton { get; set; } = true;
-    [Parameter] public string AlertType { get; set; } = "none";
+    [Parameter] public string AlertType { get; set; } = "info";
     [Parameter] public string AlertText { get; set; }
     [Parameter] public EventCallback OnToggleAlert { get; set; }
     [Parameter] public EventCallback<bool> OnDismissChanged { get; set; }
@@ -64,14 +64,14 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (AlertType.ToLower().Trim() == "none")
+        if (AlertType.ToLower().Trim() != "none")
         {
-            alertRender = $"border border-1";
+            AlertTextRender = $"text-dark";
+            alertRender = $"alert alert-{AlertType}";
         }
         else
         {
-            AlertTextRender = $"text-dark";
-            alertRender = $"alert-section alert alert-{AlertType}";
+            alertRender = "";
         }
     }
 

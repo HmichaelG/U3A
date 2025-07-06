@@ -26,7 +26,6 @@ builder.Services.AddRazorComponents(options =>
     options.DetailedErrors = builder.Environment.IsDevelopment())
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<DxThemesService>();
 builder.Services.AddScoped<LocalTime>();
 builder.Services.AddScoped<TenantInfoService>();
 builder.UseSerilogLogging(tenantConnectionString);

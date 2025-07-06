@@ -1,5 +1,5 @@
 ﻿
-// Orientation Change
+// Full screen / normal screen functions
 
 function registerOrientationChange(dotNetHelper) {
     window.addEventListener("orientationchange", () => {
@@ -11,41 +11,32 @@ function registerOrientationChange(dotNetHelper) {
 window.hoverClickMenu = (() => {
     let lastClickTime = 0;
     let hoverTimer = null;
-    const CLICK_COOLDOWN = 750;
-
-    function getAdaptiveDelay() {
-        const usedBefore = sessionStorage.getItem('menuUsed') === 'true';
-        return usedBefore ? 500 : 1200;
-    }
+    const CLICK_THRESHOLD = 500; // Minimum time between clicks
 
     return {
-        attachAdaptiveHover: function (elementId) {
-            const menu = document.getElementById(elementId);
+        attachHoverHandler: function (elementId) {
+            menu = document.getElementById(elementId);
             if (!menu) return;
 
-            // Prevent manual double-clicks
+            // Intercept manual double clicks
             menu.addEventListener('click', (e) => {
                 const now = Date.now();
-                if (now - lastClickTime < CLICK_COOLDOWN) {
-                    e.preventDefault();
+                if (now - lastClickTime < CLICK_THRESHOLD) {
                     e.stopImmediatePropagation();
+                    e.preventDefault();
                     return false;
                 }
                 lastClickTime = now;
-                sessionStorage.setItem('menuUsed', 'true');
             });
 
             menu.addEventListener('mouseenter', () => {
-                const delay = getAdaptiveDelay();
-
                 hoverTimer = setTimeout(() => {
                     const now = Date.now();
-                    if (now - lastClickTime >= CLICK_COOLDOWN) {
+                    if (now - lastClickTime >= CLICK_THRESHOLD) {
                         menu.click();
                         lastClickTime = now;
-                        sessionStorage.setItem('menuUsed', 'true');
                     }
-                }, delay);
+                }, 250);
             });
 
             menu.addEventListener('mouseleave', () => {
@@ -136,7 +127,14 @@ function GetLocalStorage(key) {
     return window.localStorage.getItem(key);
 }
 
+document.onreadystatechange = function (e) {
+    if (document.readyState === 'complete') {
+        setTheme();
+    }
+}
+
 window.onload = function () {
+    setTheme();
     displayNonInteractive();
 }
 
@@ -148,6 +146,32 @@ function displayNonInteractive() {
         }
     }, 10000);
 };
+function setTheme() {
+    // If we pass a theme in a query string then save it to localStorage
+    var qs = getQueryStrings();
+    var theme = qs['theme']
+    if (theme) {
+        localStorage.setItem("theme", theme);
+    }
+    var link = document.getElementById("theme");
+    var href = link.href;
+    if (href == null) { href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css'; }
+    // load from localStorage & replace the default
+    theme = localStorage.getItem('theme');
+    if (theme) {
+        theme = theme.replace('"', '',);
+        theme = theme.replace('"', '',);
+        if (theme.startsWith("fluent")) {
+            theme = theme.replace('.bs5', '',);
+            // whenfluent theme is working correctly
+            //    theme = 'window.matchMedia('(prefers-color-scheme: dark)').matches ? 'fluent-dark' : 'fluent-light'
+        }
+        href = href.replace('office-white', theme);
+    }
+    if (link) {
+        link.href = href;
+    }
+}
 function getQueryStrings() {
     var assoc = {};
     var decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); };

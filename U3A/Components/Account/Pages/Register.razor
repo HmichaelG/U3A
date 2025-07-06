@@ -48,11 +48,9 @@
                 <label for="confirm-password">Confirm Password</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
-            <div class="button-container">
-                <DxButton CssClass="w-50" SubmitFormOnClick='true' Text="Register" RenderStyle="ButtonRenderStyle.Primary" />
-                <NavLink href="/" class="button-link w-50">
-                    <DxButton Text="Cancel" CssClass="w-100" RenderStyle="ButtonRenderStyle.Secondary" />
-                </NavLink>
+            <div class="row p-2">
+                <button type="submit" class="w-50 btn btn-primary">Register</button>
+                <a type="button" href="/" class="w-50 btn btn-secondary">Cancel</a>
             </div>
         </EditForm>
     </div>

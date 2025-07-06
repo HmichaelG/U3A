@@ -45,33 +45,31 @@
         case HelpActivationStyle.StandardButtonAndTitle:
         case HelpActivationStyle.ButtonAndTitleNoMessages:
             <PageTitle>@($"{tenantId}: {Title}")</PageTitle>
-            <div class="w-100 flex flex-row align-items-center">
-                <div class="title-style">
-                    <DxButton IconCssClass="@HelpButtonIconCssClass" CssClass="@ButtonCssClass"
+            <div class="w-100 flex-row title-style">
+                <h1 class="@TitleCssClass h3">
+                    <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Info"
+                              RenderStyle="ButtonRenderStyle.None"
                               Click="ShowTopicAsync" Id="helpButton" />
                     @Title
-                    <div class="message-style">
-                        @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
-                        {
-                            @if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
-                            {
-                                <div class="mx-2 mt-2 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
-                            }
-                            @if (TwoFactorWarningMessage is not null)
-                            {
-                                <div class="mx-2 mt-2 alert-style alert alert-warning text-center">@TwoFactorWarningMessage</div>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(informationMessage))
-                            {
-                                <div class="mx-2 mt-2 alert-style alert alert-info text-center">
-                                    @informationMessage
-                                </div>
-                            }
-                        }
-                    </div>
-                </div>
+                </h1>
+                @if (ActivationStyle == HelpActivationStyle.StandardButtonAndTitle)
+                {
+                    @if (!string.IsNullOrWhiteSpace(inMaintenanceMessage))
+                    {
+                        <div class="mx-2 mt-2 alert-style alert alert-danger text-center">@inMaintenanceMessage</div>
+                    }
+                    @if (TwoFactorWarningMessage is not null)
+                    {
+                        <div class="mx-2 mt-2 alert-style alert alert-warning text-center">@TwoFactorWarningMessage</div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(informationMessage))
+                    {
+                        <div class="mx-2 mt-2 alert-style alert alert-info text-center">
+                            @informationMessage
+                        </div>
+                    }
+                }
             </div>
             <div class="subtitle-style">@(new MarkupString(Subtitle))</div>
             break;
@@ -108,27 +106,20 @@
         margin-bottom: 0.5dvh !important;
     }
 
-    .message-style {
-        font-size: small;
-        font-weight: initial;
+    .help-btn {
+        color: var(--dxbl-client-component-palette-info);
+        font-weight: 900;
     }
 
     .title-style {
-        display: flex;
-        align-items: center;
-        margin-top: 0.5rem;
-        max-height: 1.75rem;
-        font-size: 1.3rem;
-        font-weight: 500;
-        color: var(--dxbl-accent-color);
-        text-align: @((ws.IsLargeScreen) ? "start" : "center");
+        color: var(--dxbl-client-component-palette-primary);
+        text-align: @((ws.IsLargeScreen) ? "start" : "center"); 
         justify-content: @((ws.IsLargeScreen) ? "start" : "center");
     }
 
     .subtitle-style {
         width: 100%;
-        margin-top: 0rem;
-        margin-bottom: 0.1rem;
+        margin-bottom: 0.5rem;
         flex-direction: column;
         text-align: @((ws.IsLargeScreen) ? "start" : "center");
         justify-content: @((ws.IsLargeScreen) ? "start" : "center");
@@ -155,9 +146,7 @@
     [Parameter]
     public string TitleCssClass { get; set; } = "flex-grow-0";
     [Parameter]
-    public string ButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill text-accent";
-    [Parameter]
-    public string HelpButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill";
+    public string ButtonIconCssClass { get; set; } = "h2 bi bi-question-circle-fill help-btn";
     [Parameter]
     public bool IncludeTableOfContents { get; set; } = false;
     [Parameter]

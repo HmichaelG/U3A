@@ -2,7 +2,6 @@
 using Azure.AI.OpenAI;
 using DevExpress.AIIntegration;
 using DevExpress.AIIntegration.Blazor.Reporting.Viewer.Models;
-using DevExpress.AIIntegration.Reporting.Common.Models;
 using DevExpress.Blazor.Reporting;
 using Microsoft.Extensions.AI;
 using OpenAI;
@@ -43,29 +42,23 @@ public static class AIChatServiceExtension
 
         builder.Services.AddDevExpressBlazor();
         builder.Services.AddChatClient(aiChatClient);
-
-        var languages = new List<LanguageInfo>()
-        {
-            new LanguageInfo() {Id="en",Text="English" },
-            new LanguageInfo() { Id = "ch", Text = "Chinese" },
-            new LanguageInfo() { Id = "fr", Text = "French" },
-            new LanguageInfo() { Id = "de", Text = "German" },
-            new LanguageInfo() { Id = "gr", Text = "Greek" },
-            new LanguageInfo() { Id = "it", Text = "Italian" },
-            new LanguageInfo() { Id = "jp", Text = "Japanese" },
-            new LanguageInfo() { Id = "es", Text = "Spanish" },
-            new LanguageInfo() { Id = "vn", Text = "Vietnamese" }
-        };
         builder.Services.AddDevExpressAI(config =>
         {
             config.RegisterOpenAIAssistants(openAiClient, model);
             config.AddBlazorReportingAIIntegration(options =>
             {
-                options.AddTranslation(options =>
-                {
-                    options.SetLanguages(languages);
-                });
-                options.AddSummarization(options => options.SetSummarizationMode(SummarizationMode.Abstractive));
+                options.Languages = new List<LanguageItem>() {
+            new LanguageItem() { Key = "en", Text = "English" },
+            new LanguageItem() { Key = "ch", Text = "Chinese" },
+            new LanguageItem() { Key = "fr", Text = "French" },
+            new LanguageItem() { Key = "de", Text = "German" },
+            new LanguageItem() { Key = "gr", Text = "Greek" },
+            new LanguageItem() { Key = "it", Text = "Italian" },
+            new LanguageItem() { Key = "jp", Text = "Japanese" },
+            new LanguageItem() { Key = "es", Text = "Spanish" },
+            new LanguageItem() { Key = "vn", Text = "Vietnamese" }
+            };
+                options.SummarizationMode = SummarizationMode.Abstractive;
             });
         });
 

@@ -2,22 +2,17 @@
 
 @inject IFileVersionProvider FileVersionProvider
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
-@inject DxThemesService ThemesService
-
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="@(ThemesService.IsBootstrapDarkActive ? "dark" : null)" data-fluent-darkmode="@(ThemesService.IsFluentDarkModeActive ? "" : null)">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
     <base href="/" />
-    @DxResourceManager.RegisterTheme(DxThemes.Bootstrap)
-    @DxResourceManager.RegisterTheme(ThemesService.ActiveTheme)
-    @DxResourceManager.RegisterScripts()
 
+    <link id="theme" href=@AppendVersion("_content/DevExpress.Blazor.Themes/office-white.bs5.min.css") rel="stylesheet" />
     <link href=@AppendVersion("_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.css") rel="stylesheet" />
-
     <link href=@AppendVersion("_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css") rel="stylesheet" />
 
     <link rel="stylesheet" href="@Assets["https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"]">
@@ -35,9 +30,10 @@
     <ImportMap />
 
     <HeadOutlet @rendermode="@PageRenderMode" />
+
 </head>
 
-<body class="@(ThemesService.IsFluentActive ? "dxbl-theme-fluent" : null)">
+<body>
 
     @* For logout *@
     <form id="logout-form" action="Account/Logout" @formname="logout" method="post">

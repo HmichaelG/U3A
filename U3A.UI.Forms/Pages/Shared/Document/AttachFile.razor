@@ -15,17 +15,15 @@
     <BodyContentTemplate>
         <DxFormLayout>
             <DxFormLayoutItem ColSpanXxl="12" Context="formContext">
-                <div class="row">
+                <div class="row"
                     <div id="overviewDropZone" class="col-12 card custom-drop-zone bg-light rounded-3 m-auto">
                         <span class="bi bi-upload icon-size mb-3"></span>
                         <span>Drag and Drop <strong>PDF</strong> File Here</span><span class="m-1">or</span>
-                        <div class="button-container w-25">
-                            <DxButton id="fileSelectButton" CssClass="w-100" SubmitFormOnClick='true' Text="Select file" RenderStyle="ButtonRenderStyle.Primary" />
-                        </div>
+                        <button id="overviewSelectButton" class="btn border-primary btn-primary m-1">Select File</button>
                     </div>
                 </div>
                 <DxUpload Name="myFile" @ref="FileUploader"
-                          ExternalSelectButtonCssSelector="#fileSelectButton"
+                          ExternalSelectButtonCssSelector="#overviewSelectButton"
                           ExternalDropZoneCssSelector="#overviewDropZone"
                           ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
                           UploadUrl="@GetUploadUrl()"
