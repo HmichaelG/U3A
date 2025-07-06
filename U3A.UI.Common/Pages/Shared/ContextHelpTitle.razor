@@ -47,9 +47,9 @@
             <PageTitle>@($"{tenantId}: {Title}")</PageTitle>
             <div class="w-100 flex flex-row align-items-center">
                 <div class="title-style">
-                    <DxButton IconCssClass="@ButtonIconCssClass" CssClass="@ButtonCssClass"
+                    <DxButton IconCssClass="@HelpButtonIconCssClass" CssClass="@ButtonCssClass"
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.None"
+                              RenderStyle="ButtonRenderStyle.Info"
                               Click="ShowTopicAsync" Id="helpButton" />
                     @Title
                     <div class="message-style">
@@ -118,7 +118,7 @@
         align-items: center;
         margin-top: 0.5rem;
         max-height: 1.75rem;
-        font-size: 1rem;
+        font-size: 1.3rem;
         font-weight: 500;
         color: var(--dxbl-accent-color);
         text-align: @((ws.IsLargeScreen) ? "start" : "center");
@@ -155,7 +155,9 @@
     [Parameter]
     public string TitleCssClass { get; set; } = "flex-grow-0";
     [Parameter]
-    public string ButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill primary-color";
+    public string ButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill text-accent";
+    [Parameter]
+    public string HelpButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill";
     [Parameter]
     public bool IncludeTableOfContents { get; set; } = false;
     [Parameter]

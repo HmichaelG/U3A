@@ -112,7 +112,7 @@ else
                                                                             <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
                                                                                 <Template>
                                                                                     <div class="d-flex">
-                                                                                        <div class="flex-grow-0 pt-1 pe-2 primary-color fw-bold">From:</div>
+                                                                                        <div class="flex-grow-0 pt-1 pe-2 text-accent fw-bold">From:</div>
                                                                                         <DxDateEdit Date=@startDate DateChanged="@((DateTime newValue) => OnStartDateChanged(newValue))" CssClass="flex-grow-1" />
                                                                                     </div>
                                                                                 </Template>
@@ -120,7 +120,7 @@ else
                                                                             <DxToolbarItem Context="a" Alignment="ToolbarItemAlignment.Right">
                                                                                 <Template>
                                                                                     <div class="d-flex">
-                                                                                        <div class="flex-grow-0 pt-1 px-2 primary-color fw-bold">To:</div>
+                                                                                        <div class="flex-grow-0 pt-1 px-2 text-accent fw-bold">To:</div>
                                                                                         <DxDateEdit Date=@endDate DateChanged="@((DateTime newValue) => OnEndDateChanged(newValue))" CssClass="flex-grow-1" />
                                                                                     </div>
                                                                                 </Template>
