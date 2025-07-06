@@ -61,7 +61,7 @@ else
                 <MessageBox @ref="@messageBox" />
 
                 <DxFormLayout Enabled=@IsProcessing>
-                    <div class="text-danger">@(new MarkupString(errorMessage))</div>
+                    <div class="fluent-danger">@(new MarkupString(errorMessage))</div>
                     <DxFormLayoutItem Caption="Current Enrolment Term" ColSpanMd="12">
                         <TermsComboBox Terms="@terms" @bind-SelectedTerm="@sourceTerm" />
                     </DxFormLayoutItem>

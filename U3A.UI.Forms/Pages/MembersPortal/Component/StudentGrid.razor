@@ -42,7 +42,7 @@ else
                                 var hasMobile = !string.IsNullOrEmpty(e.Person.Mobile) && !e.Person.IsPhoneSilent && !e.Person.SMSOptOut;
                                 var hasPhone = !string.IsNullOrEmpty(e.Person.HomePhone) && !e.Person.IsPhoneSilent;
                                 var highlightcss = (isCourseClerk)
-                                ? "alert-link text-primary"
+                                ? "alert-link fluent-primary"
                                 : "";
                                 var width = (IsSmallLayout) ? "col col-9" : "col col-12";
                                 var css = $"{width} text-start {highlightcss}";

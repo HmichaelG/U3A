@@ -25,13 +25,13 @@
         </form>
         <EditForm Model="Input" FormName="change-email" OnValidSubmit="OnValidSubmitAsync" method="post">
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
+            <ValidationSummary class="fluent-danger" role="alert" />
             @if (isEmailConfirmed)
             {
                 <div class="form-floating mb-3 input-group">
                     <input type="text" value="@email" class="form-control" placeholder="Please enter your email." disabled />
                     <div class="input-group-append">
-                        <span class="h-100 input-group-text text-success font-weight-bold">✓</span>
+                        <span class="h-100 input-group-text fluent-info font-weight-bold">✓</span>
                     </div>
                     <label for="email" class="form-label">Email</label>
                 </div>
@@ -47,11 +47,13 @@
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
                 <label for="new-email" class="form-label">New email</label>
-                <ValidationMessage For="() => Input.NewEmail" class="text-danger" />
+                <ValidationMessage For="() => Input.NewEmail" class="fluent-danger" />
             </div>
-            <div class="row p-2">
-                <button type="submit" class="w-50 btn btn-primary">Change Email</button>
-                <a type="button" href="@(NavigationManager.BaseUri)" class="w-50 btn btn-secondary">Return to menu</a>
+            <div class="button-container">
+                <DxButton CssClass="w-50" SubmitFormOnClick='true' Text="Change Email" RenderStyle="ButtonRenderStyle.Primary" />
+                <NavLink href="/" class="button-link w-50">
+                    <DxButton Text="Cancel" CssClass="w-100" RenderStyle="ButtonRenderStyle.Secondary" />
+                </NavLink>
             </div>
         </EditForm>
     </div>

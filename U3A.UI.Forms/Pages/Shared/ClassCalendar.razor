@@ -42,7 +42,7 @@
                                 <GroupRowTemplate>
                                     @{
                                         <div class="pt-2">
-                                            <div class="h6 text-info">@(((DateTime)context.GroupValue).ToString(constants.FULL_DAY_DATE_FORMAT))</div>
+                                            <div class="h6 fluent-info">@(((DateTime)context.GroupValue).ToString(constants.FULL_DAY_DATE_FORMAT))</div>
                                         </div>
                                     }
                                 </GroupRowTemplate>
@@ -160,7 +160,7 @@
     {
         string result = "text-body";
         if (Events is not null && Events.Any(d => DaysEqual(d.Start, date)))
-            result = "font-weight-bold text-info";
+            result = "font-weight-bold fluent-info";
         return result;
     }
 

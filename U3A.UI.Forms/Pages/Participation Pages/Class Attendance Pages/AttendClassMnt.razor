@@ -129,10 +129,10 @@ else
                                     ValueChanged="@(async(ClassDate selectedDate) => await SelectedDateChanged(selectedDate))">
                             <Buttons>
                                 <DxEditorButton Tooltip="Add an unscheduled class"
-                                                IconCssClass="text-success bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
+                                                IconCssClass="fluent-info bi bi-plus" Click="@(async() => await OnNewDateButtonClick())" />
                                 <DxEditorButton Tooltip="Delete a class and its attendance history"
                                                 Visible="@((selectedDate != null) && (selectedDate.Date.Date <= now.Date))"
-                                                IconCssClass="text-danger bi bi-trash" Click="@(async() => await OnDeleteDateButtonClick())" />
+                                                IconCssClass="fluent-danger bi bi-trash" Click="@(async() => await OnDeleteDateButtonClick())" />
                             </Buttons>
                         </DxComboBox>
                     </DxFormLayoutItem>
@@ -192,13 +192,13 @@ else
                                 switch (status)
                                 {
                                     case AttendClassStatusType.Present:
-                                        css = "text-success";
+                                        css = "fluent-info";
                                         break;
                                     case AttendClassStatusType.AbsentFromClassWithApology:
-                                        css = "text-warning";
+                                        css = "fluent-warning";
                                         break;
                                     default:
-                                        css = "text-danger";
+                                        css = "fluent-danger";
                                         break;
                                 }
                                 <div class=@css>@context.Value</div>
@@ -242,7 +242,7 @@ else
         <div class="pt-3 pe-1 col col-3 d-none d-lg-inline">
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" CssClass="pt-2">
                 <div class="border">
-                    <div class="pt-3 px-2 text-info"><b>Class Summary</b></div>
+                    <div class="pt-3 px-2 fluent-info"><b>Class Summary</b></div>
                     <div class="row mx-2">
                         <div class="col-9">Min-Required</div>
                         <div class="col-3 text-end">@MinimumParticipants</div>
@@ -266,7 +266,7 @@ else
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
                                CssClass="mt-1 border" ColSpanSm="12">
-                <div class="pt-4 px-2 text-info"><b>Quick RollCall</b></div>
+                <div class="pt-4 px-2 fluent-info"><b>Quick RollCall</b></div>
                 <DxFormLayoutItem Caption="Attendance?" ColSpanSm="12">
                     <DxComboBox Data="ClassAttendanceStatus"
                                 @bind-Value="QuickSelectionStatus"
@@ -292,7 +292,7 @@ else
             </DxFormLayoutGroup>
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None"
                                CssClass="mt-1 border">
-                <div class="pt-3 px-2 text-info"><b>Ad Hoc Attendees</b></div>
+                <div class="pt-3 px-2 fluent-info"><b>Ad Hoc Attendees</b></div>
                 <div class="m-2">
                     <DxButton Text="Add Ad Hoc Attendee(s)" CssClass="col-12 mt-1"
                               Id="AddAdHocAttendee"

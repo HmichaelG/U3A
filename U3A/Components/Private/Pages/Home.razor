@@ -31,7 +31,7 @@ else
               HeaderVisible="true"
               HeaderText="🎁 A New Software Update"
               BodyText="Our software has been updated. Click the button above to see what has changed."
-              CssClass="text-info" />
+              CssClass="fluent-info" />
 
     <DxWindow HeaderText="Open Circuits" Width="800px" ShowFooter="true"
               ShowCloseButton="true"
@@ -87,13 +87,14 @@ else
                 else
                 {
                     <span class="d-flex flex-row align-items-center">
-                        <img class="h5 text-primary bi bi-people" />
-                        <div class="text-start mx-1" ondblclick=@(() => OnCircuitClick())>@($"{openCircuits} users logged in.")</div>
+                        <i class="fluent-primary bi bi-people fs-4"></i>
+                        <div class="mx-2" ondblclick="@(() => OnCircuitClick())">@($"{openCircuits} users logged in.")</div>
                     </span>
+
                     <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                       IsVersionButton=true
                                       ShowNewSoftwareUpdateFlyout=@((value) => {isFlyoutOpen = value;})
-                                      ButtonIconCssClass="h5 text-primary bi bi-check2-circle"
+                                      ButtonIconCssClass="fs-4 fluent-primary bi bi-check2-circle"
                                       HelpTopic=@($"{versionYear}-Version-History.html")
                                       ActivationStyle="@HelpActivationStyle.ButtonOnly"
                                       Closed="() => isFlyoutOpen=false" />
@@ -101,14 +102,14 @@ else
                               RenderStyleMode="ButtonRenderStyleMode.Outline"
                               NavigateUrl="Public/Support"
                               CssClass="ms-1"
-                              IconCssClass="h5 text-primary bi bi-person-raised-hand" />
+                              IconCssClass="fs-4 fluent-primary bi bi-person-raised-hand" />
                     <ContextHelpTitle Title=""
                                       HelpTopic="Introduction.html"
                                       IncludeTableOfContents=true
                                       ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
                 }
             </div>
-            <DxTabs CssClass="w-100">
+            <DxTabs>
                 <DxTabPage Text="Member Summary">
                     <GeneralSummaryChart />
                 </DxTabPage>
@@ -144,9 +145,12 @@ else
 }
 
 <style>
+    .tab-style {
+        width: 100dvw;
+    }
 
     .iframe-style {
-        width: 85vw;
+        width: @((ws.IsLargeScreen) ? "82dvw" : "97dvw");
         min-height: 40dvh;
         height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "7.5rem") );
         border-style: none;

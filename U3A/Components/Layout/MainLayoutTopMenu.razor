@@ -70,7 +70,7 @@
                         <div class="@((hasRole) ? "content-padding" : "")">
                             @if (!string.IsNullOrWhiteSpace(messageText))
                             {
-                                <div class="alert alert-danger text-danger text-center mx-auto">
+                                <div class="alert alert-danger fluent-danger text-center mx-auto">
                                     @(new MarkupString(messageText))
                                 </div>
                             }

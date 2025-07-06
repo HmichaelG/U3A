@@ -92,18 +92,18 @@ else
                                         @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                         {
                                             <div class="row px-2 px-md-3 col-12">
-                                                <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
+                                                <div class="fluent-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
                                             </div>
                                         }
 
                                         <div class="w-100 text-center">
                                             @if (c.Course.CourseFeePerYear != 0)
                                             {
-                                                <div class="text-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
+                                                <div class="fluent-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
                                             }
                                             @if (c.Course.HasTermFees)
                                             {
-                                                <div class="text-info"><strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong></div>
+                                                <div class="fluent-info"><strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong></div>
                                             }
                                         </div>
 
@@ -165,7 +165,7 @@ else
         </DxGrid>
 
         <div class="align-items-end">
-            <div class="h6 col-12 text-primary" align="center">
+            <div class="h6 col-12 fluent-primary" align="center">
                 @(new MarkupString(selectionCountText))
             </div>
 

@@ -197,7 +197,7 @@ else
             <DxFormLayoutGroup BeginRow=true CssClass="leader-height border w-100" Decoration="FormLayoutGroupDecoration.None">
                 <Items>
                     <div class="mx-2 mt-3 mb-2">
-                        <div class="text-info"><b>Leaders</b></div>
+                        <div class="fluent-info"><b>Leaders</b></div>
                         @if (CourseLeaders != null)
                         {
                             foreach (Person l in CourseLeaders)
@@ -209,7 +209,7 @@ else
                 </Items>
             </DxFormLayoutGroup>
             <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
-                <div class="pt-3 mx-2 text-info"><b>Statistics</b></div>
+                <div class="pt-3 mx-2 fluent-info"><b>Statistics</b></div>
                 <div class="px-3">
                     <div class="row">
                         <div class="w-75">Min-Required</div>
@@ -224,7 +224,7 @@ else
                 </div>
             </DxFormLayoutGroup>
             <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
-                <div class="pt-3 px-2 text-info"><b>Filter</b></div>
+                <div class="pt-3 px-2 fluent-info"><b>Filter</b></div>
                 <InputRadioGroup ValueChanged="@((int s) => ShowEnrolledTypeChanged(s))"
                                  Value="@ShowEnrolmentType"
                                  ValueExpression="@( () => ShowEnrolmentType )">
@@ -234,7 +234,7 @@ else
                 </InputRadioGroup>
             </DxFormLayoutGroup>
             <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
-                <div class="pt-3 px-2 text-info"><b>Quick Actions</b></div>
+                <div class="pt-3 px-2 fluent-info"><b>Quick Actions</b></div>
                 <div class="m-2">
                     <DxButton Text="Quick Enrolment" CssClass="col col-12 mt-1"
                               Id="QuickEnrolment"

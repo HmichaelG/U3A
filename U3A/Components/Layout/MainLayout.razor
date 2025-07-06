@@ -158,6 +158,7 @@
         isInteractive = RendererInfo.IsInteractive;
         if (firstRender)
         {
+            await js.LoadDxResources();
             await GetWorkstationDetails();
             objRef = DotNetObjectReference.Create(this);
             await js.InvokeVoidAsync("registerOrientationChange", objRef);

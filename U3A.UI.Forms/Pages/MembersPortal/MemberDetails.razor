@@ -112,7 +112,7 @@ else
                                 <DxFormLayoutItem Caption="Email" ColSpanMd="12">
                                     <DxTextBox @bind-Text="@person.Email" ReadOnly="true">
                                         <Buttons>
-                                            <DxEditorButton Text="Help" CssClass="text-info"
+                                            <DxEditorButton Text="Help" CssClass="fluent-info"
                                                             IconCssClass="bi bi-question"
                                                             Click="@(async () => await messageBox.ShowOkOnlyAsync("Email Address",
                                 @"<div class='text-center alert alert-info text-dark col-12'>
@@ -136,7 +136,7 @@ else
                                                 ValueFieldName="@nameof(SilentContactWrapper.Type)"
                                                 TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
                                         <Buttons>
-                                            <DxEditorButton Text="Help" CssClass="text-info"
+                                            <DxEditorButton Text="Help" CssClass="fluent-info"
                                                             IconCssClass="bi bi-question"
                                                             Click="@(async () => await messageBox?
                                                             .ShowOkOnlyAsync("Silent Contacts",
@@ -172,7 +172,7 @@ else
                         <DxTabPage Text="Your Carer's Details">
                             <DxFormLayout CssClass="container m-1 p-2 mx-auto">
                                 <DxFormLayoutGroup Caption="Your Carer's Details">
-                                    <div class="text-info text-wrap m-2">Please complete if you wish your carer to attend class with you.</div>
+                                    <div class="fluent-info text-wrap m-2">Please complete if you wish your carer to attend class with you.</div>
                                     <DxFormLayoutItem Caption="Carer's Name" ColSpanMd="12">
                                         <DxTextBox @bind-Text="@person.CarerName"
                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />

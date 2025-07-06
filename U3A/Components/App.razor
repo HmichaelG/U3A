@@ -2,20 +2,25 @@
 
 @inject IFileVersionProvider FileVersionProvider
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject DxThemesService ThemesService
+
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="@(ThemesService.IsBootstrapDarkActive ? "dark" : null)" data-fluent-darkmode="@(ThemesService.IsFluentDarkModeActive ? "" : null)">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
     <base href="/" />
 
-    <link id="theme" href=@AppendVersion("_content/DevExpress.Blazor.Themes/office-white.bs5.min.css") rel="stylesheet" />
+    @DxResourceManager.RegisterTheme(DxThemes.Bootstrap)
+    @DxResourceManager.RegisterTheme(ThemesService.ActiveTheme)
+    @DxResourceManager.RegisterScripts()
+
     <link href=@AppendVersion("_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.css") rel="stylesheet" />
     <link href=@AppendVersion("_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css") rel="stylesheet" />
-
     <link rel="stylesheet" href="@Assets["https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"]">
+    <link href=@Assets["U3A.styles.css"] rel="stylesheet" />
 
     <link rel="apple-touch-icon" href=@Assets["/favicon/apple-touch-icon.png"]>
     <meta name="web-app-capable" content="yes">
@@ -24,16 +29,13 @@
     <link rel="icon" type="image/png" sizes="32x32" href=@Assets["/favicon/favicon-32x32.png"]>
     <link rel="icon" type="image/png" sizes="16x16" href=@Assets["/favicon/favicon-16x16.png"]>
     <link rel="icon" type="image/ico" href=@Assets["/favicon/favicon.ico"]>
-    <link rel="stylesheet" href=@Assets["css/site.css"] />
-    <link href=@Assets["U3A.styles.css"] rel="stylesheet" />
     <link rel="manifest" href=@Assets["/favicon/site.webmanifest"]>
     <ImportMap />
 
     <HeadOutlet @rendermode="@PageRenderMode" />
-
 </head>
 
-<body>
+<body class="@(ThemesService.IsFluentActive ? "dxbl-theme-fluent" : null)">
 
     @* For logout *@
     <form id="logout-form" action="Account/Logout" @formname="logout" method="post">

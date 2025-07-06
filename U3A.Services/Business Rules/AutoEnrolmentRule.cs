@@ -300,19 +300,7 @@ namespace U3A.BusinessRules
                                                 .Include(x => x.Course)
                                                 .Include(x => x.Term)
                                                 .Include(x => x.Person)
-                                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted &&
-                                                             (x.TermID == SelectedTerm.ID ||
-                                                             (x.Course.AllowMultiCampsuFrom != null &&
-                                                             x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
-                                                                && x.CourseID == course.ID
-                                                                && x.Person.DateCeased == null
-                                                                && !CourseLeaders.Contains(x.Person))
-                                                .ToListAsync();
-                    enrolmentsToProcess = await dbc.Enrolment.IgnoreQueryFilters()
-                                                .Include(x => x.Course)
-                                                .Include(x => x.Term)
-                                                .Include(x => x.Person)
-                                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted &&
+                                                .Where(x =>  !x.IsDeleted && !x.Person.IsDeleted &&
                                                              (x.TermID == SelectedTerm.ID || isFutureCourse ||
                                                              (x.Course.AllowMultiCampsuFrom != null &&
                                                              x.Course.AllowMultiCampsuFrom <= today.AddDays(-1)))
@@ -626,7 +614,7 @@ namespace U3A.BusinessRules
         private static bool IsFutureCourse(DateTime today, Course course, DxSchedulerDataStorage calendar)
         {
             bool result = false;
-            result = course.Classes.All(x => x.OccurrenceID == (int)OccurrenceType.OnceOnly && x.TermsOfferedCount == 1);
+            result = course.Classes.All(x => x.OccurrenceID == (int)OccurrenceType.OnceOnly);
             if (!result)
             {
                 var start = new DateTime(today.Year, 1, 1);
@@ -637,21 +625,6 @@ namespace U3A.BusinessRules
                         .Where(x => course.Classes.Contains((Class)x.CustomFields["Source"]))
                         .Select(x => x.Start).FirstOrDefault();
                 result = (firstClass >= today);
-            }
-            return result;
-        }
-        private static List<Class> GetFutureClasses(DateTime today, Course course, DxSchedulerDataStorage calendar)
-        {
-            List<Class> result = new();
-            if (course.Classes.All(x => x.OccurrenceID == (int)OccurrenceType.OnceOnly))
-            {
-                var start = new DateTime(today.Year, 1, 1);
-                var end = new DateTime(today.Year, 12, 31);
-                var range = new DxSchedulerDateTimeRange(start, end);
-                Dictionary<Guid, List<DxSchedulerAppointmentItem>> classAppointments = new();
-                result.AddRange( calendar.GetAppointments(range)
-                        .Where(x => course.Classes.Contains((Class)x.CustomFields["Source"]))
-                        .Select(x => (Class)x.CustomFields["Source"]).ToList());
             }
             return result;
         }

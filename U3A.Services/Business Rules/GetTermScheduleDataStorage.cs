@@ -34,8 +34,8 @@ namespace U3A.BusinessRules
                 new LabelObject() {
                     Id = 0,
                     LabelCaption = "Term",
-                    BackgroundCssClass = "bg-secondary",
-                    TextCssClass = "text-black"
+                    BackgroundCssClass = "bg-secondary-subtle",
+                    TextCssClass = "text-dark"
                 },
                 new LabelObject() {
                     Id = 1,
@@ -46,8 +46,8 @@ namespace U3A.BusinessRules
                 new LabelObject() {
                     Id = 2,
                     LabelCaption = "Enrolment",
-                    BackgroundCssClass = "bg-warning",
-                    TextCssClass = "text-white"
+                    BackgroundCssClass = "bg-warning-subtle",
+                    TextCssClass = "text-dark"
                 },
                 new LabelObject() {
                     Id = 3,
@@ -89,7 +89,7 @@ namespace U3A.BusinessRules
                     // The term
                     schedule = new TermSchedule();
                     schedule.StartDate = t.StartDate.Date;
-                    schedule.EndDate = t.EndDate.Date;
+                    schedule.EndDate = t.EndDate.Date.AddDays(1);
                     schedule.AppointmentType = 0;
                     schedule.Caption = t.Name;
                     schedule.Label = (t.IsDefaultTerm) ? 1 : 0;
@@ -99,7 +99,7 @@ namespace U3A.BusinessRules
                     // The enrolment period
                     schedule = new TermSchedule();
                     schedule.StartDate = t.EnrolmentStartDate.Date;
-                    schedule.EndDate = t.EnrolmentEndDate.Date;
+                    schedule.EndDate = t.EnrolmentEndDate.Date.AddDays(1);
                     schedule.AppointmentType = 0;
                     schedule.Caption = $"{t.Name} Enrolment Period";
                     schedule.Label = 2;
