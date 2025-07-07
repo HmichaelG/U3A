@@ -137,6 +137,7 @@ function GetLocalStorage(key) {
 }
 
 window.onload = function () {
+    setTheme();
     displayNonInteractive();
 }
 
@@ -148,6 +149,20 @@ function displayNonInteractive() {
         }
     }, 10000);
 };
+function setTheme() {
+    // fluent theme: change color
+    const STD_COLOR = 'royalblue';
+    var color = localStorage.getItem('color');
+    if (!color) {
+        color = STD_COLOR;
+    }
+    const styleEl = document.querySelector('style[data-theme-id="Fluent"]');
+    if (styleEl) {
+        var inner = styleEl.innerHTML;
+        styleEl.innerHTML = inner.replace('transparent', color);
+    }
+}
+
 function getQueryStrings() {
     var assoc = {};
     var decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); };
