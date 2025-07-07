@@ -90,21 +90,21 @@ app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
 
 app.UseAntiforgery();
-app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (BadHttpRequestException ex)
-    {
-        // Handle the exception
-        if (ex.InnerException is AntiforgeryValidationException)
-        {
-            context.Response.Redirect("/");
-        }
-    }
-});
+//app.Use(async (context, next) =>
+//{
+//    try
+//    {
+//        await next();
+//    }
+//    catch (BadHttpRequestException ex)
+//    {
+//        // Handle the exception
+//        if (ex.InnerException is AntiforgeryValidationException)
+//        {
+//            context.Response.Redirect("/");
+//        }
+//    }
+//});
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
