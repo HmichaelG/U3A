@@ -48,7 +48,7 @@
             <div class="w-100 flex flex-row align-items-center">
                 <div class="title-style">
                     <DxButton IconCssClass="@HelpButtonIconCssClass" CssClass="@ButtonCssClass"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                              RenderStyleMode="ButtonRenderStyleMode.Text"
                               RenderStyle="ButtonRenderStyle.Info"
                               Click="ShowTopicAsync" Id="helpButton" />
                     @Title
@@ -157,7 +157,7 @@
     [Parameter]
     public string ButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill fluent-primary";
     [Parameter]
-    public string HelpButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill";
+    public string HelpButtonIconCssClass { get; set; } = "h5 bi bi-question-circle-fill fluent-info";
     [Parameter]
     public bool IncludeTableOfContents { get; set; } = false;
     [Parameter]

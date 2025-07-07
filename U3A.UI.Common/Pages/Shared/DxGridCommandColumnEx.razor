@@ -14,9 +14,9 @@
         HeaderTemplate = context =>
 @<text>
         @if (NewButtonVisible) {
-        <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+        <DxButton RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Large"
           RenderStyleMode="ButtonRenderStyleMode.Outline" title="Add new record"
-          IconCssClass="bi bi-plus fluent-info" Click="async () => await MyGrid.StartEditNewRowAsync()" />
+          IconCssClass="bi bi-database-add fluent-info" Click="async () => await MyGrid.StartEditNewRowAsync()" />
         }
     </text>
     ;

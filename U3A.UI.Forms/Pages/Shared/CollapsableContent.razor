@@ -3,18 +3,10 @@
 @if (!IsDismissed && Visible)
 {
     <section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
-        <button class="dismiss-button btn btn-close" onclick="@onCloseButtonClick" hidden="@(!ShowCollapseButton)" />
+        <button class="dismiss-button btn btn-close" onclick="@OnDismiss" hidden="@(!ShowCollapseButton)" />
         @ContentTemplate
         <div class="@($"{AlertTextRender}")">
             @(new MarkupString(AlertText))
-            @if (!string.IsNullOrWhiteSpace(DismissKey))
-            {
-                <DxFormLayout>
-                    <div class="d-flex w-100 justify-content-center">
-                        <DxButton Text="Do not show again" Click="@OnDismiss" RenderStyle="ButtonRenderStyle.Info" />
-                    </div>
-                </DxFormLayout>
-            }
         </div>
     </section>
     <div class="w-100 bg-primary muted" hidden="@(!isHidden || !ShowCollapseButton)">
@@ -45,7 +37,7 @@
 @code {
     [Parameter] public bool Visible { get; set; } = true;
     [Parameter] public bool ShowCollapseButton { get; set; } = true;
-    [Parameter] public string AlertType { get; set; } = "none";
+    [Parameter] public string AlertType { get; set; } = "info";
     [Parameter] public string AlertText { get; set; }
     [Parameter] public EventCallback OnToggleAlert { get; set; }
     [Parameter] public EventCallback<bool> OnDismissChanged { get; set; }
