@@ -107,7 +107,7 @@ public class Person : BaseEntity, ISoftDelete
     {
         get
         {
-            return (BirthDate == null) ? -1 : BirthDate.Value.Month;
+            return (BirthDate == null) ? -1 : BirthDate.Value.Month ;
         }
     }
     [NotMapped]
