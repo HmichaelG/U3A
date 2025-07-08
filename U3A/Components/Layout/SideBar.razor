@@ -1,31 +1,19 @@
 ﻿@inject WorkStation ws
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-<DxGridLayout>
-    <Rows>
-        <DxGridLayoutRow Areas="blank" Height="2.6rem"></DxGridLayoutRow>
-        <DxGridLayoutRow Areas="header" Height="auto"></DxGridLayoutRow>
-        <DxGridLayoutRow Areas="navigation"></DxGridLayoutRow>
-    </Rows>
-    <Columns>
-        <DxGridLayoutColumn />
-        <DxGridLayoutColumn Width="auto" />
-    </Columns>
-    <Items>
-        <DxGridLayoutItem Area="header">
-            <Template>
-                <img src="images/U3ALogo.png" />
-                <div class="h5 fluent-primary mt-1 menu-title w-100">@OrganisationName</div>
-                <SidebarImageComponent/>
-            </Template>
-        </DxGridLayoutItem>
-        <DxGridLayoutItem Area="navigation" CssClass="layout-item">
-            <Template>
-                <MainMenu IsTopMenu=false />
-            </Template>
-        </DxGridLayoutItem>
-    </Items>
-</DxGridLayout>
+<div class="d-flex flex-column sidebar-style">
+    <img src="images/U3ALogo.png" style="max-width: 81px; height: 28px" />
+    <div class="h5 flex-row fluent-primary mt-1">@OrganisationName</div>
+    <MainMenu IsTopMenu=false />
+    <SidebarImageComponent />
+</div>
+
+<style>
+    .sidebar-style {
+        margin-top: 2.6rem;
+        width: inherit;
+    }
+</style>
 
 @code {
 

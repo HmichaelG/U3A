@@ -70,7 +70,7 @@ else
     </DxWindow>
     <MessageBox @ref="@messageBox" />
 
-    <DxFormLayout CssClass="@($"px-2 mt-{ws.SizeMode + 2}")">
+    <div class="@($"px-2 mt-{ws.SizeMode + 2}")">
         @if (!hasRole)
         {
             <PageTitle>@($"{tenantId}: Member Portal")</PageTitle>
@@ -141,7 +141,7 @@ else
                 </div>
             </footer>
         }
-    </DxFormLayout>
+    </div>
 }
 
 <style>
