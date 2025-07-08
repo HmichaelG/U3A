@@ -86,9 +86,11 @@ else
                                     <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
-                                    <DxDateEdit @bind-Date="@person.BirthDate"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                NullText="Optional It helps to know you." />
+                                    <DxDateEdit @bind-Date="@person.BirthDate" DisplayFormat="@constants.LONG_MONTH_AND_YEAR_FORMAT"
+                                                Mask="@DateTimeMask.MonthAndYear"
+                                                NullText="(Optional) Month & Year only."
+                                                CalendarViewMode="CalendarViewMode.Year"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                                     <DxMemo @bind-Text="@person.Occupation" Rows="3"

@@ -162,7 +162,7 @@
                                             </DxGridBandColumn>
                                             <DxGridDataColumn Caption="Vax-Cert?" FieldName="VaxCertificateViewed" Visible="@settings.RequireVaxCertificate" Width="4rem" />
                                             <DxGridDataColumn Caption="Occupation" FieldName="Occupation" Visible=false />
-                                            <DxGridDataColumn Caption="DOB" FieldName="BirthDate" Visible="false" Width="6rem" />
+                                            <DxGridDataColumn Caption="DOB" FieldName="BirthDate" Visible="false" Width="6rem" DisplayFormat="@constants.LONG_MONTH_AND_YEAR_FORMAT" />
                                             <DxGridDataColumn Caption="Month Born" FieldName="BirthMonthName" Width="6rem" />
                                             <DxGridDataColumn Caption="Joined" FieldName="DateJoined" Width="6rem" />
                                             <DxGridDataColumn Caption="T&C's Agreed"
@@ -224,9 +224,11 @@
                                                     <DxFormLayoutItem Caption="Gender" ColSpanMd="12">
                                                         <DxComboBox Data="@gender" @bind-Value="@editItem.Gender" autocomplete="new-password" />
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
-                                                        <DxDateEdit @bind-Date="@editItem.BirthDate"
-                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
+                                                    <DxFormLayoutItem Caption="Birth Month/Year" ColSpanMd="12">
+                                                        <DxDateEdit @bind-Date="@editItem.BirthDate" DisplayFormat="@constants.LONG_MONTH_AND_YEAR_FORMAT"   
+                                                                    Mask="@DateTimeMask.MonthAndYear"
+                                                                    NullText="(Optional) Month & Year only."
+                                                                    CalendarViewMode="CalendarViewMode.Year" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                                                         <DxMemo @bind-Text="@editItem.Occupation" Rows="3" autocomplete="new-password" />

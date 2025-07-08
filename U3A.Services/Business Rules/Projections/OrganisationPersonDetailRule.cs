@@ -87,7 +87,7 @@ namespace U3A.BusinessRules
             opd.PersonState = person.State;
             opd.PersonPostcode = person.Postcode.ToString("f0");
             opd.PersonGender = person.Gender;
-            opd.PersonBirthDate = person.BirthDate;
+            opd.PersonBirthDate = person.AdjustedBirthDateTo15th;
             opd.PersonDateJoined = person.DateJoined;
             opd.PersonMembershipYears = person.MembershipYears;
             opd.PersonDateCeased = person.DateCeased;

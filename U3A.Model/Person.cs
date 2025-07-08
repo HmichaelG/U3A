@@ -102,6 +102,20 @@ public class Person : BaseEntity, ISoftDelete
 
     [DateOfBirth]
     public DateTime? BirthDate { get; set; }
+
+    [NotMapped]
+    public DateTime? AdjustedBirthDateTo15th
+    {
+        get
+        {
+            if (BirthDate.HasValue)
+            {
+                return new DateTime(BirthDate.Value.Year, BirthDate.Value.Month, 15);
+            }
+            return null;
+        }
+    }
+
     [NotMapped]
     public int BirthMonth
     {

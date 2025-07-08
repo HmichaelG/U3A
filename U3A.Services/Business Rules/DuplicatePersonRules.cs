@@ -87,9 +87,9 @@ namespace U3A.BusinessRules
         private static int CountMatches(Person person, Person duplicate)
         {
             int count = 0;
-            if (person.BirthDate.HasValue || duplicate.BirthDate.HasValue)
+            if (person.AdjustedBirthDateTo15th.HasValue || duplicate.AdjustedBirthDateTo15th.HasValue)
             {
-                if ((person.BirthDate ?? DateTime.MinValue) != (duplicate.BirthDate ?? DateTime.MinValue)) { return count; }
+                if ((person.AdjustedBirthDateTo15th ?? DateTime.MinValue) != (duplicate.AdjustedBirthDateTo15th ?? DateTime.MinValue)) { return count; }
                 else count++;
             }
             if ((!string.IsNullOrWhiteSpace(person.AdjustedMobile)) &&
@@ -263,7 +263,7 @@ namespace U3A.BusinessRules
         private static StringBuilder CreateDuplicateTable(Person person, Person duplicate)
         {
             var result = new StringBuilder();
-            string birthDate = (duplicate.BirthDate.HasValue) ? duplicate.BirthDate.Value.ToString("d") : "unknown";
+            string birthDate = (duplicate.AdjustedBirthDateTo15th.HasValue) ? duplicate.AdjustedBirthDateTo15th.Value.ToString("d") : "unknown";
             string email = (!string.IsNullOrWhiteSpace(duplicate.Email)) ? duplicate.Email : "unknown";
             string mobile = (!string.IsNullOrWhiteSpace(duplicate.Mobile)) ? duplicate.Mobile : "unknown";
             string homePhone = (!string.IsNullOrWhiteSpace(duplicate.HomePhone)) ? duplicate.HomePhone : "unknown";
@@ -302,9 +302,9 @@ namespace U3A.BusinessRules
         }
         static string CheckSameBirthdate(Person person, Person duplicate)
         {
-            if (person.BirthDate.HasValue && duplicate.BirthDate.HasValue)
+            if (person.AdjustedBirthDateTo15th.HasValue && duplicate.AdjustedBirthDateTo15th.HasValue)
             {
-                return (person.BirthDate.Value == duplicate.BirthDate.Value) ? CHECK_MARK : string.Empty;
+                return (person.AdjustedBirthDateTo15th.Value == duplicate.AdjustedBirthDateTo15th.Value) ? CHECK_MARK : string.Empty;
             }
             return string.Empty;
         }
