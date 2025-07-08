@@ -35,6 +35,7 @@ namespace U3A.Model
         public bool IsLargeScreen => MenuBehavior == "Large" || (MenuBehavior == "Auto" && ScreenSize == ScreenSizes.XLarge);
 
         public string Theme;
+        public string AccentColor;
         public string SidebarImage;
         public string MenuBehavior;
 
@@ -42,6 +43,7 @@ namespace U3A.Model
         const string USE_TOP_MENU_KEY = "use-topmenu";
         const string SIZE_MODE = "size-mode";
         const string THEME = "theme";
+        const string ACCENT_COLOR = "accent-color";
         const string SIDEBAR_IMAGE = "sidebar-image";
         const string MENU_BEHAVIOR = "menu-behavior";
 
@@ -71,10 +73,21 @@ namespace U3A.Model
             }
 
             // theme
-            Theme = "blazing-berry";
+            Theme = "light";
             if (await localStorage.ContainKeyAsync(THEME))
             {
                 Theme = await localStorage.GetItemAsync<string>(THEME);
+            }
+            if (THEME != "light" && THEME != "dark")
+            {
+                Theme = "light";
+            }
+
+            // accent color
+            AccentColor = "royalblue";
+            if (await localStorage.ContainKeyAsync(ACCENT_COLOR))
+            {
+                AccentColor = await localStorage.GetItemAsync<string>(ACCENT_COLOR);
             }
 
             // sidebar image
@@ -115,6 +128,8 @@ namespace U3A.Model
             await localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode);
             // theme
             await localStorage.SetItemAsync<String>(THEME, Theme);
+            // accent color
+            await localStorage.SetItemAsync<String>(ACCENT_COLOR, AccentColor);
             // sidebar image
             await localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage);
         }

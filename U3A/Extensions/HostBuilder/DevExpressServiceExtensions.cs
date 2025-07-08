@@ -36,10 +36,7 @@ public static class DevExpressServiceExtensions
         });
 
         builder.Services.AddDevExpressServerSideBlazorReportViewer();
-        builder.Services.AddDevExpressBlazor(options =>
-        {
-            options.SizeMode = SizeMode.Small;
-        });
+        builder.Services.AddDevExpressBlazor();
 
         builder.Services.AddDevExpressServerSideBlazorPdfViewer();
 

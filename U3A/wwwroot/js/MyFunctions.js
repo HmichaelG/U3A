@@ -152,9 +152,12 @@ function displayNonInteractive() {
 function setTheme() {
     // fluent theme: change color
     const STD_COLOR = 'royalblue';
-    var color = localStorage.getItem('color');
+    var color = localStorage.getItem('accent-color');
     if (!color) {
         color = STD_COLOR;
+    }
+    else {
+        color = color.replaceAll('"', '');
     }
     const styleEl = document.querySelector('style[data-theme-id="Fluent"]');
     if (styleEl) {

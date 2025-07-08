@@ -9,20 +9,13 @@
 }
 else
 {
-    <DxToolbar CssClass="my-1">
-        <DxToolbarItem Alignment="ToolbarItemAlignment.Left">
-            <Template>
-                <DxFormLayoutItem Caption="Max Y-Axis breaks" Context="thisContext">
-                    <DxSpinEdit @bind-Value=@chartBreaks InputCssClass="col col-12" MinValue="0" MaxValue="5" />
-                </DxFormLayoutItem>
-            </Template>
-        </DxToolbarItem>
-        <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
-                       Alignment="ToolbarItemAlignment.Right" CssClass="me-1 my-2"
-                       Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
-                       IconCssClass="bi bi-filetype-png" />
-    </DxToolbar>
     <DxFormLayout>
+        <DxToolbar>
+            <DxToolbarItem Text="Export" RenderStyle="ButtonRenderStyle.Primary"
+                           Alignment="ToolbarItemAlignment.Right" CssClass="me-1"
+                           Click=@(async () => await chart?.ExportAsync(@title,ChartExportFormat.Png))
+                           IconCssClass="bi bi-filetype-png" />
+        </DxToolbar>
         <DxSplitter CssClass="border controlHeight" Width="100%">
             <Panes>
                 <DxSplitterPane Size="75%">
@@ -58,43 +51,43 @@ else
                         <DxChartTooltip Enabled="!ShowSeriesLabels">
                             @context.Point.Render((seriesPoint) =>
                             @<div style="margin: 0.75rem">
-                                <div>@seriesPoint.SeriesName</div>
-                                <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
-                                <span>@($"{seriesPoint.Value: ,.0}K")</span>
-                            </div>
-                                 )
-                        </DxChartTooltip>
-                        <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks" />
-                        <DxChartArgumentAxis TickInterval="ChartAxisInterval.Month" MinorTickInterval="ChartAxisInterval.Month">
-                            <DxChartAxisLabel Format="ChartElementFormat.MonthAndYear"></DxChartAxisLabel>
-                        </DxChartArgumentAxis>
-                    </DxChart>
-                </DxSplitterPane>
-                <DxSplitterPane>
-                    <div class="h6">Receipt Summary</div>
-                    <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="gridHeight"
-                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                            AutoExpandAllGroupRows=true
-                            ShowFilterRow="false"
-                            ShowAllRows="true">
-                        <Columns>
-                            <DxGridDataColumn Caption="Type" FieldName="Type" GroupIndex="0" />
-                            <DxGridDataColumn Caption="Year" FieldName="Year" GroupIndex="1" DisplayFormat="{0:D4}" />
-                            <DxGridDataColumn Caption="Month" FieldName="MonthName" />
-                            <DxGridDataColumn Caption="Amount" FieldName="Total" DisplayFormat="{0:c2}" />
-                        </Columns>
-                        <GroupSummary>
-                            <DxGridSummaryItem FooterColumnName="Total"
-                                               SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
-                        </GroupSummary>
-                        <TotalSummary>
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
-                        </TotalSummary>
-                    </DxGrid>
-                </DxSplitterPane>
-            </Panes>
-        </DxSplitter>
-    </DxFormLayout>
+                            <div>@seriesPoint.SeriesName</div>
+                            <span>@($"{seriesPoint.Argument: MMM yyyy}: ")</span>
+                            <span>@($"{seriesPoint.Value: ,.0}K")</span>
+                        </div>
+                                                )
+                    </DxChartTooltip>
+                    <DxChartValueAxis AutoBreaksEnabled="true" MaxAutoBreakCount="@chartBreaks" />
+                    <DxChartArgumentAxis TickInterval="ChartAxisInterval.Month" MinorTickInterval="ChartAxisInterval.Month">
+                        <DxChartAxisLabel Format="ChartElementFormat.MonthAndYear"></DxChartAxisLabel>
+                    </DxChartArgumentAxis>
+                </DxChart>
+            </DxSplitterPane>
+            <DxSplitterPane>
+                <div class="h6">Receipt Summary</div>
+                <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="gridHeight"
+                        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                        AutoExpandAllGroupRows=true
+                        ShowFilterRow="false"
+                        ShowAllRows="true">
+                    <Columns>
+                        <DxGridDataColumn Caption="Type" FieldName="Type" GroupIndex="0" />
+                        <DxGridDataColumn Caption="Year" FieldName="Year" GroupIndex="1" DisplayFormat="{0:D4}" />
+                        <DxGridDataColumn Caption="Month" FieldName="MonthName" />
+                        <DxGridDataColumn Caption="Amount" FieldName="Total" DisplayFormat="{0:c2}" />
+                    </Columns>
+                    <GroupSummary>
+                        <DxGridSummaryItem FooterColumnName="Total"
+                                           SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+                    </GroupSummary>
+                    <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Total" />
+                    </TotalSummary>
+                </DxGrid>
+            </DxSplitterPane>
+        </Panes>
+    </DxSplitter>
+</DxFormLayout>
 }
 <style>
     .controlHeight {
