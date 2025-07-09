@@ -15,6 +15,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
 @inject LocalTime lt
+@inject WorkStation ws
 
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
@@ -43,171 +44,177 @@ else
                   RenderStyle="ButtonRenderStyle.Primary"
                   RenderStyleMode="ButtonRenderStyleMode.Outline">
         </DxButton>
-        <DxGridLayout>
-            <Rows>
-                @if (IsXtraSmallLayout || IsSmallLayout)
-                {
-                    <DxGridLayoutRow Areas="header" Height="auto" />
-                    <DxGridLayoutRow Areas="content" />
-                    <DxGridLayoutRow Areas="footer" Height="1px" />
-                }
-                else
-                {
-                    <DxGridLayoutRow Areas="Left-Blank header Right-Blank calendar" Height="auto" />
-                    <DxGridLayoutRow Areas="Left-Blank content Right-Blank calendar" />
-                }
-            </Rows>
-            <Columns>
-                @{
-                    if (IsXtraSmallLayout || IsSmallLayout)
+
+        <div class="px-4">
+        <DxFormLayout CssClass="container-fluid" SizeMode="SizeMode.Small">
+            <DxGridLayout>
+                <Rows>
+                    @if (IsXtraSmallLayout || IsSmallLayout)
                     {
-                        <DxGridLayoutColumn Width="100%" />
-                    }
-                    else if (IsMediumLayout)
-                    {
-                        <DxGridLayoutColumn Width="10%" />
-                        <DxGridLayoutColumn Width="80%" />
-                        <DxGridLayoutColumn Width="10%" />
-                    }
-                    else if (IsLargeLayout)
-                    {
-                        <DxGridLayoutColumn Width="5%" />
-                        <DxGridLayoutColumn Width="60%" />
-                        <DxGridLayoutColumn Width="5%" />
+                        <DxGridLayoutRow Areas="header" Height="auto" />
+                        <DxGridLayoutRow Areas="content" />
+                        <DxGridLayoutRow Areas="footer" Height="1px" />
                     }
                     else
                     {
-                        <DxGridLayoutColumn Width="10%" />
-                        <DxGridLayoutColumn Width="60%" />
-                        <DxGridLayoutColumn Width="10%" />
+                    <DxGridLayoutRow Areas="Left-Blank header Right-Blank calendar" Height="auto" />
+                        <DxGridLayoutRow Areas="Left-Blank content Right-Blank calendar" />
                     }
-                }
-            </Columns>
-            <Items>
-                <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none" />
-                <DxGridLayoutItem Area="header" CssClass="pt-1 pb-2">
-                    <Template>
-                        <PortalHeader NavigateTo="/public" />
-                    </Template>
-                </DxGridLayoutItem>
-                <DxGridLayoutItem Area="content" CssClass="px-md-4">
-                    <Template>
-                        <ErrorBoundary @ref=@errorBoundary>
-                            <ChildContent>
-                                <DxFormLayout>
-                                    <div class="row col col-12 mx-auto">
-                                        <div class="col col-8 mx-auto">
-                                            <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
-                                        </div>
-                                        <DxFormLayoutGroup Caption="Class Schedule" ColSpanMd="8" CssClass="mx-auto" CaptionCssClass="fluent-primary">
-                                            <div class="w-100 px-2 mt-2">
-                                                @if (isNoEnrolmentTermAvailable)
-                                                {
-                                                    <p class="box-height">We are currently working on a new Class Schedule. It will be available soon.</p>
-                                                }
-                                                else
-                                                {
-                                                    <p>
-                                                        Click below to view the <b>@(settings.U3AGroup)</b>
-                                                        Class Schedule, our calendar of classes, activities and events in the year.
-                                                    You do not need to be logged in to view or print this report.</p>
-                                                }
-                                                <div class="d-flex w-100">
-                                                    <DxButton Text="Print (Desktop View)" Enabled="@(!isNoEnrolmentTermAvailable)"
-                                                              IconCssClass="bi bi-printer"
-                                                              Click="OnReportClick"
-                                                              CssClass="flex-grow-1 me-1"
-                                                              RenderStyle="ButtonRenderStyle.Primary"
-                                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
-                                                    </DxButton>
-                                                    <DxButton Text="Display (Mobile View)" Enabled="@(!isNoEnrolmentTermAvailable)"
-                                                              IconCssClass="bi-phone menu-icon h2"
-                                                              Click="OnPreviewClick"
-                                                              CssClass="flex-grow-1 me-1"
-                                                              RenderStyle="ButtonRenderStyle.Primary"
-                                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
-                                                    </DxButton>
-                                                </div>
-                                            </div>
-                                        </DxFormLayoutGroup>
-                                        <div class="row col-12 mx-auto">
-                                            <DxFormLayoutGroup Caption="New Member?" ColSpanMd="6" CaptionCssClass="fluent-primary">
-                                                <div class="mt-2 px-2 col-12">
-                                                    <div class="h6">Start Here</div>
-                                                    <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
-                                                        If you wish to join <b>@(settings.U3AGroup)</b>, please register to securely use the membership system and protect your privacy. You will need an email address to do so.
-                                                    </p>
-                                                    <DxButton Text="Register" Enabled="@(!isBeforeEnrolmentDay && !isNoEnrolmentTermAvailable)"
-                                                              IconCssClass="bi bi-person-plus menu-icon me-3 h2"
-                                                              CssClass="col-12 mx-auto"
-                                                              Click="@(e => NavigationManager.NavigateTo("Account/Register",true))"
-                                                              RenderStyle="ButtonRenderStyle.Primary"
-                                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
-                                                    </DxButton>
-                                                </div>
-                                            </DxFormLayoutGroup>
-                                            <DxFormLayoutGroup Caption="Returning Member?" ColSpanMd="6" CaptionCssClass="fluent-primary">
-                                                <div class="mt-2 px-2 col-12">
-                                                    <div class="h6">Login Here</div>
-                                                    <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
-                                                        As an existing member, please login to access your membership details, pay your membership fees,
-                                                        enroll in courses and more!
-                                                    </p>
-                                                    <DxButton Text="Login" Enabled="@(!isBeforeEnrolmentDay)"
-                                                              IconCssClass="bi bi-person-check menu-icon me-3 h2"
-                                                              CssClass="col-12"
-                                                              Click="@(e => NavigationManager.NavigateTo("Account/Login",true))"
-                                                              RenderStyle="ButtonRenderStyle.Primary"
-                                                              RenderStyleMode="ButtonRenderStyleMode.Outline">
-                                                    </DxButton>
-                                                </div>
-                                            </DxFormLayoutGroup>
-                                        </div>
-                                        @if (isBeforeEnrolmentDay || isNoEnrolmentTermAvailable)
-                                        {
-                                            <div class="card card-body border-info alert-info w-100 text-center h5">
-                                                @(new MarkupString(lockoutMessage))
-                                            </div>
-
-                                        }
-                                        <div class="row">
-                                            <footer class="footer my-2 fluent-muted">
-                                                <div align="center">
-                                                    &copy; @(DateTime.Today.Year) U3Admin.org.au
-                                                </div>
-                                            </footer>
-                                        </div>
-                                    </div>
-                                </DxFormLayout>
-                            </ChildContent>
-                            <ErrorContent>
-                                <p class="u3admin-error-boundary mt-5">
-                                    @if (constants.IS_DEVELOPMENT)
-                                    {
-                                        <div class="w-50">@context.ToString()</div>
-                                    }
-                                    Oops! Something went wrong. An unexpected error has occurred.<br />
-                                    When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(lt.GetLocalTimeAsync()) Local ).
-                                    <button class="btn btn-warning" @onclick="ResetError">Reset</button>
-                                </p>
-
-                            </ErrorContent>
-                        </ErrorBoundary>
-                    </Template>
-                </DxGridLayoutItem>
-                <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none" />
-                @if (!(IsXtraSmallLayout || IsSmallLayout || IsMediumLayout))
-                {
-                    <DxGridLayoutItem Area="calendar">
+                </Rows>
+                <Columns>
+                    @{
+                        if (IsXtraSmallLayout || IsSmallLayout)
+                        {
+                            <DxGridLayoutColumn Width="100%" />
+                        }
+                        else if (IsMediumLayout)
+                        {
+                            <DxGridLayoutColumn Width="10%" />
+                            <DxGridLayoutColumn Width="80%" />
+                            <DxGridLayoutColumn Width="10%" />
+                        }
+                        else if (IsLargeLayout)
+                        {
+                            <DxGridLayoutColumn Width="5%" />
+                            <DxGridLayoutColumn Width="60%" />
+                            <DxGridLayoutColumn Width="5%" />
+                        }
+                        else
+                        {
+                            <DxGridLayoutColumn Width="10%" />
+                            <DxGridLayoutColumn Width="60%" />
+                            <DxGridLayoutColumn Width="5%" />
+                        }
+                    }
+                </Columns>
+                <Items>
+                    <DxGridLayoutItem Area="Left-Blank" CssClass="d-print-none" />
+                    <DxGridLayoutItem Area="header" CssClass="pt-1 pb-2">
                         <Template>
-                            <div class="calendar-style">
-                                <ClassCalendar />
-                            </div>
+                            <PortalHeader NavigateTo="/public" />
                         </Template>
                     </DxGridLayoutItem>
-                }
-            </Items>
-        </DxGridLayout>
+                    <DxGridLayoutItem Area="content" CssClass="px-md-4">
+                        <Template>
+                            <ErrorBoundary @ref=@errorBoundary>
+                                <ChildContent>
+                                    <DxFormLayout>
+                                        <div class="row col col-12 mx-auto">
+                                            <div class="col col-8 mx-auto">
+                                                <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
+                                            </div>
+                                            <DxFormLayoutGroup Caption="Class Schedule" ColSpanMd="8" CssClass="mx-auto" CaptionCssClass="fluent-primary">
+                                                <div class="w-100 px-2 mt-2">
+                                                    @if (isNoEnrolmentTermAvailable)
+                                                    {
+                                                        <p class="box-height">We are currently working on a new Class Schedule. It will be available soon.</p>
+                                                    }
+                                                    else
+                                                    {
+                                                        <p>
+                                                            Click below to view the <b>@(settings.U3AGroup)</b>
+                                                            Class Schedule, our calendar of classes, activities and events in the year.
+                                                            You do not need to be logged in to view or print this report.
+                                                        </p>
+                                                    }
+                                                    <div class="d-flex w-100">
+                                                        <DxButton Text="Print (Desktop View)" Enabled="@(!isNoEnrolmentTermAvailable)"
+                                                                  IconCssClass="bi bi-printer menu-icon me-3 h2"
+                                                                  Click="OnReportClick"
+                                                                  CssClass="flex-grow-1 me-1"
+                                                                  RenderStyle="ButtonRenderStyle.Primary"
+                                                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                        </DxButton>
+                                                        <DxButton Text="Display (Mobile View)" Enabled="@(!isNoEnrolmentTermAvailable)"
+                                                              IconCssClass="bi-phone menu-icon me-3 h2"
+                                                                  Click="OnPreviewClick"
+                                                                  CssClass="flex-grow-1 me-1"
+                                                                  RenderStyle="ButtonRenderStyle.Primary"
+                                                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                        </DxButton>
+                                                    </div>
+                                                </div>
+                                            </DxFormLayoutGroup>
+                                            <div class="row col-12 mx-auto">
+                                                <DxFormLayoutGroup Caption="New Member?" ColSpanMd="6" CaptionCssClass="fluent-primary">
+                                                    <div class="mt-2 px-2 col-12">
+                                                        <div class="h6">Start Here</div>
+                                                        <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
+                                                            If you wish to join <b>@(settings.U3AGroup)</b>, please register to securely use the membership system and protect your privacy. You will need an email address to do so.
+                                                        </p>
+                                                        <DxButton Text="Register" Enabled="@(!isBeforeEnrolmentDay && !isNoEnrolmentTermAvailable)"
+                                                              IconCssClass="bi bi-person-plus menu-icon me-3 h2"
+                                                                  CssClass="col-12 mx-auto"
+                                                                  Click="@(e => NavigationManager.NavigateTo("Account/Register",true))"
+                                                                  RenderStyle="ButtonRenderStyle.Primary"
+                                                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                        </DxButton>
+                                                    </div>
+                                                </DxFormLayoutGroup>
+                                                <DxFormLayoutGroup Caption="Returning Member?" ColSpanMd="6" CaptionCssClass="fluent-primary">
+                                                    <div class="mt-2 px-2 col-12">
+                                                        <div class="h6">Login Here</div>
+                                                        <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
+                                                            As an existing member, please login to access your membership details, pay your membership fees,
+                                                            enroll in courses and more!
+                                                        </p>
+                                                        <DxButton Text="Login" Enabled="@(!isBeforeEnrolmentDay)"
+                                                              IconCssClass="bi bi-person-check menu-icon me-3 h2"
+                                                                  CssClass="col-12"
+                                                                  Click="@(e => NavigationManager.NavigateTo("Account/Login",true))"
+                                                                  RenderStyle="ButtonRenderStyle.Primary"
+                                                                  RenderStyleMode="ButtonRenderStyleMode.Outline">
+                                                        </DxButton>
+                                                    </div>
+                                                </DxFormLayoutGroup>
+                                            </div>
+                                            @if (isBeforeEnrolmentDay || isNoEnrolmentTermAvailable)
+                                            {
+                                                <div class="card card-body border-info alert-info w-100 text-center h5">
+                                                    @(new MarkupString(lockoutMessage))
+                                                </div>
+
+                                            }
+                                            <div class="row">
+                                                <footer class="footer my-2 fluent-muted">
+                                                    <div align="center">
+                                                        &copy; @(DateTime.Today.Year) U3Admin.org.au
+                                                    </div>
+                                                </footer>
+                                            </div>
+                                        </div>
+                                    </DxFormLayout>
+                                </ChildContent>
+                                <ErrorContent>
+                                    <p class="u3admin-error-boundary mt-5">
+                                        @if (constants.IS_DEVELOPMENT)
+                                        {
+                                            <div class="w-50">@context.ToString()</div>
+                                        }
+                                        Oops! Something went wrong. An unexpected error has occurred.<br />
+                                        When reporting this issue please include the date and time: @(DateTime.UtcNow) UTC ( @(lt.GetLocalTimeAsync()) Local ).
+                                        <button class="btn btn-warning" @onclick="ResetError">Reset</button>
+                                    </p>
+
+                                </ErrorContent>
+                            </ErrorBoundary>
+                        </Template>
+                    </DxGridLayoutItem>
+                    <DxGridLayoutItem Area="Right-Blank" CssClass="d-print-none" />
+                    @if (!(IsXtraSmallLayout || IsSmallLayout || IsMediumLayout))
+                    {
+                        <DxGridLayoutItem Area="calendar">
+                            <Template>
+                                <DxFormLayout CssClass="calendar-style">
+                                    <ClassCalendar />
+                                </DxFormLayout>
+                            </Template>
+                        </DxGridLayoutItem>
+                    }
+                </Items>
+            </DxGridLayout>
+        </DxFormLayout>
+        </div>
     }
     if (!isInteractive)
     {
@@ -226,6 +233,7 @@ else
     }
 
     .calendar-style {
+        margin-top: 2.5rem;
         width: 95%;
     }
 

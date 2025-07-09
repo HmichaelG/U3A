@@ -98,7 +98,7 @@
                 sizeMode = SizeMode.Small;
                 break;
         }
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     public void Dispose()
