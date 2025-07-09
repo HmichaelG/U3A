@@ -16,7 +16,7 @@
         @if (NewButtonVisible) {
         <DxButton RenderStyle="ButtonRenderStyle.Primary" SizeMode="SizeMode.Large"
           RenderStyleMode="ButtonRenderStyleMode.Outline" title="Add new record"
-          IconCssClass="bi bi-database-add fluent-info" Click="async () => await MyGrid.StartEditNewRowAsync()" />
+          IconCssClass="bi bi-database-add text-fl-info" Click="async () => await MyGrid.StartEditNewRowAsync()" />
         }
     </text>
     ;
@@ -25,12 +25,12 @@
         @if (EditButtonVisible) {
             <DxButton RenderStyle="ButtonRenderStyle.Secondary"
               RenderStyleMode="ButtonRenderStyleMode.Outline" title="Edit this record"
-              IconCssClass="bi bi-pencil fluent-warning" Click="async () => await MyGrid.StartEditDataItemAsync(context.DataItem)" />
+              IconCssClass="bi bi-pencil text-fl-warning" Click="async () => await MyGrid.StartEditDataItemAsync(context.DataItem)" />
         }
         @if (DeleteButtonVisible) {
             <DxButton RenderStyle="ButtonRenderStyle.Secondary" title="Delete this record"
               RenderStyleMode="ButtonRenderStyleMode.Outline"
-                  IconCssClass="bi bi-trash fluent-danger" Click="() => DoDeleteClick(context.DataItem)" />
+                  IconCssClass="bi bi-trash text-fl-danger" Click="() => DoDeleteClick(context.DataItem)" />
         }
     </text>
         ;
@@ -38,10 +38,10 @@
     @<text>
         <DxButton RenderStyle="ButtonRenderStyle.Secondary"
               RenderStyleMode="ButtonRenderStyleMode.Outline" title="Save your changes"
-              IconCssClass="bi bi-hdd fluent-info" Click="async () => await MyGrid.SaveChangesAsync()" />
+              IconCssClass="bi bi-hdd text-fl-info" Click="async () => await MyGrid.SaveChangesAsync()" />
         <DxButton RenderStyle="ButtonRenderStyle.Secondary" title="Cancel your changes"
               RenderStyleMode="ButtonRenderStyleMode.Outline"
-              IconCssClass="bi bi-arrow-counterclockwise fluent-danger" Click="() => MyGrid.CancelEditAsync()" />
+              IconCssClass="bi bi-arrow-counterclockwise text-fl-danger" Click="() => MyGrid.CancelEditAsync()" />
     </text>
     ;
     }

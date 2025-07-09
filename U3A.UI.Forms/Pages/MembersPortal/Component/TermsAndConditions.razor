@@ -23,7 +23,7 @@
                       Click="@(e => OnTandCClicked())"
                       RenderStyleMode="ButtonRenderStyleMode.Contained">
             </DxButton>
-            <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 fluent-danger" hidden="@(!isConfirmationRequired)"
+            <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-fl-danger" hidden="@(!isConfirmationRequired)"
                         CheckedChanged="@(async (bool value) => await ConfirmationChanged(value))"
                         Alignment="CheckBoxContentAlignment.Right"
                         LabelPosition="LabelPosition.Left">

@@ -22,11 +22,11 @@
     <div class="col-12">
         <EditForm Model="Input" FormName="login-with-recovery-code" OnValidSubmit="OnValidSubmitAsync" method="post">
             <DataAnnotationsValidator />
-            <ValidationSummary class="fluent-danger" role="alert" />
+            <ValidationSummary class="text-fl-danger" role="alert" />
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.RecoveryCode" class="form-control" autocomplete="off" placeholder="RecoveryCode" />
                 <label for="recovery-code" class="form-label">Recovery Code</label>
-                <ValidationMessage For="() => Input.RecoveryCode" class="fluent-danger" />
+                <ValidationMessage For="() => Input.RecoveryCode" class="text-fl-danger" />
             </div>
             <div class="button-container">
                 <DxButton CssClass="w-100" SubmitFormOnClick='true' Text="Login" RenderStyle="ButtonRenderStyle.Primary" />

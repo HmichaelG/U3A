@@ -18,12 +18,12 @@ else
         <div class=@((isOnBehalfOf)
          ? ""
          : "col col-12 col-md-8 mx-auto pb-2")>
-            <div class="p-2 w-100 text-center fluent-info">
-                To add leave, click the <span class="fluent-info h6 bi bi-plus-lg"></span> button below.
+            <div class="p-2 w-100 text-center text-fl-info">
+                To add leave, click the <span class="text-fl-info h6 bi bi-plus-lg"></span> button below.
                 Enter a start date, return date and reason then click Save.
                 To edit / delete leave, first click to select the leave item
-                then click <span class="fluent-warning h6 bi bi-pencil"></span> to edit,
-                click the <span class="fluent-danger h6 bi bi-trash"></span> to delete.
+                then click <span class="text-fl-warning h6 bi bi-pencil"></span> to edit,
+                click the <span class="text-fl-danger h6 bi bi-trash"></span> to delete.
             </div>
             <DxGrid @ref="Grid" CustomizeElement="OnCustomizeElement"
                     CssClass="grid-height" id="myGrid"

@@ -25,13 +25,13 @@
         </form>
         <EditForm Model="Input" FormName="change-email" OnValidSubmit="OnValidSubmitAsync" method="post">
             <DataAnnotationsValidator />
-            <ValidationSummary class="fluent-danger" role="alert" />
+            <ValidationSummary class="text-fl-danger" role="alert" />
             @if (isEmailConfirmed)
             {
                 <div class="form-floating mb-3 input-group">
                     <input type="text" value="@email" class="form-control" placeholder="Please enter your email." disabled />
                     <div class="input-group-append">
-                        <span class="h-100 input-group-text fluent-info font-weight-bold">✓</span>
+                        <span class="h-100 input-group-text text-fl-info font-weight-bold">✓</span>
                     </div>
                     <label for="email" class="form-label">Email</label>
                 </div>
@@ -47,7 +47,7 @@
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
                 <label for="new-email" class="form-label">New email</label>
-                <ValidationMessage For="() => Input.NewEmail" class="fluent-danger" />
+                <ValidationMessage For="() => Input.NewEmail" class="text-fl-danger" />
             </div>
             <div class="button-container">
                 <DxButton CssClass="w-50" SubmitFormOnClick='true' Text="Change Email" RenderStyle="ButtonRenderStyle.Primary" />
