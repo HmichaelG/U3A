@@ -1,5 +1,7 @@
 ﻿using DevExpress.Blazor;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using U3A.Database;
 
 namespace U3A.Services;
 
@@ -35,9 +37,13 @@ public static class DxThemes {
     }
 }
 
-public class DxThemesService {
-    public DxThemesService() {
-        ActiveTheme = DxThemes.FluentLight;
+public class DxThemesService
+{
+    private readonly IDbContextFactory<TenantDbContext> _tenantDbFactory;
+
+    public DxThemesService(IDbContextFactory<TenantDbContext> tenantDbFactory)
+    {
+        ActiveTheme = DxThemes.FluentLight;        
     }
 
     public ITheme ActiveTheme { get; private set; }

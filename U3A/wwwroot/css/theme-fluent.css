@@ -1,6 +1,9 @@
 ﻿.fluent-primary {
     color: var(--DS-color-content-primary-default-rest);
 }
+.fluent-muted {
+    background-color: var(--DS-color-content-primary-subdued-rest);
+}
 .fluent-info {
     color: var(--DS-color-content-info-default-rest);
 }
@@ -15,6 +18,12 @@
 }
 .fluent-secondary {
     color: var(--DS-color-content-secondary-default-rest);
+}
+
+.alert-primary {
+    color: var(--DS-color-content-primary-default-rest);
+    background-color: var(--DS-color-surface-primary-subdued-rest);
+    border-color: var(--DS-color-border-primary-default-rest);
 }
 
 .alert-danger {

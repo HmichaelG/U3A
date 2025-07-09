@@ -1,14 +1,42 @@
 ﻿@namespace U3A.UI.Forms
+
+@using Serilog
+
 @inherits LayoutComponentBase
+@implements IDisposable
+
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+@inject WorkStation ws
+@inject NavigationManager navMan
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <PageTitle>@($"{tenantId} Member Portal")</PageTitle>
 
 <div class="page">
     @Body
 </div>
+
 @code {
     string? tenantId;
+    int openCircuits { get; set; }
+    bool hasRole { get; set; }
+    bool? useTopMenu = null; // default is sidebar
+    LoginState? loginState { get; set; }
+
+    bool isXSmall;
+    bool isSmall;
+    bool isMedium;
+    bool isLarge;
+    bool isXLarge;
+
+    U3ADbContext? dbc { get; set; }
+    string? currentUrl;
+    bool isInteractive = false;
+    SizeMode sizeMode;
+    private DotNetObjectReference<BasicLayout>? objRef;
+    string Orientation { get; set; } = "unknown";
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -20,5 +48,64 @@
             }
         }
     }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        isInteractive = RendererInfo.IsInteractive;
+        if (firstRender)
+        {
+            await js.LoadDxResources();
+            await GetWorkstationDetails();
+            objRef = DotNetObjectReference.Create(this);
+            await js.InvokeVoidAsync("registerOrientationChange", objRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OnOrientationChanged(string orientation)
+    {
+        navMan.NavigateTo(navMan.Uri, forceLoad: true);
+    }
+
+    async Task OnXSmallChanged(bool isActive) => await processSizeChange(ScreenSizes.XSmall);
+    async Task OnSmallChanged(bool isActive) => await processSizeChange(ScreenSizes.Small);
+    async Task OnMediumChanged(bool isActive) => await processSizeChange(ScreenSizes.Medium);
+    async Task OnLargeChanged(bool isActive) => await processSizeChange(ScreenSizes.Large);
+    async Task OnXLargeChanged(bool isActive) => await processSizeChange(ScreenSizes.XLarge);
+
+    int seq = 0;
+    async Task processSizeChange(ScreenSizes size)
+    {
+        await ws.SetScreenSizeAsync(size);
+        StateHasChanged();
+        seq++;
+        Log.Information($"{seq}: Screen size changed to: {size}", size);
+    }
+
+    private async Task GetWorkstationDetails()
+    {
+        bool forceReload = await ws.GetWorkstationDetail(localStorage, U3Adbfactory);
+        if (forceReload) navMan.NavigateTo(navMan.Uri, forceLoad: true);
+        useTopMenu = ws.UseTopMenu;
+        switch (ws.SizeMode)
+        {
+            case 1:
+                sizeMode = SizeMode.Medium;
+                break;
+            case 2:
+                sizeMode = SizeMode.Large;
+                break;
+            default:
+                sizeMode = SizeMode.Small;
+                break;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        dbc?.Dispose();
+    }
+
 
 }

@@ -99,7 +99,7 @@ else
                                         <div class="col col-8 mx-auto">
                                             <TermsAndConditions SystemSettings="settings" IsEnrolmentNotice=true OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                                         </div>
-                                        <DxFormLayoutGroup Caption="Class Schedule" ColSpanMd="8" CssClass="mx-auto" CaptionCssClass="text-primary">
+                                        <DxFormLayoutGroup Caption="Class Schedule" ColSpanMd="8" CssClass="mx-auto" CaptionCssClass="fluent-primary">
                                             <div class="w-100 px-2 mt-2">
                                                 @if (isNoEnrolmentTermAvailable)
                                                 {
@@ -110,12 +110,11 @@ else
                                                     <p>
                                                         Click below to view the <b>@(settings.U3AGroup)</b>
                                                         Class Schedule, our calendar of classes, activities and events in the year.
-                                                    </p>
-                                                    <p>You do not need to be logged in to view or print this report.</p>
+                                                    You do not need to be logged in to view or print this report.</p>
                                                 }
                                                 <div class="d-flex w-100">
                                                     <DxButton Text="Print (Desktop View)" Enabled="@(!isNoEnrolmentTermAvailable)"
-                                                              IconCssClass="bi-printer menu-icon h2"
+                                                              IconCssClass="bi bi-printer"
                                                               Click="OnReportClick"
                                                               CssClass="flex-grow-1 me-1"
                                                               RenderStyle="ButtonRenderStyle.Primary"
@@ -132,7 +131,7 @@ else
                                             </div>
                                         </DxFormLayoutGroup>
                                         <div class="row col-12 mx-auto">
-                                            <DxFormLayoutGroup Caption="New Member?" ColSpanMd="6" CaptionCssClass="text-primary">
+                                            <DxFormLayoutGroup Caption="New Member?" ColSpanMd="6" CaptionCssClass="fluent-primary">
                                                 <div class="mt-2 px-2 col-12">
                                                     <div class="h6">Start Here</div>
                                                     <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
@@ -147,7 +146,7 @@ else
                                                     </DxButton>
                                                 </div>
                                             </DxFormLayoutGroup>
-                                            <DxFormLayoutGroup Caption="Returning Member?" ColSpanMd="6" CaptionCssClass="text-primary">
+                                            <DxFormLayoutGroup Caption="Returning Member?" ColSpanMd="6" CaptionCssClass="fluent-primary">
                                                 <div class="mt-2 px-2 col-12">
                                                     <div class="h6">Login Here</div>
                                                     <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
@@ -166,13 +165,13 @@ else
                                         </div>
                                         @if (isBeforeEnrolmentDay || isNoEnrolmentTermAvailable)
                                         {
-                                            <div class="card card-body border-info alert-info text-dark w-100 text-center h5">
+                                            <div class="card card-body border-info alert-info w-100 text-center h5">
                                                 @(new MarkupString(lockoutMessage))
                                             </div>
 
                                         }
                                         <div class="row">
-                                            <footer class="footer my-2 text-muted">
+                                            <footer class="footer my-2 fluent-muted">
                                                 <div align="center">
                                                     &copy; @(DateTime.Today.Year) U3Admin.org.au
                                                 </div>

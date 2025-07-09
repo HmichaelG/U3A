@@ -188,7 +188,8 @@
 
     private async Task GetWorkstationDetails()
     {
-        await ws.GetWorkstationDetail(localStorage);
+        bool forceReload = await ws.GetWorkstationDetail(localStorage, U3Adbfactory);
+        if (forceReload) navMan.NavigateTo(navMan.Uri, forceLoad: true);
         useTopMenu = ws.UseTopMenu;
         switch (ws.SizeMode)
         {
