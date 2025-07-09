@@ -49,7 +49,7 @@ public class WorkStation
     const string SIDEBAR_IMAGE = "sidebar-image";
     const string MENU_BEHAVIOR = "menu-behavior";
 
-public async Task<bool> GetWorkstationDetail(ILocalStorageService localStorage, IDbContextFactory<U3ADbContext> U3AdbFactory)
+    public async Task<bool> GetWorkstationDetail(ILocalStorageService localStorage, IDbContextFactory<U3ADbContext> U3AdbFactory)
     {
         bool forceReload = false;
         //workstation ID
@@ -57,8 +57,7 @@ public async Task<bool> GetWorkstationDetail(ILocalStorageService localStorage, 
         if (id == null)
         {
             id = Guid.NewGuid().ToString();
-            localStorage.SetItemAsync(WORKSTATION_ID, id)
-                .SafeFireAndForget(onException: ex => Log.Error("Error setting WORKSTATION_ID", ex));
+            await localStorage.SetItemAsync(WORKSTATION_ID, id);
         }
         ID = id;
         // Use top menu
@@ -101,9 +100,12 @@ public async Task<bool> GetWorkstationDetail(ILocalStorageService localStorage, 
                 var tenant = db.TenantInfo;
                 if (tenant != null && !string.IsNullOrEmpty(tenant.PrimaryWebsiteColor))
                 {
-                    AccentColor = tenant.PrimaryWebsiteColor;
-                    await localStorage.SetItemAsync<String>(ACCENT_COLOR, AccentColor);
-                    forceReload = true; // Force reload to apply the new accent color
+                    if (string.IsNullOrEmpty(AccentColor))
+                    {
+                        AccentColor = tenant.PrimaryWebsiteColor;
+                        await localStorage.SetItemAsync<String>(ACCENT_COLOR, AccentColor);
+                        forceReload = true; // Force reload to apply the new accent color
+                    }
                 }
             }
         }
@@ -148,7 +150,10 @@ public async Task<bool> GetWorkstationDetail(ILocalStorageService localStorage, 
         // theme
         await localStorage.SetItemAsync<String>(THEME, Theme);
         // accent color
-        await localStorage.SetItemAsync<String>(ACCENT_COLOR, AccentColor);
+        if (!string.IsNullOrEmpty(AccentColor))
+        {
+            await localStorage.SetItemAsync<String>(ACCENT_COLOR, AccentColor);
+        }
         // sidebar image
         await localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage);
     }
