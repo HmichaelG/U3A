@@ -5,6 +5,7 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using U3A.Database;
 using U3A.Model;
+using U3A.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +51,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddDevExpressBlazor();
 builder.Services.Configure<DevExpress.Blazor.Configuration.GlobalOptions>(options =>
 {
-    options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
     options.SizeMode = DevExpress.Blazor.SizeMode.Small;
 });
 
