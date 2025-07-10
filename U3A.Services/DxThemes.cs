@@ -5,13 +5,16 @@ using U3A.Database;
 
 namespace U3A.Services;
 
-public static class DxThemes {
-    public static readonly ITheme FluentLight = Themes.Fluent.Clone(properties => {
+public static class DxThemes
+{
+    public static readonly ITheme FluentLight = Themes.Fluent.Clone(properties =>
+    {
         properties.Mode = ThemeMode.Light;
-        properties.SetCustomAccentColor("transparent");
+        properties.SetCustomAccentColor("gainsboro");
         AddFluentTheme(properties);
     });
-    public static readonly ITheme FluentDark = Themes.Fluent.Clone(properties => {
+    public static readonly ITheme FluentDark = Themes.Fluent.Clone(properties =>
+    {
         properties.Mode = ThemeMode.Dark;
         AddFluentTheme(properties);
     });
@@ -22,17 +25,31 @@ public static class DxThemes {
     public static readonly ITheme Bootstrap = Themes.BootstrapExternal.Clone(properties => AddBootstrapExternalTheme("bootstrap", properties));
     public static readonly ITheme BootstrapDark = Themes.BootstrapExternal.Clone(properties => AddBootstrapExternalTheme("bootstrap-dark", properties));
 
-    public static void AddBootstrapTheme(ThemeProperties properties) {
+    public static ITheme CreateTheme(string ThemeName, string AccentColor)
+    {
+        ThemeMode mode = (ThemeName.ToLowerInvariant() == "light") ? ThemeMode.Light : ThemeMode.Dark;
+        ITheme newTheme = Themes.Fluent.Clone(properties =>
+        {
+            properties.Mode = mode;
+            properties.SetCustomAccentColor(AccentColor);
+        });
+        return newTheme;
+    }
+
+    public static void AddBootstrapTheme(ThemeProperties properties)
+    {
         properties.AddFilePaths($"css/theme-bs.css");
     }
 
-    public static void AddBootstrapExternalTheme(string themeName, ThemeProperties properties) {
+    public static void AddBootstrapExternalTheme(string themeName, ThemeProperties properties)
+    {
         properties.Name = themeName;
         AddBootstrapTheme(properties);
         properties.AddFilePaths($"css/bootstrap/bootstrap.min.css");
     }
 
-    public static void AddFluentTheme(ThemeProperties properties) {
+    public static void AddFluentTheme(ThemeProperties properties)
+    {
         properties.AddFilePaths($"css/theme-fluent.css");
     }
 }
@@ -43,7 +60,7 @@ public class DxThemesService
 
     public DxThemesService(IDbContextFactory<TenantDbContext> tenantDbFactory)
     {
-        ActiveTheme = DxThemes.FluentLight;        
+        ActiveTheme = DxThemes.FluentLight;
     }
 
     public ITheme ActiveTheme { get; private set; }

@@ -36,7 +36,7 @@ public class WorkStation
     public bool IsMediumScreen => MenuBehavior == "Medium" || (MenuBehavior == "Auto" && (ScreenSize == ScreenSizes.Medium || ScreenSize == ScreenSizes.Large));
     public bool IsLargeScreen => MenuBehavior == "Large" || (MenuBehavior == "Auto" && ScreenSize == ScreenSizes.XLarge);
 
-    public string Theme;
+    public string theme;
     public string AccentColor;
     public string SidebarImage;
     public string MenuBehavior;
@@ -75,14 +75,14 @@ public class WorkStation
         }
 
         // theme
-        Theme = "light";
+        theme = "light";
         if (await localStorage.ContainKeyAsync(THEME))
         {
-            Theme = await localStorage.GetItemAsync<string>(THEME);
+            theme = await localStorage.GetItemAsync<string>(THEME);
         }
-        if (THEME != "light" && THEME != "dark")
+        if (theme != "light" && theme != "dark")
         {
-            Theme = "light";
+            theme = "light";
         }
 
         // accent color
@@ -148,7 +148,7 @@ public class WorkStation
         // size mode
         await localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode);
         // theme
-        await localStorage.SetItemAsync<String>(THEME, Theme);
+        await localStorage.SetItemAsync<String>(THEME, theme);
         // accent color
         if (!string.IsNullOrEmpty(AccentColor))
         {

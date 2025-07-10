@@ -162,9 +162,42 @@ function setTheme() {
     const styleEl = document.querySelector('style[data-theme-id="Fluent"]');
     if (styleEl) {
         var inner = styleEl.innerHTML;
-        styleEl.innerHTML = inner.replace('transparent', color);
+        styleEl.innerHTML = inner.replace('gainsboro', color);
     }
 }
+
+window.cookieInterop = {
+    setCookie: function (name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 86400000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    },
+    getCookie: function (name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i].trim();
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+        }
+        return null;
+    }
+};
+
+//@code {
+//    private async Task SetCookie() =>
+//    await JS.InvokeVoidAsync("cookieInterop.setCookie", "UserData", "SomeValue", 7);
+
+//    private async Task GetCookie() {
+//        var value = await JS.InvokeAsync < string > ("cookieInterop.getCookie", "UserData");
+//        Console.WriteLine($"Cookie value: {value}");
+//    }
+//}
+
+
 
 function getQueryStrings() {
     var assoc = {};

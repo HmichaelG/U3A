@@ -15,6 +15,7 @@
 @inject NavigationManager navMan
 @inject IJSRuntime js
 @inject WorkStation ws
+@inject IThemeChangeService themeChangeService
 @implements IDisposable
 
 @if (isInteractive)
@@ -203,7 +204,8 @@
                 sizeMode = SizeMode.Small;
                 break;
         }
-        await InvokeAsync(StateHasChanged);
+        // await themeChangeService.SetTheme(DxThemes.CreateTheme( ws.theme, ws.AccentColor));
+        StateHasChanged();
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)

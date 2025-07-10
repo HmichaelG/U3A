@@ -13,9 +13,20 @@
 
 <PageTitle>@($"{tenantId} Member Portal")</PageTitle>
 
-<div class="page">
+<DxFormLayout SizeMode="@sizeMode" CssClass="form-style">
     @Body
-</div>
+</DxFormLayout>
+<style>
+    .form-style {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+</style>
 
 @code {
     string? tenantId;
@@ -99,6 +110,7 @@
                 break;
         }
         StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
