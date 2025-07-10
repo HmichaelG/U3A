@@ -10,6 +10,7 @@
 @inject WorkStation ws
 @inject NavigationManager navMan
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IThemeChangeService themeChangeService
 
 <PageTitle>@($"{tenantId} Member Portal")</PageTitle>
 
@@ -110,7 +111,6 @@
                 break;
         }
         StateHasChanged();
-        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
