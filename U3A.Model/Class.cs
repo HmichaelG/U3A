@@ -82,6 +82,19 @@ namespace U3A.Model
             }
         }
         [NotMapped]
+        public int TermsOfferedCount
+        {
+            get
+            {
+                int result = 0;
+                if (OfferedTerm1) { result++; }
+                if (OfferedTerm2) { result++; }
+                if (OfferedTerm3) { result++; }
+                if (OfferedTerm4) { result++; }
+                return result;
+            }
+        }
+        [NotMapped]
         public string OfferedSummaryAdjusted
         {
             get
