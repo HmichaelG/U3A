@@ -664,13 +664,13 @@ namespace U3A.BusinessRules
             var deletions = await dbc.Enrolment
                         .Include(x => x.Class)
                         .Where(x => x.ClassID == ClassID).ToArrayAsync();
-            await DeleteEnrolmentAsync(dbc, deletions); 
+            await DeleteEnrolmentsAsync(dbc, deletions); 
         }
         public static async Task DeleteEnrolmentAsync(U3ADbContext dbc, Enrolment deletion)
         {
-            await DeleteEnrolmentAsync(dbc, new List<Enrolment> { deletion });
+            await DeleteEnrolmentsAsync(dbc, new List<Enrolment> { deletion });
         }
-        public static async Task DeleteEnrolmentAsync(U3ADbContext dbc, IEnumerable<Enrolment> deletions)
+        public static async Task DeleteEnrolmentsAsync(U3ADbContext dbc, IEnumerable<Enrolment> deletions)
         {
             foreach (var enrolment in deletions)
             {
@@ -740,7 +740,7 @@ namespace U3A.BusinessRules
                                             (x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber ||
                                                 c.StartDate != null && c.OccurrenceID == (int)OccurrenceType.OnceOnly))
                                             .ToListAsync();
-                    if (deletions != null) { await DeleteEnrolmentAsync(dbc, deletions); }
+                    if (deletions != null) { await DeleteEnrolmentsAsync(dbc, deletions); }
                 }
                 else
                 {
@@ -753,7 +753,7 @@ namespace U3A.BusinessRules
                                             (x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber ||
                                                 c.StartDate != null && c.OccurrenceID == (int)OccurrenceType.OnceOnly))
                                         .ToListAsync();
-                    if (deletions != null) { await DeleteEnrolmentAsync(dbc, deletions); }
+                    if (deletions != null) { await DeleteEnrolmentsAsync(dbc, deletions); }
                 }
             }
         }
