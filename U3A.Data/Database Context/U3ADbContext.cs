@@ -83,7 +83,6 @@ namespace U3A.Database
                 return;
             }
             var identifier = hs.GetIdentifier(_httpContextAccessor.HttpContext.Request.Host.Host);
-            if (identifier == "bs-local") identifier = "localhost"; // BrowserStack
             using (var dbc = _TenantDbFactory.CreateDbContext())
             {
                 // Redirect console output to null

@@ -664,19 +664,26 @@ namespace U3A.BusinessRules
             var deletions = await dbc.Enrolment
                         .Include(x => x.Class)
                         .Where(x => x.ClassID == ClassID).ToArrayAsync();
-            foreach (var d in deletions) { await DeleteEnrolmentAsync(dbc, d); }
+            await DeleteEnrolmentAsync(dbc, deletions); 
         }
-        public static async Task DeleteEnrolmentAsync(U3ADbContext dbc, Enrolment enrolment)
+        public static async Task DeleteEnrolmentAsync(U3ADbContext dbc, Enrolment deletion)
         {
-            // delete the enrolments
-            var query = await dbc.Enrolment.FindAsync(enrolment.ID);
-            dbc.Remove(query);
-            // delete future attendance records
-            var query2 = await dbc.AttendClass
-                        .Where(x => x.ClassID == enrolment.ClassID
-                                    && x.PersonID == enrolment.PersonID)
-                                    .Where(x => x.Date >= dbc.GetLocalTime()).ToListAsync();
-            if (query != null) { dbc.RemoveRange(query2); }
+            await DeleteEnrolmentAsync(dbc, new List<Enrolment> { deletion });
+        }
+        public static async Task DeleteEnrolmentAsync(U3ADbContext dbc, IEnumerable<Enrolment> deletions)
+        {
+            foreach (var enrolment in deletions)
+            {
+                // delete the enrolments
+                var query = await dbc.Enrolment.FindAsync(enrolment.ID);
+                dbc.Remove(query);
+                // delete future attendance records
+                var query2 = await dbc.AttendClass
+                            .Where(x => x.ClassID == enrolment.ClassID
+                                        && x.PersonID == enrolment.PersonID)
+                                        .Where(x => x.Date >= dbc.GetLocalTime()).ToListAsync();
+                if (query != null) { dbc.RemoveRange(query2); }
+            }
         }
 
         public static async Task DeleteEnrolmentsRescinded(U3ADbContext dbc,
@@ -720,32 +727,33 @@ namespace U3A.BusinessRules
                                             Person person,
                                             Term term, Term prevTerm)
         {
+            List<Enrolment> deletions = new();
             foreach (var c in DeletedClasses)
             {
                 if ((ParticipationType)c.Course.CourseParticipationTypeID == ParticipationType.SameParticipantsInAllClasses)
                 {
-                    var deletion = await dbc.Enrolment
+                    deletions = await dbc.Enrolment
                                         .Include(x => x.Term)
                                         .Where(x =>
                                             x.CourseID == c.CourseID &&
                                             x.PersonID == person.ID &&
-                                            (x.Term.Year == term.Year ||
+                                            (x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber ||
                                                 c.StartDate != null && c.OccurrenceID == (int)OccurrenceType.OnceOnly))
-                                            .FirstOrDefaultAsync();
-                    if (deletion != null) { await DeleteEnrolmentAsync(dbc, deletion); }
+                                            .ToListAsync();
+                    if (deletions != null) { await DeleteEnrolmentAsync(dbc, deletions); }
                 }
                 else
                 {
-                    var deletion = await dbc.Enrolment
+                    deletions = await dbc.Enrolment
                                     .Include(x => x.Term)
                                     .Where(x =>
                                         x.CourseID == c.CourseID &&
                                         x.ClassID == c.ID &&
                                         x.PersonID == person.ID &&
-                                            (x.Term.Year == term.Year ||
+                                            (x.Term.Year == term.Year && x.Term.TermNumber >= term.TermNumber ||
                                                 c.StartDate != null && c.OccurrenceID == (int)OccurrenceType.OnceOnly))
-                                        .FirstOrDefaultAsync();
-                    if (deletion != null) { await DeleteEnrolmentAsync(dbc, deletion); }
+                                        .ToListAsync();
+                    if (deletions != null) { await DeleteEnrolmentAsync(dbc, deletions); }
                 }
             }
         }
