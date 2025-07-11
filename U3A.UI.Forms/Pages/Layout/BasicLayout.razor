@@ -7,7 +7,7 @@
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
-@inject WorktationService ws
+@inject WorkstationService ws
 @inject NavigationManager navMan
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
@@ -61,7 +61,7 @@
 
     private async Task GetWorkstationDetails()
     {
-        await ws.GetWorkstationDetail(localStorage, U3Adbfactory);
+        await ws.GetWorkstationDetail();
         switch (ws.SizeMode)
         {
             case 1:

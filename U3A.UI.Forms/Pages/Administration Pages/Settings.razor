@@ -1,7 +1,7 @@
 ﻿@page "/Settings"
 
 @inject IJSRuntime js
-@inject WorktationService ws
+@inject WorkstationService ws
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
@@ -171,7 +171,7 @@ else
 
     async void ValidFormSubmitted(EditContext editContext)
     {
-        await ws.SetWorkstationDetail(localStorage);
+        await ws.SetWorkstationDetail();
         NavigationManager.NavigateTo("/", true);
     }
 

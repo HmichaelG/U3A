@@ -60,21 +60,21 @@ public class DxThemesService
 {
 
     public DxThemesService(IHttpContextAccessor httpContextAccessor,
-                            IDbContextFactory<U3ADbContext> contextFactory,
-                            WorktationService ws)
+                            WorkstationService ws)
     {
         ActiveTheme = DxThemes.FluentLight; // set the default
-        using var dbc = contextFactory.CreateDbContext();
         var request = httpContextAccessor.HttpContext.Request;
         if (request == null) return;
 
-        var workstationID = request.Cookies.Where(x => x.Key == WorktationService.WORKSTATION_ID).FirstOrDefault().Value;
-        if (string.IsNullOrWhiteSpace(workstationID) ) { return; }
+        var theme = request.Cookies.Where(x => x.Key == WorkstationService.THEME).FirstOrDefault().Value;
+        if (string.IsNullOrWhiteSpace(theme)) { return; }
+        var color = request.Cookies.Where(x => x.Key == WorkstationService.ACCENT_COLOR).FirstOrDefault().Value;
+        if (string.IsNullOrWhiteSpace(color)) { return; }
 
         ActiveTheme = Themes.Fluent.Clone(properties =>
          {
-             properties.Mode = ThemeMode.Dark;
-             properties.SetCustomAccentColor("red");
+             properties.Mode = (theme.ToLowerInvariant() == "dark") ? ThemeMode.Dark : ThemeMode.Light ;
+             properties.SetCustomAccentColor(color);
              properties.AddFilePaths($"css/theme-fluent.css");
          });
 

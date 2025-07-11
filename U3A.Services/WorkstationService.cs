@@ -1,7 +1,10 @@
 ﻿using AsyncAwaitBestPractices;
 using Blazored.LocalStorage;
+using DevExpress.XtraRichEdit.Layout.Engine;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Serilog;
 using System;
@@ -11,19 +14,13 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using U3A.Database;
+using U3A.Model;
 
 namespace U3A.Services;
 
-public enum ScreenSizes
-{
-    XSmall,
-    Small,
-    Medium,
-    Large,
-    XLarge,
-    Unknown
-}
-public class WorktationService(IJSRuntime js)
+public class WorkstationService(IJSRuntime js,
+                ILocalStorageService localStorage,
+                IDbContextFactory<U3ADbContext> U3AdbFactory)
 {
     // size Changed event
     public event EventHandler ScreenSizeChanged;
@@ -36,95 +33,71 @@ public class WorktationService(IJSRuntime js)
     public bool IsMediumScreen => MenuBehavior == "Medium" || (MenuBehavior == "Auto" && (ScreenSize == ScreenSizes.Medium || ScreenSize == ScreenSizes.Large));
     public bool IsLargeScreen => MenuBehavior == "Large" || (MenuBehavior == "Auto" && ScreenSize == ScreenSizes.XLarge);
 
-    public string theme;
-    public string AccentColor;
-    public string SidebarImage;
-    public string MenuBehavior;
+    public string theme { get; set; }
+    public string AccentColor { get; set; }
+    public string SidebarImage { get; set; }
+    public string MenuBehavior { get; set; }
+
+    private const string DEFAULT_COLOR = "royalblue";
 
     public const string WORKSTATION_ID = "WorkstationID";
-    const string USE_TOP_MENU_KEY = "use-topmenu";
-    const string SIZE_MODE = "size-mode";
-    const string THEME = "theme";
-    const string ACCENT_COLOR = "accent-color";
-    const string SIDEBAR_IMAGE = "sidebar-image";
-    const string MENU_BEHAVIOR = "menu-behavior";
+    public const string THEME = "theme";
+    public const string ACCENT_COLOR = "accentColor";
 
-    public async Task<bool> GetWorkstationDetail(ILocalStorageService localStorage, IDbContextFactory<U3ADbContext> U3AdbFactory)
+    public async Task GetWorkstationDetail()
     {
-        bool forceReload = false;
         //workstation ID
-        var id = await localStorage.GetItemAsync<string>(WORKSTATION_ID);
-        if (id == null)
         {
-            id = Guid.NewGuid().ToString();
-            await localStorage.SetItemAsync(WORKSTATION_ID, id);
+            var id = await localStorage.GetItemAsync<string>(WORKSTATION_ID);
+            if (id == null)
+            {
+                id = Guid.NewGuid().ToString();
+                await localStorage.SetItemAsync(WORKSTATION_ID, id);
+            }
+            ID = id;
         }
-        ID = id;
+
+        using var dbc = await U3AdbFactory.CreateDbContextAsync();
+        var workstation = await dbc.Workstation.FindAsync(ID);
+        if (workstation == null)
+        {
+            workstation = new() { ID = ID };
+            await dbc.AddAsync(workstation);
+            await dbc.SaveChangesAsync();
+        }
         // Use top menu
-        UseTopMenu = false;
-        if (await localStorage.ContainKeyAsync(USE_TOP_MENU_KEY))
-        {
-            UseTopMenu = await localStorage.GetItemAsync<bool>(USE_TOP_MENU_KEY);
-        }
+        UseTopMenu = workstation.UseTopMenu;
 
         // size mode
-        SizeMode = 0;
-        if (await localStorage.ContainKeyAsync(SIZE_MODE))
-        {
-            SizeMode = await localStorage.GetItemAsync<int>(SIZE_MODE);
-        }
+        SizeMode = workstation.SizeMode;
 
         // theme
-        theme = "light";
-        if (await localStorage.ContainKeyAsync(THEME))
-        {
-            theme = await localStorage.GetItemAsync<string>(THEME);
-        }
-        if (theme != "light" && theme != "dark")
-        {
-            theme = "light";
-        }
+        theme = workstation.theme;
 
         // accent color
-        AccentColor = string.Empty;
-        if (await localStorage.ContainKeyAsync(ACCENT_COLOR))
-        {
-            // Attempt to get the accent color from local storage
-            AccentColor = await localStorage.GetItemAsync<string>(ACCENT_COLOR) ?? string.Empty;
-        }
+        AccentColor = workstation.AccentColor;
         if (string.IsNullOrEmpty(AccentColor))
         {
             //Use Website primary color as default
-            using (var db = U3AdbFactory.CreateDbContext())
+            var tenant = dbc.TenantInfo;
+            if (string.IsNullOrEmpty(tenant.PrimaryWebsiteColor))
             {
-                var tenant = db.TenantInfo;
-                if (tenant != null && !string.IsNullOrEmpty(tenant.PrimaryWebsiteColor))
-                {
-                    if (string.IsNullOrEmpty(AccentColor))
-                    {
-                        AccentColor = tenant.PrimaryWebsiteColor;
-                        await localStorage.SetItemAsync<String>(ACCENT_COLOR, AccentColor);
-                        forceReload = true; // Force reload to apply the new accent color
-                    }
-                }
+                AccentColor = DEFAULT_COLOR;
+            }
+            else
+            {
+                AccentColor = tenant.PrimaryWebsiteColor;
             }
         }
 
-        // sidebar image
-        SidebarImage = "Random Image";
-        if (await localStorage.ContainKeyAsync(SIDEBAR_IMAGE))
-        {
-            SidebarImage = await localStorage.GetItemAsync<string>(SIDEBAR_IMAGE);
-        }
+        // Sidebar image
+        SidebarImage = workstation.SidebarImage;
 
         // menu behavior
-        MenuBehavior = "Auto";
-        if (await localStorage.ContainKeyAsync(MENU_BEHAVIOR))
-        {
-            MenuBehavior = await localStorage.GetItemAsync<string>(MENU_BEHAVIOR);
-        }
+        MenuBehavior = workstation.MenuBehavior;
 
-        return forceReload;
+        // Force refresh of cookies
+        await RefreshCookies();
     }
 
     public async Task SetScreenSizeAsync(ScreenSizes size)
@@ -139,23 +112,33 @@ public class WorktationService(IJSRuntime js)
         }
     }
 
-    public async Task SetWorkstationDetail(ILocalStorageService localStorage)
+    public async Task SetWorkstationDetail()
+    {
+        await RefreshCookies();
+
+        using var dbc = await U3AdbFactory.CreateDbContextAsync();
+        var workstation = await dbc.Workstation.FindAsync(ID);
+        // Menu behavior
+        workstation.MenuBehavior = MenuBehavior;
+        // Use top menu
+        workstation.UseTopMenu = UseTopMenu;
+        // size mode
+        workstation.SizeMode = SizeMode;
+        // theme
+        workstation.theme = theme;
+        // accent color
+        if (string.IsNullOrEmpty(AccentColor)) { AccentColor = DEFAULT_COLOR; }
+        workstation.AccentColor = AccentColor;
+        // sidebar image
+        workstation.SidebarImage = SidebarImage;
+        await dbc.SaveChangesAsync();
+    }
+
+    private async Task RefreshCookies()
     {
         await js.InvokeVoidAsync("cookieInterop.setCookie", WORKSTATION_ID, ID, 999999);
-        // Menu behavior
-        await localStorage.SetItemAsync<String>(MENU_BEHAVIOR, MenuBehavior);
-        // Use top menu
-        await localStorage.SetItemAsync<bool>(USE_TOP_MENU_KEY, UseTopMenu);
-        // size mode
-        await localStorage.SetItemAsync<int>(SIZE_MODE, SizeMode);
-        // theme
-        await localStorage.SetItemAsync<String>(THEME, theme);
-        // accent color
-        if (!string.IsNullOrEmpty(AccentColor))
-        {
-            await localStorage.SetItemAsync<String>(ACCENT_COLOR, AccentColor);
-        }
-        // sidebar image
-        await localStorage.SetItemAsync<String>(SIDEBAR_IMAGE, SidebarImage);
+        await js.InvokeVoidAsync("cookieInterop.setCookie", THEME, theme, 999999);
+        await js.InvokeVoidAsync("cookieInterop.setCookie", ACCENT_COLOR, AccentColor, 999999);
+
     }
 }

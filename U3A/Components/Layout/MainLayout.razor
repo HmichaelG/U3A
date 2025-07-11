@@ -14,7 +14,7 @@
 @inject CircuitHandler circuitHandler
 @inject NavigationManager navMan
 @inject IJSRuntime js
-@inject WorktationService ws
+@inject WorkstationService ws
 @inject DxThemesService themeService
 @inject IThemeChangeService themeChangeService
 @implements IDisposable
@@ -190,8 +190,7 @@
 
     private async Task GetWorkstationDetails()
     {
-        bool forceReload = await ws.GetWorkstationDetail(localStorage, U3Adbfactory);
-        if (forceReload) navMan.NavigateTo(navMan.Uri, forceLoad: true);
+        await ws.GetWorkstationDetail();
         useTopMenu = ws.UseTopMenu;
         switch (ws.SizeMode)
         {
@@ -205,7 +204,6 @@
                 sizeMode = SizeMode.Small;
                 break;
         }
-        //await themeChangeService.SetTheme(DxThemes.CreateTheme( ws.theme, ws.AccentColor));
         StateHasChanged();
     }
 

@@ -62,6 +62,7 @@ namespace U3A.Database
         public DbSet<LeaderHistory> LeaderHistory { get; set; }
         public DbSet<LuckyMemberDraw> LuckyMemberDraw { get; set; }
         public DbSet<LuckyMemberDrawEntrant> LuckyMemberDrawEntrant { get; set; }
+        public DbSet<Workstation> Workstation { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
