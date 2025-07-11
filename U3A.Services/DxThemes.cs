@@ -61,14 +61,14 @@ public class DxThemesService
 
     public DxThemesService(IHttpContextAccessor httpContextAccessor,
                             IDbContextFactory<U3ADbContext> contextFactory,
-                            WorkStation ws)
+                            WorktationService ws)
     {
         ActiveTheme = DxThemes.FluentLight; // set the default
         using var dbc = contextFactory.CreateDbContext();
         var request = httpContextAccessor.HttpContext.Request;
         if (request == null) return;
 
-        var workstationID = request.Cookies.Where(x => x.Key == WorkStation.WORKSTATION_ID).FirstOrDefault().Value;
+        var workstationID = request.Cookies.Where(x => x.Key == WorktationService.WORKSTATION_ID).FirstOrDefault().Value;
         if (string.IsNullOrWhiteSpace(workstationID) ) { return; }
 
         ActiveTheme = Themes.Fluent.Clone(properties =>

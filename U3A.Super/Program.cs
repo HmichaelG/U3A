@@ -61,7 +61,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddMicrosoftIdentityConsentHandler();
 
-builder.Services.AddScoped<WorkStation>();
+builder.Services.AddScoped<WorktationService>();
 
 var app = builder.Build();
 

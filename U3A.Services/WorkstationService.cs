@@ -23,7 +23,7 @@ public enum ScreenSizes
     XLarge,
     Unknown
 }
-public class WorkStation(IJSRuntime js)
+public class WorktationService(IJSRuntime js)
 {
     // size Changed event
     public event EventHandler ScreenSizeChanged;

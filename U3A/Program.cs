@@ -39,7 +39,7 @@ if (recaptureKey != null) builder.Services.Configure<reCAPTCHAVerificationOption
 builder.Services.AddTransient<ReCaptchaV2API>();
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
-builder.Services.AddScoped<WorkStation>();
+builder.Services.AddScoped<WorktationService>();
 builder.AddAIChatService(AIChatServiceExtension.ChatServiceType.Azure);
 builder.AddIdentityService();
 
