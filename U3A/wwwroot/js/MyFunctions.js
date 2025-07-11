@@ -164,6 +164,12 @@ function setTheme() {
         var inner = styleEl.innerHTML;
         styleEl.innerHTML = inner.replace('gainsboro', color);
     }
+    // mode
+    const elHtml = document.querySelector('html');
+    if (elHtml) {
+        alert("there");
+        elHtml.setAttribute('data-text-fl-darkmode', " ");
+    }
 }
 
 window.cookieInterop = {

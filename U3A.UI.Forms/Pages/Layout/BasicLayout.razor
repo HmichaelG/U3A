@@ -10,7 +10,6 @@
 @inject WorkStation ws
 @inject NavigationManager navMan
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
-@inject IThemeChangeService themeChangeService
 
 <PageTitle>@($"{tenantId} Member Portal")</PageTitle>
 
@@ -36,19 +35,9 @@
     bool? useTopMenu = null; // default is sidebar
     LoginState? loginState { get; set; }
 
-    bool isXSmall;
-    bool isSmall;
-    bool isMedium;
-    bool isLarge;
-    bool isXLarge;
-
     U3ADbContext? dbc { get; set; }
-    string? currentUrl;
     bool isInteractive = false;
     SizeMode sizeMode;
-    private DotNetObjectReference<BasicLayout>? objRef;
-    string Orientation { get; set; } = "unknown";
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,37 +56,12 @@
         {
             await js.LoadDxResources();
             await GetWorkstationDetails();
-            objRef = DotNetObjectReference.Create(this);
-            await js.InvokeVoidAsync("registerOrientationChange", objRef);
         }
-    }
-
-    [JSInvokable]
-    public void OnOrientationChanged(string orientation)
-    {
-        navMan.NavigateTo(navMan.Uri, forceLoad: true);
-    }
-
-    async Task OnXSmallChanged(bool isActive) => await processSizeChange(ScreenSizes.XSmall);
-    async Task OnSmallChanged(bool isActive) => await processSizeChange(ScreenSizes.Small);
-    async Task OnMediumChanged(bool isActive) => await processSizeChange(ScreenSizes.Medium);
-    async Task OnLargeChanged(bool isActive) => await processSizeChange(ScreenSizes.Large);
-    async Task OnXLargeChanged(bool isActive) => await processSizeChange(ScreenSizes.XLarge);
-
-    int seq = 0;
-    async Task processSizeChange(ScreenSizes size)
-    {
-        await ws.SetScreenSizeAsync(size);
-        StateHasChanged();
-        seq++;
-        Log.Information($"{seq}: Screen size changed to: {size}", size);
     }
 
     private async Task GetWorkstationDetails()
     {
-        bool forceReload = await ws.GetWorkstationDetail(localStorage, U3Adbfactory);
-        if (forceReload) navMan.NavigateTo(navMan.Uri, forceLoad: true);
-        useTopMenu = ws.UseTopMenu;
+        await ws.GetWorkstationDetail(localStorage, U3Adbfactory);
         switch (ws.SizeMode)
         {
             case 1:
@@ -115,7 +79,6 @@
 
     public void Dispose()
     {
-        objRef?.Dispose();
         dbc?.Dispose();
     }
 
