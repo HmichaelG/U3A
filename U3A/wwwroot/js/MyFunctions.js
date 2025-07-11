@@ -162,13 +162,7 @@ function setTheme() {
     const styleEl = document.querySelector('style[data-theme-id="Fluent"]');
     if (styleEl) {
         var inner = styleEl.innerHTML;
-        styleEl.innerHTML = inner.replace('gainsboro', color);
-    }
-    // mode
-    const elHtml = document.querySelector('html');
-    if (elHtml) {
-        alert("there");
-        elHtml.setAttribute('data-text-fl-darkmode', " ");
+        styleEl.innerHTML = inner.replace('royalblue', color);
     }
 }
 

@@ -10,12 +10,13 @@ public static class DxThemes
     public static readonly ITheme FluentLight = Themes.Fluent.Clone(properties =>
     {
         properties.Mode = ThemeMode.Light;
-        properties.SetCustomAccentColor("gainsboro");
+        properties.SetCustomAccentColor("royalblue");
         AddFluentTheme(properties);
     });
     public static readonly ITheme FluentDark = Themes.Fluent.Clone(properties =>
     {
         properties.Mode = ThemeMode.Dark;
+        properties.SetCustomAccentColor("royalblue");
         AddFluentTheme(properties);
     });
     public static readonly ITheme BlazingBerry = Themes.BlazingBerry.Clone(AddBootstrapTheme);
@@ -56,9 +57,8 @@ public static class DxThemes
 
 public class DxThemesService
 {
-    private readonly IDbContextFactory<TenantDbContext> _tenantDbFactory;
 
-    public DxThemesService(IDbContextFactory<TenantDbContext> tenantDbFactory)
+    public DxThemesService()
     {
         ActiveTheme = DxThemes.FluentLight;
     }

@@ -15,6 +15,7 @@
 @inject NavigationManager navMan
 @inject IJSRuntime js
 @inject WorkStation ws
+@inject DxThemesService themeService
 @inject IThemeChangeService themeChangeService
 @implements IDisposable
 
@@ -181,10 +182,10 @@
     int seq = 0;
     async Task processSizeChange(ScreenSizes size)
     {
-            await ws.SetScreenSizeAsync(size);
-            StateHasChanged();
-            seq++;
-            Log.Information($"{seq}: Screen size changed to: {size}", size);
+        await ws.SetScreenSizeAsync(size);
+        StateHasChanged();
+        seq++;
+        Log.Information($"{seq}: Screen size changed to: {size}", size);
     }
 
     private async Task GetWorkstationDetails()
@@ -204,7 +205,7 @@
                 sizeMode = SizeMode.Small;
                 break;
         }
-        // await themeChangeService.SetTheme(DxThemes.CreateTheme( ws.theme, ws.AccentColor));
+        //await themeChangeService.SetTheme(DxThemes.CreateTheme( ws.theme, ws.AccentColor));
         StateHasChanged();
     }
 
