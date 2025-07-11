@@ -137,7 +137,7 @@ function GetLocalStorage(key) {
 }
 
 window.onload = function () {
-    setTheme();
+    //setTheme();
     displayNonInteractive();
 }
 

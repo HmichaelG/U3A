@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using U3A.Database;
@@ -58,9 +59,25 @@ public static class DxThemes
 public class DxThemesService
 {
 
-    public DxThemesService()
+    public DxThemesService(IHttpContextAccessor httpContextAccessor,
+                            IDbContextFactory<U3ADbContext> contextFactory,
+                            WorkStation ws)
     {
-        ActiveTheme = DxThemes.FluentLight;
+        ActiveTheme = DxThemes.FluentLight; // set the default
+        using var dbc = contextFactory.CreateDbContext();
+        var request = httpContextAccessor.HttpContext.Request;
+        if (request == null) return;
+
+        var workstationID = request.Cookies.Where(x => x.Key == WorkStation.WORKSTATION_ID).FirstOrDefault().Value;
+        if (string.IsNullOrWhiteSpace(workstationID) ) { return; }
+
+        ActiveTheme = Themes.Fluent.Clone(properties =>
+         {
+             properties.Mode = ThemeMode.Dark;
+             properties.SetCustomAccentColor("red");
+             properties.AddFilePaths($"css/theme-fluent.css");
+         });
+
     }
 
     public ITheme ActiveTheme { get; private set; }

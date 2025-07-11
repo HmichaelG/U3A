@@ -23,7 +23,7 @@ public enum ScreenSizes
     XLarge,
     Unknown
 }
-public class WorkStation
+public class WorkStation(IJSRuntime js)
 {
     // size Changed event
     public event EventHandler ScreenSizeChanged;
@@ -41,7 +41,7 @@ public class WorkStation
     public string SidebarImage;
     public string MenuBehavior;
 
-    const string WORKSTATION_ID = "WorkstationID";
+    public const string WORKSTATION_ID = "WorkstationID";
     const string USE_TOP_MENU_KEY = "use-topmenu";
     const string SIZE_MODE = "size-mode";
     const string THEME = "theme";
@@ -141,6 +141,7 @@ public class WorkStation
 
     public async Task SetWorkstationDetail(ILocalStorageService localStorage)
     {
+        await js.InvokeVoidAsync("cookieInterop.setCookie", WORKSTATION_ID, ID, 999999);
         // Menu behavior
         await localStorage.SetItemAsync<String>(MENU_BEHAVIOR, MenuBehavior);
         // Use top menu
