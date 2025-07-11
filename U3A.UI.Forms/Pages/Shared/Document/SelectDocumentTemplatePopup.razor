@@ -13,7 +13,7 @@
 
 <Progress @ref=@progressBar />
 
-<DxPopup Visible="@popupVisible" @ref="@popup" Width="95dvw" CssClass="editor-popup"
+<DxPopup Visible="@popupVisible" @ref="@popup" Width="100dvw" CssClass="editor-popup"
          PositionY="5"
          CloseButtonClick="@NegativeButtonClicked"
          CloseOnEscape="false"
@@ -21,7 +21,7 @@
          AllowDrag=true
          HeaderText="Communicate">
     <HeaderContentTemplate>
-        <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
+        <ContextHelpTitle Title="Communicate" HelpTopic="Communicate.html" />
     </HeaderContentTemplate>
     <BodyContentTemplate Context="PopupContext">
             <DxSplitter Orientation="Orientation.Horizontal"
@@ -164,7 +164,7 @@
 
 <style>
     .editor-popup {
-        height: calc(100dvh - 2rem);
+        height: 100dvh;
     }
 
     .preview {
