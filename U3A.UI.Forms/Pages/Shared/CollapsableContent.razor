@@ -2,16 +2,16 @@
 
 @if (!IsDismissed && Visible)
 {
-    <section class="@($"{CssClass} {alertRender} text-center")" hidden="@isHidden">
-        <button class="dismiss-button btn btn-close" onclick="@OnDismiss" hidden="@(!ShowCollapseButton)" />
+    <section class="@($"{CssClass} {alertRender}")" hidden="@isHidden">
+        <DxButton CssClass="dismiss-button" 
+            Click="@OnDismiss"
+            IconCssClass="bi bi-x-lg"
+            RenderStyle=ButtonRenderStyle.Primary
+            RenderStyleMode="ButtonRenderStyleMode.Text"
+            Visible="@(ShowCollapseButton)" />
         @ContentTemplate
-        <div class="@($"{AlertTextRender}")">
-            @(new MarkupString(AlertText))
-        </div>
+        @(new MarkupString(AlertText))
     </section>
-    <div class="w-100 bg-primary muted" hidden="@(!isHidden || !ShowCollapseButton)">
-        <button class="dismiss-button btn btn-close" onclick="@onOpenButtonClick" />
-    </div>
 }
 
 <style>
@@ -44,13 +44,12 @@
     [Parameter] public EventCallback OnContentExpanded { get; set; }
     [Parameter] public EventCallback OnContentCollapsed { get; set; }
     [Parameter] public RenderFragment ContentTemplate { get; set; }
-    [Parameter] public string CssClass { get; set; }
+    [Parameter] public string CssClass { get; set; } = " text-center";
     [Parameter] public string? DismissKey { get; set; }
 
     bool IsDismissed = true;
 
     bool isHidden = false;
-    string AlertTextRender;
     string alertRender;
 
     protected override void OnInitialized()
@@ -62,7 +61,6 @@
         }
         else
         {
-            AlertTextRender = $"text-dark";
             alertRender = $"alert-section alert alert-{AlertType}";
         }
     }
@@ -87,35 +85,5 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    async Task onOpenButtonClick()
-    {
-        isHidden = false;
-        await RaiseToggleLayoutEvent();
-    }
-    async Task onCloseButtonClick()
-    {
-        isHidden = true;
-        await RaiseToggleLayoutEvent();
-    }
-
-    public async Task ToggleLayoutAsync(bool isCollapsed)
-    {
-        isHidden = isCollapsed;
-        await RaiseToggleLayoutEvent();
-    }
-
-    async Task RaiseToggleLayoutEvent()
-    {
-        InvokeAsync(StateHasChanged);
-        if (isHidden)
-        {
-            await OnContentCollapsed.InvokeAsync();
-        }
-        else
-        {
-            await OnContentExpanded.InvokeAsync();
-        }
-        await OnToggleAlert.InvokeAsync();
-    }
 }
 
