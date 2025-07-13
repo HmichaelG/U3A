@@ -75,6 +75,22 @@ h1:focus {
         content: "An error has occurred."
     }
 
+.links-container {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+    align-items: center;
+}
+
+    .links-container .dot {
+        height: 0.3125rem;
+        width: 0.3125rem;
+        margin: 0 0.1875rem;
+        border-radius: 50%;
+        background-color: var(--bs-body-color, var(--DS-color-content-neutral-default-rest));
+        opacity: 0.7;
+    }
+
 
 /*Support form google material icons*/
 

@@ -109,7 +109,7 @@ else
                                       ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
                 }
             </div>
-            <DxTabs class="w-100">
+            <DxTabs class="w-100 mb-4">
                 <DxTabPage Text="Member Summary">
                     <GeneralSummaryChart />
                 </DxTabPage>
@@ -135,6 +135,9 @@ else
                     <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-style"></iframe>
                 </DxTabPage>
             </DxTabs>
+            <footer class="text-fl-muted" style="position: fixed; bottom: 0; left: 0;">
+                &copy; @(DateTime.Today.Year) M &amp; B Hanlon Pty Ltd
+            </footer>
         }
     </div>
 }

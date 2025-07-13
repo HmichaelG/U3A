@@ -22,11 +22,13 @@ else
 {
     <Progress @ref=@progress />
     <MessageBox @ref=@messageBox />
+
     <div class="col col-12 col-md-10 col-lg-6 mt-2 px-2 mx-auto">
-        <div class="text-center alert alert-success text-dark w-100">
+        <div class="text-center alert alert-primary w-100">
             <div class="w-100 pb-2">@welcomeText</div>
             <DxButton Text="Today's Schedule" Click="@SetupClassesToday"
-                      RenderStyle="ButtonRenderStyle.Success" IconCssClass="bi bi-alarm"
+                      RenderStyle="ButtonRenderStyle.Primary" IconCssClass="bi bi-alarm"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline"
                       Visible=@(classText == null) />
             <div class="w-100">@classText</div>
         </div>
@@ -246,13 +248,13 @@ else
             </Items>
         </DxAccordion>
         <p class="text-center">@($"There are {openCircuits} users logged in.")</p>
-        <footer class="mt-2 col col-12 text-muted">
-            <div align="center">
-                &copy; @(DateTime.Today.Year) - U3Admin.org.au
-                <a href="Public/Support">Click for support</a>
-            </div>
-        </footer>
     </div>
+    <footer class="w-100 links-container">
+        &copy; @(DateTime.Today.Year) M &amp; B Hanlon Pty Ltd
+        <div class="dot" />
+        <a href="Public/Support">Click for support</a>
+    </footer>
+
     <style>
 
         .schedule-table {

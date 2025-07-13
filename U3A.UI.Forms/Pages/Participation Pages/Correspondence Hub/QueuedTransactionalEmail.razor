@@ -33,10 +33,10 @@ else
     {
         <div class="px-2">
             <CollapsableContent DismissKey="{D46A020E-E4C2-4A3A-A684-80EE7B36AE34}" Visible="@(!IsEmbedded)"
-                                AlertText=@($@"<p><strong>Transactional email</strong> is queued &amp; background processed.<br />
-                        Cash Receipts and Enrolments are sent hourly, Leader Reports are sent within 48 hours of the next class.<br/>
-                        Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.<br />
-                        Processed correspondence is deleted after 30 days</p>.")
+                                AlertText=@($@"<strong>Transactional email</strong> is queued &amp; background processed.</br>
+                        Cash Receipts and Enrolments are sent hourly, Leader Reports are sent within 48 hours of the next class.</br>
+                        Postal reports are sent to <strong>{settings?.SendEmailAddesss}</strong>.</br>
+                        Processed correspondence is deleted after 30 days")
                                 OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
                                 OnToggleAlert="@(async() => await fullScreen.RefreshLayout())" />
 
