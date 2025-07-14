@@ -26,6 +26,8 @@
                 Note: U3A Tenants in <em>Postmark Sandbox</em> are considered demonstration tenants only.
             </p>
             <div class="pb-2">
+                <FullScreen DisplayOffset="12" HideToggle="true">
+                    <ContentTemplate>
                 <DxGrid @ref="grid" Data="@tenantInfo"
                         @bind-SelectedDataItems="@selectedItems"
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -112,6 +114,8 @@
                     </TotalSummary>
 
                 </DxGrid>
+                    </ContentTemplate>
+                </FullScreen>
             </div>
         </div>
     </DxLoadingPanel>
