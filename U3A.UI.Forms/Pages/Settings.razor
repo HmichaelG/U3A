@@ -172,7 +172,7 @@ else
     async void ValidFormSubmitted(EditContext editContext)
     {
         await ws.SetWorkstationDetail();
-        NavigationManager.NavigateTo("/", true);
+        NavigationManager.Refresh();
     }
 
     void Close()
