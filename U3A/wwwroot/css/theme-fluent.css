@@ -1,23 +1,46 @@
 ﻿.text-fl-primary {
-    color: var(--DS-color-content-primary-default-rest);
+    color: var(--DS-color-content-primary-default-rest) !important;
 }
 .text-fl-muted {
-    background-color: var(--DS-color-content-primary-subdued-rest);
+    background-color: var(--DS-color-content-primary-subdued-rest) !important;
 }
 .text-fl-info {
-    color: var(--DS-color-content-info-default-rest);
+    color: var(--DS-color-content-info-default-rest) !important;
 }
 .text-fl-success {
-    color: var(--DS-color-content-success-default-rest);
+    color: var(--DS-color-content-success-default-rest) !important;
 }
 .text-fl-warning {
-    color: var(--DS-color-content-warning-default-rest);
+    color: var(--DS-color-content-warning-default-rest) !important;
 }
 .text-fl-danger {
-    color: var(--DS-color-content-danger-default-rest);
+    color: var(--DS-color-content-danger-default-rest) !important;
 }
 .text-fl-secondary {
-    color: var(--DS-color-content-secondary-default-rest);
+    color: var(--DS-color-content-secondary-default-rest) !important;
+}
+.text-fl-neutral {
+    color: var(--DS-color-content-neutral-default-rest) !important;
+}
+
+.card {
+    background-color: var(--DS-color-surface-neutral-default-rest)    !important;
+    border-color: var(--DS-color-border-neutral-default-rest)    !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+    color: var(--DS-color-content-primary-default-rest);
 }
 
 .alert-primary {
@@ -39,25 +62,20 @@
 }
 
 .alert-success {
-    color: var(--DS-color-content-success-warning-rest);
+    color: var(--DS-color-content-success-success-rest);
     background-color: var(--DS-color-surface-success-subdued-rest);
     border-color: var(--DS-color-border-success-default-rest);
 }
 .alert-info {
-    color: var(--DS-color-content-info-warning-rest);
+    color: var(--DS-color-content-info-info-rest);
     background-color: var(--DS-color-surface-info-subdued-rest);
     border-color: var(--DS-color-border-info-default-rest);
 }
-
-.dxbl-btn-outline-primary,
-.dxbl-btn-outline-secondary,
-.dxbl-btn-outline-success,
-.dxbl-btn-outline-danger,
-.dxbl-btn-outline-warning {
-    color: var(--dxbl-btn-hover-color);
-    border-width: thin;
+.alert-neutral {
+    color: var(--DS-color-content-info-neutral-rest);
+    background-color: var(--DS-color-surface-neutral-subdued-rest);
+    border-color: var(--DS-color-border-neutral-default-rest);
 }
-
 
 .navigation-drawer {
     --dxbl-drawer-separator-border-width: 0;
