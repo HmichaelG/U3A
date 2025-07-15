@@ -15,18 +15,18 @@
 else
 {
 
-    <div class="row  align-content-start">
+    <div class="row align-content-start">
         <ContextHelpTitle Title="Add/Edit Receipts & Refunds" HelpTopic="Add_Edit-Receipts.html" />
     </div>
-    <div class="row">
-        <div class="col-10 d-none d-md-inline">
+    <div class="d-flex flex-row">
+        <div class="flex-grow-1">
             This procedure is intended to make adjustments and correct errors only, as
             <br />Receipts are normally created via <em>Bank Data Import</em> or the <em>Online Payment Gateway</em> (Member Portal).
             <br />At all times, the total of receipts displayed below must balance actual monies received.
             <br /><strong>Note: </strong>This procedure is intended to correct receipt transactions only. Use <em>Fee Adjustment</em> to adjust fees owing.
             <br /><strong>Hint: </strong>Group by date to display sub-totals on a daily basis.
         </div>
-        <div class="col col-lg-2">
+        <div class="flex-grow-0 me-4">
             <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" />
         </div>
 

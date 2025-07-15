@@ -43,16 +43,13 @@
                     SubmitFormOnClick=true 
                     RenderStyle="ButtonRenderStyle.Primary" />
                 </div>
-                <div>
-                    <p>
+                <div class="links-container">
                         <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
+                        <div class="dot" />
                         <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
+                </div>
+                <div class="links-container">
+                    <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
                 </div>
             </EditForm>
         </section>

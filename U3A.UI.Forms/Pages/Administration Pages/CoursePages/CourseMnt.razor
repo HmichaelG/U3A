@@ -24,13 +24,13 @@
 else
 {
 
-    <div class="row">
-        <div class="col col-lg-10">
+    <div class="d-flex flex-row mt-2">
+        <div class="flex-grow-1">
             <ContextHelpTitle Title="Courses" HelpTopic="Add_Edit-Courses.html"
                               Subtitle="<div>Courses are studies and/or activities undertaken by participants.</div>
                                         <div><b>Note:</b> A course must have at least one class to enable enrolments.</div>"/>
         </div>
-        <div class="col col-lg-2">
+        <div class="flex-grow-0 me-4">
             <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" />
         </div>
     </div>
