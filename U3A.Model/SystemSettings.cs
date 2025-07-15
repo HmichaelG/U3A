@@ -181,9 +181,6 @@ namespace U3A.Model
         [NotMapped]
         public TimeSpan UTCOffset { get; set; }
 
-        public bool SeparateMerchantFeeAndU3AFee { get; set; } = true;
-        public decimal MerchantFeeFixed { get; set; } = 0.25m;
-        public decimal MerchantFeePercentage { get; set; } = 1.5m;
     }
 
     public enum AutoEnrollOccurrence

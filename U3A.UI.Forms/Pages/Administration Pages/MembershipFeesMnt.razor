@@ -47,15 +47,18 @@ else {
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
                 <DxFormLayoutGroup Caption="Eway Merchant Fees" ColSpanLg="6" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
-                    <DxFormLayoutItem Caption="Separate Merchant Fee from U3A Fees?" ColSpanMd="12">
-                        <DxCheckBox @bind-Checked="@systemSettings.SeparateMerchantFeeAndU3AFee" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Merchant Fee Fixed Amount" ColSpanMd="12">
-                        <DxMaskedInput @bind-Value="@systemSettings.MerchantFeeFixed" Mask="@NumericMask.Currency" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Merchant Fee Percent Amount" ColSpanMd="12">
-                        <DxMaskedInput @bind-Value="@systemSettings.MerchantFeePercentage" Mask="@NumericMask.Percentage" />
-                    </DxFormLayoutItem>
+                    <div class="alert alert-info">
+                        <p>
+                        By default, merchant fees are not included in fees charged to members. That is, liability for merchant
+                        is incurred and borne by the U3A. The link below explains how to charge The member a merchant fee surcharge
+                        in addition to membership fees.
+                        </p>
+                        <p>
+                            <a href="https://go.eway.io/s/article/Can-I-add-a-surcharge-to-payments?language=en_US">
+                                Add merchant fee surcharge.    
+                            </a>
+                        </p>
+                    </div>
                 </DxFormLayoutGroup>
                 <DxFormLayoutGroup Caption="Complimentary Membership Parameters" ColSpanLg="6" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                     <DxFormLayoutItem Caption="Include Membership Fee In Complimentary?" ColSpanMd="12">
