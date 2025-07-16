@@ -3,14 +3,12 @@
 @inject NavigationManager NavigationManager
 
 <PortalHeader NavigateTo="/" />
-<div class="container">
-    <main role="main">
-        <div align="center">
-            <div class="alert alert-primary p-2 my-4 col col-12 col-sm-8 col-md-6 col-lg-5">
-                @Body
-            </div>
+<div class="container mt-2">
+    <div align="center">
+        <div class="alert alert-primary p-2 my-4 col col-12 col-sm-8 col-md-6 col-lg-5">
+            @Body
         </div>
-    </main>
+    </div>
 </div>
 <footer class="w-100 links-container">
     &copy; @(DateTime.Today.Year) M &amp; B Hanlon Pty Ltd
