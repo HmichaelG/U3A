@@ -23,6 +23,31 @@
     color: var(--DS-color-content-neutral-default-rest) !important;
 }
 
+.bg-fl-primary-subtle {
+    background-color: var(--DS-color-surface-primary-subdued-rest);
+}
+.bg-fl-success-subtle {
+    background-color: var(--DS-color-surface-success-subdued-rest);
+}
+.bg-fl-warning-subtle {
+    background-color: var(--DS-color-surface-warning-subdued-rest);
+}
+.bg-fl-info-subtle {
+    background-color: var(--DS-color-surface-info-subdued-rest);
+}
+
+.card-fl {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: var(--bs-card-height);
+    word-wrap: break-word;
+    background-clip: border-box;
+    border: 1px solid;
+    border-radius: 3px;
+}
+
 .dxbl-group-header {
     color: var(--DS-color-content-primary-default-rest) !important;
 }
@@ -40,6 +65,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     color: var(--DS-color-content-primary-default-rest);
     background-color: var(--DS-color-surface-primary-subdued-rest);
     border-color: var(--DS-color-border-primary-default-rest);
+}
+
+.alert-secondary {
+    color: var(--DS-color-content-secondary-default-rest);
+    background-color: var(--DS-color-surface-secondary-subdued-rest);
+    border-color: var(--DS-color-border-secondary-default-rest);
 }
 
 .alert-danger {

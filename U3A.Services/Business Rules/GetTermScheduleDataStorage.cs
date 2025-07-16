@@ -34,26 +34,26 @@ namespace U3A.BusinessRules
                 new LabelObject() {
                     Id = 0,
                     LabelCaption = "Term",
-                    BackgroundCssClass = "bg-secondary-subtle",
-                    TextCssClass = "text-dark"
+                    BackgroundCssClass = "bg-fl-primary-subtle",
+                    TextCssClass = "text-fl-primary"
                 },
                 new LabelObject() {
                     Id = 1,
                     LabelCaption = "Default Term",
-                    BackgroundCssClass = "bg-success",
-                    TextCssClass = "text-white"
+                    BackgroundCssClass = "bg-fl-success-subtle",
+                    TextCssClass = "text-fl-success"
                 },
                 new LabelObject() {
                     Id = 2,
                     LabelCaption = "Enrolment",
-                    BackgroundCssClass = "bg-warning-subtle",
-                    TextCssClass = "text-dark"
+                    BackgroundCssClass = "bg-fl-warning-subtle",
+                    TextCssClass = "text-fl-warning"
                 },
                 new LabelObject() {
                     Id = 3,
                     LabelCaption = "Enrolment Allocation Review",
-                    BackgroundCssClass = "bg-info",
-                    TextCssClass = "text-white"
+                    BackgroundCssClass = "bg-fl-info-subtle",
+                    TextCssClass = "text-fl-info"
                 },
             };
             dataStorage.AppointmentsSource = await GetTermScheduleAsync(dbc);
