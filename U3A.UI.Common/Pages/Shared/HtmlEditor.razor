@@ -12,7 +12,7 @@
 
 <MessageBox @ref=@messageBox />
 
-<DxTabs style="width:100%">
+<DxTabs CssClass="w-100">
     <DxTabPage Text="Editor">
         <DxHtmlEditor AllowSoftLineBreak="true"
                       TableResizeEnabled="true"
@@ -46,7 +46,7 @@
     <DxTabPage Text="Code" Click="() => {Markup = PrettyPrint(Markup);
                                             isCodeEditable=false;
                                             StateHasChanged();}">
-        <DxMemo @bind-Text="@Markup"
+        <DxMemo @bind-Text="@Markup" CssClass="w-100"
                 @bind-Text:after=@OnEditorTextChanged
                 Rows="20"
                 ReadOnly="@(!isCodeEditable)" />
