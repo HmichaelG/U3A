@@ -24,22 +24,19 @@ else
     if (!IsPortal)
     {
         <ContextHelpTitle Title="Course Schedule" HelpTopic="course-schedule.html" />
-        <div class="d-flex flex-row-reverse w-100 px-4 px-auto mb-2">
-            <DxButton RenderStyle="ButtonRenderStyle.Primary" CssClass="flex-grow-0" Text="Process"
-                      RenderStyleMode="ButtonRenderStyleMode.Contained" Click="@ProcessButtonClicked">
-            </DxButton>
+        <div class="d-flex flex-row w-100 px-4 px-auto mb-2">
+            <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="3">
+                <TermsComboBox Terms="@terms"
+                               @bind-SelectedTerm="@selectedTerm"
+                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+            </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Filter By Venue" Cssclass="flex-grow-1">
                 <DxTagBox Data="@AvailableVenues"
                           ClearButtonDisplayMode="default"
                           TextFieldName="@nameof(Venue.Name)"
                           NullText="Optionally filter by one or more venue locations."
-                          @bind-Values="@VenuesToFilter">
+                          @bind-Values="@VenuesToFilter" @bind-Values:after=@SelectedVenuesChanged>
                 </DxTagBox>
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="4">
-                <TermsComboBox Terms="@terms"
-                               @bind-SelectedTerm="@selectedTerm"
-                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
             </DxFormLayoutItem>
         </div>
     }
@@ -118,6 +115,7 @@ else
 
 
     bool IsReady;
+    public List<Venue>? venues { get; set; }
     public List<Venue>? AvailableVenues { get; set; }
     public IEnumerable<Venue>? VenuesToFilter { get; set; }
     LocalTime localTime;
@@ -139,17 +137,13 @@ else
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-        AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
+        venues = await BusinessRule.SelectableVenuesAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         if (IsPublic) IsPortal = true;
-        //viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
         if (selectedTerm != null)
         {
             SelectedTermChanged(selectedTerm);
-            if (IsPortal && DataStorage == null && selectedTerm != null)
-            {
-                await ProcessButtonClicked();
-            }
+            await ProcessSelection();
         }
         IsReady = true;
         await base.OnInitializedAsync();
@@ -169,9 +163,18 @@ else
             StartDate = now;
         }
         else { StartDate = term.StartDate; }
+        await ProcessSelection();
     }
 
-    async Task ProcessButtonClicked()
+    async Task SelectedVenuesChanged()
+    {
+        await ProcessSelection();
+        viewType = (VenuesToFilter.Count() > 0)
+                        ? SchedulerViewType.WorkWeek 
+                        : SchedulerViewType.Day;
+    }
+
+    async Task ProcessSelection()
     {
         if (!IsPortal)
         {
@@ -184,6 +187,12 @@ else
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IncludeOffScheduleActivities: !IsPortal);
+                if (!IsReady)
+                {
+                    DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(StartDate, StartDate.AddYears(1));
+                    var venueNames = DataStorage.GetAppointments(range).Select(x => x.Location);
+                    AvailableVenues = venues.Where(x => venueNames.Contains(x.Name)).ToList();
+                }
             }
         }
         if (!IsPortal)
