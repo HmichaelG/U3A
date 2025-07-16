@@ -76,7 +76,7 @@ else
             </AppointmentTooltipHeaderTemplate>
             <AppointmentTooltipTemplate>
                 <div class="container">
-                    <span style="vertical-align: middle;">
+                    <span style="card-fl vertical-align: middle;">
                         <strong>Subject:</strong>  @context.Appointment.Subject<br />
                         <strong>Leader:</strong>  @context.Appointment.Description<br />
                         <strong>Location:</strong>  @context.Appointment.Location<br />
@@ -121,7 +121,7 @@ else
     public List<Venue>? AvailableVenues { get; set; }
     public IEnumerable<Venue>? VenuesToFilter { get; set; }
     LocalTime localTime;
-    SchedulerViewType viewType = SchedulerViewType.WorkWeek;
+    SchedulerViewType viewType = SchedulerViewType.Day;
 
     private List<Term> terms { get; set; }
     private Term? selectedTerm { get; set; }
@@ -142,7 +142,7 @@ else
         AvailableVenues = await BusinessRule.SelectableVenuesAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         if (IsPublic) IsPortal = true;
-        viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
+        //viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
         if (selectedTerm != null)
         {
             SelectedTermChanged(selectedTerm);

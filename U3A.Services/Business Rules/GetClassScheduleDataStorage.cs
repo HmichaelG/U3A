@@ -46,32 +46,32 @@ namespace U3A.BusinessRules
             new LabelObject() {
                 Id = 0,
                 LabelCaption = "Undersubscribed",
-                BackgroundCssClass = "bg-warning",
-                TextCssClass = "text-white"
+                BackgroundCssClass = "bg-fl-warning-subtle",
+                TextCssClass = "text-fl-warning"
             },
             new LabelObject() {
                 Id = 1,
                 LabelCaption = "Good To Go",
-                BackgroundCssClass = "bg-success",
-                TextCssClass = "text-white"
+                BackgroundCssClass = "bg-fl-success-subtle",
+                TextCssClass = "text-fl-success"
             },
             new LabelObject() {
                 Id = 2,
                 LabelCaption = "Oversubscribed",
-                BackgroundCssClass = "bg-danger",
-                TextCssClass = "text-white"
+                BackgroundCssClass = "bg-fl-danger-subtle",
+                TextCssClass = "text-fl-danger"
             },
             new LabelObject() {
                 Id = 3,
                 LabelCaption = "Off-Schedule Activity",
-                BackgroundCssClass = "bg-info",
-                TextCssClass = "text-white"
+                BackgroundCssClass = "bg-fl-info-subtle",
+                TextCssClass = "text-fl-info"
             },
             new LabelObject() {
                 Id = 9,
                 LabelCaption = "Cancelled/Postponed",
-                BackgroundCssClass = "bg-light",
-                TextCssClass = "text-black"
+                BackgroundCssClass = "bg-fl-neutral-subtle",
+                TextCssClass = "text-fl-neutral"
             },
         },
                 AppointmentLabelMappings = new DxSchedulerAppointmentLabelMappings()
