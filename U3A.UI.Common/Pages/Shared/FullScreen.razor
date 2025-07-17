@@ -68,6 +68,15 @@
         isFullscreen = !isFullscreen;
         await RefreshLayout();
     }
+    public async Task ResetFullScreen()
+    {
+        if (isFullscreen)
+        {
+            isFullscreen = !isFullscreen;
+            await RefreshLayout();
+        }
+    }
+
 
     public async Task RefreshLayout(bool UseAlternateDisplayOffset = false)
     {

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using U3A.Database;
 using U3A.Model;
