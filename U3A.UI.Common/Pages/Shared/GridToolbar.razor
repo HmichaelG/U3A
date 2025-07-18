@@ -1,4 +1,6 @@
-﻿@using Microsoft.JSInterop
+﻿@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@using Microsoft.JSInterop
 @using DevExpress.Export
 @using System.Drawing
 @using System.Collections
@@ -112,21 +114,53 @@
                        Alignment="ToolbarItemAlignment.Right"
                        Tooltip="Filter / search for records">
         </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel Export"
+        <DxToolbarItem id="dropdown-target-container" IconCssClass="bi bi-file-spreadsheet" Text="Export"
                        BeginGroup=true
                        Alignment="ToolbarItemAlignment.Right">
             <Items>
-                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportAll" Text="Export All"
-                               Tooltip="Export the entire grid to Excel">
+                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="To Excel"
+                               Click="() => {
+                                                isOpenForExcel = !isOpenForExcel; 
+                                                isDropDownOpen = isOpenForExcel || isOpenForPdf;
+                                                reportTitle = string.Empty;
+                                            }"
+                               Tooltip="Export the grid to Excel">
                 </DxToolbarItem>
-                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportSelected" Text="Export Selected"
-                               Tooltip="Export selected rows to Excel" Visible="@areRowsSelectable">
+                <DxToolbarItem IconCssClass="bi bi-file-pdf" Text="To PDF"
+                               Click="() => {
+                                                isOpenForPdf = !isOpenForPdf; 
+                                                isDropDownOpen = isOpenForExcel || isOpenForPdf;
+                                                reportTitle = string.Empty;
+                                            }"
+                               Tooltip="Export the grid to Pdf">
                 </DxToolbarItem>
             </Items>
         </DxToolbarItem>
         @CustomButtonContent
     </Items>
 </DxToolbar>
+<DxDropDown @bind-IsOpen="@isDropDownOpen"
+            Id="dropDown-overview"
+            FooterVisible="true"
+            HeaderVisible="true"
+            HeaderText="Export Parameters"
+            PositionMode="DropDownPositionMode.Bottom"
+            Width="max(25vw, 250px)"
+            PositionTarget="#dropdown-target-container"
+            RestrictionTarget="#dropdown-target-container"
+            CloseMode="DropDownCloseMode.Close"
+            PreventCloseOnPositionTargetClick="true">
+    <BodyContentTemplate>
+        <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+            <DxFormLayoutItem Caption="Title" ColSpanMd="12" Context="bodyContext">
+                <DxTextBox @bind-Text=@reportTitle />
+            </DxFormLayoutItem>
+        </DxFormLayoutGroup>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton Text="Export" Click="OnDropDownClick" />
+    </FooterContentTemplate>
+</DxDropDown>
 
 @code {
 
@@ -152,6 +186,10 @@
     string showSelectedOnlyText = string.Empty;
     string showSelectedOnlyTooltip = string.Empty;
     bool showSelectedOnly = true;
+    bool isOpenForExcel = false;
+    bool isOpenForPdf = false;
+    bool isDropDownOpen = false;
+    string reportTitle = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -180,7 +218,7 @@
         await base.OnInitializedAsync();
     }
 
-    object savedData = null; 
+    object savedData = null;
     private void ToggleShowSelectedOnly()
     {
         if (LinkedGrid == null) { return; }
@@ -337,12 +375,6 @@
                     IconCssClass = "bi bi-check-circle"
                 });
                 break;
-            case "ExportAll":
-                await ExcelExport(false);
-                break;
-            case "ExportSelected":
-                await ExcelExport(true);
-                break;
             case "Filter":
                 if (LinkedGrid.FilterMenuButtonDisplayMode == GridFilterMenuButtonDisplayMode.Default)
                 {
@@ -362,8 +394,64 @@
         LinkedGrid.EndUpdate();
     }
 
-    async Task ExcelExport(bool SelectedRowsOnly)
+    async Task OnDropDownClick()
     {
+        LinkedGrid!.BeginUpdate();
+        if (isOpenForExcel) { await ExcelExport(); } else { await PdfExport(); }
+        LinkedGrid!.EndUpdate();
+        isDropDownOpen = isOpenForExcel = isOpenForPdf = false;
+    }
+
+
+    async Task PdfExport()
+    {
+        if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = "Pdf Export";
+        await LinkedGrid!.ExportToPdfAsync(reportTitle,
+            new GridPdfExportOptions()
+            {
+                FitToPage = true,
+                CustomizeDocument = OnCustomizeDocument,
+                CustomizeCell = OnCustomizeCell,
+                CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
+                CustomizePageFooter = OnCustomizePageFooter, // Adds page footers
+            });
+    }
+
+    void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
+    {
+        args.ElementStyle.Font = new DXFont("Arial", 16);
+        args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+        args.Text = reportTitle;
+    }
+
+    void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
+    {
+        args.PaperKind = DXPaperKind.A4;
+        args.Landscape = true;
+        args.Margins = new DXMargins(50, 50, 50, 50);
+    }
+
+    void OnCustomizeCell(GridDocumentExportCustomizeCellEventArgs args)
+    {
+        if (args.AreaType == DocumentExportAreaType.DataArea && args.Value is bool)
+        {
+            var val = (bool)args.Value;
+            args.Text = (val) ? "✔️" : "";
+            args.Handled = true;
+        }
+    }
+
+    void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
+    {
+        args.Text = "Page {0} of {1}";
+    }
+
+
+    #region "Excel Export"
+
+    async Task ExcelExport()
+    {
+        if (string.IsNullOrEmpty(reportTitle)) reportTitle = "Excel Export";
         foreach (var col in LinkedGrid!.GetDataColumns())
         {
             col.ExportEnabled = col.Visible;
@@ -402,10 +490,9 @@
                 }
             }
         };
-        options.ExportSelectedRowsOnly = SelectedRowsOnly;
         try
         {
-            await LinkedGrid.ExportToXlsxAsync("gridExport.Xlsx", options);
+            await LinkedGrid.ExportToXlsxAsync($"{reportTitle.Trim()}.Xlsx", options);
         }
         catch (NullReferenceException ex)
         {
@@ -450,4 +537,5 @@
         return Color.FromArgb(color.A, (int)red, (int)green, (int)blue);
     }
 
+    #endregion
 }
