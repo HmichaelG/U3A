@@ -1,8 +1,10 @@
-﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <DxFormLayoutGroup Caption="@($"Enrolment History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
     <div class="h-25 overflow-auto">
-        <DxGrid Data="@enrolments" @ref="@grid"         
+        <DxGrid Data="@enrolments" @ref="@dxGrid"
                 TextWrapEnabled=false
                 ColumnResizeMode="GridColumnResizeMode.NextColumn"
                 AllowSorting=false
@@ -38,6 +40,8 @@
 
 @code {
 
+
+
     [Parameter]
     public Term SelectedTerm { get; set; }
 
@@ -48,7 +52,9 @@
     public string CssClass { get; set; }
 
     List<StudentClassSummary> enrolments = new();
-    DxGrid? grid;
+    DxGrid? dxGrid;
+
+    string reportTitle;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -59,6 +65,47 @@
                 enrolments = await BusinessRule.GetAllEnrolmentsForStudent(dbc, SelectedTerm, SelectedPerson);
             }
         }
+    }
+
+    public async Task Print()
+    {
+        reportTitle = $"Enrolment History: {SelectedPerson.FullName}";
+        await dxGrid.ExportToPdfAsync(reportTitle,
+            new GridPdfExportOptions()
+            {
+                FitToPage = true,
+                CustomizeDocument = OnCustomizeDocument,
+                CustomizeCell = OnCustomizeCell,
+                CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
+                CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
+            });
+    }
+
+    void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
+    {
+        args.ElementStyle.Font = new DXFont("Arial", 16);
+        args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+        args.Text = reportTitle;
+    }
+
+    void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
+    {
+        args.PaperKind = DXPaperKind.A4;
+        args.Margins = new DXMargins(50, 50, 50, 50);
+    }
+
+    void OnCustomizeCell(GridDocumentExportCustomizeCellEventArgs args)
+    {
+        if (args.AreaType == DocumentExportAreaType.DataArea && args.Value is bool)
+        {
+            var val = (bool)args.Value;
+            args.Text = (val) ? "Yes" : "No";
+            args.Handled = true;
+        }
+    }
+    void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
+    {
+        args.Text = "Page {0} of {1}";
     }
 
 }

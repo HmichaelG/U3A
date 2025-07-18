@@ -38,29 +38,36 @@
 
     </TargetContent>
     <BodyTemplate>
-        <DxTabs>
+        <DxTabs @ref=@dxTabs>
             <DxTabPage Text="Statement of Account">
-                <StatementOfAccount SelectedPerson="@selectedPerson"
+                <StatementOfAccount @ref=@statementOfAccount 
+                                    SelectedPerson="@selectedPerson"
                                     SelectedTerm="@currentTerm"
                                     CssClass="drawer-content-style" />
             </DxTabPage>
             <DxTabPage Text="Enrolment History">
-                <EnrolmentHistory SelectedPerson="@selectedPerson"
+                <EnrolmentHistory @ref=@enrolmentHistory SelectedPerson="@selectedPerson"
                                   SelectedTerm="@currentTerm"
                                   CssClass="drawer-content-style" />
             </DxTabPage>
             <DxTabPage Text="Attendance History">
-                <AttendanceHistory SelectedPerson="@selectedPerson"
+                <AttendanceHistory @ref=@attendanceHistory SelectedPerson="@selectedPerson"
                                    SelectedTerm="@currentTerm"
                                    CssClass="drawer-content-style" />
             </DxTabPage>
             <DxTabPage Text="Leadership History">
-                <LeadershipHistory SelectedPerson="@selectedPerson"
+                <LeadershipHistory @ref=@leadershipHistory SelectedPerson="@selectedPerson"
                                    CssClass="drawer-content-style" />
             </DxTabPage>
         </DxTabs>
-        <DxButton Text="Close"
-                  Click="@(() => { isDrawerOpen = false; StateHasChanged(); })" />
+        <div class="links-container">
+            <DxButton Text="Close"
+                      Click="@(() => { isDrawerOpen = false; StateHasChanged(); })" />
+            <DxButton Text="Print" 
+                      IconCssClass="bi bi-file-pdf"
+                      RenderStyle=ButtonRenderStyle.Secondary
+                      Click="OnPrint" />
+        </div>
     </BodyTemplate>
 </DxDrawer>
 
@@ -79,6 +86,11 @@
     [Parameter]
     public string TargetName { get; set; }
 
+    DxTabs? dxTabs;
+    StatementOfAccount? statementOfAccount;
+    EnrolmentHistory? enrolmentHistory;
+    LeadershipHistory? leadershipHistory;
+    AttendanceHistory? attendanceHistory;
     bool isDrawerOpen { get; set; }
     Person? selectedPerson { get; set; }
     Term? currentTerm { get; set; }
@@ -88,5 +100,25 @@
         selectedPerson = person;
         currentTerm = term;
         isDrawerOpen = true;
+        dxTabs.ActiveTabIndex = 0;
+    }
+
+    async Task OnPrint()
+    {
+        switch (dxTabs.ActiveTabIndex)
+        {
+            case 0:
+                statementOfAccount.Print();
+                break;
+            case 1:
+                enrolmentHistory.Print();
+                break;
+            case 2:
+                attendanceHistory.Print();
+                break;
+            case 3:
+                leadershipHistory.Print();
+                break;
+        }
     }
 }

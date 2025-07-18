@@ -1,4 +1,6 @@
-﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <DxFormLayoutGroup Caption="@($"Statement of Account for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
     <div class="d-flex flex-row-reverse w-100">
@@ -11,7 +13,7 @@
         </DxDropDownButton>
     </div>
     <div class="h-25 overflow-auto">
-        <DxGrid Data="@memberFees"
+        <DxGrid @ref=@dxGrid Data="@memberFees"
                 AllowSorting=false
                 AllowFiltering=false
                 AllowGrouping=false
@@ -63,6 +65,8 @@
     List<MemberFee> memberFees = new();
     MemberFeeCalculationService? service;
     bool showBalance;
+    DxGrid? dxGrid;
+    string reportTitle;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -94,4 +98,38 @@
         StateHasChanged();
     }
 
+    public async Task Print()
+    {
+        reportTitle = $"Statement of Account: {SelectedPerson.FullName}";
+        await dxGrid.ExportToPdfAsync(reportTitle,
+            new GridPdfExportOptions()
+            {
+                FitToPage = false,
+                CustomizeDocument = OnCustomizeDocument,
+                CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
+                CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
+                CustomizeColumn = OnCustomizeColumn,
+            });
+    }
+
+    void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
+    {
+        args.ElementStyle.Font = new DXFont("Arial", 16);
+        args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+        args.Text = reportTitle;
+    }
+    void OnCustomizeColumn(GridDocumentExportCustomizeColumnEventArgs args)
+    {
+        if (args.FieldName == "Date") args.Width = 300;
+        if (args.FieldName == "Description") args.Width = 1500;
+    }
+    void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
+    {
+        args.PaperKind = DXPaperKind.A4;
+        args.Margins = new DXMargins(50, 50, 50, 50);
+    }
+    void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
+    {
+        args.Text = "Page {0} of {1}";
+    }
 }
