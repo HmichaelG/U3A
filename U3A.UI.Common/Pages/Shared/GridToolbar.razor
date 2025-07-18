@@ -120,7 +120,7 @@
             <Items>
                 <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="To Excel"
                                Click="() => {
-                                                isOpenForExcel = !isOpenForExcel; 
+                                                isOpenForExcel = !isOpenForExcel;
                                                 isDropDownOpen = isOpenForExcel || isOpenForPdf;
                                                 reportTitle = string.Empty;
                                             }"
@@ -128,7 +128,7 @@
                 </DxToolbarItem>
                 <DxToolbarItem IconCssClass="bi bi-file-pdf" Text="To PDF"
                                Click="() => {
-                                                isOpenForPdf = !isOpenForPdf; 
+                                                isOpenForPdf = !isOpenForPdf;
                                                 isDropDownOpen = isOpenForExcel || isOpenForPdf;
                                                 reportTitle = string.Empty;
                                             }"
@@ -152,13 +152,20 @@
             PreventCloseOnPositionTargetClick="true">
     <BodyContentTemplate>
         <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
-            <DxFormLayoutItem Caption="Title" ColSpanMd="12" Context="bodyContext">
+            <DxFormLayoutItem Caption="Title" ColSpanMd="12" Context="titleContext">
                 <DxTextBox @bind-Text=@reportTitle />
             </DxFormLayoutItem>
         </DxFormLayoutGroup>
+        @if (isOpenForPdf)
+        {
+            <DxFormLayoutItem Caption="Print Portrait?"
+                              ColSpanMd="12" Context="orientationContext">
+                <DxCheckBox @bind-Checked=@IsPortrait />
+            </DxFormLayoutItem>
+        }
     </BodyContentTemplate>
-    <FooterContentTemplate>
-        <DxButton Text="Export" Click="OnDropDownClick" />
+    <FooterContentTemplate Context="footerContext">
+        <DxButton Text="Export" Click="OnDropDownClick" Enabled=@(!isExporting) />
     </FooterContentTemplate>
 </DxDropDown>
 
@@ -394,58 +401,65 @@
         LinkedGrid.EndUpdate();
     }
 
+    bool isExporting;
     async Task OnDropDownClick()
     {
+        isExporting = true;
+       await InvokeAsync(StateHasChanged);
         LinkedGrid!.BeginUpdate();
         if (isOpenForExcel) { await ExcelExport(); } else { await PdfExport(); }
         LinkedGrid!.EndUpdate();
-        isDropDownOpen = isOpenForExcel = isOpenForPdf = false;
+        isExporting = isDropDownOpen = isOpenForExcel = isOpenForPdf = false;
     }
 
+    #region "Pdf Export"
 
+    const string DEFAULT_PDF_TITLE = "Pdf Export";
+    bool IsPortrait = false;
     async Task PdfExport()
     {
-        if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = "Pdf Export";
+        if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = DEFAULT_PDF_TITLE;
         await LinkedGrid!.ExportToPdfAsync(reportTitle,
             new GridPdfExportOptions()
             {
                 FitToPage = true,
-                CustomizeDocument = OnCustomizeDocument,
+                CustomizeDocument = (e) =>
+                {
+                    e.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
+                    e.PaperKind = DXPaperKind.A4;
+                    e.Landscape = !IsPortrait;
+                    e.Margins = new DXMargins(25, 25, 25, 50);
+                },
                 CustomizeCell = OnCustomizeCell,
-                CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
-                CustomizePageFooter = OnCustomizePageFooter, // Adds page footers
+                CustomizeDocumentHeader = (e) =>
+                {
+                    if (reportTitle != DEFAULT_PDF_TITLE)
+                    {
+                        e.ElementStyle.Font = new DXFont("Arial", 16);
+                        e.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+                        e.Text = reportTitle;
+                    }
+                },
+                CustomizePageFooter = (e) => { e.Text = "Page {0} of {1}"; }
             });
-    }
-
-    void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
-    {
-        args.ElementStyle.Font = new DXFont("Arial", 16);
-        args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
-        args.Text = reportTitle;
-    }
-
-    void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
-    {
-        args.PaperKind = DXPaperKind.A4;
-        args.Landscape = true;
-        args.Margins = new DXMargins(50, 50, 50, 50);
     }
 
     void OnCustomizeCell(GridDocumentExportCustomizeCellEventArgs args)
     {
+        if (args.AreaType == DocumentExportAreaType.Header)
+        {
+            args.ElementStyle.BackColor = System.Drawing.Color.RoyalBlue;
+            args.ElementStyle.ForeColor = System.Drawing.Color.White;
+        }
         if (args.AreaType == DocumentExportAreaType.DataArea && args.Value is bool)
         {
             var val = (bool)args.Value;
-            args.Text = (val) ? "✔️" : "";
-            args.Handled = true;
+            args.Text = (val) ? "✓" : "✕";
         }
+        args.Handled = true;
     }
 
-    void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
-    {
-        args.Text = "Page {0} of {1}";
-    }
-
+    #endregion
 
     #region "Excel Export"
 
