@@ -8,6 +8,8 @@
 @using DevExpress.Blazor
 @using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Components.Routing
+@using System.Text.RegularExpressions
+@using Serilog
 
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject NavigationManager navMan
@@ -162,6 +164,12 @@
                               ColSpanMd="12" Context="orientationContext">
                 <DxCheckBox @bind-Checked=@IsPortrait />
             </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Column Widths"
+                              ColSpanMd="12" Context="orientationContext">
+            <DxRadioGroup Items="@(new List<string> {DEFAULT_FIT_STYLE,"Fit contents"})"
+                          @bind-Value="@fitStyle" Layout="RadioGroupLayout.Horizontal"/>
+            </DxFormLayoutItem>
+
         }
     </BodyContentTemplate>
     <FooterContentTemplate Context="footerContext">
@@ -405,24 +413,55 @@
     async Task OnDropDownClick()
     {
         isExporting = true;
-       await InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
         LinkedGrid!.BeginUpdate();
         if (isOpenForExcel) { await ExcelExport(); } else { await PdfExport(); }
         LinkedGrid!.EndUpdate();
         isExporting = isDropDownOpen = isOpenForExcel = isOpenForPdf = false;
+        LinkedGrid!.LoadLayout(defaultLayout);
+        LinkedGrid!.Reload();
     }
 
     #region "Pdf Export"
 
     const string DEFAULT_PDF_TITLE = "Pdf Export";
+    const string DEFAULT_FIT_STYLE = "Fit to page";
     bool IsPortrait = false;
+    GridPersistentLayout? Layout;
+    string fitStyle = DEFAULT_FIT_STYLE;
+
     async Task PdfExport()
     {
         if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = DEFAULT_PDF_TITLE;
+        if (layout is null)
+        {
+            LinkedGrid!.AutoFitColumnWidths();
+            layout = LinkedGrid.SaveLayout();
+        }
         await LinkedGrid!.ExportToPdfAsync(reportTitle,
             new GridPdfExportOptions()
             {
-                FitToPage = true,
+                FitToPage = (fitStyle == DEFAULT_FIT_STYLE) ? true : false,
+
+                CustomizeColumn = (e) =>
+                {
+                  if (fitStyle == DEFAULT_FIT_STYLE) return;
+                  var col = layout.Columns.FirstOrDefault(x => x.FieldName == e.FieldName);
+                    if (col is not null && col.ColumnType == GridPersistentLayoutColumnType.Data)
+                    {
+                        if (col.Width is not null)
+                        {
+                            e.Width = (int)(CssToPixels(col.Width, 12, "font") * 300 / 96);
+                            Log.Information("Calculated: {0} {1}", e.FieldName, e.Width);
+                        }
+                        else
+                        {
+                            e.Width = 600;
+                            Log.Information("Default: {0} {1}", e.FieldName, e.Width);
+                        }
+                    }
+                },
+
                 CustomizeDocument = (e) =>
                 {
                     e.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
@@ -430,7 +469,9 @@
                     e.Landscape = !IsPortrait;
                     e.Margins = new DXMargins(25, 25, 25, 50);
                 },
+
                 CustomizeCell = OnCustomizeCell,
+                
                 CustomizeDocumentHeader = (e) =>
                 {
                     if (reportTitle != DEFAULT_PDF_TITLE)
@@ -440,8 +481,29 @@
                         e.Text = reportTitle;
                     }
                 },
+                
                 CustomizePageFooter = (e) => { e.Text = "Page {0} of {1}"; }
             });
+    }
+
+    public static float CssToPixels(string cssValue, float contextValue, string unitContext)
+    {
+        var match = Regex.Match(cssValue.Trim(), @"([\d.]+)([a-z%]+)");
+        if (!match.Success) throw new ArgumentException("Invalid CSS value");
+
+        float value = float.Parse(match.Groups[1].Value);
+        string unit = match.Groups[2].Value.ToLower();
+
+        return unit switch
+        {
+            "px" => value,
+            "%" => value / 100f * contextValue,           // parent width
+            "em" => value * contextValue,                 // current font size
+            "rem" => value * contextValue,                // root font size
+            "vw" => value / 100f * contextValue,          // viewport width
+            "vh" => value / 100f * contextValue,          // viewport height
+            _ => throw new NotSupportedException($"Unsupported unit: {unit}")
+        };
     }
 
     void OnCustomizeCell(GridDocumentExportCustomizeCellEventArgs args)
