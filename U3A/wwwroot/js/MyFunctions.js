@@ -137,7 +137,6 @@ function GetLocalStorage(key) {
 }
 
 window.onload = function () {
-    //setTheme();
     displayNonInteractive();
 }
 
@@ -149,22 +148,6 @@ function displayNonInteractive() {
         }
     }, 10000);
 };
-function setTheme() {
-    // fluent theme: change color
-    const STD_COLOR = 'royalblue';
-    var color = localStorage.getItem('accent-color');
-    if (!color) {
-        color = STD_COLOR;
-    }
-    else {
-        color = color.replaceAll('"', '');
-    }
-    const styleEl = document.querySelector('style[data-theme-id="Fluent"]');
-    if (styleEl) {
-        var inner = styleEl.innerHTML;
-        styleEl.innerHTML = inner.replace('royalblue', color);
-    }
-}
 
 window.cookieInterop = {
     setCookie: function (name, value, days) {
@@ -186,33 +169,6 @@ window.cookieInterop = {
         return null;
     }
 };
-
-//@code {
-//    private async Task SetCookie() =>
-//    await JS.InvokeVoidAsync("cookieInterop.setCookie", "UserData", "SomeValue", 7);
-
-//    private async Task GetCookie() {
-//        var value = await JS.InvokeAsync < string > ("cookieInterop.getCookie", "UserData");
-//        Console.WriteLine($"Cookie value: {value}");
-//    }
-//}
-
-
-
-function getQueryStrings() {
-    var assoc = {};
-    var decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); };
-    var queryString = location.search.substring(1);
-    var keyValues = queryString.split('&');
-
-    for (var i in keyValues) {
-        var key = keyValues[i].split('=');
-        if (key.length > 1) {
-            assoc[decode(key[0])] = decode(key[1]);
-        }
-    }
-    return assoc;
-}
 
 window.clipboardCopy = {
     copyText: function (text) {
