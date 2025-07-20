@@ -161,6 +161,11 @@
                     <DxRadioGroup Items="@(new List<int> { 8, 9, 10 })"
                                   @bind-Value="@pdfFontSize" Layout="RadioGroupLayout.Horizontal" />
                 </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Page Size" CssClass="mt-1"
+                                  ColSpanMd="12" Context="fontContext">
+                    <DxRadioGroup Items="@(new List<string> { DEFAULT_PAGE_SIZE,"A3" })"
+                                  @bind-Value="@pdfPageSize" Layout="RadioGroupLayout.Horizontal" />
+                </DxFormLayoutItem>
             }
         </DxFormLayoutGroup>
     </BodyContentTemplate>
@@ -430,9 +435,11 @@
 
     const string DEFAULT_PDF_TITLE = "Pdf Export";
     const string DEFAULT_FIT_TO_PAGE = "Fit to page";
+    const string DEFAULT_PAGE_SIZE = "A4";
     const int DEFAULT_MARGIN = 25;
     bool IsPortrait = false;
     int pdfFontSize = 8;
+    string pdfPageSize = DEFAULT_PAGE_SIZE;
     GridPersistentLayout? pdfExportLayout;
     string fitStyle = DEFAULT_FIT_TO_PAGE;
     float PaperWidth() => ((IsPortrait) ? 8.27f : 11.69f) - (DEFAULT_MARGIN * 2 / 100);
@@ -472,7 +479,7 @@
             CustomizeDocument = (e) =>
             {
                 e.DefaultElementStyle.Font = new DXFont("Times New Roman", pdfFontSize);
-                e.PaperKind = DXPaperKind.A4;
+                e.PaperKind = (pdfPageSize == DEFAULT_PAGE_SIZE) ? DXPaperKind.A4 : DXPaperKind.A3;
                 e.Landscape = !IsPortrait;
                 e.Margins = new DXMargins(DEFAULT_MARGIN, DEFAULT_MARGIN, DEFAULT_MARGIN, 50);
             },
