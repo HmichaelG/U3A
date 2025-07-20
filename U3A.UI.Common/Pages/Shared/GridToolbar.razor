@@ -120,22 +120,10 @@
                        BeginGroup=true
                        Alignment="ToolbarItemAlignment.Right">
             <Items>
-                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="To Excel"
-                               Click="() => {
-                                                isOpenForExcel = !isOpenForExcel;
-                                                isDropDownOpen = isOpenForExcel || isOpenForPdf;
-                                                reportTitle = string.Empty;
-                                            }"
-                               Tooltip="Export the grid to Excel">
-                </DxToolbarItem>
-                <DxToolbarItem IconCssClass="bi bi-file-pdf" Text="To PDF"
-                               Click="() => {
-                                                isOpenForPdf = !isOpenForPdf;
-                                                isDropDownOpen = isOpenForExcel || isOpenForPdf;
-                                                reportTitle = string.Empty;
-                                            }"
-                               Tooltip="Export the grid to Pdf">
-                </DxToolbarItem>
+                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="To Excel" Name="ToExcel"
+                               Tooltip="Export the grid to Excel" />
+                <DxToolbarItem IconCssClass="bi bi-file-pdf" Text="To Pdf" Name="ToPdf"
+                               Tooltip="Export the grid to Pdf" />
             </Items>
         </DxToolbarItem>
         @CustomButtonContent
@@ -158,16 +146,21 @@
                 <DxTextBox @bind-Text=@reportTitle />
             </DxFormLayoutItem>
         </DxFormLayoutGroup>
-        @if (isOpenForPdf)
+        @if (showPdfOptions)
         {
             <DxFormLayoutItem Caption="Print Portrait?"
                               ColSpanMd="12" Context="orientationContext">
                 <DxCheckBox @bind-Checked=@IsPortrait />
             </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Column Widths"
+            <DxFormLayoutItem Caption="Column Widths" CssClass="mt-1"
                               ColSpanMd="12" Context="orientationContext">
-            <DxRadioGroup Items="@(new List<string> {DEFAULT_FIT_STYLE,"Fit contents"})"
-                          @bind-Value="@fitStyle" Layout="RadioGroupLayout.Horizontal"/>
+                <DxRadioGroup Items="@(new List<string> { DEFAULT_FIT_TO_PAGE, "Use Grid" })"
+                              @bind-Value="@fitStyle" Layout="RadioGroupLayout.Horizontal" />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Font Size" CssClass="mt-1"
+                              ColSpanMd="12" Context="fontContext">
+                <DxRadioGroup Items="@(new List<int> { 8,9,10 })"
+                              @bind-Value="@pdfFontSize" Layout="RadioGroupLayout.Horizontal" />
             </DxFormLayoutItem>
 
         }
@@ -201,8 +194,8 @@
     string showSelectedOnlyText = string.Empty;
     string showSelectedOnlyTooltip = string.Empty;
     bool showSelectedOnly = true;
-    bool isOpenForExcel = false;
-    bool isOpenForPdf = false;
+    bool showExcelOptions = false;
+    bool showPdfOptions = false;
     bool isDropDownOpen = false;
     string reportTitle = "";
 
@@ -405,6 +398,17 @@
             case "SelectedOnly":
                 ToggleShowSelectedOnly();
                 break;
+            case "ToExcel":
+                showExcelOptions = true;
+                isDropDownOpen = true;
+                reportTitle = string.Empty;
+                break;
+            case "ToPdf":
+                pdfExportLayout = LinkedGrid!.SaveLayout();
+                showPdfOptions = true;
+                isDropDownOpen = true;
+                reportTitle = string.Empty;
+                break;
         }
         LinkedGrid.EndUpdate();
     }
@@ -416,82 +420,76 @@
         isDropDownOpen = false;
         await InvokeAsync(StateHasChanged);
         LinkedGrid!.BeginUpdate();
-        if (isOpenForExcel) { await ExcelExport(); } else { await PdfExport(); }
+        if (showExcelOptions) { await ExcelExport(); } else { await PdfExport(); }
         LinkedGrid!.EndUpdate();
-        isExporting = isDropDownOpen = isOpenForExcel = isOpenForPdf = false;
-        LinkedGrid!.LoadLayout(defaultLayout);
-        LinkedGrid!.Reload();
+        isExporting = isDropDownOpen = showExcelOptions = showPdfOptions = false;
     }
 
     #region "Pdf Export"
 
     const string DEFAULT_PDF_TITLE = "Pdf Export";
-    const string DEFAULT_FIT_STYLE = "Fit to page";
+    const string DEFAULT_FIT_TO_PAGE = "Fit to page";
+    const int DEFAULT_MARGIN = 25;
     bool IsPortrait = false;
+    int pdfFontSize = 8;
     GridPersistentLayout? pdfExportLayout;
-    string fitStyle = DEFAULT_FIT_STYLE;
+    string fitStyle = DEFAULT_FIT_TO_PAGE;
+    float PaperWidth() => ((IsPortrait) ? 8.27f : 11.69f) - (DEFAULT_MARGIN * 2 / 100);
 
     async Task PdfExport()
     {
         if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = DEFAULT_PDF_TITLE;
-        if (pdfExportLayout is null)
-        {
-            pdfExportLayout = await localStorage.GetItemAsync<GridPersistentLayout>(LayoutKey!);
-            if (pdfExportLayout is null)
-            {
-                LinkedGrid!.AutoFitColumnWidths();
-                pdfExportLayout = LinkedGrid.SaveLayout();
-            }
-        }
         await LinkedGrid!.ExportToPdfAsync(reportTitle,
             new GridPdfExportOptions()
             {
-                FitToPage = (fitStyle == DEFAULT_FIT_STYLE) ? true : false,
+                FitToPage = (fitStyle == DEFAULT_FIT_TO_PAGE) ? true : false,
 
                 CustomizeColumn = (e) =>
                 {
-                  if (fitStyle == DEFAULT_FIT_STYLE) return;
-                  var col = pdfExportLayout.Columns.FirstOrDefault(x => x.FieldName == e.FieldName);
+                    if (fitStyle == DEFAULT_FIT_TO_PAGE) return;
+                    if (e.IsHidden) return;
+                    var col = pdfExportLayout!.Columns.FirstOrDefault(x => x.FieldName == e.FieldName);
                     if (col is not null && col.ColumnType == GridPersistentLayoutColumnType.Data)
                     {
                         if (col.Width is not null)
                         {
-                            e.Width = (int)(CssToPixels(col.Width, 8, "font") * 300 / 96);
-                            Log.Information("Calculated: {0} {1}", e.FieldName, e.Width);
+                            e.Width = (int)(CssToPixels(col.Width, 16) * 300 / 96);
+                            Log.Information("Calculated: {0} {1} {2}", e.FieldName, col.Width, e.Width);
                         }
                         else
                         {
-                            e.Width = 600;
-                            Log.Information("Default: {0} {1}", e.FieldName, e.Width);
+                            e.Width = 600; // PersistentGridLayout does not have width (null)
+                            Log.Information("Default: {0} {1} {2}", e.FieldName, col.Width, e.Width);
                         }
                     }
                 },
 
                 CustomizeDocument = (e) =>
                 {
-                    e.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
+                    e.DefaultElementStyle.Font = new DXFont("Times New Roman", pdfFontSize);
                     e.PaperKind = DXPaperKind.A4;
                     e.Landscape = !IsPortrait;
-                    e.Margins = new DXMargins(25, 25, 25, 50);
+                    e.Margins = new DXMargins(DEFAULT_MARGIN, DEFAULT_MARGIN, DEFAULT_MARGIN, 50);
                 },
 
                 CustomizeCell = OnCustomizeCell,
-                
+
                 CustomizeDocumentHeader = (e) =>
                 {
                     if (reportTitle != DEFAULT_PDF_TITLE)
                     {
                         e.ElementStyle.Font = new DXFont("Arial", 16);
                         e.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+                        e.ElementStyle.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
                         e.Text = reportTitle;
                     }
                 },
-                
+
                 CustomizePageFooter = (e) => { e.Text = "Page {0} of {1}"; }
             });
     }
 
-    public static float CssToPixels(string cssValue, float contextValue, string unitContext)
+    public float CssToPixels(string cssValue, float fontSize)
     {
         var match = Regex.Match(cssValue.Trim(), @"([\d.]+)([a-z%]+)");
         if (!match.Success) throw new ArgumentException("Invalid CSS value");
@@ -502,11 +500,10 @@
         return unit switch
         {
             "px" => value,
-            "%" => value / 100f * contextValue,           // parent width
-            "em" => value * contextValue,                 // current font size
-            "rem" => value * contextValue,                // root font size
-            "vw" => value / 100f * contextValue,          // viewport width
-            "vh" => value / 100f * contextValue,          // viewport height
+            "%" => value * PaperWidth(),            // parent width
+            "em" => value * fontSize,               // current font size
+            "rem" => value * fontSize,              // root font size
+            "vw" => value * PaperWidth(),          // viewport width
             _ => throw new NotSupportedException($"Unsupported unit: {unit}")
         };
     }
@@ -555,6 +552,7 @@
                 // Freeze the top row(s)
                 e.Sheet.SplitPosition = new DevExpress.Export.Xl.XlCellPosition(0, SpreadsheetHeaderRows);
             },
+
             CustomizeCell = e =>
             {
                 // Highlight header and footer
@@ -569,7 +567,8 @@
                     if (e.Formatting != null) e.Formatting.BackColor = ChangeColorBrightness(Color.Gainsboro, 0.6F);
                     e.Handled = true;
                 }
-            }
+            },
+
         };
         try
         {
