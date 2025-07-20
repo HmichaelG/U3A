@@ -133,7 +133,7 @@
             Id="dropDown-overview"
             FooterVisible="true"
             HeaderVisible="true"
-            HeaderText="Export Parameters"
+            HeaderText="@($"{((showPdfOptions) ? "Pdf" : "Excel")} Export Parameters")"
             PositionMode="DropDownPositionMode.Bottom"
             Width="max(25vw, 250px)"
             PositionTarget="#dropdown-target-container"
@@ -145,25 +145,24 @@
             <DxFormLayoutItem Caption="Title" ColSpanMd="12" Context="titleContext">
                 <DxTextBox @bind-Text=@reportTitle />
             </DxFormLayoutItem>
+            @if (showPdfOptions)
+            {
+                <DxFormLayoutItem Caption="Print Portrait?" CssClass="mt-2"
+                                  ColSpanMd="12" Context="orientationContext">
+                    <DxCheckBox @bind-Checked=@IsPortrait />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Column Widths" CssClass="mt-1"
+                                  ColSpanMd="12" Context="orientationContext">
+                    <DxRadioGroup Items="@(new List<string> { DEFAULT_FIT_TO_PAGE, "Use Grid" })"
+                                  @bind-Value="@fitStyle" Layout="RadioGroupLayout.Horizontal" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Font Size" CssClass="mt-1"
+                                  ColSpanMd="12" Context="fontContext">
+                    <DxRadioGroup Items="@(new List<int> { 8, 9, 10 })"
+                                  @bind-Value="@pdfFontSize" Layout="RadioGroupLayout.Horizontal" />
+                </DxFormLayoutItem>
+            }
         </DxFormLayoutGroup>
-        @if (showPdfOptions)
-        {
-            <DxFormLayoutItem Caption="Print Portrait?"
-                              ColSpanMd="12" Context="orientationContext">
-                <DxCheckBox @bind-Checked=@IsPortrait />
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Column Widths" CssClass="mt-1"
-                              ColSpanMd="12" Context="orientationContext">
-                <DxRadioGroup Items="@(new List<string> { DEFAULT_FIT_TO_PAGE, "Use Grid" })"
-                              @bind-Value="@fitStyle" Layout="RadioGroupLayout.Horizontal" />
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Font Size" CssClass="mt-1"
-                              ColSpanMd="12" Context="fontContext">
-                <DxRadioGroup Items="@(new List<int> { 8,9,10 })"
-                              @bind-Value="@pdfFontSize" Layout="RadioGroupLayout.Horizontal" />
-            </DxFormLayoutItem>
-
-        }
     </BodyContentTemplate>
     <FooterContentTemplate Context="footerContext">
         <DxButton Text="Export" Click="OnDropDownClick" Enabled=@(!isExporting) />
@@ -441,54 +440,58 @@
     async Task PdfExport()
     {
         if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = DEFAULT_PDF_TITLE;
-        await LinkedGrid!.ExportToPdfAsync(reportTitle,
-            new GridPdfExportOptions()
+        var groupCount = LinkedGrid!.GetGroupCount();
+        await LinkedGrid!.ExportToPdfAsync(reportTitle, new GridPdfExportOptions()
+        {
+            FitToPage = (fitStyle == DEFAULT_FIT_TO_PAGE) ? true : false,
+
+            CustomizeColumn = (e) =>
             {
-                FitToPage = (fitStyle == DEFAULT_FIT_TO_PAGE) ? true : false,
-
-                CustomizeColumn = (e) =>
+                if (fitStyle == DEFAULT_FIT_TO_PAGE) return;
+                if (e.IsHidden) return;
+                var col = pdfExportLayout!.Columns.FirstOrDefault(x => x.FieldName == e.FieldName);
+                if (col is not null && col.ColumnType == GridPersistentLayoutColumnType.Data)
                 {
-                    if (fitStyle == DEFAULT_FIT_TO_PAGE) return;
-                    if (e.IsHidden) return;
-                    var col = pdfExportLayout!.Columns.FirstOrDefault(x => x.FieldName == e.FieldName);
-                    if (col is not null && col.ColumnType == GridPersistentLayoutColumnType.Data)
+                    if (col.Width is not null && col.Width != "100%")
                     {
-                        if (col.Width is not null)
+                        e.Width = (int)(CssToPixels(col.Width, 16) * 300 / 96);
+                        if (e.ColumnIndex == 0)
                         {
-                            e.Width = (int)(CssToPixels(col.Width, 16) * 300 / 96);
-                            Log.Information("Calculated: {0} {1} {2}", e.FieldName, col.Width, e.Width);
+                            e.Width += 50*groupCount; // Add some padding for the first column
                         }
-                        else
-                        {
-                            e.Width = 600; // PersistentGridLayout does not have width (null)
-                            Log.Information("Default: {0} {1} {2}", e.FieldName, col.Width, e.Width);
-                        }
+                        Log.Information("Calculated: {0} {1} {2}", e.FieldName, col.Width, e.Width);
                     }
-                },
-
-                CustomizeDocument = (e) =>
-                {
-                    e.DefaultElementStyle.Font = new DXFont("Times New Roman", pdfFontSize);
-                    e.PaperKind = DXPaperKind.A4;
-                    e.Landscape = !IsPortrait;
-                    e.Margins = new DXMargins(DEFAULT_MARGIN, DEFAULT_MARGIN, DEFAULT_MARGIN, 50);
-                },
-
-                CustomizeCell = OnCustomizeCell,
-
-                CustomizeDocumentHeader = (e) =>
-                {
-                    if (reportTitle != DEFAULT_PDF_TITLE)
+                    else
                     {
-                        e.ElementStyle.Font = new DXFont("Arial", 16);
-                        e.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
-                        e.ElementStyle.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-                        e.Text = reportTitle;
+                        e.Width = 600; // PersistentGridLayout does not have width (null)
+                        Log.Information("Default: {0} {1} {2}", e.FieldName, col.Width, e.Width);
                     }
-                },
+                }
+            },
 
-                CustomizePageFooter = (e) => { e.Text = "Page {0} of {1}"; }
-            });
+            CustomizeDocument = (e) =>
+            {
+                e.DefaultElementStyle.Font = new DXFont("Times New Roman", pdfFontSize);
+                e.PaperKind = DXPaperKind.A4;
+                e.Landscape = !IsPortrait;
+                e.Margins = new DXMargins(DEFAULT_MARGIN, DEFAULT_MARGIN, DEFAULT_MARGIN, 50);
+            },
+
+            CustomizeCell = OnCustomizeCell,
+
+            CustomizeDocumentHeader = (e) =>
+            {
+                if (reportTitle != DEFAULT_PDF_TITLE)
+                {
+                    e.ElementStyle.Font = new DXFont("Arial", 16);
+                    e.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+                    e.ElementStyle.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
+                    e.Text = reportTitle;
+                }
+            },
+
+            CustomizePageFooter = (e) => { e.Text = "Page {0} of {1}"; }
+        });
     }
 
     public float CssToPixels(string cssValue, float fontSize)
