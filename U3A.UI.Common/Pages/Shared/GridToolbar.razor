@@ -163,14 +163,17 @@
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Page Size" CssClass="mt-1"
                                   ColSpanMd="12" Context="fontContext">
-                    <DxRadioGroup Items="@(new List<string> { DEFAULT_PAGE_SIZE,"A3" })"
+                    <DxRadioGroup Items="@(new List<string> { DEFAULT_PAGE_SIZE, "A3" })"
                                   @bind-Value="@pdfPageSize" Layout="RadioGroupLayout.Horizontal" />
                 </DxFormLayoutItem>
             }
         </DxFormLayoutGroup>
     </BodyContentTemplate>
     <FooterContentTemplate Context="footerContext">
-        <DxButton Text="Export" Click="OnDropDownClick" Enabled=@(!isExporting) />
+        <div class="links-container">
+            <DxWaitIndicator Visible="@isExporting" />
+            <DxButton Text="Export" Click="OnDropDownClick" Enabled=@(!isExporting) />
+        </div>
     </FooterContentTemplate>
 </DxDropDown>
 
@@ -422,13 +425,17 @@
     bool isExporting;
     async Task OnDropDownClick()
     {
-        isExporting = true;
-        isDropDownOpen = false;
-        await InvokeAsync(StateHasChanged);
-        LinkedGrid!.BeginUpdate();
-        if (showExcelOptions) { await ExcelExport(); } else { await PdfExport(); }
-        LinkedGrid!.EndUpdate();
-        isExporting = isDropDownOpen = showExcelOptions = showPdfOptions = false;
+        if (isExporting) return; // Prevent multiple clicks)
+        try
+        {
+            isExporting = true;
+            StateHasChanged();
+            await Task.Delay(100); // Allow UI to update before export
+            LinkedGrid!.BeginUpdate();
+            if (showExcelOptions) { await ExcelExport(); } else { await PdfExport(); }
+            LinkedGrid!.EndUpdate();
+        }
+        finally { isExporting = isDropDownOpen = showExcelOptions = showPdfOptions = false; }
     }
 
     #region "Pdf Export"
@@ -464,7 +471,7 @@
                         e.Width = (int)(CssToPixels(col.Width, 16) * 300 / 96);
                         if (e.ColumnIndex == 0)
                         {
-                            e.Width += 50*groupCount; // Add some padding for the first column
+                            e.Width += 50 * groupCount; // Add some padding for the first column
                         }
                         Log.Information("Calculated: {0} {1} {2}", e.FieldName, col.Width, e.Width);
                     }
