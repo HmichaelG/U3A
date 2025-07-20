@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-07-18T15:43:12.345+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-07-20T13:02:53.389+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>2025 Version History</title>
   <body>
     <header>
@@ -35,10 +35,21 @@
       <li styleclass="Normal">An issue that caused the system to freeze if the Member Details flyout was activated while the grid was maximised. To resolve this issue, the grid is now automatically returned to the normal state before the flyout is displayed.</li>
     </list>
     <para styleclass="Heading3">Grid Toolbar Export Options</para>
-    <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; font-style:italic; color:#000000;">
-      <li styleclass="Normal">Export all or export selected options have been removed from the drop-down. There is now a <text style="font-style:italic;">Selected Only? </text>button to display only rows selected. The export option only export visible rows.</li>
-      <li styleclass="Normal">You can now export either to Excel of PDF. PDF export is new and should be considered a work in progress. In particular, the ability to automatically size columns is missing.</li>
-      <li styleclass="Normal">When you click an export option a popup dialog will be displayed giving you with the ability to input an export title. The title is used as the exported data file name as well as the report title for PDF reports.</li>
+    <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal">Export all or export selected options have been removed from the drop-down. There is now a <text style="font-style:italic;">Selected Only? </text>button to display only rows selected. The export option only exports visible rows.</li>
+      <li styleclass="Normal">You can now export either to Excel of PDF.</li>
+      <li styleclass="Normal">When you click an export option a popup dialog will be displayed giving you with the ability to input an export title. The title is used as the exported data file name as well as the report title for PDF reports. In addition, Pdf reports have the following options...</li>
+      <list id="5" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+        <li styleclass="Normal"><text style="font-style:italic;">Print Portrait?</text> by default, reports will be created in landscape orientation. Tick this box to display in portrait mode.</li>
+        <li styleclass="Normal"><text style="font-style:italic;">Column Widths</text>. Your options are...</li>
+        <list id="5" level="2" type="ol" listtype="lower-roman" formatstring="&#37;&#50;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+          <li styleclass="Normal"><text style="font-style:italic;">Fit To Page</text>. The default is to print the report so that it will fit on one page.This may result in excessive word wrapping to make each column fit.</li>
+          <li styleclass="Normal"><text style="font-style:italic;">Use Grid</text>. The alternative is to use the relative grid column sizes when creating the report. if <text style="font-style:italic;">Auto Fit</text> has previously been applied to the grid, this option will result in minimum word-wrapping on the report. However, reports with many columns may extend over more than one page.</li>
+        </list>
+      </list>
+      <list id="5" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+        <li styleclass="Normal"><text style="font-style:italic;">Font Size</text>. A choice of common font sizes, the default being 8pt.</li>
+      </list>
     </list>
     <para styleclass="Heading2"><text style="font-weight:bold;">Version 2025.7.4</text></para>
     <para styleclass="Heading3">System</para>
