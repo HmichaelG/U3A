@@ -82,10 +82,10 @@ else
                             </DxFormLayoutItem>
                         </DxFormLayoutGroup>
                         <DxFormLayoutItem Caption="Equipment Available" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                            <DxMemo @bind-Text="@editItem.Equipment" Rows="3" />
+                            <DxMemo @bind-Text="@editItem.Equipment" Rows="3" CssClass="w-100" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Comment" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
+                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" CssClass="w-100" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Discontinued">
                             <DxCheckBox @bind-Checked="@editItem.Discontinued" />
