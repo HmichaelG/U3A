@@ -25,7 +25,7 @@ else
 {
     if (showPDF)
     {
-        <div class="row w-100 bg-secondary">
+        <div class="row w-100">
             <PdfViewer DisplayHeightOffset=@((IsEmbedded) ? 18.5 : 8) DocumentContent="@pdfContent" OnCloseButtonClick="@(() => showPDF = false)" />
         </div>
     }
