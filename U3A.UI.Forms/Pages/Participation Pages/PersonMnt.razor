@@ -169,7 +169,7 @@
                                                               UnboundType="GridUnboundColumnType.DateTime"
                                                               FieldName="TermsLastAgreed" Width="6rem" DisplayFormat="d/M/yy HH:mm" />
                                             <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToBriefText" Width="6rem" SortMode="GridColumnSortMode.Value" />
-                                            <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
+                                            <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Width="6rem" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
                                             <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
                                                               DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
                                             <DxGridDataColumn Visible="@(!IsSelectionList)" Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
