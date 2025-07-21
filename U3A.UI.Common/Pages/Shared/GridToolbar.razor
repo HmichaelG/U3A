@@ -430,7 +430,7 @@
         {
             isExporting = true;
             StateHasChanged();
-            await Task.Delay(100); // Allow UI to update before export
+            await Task.Delay(500); // Allow UI to update before export
             LinkedGrid!.BeginUpdate();
             if (showExcelOptions) { await ExcelExport(); } else { await PdfExport(); }
             LinkedGrid!.EndUpdate();
