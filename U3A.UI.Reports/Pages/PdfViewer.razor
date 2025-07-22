@@ -11,18 +11,13 @@
 @using DevExpress.Blazor.PdfViewer
 @using DevExpress.XtraPrinting
 @using U3A.Services
-@using U3A.UI.Common.Pages.Shared
 @using DevExpress.Blazor.Reporting.Models
 @using Microsoft.Extensions.DependencyInjection
 
 @attribute [Authorize]
 
 
-@if (!isReady)
-{
-    <LoadingIndicator />
-}
-else
+@if (isReady)
 {
     <DxWindow Visible=@PdfIsReady @ref="@reportViewer" Width="100dvw"
     Height="100dvh"
