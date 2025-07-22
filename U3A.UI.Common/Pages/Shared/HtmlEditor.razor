@@ -17,6 +17,10 @@
         <DxHtmlEditor AllowSoftLineBreak="true"
                       TableResizeEnabled="true"
                       MediaResizeEnabled="false"
+                      ValidationMessage="@errorText"
+                      ValidationMessagePosition="HtmlEditorValidationMessagePosition.Top"
+                      IsValid="@isValid"
+                      BindMarkupMode="HtmlEditorBindMarkupMode.OnDelayedInput"
                       @bind-Markup="@Markup"
                       @bind-Markup:after="@OnMarkupChanged"
                       Width="@Width" Height="@Height">
@@ -81,9 +85,11 @@
     MessageBox? messageBox;
     bool isCodeEditable;
     static string errorText = "";
+    bool isValid;
 
     protected override Task OnInitializedAsync()
     {
+        isValid = true;
         Markup = AdjustAndMinifyHtml(Markup);
         return base.OnInitializedAsync();
     }
@@ -102,14 +108,35 @@
 
     async Task OnMarkupChanged()
     {
-        await MarkupChanged.InvokeAsync(Markup);
+        ValidateImages();
+        if (isValid)  await MarkupChanged.InvokeAsync(Markup);
     }
 
     async Task OnEditorTextChanged()
     {
-        await MarkupChanged.InvokeAsync(Markup);
+        ValidateImages();
+        if (isValid) await MarkupChanged.InvokeAsync(Markup);
     }
 
+    void ValidateImages()
+    {
+        isValid = true;
+        if (Markup is null) return;
+        var document = ParseHtml(Markup);
+        if (document is null) return;
+        var images = document.Images;
+        foreach (var image in images)
+        {
+            //if source is embedded image, ensure it is base64 encoded & less than 100KB
+            if (image.Source is not null && image.Source.StartsWith("data:image/") && image.Source.Length > 100 * 1024)
+            {
+                errorText = $"Your image is too large. Please use an image smaller than 100KB.";
+                isValid = false;
+                return;
+            }
+        }
+        errorText = string.Empty;
+    }
 
     public static string PrettyPrint(string html)
     {
