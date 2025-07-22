@@ -24,65 +24,14 @@
 }
 else
 {
-    <DxPdfViewer @ref="@reportViewer"
-                 DocumentContent="@DocumentContent"                 
-                 IsSinglePagePreview="false"
-                 ZoomLevel="1"
-                 CssClass="view-style"
-                 CustomizeToolbar="OnCustomizeToolbar" />
-}
-<style>
-    .view-style {
-        width:100%;
-        height: @viewerHeight
-    }
-
-</style>
-
-@code {
-    DxPdfViewer? reportViewer;
-    [Parameter]
-    public Byte[] DocumentContent { get; set; }
-    [Parameter]
-    public XtraReport Report { get; set; }
-    [Parameter]
-    public EventCallback OnCloseButtonClick { get; set; }
-    [Parameter]
-    public double DisplayHeightOffset { get; set; } = 4;
-
-    string viewerHeight;
-
-    bool isReady;
-
-    protected override async Task OnInitializedAsync()
-    {
-        viewerHeight = (ws.UseTopMenu) 
-        ? $"calc(100dvh - {DisplayHeightOffset+3}rem) !important;" 
-        : $"calc(100dvh - {DisplayHeightOffset}rem) !important;";
-        if (Report is not null)
-        {
-            using (var ms = new MemoryStream())
-            {
-                await Report.ExportToPdfAsync(ms);
-                ms.Position = 0;
-                DocumentContent = ms.ToArray();
-            }
-
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            isReady = true;
-            await InvokeAsync(StateHasChanged);
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    void OnCustomizeToolbar(ToolbarModel toolbarModel)
-    {
+    <DxWindow Visible=@PdfIsReady @ref="@reportViewer" Width="100dvw"
+    Height="100dvh"
+    PositionY="0"
+    CloseOnEscape="false"
+    ShowHeader="false">
+        <BodyContentTemplate Context="PopupContext">
+            <DxPdfViewer ZoomLevel="1" DocumentContent="@DocumentContent" DocumentName="@ReportTitle"
+            CustomizeToolbar="@((ToolbarModel toolbarModel) => {
         toolbarModel.AllItems.Add(new ToolbarItem()
             {
                 IconCssClass = "exit-icon",
@@ -90,18 +39,41 @@ else
                 Text = "Close Report",
                 AdaptiveText = "Close Report",
                 AdaptivePriority = 1,
-                Click = async (args) =>
-                {
-                    if (OnCloseButtonClick.HasDelegate)
-                    {
-                        await OnCloseButtonClick.InvokeAsync();
-                    }
-                    else
-                    {
-                        NavMan.NavigateTo("/");
-                    }
-                }
-            });
+                Click = async (args) => {PdfIsReady = false; await OnCloseButtonClick.InvokeAsync();},
+                });
+            })"
+            CssClass="w-100 h-100" />
+        </BodyContentTemplate>
+    </DxWindow>
+}
+
+@code {
+    DxWindow? reportViewer;
+    [Parameter]
+    public bool PdfIsReady { get; set; }
+    [Parameter]
+    public Byte[] DocumentContent { get; set; }
+    [Parameter]
+    public string ReportTitle { get; set; } = "PDF Report";
+    [Parameter]
+    public XtraReport FileName { get; set; }
+    [Parameter]
+    public EventCallback OnCloseButtonClick { get; set; }
+
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (FileName is not null)
+        {
+            using (var ms = new MemoryStream())
+            {
+                await FileName.ExportToPdfAsync(ms);
+                ms.Position = 0;
+                DocumentContent = ms.ToArray();
+            }
+        }
+        isReady = true;
     }
 
 }
