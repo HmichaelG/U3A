@@ -118,16 +118,13 @@
                        Alignment="ToolbarItemAlignment.Right"
                        Tooltip="Filter / search for records">
         </DxToolbarItem>
-        <DxToolbarItem id="dropdown-target-container" IconCssClass="bi bi-file-spreadsheet" Text="Export"
-                       BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right">
-            <Items>
-                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="To Excel" Name="ToExcel"
-                               Tooltip="Export the grid to Excel" />
-                <DxToolbarItem IconCssClass="bi bi-file-pdf" Text="To Pdf" Name="ToPdf"
-                               Tooltip="Export the grid to Pdf" />
-            </Items>
-        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel" Name="ToExcel" BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                        Tooltip="Export the grid to Excel" />
+        <DxToolbarItem IconCssClass="bi bi-printer" Text="Print" Name="ToPdf" 
+                       Alignment="ToolbarItemAlignment.Right"
+                        id="dropdown-target-container"
+                        Tooltip="Create a Pdf report from the grid" />
         @CustomButtonContent
     </Items>
 </DxToolbar>
