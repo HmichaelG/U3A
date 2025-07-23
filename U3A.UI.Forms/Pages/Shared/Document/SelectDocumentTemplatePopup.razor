@@ -7,12 +7,13 @@
 @using DevExpress.Blazor.RichEdit
 
 @inject TenantInfoService tenantService
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <AttachFile @ref=@attachFile Attachments="@newAttachments" AttachmentsChanged="OnFileAttachmentsChanged" />
 <MessageBox @ref="messageBox" />
 
 <Progress @ref=@progressBar />
-<PdfViewer PdfIsReady=@pdfVisible DocumentContent="@pdfContent" OnCloseButtonClick="@(() => pdfVisible = false)" />
+<PdfViewer @bind-PdfIsReady=@pdfVisible DocumentContent="@pdfContent" />
 
 <DxPopup Visible="@popupVisible" @ref="@popup" Width="100dvw" CssClass="editor-popup"
          PositionY="5"
@@ -214,7 +215,7 @@
     IEnumerable<string?> selectedAttachments = new List<string>();
 
     int ActiveTabIndex = 1;
-    bool pdfVisible;
+    bool pdfVisible = false;
     bool popupVisible;
     DxPopup? popup;
     DxRichEdit? richEdit;
@@ -238,9 +239,10 @@
     protected override async Task OnInitializedAsync()
     {
         newAttachments.Clear();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
         var tInfo = await tenantService.GetTenantInfoAsync();
-        term = await BusinessRule.CurrentEnrolmentTermAsync(dbContext)
-                ?? await BusinessRule.CurrentTermAsync(dbContext);
+        term = await BusinessRule.CurrentEnrolmentTermAsync(dbc)
+                ?? await BusinessRule.CurrentTermAsync(dbc);
         isEmailEnabled = tInfo.UsePostmarkTestEnviroment;
     }
 

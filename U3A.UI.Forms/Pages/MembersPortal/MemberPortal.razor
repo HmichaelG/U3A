@@ -102,7 +102,7 @@ else
                 case PortalMenuSelection.PrintMemberBadge:
                     <PdfViewer PdfIsReady=true 
                         FileName="@(GetMemberBadgeReport())"
-                        OnCloseButtonClick=@(() => 
+                        PdfIsReadyChanged=@(() => 
                         {
                         menuSelection = PortalMenuSelection.ShowMenu;
                         OnReportComplete();

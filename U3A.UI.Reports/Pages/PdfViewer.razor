@@ -34,7 +34,7 @@
                 Text = "Close Report",
                 AdaptiveText = "Close Report",
                 AdaptivePriority = 1,
-                Click = async (args) => {PdfIsReady = false; await OnCloseButtonClick.InvokeAsync();},
+                Click = async (args) => {PdfIsReady = false; await PdfIsReadyChanged.InvokeAsync(false);},
                 });
             })"
             CssClass="w-100 h-100" />
@@ -47,13 +47,13 @@
     [Parameter]
     public bool PdfIsReady { get; set; }
     [Parameter]
+    public EventCallback<bool> PdfIsReadyChanged { get; set; }
+    [Parameter]
     public Byte[] DocumentContent { get; set; }
     [Parameter]
     public string ReportTitle { get; set; } = "PDF Report";
     [Parameter]
     public XtraReport FileName { get; set; }
-    [Parameter]
-    public EventCallback OnCloseButtonClick { get; set; }
 
     bool isReady;
 

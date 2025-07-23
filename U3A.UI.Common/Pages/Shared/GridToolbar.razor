@@ -178,7 +178,7 @@
     </FooterContentTemplate>
 </DxDropDown>
 
-<PdfViewer PdfIsReady=@pdfIsReady DocumentContent="@pdfContent" ReportTitle="@reportTitle" OnCloseButtonClick="() => pdfIsReady = false" />
+<PdfViewer @bind-PdfIsReady=@pdfIsReady DocumentContent="@pdfContent" ReportTitle="@reportTitle" />
 
 @code {
 
@@ -477,10 +477,11 @@
                 var col = pdfExportLayout!.Columns.FirstOrDefault(x => x.FieldName == e.FieldName);
                 if (col is not null && col.ColumnType == GridPersistentLayoutColumnType.Data)
                 {
-                    if (col.Width is not null && col.Width != "100%")
+                    if (col.Width is not null)
                     {
                         float screenWidth;
                         screenWidth = (int)CssToPixels(col.Width,fontSize: 16, gridWidth: gridWidth);
+                        if (!col.Width.EndsWith("%")) { gridWidth -= screenWidth; }
                         e.Width = (int)(screenWidth * 300 / 96); // adjust for printer DPI
                         if (e.ColumnIndex == 0)
                         {
@@ -535,10 +536,9 @@
         return unit switch
         {
             "px" => value,
-            "%" => value * gridWidth / 100f,            // parent width
+            "%" => (gridWidth > 0) ? value * gridWidth / 100f : 100f,            // parent width
             "em" => value * fontSize,               // current font size
             "rem" => value * fontSize,              // root font size
-            "vw" => value * gridWidth / 100f,          // viewport width
             _ => throw new NotSupportedException($"Unsupported unit: {unit}")
         };
     }

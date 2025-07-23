@@ -185,7 +185,8 @@ function clearQueryString() {
 }
 
 function getGridWidth(gridSelector) {
-    var grid = document.querySelector(gridSelector);
-    var result = (grid != null) ? grid.offsetWidth : 900;
-    return result;
+    const grid = document.querySelector(gridSelector); 
+    grid.style.tableLayout = "fixed"; // Ensure fixed layout for accurate width calculation
+    const width = grid ? grid.offsetWidth : 900;
+    return width;
 } 

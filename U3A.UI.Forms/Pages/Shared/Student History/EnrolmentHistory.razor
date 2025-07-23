@@ -38,9 +38,9 @@
 
 </DxFormLayoutGroup>
 
+<PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+
 @code {
-
-
 
     [Parameter]
     public Term SelectedTerm { get; set; }
@@ -56,6 +56,10 @@
 
     string reportTitle;
 
+    bool isPdfReady = false;
+
+    byte[] documentContent;
+
     protected override async Task OnParametersSetAsync()
     {
         if (SelectedPerson != null && SelectedTerm != null)
@@ -69,8 +73,10 @@
 
     public async Task Print()
     {
+        dxGrid.AutoFitColumnWidths();
         reportTitle = $"Enrolment History: {SelectedPerson.FullName}";
-        await dxGrid.ExportToPdfAsync(reportTitle,
+        using var ms = new MemoryStream();
+        await dxGrid.ExportToPdfAsync(ms,
             new GridPdfExportOptions()
             {
                 FitToPage = true,
@@ -79,6 +85,8 @@
                 CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
                 CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
             });
+        documentContent = ms.ToArray();
+        isPdfReady = true;
     }
 
     void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
@@ -90,6 +98,7 @@
 
     void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
     {
+        args.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
         args.PaperKind = DXPaperKind.A4;
         args.Margins = new DXMargins(50, 50, 50, 50);
     }

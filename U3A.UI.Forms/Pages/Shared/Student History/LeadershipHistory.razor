@@ -29,21 +29,9 @@
 
 </DxFormLayoutGroup>
 
+<PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+
 @code {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     [Parameter]
     public Person SelectedPerson { get; set; }
@@ -55,6 +43,8 @@
     DxGrid? dxGrid;
 
     string reportTitle;
+    bool isPdfReady = false;
+    byte[] documentContent;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -69,9 +59,9 @@
 
     public async Task Print()
     {
-
         reportTitle = $"Leadership History: {SelectedPerson.FullName}";
-        await dxGrid.ExportToPdfAsync(reportTitle,
+        using var ms = new System.IO.MemoryStream();
+        await dxGrid.ExportToPdfAsync(ms,
             new GridPdfExportOptions()
             {
                 FitToPage = true,
@@ -79,6 +69,8 @@
                 CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
                 CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
             });
+        documentContent = ms.ToArray();
+        isPdfReady = true;
     }
 
     void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
@@ -90,6 +82,7 @@
 
     void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
     {
+        args.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
         args.PaperKind = DXPaperKind.A4;
         args.Margins = new DXMargins(50, 50, 50, 50);
     }

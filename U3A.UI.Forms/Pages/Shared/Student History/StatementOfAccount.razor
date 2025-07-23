@@ -49,6 +49,8 @@
 
 </DxFormLayoutGroup>
 
+<PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+
 @code {
 
     [Parameter]
@@ -67,6 +69,8 @@
     bool showBalance;
     DxGrid? dxGrid;
     string reportTitle;
+    byte[] documentContent;
+    bool isPdfReady = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -101,15 +105,18 @@
     public async Task Print()
     {
         reportTitle = $"Statement of Account: {SelectedPerson.FullName}";
-        await dxGrid.ExportToPdfAsync(reportTitle,
+        using var ms = new MemoryStream();
+        await dxGrid.ExportToPdfAsync(ms,
             new GridPdfExportOptions()
             {
-                FitToPage = false,
+                FitToPage = true,
                 CustomizeDocument = OnCustomizeDocument,
                 CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
                 CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
                 CustomizeColumn = OnCustomizeColumn,
             });
+        documentContent = ms.ToArray();
+        isPdfReady = true;
     }
 
     void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
@@ -125,6 +132,7 @@
     }
     void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
     {
+        args.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
         args.PaperKind = DXPaperKind.A4;
         args.Margins = new DXMargins(50, 50, 50, 50);
     }

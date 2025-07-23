@@ -16,7 +16,7 @@
 
 @attribute [Authorize]
 
-<PdfViewer PdfIsReady=@showPDF DocumentContent="@pdfContent" OnCloseButtonClick="@(() => showPDF = false)" />
+<PdfViewer @bind-PdfIsReady=@showPDF DocumentContent="@pdfContent" />
 
 @if (!IsReady)
 {
