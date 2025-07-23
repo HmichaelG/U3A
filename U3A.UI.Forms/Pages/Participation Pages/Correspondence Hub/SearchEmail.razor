@@ -91,7 +91,7 @@ else
 
             <FullScreen @ref=@fullScreen DisplayOffset="22" AlternateDisplayOffset="13">
                 <ContentTemplate>
-                    <DxGrid Data=@messages @ref=@mainGrid
+                    <DxGrid id="my-grid" Data=@messages @ref=@mainGrid
                             AutoExpandAllGroupRows=false>
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid LayoutKey="{B8414CBE-49B9-47D4-A754-4FDC59A29115}" />

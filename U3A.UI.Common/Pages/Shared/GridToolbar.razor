@@ -16,6 +16,7 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject NavigationManager navMan
 @inject IToastNotificationService ToastService
+@inject IJSRuntime js
 
 <DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
 <MessageBox @ref=messageBox />
@@ -459,6 +460,9 @@
 
     async Task PdfExport()
     {
+        var gridWidth = await js.InvokeAsync<float>("getGridWidth", "#my-grid");
+        Log.Information("");
+        Log.Information("Grid-width: {0}", gridWidth);
         if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = DEFAULT_PDF_TITLE;
         var groupCount = LinkedGrid!.GetGroupCount();
         using var ms = new MemoryStream();
@@ -475,16 +479,18 @@
                 {
                     if (col.Width is not null && col.Width != "100%")
                     {
-                        e.Width = (int)(CssToPixels(col.Width, 16) * 300 / 96);
+                        float screenWidth;
+                        screenWidth = (int)CssToPixels(col.Width,fontSize: 16, gridWidth: gridWidth);
+                        e.Width = (int)(screenWidth * 300 / 96); // adjust for printer DPI
                         if (e.ColumnIndex == 0)
                         {
                             e.Width += 50 * groupCount; // Add some padding for the first column
                         }
-                        Log.Information("Calculated: {0} {1} {2}", e.FieldName, col.Width, e.Width);
+                        Log.Information("Calculated: Original: {0} Screen: {1} {2} Calculated: {3}", e.FieldName, col.Width, screenWidth, e.Width);
                     }
                     else
                     {
-                        e.Width = 600; // PersistentGridLayout does not have width (null)
+                        e.Width = 300; // PersistentGridLayout does not have width (null)
                         Log.Information("Default: {0} {1} {2}", e.FieldName, col.Width, e.Width);
                     }
                 }
@@ -518,7 +524,7 @@
         StateHasChanged();
     }
 
-    public float CssToPixels(string cssValue, float fontSize)
+    public float CssToPixels(string cssValue, float fontSize, float gridWidth)
     {
         var match = Regex.Match(cssValue.Trim(), @"([\d.]+)([a-z%]+)");
         if (!match.Success) throw new ArgumentException("Invalid CSS value");
@@ -529,10 +535,10 @@
         return unit switch
         {
             "px" => value,
-            "%" => value * PaperWidth(),            // parent width
+            "%" => value * gridWidth / 100f,            // parent width
             "em" => value * fontSize,               // current font size
             "rem" => value * fontSize,              // root font size
-            "vw" => value * PaperWidth(),          // viewport width
+            "vw" => value * gridWidth / 100f,          // viewport width
             _ => throw new NotSupportedException($"Unsupported unit: {unit}")
         };
     }

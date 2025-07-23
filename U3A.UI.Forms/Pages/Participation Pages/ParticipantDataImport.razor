@@ -78,7 +78,7 @@ else {
             </div>
         </div> @*row*@
 
-        <DxGrid Data="@importData" @ref=@mainGrid CssClass="grid-height"
+        <DxGrid id="my-grid" Data="@importData" @ref=@mainGrid CssClass="grid-height"
             CustomizeElement="Grid_CustomizeElement"
             DetailRowDisplayMode="GridDetailRowDisplayMode.Always"
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"

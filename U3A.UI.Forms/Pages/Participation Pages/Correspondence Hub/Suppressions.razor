@@ -31,7 +31,7 @@ else
 
         <FullScreen @ref=@fullScreen DisplayOffset="@contentSize">
             <ContentTemplate>
-                <DxGrid Data=@suppressions @ref=@mainGrid
+                <DxGrid id="my-grid" Data=@suppressions @ref=@mainGrid
                         @bind-SelectedDataItems="@SelectedDataItems">
                     <ToolbarTemplate>
                         <GridToolbar LinkedGrid=@mainGrid LayoutKey="{CF0E2A1F-A9EF-4CF2-9544-F5609DE4A189}">

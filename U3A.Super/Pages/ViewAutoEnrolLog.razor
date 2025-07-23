@@ -21,7 +21,7 @@
         <div class="pb-2 text-style">
             <FullScreen DisplayOffset="10" HideToggle="true">
                 <ContentTemplate>
-                    <DxGrid @ref="grid" Data="@logs"
+                    <DxGrid id="my-grid" @ref="grid" Data="@logs"
                             KeyFieldName="Id"
                             AutoExpandAllGroupRows="true"
                             ValidationEnabled="true">

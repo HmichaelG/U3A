@@ -28,7 +28,7 @@
             <div class="pb-2">
                 <FullScreen DisplayOffset="12" HideToggle="true">
                     <ContentTemplate>
-                <DxGrid @ref="grid" Data="@tenantInfo"
+                <DxGrid id="my-grid" @ref="grid" Data="@tenantInfo"
                         @bind-SelectedDataItems="@selectedItems"
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         UnboundColumnData="GetUnboundColumnData"

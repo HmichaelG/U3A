@@ -65,7 +65,7 @@ else
             </DxSplitterPane>
             <DxSplitterPane>
                 <div class="h6">Receipt Summary</div>
-                <DxGrid Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="gridHeight"
+                <DxGrid id="my-grid" Data="@(receiptData?.Where(x => x.Total != 0))" CssClass="gridHeight"
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         AutoExpandAllGroupRows=true
                         ShowFilterRow="false"

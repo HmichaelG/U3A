@@ -86,7 +86,7 @@ else
     <div>@BankAccountDetails</div>
     <FullScreen DisplayOffset="20">
         <ContentTemplate>
-            <DxGrid Data="@importData" @ref=@mainGrid
+            <DxGrid id="my-grid" Data="@importData" @ref=@mainGrid
                     SelectionMode="GridSelectionMode.Single"
                     SelectedDataItem=@selectedDataItem
                     SelectedDataItemChanged="OnSelectedDataItemChanged"

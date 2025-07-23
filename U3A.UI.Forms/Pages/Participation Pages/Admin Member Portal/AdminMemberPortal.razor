@@ -100,7 +100,7 @@ else
                                                 <DxTabPage Text="Received">
                                                     <FullScreen DisplayOffset="13" HideToggle="true">
                                                         <ContentTemplate>
-                                                            <DxGrid @ref=@receiptGrid Data="@ReceivedToday" CssClass="m-2"
+                                                            <DxGrid id="my-grid" @ref=@receiptGrid Data="@ReceivedToday" CssClass="m-2"
                                                                     UnboundColumnData="Grid_UnboundColumnData"
                                                                     TextWrapEnabled="false"
                                                                     ShowFilterRow="false"

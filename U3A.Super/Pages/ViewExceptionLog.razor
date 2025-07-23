@@ -33,7 +33,7 @@
             <div class="pb-2">
                 <FullScreen DisplayOffset="10" HideToggle="true">
                     <ContentTemplate>
-                        <DxGrid @ref="grid" Data="@exceptions"
+                        <DxGrid id="my-grid" @ref="grid" Data="@exceptions"
                                 AutoExpandAllGroupRows="true"
                                 DataItemDeleting="Grid_DataItemDeleting"
                                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"

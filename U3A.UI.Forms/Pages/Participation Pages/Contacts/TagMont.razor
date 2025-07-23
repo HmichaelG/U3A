@@ -20,7 +20,7 @@ else
 
     <FullScreen>
         <ContentTemplate>
-            <DxGrid Data="@Tags" @ref=@mainGrid
+            <DxGrid id="my-grid" Data="@Tags" @ref=@mainGrid
                     ValidationEnabled="true"
                     EditMode="GridEditMode.EditCell"
                     DataItemDeleting="Grid_DataItemDeleting"

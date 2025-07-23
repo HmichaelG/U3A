@@ -317,7 +317,7 @@ else
                                                                    ColSpanMd="12"
                                                                    Visible="@systemSettings.AllowMultiCampusExtensions">
                                                     <DxFormLayoutGroup Caption="U3A Not Allowed" ColSpanMd="5">
-                                                        <DxGrid @ref=@UnassignedGrid Data=@UnassignedU3A AllowColumnReorder=false CssClass="m-1"
+                                                        <DxGrid id="my-grid" @ref=@UnassignedGrid Data=@UnassignedU3A AllowColumnReorder=false CssClass="m-1"
                                                                 @bind-SelectedDataItems="SelectedUnassignedItems"
                                                                 SelectionMode="GridSelectionMode.Multiple"
                                                                 VirtualScrollingEnabled=true
@@ -344,7 +344,7 @@ else
                                                     </DxFormLayoutGroup>
 
                                                     <DxFormLayoutGroup Caption="U3A Allowed" ColSpanMd="5">
-                                                        <DxGrid @ref=@AssignedGrid Data=@AssignedU3A AllowColumnReorder=false CssClass="m-1"
+                                                        <DxGrid id="my-grid" @ref=@AssignedGrid Data=@AssignedU3A AllowColumnReorder=false CssClass="m-1"
                                                                 @bind-SelectedDataItems="SelectedAssignedItems"
                                                                 SelectionMode="GridSelectionMode.Multiple"
                                                                 VirtualScrollingEnabled=true

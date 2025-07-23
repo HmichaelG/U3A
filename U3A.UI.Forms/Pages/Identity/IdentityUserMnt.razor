@@ -63,7 +63,7 @@ else
 
     <FullScreen DisplayOffset="@((IsEmbedded) ? 14 : 8)" HideToggle="@IsEmbedded">
         <ContentTemplate>
-            <DxGrid Data="@AppUsers" @ref="mainGrid"
+            <DxGrid id="my-grid" Data="@AppUsers" @ref="mainGrid"
                     UnboundColumnData="Grid_CustomUnboundColumnData"
                     @bind-SelectedDataItems="@SelectedDataItems"
                     ShowSearchBox="true"

@@ -50,7 +50,7 @@ else
             <div class="col-9 px-4">
                 <FullScreen DisplayOffset="@contentSize">
                     <ContentTemplate>
-                        <DxGrid Data="@Classes" @ref=@mainGrid
+                        <DxGrid id="my-grid" Data="@Classes" @ref=@mainGrid
                                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                                 ShowFilterRow="false"
                                 ShowAllRows="true"

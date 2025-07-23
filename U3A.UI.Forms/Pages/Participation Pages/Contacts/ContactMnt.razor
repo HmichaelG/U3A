@@ -73,7 +73,7 @@
                     switch (index)
                     {
                         case 0:
-                            <DxGrid Data="@contacts" @ref=@mainGrid
+                            <DxGrid id="my-grid" Data="@contacts" @ref=@mainGrid
                                     @bind-SelectedDataItems="@SelectedDataItems"
                                     UnboundColumnData="OnUnboundColumnData"
                                     AllowSelectRowByClick="false"

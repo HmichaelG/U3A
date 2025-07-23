@@ -72,7 +72,7 @@ else
             </DxSplitterPane>
             <DxSplitterPane>
                 <div class="h6">New Member Details</div>
-                <DxGrid Data="@(memberData?.Where(x => x.Count != 0))" CssClass="gridHeight"
+                <DxGrid id="my-grid" Data="@(memberData?.Where(x => x.Count != 0))" CssClass="gridHeight"
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         AutoExpandAllGroupRows="true"
                         ShowFilterRow="false"

@@ -183,3 +183,9 @@ window.clipboardCopy = {
 function clearQueryString() {
     window.history.pushState({}, document.title, "/");
 }
+
+function getGridWidth(gridSelector) {
+    var grid = document.querySelector(gridSelector);
+    var result = (grid != null) ? grid.offsetWidth : 900;
+    return result;
+} 

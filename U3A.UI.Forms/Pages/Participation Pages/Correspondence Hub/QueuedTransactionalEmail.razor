@@ -41,7 +41,7 @@ else
         <div class="pb-1" />
         <FullScreen @ref=@fullScreen DisplayOffset="@contentSize" HideToggle="@IsEmbedded">
             <ContentTemplate>
-                <DxGrid Data="@SendMail" @ref=@mainGrid
+                <DxGrid id="my-grid" Data="@SendMail" @ref=@mainGrid
                         @bind-SelectedDataItems="@SelectedDataItems"
                         UnboundColumnData="Grid_CustomUnboundColumnData"
                         ShowFilterRow="false"

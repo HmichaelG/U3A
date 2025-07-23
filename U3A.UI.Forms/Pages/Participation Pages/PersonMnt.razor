@@ -63,7 +63,7 @@
                         <DxTabPage Text="All" Click="@(() => selectedTab = Tabs.AllRecords)" />
                     </DxTabs>
                 </div>
-                                    <DxGrid Data="@Persons" @ref=@mainGrid CssClass="grid-style"
+                                    <DxGrid id="my-grid" Data="@Persons" @ref=@mainGrid CssClass="grid-style"
                                             SelectionMode="GridSelectionMode.Multiple"
                                             SelectedDataItems="@SelectedParticipants"
                                             SelectedDataItemsChanged="@OnSelectedParticipantsChanged"
