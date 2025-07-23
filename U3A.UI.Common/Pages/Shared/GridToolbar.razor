@@ -11,7 +11,7 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using System.Text.RegularExpressions
 @using Serilog
-@using DevExpress.Blazor.PdfViewer
+@using U3A.UI.Reports.Pages
 
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject NavigationManager navMan
@@ -177,29 +177,7 @@
     </FooterContentTemplate>
 </DxDropDown>
 
-<DxWindow @bind-Visible="@pdfIsReady" @ref="@pdfViewer" Width="100dvw"
-         Height="100dvh"
-         PositionY="0"
-         CloseOnEscape="false"
-         ShowCloseButton="true"
-         ShowHeader="false"
-         HeaderText="Report Viewer">
-    <BodyContentTemplate Context="PopupContext">
-         <DxPdfViewer DocumentContent="@pdfContent" DocumentName="@reportTitle"
-                     CustomizeToolbar="@((ToolbarModel toolbarModel) => {
-        toolbarModel.AllItems.Add(new ToolbarItem()
-            {
-                IconCssClass = "exit-icon",
-                BeginGroup = true,
-                Text = "Close Report",
-                AdaptiveText = "Close Report",
-                AdaptivePriority = 1,
-                Click = async (args) => pdfIsReady = false,
-                });
-            })"
-            CssClass="w-100 h-100" />
-    </BodyContentTemplate>
-</DxWindow>
+<PdfViewer PdfIsReady=@pdfIsReady DocumentContent="@pdfContent" ReportTitle="@reportTitle" OnCloseButtonClick="() => pdfIsReady = false" />
 
 @code {
 
