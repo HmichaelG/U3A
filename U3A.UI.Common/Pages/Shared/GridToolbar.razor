@@ -460,15 +460,7 @@
     async Task PdfExport()
     {
         float gridWidth = 0;
-        try
-        {
-            gridWidth = await js.InvokeAsync<float>("getGridWidth", "#my-grid");
-        }
-        catch (JSException ex)
-        {
-            Log.Error(ex, "Error getting grid width");
-            gridWidth = 800; // Default width if JS call fails
-        }
+        gridWidth = await js.InvokeAsync<float>("getGridWidth"); // returns the grid width or default of 800
         pdfExportLayout = LinkedGrid!.SaveLayout();
         Log.Information("");
         Log.Information("Grid-width: {0}", gridWidth);

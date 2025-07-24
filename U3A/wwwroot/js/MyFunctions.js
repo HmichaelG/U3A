@@ -184,9 +184,8 @@ function clearQueryString() {
     window.history.pushState({}, document.title, "/");
 }
 
-function getGridWidth(gridSelector) {
-    const grid = document.querySelector(gridSelector); 
-    grid.style.tableLayout = "fixed"; // Ensure fixed layout for accurate width calculation
+function getGridWidth() {
+    const grid = document.querySelector(".dxbl-grid"); 
     const width = grid ? grid.offsetWidth : 900;
     return width;
 } 
