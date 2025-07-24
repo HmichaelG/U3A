@@ -33,7 +33,7 @@
                 BeginGroup = true,
                 Text = "Close Report",
                 AdaptiveText = "Close Report",
-                AdaptivePriority = 1,
+                AdaptivePriority = -99,
                 Click = async (args) => {PdfIsReady = false; await PdfIsReadyChanged.InvokeAsync(false);},
                 });
             })"

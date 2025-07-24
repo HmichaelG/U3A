@@ -142,7 +142,6 @@ else
     {
         if (firstRender)
         {
-            await InvokeAsync(StateHasChanged);
             if (HideTabPanels)
             {
                 reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
@@ -156,9 +155,7 @@ else
             EditingFieldModelFactory.RegisterMaskEditor("Day", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|([1-2][0-9])|(3[0-1])" });
             EditingFieldModelFactory.RegisterMaskEditor("Month", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|(1[0-2])" });
             EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
-            StateHasChanged();
         }
-        if (reportViewer != null) { reportViewer.LoadingPanelVisible = true; }
     }
 
     void OnCustomizeToolbar(ToolbarModel toolbarModel)
@@ -169,7 +166,7 @@ else
             BeginGroup = true,
             Text = "Close Report",
             AdaptiveText = "Close Report",
-            AdaptivePriority = 1,
+            AdaptivePriority = -99,            
             Click = async (args) =>
             {
                 ReportIsReady = false;

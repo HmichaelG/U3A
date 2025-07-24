@@ -189,3 +189,16 @@ function getGridWidth() {
     const width = grid ? grid.offsetWidth : 900;
     return width;
 } 
+
+function getGridColumnWidths() {
+    const gridMap = new Map();
+    var grid = document.querySelector(".dxbl-grid");
+    var headerCells = grid.getElementsByClassName("my-header-cell");
+    for (const headerCell of headerCells) {
+        var fieldName = headerCell.getAttribute("fieldname");
+        if (fieldName) {
+            gridMap.set(fieldName, headerCell.offsetWidth);
+        }
+    }
+    return Object.fromEntries(gridMap);
+}
