@@ -121,11 +121,11 @@
         </DxToolbarItem>
         <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel" Name="ToExcel" BeginGroup=true
                        Alignment="ToolbarItemAlignment.Right"
-                        Tooltip="Export the grid to Excel" />
-        <DxToolbarItem IconCssClass="bi bi-printer" Text="Print" Name="ToPdf" 
+                       Tooltip="Export the grid to Excel" />
+        <DxToolbarItem IconCssClass="bi bi-printer" Text="Print" Name="ToPdf"
                        Alignment="ToolbarItemAlignment.Right"
-                        id="dropdown-target-container"
-                        Tooltip="Create a Pdf report from the grid" />
+                       id="dropdown-target-container"
+                       Tooltip="Create a Pdf report from the grid" />
         @CustomButtonContent
     </Items>
 </DxToolbar>
@@ -419,7 +419,6 @@
                 reportTitle = string.Empty;
                 break;
             case "ToPdf":
-                pdfExportLayout = LinkedGrid!.SaveLayout();
                 showPdfOptions = true;
                 showExcelOptions = false;
                 isDropDownOpen = true;
@@ -460,7 +459,17 @@
 
     async Task PdfExport()
     {
-        var gridWidth = await js.InvokeAsync<float>("getGridWidth", "#my-grid");
+        float gridWidth = 0;
+        try
+        {
+            gridWidth = await js.InvokeAsync<float>("getGridWidth", "#my-grid");
+        }
+        catch (JSException ex)
+        {
+            Log.Error(ex, "Error getting grid width");
+            gridWidth = 800; // Default width if JS call fails
+        }
+        pdfExportLayout = LinkedGrid!.SaveLayout();
         Log.Information("");
         Log.Information("Grid-width: {0}", gridWidth);
         if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = DEFAULT_PDF_TITLE;
@@ -480,7 +489,7 @@
                     if (col.Width is not null)
                     {
                         float screenWidth;
-                        screenWidth = (int)CssToPixels(col.Width,fontSize: 16, gridWidth: gridWidth);
+                        screenWidth = (int)CssToPixels(col.Width, fontSize: 16, gridWidth: gridWidth);
                         if (!col.Width.EndsWith("%")) { gridWidth -= screenWidth; }
                         e.Width = (int)(screenWidth * 300 / 96); // adjust for printer DPI
                         if (e.ColumnIndex == 0)
