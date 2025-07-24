@@ -3,10 +3,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @implements IDisposable
 
-@if (!IsReady) {
-    <LoadingIndicator />
-}
-else {
+@if (IsReady) {
     
 <DxReportDesigner Height="1000px" Width="100%" AllowMDI="true" >
     <DxReportDesignerWizardSettings UseFullscreenWizard="true" />

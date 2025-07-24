@@ -32,33 +32,29 @@
 @using DevExpress.Blazor.Reporting
 @using Microsoft.Extensions.DependencyInjection
 
-@if (isReady)
+@if (!isReady)
 {
-    <div class="@containerClass">
-        <DxReportViewer @ref="@reportViewer"
-                        Report="@Report"
-                        SinglePagePreview="false"
-                        Zoom="1"
-                        CssClass="w-100"
-                        OnCustomizeToolbar="OnCustomizeToolbar"
-                        RootCssClasses="@RootCssClass" />
-    </div>
+    <div><em>Loading</em></div>
 }
-<style>
-    .view-normal {
-        height: @viewerHeight
-    }
-    .view-smallScreen{
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--bs-body-bg);
-        position: fixed;
-        z-index: 2000;
-        opacity: 1;
-        height: @viewerHeight
-    }
-</style>
+else
+{
+    <DxWindow Visible=@ReportIsReady Width="100dvw"
+              Height="100dvh"
+              PositionY="0"
+              CloseOnEscape="false"
+              ShowHeader="false">
+        <BodyContentTemplate Context="PopupContext">
+            <DxReportViewer @ref="@reportViewer"
+                            Report="@Report"
+                            SinglePagePreview="false"
+                            Zoom="1"
+                            CssClass="w-100 h-100"
+                            OnCustomizeToolbar="OnCustomizeToolbar" />
+        </BodyContentTemplate>
+    </DxWindow>
+}
+
+
 
 @code {
     DxReportViewer? reportViewer;
@@ -70,9 +66,10 @@
     [Parameter]
     public XtraReport? Report { get; set; }
     [Parameter]
-    public string RootCssClass { get; set; } = "view-normal";
+    public bool ReportIsReady { get; set; } = false;
     [Parameter]
-    public EventCallback OnCloseButtonClick { get; set; }
+    public EventCallback<bool> ReportIsReadyChanged { get; set; }
+
 
     string viewerHeight;
 
@@ -81,13 +78,11 @@
     string? tenantId;
     bool isReady;
     string googleFontsAPIKey;
-    string containerClass = "view-normal";
 
     protected override async Task OnInitializedAsync()
     {
         googleFontsAPIKey = config.GetValue<string>("GoogleFontsAPIKey");
         DXFontRepository.QueryNotFoundFont += Report_QueryNotFoundFont;
-        viewerHeight = (ws.UseTopMenu) ? "calc(100dvh - 4rem) !important;" : "calc(100dvh - 1rem) !important;";
         dbc = await U3Adbfactory.CreateDbContextAsync();
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
         tenantId = textInfo.ToTitleCase(dbc.TenantInfo.Identifier!);
@@ -97,6 +92,7 @@
             Type? thisType = Type.GetType($"U3A.UI.Reports.{ReportName}");
             if (thisType != null)
             {
+                ReportIsReady = true;
                 Report = (XtraReport?)Activator.CreateInstance(thisType);
                 ReportName = Report.Name;
                 if (Report is IXtraReportWithNavManager)
@@ -131,6 +127,7 @@
                 }
             }
         }
+        isReady = true;
     }
 
     private void Report_QueryNotFoundFont(object sender, NotFoundFontEventArgs e)
@@ -145,7 +142,6 @@
     {
         if (firstRender)
         {
-            isReady = true;
             await InvokeAsync(StateHasChanged);
             if (HideTabPanels)
             {
@@ -160,7 +156,6 @@
             EditingFieldModelFactory.RegisterMaskEditor("Day", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|([1-2][0-9])|(3[0-1])" });
             EditingFieldModelFactory.RegisterMaskEditor("Month", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|(1[0-2])" });
             EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
-            containerClass = (ws.IsLargeScreen) ? "view-normal" : "view-smallScreen";
             StateHasChanged();
         }
         if (reportViewer != null) { reportViewer.LoadingPanelVisible = true; }
@@ -177,9 +172,10 @@
             AdaptivePriority = -99,
             Click = async (args) =>
             {
-                if (OnCloseButtonClick.HasDelegate)
+                ReportIsReady = false;
+                if (ReportIsReadyChanged.HasDelegate)
                 {
-                    await OnCloseButtonClick.InvokeAsync();
+                    await ReportIsReadyChanged.InvokeAsync();
                 }
                 else
                 {
