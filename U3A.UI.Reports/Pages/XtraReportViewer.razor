@@ -32,27 +32,21 @@
 @using DevExpress.Blazor.Reporting
 @using Microsoft.Extensions.DependencyInjection
 
-@if (!isReady)
-{
-    <div><em>Loading</em></div>
-}
-else
-{
-    <DxWindow Visible=@ReportIsReady Width="100dvw"
-              Height="100dvh"
-              PositionY="0"
-              CloseOnEscape="false"
-              ShowHeader="false">
-        <BodyContentTemplate Context="PopupContext">
-            <DxReportViewer @ref="@reportViewer"
-                            Report="@Report"
-                            SinglePagePreview="false"
-                            Zoom="1"
-                            CssClass="w-100 h-100"
-                            OnCustomizeToolbar="OnCustomizeToolbar" />
-        </BodyContentTemplate>
-    </DxWindow>
-}
+<DxWaitIndicator Visible=true /><em>Loading...</em>
+<DxWindow Visible=@ReportIsReady Width="100dvw"
+          Height="100dvh"
+          PositionY="0"
+          CloseOnEscape="false"
+          ShowHeader="false">
+    <BodyContentTemplate Context="PopupContext">
+        <DxReportViewer @ref="@reportViewer"
+                        Report="@Report"
+                        SinglePagePreview="false"
+                        Zoom="1"
+                        CssClass="w-100 h-100"
+                        OnCustomizeToolbar="OnCustomizeToolbar" />
+    </BodyContentTemplate>
+</DxWindow>
 
 
 
@@ -80,6 +74,40 @@ else
     string googleFontsAPIKey;
 
     protected override async Task OnInitializedAsync()
+    {
+        await SetupReport();
+        isReady = true;
+    }
+
+    private void Report_QueryNotFoundFont(object sender, NotFoundFontEventArgs e)
+    {
+        var service = new FontCollectorService();
+        var fontData = service.ProcessFont(googleFontsAPIKey, e.RequestedFont).Result;
+        e.FontFileData = fontData;
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (HideTabPanels)
+            {
+                reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
+                reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
+                reportViewer.TabPanelModel[TabContentKind.Search].Visible = false;
+            }
+            EditingFieldModelFactory.RegisterMaskEditor("Name", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z -.]+" });
+            EditingFieldModelFactory.RegisterMaskEditor("UppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z]+" });
+            EditingFieldModelFactory.RegisterMaskEditor("NumbersAndUppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9]+" });
+            EditingFieldModelFactory.RegisterMaskEditor("UppercaseText", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9 ,-/]+" });
+            EditingFieldModelFactory.RegisterMaskEditor("Day", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|([1-2][0-9])|(3[0-1])" });
+            EditingFieldModelFactory.RegisterMaskEditor("Month", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|(1[0-2])" });
+            EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
+        }
+    }
+
+    async Task SetupReport()
     {
         googleFontsAPIKey = config.GetValue<string>("GoogleFontsAPIKey");
         DXFontRepository.QueryNotFoundFont += Report_QueryNotFoundFont;
@@ -127,35 +155,6 @@ else
                 }
             }
         }
-        isReady = true;
-    }
-
-    private void Report_QueryNotFoundFont(object sender, NotFoundFontEventArgs e)
-    {
-        var service = new FontCollectorService();
-        var fontData = service.ProcessFont(googleFontsAPIKey, e.RequestedFont).Result;
-        e.FontFileData = fontData;
-    }
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (HideTabPanels)
-            {
-                reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
-                reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
-                reportViewer.TabPanelModel[TabContentKind.Search].Visible = false;
-            }
-            EditingFieldModelFactory.RegisterMaskEditor("Name", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z -.]+" });
-            EditingFieldModelFactory.RegisterMaskEditor("UppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z]+" });
-            EditingFieldModelFactory.RegisterMaskEditor("NumbersAndUppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9]+" });
-            EditingFieldModelFactory.RegisterMaskEditor("UppercaseText", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9 ,-/]+" });
-            EditingFieldModelFactory.RegisterMaskEditor("Day", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|([1-2][0-9])|(3[0-1])" });
-            EditingFieldModelFactory.RegisterMaskEditor("Month", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|(1[0-2])" });
-            EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
-        }
     }
 
     void OnCustomizeToolbar(ToolbarModel toolbarModel)
@@ -166,7 +165,7 @@ else
             BeginGroup = true,
             Text = "Close Report",
             AdaptiveText = "Close Report",
-            AdaptivePriority = -99,            
+            AdaptivePriority = -99,
             Click = async (args) =>
             {
                 ReportIsReady = false;

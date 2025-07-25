@@ -17,8 +17,6 @@
 @attribute [Authorize]
 
 
-@if (isReady)
-{
     <DxWindow Visible=@PdfIsReady @ref="@reportViewer" Width="100dvw"
     Height="100dvh"
     PositionY="0"
@@ -40,7 +38,6 @@
             CssClass="w-100 h-100" />
         </BodyContentTemplate>
     </DxWindow>
-}
 
 @code {
     DxWindow? reportViewer;
