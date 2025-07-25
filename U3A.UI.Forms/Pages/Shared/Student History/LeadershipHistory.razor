@@ -4,7 +4,7 @@
 
 <DxFormLayoutGroup Caption="@($"Leadership History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
     <div class="h-25 overflow-auto">
-        <DxGrid id="my-grid" Data="@leadersHistory" @ref="@dxGrid"
+        <DxGrid id="do-not-print" Data="@leadersHistory" @ref="@dxGrid"
                 TextWrapEnabled=false
                 ColumnResizeMode="GridColumnResizeMode.NextColumn"
                 AllowSorting=false

@@ -185,10 +185,10 @@ function clearQueryString() {
 }
 
 function getGridWidth() {
-    const grid = document.querySelector(".dxbl-grid"); 
+    const grid = document.querySelector(".dxbl-grid");
     const width = grid ? grid.offsetWidth : 900;
     return width;
-} 
+}
 
 function getGridColumnWidths() {
     const gridMap = new Map();
@@ -198,6 +198,22 @@ function getGridColumnWidths() {
         var fieldName = headerCell.getAttribute("fieldname");
         if (fieldName) {
             gridMap.set(fieldName, headerCell.offsetWidth);
+        }
+    }
+    return Object.fromEntries(gridMap);
+}
+
+function getGridColumnWidths(gridSelector) {
+    const gridMap = new Map();
+    var grids = document.querySelectorAll(gridSelector);
+    for (const grid of grids) {
+        var headerCells = grid.getElementsByClassName("my-header-cell");
+        for (const headerCell of headerCells) {
+            console.log(headerCell);
+            var fieldName = headerCell.getAttribute("fieldname");
+            if (fieldName) {
+                gridMap.set(fieldName, headerCell.offsetWidth);
+            }
         }
     }
     return Object.fromEntries(gridMap);

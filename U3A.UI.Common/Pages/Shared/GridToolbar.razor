@@ -184,6 +184,7 @@
 
     [Parameter, EditorRequired]
     public IGrid? LinkedGrid { get; set; }
+    [Parameter] public string? LinkedGridId { get; set; } = "my-grid";
     [Parameter] public bool Visible { get; set; } = true;
     [Parameter] public bool HideGroupPanel { get; set; }
     [Parameter] public bool HideSearchBox { get; set; }
@@ -209,21 +210,20 @@
     bool isDropDownOpen = false;
     string reportTitle = "";
     bool pdfIsReady = false;
-    DxWindow? pdfViewer;
     Byte[]? pdfContent = null;
 
 
     protected override async Task OnInitializedAsync()
     {
-        if (LinkedGrid != null)
+        if (LinkedGrid is DxGrid dxGrid)
         {
             if (LayoutKey != null)
             {
-                defaultLayout = LinkedGrid.SaveLayout();
+                defaultLayout = dxGrid.SaveLayout();
                 layout = await localStorage.GetItemAsync<GridPersistentLayout>(LayoutKey);
                 if (layout != null)
                 {
-                    LinkedGrid.LoadLayout(layout);
+                    dxGrid.LoadLayout(layout);
                     ToastService.ShowToast(new ToastOptions()
                     {
                         Title = "Layout Restored",
@@ -235,9 +235,18 @@
                     });
                 }
             }
+            dxGrid.BeginUpdate();
+            dxGrid.CustomizeElement = (e) =>
+            {
+                if (e.ElementType == GridElementType.HeaderCell)
+                {
+                    e.CssClass = "my-header-cell";
+                    e.Attributes["fieldname"] = e.Column is DxGridDataColumn c ? c.FieldName : null;
+                }
+            };
+            dxGrid.EndUpdate();
         }
         ToggleShowSelectedOnly();
-        await base.OnInitializedAsync();
     }
 
     object savedData = null;
@@ -321,6 +330,7 @@
     async Task OnItemClick(ToolbarItemClickEventArgs e)
     {
         if (LinkedGrid == null) { return; }
+        var columnWidths = await js.InvokeAsync<Dictionary<string, float>>("getGridColumnWidths", $"#{LinkedGridId}");
         LinkedGrid.BeginUpdate();
         switch (e.ItemName)
         {
@@ -459,9 +469,23 @@
 
     async Task PdfExport()
     {
-        float gridWidth = 0;
-        gridWidth = await js.InvokeAsync<float>("getGridWidth"); // returns the grid width or default of 800
-        pdfExportLayout = LinkedGrid!.SaveLayout();
+        var columnWidths = await js.InvokeAsync<Dictionary<string, float>>("getGridColumnWidths", $"#{LinkedGridId}");
+        if (columnWidths is null || columnWidths.Count == 0)
+        {
+            ToastService.ShowToast(new ToastOptions()
+            {
+                Title = "Export Error",
+                Text = "No columns found to export.",
+                ProviderName = "Result",
+                ThemeMode = ToastThemeMode.Pastel,
+                RenderStyle = ToastRenderStyle.Danger,
+                IconCssClass = "bi bi-exclamation-triangle"
+            });
+            return;
+        }
+        ;
+
+        float gridWidth = columnWidths.Values.Sum();
         Log.Information("");
         Log.Information("Grid-width: {0}", gridWidth);
         if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = DEFAULT_PDF_TITLE;
@@ -473,27 +497,24 @@
 
             CustomizeColumn = (e) =>
             {
-                if (fitStyle == DEFAULT_FIT_TO_PAGE) return;
                 if (e.IsHidden) return;
-                var col = pdfExportLayout!.Columns.FirstOrDefault(x => x.FieldName == e.FieldName);
-                if (col is not null && col.ColumnType == GridPersistentLayoutColumnType.Data)
+                // Use the column width from the grid
+                if (columnWidths.TryGetValue(e.FieldName, out var width))
                 {
-                    if (col.Width is not null)
+                    if (width > 0)
                     {
-                        float screenWidth;
-                        screenWidth = (int)CssToPixels(col.Width, fontSize: 16, gridWidth: gridWidth);
-                        if (!col.Width.EndsWith("%")) { gridWidth -= screenWidth; }
-                        e.Width = (int)(screenWidth * 300 / 96); // adjust for printer DPI
                         if (e.ColumnIndex == 0)
                         {
-                            e.Width += 50 * groupCount; // Add some padding for the first column
+                            width += 50 * groupCount; // Add padding to first column for group indents
                         }
-                        Log.Information("Calculated: Original: {0} Screen: {1} {2} Calculated: {3}", e.FieldName, col.Width, screenWidth, e.Width);
+                        float fitToPageAdjustment = (fitStyle == DEFAULT_FIT_TO_PAGE) ? gridWidth / PaperWidth() : 1;
+                        e.Width = (int)(width * fitToPageAdjustment * 300 / 96); // adjust for printer DPI
+                        Log.Information("Using grid width: {0} {1}", e.FieldName, e.Width);
                     }
                     else
                     {
-                        e.Width = 300; // PersistentGridLayout does not have width (null)
-                        Log.Information("Default: {0} {1} {2}", e.FieldName, col.Width, e.Width);
+                        e.Width = 300; // Default width if not found
+                        Log.Information("Default width: {0} {1}", e.FieldName, e.Width);
                     }
                 }
             },
