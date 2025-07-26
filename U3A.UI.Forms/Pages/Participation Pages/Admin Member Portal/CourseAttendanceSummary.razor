@@ -20,7 +20,7 @@
 
         <div class="w-100 text-fl-info"><strong>Hint:</strong> Click rows on either grid to drill into detail.</div>
         <div class="col col-7 px-1">
-            <DxGrid Data="@termSummary" @ref=@mainGrid CssClass="grid-height" id="myGrid"
+            <DxGrid Data="@termSummary" @ref=@mainGrid CssClass="grid-height" id="my-grid"
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                     FocusedRowEnabled="true"
                     FocusedRowChanged="OnFocusedRowChanged"
@@ -50,14 +50,14 @@
             </DxGrid>
         </div>
         <div class="col col-5 px-1">
-            <DxGrid Data="@selectedClassSummary" @ref=@classGrid CssClass="grid-height" id="myGrid"
+            <DxGrid Data="@selectedClassSummary" @ref=@classGrid CssClass="grid-height" id="my-grid2"
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                     SelectionMode="GridSelectionMode.Single"
                     SelectedDataItemChanged="OnSelectedDataItemChanged"
                     AllowSelectRowByClick=true
                     ShowAllRows="true">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@classGrid HideGroupPanel=true HideSearchBox=true LayoutKey="{44317751-C5CC-40D7-91BF-C777C5F9745A}" />
+                    <GridToolbar LinkedGrid=@classGrid LinkedGridId="my-grid2" HideGroupPanel=true HideSearchBox=true LayoutKey="{44317751-C5CC-40D7-91BF-C777C5F9745A}" />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridDataColumn Caption="Date" FieldName="ClassDate" DisplayFormat="@constants.STD_DATETIME_FORMAT" />
