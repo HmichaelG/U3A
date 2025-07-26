@@ -16,7 +16,8 @@ namespace U3A.Model
         public DateTime? Date { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
-        public decimal? Balance { get; set; }
+        public decimal? Allocated { get; set; } = null;
+        public decimal? Balance { get; set; } = null;
         public bool IsNotAllocated { get; set; } = false;
     }
 
