@@ -34,7 +34,7 @@ else
 
     @if (!hideReceiptDateRangeMessage)
     {
-        <h4 class="col col-12 alert alert-warning text-dark text-center p-2">@receiptDateRangeMessage</h4>
+        <h4 class="col col-12 alert alert-warning  text-center p-2">@receiptDateRangeMessage</h4>
     }
     <div class="row">
         <div class="col col-lg-6">
@@ -48,7 +48,7 @@ else
             <DxUpload Name="myFile" @ref="FileUploader"
                       ExternalSelectButtonCssSelector="#fileSelectButton"
                       ExternalDropZoneCssSelector="#overviewDemoDropZone"
-                      ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                      ExternalDropZoneDragOverCssClass="bg-light border-secondary "
                       UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
                       AllowedFileExtensions="@(new List<string> { ".ofx",".qif" })"
                       FileUploaded="FileUploaded"
@@ -312,7 +312,7 @@ else
             {
                 OKButtonText = "Yes, I'm Ok with that!",
                 Caption = "Unexpected date range in Bank import file",
-                Message = $"<div class='text-center alert alert-danger alert text-dark p-2'><p>The Bank date range <strong>{firstImportDate?.ToShortDateString()}</strong> to <strong>{lastImportDate?.ToShortDateString()}</strong>.<br>" +
+                Message = $"<div class='text-center alert alert-danger alert  p-2'><p>The Bank date range <strong>{firstImportDate?.ToShortDateString()}</strong> to <strong>{lastImportDate?.ToShortDateString()}</strong>.<br>" +
                                                                                                                                                                         $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
                                                                                                                                                                             "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
             };

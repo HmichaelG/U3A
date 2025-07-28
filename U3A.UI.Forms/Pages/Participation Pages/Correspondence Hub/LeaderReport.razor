@@ -251,7 +251,7 @@ else
         ErrorMessage = "";
         await ProcessReportsAsync();
         var msg = $"<p>The selected documents have been queued for immediate processing and will be sent via email.</p>";
-        if (ErrorMessage != "") { msg += $"<div class='alert alert-danger text-dark'>{ErrorMessage}</div>"; }
+        if (ErrorMessage != "") { msg += $"<div class='alert alert-danger '>{ErrorMessage}</div>"; }
         await messageBox.ShowOkOnlyAsync("Communication Complete", msg);
     }
 

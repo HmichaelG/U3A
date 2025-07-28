@@ -49,7 +49,7 @@ else
         </div>
         @if (isNotInEnrolmentPeriod)
         {
-            <p class="alert alert-danger text-dark col-12 my-2" align="center">
+            <p class="alert alert-danger col-12 my-2" align="center">
                 @(enrolmentLockoutText)
             </p>
         }
@@ -1146,7 +1146,7 @@ else
                                     ? "Closed.<br/>A closed class is one in which new enrolments are currently suspended"
                                     : $"Closed because...</br><b>{selectedClass.Course.AutoEnrolDisabledReason}</b>";
             }
-            result = $@"<div class='alert alert-danger text-dark text-center'><h5>Class is {reason}</h5>
+            result = $@"<div class='alert alert-danger text-center'><h5>Class is {reason}</h5>
                         You have requested enrolment in a class that is {extendedReason}.<br/>
                         Your request will be <strong>Waitlisted</strong> meaning you will
                         be notified should a place become available in the future.</br>
@@ -1163,7 +1163,7 @@ else
             var alert = (selectedClass.OccurrenceID == (int)OccurrenceType.OnceOnly)
                             ? "warning"
                             : "danger";
-            result = $@"<div class='alert alert-{alert} text-dark text-center'><h5>Class is not available this term</h5>
+            result = $@"<div class='alert alert-{alert} text-center'><h5>Class is not available this term</h5>
                         You have requested enrolment in a class that unavailable this term.<br/>{action}
                         </div>";
 

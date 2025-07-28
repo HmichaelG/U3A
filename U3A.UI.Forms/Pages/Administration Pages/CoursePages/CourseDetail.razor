@@ -13,7 +13,7 @@ else
     <DxFormLayout Data="@Course" CssClass="w-100 p-1">
         <DxTabs @ref=@TabPages
                 CssClass="page-height w-100" TabClick="OnTabPageClick" ActiveTabIndex="@((int)CourseViewType)">
-            <DxTabPage Text="Simple View" Enabled=@(Course.Classes.Count <= 1)>
+            <DxTabPage Text="Simple View" Enabled="@(Course.Classes.Count <= 1)">
                 <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
                                  Settings=@Settings CourseEditView="@CourseEditViewType.Simplified"
                                  Course="Course"
@@ -26,7 +26,7 @@ else
                 </DxFormLayoutItem>
             </DxTabPage>
 
-            <DxTabPage Text="Activity View" Enabled=@(Course.Classes.Count <= 1)>
+            <DxTabPage Text="Activity View" Enabled="@(Course.Classes.Count <= 1)">
                 <FrmCourseSimple @ref="@frmCourseSimple" AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
                                  Settings=@Settings CourseEditView="@CourseEditViewType.Activity"
                                  Course="Course"
@@ -95,10 +95,10 @@ else
                                     Enabled="@EnableMultiCampus"
                                     NullText=@((EnableMultiCampus) ? "" : "Not available for this course") />
                     </DxFormLayoutItem>
-                    <div class='mt-2 mx-4 alert alert-warning text-dark text-center'>
+                    <div class='mt-2 mx-4 alert alert-warning text-center'>
                         <h6>This feature is Experimental</h6>
                         Experimental features are new and are still undergoing full implementation.
-                        While you are encouraged to participate in this using this feature, you should be aware that implementation
+                        While you are encouraged to participate in using this feature, you should be aware that implementation
                         and the feature-set may change. Thank you for your participation!
                     </div>
                 </DxFormLayoutGroup>

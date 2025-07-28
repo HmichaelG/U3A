@@ -76,7 +76,7 @@ else
                         <ContentTemplate>
                             @if (!string.IsNullOrWhiteSpace(InMaintenanceTill))
                             {
-                                <div class="alert alert-info text-dark text-center">
+                                <div class="alert alert-info  text-center">
                                     <h5>Member Portal Maintenance Mode</h5>
                                     <p>Access to the system is currently disabled while we perform important work on our database.</p>
                                     <p>@(new MarkupString($"We expect the system to resume normal operations on or after <br/><strong>{InMaintenanceTill}</strong>.")) </p>
@@ -184,7 +184,7 @@ else
 
                     <DxAccordionItem Text="Linked Members">
                         <ContentTemplate>
-                            <div class="text-center alert alert-info text-dark">
+                            <div class="text-center alert alert-info ">
                                 <p>
                                     A <strong>linked member</strong> is one who shares your email address.
                                     It is mainly intended for your spouse or partner but might also

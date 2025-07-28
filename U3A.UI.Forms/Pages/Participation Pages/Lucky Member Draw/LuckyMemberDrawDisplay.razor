@@ -16,11 +16,11 @@ else
     @layout MinimalLayout
     <main role="main" align="center" class="w-100">
 
-        <h1 class="text-dark" align: center>@title</h1>
+        <div class="h1 alert alert-primary" align: center>@title</div>
         <div class="center-container card">
-            <h1 class="@($"text-dark")">@prizeNumber</h1>
-            <h1 class="@($"text-dark {winnerStyle}")">@winner</h1>
-            <h3 class="@($"text-dark")">@location</h3>
+            <h1>@prizeNumber</h1>
+            <h1 class="@winnerStyle">@winner</h1>
+            <h3>@location</h3>
         </div>
         <div class="d-flex flex-row-reverse gap-1">
             <DxButton Click="PickWinner" Text="Pick a Winner" Enabled=@(canDraw) />

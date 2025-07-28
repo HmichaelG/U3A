@@ -24,6 +24,7 @@ else
         <ContentTemplate>
             <DxGrid id="my-grid" Data="@Venues" @ref=@mainGrid
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    TextWrapEnabled="true"
                     ShowFilterRow="false"
                     ShowAllRows="true"
                     KeyFieldName="ID"
@@ -43,6 +44,10 @@ else
                     <DxGridDataColumn Caption="Contact" FieldName="Coordinator" />
                     <DxGridDataColumn Caption="Email" FieldName="Email" />
                     <DxGridDataColumn Caption="Phone" FieldName="Phone" />
+                    <DxGridDataColumn Caption="Key Code" FieldName="@(nameof(Venue.KeyCode))" />
+                    <DxGridDataColumn Caption="Access Detail" FieldName="@(nameof(Venue.AccessDetail))" Visible="false" />
+                    <DxGridDataColumn Caption="Equipment" FieldName="@(nameof(Venue.Equipment))" Visible="false" />
+                    <DxGridDataColumn Caption="Commnet" FieldName="@(nameof(Venue.Comment))" Visible="false" />
                 </Columns>
                 <TotalSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom" FieldName="Discontinued" />

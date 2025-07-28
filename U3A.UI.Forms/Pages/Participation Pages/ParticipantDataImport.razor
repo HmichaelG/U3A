@@ -38,7 +38,7 @@ else {
                 <DxUpload Name="myFile" @ref="FileUploader"
                       ExternalSelectButtonCssSelector="#overviewDemoSelectButton"
                       ExternalDropZoneCssSelector="#overviewDemoDropZone"
-                      ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+                      ExternalDropZoneDragOverCssClass="bg-light border-secondary "
                       UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
                       AllowedFileExtensions="@(new List<string> { ".csv" })"
                       FileUploaded="FileUploaded"

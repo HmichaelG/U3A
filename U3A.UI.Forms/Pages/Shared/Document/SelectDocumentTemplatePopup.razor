@@ -30,12 +30,12 @@
                     Height="100&)">
             <Panes>
                 <DxSplitterPane Size="35%">
-                    <div class="alert alert-warning text-dark text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
+                    <div class="alert alert-warning  text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
                         The mail system is currently disabled or in sandbox mode.<br />
                         Your email will be routed through Postmark's servers but members wil not receive it.<br />
                         Please use sparingly, all email delivered or not incurs usage cost.
                     </div>
-                    <div class="alert alert-info text-dark text-center" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
+                    <div class="alert alert-info  text-center" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
                         @{
                             var financial = SendTo.Count(x => x.FinancialTo >= term?.Year);
                             var unFinancial = SendTo.Count(x => x.FinancialTo < term?.Year);

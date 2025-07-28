@@ -9,7 +9,7 @@
 @if (isReady)
 {
     <DxFormLayout CssClass="col col-md-6 mx-auto my-4">
-        <div class="w-100 h2 text-center alert alert-info text-dark">@(now.ToString("dddd, dd MMM hh:mm:ss tt"))</div>
+        <div class="w-100 h2 text-center alert alert-info ">@(now.ToString("dddd, dd MMM hh:mm:ss tt"))</div>
         @if (signInDetails == null || signInDetails.Count <= 0)
         {
             <div class="alert alert-danger text-fl-danger col-12 text-center">
