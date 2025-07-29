@@ -43,30 +43,9 @@ public static class AIChatServiceExtension
 
         builder.Services.AddDevExpressBlazor();
         builder.Services.AddChatClient(aiChatClient);
-
-        var languages = new List<LanguageInfo>()
-        {
-            new LanguageInfo() {Id="en",Text="English" },
-            new LanguageInfo() { Id = "ch", Text = "Chinese" },
-            new LanguageInfo() { Id = "fr", Text = "French" },
-            new LanguageInfo() { Id = "de", Text = "German" },
-            new LanguageInfo() { Id = "gr", Text = "Greek" },
-            new LanguageInfo() { Id = "it", Text = "Italian" },
-            new LanguageInfo() { Id = "jp", Text = "Japanese" },
-            new LanguageInfo() { Id = "es", Text = "Spanish" },
-            new LanguageInfo() { Id = "vn", Text = "Vietnamese" }
-        };
         builder.Services.AddDevExpressAI(config =>
         {
             config.RegisterOpenAIAssistants(openAiClient, model);
-            config.AddBlazorReportingAIIntegration(options =>
-            {
-                options.AddTranslation(options =>
-                {
-                    options.SetLanguages(languages);
-                });
-                options.AddSummarization(options => options.SetSummarizationMode(SummarizationMode.Abstractive));
-            });
         });
 
         builder.Services.AddSingleton<IAIExceptionHandler>(new AIExceptionHandler());

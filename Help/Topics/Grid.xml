@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-07-21T11:50:48.426+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-07-29T10:40:27.915+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Grid</title>
   <body>
     <header>
@@ -114,15 +114,20 @@
     </table></para>
     <para styleclass="Normal">If provided, rows can be selected by clicking the selection check box usually located as the left most column on the grid. Use the check box located on the column header to select/deselect all rows. A range of rows may be selected by using SHIFT-Click on the row.</para>
     <para styleclass="Normal">A grid toolbar button, <text style="font-style:italic;">Selected Only?</text> will be displayed when a grid has a selection column. It will display selected records only when clicked. If clicked again, all records will be displayed.</para>
-    <para styleclass="Heading2">Export</para>
-    <para styleclass="Normal">Click the <text style="font-style:italic;">Export</text><text style="font-weight:bold; font-style:italic;">&#32;</text>button on the toolbar to export the grid&apos;s data. You export either to Microsoft Excel or Adobe PDF format.The export will be downloaded as an file and placed in the Downloads folder on your PC. </para>
-    <para styleclass="Normal">When you click an export option a popup dialog will be displayed giving you with the ability to input an export title. The title is used as the exported data file name as well as the report title for PDF reports. In addition, Pdf reports have the following options...</para>
+    <para styleclass="Heading2">Excel</para>
+    <para styleclass="Normal">Click the <text style="font-style:italic;">Excel</text><text style="font-weight:bold; font-style:italic;">&#32;</text>button on the toolbar to export the grid&apos;s data as an Excel spreadsheet. </para>
+    <para styleclass="Normal">When you click the Excel button, a popup dialog will be displayed giving you with the ability to input a title. The title is used as the exported data file name.</para>
+    <para styleclass="Normal">The export will be downloaded as an file and placed in the Downloads folder on your PC. </para>
+    <para styleclass="Heading2">Print</para>
+    <para styleclass="Normal">Click the <text style="font-style:italic;">Print </text>button to create a PDF report.</para>
+    <para styleclass="Normal">When you click the Print button, a popup dialog will be displayed giving you with the ability to input the following options...</para>
     <list id="3" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
+      <li styleclass="Normal"><text style="font-style:italic;">Report Title</text>. The title is placed at the top of the first page of the report.</li>
       <li styleclass="Normal"><text style="font-style:italic;">Print Portrait?</text> by default, reports will be created in landscape orientation. Tick this box to display in portrait mode.</li>
       <li styleclass="Normal"><text style="font-style:italic;">Column Widths</text>. Your options are...</li>
       <list id="3" level="1" type="ol" listtype="lower-alpha" formatstring="&#37;&#49;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
-        <li styleclass="Normal"><text style="font-style:italic;">Fit To Page</text>. The default is to print the report so that it will fit on one page.This may result in excessive word wrapping to make each column fit. It should only be used for reports with a small number of columns.</li>
-        <li styleclass="Normal"><text style="font-style:italic;">Use Grid</text>. The alternative is to use the relative grid column sizes when creating the report. if <text style="font-style:italic;">Auto Fit</text> has previously been applied to the grid, this option will result in minimum word-wrapping on the report. However, reports with many columns may extend over more than one page.</li>
+        <li styleclass="Normal"><text style="font-style:italic;">Fit To Page</text>. The default is to print the report so that it will fit on one page.This may sometimes result in excessive word wrapping to make each column fit. To reduce test wrapping, reduce the number of columns you require on the report. </li>
+        <li styleclass="Normal"><text style="font-style:italic;">Fit Column Width</text>. The alternative is to use the actual grid column sizes when creating the report. if <text style="font-style:italic;">Auto Fit</text> has previously been applied to the grid, this option will result in minimum word-wrapping on the report. However, reports with many columns may extend over more than one page.</li>
       </list>
     </list>
     <list id="3" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:&apos;Segoe UI&apos;; font-size:11pt; color:#000000;">
