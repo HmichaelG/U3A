@@ -74,7 +74,7 @@
                         PagerVisibleNumericButtonCount="10"
                         PagerVisible="true">
                     <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey" >
+                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey" SpreadsheetHeaderRows="2" >
                             <CustomButtonContent>
                                 <DxToolbarItem Text="Adjust Fees" Visible=@(!IsReadOnly)
                                       IconCssClass="bi bi-currency-dollar"
@@ -87,27 +87,51 @@
                     <Columns>
                         <DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" Visible=@(!IsReadOnly) />
                         <DxGridDataColumn Caption="Member" FieldName="FullName" Width="10rem" FixedPosition="GridColumnFixedPosition.Left" />
-                        <DxGridDataColumn Caption="Joined" FieldName="DateJoined" DisplayFormat="dd-MMM-yy" Width="5rem" />
-                        <DxGridDataColumn Caption="Email" FieldName="Email" Width="12rem" Visible="false" />
-                        <DxGridDataColumn Caption="Mobile" FieldName="Mobile" Width="5rem" Visible="false" />
-                        <DxGridDataColumn Caption="Home" FieldName="HomePhone" Width="5rem" Visible="false" />
-                        <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="7rem" />
-                        <DxGridDataColumn Caption="Life?" FieldName="IsLifeMember" Visible="@true" Width="7rem" />
-                        <DxGridDataColumn Caption="Complimentary?" FieldName="IsComplimentary" Visible="@true" Width="7rem" />
-                        <DxGridDataColumn Caption="Active Enrolments" FieldName="Enrolments" DisplayFormat="N0" Width="5rem" />
-                        <DxGridDataColumn Caption="W/Listed Enrolments" FieldName="Waitlisted" DisplayFormat="N0" Width="5rem" />
-                        <DxGridDataColumn Caption="Last Receipt" FieldName="LastReceipt" DisplayFormat="dd-MMM-yy" Width="5rem" />
-                        <DxGridDataColumn Caption="Membership" FieldName="MembershipFees" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Postal" FieldName="MailSurcharge" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Course/Year" FieldName="CourseFeesPerYear" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Course/Term" FieldName="CourseFeesPerTerm" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Other" FieldName="OtherFees" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Received" FieldName="AmountReceived" DisplayFormat="c2" Width="5rem" />
+                        <DxGridBandColumn Caption="Contact Details" Visible=false>
+                            <Columns>
+                                <DxGridDataColumn Caption="Email" FieldName="Email" Width="12rem" />
+                                <DxGridDataColumn Caption="Mobile" FieldName="Mobile" Width="5rem" />
+                                <DxGridDataColumn Caption="Home" FieldName="HomePhone" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Membership">
+                            <Columns>
+                                <DxGridDataColumn Caption="Joined" FieldName="DateJoined" DisplayFormat="dd-MMM-yy" Width="5rem" />
+                                <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="7rem" />
+                                <DxGridDataColumn Caption="Life?" FieldName="IsLifeMember" Visible="@true" Width="7rem" />
+                                <DxGridDataColumn Caption="Comp?" FieldName="IsComplimentary" Visible="@true" Width="7rem" />
+                                <DxGridDataColumn Caption="Fin-To" FieldName=FinancialToBriefText Width="2.5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Enrolment">
+                            <Columns>
+                                <DxGridDataColumn Caption="Active" FieldName="Enrolments" DisplayFormat="N0" Width="5rem" />
+                                <DxGridDataColumn Caption="W/List" FieldName="Waitlisted" DisplayFormat="N0" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Membership Fees">
+                            <Columns>
+                                <DxGridDataColumn Caption="M'ship" FieldName="MembershipFees" DisplayFormat="c2" Width="5rem" />
+                                <DxGridDataColumn Caption="Postal" FieldName="MailSurcharge" DisplayFormat="c2" Width="5rem" />
+                                <DxGridDataColumn Caption="Other" FieldName="OtherFees" DisplayFormat="c2" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Course Fees">
+                            <Columns>
+                                <DxGridDataColumn Caption="Year" FieldName="CourseFeesPerYear" DisplayFormat="c2" Width="5rem" />
+                                <DxGridDataColumn Caption="Term" FieldName="CourseFeesPerTerm" DisplayFormat="c2" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Receipts">
+                            <Columns>
+                                <DxGridDataColumn Caption="Last Receipt" FieldName="LastReceipt" DisplayFormat="dd-MMM-yy" Width="5rem" />
+                                <DxGridDataColumn Caption="Received" FieldName="AmountReceived" DisplayFormat="c2" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
                         <DxGridDataColumn Caption="Total" FieldName="TotalFees" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Fin-To" FieldName=FinancialToBriefText Width="2.5rem" />
                     <DxGridDataColumn Width="3rem" Visible=@(!IsReadOnly) 
                                         Caption="Details" AllowGroup="false" 
-                                        ExportEnabled="false" 
+                                        ExportEnabled="false"  
                                         FixedPosition="GridColumnFixedPosition.Right">
                         <CellDisplayTemplate>
                             <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
