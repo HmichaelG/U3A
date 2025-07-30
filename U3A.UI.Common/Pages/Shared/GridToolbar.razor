@@ -144,7 +144,7 @@
     <BodyContentTemplate>
         <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
             <DxFormLayoutItem Caption="Title" ColSpanMd="12" Context="titleContext">
-                <DxTextBox @bind-Text=@reportTitle />
+                <DxMemo @bind-Text=@reportTitle Rows="3" CssClass="w-100" />
             </DxFormLayoutItem>
             @if (showPdfOptions)
             {
