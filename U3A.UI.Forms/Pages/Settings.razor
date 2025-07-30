@@ -76,12 +76,10 @@ else
                         </div>
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
-                <DxFormLayoutItem ColSpanMd="12">
-                    <Template>
-                        <DxButton SubmitFormOnClick="true" Text="Apply Settings" RenderStyle="@ButtonRenderStyle.Primary" CssClass="me-4" />
-                        <DxButton SubmitFormOnClick="false" Text="Close" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
-                    </Template>
-                </DxFormLayoutItem>
+                <div class="links-container">
+                    <DxButton SubmitFormOnClick="true" Text="Apply Settings" RenderStyle="@ButtonRenderStyle.Primary" />
+                    <DxButton SubmitFormOnClick="false" Text="Close" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
+                </div>
             </DxFormLayoutGroup>
         </div>
     </EditForm>

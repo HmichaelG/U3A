@@ -1,6 +1,7 @@
 ﻿@page "/MemberAttendanceAnalysis"
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> tenantDbFactory
 @inject NavigationManager navMan
 
 @if (!isReady)
@@ -80,8 +81,9 @@ else
     {
         pivotData = new List<AttendClass>();
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        using var dbct = await tenantDbFactory.CreateDbContextAsync();
         var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-        pivotData = await BusinessRule.GetAttendanceAsync(dbc, currentTerm.Year, dbc.GetLocalDate());
+        pivotData = await BusinessRule.GetAttendanceAsync(dbc, dbct, currentTerm.Year, dbc.GetLocalDate());
         isReady = true;
     }
 

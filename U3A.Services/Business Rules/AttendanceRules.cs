@@ -501,10 +501,16 @@ public static partial class BusinessRule
     }
 
     public static async Task<List<AttendClass>> GetAttendanceAsync(U3ADbContext dbc,
+                            TenantDbContext dbct,
                             int Year, DateTime PeriodEndDate)
     {
         var venues = await dbc.Venue.ToListAsync();
         var persons = await dbc.Person.ToListAsync();
+        string tenant = dbc.TenantInfo.Identifier;
+        var otherU3APersons = await dbct.MultiCampusPerson
+                                    .Where(x => x.TenantIdentifier != tenant)
+                                    .ToListAsync();
+        persons.AddRange(otherU3APersons.Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, ID = x.ID }));
         var courses = await dbc.Course.Include(x => x.CourseParticipationType).ToListAsync();
         var courseTypes = await dbc.CourseType.ToListAsync();
         var classes = await dbc.Class
