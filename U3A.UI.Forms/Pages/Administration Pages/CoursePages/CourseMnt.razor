@@ -24,16 +24,20 @@
 else
 {
 
-    <div class="d-flex flex-row mt-2">
-        <div class="flex-grow-1">
-            <ContextHelpTitle Title="Courses" HelpTopic="Add_Edit-Courses.html"
-                              Subtitle="<div>Courses are studies and/or activities undertaken by participants.</div>
-                                        <div><b>Note:</b> A course must have at least one class to enable enrolments.</div>"/>
+    @if (!IsReadOnly)
+    {
+        <div class="d-flex flex-row mt-2">
+
+            <div class="flex-grow-1">
+                <ContextHelpTitle Title="Courses" HelpTopic="Add_Edit-Courses.html"
+                                  Subtitle="<div>Courses are studies and/or activities undertaken by participants.</div>
+                                                <div><b>Note:</b> A course must have at least one class to enable enrolments.</div>"/>
+            </div>
+            <div class="flex-grow-0 me-4">
+                <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" />
+            </div>
         </div>
-        <div class="flex-grow-0 me-4">
-            <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" />
-        </div>
-    </div>
+    }
 
     <Progress @ref=@progressBar />
     <MessageBox @ref="@messageBox" />
@@ -51,7 +55,8 @@ else
         <DxTabPage Text="Multi-Campus" />
         <DxTabPage Text="Class View">
             <ClassView Year="@Year" AnyEnrolmentsInYear="@anyEnrolmentsInYear"
-                       Settings=@settings
+                       Settings=@settings IsReadOnly=@IsReadOnly
+                       GridLayoutKey="@((IsReadOnly) ? "{D6067CB6-0D7D-47BF-97B1-DD461A22D5B1}" : null)"
                        Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
                        Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
                        CourseParticipationTypes="@CourseParticipationTypes" />
@@ -63,7 +68,7 @@ else
             <ContentTemplate>
                 <DxGrid id="my-grid" Data="@Courses" @ref=@mainGrid
                         AutoCollapseDetailRow="true"
-                        DetailRowDisplayMode="GridDetailRowDisplayMode.Auto"
+                        DetailRowDisplayMode="@((IsReadOnly) ? GridDetailRowDisplayMode.Never : GridDetailRowDisplayMode.Auto)"
                         KeyFieldName="ID"
                         ValidationEnabled="true"
                         EditStart="Grid_EditStart"
@@ -79,16 +84,16 @@ else
                         <GridToolbar @ref="Toolbar"
                                      LinkedGrid=@mainGrid
                                      SpreadsheetHeaderRows="2"
-                                     IsMasterDetail=true
-                                     LayoutKey="{2A9D0137-5DD2-4290-A9B7-4C4F5676F224}">
+                                     IsMasterDetail=@(!IsReadOnly)
+                                     LayoutKey="@GridLayoutKey">
                             <CustomButtonContent>
                                 <DxToolbarItem CssClass="w-100 mx-1" IconCssClass="bi bi-database"
-                                               Text="Rebuild Cache"
+                                               Text="Rebuild Cache" Visible="!IsReadOnly"
                                                RenderStyle="@ButtonRenderStyle.Primary"
                                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                                Click="@OnRebuild" />
                                 <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-check-circle"
-                                               Text="Preview Schedule"
+                                               Text="Preview Schedule" Visible="!IsReadOnly"
                                                RenderStyle="@ButtonRenderStyle.Info"
                                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained">
                                     <Items>
@@ -107,11 +112,11 @@ else
                         </GridToolbar>
                     </ToolbarTemplate>
                     <Columns>
-                        <DxGridCommandColumnEx @ref="GridCommandColumn"
+                        <DxGridCommandColumnEx @ref="GridCommandColumn" Visible="!IsReadOnly"
                                                NewButtonVisible="true"
                                                EditButtonVisible="true"
                                                DeleteButtonVisible="true" FixedPosition="GridColumnFixedPosition.Left" />
-                        <DxGridDataColumn Caption="Year" FieldName="Year"
+                        <DxGridDataColumn Caption="Year" FieldName="Year" Visible="!IsReadOnly"
                                           FixedPosition="GridColumnFixedPosition.Left"
                                           Width="3rem" DisplayFormat="####" />
                         <DxGridDataColumn Caption="ID" FieldName="ConversionID"
@@ -120,7 +125,7 @@ else
                         <DxGridDataColumn Caption="Name" FieldName="Name"
                                           FixedPosition="GridColumnFixedPosition.Left"
                                           Width="15rem" />
-                        <DxGridDataColumn Width="5rem" Caption="Description"
+                        <DxGridDataColumn Width="5rem" Caption="Description" Visible="!IsReadOnly"
                                           FixedPosition="GridColumnFixedPosition.Left"
                                           AllowGroup="false">
                             <CellDisplayTemplate>
@@ -162,7 +167,7 @@ else
                             <Columns>
                                 <DxGridDataColumn Caption="Maximum" FieldName="MaximumStudents" DisplayFormat="{0:n0}" Width="6rem" />
                                 <DxGridDataColumn Caption="Required" FieldName="RequiredStudents" DisplayFormat="{0:n0}" Width="6rem" />
-`                                <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" Width="6rem" />
+                                `                                <DxGridDataColumn Caption="Auto-Enrol?" FieldName="AllowAutoEnrol" Width="6rem" />
                             </Columns>
                         </DxGridBandColumn>
                         <DxGridDataColumn Caption="Multi-Campus" FieldName=@nameof(Course.AllowMultiCampsuFrom) Width="8rem" />
@@ -230,6 +235,11 @@ else
 
 
 @code {
+    [Parameter]
+    public bool IsReadOnly { get; set; } = false;
+    [Parameter]
+    public string GridLayoutKey { get; set; } = "{2A9D0137-5DD2-4290-A9B7-4C4F5676F224}";
+
     bool IsReady;
 
     DxTabs? tabs;

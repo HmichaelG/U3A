@@ -12,10 +12,11 @@
 }
 else
 {
-
-    <ContextHelpTitle Title="Venues" HelpTopic="add_edit-venues.html"
-                      Subtitle="Venues identify the location in which courses and/or activities offered to students are held." />
-
+    @if (!IsReadOnly)
+    {
+        <ContextHelpTitle Title="Venues" HelpTopic="add_edit-venues.html"
+                          Subtitle="Venues identify the location in which courses and/or activities offered to students are held." />
+    }
     <MessageBox @ref="@messageBox" />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
@@ -34,10 +35,13 @@ else
                     SelectedDataItemsChanged="Grid_SelectedDataItemsChanged"
                     CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{279961FC-0FAC-4C87-874C-26CA8B9ADADB}" />
+                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey" />
                 </ToolbarTemplate>
                 <Columns>
-                    <DxGridCommandColumnEx @ref="GridCommandColumn" Width="60px" EditButtonVisible="true" DeleteButtonVisible="false" />
+                    <DxGridCommandColumnEx @ref="GridCommandColumn"
+                                           Width="60px" Visible="!IsReadOnly"
+                                           EditButtonVisible="true"
+                                           DeleteButtonVisible="false" />
                     <DxGridDataColumn Width="6rem" Caption="Discontinued" FieldName="Discontinued" />
                     <DxGridDataColumn Caption="Name" FieldName="Name" />
                     <DxGridDataColumn Caption="Address" FieldName="Address" />
@@ -116,6 +120,10 @@ else
 
 
 @code {
+    [Parameter]
+    public bool IsReadOnly { get; set; } = false;
+    [Parameter]
+    public string GridLayoutKey { get; set; } = "{279961FC-0FAC-4C87-874C-26CA8B9ADADB}";
     bool IsReady;
     private List<Venue> Venues { get; set; }
     private DxGridCommandColumnEx? GridCommandColumn;

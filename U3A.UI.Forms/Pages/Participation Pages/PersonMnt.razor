@@ -28,7 +28,7 @@
     }
     else
     {
-            <div hidden="@(IsEmbedded || IsSelectionList)">
+            <div hidden="@(IsEmbedded || IsSelectionList || IsReadOnly)">
                     <ContextHelpTitle Title="Participants" HelpTopic="Add_Edit-Participants.html"
                         Subtitle="Participants are people participating in your U3A. This may include students, staff, volunteers, course leaders etc."/>
             </div>
@@ -84,7 +84,7 @@
                                                          ToolbarFilterClosed="@(OnToolbarFilterClosed)">
                                                 <CustomButtonContent>
                                                     <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                                                                   Visible="@(!(IsEmbedded || IsSelectionList))"
+                                                                   Visible="@(!(IsEmbedded || IsSelectionList || IsReadOnly))"
                                                                    BeginGroup=true
                                                                    Click=@OnCommunicate
                                                                    RenderStyle="ButtonRenderStyle.Primary"
@@ -104,11 +104,11 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
-                                                                   Width="2rem" Visible="@(!IsEmbedded)" />
+                                                                   Width="2rem" Visible="@(!(IsEmbedded || IsReadOnly))" />
                                             <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left" 
-                                                                   Visible="@(!IsSelectionList)"
+                                                                   Visible="@(!(IsSelectionList || IsReadOnly))"
                                                                    Width="6rem" DeleteButtonVisible=@(!IsEmbedded) />
-                                            <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
+                                            <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left" Visible="@(!(IsSelectionList || IsReadOnly))"
                                                               Caption="ID" FieldName="PersonIdentity" Width="4rem" />
                                             <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
                                                               Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
@@ -172,7 +172,7 @@
                                             <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Width="6rem" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
                                             <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
                                                               DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
-                                            <DxGridDataColumn Visible="@(!IsSelectionList)" Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
+                                            <DxGridDataColumn Visible="@(!(IsSelectionList || IsReadOnly))" Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                                 <CellDisplayTemplate>
                                                     <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"                                                              
                                                               RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
@@ -348,7 +348,7 @@
                                     </DxGrid>
                                 </DxSplitterPane>
                         <DxSplitterPane Size="10rem" AllowCollapse="@(!IsEmbedded)"
-                                                Collapsed="@isSplitterCollapsed" Visible="@(!IsSelectionList)">
+                                                Collapsed="@isSplitterCollapsed" Visible="@(!(IsSelectionList || IsReadOnly))">
                                     <div class="h6">Queued Broadcast Email</div>
                                     <QueuedBroadcastEmailGrid @ref=@queueGrid IsEmbedded="true" />
                                 </DxSplitterPane>
@@ -377,9 +377,11 @@
     public double GridDisplayOffset { get; set; } = 5;
 
     [Parameter]
-    public bool IsEmbedded { get; set; }
+    public bool IsEmbedded { get; set; } = false;
     [Parameter]
-    public bool IsSelectionList { get; set; }
+    public bool IsSelectionList { get; set; } = false;
+    [Parameter]
+    public bool IsReadOnly { get; set; } = false;
     [Parameter]
     public string GridLayoutKey { get; set; } = "{CCDCC0AB-5B0D-40D5-BB06-7A21E3EDCAFA}";
     [Parameter]

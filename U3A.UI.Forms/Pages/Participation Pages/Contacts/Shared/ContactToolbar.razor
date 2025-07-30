@@ -4,7 +4,7 @@
 <GridToolbar LinkedGrid=@LinkedGrid LayoutKey="@LayoutKey"
             SpreadsheetHeaderRows="2">
     <CustomButtonContent>
-        <DxToolbarItem BeginGroup="true" Text="Tag Options"
+        <DxToolbarItem BeginGroup="true" Text="Tag Options" Visible="@Visible"
                        IconCssClass="bi bi-bookmark"
                        Alignment="ToolbarItemAlignment.Right"
                        RenderStyle="ButtonRenderStyle.Info"
@@ -29,7 +29,7 @@
                 </DxToolbarItem>
             </Items>
         </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-trash" Name="Delete" Text="Delete"
+        <DxToolbarItem IconCssClass="bi bi-trash" Name="Delete" Text="Delete" Visible="@Visible"
                        BeginGroup=true
                        Click=@OnDeleteClicked
                        RenderStyle="ButtonRenderStyle.Danger"
@@ -37,7 +37,7 @@
                        Alignment="ToolbarItemAlignment.Right"
                        Tooltip="Delete the selected Contacts">
         </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+        <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate" Visible="@Visible"
                        BeginGroup=true
                        Click=@OnCommunicateClicked
                        RenderStyle="ButtonRenderStyle.Primary"
@@ -49,6 +49,8 @@
 </GridToolbar>
 
 @code {
+    [Parameter]
+    public bool Visible { get; set; } = false;
     [Parameter, EditorRequired]
     public IGrid LinkedGrid { get; set; }
     [Parameter, EditorRequired]
