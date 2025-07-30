@@ -141,11 +141,9 @@
                             {
                                 <DxMenuItem Text="Reports" IconCssClass="menu-icon bi bi-printer" NavigateUrl=@(!isSmallScreen ? "ReportsIntroduction" : null)>
                                     <Items>
-                                        <DxMenuItem Text="Listings">
+                                        <DxMenuItem Text="Analysis">
                                             <Items>
-                                                <DxMenuItem Text="Course Type List" NavigateUrl="XtraReportViewer/CourseTypeList" />
-                                                <DxMenuItem Text="Venue List" NavigateUrl="XtraReportViewer/VenueList" />
-                                                <DxMenuItem Text="Public Holiday List" NavigateUrl="XtraReportViewer/PublicHolidayList" />
+                                                <DxMenuItem Text="Attendance Analysis" NavigateUrl="MemberAttendanceAnalysis" />
                                             </Items>
                                         </DxMenuItem>
                                         <DxMenuItem Text="Custom Reports">
@@ -155,6 +153,13 @@
                                                 <DxMenuItem Text="Custom Course List" NavigateUrl="CustomCourseList" />
                                                 <DxMenuItem Text="Custom Venue List" NavigateUrl="CustomVenueList" />
                                                 <DxMenuItem Text="Custom Financial Status List" NavigateUrl="CustomFinancialStatusList" />
+                                            </Items>
+                                        </DxMenuItem>
+                                        <DxMenuItem Text="Listings">
+                                            <Items>
+                                                <DxMenuItem Text="Course Type List" NavigateUrl="XtraReportViewer/CourseTypeList" />
+                                                <DxMenuItem Text="Venue List" NavigateUrl="XtraReportViewer/VenueList" />
+                                                <DxMenuItem Text="Public Holiday List" NavigateUrl="XtraReportViewer/PublicHolidayList" />
                                             </Items>
                                         </DxMenuItem>
                                         <DxMenuItem Text="Participant Reports">

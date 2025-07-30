@@ -468,9 +468,40 @@ public static partial class BusinessRule
             });
         return attendance;
     }
-    
+
     public static async Task<List<AttendClass>> GetAttendanceAsync(U3ADbContext dbc,
                             Term SelectedTerm, DateTime PeriodEndDate)
+    {
+        var venues = await dbc.Venue.ToListAsync();
+        var persons = await dbc.Person.IgnoreQueryFilters().ToListAsync();
+        var courses = await dbc.Course.Include(x => x.CourseParticipationType).ToListAsync();
+        var courseTypes = await dbc.CourseType.ToListAsync();
+        var classes = await dbc.Class
+                        .Include(x => x.Occurrence)
+                        .Include(x => x.OnDay)
+                        .ToListAsync();
+        Parallel.ForEach(courses, c => { c.CourseType = courseTypes.Find(x => x.ID == c.CourseTypeID); });
+        Parallel.ForEach(classes, c =>
+        {
+            if (c.LeaderID != null) { c.Leader = persons.Find(x => x.ID == c.LeaderID); }
+            if (c.Leader2ID != null) { c.Leader2 = persons.Find(x => x.ID == c.Leader2ID); }
+            if (c.Leader3ID != null) { c.Leader3 = persons.Find(x => x.ID == c.Leader2ID); }
+            if (c.Venue != null) { c.Venue = venues.Find(x => x.ID == c.VenueID); }
+        });
+        var attendClass = await dbc.AttendClass
+                            .Include(x => x.AttendClassStatus)
+                            .Where(x => x.TermID == SelectedTerm.ID && x.Date <= PeriodEndDate).ToListAsync();
+        Parallel.ForEach(attendClass, a =>
+        {
+            a.Term = SelectedTerm;
+            a.Person = persons.Find(x => x.ID == a.PersonID);
+            a.Class = classes.Find(x => x.ID == a.ClassID);
+        });
+        return attendClass;
+    }
+
+    public static async Task<List<AttendClass>> GetAttendanceAsync(U3ADbContext dbc,
+                            int Year, DateTime PeriodEndDate)
     {
         var venues = await dbc.Venue.ToListAsync();
         var persons = await dbc.Person.ToListAsync();
@@ -483,15 +514,17 @@ public static partial class BusinessRule
         Parallel.ForEach(courses, c => { c.CourseType = courseTypes.Find(x => x.ID == c.CourseTypeID); });
         Parallel.ForEach(classes, c =>
         {
-            if (c.Leader != null) { c.Leader = persons.Find(x => x.ID == c.LeaderID); }
+            if (c.LeaderID != null) { c.Leader = persons.Find(x => x.ID == c.LeaderID); }
+            if (c.Leader2ID != null) { c.Leader2 = persons.Find(x => x.ID == c.Leader2ID); }
+            if (c.Leader3ID != null) { c.Leader3 = persons.Find(x => x.ID == c.Leader3ID); }
             if (c.Venue != null) { c.Venue = venues.Find(x => x.ID == c.VenueID); }
         });
         var attendClass = await dbc.AttendClass
+                            .Include(x => x.Term)
                             .Include(x => x.AttendClassStatus)
-                            .Where(x => x.TermID == SelectedTerm.ID && x.Date <= PeriodEndDate).ToListAsync();
+                            .Where(x => x.Date.Year == Year && x.Date <= PeriodEndDate).ToListAsync();
         Parallel.ForEach(attendClass, a =>
         {
-            a.Term = SelectedTerm;
             a.Person = persons.Find(x => x.ID == a.PersonID);
             a.Class = classes.Find(x => x.ID == a.ClassID);
         });

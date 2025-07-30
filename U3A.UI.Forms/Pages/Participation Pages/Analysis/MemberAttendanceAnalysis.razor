@@ -1,0 +1,88 @@
+﻿@page "/MemberAttendanceAnalysis"
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager navMan
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxWindow Visible=true Width="100dvw"
+             Height="100dvh"
+             PositionY="0"
+             CloseOnEscape="true"
+             ShowCloseButton="true"
+             HeaderText="Attendance Analysis"
+             Closed="@(() => navMan.NavigateTo("/"))"
+             ShowHeader="true">
+        <BodyContentTemplate Context="PopupContext">
+            <DxPivotTable Data="@pivotData"
+                          ShowRowGrandTotals="true"
+                          ShowColumnGrandTotals="true" CssClass="w-100 h-100">
+                <Fields>
+                    <DxPivotTableField Field="@nameof(AttendClass.Actual)" Caption="Act"
+                                       Area="@PivotTableArea.Data" />
+                    <DxPivotTableField Field="@nameof(AttendClass.Expected)" Caption="Exp"
+                                       Area="@PivotTableArea.Data" />
+                    <DxPivotTableField Field="@nameof(AttendClass.Difference)" Caption="+/-"
+                                       Area="@PivotTableArea.Data" />
+                    <DxPivotTableField Field="@nameof(AttendClass.CourseTypeName)" Caption="Course Type"
+                                       Area="@PivotTableArea.Row" />
+                    <DxPivotTableField Field="@nameof(AttendClass.CourseName)"
+                                       Area="@PivotTableArea.Row" />
+                    <DxPivotTableField Field="Term.Name" Caption="Term"
+                                       Area="@PivotTableArea.Row" />
+                    <DxPivotTableField Field="@nameof(AttendClass.Date)"
+                                       Area="@PivotTableArea.Row" />
+                    <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Month"
+                                       GroupInterval="PivotTableGroupInterval.DateMonth"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Day"
+                                       GroupInterval="PivotTableGroupInterval.DateDayOfWeek"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="Person.FullName" Caption="Attendee"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="Person.Gender" Caption="Gender"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="Class.Venue.Name" Caption="Venue"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(AttendClass.Comment)"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(AttendClass.Present)"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(AttendClass.AbsentWithApology)" Caption="Absent with Apology"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(AttendClass.AbsentWithoutApology)" Caption="Absent w'out Apology"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(AttendClass.IsAdHoc)" Caption="AdHoc?"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="Class.GuestLeader" Caption="Guest Leader"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="Class.Leader.FullName" Caption="Leader"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="Class.Leader2.FullName" Caption="Leader-2"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="Class.Leader3.FullName" Caption="Leader-3"
+                                       Area="@PivotTableArea.Filter" />
+                </Fields>
+            </DxPivotTable>
+        </BodyContentTemplate>
+    </DxWindow>
+}
+
+@code {
+    IEnumerable<AttendClass>? pivotData { get; set; }
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pivotData = new List<AttendClass>();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+        pivotData = await BusinessRule.GetAttendanceAsync(dbc, currentTerm.Year, dbc.GetLocalDate());
+        isReady = true;
+    }
+
+}
