@@ -17,7 +17,7 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -2292,12 +2292,6 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                         .HasColumnType("decimal(18,2)")
                         .HasComment("Term 4 Year Membership Fee");
 
-                    b.Property<decimal>("MerchantFeeFixed")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("MerchantFeePercentage")
-                        .HasColumnType("decimal(18,2)");
-
                     b.PrimitiveCollection<string>("MultiCampusU3AAllowed")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2345,9 +2339,6 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 
                     b.Property<int>("SendLeaderReportsTo")
                         .HasColumnType("int");
-
-                    b.Property<bool>("SeparateMerchantFeeAndU3AFee")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("ShowLeaderOnPublicSchedule")
                         .HasColumnType("bit");

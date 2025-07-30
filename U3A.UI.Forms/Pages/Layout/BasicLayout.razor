@@ -1,14 +1,43 @@
 ﻿@namespace U3A.UI.Forms
+
+@using Serilog
+
 @inherits LayoutComponentBase
+@implements IDisposable
+
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IJSRuntime js
+@inject WorkstationService ws
+@inject NavigationManager navMan
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <PageTitle>@($"{tenantId} Member Portal")</PageTitle>
 
-<div class="page">
+<DxFormLayout SizeMode="@sizeMode" CssClass="form-style">
     @Body
-</div>
+</DxFormLayout>
+<style>
+    .form-style {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+</style>
+
 @code {
     string? tenantId;
+    int openCircuits { get; set; }
+    bool hasRole { get; set; }
+    bool? useTopMenu = null; // default is sidebar
+    LoginState? loginState { get; set; }
+
+    U3ADbContext? dbc { get; set; }
+    bool isInteractive = false;
+    SizeMode sizeMode;
 
     protected override async Task OnInitializedAsync()
     {
@@ -20,5 +49,38 @@
             }
         }
     }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        isInteractive = RendererInfo.IsInteractive;
+        if (firstRender)
+        {
+            await js.LoadDxResources();
+            await GetWorkstationDetails();
+        }
+    }
+
+    private async Task GetWorkstationDetails()
+    {
+        await ws.GetWorkstationDetail();
+        switch (ws.SizeMode)
+        {
+            case 1:
+                sizeMode = SizeMode.Medium;
+                break;
+            case 2:
+                sizeMode = SizeMode.Large;
+                break;
+            default:
+                sizeMode = SizeMode.Small;
+                break;
+        }
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        dbc?.Dispose();
+    }
+
 
 }

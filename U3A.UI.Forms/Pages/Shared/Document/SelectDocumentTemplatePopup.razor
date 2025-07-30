@@ -7,13 +7,15 @@
 @using DevExpress.Blazor.RichEdit
 
 @inject TenantInfoService tenantService
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <AttachFile @ref=@attachFile Attachments="@newAttachments" AttachmentsChanged="OnFileAttachmentsChanged" />
 <MessageBox @ref="messageBox" />
 
 <Progress @ref=@progressBar />
+<PdfViewer @bind-PdfIsReady=@pdfVisible DocumentContent="@pdfContent" />
 
-<DxPopup Visible="@popupVisible" @ref="@popup" Width="95dvw" CssClass="editor-popup"
+<DxPopup Visible="@popupVisible" @ref="@popup" Width="100dvw" CssClass="editor-popup"
          PositionY="5"
          CloseButtonClick="@NegativeButtonClicked"
          CloseOnEscape="false"
@@ -21,19 +23,19 @@
          AllowDrag=true
          HeaderText="Communicate">
     <HeaderContentTemplate>
-        <div class="h6">Communicate</div>
+        <ContextHelpTitle Title="Communicate" HelpTopic="Communicate.html" />
     </HeaderContentTemplate>
     <BodyContentTemplate Context="PopupContext">
-        <DxFormLayout>
-            <div class="row vw-100 m-1">
-                <div class="col col-4">
-                    <ContextHelpTitle Title="Communicate" TitleCssClass="h6 d-flex align-items-center" HelpTopic="Communicate.html" />
-                    <div class="alert alert-warning text-dark text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
+        <DxSplitter Orientation="Orientation.Horizontal"
+                    Height="100&)">
+            <Panes>
+                <DxSplitterPane Size="35%">
+                    <div class="alert alert-warning  text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
                         The mail system is currently disabled or in sandbox mode.<br />
                         Your email will be routed through Postmark's servers but members wil not receive it.<br />
                         Please use sparingly, all email delivered or not incurs usage cost.
                     </div>
-                    <div class="alert alert-info text-dark text-center" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
+                    <div class="alert alert-info  text-center" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
                         @{
                             var financial = SendTo.Count(x => x.FinancialTo >= term?.Year);
                             var unFinancial = SendTo.Count(x => x.FinancialTo < term?.Year);
@@ -116,55 +118,46 @@
                                   RenderStyle="ButtonRenderStyle.Secondary"
                                   Text="Cancel" Click="@NegativeButtonClicked" />
                     </div>
-                </div>
+                </DxSplitterPane>
 
-                <div class="col col-8">
-                    @if (pdfVisible)
-                    {
-                        <div class="preview">
-                            <PdfViewer DocumentContent="@pdfContent" OnCloseButtonClick="@(() => pdfVisible = false)" />
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
-                        <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
-                                    ViewType="ViewType.PrintLayout"
-                                    ActiveRibbonTabIndex="@ActiveTabIndex"
-                                    CheckSpelling=true
-                                    BarMode=BarMode.Ribbon
-                                    DocumentContent="@SelectedDocumentTemplate.Content"
-                                    DocumentFormat="DocumentFormat.Rtf"
-                                    CustomizeRibbon="OnCustomizeRichEditToolbar"
-                                    DocumentLoaded="OnDocumentLoaded"
-                                    DocumentContentChanged="OnDocumentContentChanged"
-                                    CssClass="w-100 rtf-style">
-                            <AdditionalItems>
-                                <SummarizeAIContextMenuItem />
-                                <ExplainAIContextMenuItem />
-                                <ProofreadAIContextMenuItem />
-                                <ExpandAIContextMenuItem />
-                                <ShortenAIContextMenuItem />
-                                <AskAssistantAIContextMenuItem />
-                                <ChangeStyleAIContextMenuItem />
-                                <ChangeToneAIContextMenuItem />
-                                <GenerateDescriptionAIContextMenuItem />
-                                <TranslateAIContextMenuItem Languages="@("English, German, French, Chinese")" />
-                            </AdditionalItems>
-                            <MailMergeSettings>
-                                <DxMailMergeSettings Data="@ExportData" />
-                            </MailMergeSettings>
-                        </DxRichEdit>
-                    }
-                </div>
-            </div>
-        </DxFormLayout>
+                <DxSplitterPane Size="60%">
+                    <div class="text-fl-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
+                    <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
+                                ViewType="ViewType.PrintLayout"
+                                ActiveRibbonTabIndex="@ActiveTabIndex"
+                                CheckSpelling=true
+                                BarMode=BarMode.Ribbon
+                                DocumentContent="@SelectedDocumentTemplate.Content"
+                                DocumentFormat="DocumentFormat.Rtf"
+                                CustomizeRibbon="OnCustomizeRichEditToolbar"
+                                DocumentLoaded="OnDocumentLoaded"
+                                DocumentContentChanged="OnDocumentContentChanged"
+                                CssClass="w-100 rtf-style">
+                        <AdditionalItems>
+                            <SummarizeAIContextMenuItem />
+                            <ExplainAIContextMenuItem />
+                            <ProofreadAIContextMenuItem />
+                            <ExpandAIContextMenuItem />
+                            <ShortenAIContextMenuItem />
+                            <AskAssistantAIContextMenuItem />
+                            <ChangeStyleAIContextMenuItem />
+                            <ChangeToneAIContextMenuItem />
+                            <GenerateDescriptionAIContextMenuItem />
+                            <TranslateAIContextMenuItem Languages="@("English, German, French, Chinese")" />
+                        </AdditionalItems>
+                        <MailMergeSettings>
+                            <DxMailMergeSettings Data="@ExportData" />
+                        </MailMergeSettings>
+                    </DxRichEdit>
+                </DxSplitterPane>
+            </Panes>
+        </DxSplitter>
     </BodyContentTemplate>
 </DxPopup>
 
 <style>
     .editor-popup {
-        height: calc(100dvh - 2rem);
+        height: 100dvh;
     }
 
     .preview {
@@ -222,11 +215,10 @@
     IEnumerable<string?> selectedAttachments = new List<string>();
 
     int ActiveTabIndex = 1;
-    bool pdfVisible;
+    bool pdfVisible = false;
     bool popupVisible;
     DxPopup? popup;
     DxRichEdit? richEdit;
-    DxRichEdit? rePreview;
     Document documentAPI;
     bool IsEmail;
     bool IsEmailOrPostal;
@@ -247,15 +239,16 @@
     protected override async Task OnInitializedAsync()
     {
         newAttachments.Clear();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
         var tInfo = await tenantService.GetTenantInfoAsync();
-        term = await BusinessRule.CurrentEnrolmentTermAsync(dbContext)
-                ?? await BusinessRule.CurrentTermAsync(dbContext);
+        term = await BusinessRule.CurrentEnrolmentTermAsync(dbc)
+                ?? await BusinessRule.CurrentTermAsync(dbc);
         isEmailEnabled = tInfo.UsePostmarkTestEnviroment;
-        base.OnInitializedAsync();
     }
 
-    public Task<bool> ShowAsync()
+    public async Task<bool> ShowAsync()
     {
+        StateHasChanged();
         DelayedStart = 1;
         attachments = new List<string>();
         newAttachments.Clear();
@@ -273,12 +266,12 @@
                             .Select(x => x.FromEmailAddress.ToLower()).Distinct().ToList();
         popupVisible = true;
         tcs = new TaskCompletionSource<bool>();
-        tcs.Task.ContinueWith(_ =>
+        await tcs.Task.ContinueWith(_ =>
         {
             popupVisible = false;
         });
         StateHasChanged();
-        return tcs.Task;
+        return await tcs.Task;
     }
 
     async Task OnAttachFile()

@@ -21,11 +21,11 @@
             <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
             <input type="hidden" name="RememberMe" value="@RememberMe" />
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
+            <ValidationSummary class="text-fl-danger" role="alert" />
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.TwoFactorCode" class="form-control" autocomplete="off" />
                 <label for="two-factor-code" class="form-label">Authenticator code</label>
-                <ValidationMessage For="() => Input.TwoFactorCode" class="text-danger" />
+                <ValidationMessage For="() => Input.TwoFactorCode" class="text-fl-danger" />
             </div>
             <div class="checkbox mb-3">
                 <label for="remember-machine" class="form-label">
@@ -33,8 +33,8 @@
                     Remember this device
                 </label>
             </div>
-            <div>
-                <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+            <div class="button-container">
+                <DxButton CssClass="w-100" SubmitFormOnClick='true' Text="Login" RenderStyle="ButtonRenderStyle.Primary" />
             </div>
         </EditForm>
     </div>

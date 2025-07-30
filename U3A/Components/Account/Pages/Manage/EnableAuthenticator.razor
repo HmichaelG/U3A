@@ -65,10 +65,12 @@ else
                     <div class="w-100 form-floating mb-3">
                         <InputText @bind-Value="Input.Code" class="form-control" autocomplete="off" placeholder="Please enter the code." />
                         <label for="code" class="control-label form-label">Verification Code</label>
-                        <ValidationMessage For="() => Input.Code" class="text-danger" />
-                        <div class="row p-2">
-                            <button type="submit" class="w-50 btn btn-primary">Verify</button>
-                            <a type="button" href="@navMan.BaseUri" class="w-50 btn btn-secondary">Cancel</a>
+                        <ValidationMessage For="() => Input.Code" class="text-fl-danger" />
+                        <div class="button-container">
+                            <DxButton CssClass="w-50" SubmitFormOnClick='true' Text="Verify" RenderStyle="ButtonRenderStyle.Primary" />
+                            <NavLink href="/" class="button-link w-50">
+                                <DxButton Text="Cancel" CssClass="w-100" RenderStyle="ButtonRenderStyle.Secondary" />
+                            </NavLink>
                         </div>
                     </div>
                 </EditForm>

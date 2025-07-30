@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_SystemSettings_Eway
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_SystemSettings_removeEway
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Receipt_MerchantFee
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Receipt_Reinstate_MerchantFee
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Receipt_MerchantFee
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Receipt_Reinstate_MerchantFee
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

@@ -1,4 +1,5 @@
-﻿using DevExpress.Blazor.RichEdit.SpellCheck;
+﻿using DevExpress.Blazor;
+using DevExpress.Blazor.RichEdit.SpellCheck;
 using DevExpress.Drawing;
 using Microsoft.Extensions.FileProviders;
 using System.Reflection;
@@ -35,10 +36,7 @@ public static class DevExpressServiceExtensions
         });
 
         builder.Services.AddDevExpressServerSideBlazorReportViewer();
-        builder.Services.AddDevExpressBlazor(options =>
-        {
-            options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
-        });
+        builder.Services.AddDevExpressBlazor();
 
         builder.Services.AddDevExpressServerSideBlazorPdfViewer();
 

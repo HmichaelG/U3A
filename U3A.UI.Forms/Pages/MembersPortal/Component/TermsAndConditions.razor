@@ -9,7 +9,7 @@
 
 @if (isReady)
 {
-    <section class="card border-info alert-info w-100 p-1" hidden="@isHidden">
+    <section class="card border-subdued alert-primary w-100 p-1" hidden="@isHidden">
         <div class=@($"text-center p-2 {fontSizeCssClass}")>
             <button class="btn-close float-right" onclick="@onCloseButtonClick" />
             <strong>Terms &amp; Conditions</strong><br />@introduction
@@ -19,12 +19,11 @@
                       CssClass=@((isConfirmationRequired)
                   ? "flex-grow-1"
                   : "popup-button mx-auto flex-grow-0")
-                      IconCssClass="bi bi-eyeglasses menu-icon icon-color pe-2"
+                      IconCssClass="bi bi-eyeglasses menu-icon pe-2"
                       Click="@(e => OnTandCClicked())"
-                      RenderStyle="ButtonRenderStyle.Info"
                       RenderStyleMode="ButtonRenderStyleMode.Contained">
             </DxButton>
-            <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-danger" hidden="@(!isConfirmationRequired)"
+            <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-fl-danger" hidden="@(!isConfirmationRequired)"
                         CheckedChanged="@(async (bool value) => await ConfirmationChanged(value))"
                         Alignment="CheckBoxContentAlignment.Right"
                         LabelPosition="LabelPosition.Left">

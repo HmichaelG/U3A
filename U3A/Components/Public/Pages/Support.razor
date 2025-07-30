@@ -44,7 +44,7 @@ else
                   Context="editContext">
             <h3>Request Support</h3>
             <p>
-                You are valued & important. Enter or confirm your contact details and provide a clear, concise
+                Please enter or confirm your contact details and provide a clear, concise
                 description of your issue.
                 </p>
                 <p>
@@ -67,7 +67,7 @@ else
                     <DxTextBox @bind-Text="@supportModel!.Email" />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem Caption="Issue Description" ColSpanMd="12">
-                    <DxMemo Rows="8" @bind-Text="@supportModel!.Description" />
+                    <DxMemo Rows="8" @bind-Text="@supportModel!.Description" CssClass="w-100" />
                 </DxFormLayoutItem>
                 <div class="flex mt-2 mx-auto">
                     <ReCAPTCHA @ref="@reCAPTCHAComponent" SiteKey="6LcT11spAAAAAEc0vtGQmtI2Kv5jII5kB2pz5Gnn" OnSuccess="OnSuccess" OnExpired="OnExpired" />

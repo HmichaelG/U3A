@@ -20,10 +20,10 @@
     {
         <ExceptionLogPage Id="@logId"
                           OnFinished="@(async() =>
-                {
-                    logId = null;
-                    StateHasChanged();
-                })" />
+                                                                    {
+                                                                        logId = null;
+                                                                        StateHasChanged();
+                                                                    })" />
     }
     else
     {
@@ -33,7 +33,7 @@
             <div class="pb-2">
                 <FullScreen DisplayOffset="10" HideToggle="true">
                     <ContentTemplate>
-                        <DxGrid @ref="grid" Data="@exceptions"
+                        <DxGrid id="my-grid" @ref="grid" Data="@exceptions"
                                 AutoExpandAllGroupRows="true"
                                 DataItemDeleting="Grid_DataItemDeleting"
                                 ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -162,13 +162,13 @@
         {
             exceptions = await dbc.LogEvents.OrderByDescending(x => x.TimeStamp)
                         .Select(x => new LogEvents
-                            {
-                                Id = x.Id,
-                                Tenant = x.Tenant,
-                                User = x.User,
-                                TimeStamp = x.TimeStamp,
-                                Message = x.Message
-                            }).ToListAsync();
+                        {
+                            Id = x.Id,
+                            Tenant = x.Tenant,
+                            User = x.User,
+                            TimeStamp = x.TimeStamp,
+                            Message = x.Message
+                        }).ToListAsync();
             if (!showAll) { exceptions = exceptions.Where(x => !string.IsNullOrWhiteSpace(x.Tenant)).ToList(); }
         }
         selectedLog = null;

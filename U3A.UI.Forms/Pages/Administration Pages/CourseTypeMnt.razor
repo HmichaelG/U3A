@@ -23,7 +23,7 @@ else
 
     <FullScreen>
         <ContentTemplate>
-            <DxGrid Data="@CourseTypes" @ref=@mainGrid
+            <DxGrid id="my-grid" Data="@CourseTypes" @ref=@mainGrid
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                     ShowFilterRow="false"
                     ShowAllRows="true"
@@ -55,7 +55,7 @@ else
                             <DxTextBox @bind-Text="@editItem.ShortName" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Comment" ColSpanMd="12">
-                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
+                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" CssClass="w-100" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Discontinued">
                             <DxCheckBox @bind-Checked="@editItem.Discontinued" />

@@ -1,5 +1,5 @@
 ﻿
-// Full screen / normal screen functions
+// Orientation Change
 
 function registerOrientationChange(dotNetHelper) {
     window.addEventListener("orientationchange", () => {
@@ -11,32 +11,41 @@ function registerOrientationChange(dotNetHelper) {
 window.hoverClickMenu = (() => {
     let lastClickTime = 0;
     let hoverTimer = null;
-    const CLICK_THRESHOLD = 500; // Minimum time between clicks
+    const CLICK_COOLDOWN = 750;
+
+    function getAdaptiveDelay() {
+        const usedBefore = sessionStorage.getItem('menuUsed') === 'true';
+        return usedBefore ? 500 : 1200;
+    }
 
     return {
-        attachHoverHandler: function (elementId) {
-            menu = document.getElementById(elementId);
+        attachAdaptiveHover: function (elementId) {
+            const menu = document.getElementById(elementId);
             if (!menu) return;
 
-            // Intercept manual double clicks
+            // Prevent manual double-clicks
             menu.addEventListener('click', (e) => {
                 const now = Date.now();
-                if (now - lastClickTime < CLICK_THRESHOLD) {
-                    e.stopImmediatePropagation();
+                if (now - lastClickTime < CLICK_COOLDOWN) {
                     e.preventDefault();
+                    e.stopImmediatePropagation();
                     return false;
                 }
                 lastClickTime = now;
+                sessionStorage.setItem('menuUsed', 'true');
             });
 
             menu.addEventListener('mouseenter', () => {
+                const delay = getAdaptiveDelay();
+
                 hoverTimer = setTimeout(() => {
                     const now = Date.now();
-                    if (now - lastClickTime >= CLICK_THRESHOLD) {
+                    if (now - lastClickTime >= CLICK_COOLDOWN) {
                         menu.click();
                         lastClickTime = now;
+                        sessionStorage.setItem('menuUsed', 'true');
                     }
-                }, 250);
+                }, delay);
             });
 
             menu.addEventListener('mouseleave', () => {
@@ -127,14 +136,7 @@ function GetLocalStorage(key) {
     return window.localStorage.getItem(key);
 }
 
-document.onreadystatechange = function (e) {
-    if (document.readyState === 'complete') {
-        setTheme();
-    }
-}
-
 window.onload = function () {
-    setTheme();
     displayNonInteractive();
 }
 
@@ -146,46 +148,27 @@ function displayNonInteractive() {
         }
     }, 10000);
 };
-function setTheme() {
-    // If we pass a theme in a query string then save it to localStorage
-    var qs = getQueryStrings();
-    var theme = qs['theme']
-    if (theme) {
-        localStorage.setItem("theme", theme);
-    }
-    var link = document.getElementById("theme");
-    var href = link.href;
-    if (href == null) { href = '_content/DevExpress.Blazor.Themes/office-white.bs5.min.css'; }
-    // load from localStorage & replace the default
-    theme = localStorage.getItem('theme');
-    if (theme) {
-        theme = theme.replace('"', '',);
-        theme = theme.replace('"', '',);
-        if (theme.startsWith("fluent")) {
-            theme = theme.replace('.bs5', '',);
-            // whenfluent theme is working correctly
-            //    theme = 'window.matchMedia('(prefers-color-scheme: dark)').matches ? 'fluent-dark' : 'fluent-light'
-        }
-        href = href.replace('office-white', theme);
-    }
-    if (link) {
-        link.href = href;
-    }
-}
-function getQueryStrings() {
-    var assoc = {};
-    var decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); };
-    var queryString = location.search.substring(1);
-    var keyValues = queryString.split('&');
 
-    for (var i in keyValues) {
-        var key = keyValues[i].split('=');
-        if (key.length > 1) {
-            assoc[decode(key[0])] = decode(key[1]);
+window.cookieInterop = {
+    setCookie: function (name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 86400000));
+            expires = "; expires=" + date.toUTCString();
         }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    },
+    getCookie: function (name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i].trim();
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+        }
+        return null;
     }
-    return assoc;
-}
+};
 
 window.clipboardCopy = {
     copyText: function (text) {
@@ -199,4 +182,39 @@ window.clipboardCopy = {
 
 function clearQueryString() {
     window.history.pushState({}, document.title, "/");
+}
+
+function getGridWidth() {
+    const grid = document.querySelector(".dxbl-grid");
+    const width = grid ? grid.offsetWidth : 900;
+    return width;
+}
+
+function getGridColumnWidths() {
+    const gridMap = new Map();
+    var grid = document.querySelector(".dxbl-grid");
+    var headerCells = grid.getElementsByClassName("my-header-cell");
+    for (const headerCell of headerCells) {
+        var fieldName = headerCell.getAttribute("fieldname");
+        if (fieldName) {
+            gridMap.set(fieldName, headerCell.offsetWidth);
+        }
+    }
+    return Object.fromEntries(gridMap);
+}
+
+function getGridColumnWidths(gridSelector) {
+    const gridMap = new Map();
+    var grids = document.querySelectorAll(gridSelector);
+    for (const grid of grids) {
+        var headerCells = grid.getElementsByClassName("my-header-cell");
+        for (const headerCell of headerCells) {
+            console.log(headerCell);
+            var fieldName = headerCell.getAttribute("fieldname");
+            if (fieldName) {
+                gridMap.set(fieldName, headerCell.offsetWidth);
+            }
+        }
+    }
+    return Object.fromEntries(gridMap);
 }

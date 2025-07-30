@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-U3A-1fe615b5-a026-4c5d-8e8e-7d353ab11b61</UserSecretsId>
-    <Version>2025.7.4.0000</Version>
+    <Version>2025.7.24.0000</Version>
     <ApplicationInsightsResourceId>/subscriptions/c6a46b11-c209-428d-9386-3d7f92c9525f/resourceGroups/U3A-linux_group/providers/microsoft.insights/components/U3A-linux</ApplicationInsightsResourceId>
     <PublishAot>False</PublishAot>
     <SignAssembly>False</SignAssembly>
@@ -18,6 +18,8 @@
   <ItemGroup>
     <Content Remove="Components\Private\Pages\Reports.razor" />
     <Content Remove="Components\Public\Pages\ReCAPTCHA.razor" />
+    <Content Remove="wwwroot\css\bootstrap\bootstrap.css" />
+    <Content Remove="wwwroot\css\bootstrap\bootstrap.min.css" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="resources\en_AU.aff" />
@@ -30,50 +32,52 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Components\Public\Shared\ReCAPTCHA.razor" />
+    <None Include="wwwroot\css\bootstrap\bootstrap.css" />
+    <None Include="wwwroot\css\bootstrap\bootstrap.min.css" />
     <None Include="wwwroot\favicon\site.webmanifest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.Azure.AI.OpenAI" Version="9.1.0-preview.1.25121.10" />
-    <PackageReference Include="Aspire.Hosting.Azure.CognitiveServices" Version="9.3.0" />
-    <PackageReference Include="Aspire.Hosting.SqlServer" Version="9.3.0" />
-    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="9.3.0" />
+    <PackageReference Include="Aspire.Hosting.Azure.CognitiveServices" Version="9.3.1" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="9.3.2" />
+    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="9.3.1" />
     <PackageReference Include="Azure.AI.OpenAI" Version="2.2.0-beta.4" />
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />
-    <PackageReference Include="Azure.Identity" Version="1.14.0" />
+    <PackageReference Include="Azure.Identity" Version="1.14.2" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="CommonPasswordsValidator" Version="1.5.0" />
-    <PackageReference Include="DevExpress.AIIntegration" Version="24.2.8" />
-    <PackageReference Include="DevExpress.AIIntegration.Blazor" Version="24.2.8" />
-    <PackageReference Include="DevExpress.AIIntegration.Blazor.Reporting.Viewer" Version="24.2.8" />
-    <PackageReference Include="DevExpress.AIIntegration.OpenAI" Version="24.2.8" />
-    <PackageReference Include="DevExpress.Blazor" Version="24.2.8" />
-    <PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="24.2.8" />
-    <PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="24.2.8" />
-    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="24.2.8" />
-    <PackageReference Include="DevExpress.Blazor.Themes" Version="24.2.8" />
-    <PackageReference Include="DevExpress.Drawing" Version="24.2.8" />
-    <PackageReference Include="DevExpress.Drawing.Skia" Version="24.2.8" />
+    <PackageReference Include="DevExpress.AIIntegration" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.AIIntegration.Blazor" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.AIIntegration.Blazor.Reporting.Viewer" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.AIIntegration.OpenAI" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.Blazor" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.Blazor.Themes" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.Drawing" Version="25.1.4-pre-25194" />
+    <PackageReference Include="DevExpress.Drawing.Skia" Version="25.1.4-pre-25194" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.7" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.AI" Version="9.5.0" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="9.7.1" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.3.0-preview.1.25161.3" />
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.1-dev-00046" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.2.0" />
-    <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.1.1" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.2.2" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
-    <PackageReference Include="System.Numerics.Tensors" Version="9.0.5" />
+    <PackageReference Include="System.Numerics.Tensors" Version="9.0.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\U3A.Data\U3A.Database.csproj" />

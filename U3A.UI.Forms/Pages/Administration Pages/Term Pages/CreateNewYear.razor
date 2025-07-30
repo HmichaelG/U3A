@@ -12,10 +12,10 @@
             <ContextHelpTitle Title=@($"Create/Edit Terms for {newYear}") HelpTopic="add_edit-enrolment-terms.html"
                               Subtitle="<div>Use this procedure to quickly create enrolment terms for the new year.</div>
                                         <div>Simply review / correct the term start date and duration. We'll do the rest.</div>" />
-            <div class="mt-2 text-danger text-center w-100">
+            <div class="mt-2 text-fl-danger text-center w-100">
                 @validationMessage
             </div>
-            <DxGrid Data="@Terms" @ref=@mainGrid CssClass="grid-height"
+            <DxGrid id="my-grid" Data="@Terms" @ref=@mainGrid CssClass="grid-height"
                     ShowFilterRow="false"
                     ShowAllRows="true"
                     KeyFieldName="ID"

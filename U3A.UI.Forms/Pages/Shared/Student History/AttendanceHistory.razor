@@ -1,8 +1,10 @@
-﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <DxFormLayoutGroup Caption="@($"Attendance History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
     <div class="h-25 overflow-auto">
-        <DxGrid Data="@attendance" @ref="@grid"
+        <DxGrid id="do-not-print" Data="@attendance" @ref="@dxGrid"
                 TextWrapEnabled=false
                 ColumnResizeMode="GridColumnResizeMode.NextColumn"
                 AllowSorting=false
@@ -16,7 +18,7 @@
             <Columns>
                 <DxGridDataColumn FieldName="Term.Name" Caption="Term" GroupIndex="0" />
                 <DxGridDataColumn FieldName="CourseName" Caption="Course" Width="40%" GroupIndex="1" />
-                <DxGridDataColumn FieldName="Date" Caption="Date" >
+                <DxGridDataColumn FieldName="Date" Caption="Date">
                     <GroupFooterTemplate>
                         @{
                             var summaryItems = context.SummaryItems;
@@ -37,7 +39,7 @@
                                 }
                             }
                         }
-                    </GroupFooterTemplate>                    
+                    </GroupFooterTemplate>
                 </DxGridDataColumn>
                 <DxGridDataColumn FieldName="Present" Caption="Present" />
                 <DxGridDataColumn FieldName="AbsentWithApology" Caption="Apology" />
@@ -46,7 +48,7 @@
             </Columns>
             <GroupSummary>
                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom"
-                                   DisplayText = "Sub-Total"
+                                   DisplayText="Sub-Total"
                                    FooterColumnName="Date" />
                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
                                    DisplayText="{0:n0}"
@@ -83,7 +85,12 @@
 
 </DxFormLayoutGroup>
 
+<PdfViewer PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+
+
 @code {
+
+
 
     [Parameter]
     public Term SelectedTerm { get; set; }
@@ -95,7 +102,12 @@
     public string CssClass { get; set; }
 
     List<AttendClass> attendance = new();
-    DxGrid? grid;
+    DxGrid? dxGrid;
+    string reportTitle;
+
+    bool isPdfReady;
+
+    byte[] documentContent;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -134,6 +146,52 @@
                 }
                 break;
         }
+    }
+
+    public async Task Print()
+    {
+        reportTitle = $"Attendance History: {SelectedPerson.FullName}";
+        using var ms = new MemoryStream();
+        await dxGrid.ExportToPdfAsync(ms,
+            new GridPdfExportOptions()
+            {
+                FitToPage = true,
+                CustomizeDocument = OnCustomizeDocument,
+                CustomizeCell = OnCustomizeCell,
+                CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
+                CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
+            });
+        documentContent = ms.ToArray();
+        isPdfReady = true;
+    }
+
+    void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
+    {
+        args.ElementStyle.Font = new DXFont("Arial", 16);
+        args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+        args.Text = reportTitle;
+    }
+
+    void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
+    {
+        args.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
+        args.PaperKind = DXPaperKind.A4;
+        args.Margins = new DXMargins(50, 50, 50, 50);
+    }
+
+    void OnCustomizeCell(GridDocumentExportCustomizeCellEventArgs args)
+    {
+        if (args.AreaType == DocumentExportAreaType.DataArea && args.Value is bool)
+        {
+            var val = (bool)args.Value;
+            args.Text = (val) ? "x" : "";
+            args.Handled = true;
+        }
+    }
+
+    void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
+    {
+        args.Text = "Page {0} of {1}";
     }
 
 }

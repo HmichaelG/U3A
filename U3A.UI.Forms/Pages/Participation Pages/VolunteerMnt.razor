@@ -26,7 +26,7 @@ else
 
     <FullScreen>
         <ContentTemplate>
-            <DxGrid Data="@Volunteers" @ref=@mainGrid
+            <DxGrid id="my-grid" Data="@Volunteers" @ref=@mainGrid
                     ColumnResizeMode="GridColumnResizeMode.Disabled"
                     @bind-SelectedDataItems="@SelectedDataItems"
                     AllowSelectRowByClick="true"

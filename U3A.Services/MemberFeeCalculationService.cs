@@ -17,6 +17,7 @@ using U3A.Model;
 using U3A.Model;
 using Serilog;
 using Microsoft.AspNetCore.Hosting;
+using DevExpress.Blazor.RichEdit;
 
 namespace U3A.Services;
 
@@ -660,14 +661,36 @@ public class MemberFeeCalculationService
             result = allocatedItems.ToList();
             foreach (var item in ItemsToAllocate.Where(x => !keys.Contains(x.ID)))
             {
-                if (totalDue != 0) { item.IsNotAllocated = true; }// Mark as not allocated
-                result.Add(item);
+                if (totalDue != 0) { item.IsNotAllocated = true; } // Mark as not allocated
+                    result.Add(item);
             }
         }
         else foreach (var item in ItemsToAllocate.Where(x => !keys.Contains(x.ID)))
             {
                 result.Add(item);
             }
+
+        foreach (var item in result)
+        {
+            if (!item.IsNotAllocated && item.SortOrder != MemberFeeSortOrder.Receipt)
+            {
+                item.Allocated = item.Amount;
+            }
+        }
+
+        var unallocatedFees = result.Where(x => x.IsNotAllocated && x.SortOrder != MemberFeeSortOrder.Receipt);
+        var remainingCredits = result.Where(x => x.IsNotAllocated && x.SortOrder== MemberFeeSortOrder.Receipt).Sum(x => x.Amount);
+        // Allocate remaining credits to unallocated fees
+        if (remainingCredits < 0)
+        {
+            foreach (var fee in unallocatedFees)
+            {
+                if (remainingCredits >= 0) break;
+                var allocation = Math.Min(-remainingCredits, fee.Amount);
+                fee.Allocated = allocation;
+                remainingCredits += allocation;
+            }
+        }
         CalculateBalance(result);
         return result;
     }

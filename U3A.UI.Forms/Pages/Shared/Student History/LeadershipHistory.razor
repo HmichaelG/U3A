@@ -1,8 +1,10 @@
-﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <DxFormLayoutGroup Caption="@($"Leadership History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
     <div class="h-25 overflow-auto">
-        <DxGrid Data="@leadersHistory" @ref="@grid"
+        <DxGrid id="do-not-print" Data="@leadersHistory" @ref="@dxGrid"
                 TextWrapEnabled=false
                 ColumnResizeMode="GridColumnResizeMode.NextColumn"
                 AllowSorting=false
@@ -27,6 +29,8 @@
 
 </DxFormLayoutGroup>
 
+<PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+
 @code {
 
     [Parameter]
@@ -36,7 +40,11 @@
     public string CssClass { get; set; }
 
     List<LeaderHistory> leadersHistory = new();
-    DxGrid? grid;
+    DxGrid? dxGrid;
+
+    string reportTitle;
+    bool isPdfReady = false;
+    byte[] documentContent;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -49,5 +57,39 @@
         }
     }
 
+    public async Task Print()
+    {
+        reportTitle = $"Leadership History: {SelectedPerson.FullName}";
+        using var ms = new System.IO.MemoryStream();
+        await dxGrid.ExportToPdfAsync(ms,
+            new GridPdfExportOptions()
+            {
+                FitToPage = true,
+                CustomizeDocument = OnCustomizeDocument,
+                CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
+                CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
+            });
+        documentContent = ms.ToArray();
+        isPdfReady = true;
+    }
+
+    void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
+    {
+        args.ElementStyle.Font = new DXFont("Arial", 16);
+        args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+        args.Text = reportTitle;
+    }
+
+    void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
+    {
+        args.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
+        args.PaperKind = DXPaperKind.A4;
+        args.Margins = new DXMargins(50, 50, 50, 50);
+    }
+
+    void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
+    {
+        args.Text = "Page {0} of {1}";
+    }
 
 }

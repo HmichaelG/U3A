@@ -27,7 +27,7 @@ else
                 <DxButton Text="Scan QR Code" Click="@OnScanQRCode" />
                 <DxButton Text="Reset Selection" Click="@OnResetSelection"
                           RenderStyleMode="ButtonRenderStyleMode.Outline" />
-                <div class="text-info"><b>@($"There are {selectedCount} participants in this draw.")</b></div>
+                <div class="text-fl-info"><b>@($"There are {selectedCount} participants in this draw.")</b></div>
             </div>
         </div>
         <PersonMnt @ref=@selectionList GridDisplayOffset="10" IsSelectionList="true"

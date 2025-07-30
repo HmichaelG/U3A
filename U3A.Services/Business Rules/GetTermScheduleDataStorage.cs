@@ -34,26 +34,26 @@ namespace U3A.BusinessRules
                 new LabelObject() {
                     Id = 0,
                     LabelCaption = "Term",
-                    BackgroundCssClass = "bg-secondary",
-                    TextCssClass = "text-black"
+                    BackgroundCssClass = "bg-fl-primary-subtle",
+                    TextCssClass = "text-fl-primary"
                 },
                 new LabelObject() {
                     Id = 1,
                     LabelCaption = "Default Term",
-                    BackgroundCssClass = "bg-success",
-                    TextCssClass = "text-white"
+                    BackgroundCssClass = "bg-fl-success-subtle",
+                    TextCssClass = "text-fl-success"
                 },
                 new LabelObject() {
                     Id = 2,
                     LabelCaption = "Enrolment",
-                    BackgroundCssClass = "bg-warning",
-                    TextCssClass = "text-white"
+                    BackgroundCssClass = "bg-fl-warning-subtle",
+                    TextCssClass = "text-fl-warning"
                 },
                 new LabelObject() {
                     Id = 3,
                     LabelCaption = "Enrolment Allocation Review",
-                    BackgroundCssClass = "bg-info",
-                    TextCssClass = "text-white"
+                    BackgroundCssClass = "bg-fl-info-subtle",
+                    TextCssClass = "text-fl-info"
                 },
             };
             dataStorage.AppointmentsSource = await GetTermScheduleAsync(dbc);
@@ -89,7 +89,7 @@ namespace U3A.BusinessRules
                     // The term
                     schedule = new TermSchedule();
                     schedule.StartDate = t.StartDate.Date;
-                    schedule.EndDate = t.EndDate.Date;
+                    schedule.EndDate = t.EndDate.Date.AddDays(1);
                     schedule.AppointmentType = 0;
                     schedule.Caption = t.Name;
                     schedule.Label = (t.IsDefaultTerm) ? 1 : 0;
@@ -99,7 +99,7 @@ namespace U3A.BusinessRules
                     // The enrolment period
                     schedule = new TermSchedule();
                     schedule.StartDate = t.EnrolmentStartDate.Date;
-                    schedule.EndDate = t.EnrolmentEndDate.Date;
+                    schedule.EndDate = t.EnrolmentEndDate.Date.AddDays(1);
                     schedule.AppointmentType = 0;
                     schedule.Caption = $"{t.Name} Enrolment Period";
                     schedule.Label = 2;

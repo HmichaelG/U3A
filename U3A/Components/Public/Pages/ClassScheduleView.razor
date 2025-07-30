@@ -12,38 +12,31 @@
 
 @layout BasicLayout
 
-<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-@bind-IsActive="@IsMobileLayout" />
-
 @if (!IsReady)
 {
-    <em>Loading...</em>
+    <LoadingIndicator />
 }
 else
 {
-    <PortalHeader NavigateTo="/public" NoU3AGroup="true" />
-    <div class="col col-md-10 col-lg-8 mx-auto">
-        <p>@message</p>
-        <DxReportViewer @ref="@reportViewer" Id="reportViewer"
-        Report="@rpt" SizeMode="SizeMode.Small"
-        SinglePagePreview="false"
-        RootCssClasses="w-100 view-normal"
-        TabPanelMinWidth="200"
-        TabPanelMaxWidth="200"
-        Zoom="1"
-        OnCustomizeToolbar="@OnCustomizeToolbar" />
-    </div>
+    <DxWindow Width="100dvw"
+    Height="100dvh"
+              PositionY="0"
+              CloseOnEscape="false"
+              Visible="true"
+              ShowHeader="false">
+        <BodyContentTemplate Context="PopupContext">
+            <DxReportViewer @ref="@reportViewer"
+                            Report="@rpt"
+                            SinglePagePreview="false"
+                            Zoom="1"
+                            CssClass="w-100 h-100"
+                            OnCustomizeToolbar="OnCustomizeToolbar" />
+        </BodyContentTemplate>
+    </DxWindow>
 }
-<style>
-    .view-normal {
-    height: calc(100dvh - 3.5rem) !important;
-    }
-
-</style>
 
 @code {
     bool IsReady;
-    bool IsMobileLayout;
 
     ClassScheduleRpt? rpt;
     MarkupString message = new MarkupString("");
@@ -72,7 +65,6 @@ else
             rpt.CreateReport();
         }
         IsReady = true;
-        await base.OnInitializedAsync();
     }
 
 
@@ -90,18 +82,18 @@ else
             }
         }
         toolbarModel.AllItems.Add(new ToolbarItem()
+        {
+            IconCssClass = "fw-bold text-fl-primary exit-icon",
+            BeginGroup = true,
+            Text = "Close Report",
+            AdaptiveText = "Close Report",
+            AdaptivePriority = 1,
+            Click = async (args) =>
             {
-                IconCssClass = "fw-bolder text-primary bi bi-door-open",
-                BeginGroup = true,
-                Text = "Close Report",
-                AdaptiveText = "Close Report",
-                AdaptivePriority = 1,
-                Click = async (args) =>
-                {
-                    NavMan.NavigateTo("/public");
-                    await InvokeAsync(StateHasChanged);
-                }
-            });
+                NavMan.NavigateTo("/public");
+                await InvokeAsync(StateHasChanged);
+            }
+        });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

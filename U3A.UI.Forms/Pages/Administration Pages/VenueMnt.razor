@@ -12,18 +12,20 @@
 }
 else
 {
-
-    <ContextHelpTitle Title="Venues" HelpTopic="add_edit-venues.html"
-                      Subtitle="Venues identify the location in which courses and/or activities offered to students are held." />
-
+    @if (!IsReadOnly)
+    {
+        <ContextHelpTitle Title="Venues" HelpTopic="add_edit-venues.html"
+                          Subtitle="Venues identify the location in which courses and/or activities offered to students are held." />
+    }
     <MessageBox @ref="@messageBox" />
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
     <FullScreen>
         <ContentTemplate>
-            <DxGrid Data="@Venues" @ref=@mainGrid
+            <DxGrid id="my-grid" Data="@Venues" @ref=@mainGrid
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                    TextWrapEnabled="true"
                     ShowFilterRow="false"
                     ShowAllRows="true"
                     KeyFieldName="ID"
@@ -33,16 +35,23 @@ else
                     SelectedDataItemsChanged="Grid_SelectedDataItemsChanged"
                     CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{279961FC-0FAC-4C87-874C-26CA8B9ADADB}" />
+                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey" />
                 </ToolbarTemplate>
                 <Columns>
-                    <DxGridCommandColumnEx @ref="GridCommandColumn" Width="60px" EditButtonVisible="true" DeleteButtonVisible="false" />
+                    <DxGridCommandColumnEx @ref="GridCommandColumn"
+                                           Width="60px" Visible="!IsReadOnly"
+                                           EditButtonVisible="true"
+                                           DeleteButtonVisible="false" />
                     <DxGridDataColumn Width="6rem" Caption="Discontinued" FieldName="Discontinued" />
                     <DxGridDataColumn Caption="Name" FieldName="Name" />
                     <DxGridDataColumn Caption="Address" FieldName="Address" />
                     <DxGridDataColumn Caption="Contact" FieldName="Coordinator" />
                     <DxGridDataColumn Caption="Email" FieldName="Email" />
                     <DxGridDataColumn Caption="Phone" FieldName="Phone" />
+                    <DxGridDataColumn Caption="Key Code" FieldName="@(nameof(Venue.KeyCode))" />
+                    <DxGridDataColumn Caption="Access Detail" FieldName="@(nameof(Venue.AccessDetail))" Visible="false" />
+                    <DxGridDataColumn Caption="Equipment" FieldName="@(nameof(Venue.Equipment))" Visible="false" />
+                    <DxGridDataColumn Caption="Commnet" FieldName="@(nameof(Venue.Comment))" Visible="false" />
                 </Columns>
                 <TotalSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom" FieldName="Discontinued" />
@@ -82,10 +91,10 @@ else
                             </DxFormLayoutItem>
                         </DxFormLayoutGroup>
                         <DxFormLayoutItem Caption="Equipment Available" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                            <DxMemo @bind-Text="@editItem.Equipment" Rows="3" />
+                            <DxMemo @bind-Text="@editItem.Equipment" Rows="3" CssClass="w-100" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Comment" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" />
+                            <DxMemo @bind-Text="@editItem.Comment" Rows="5" CssClass="w-100" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="Discontinued">
                             <DxCheckBox @bind-Checked="@editItem.Discontinued" />
@@ -111,6 +120,10 @@ else
 
 
 @code {
+    [Parameter]
+    public bool IsReadOnly { get; set; } = false;
+    [Parameter]
+    public string GridLayoutKey { get; set; } = "{279961FC-0FAC-4C87-874C-26CA8B9ADADB}";
     bool IsReady;
     private List<Venue> Venues { get; set; }
     private DxGridCommandColumnEx? GridCommandColumn;

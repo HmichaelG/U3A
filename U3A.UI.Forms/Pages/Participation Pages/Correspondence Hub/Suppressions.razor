@@ -31,7 +31,7 @@ else
 
         <FullScreen @ref=@fullScreen DisplayOffset="@contentSize">
             <ContentTemplate>
-                <DxGrid Data=@suppressions @ref=@mainGrid
+                <DxGrid id="my-grid" Data=@suppressions @ref=@mainGrid
                         @bind-SelectedDataItems="@SelectedDataItems">
                     <ToolbarTemplate>
                         <GridToolbar LinkedGrid=@mainGrid LayoutKey="{CF0E2A1F-A9EF-4CF2-9544-F5609DE4A189}">
@@ -131,7 +131,7 @@ else
         if (count > 0)
         {
             result = (await messageBox.ShowAsync("Spam complaints can’t be reactivated",
-                                   @"<div class='alert alert-danger text-dark pb-2'>
+                                   @"<div class='alert alert-danger  pb-2'>
                             <p>A spam complaint is recorded when a subscriber clicks “This is Spam” or “Mark as Spam” in email clients like Outlook, Gmail, and other similar services.
                                 In the email industry, spam complaints are a clear metric to determine abuse and poor sending practices.
                                 If you feel a spam complaint has a reason for being reactivated, please <a href='https://postmarkapp.com/contact'>contact Postmark support</a> directly.</p>

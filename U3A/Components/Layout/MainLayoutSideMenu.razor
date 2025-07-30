@@ -13,7 +13,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject LocalTime lt
 @inject IJSRuntime js
-@inject WorkStation ws
+@inject WorkstationService ws
 
 @rendermode InteractiveServer
 
@@ -26,7 +26,7 @@
 
 <style>
     .sidebar-toggle-button {
-        z-index: 1040;
+        z-index: 200; /* below FullScreen index */
         left: 0;
         top: 0;
         margin: 0.2rem;
@@ -45,12 +45,12 @@ else
               Mode=@drawerMode
               CloseOnTargetContentClick="true"
               Position="DrawerPosition.Left"
-              PanelWidth="17.5rem">
+              PanelWidth="15.5rem">
         <BodyTemplate>
             <SideBar />
         </BodyTemplate>
         <TargetContent>
-            <DxGridLayout CssClass="">
+            <DxGridLayout CssClass="w-100">
                 <Rows>
                     <DxGridLayoutRow Areas="Left-Blank content Right-Blank" Height="auto" />
                 </Rows>
@@ -72,14 +72,14 @@ else
                 </Columns>
                 <Items>
                     <DxGridLayoutItem Area="Left-Blank" />
-                    <DxGridLayoutItem Area="content" CssClass="mt-1 main">
+                    <DxGridLayoutItem Area="content" CssClass="mt-2">
                         <Template>
                             <ErrorBoundary @ref="@errorBoundary">
                                 <ChildContent>
                                     <div class="pt-1">
                                         @if (!string.IsNullOrWhiteSpace(messageText))
                                         {
-                                            <div class="alert alert-danger text-danger text-center mx-auto">
+                                            <div class="alert alert-danger text-fl-danger text-center mx-auto">
                                                 @(new MarkupString(messageText))
                                             </div>
                                         }
@@ -121,7 +121,6 @@ else
     DrawerMode drawerMode;
     bool isSmallScreen;
     bool isReady;
-    private DotNetObjectReference<MainLayoutSideMenu>? objRef;
     public string Orientation { get; set; } = "unknown";
     bool screenSizeChanged;
 
@@ -158,7 +157,7 @@ else
     {
         if (firstRender)
         {
-            await js.InvokeVoidAsync("hoverClickMenu.attachHoverHandler", "main-menu-button");
+            await js.InvokeVoidAsync("hoverClickMenu.attachAdaptiveHover", "main-menu-button");
             await js.InvokeVoidAsync("hoverClickMenu.attachHomeKeyHandler", "main-menu-button");
             setupMenuOnLocationChange();
         }

@@ -26,7 +26,7 @@ else
 
     <FullScreen DisplayOffset="@((IsEmbedded) ? 13 : 8)" HideToggle="@IsEmbedded">
         <ContentTemplate>
-            <DxGrid Data="@PaymentStatus" @ref=@mainGrid
+            <DxGrid id="my-grid" Data="@PaymentStatus" @ref=@mainGrid
             AutoExpandAllGroupRows="true"
             SelectionMode="GridSelectionMode.Single"
             SelectedDataItem="selectedPaymentStatus"

@@ -7,7 +7,7 @@
 @inject NavigationManager NavMan
 @inject IConfiguration config
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
-@inject WorkStation ws
+@inject WorkstationService ws
 
 @using System.Web
 @using Microsoft.AspNetCore.Builder
@@ -33,7 +33,7 @@ else
         </div>
         @if (isNotInEnrolmentPeriod)
         {
-            <p class="alert alert-danger text-dark col-12 my-2" align="center">
+            <p class="alert alert-danger col-12 my-2" align="center">
                 @(enrolmentLockoutText)
             </p>
         }
@@ -92,18 +92,18 @@ else
                                         @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                         {
                                             <div class="row px-2 px-md-3 col-12">
-                                                <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
+                                                <div class="text-fl-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
                                             </div>
                                         }
 
                                         <div class="w-100 text-center">
                                             @if (c.Course.CourseFeePerYear != 0)
                                             {
-                                                <div class="text-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
+                                                <div class="text-fl-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
                                             }
                                             @if (c.Course.HasTermFees)
                                             {
-                                                <div class="text-info"><strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong></div>
+                                                <div class="text-fl-info"><strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong></div>
                                             }
                                         </div>
 
@@ -165,7 +165,7 @@ else
         </DxGrid>
 
         <div class="align-items-end">
-            <div class="h6 col-12 text-primary" align="center">
+            <div class="h6 col-12 text-fl-primary" align="center">
                 @(new MarkupString(selectionCountText))
             </div>
 

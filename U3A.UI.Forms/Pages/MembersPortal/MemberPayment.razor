@@ -46,7 +46,7 @@ else
                         @if (showFeesDueToggle)
                         {
                             <div class="h-25 overflow-auto">
-                                <DxGrid Data="memberFees"
+                                <DxGrid id="my-grid" Data="memberFees"
                                         AllowSorting=false
                                         AllowFiltering=false
                                         AllowGrouping=false
@@ -84,7 +84,7 @@ else
                     </DxFormLayoutGroup>
                     @if (!string.IsNullOrWhiteSpace(OnlineErrorMessage))
                     {
-                        <div class="alert alert-warning text-dark text-center">
+                        <div class="alert alert-warning  text-center">
                             @OnlineErrorMessage
                         </div>
                     }
@@ -146,7 +146,7 @@ else
                                 <div class="col col-7">@($"{loginState.SelectedPerson.FirstAndLastName} {term.Year}")</div>
                             </div>
                             <br />
-                            <p align="center" class="alert alert-info text-dark">
+                            <p align="center" class="alert alert-info ">
                                 <em>
                                     <strong>Please Note:</strong><br>It is vital that the direct payment be completed with the above detail exactly as shown.
                                     Doing otherwise will incur unnecessary work for our volunteer staff and delay finalising your payment in our systems.<br />

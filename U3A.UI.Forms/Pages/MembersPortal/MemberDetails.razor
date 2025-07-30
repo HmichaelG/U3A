@@ -1,5 +1,5 @@
 ﻿@inject IJSRuntime js
-@inject WorkStation ws
+@inject WorkstationService ws
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager NavigationManager
 
@@ -29,7 +29,7 @@ else
             <DxFormLayout CssClass="scrollable border-bottom border-1 border-primary" id="myForm">
                 @if (loginState?.SelectedPerson == null)
                 {
-                    <span class="text-center alert alert-success text-dark w-100 mt-2">
+                    <span class="text-center alert alert-success w-100 mt-2">
                         <div>
                             Welcome! Let's start by getting to know you.
                         </div>
@@ -37,7 +37,7 @@ else
                 }
                 @if (IsNewLinkedMember)
                 {
-                    <div class="text-center text-wrap alert alert-info text-dark w-100 mt-2">
+                    <div class="text-center text-wrap alert alert-info w-100 mt-2">
                         You are about to create a new linked member for whom you will
                         assume responsibility for membership fees and course enrolment.
                     </div>
@@ -86,12 +86,14 @@ else
                                     <DxComboBox Data="@gender" @bind-Value="@person.Gender" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Birth Date" ColSpanMd="12">
-                                    <DxDateEdit @bind-Date="@person.BirthDate"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                NullText="Optional It helps to know you." />
+                                    <DxDateEdit @bind-Date="@person.BirthDate" DisplayFormat="@constants.LONG_MONTH_AND_YEAR_FORMAT"
+                                                Mask="@DateTimeMask.MonthAndYear"
+                                                NullText="(Optional) Month & Year only."
+                                                CalendarViewMode="CalendarViewMode.Year"
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
-                                    <DxMemo @bind-Text="@person.Occupation" Rows="3"
+                                    <DxMemo @bind-Text="@person.Occupation" Rows="3" CssClass="w-100"
                                             NullText="Tinker, tailor, soldier, spy? Your skills may be useful to us. Enter one per line." />
                                 </DxFormLayoutItem>
                             </DxFormLayoutGroup>
@@ -112,10 +114,10 @@ else
                                 <DxFormLayoutItem Caption="Email" ColSpanMd="12">
                                     <DxTextBox @bind-Text="@person.Email" ReadOnly="true">
                                         <Buttons>
-                                            <DxEditorButton Text="Help" CssClass="text-info"
+                                            <DxEditorButton Text="Help" CssClass="text-fl-info"
                                                             IconCssClass="bi bi-question"
                                                             Click="@(async () => await messageBox.ShowOkOnlyAsync("Email Address",
-                                @"<div class='text-center alert alert-info text-dark col-12'>
+                                @"<div class='text-center alert alert-info col-12'>
                                 <p>Your email address and password is the key to access your U3A details.
                                     It must be protected and kept secure at all times.
                                 <p>To change your email address or password, return to the menu and click <strong>Manage Credentials</strong>.
@@ -136,11 +138,11 @@ else
                                                 ValueFieldName="@nameof(SilentContactWrapper.Type)"
                                                 TextFieldName="@nameof(SilentContactWrapper.DisplayText)">
                                         <Buttons>
-                                            <DxEditorButton Text="Help" CssClass="text-info"
+                                            <DxEditorButton Text="Help" CssClass="text-fl-info"
                                                             IconCssClass="bi bi-question"
                                                             Click="@(async () => await messageBox?
                                                             .ShowOkOnlyAsync("Silent Contacts",
-                                @"<div class='text-center alert alert-info text-dark col-12'>
+                                @"<div class='text-center alert alert-info col-12'>
                                 <p>Silent phone numbers are not visible to leaders, clerks or students.
                                 <p>A <strong>leader/clerk's</strong> silent email is not visible to students.
                                 <p>A <strong>student's</strong> silent email remains visible to leaders/clerks so that communication is possible.
@@ -172,7 +174,7 @@ else
                         <DxTabPage Text="Your Carer's Details">
                             <DxFormLayout CssClass="container m-1 p-2 mx-auto">
                                 <DxFormLayoutGroup Caption="Your Carer's Details">
-                                    <div class="text-info text-wrap m-2">Please complete if you wish your carer to attend class with you.</div>
+                                    <div class="text-fl-info text-wrap m-2">Please complete if you wish your carer to attend class with you.</div>
                                     <DxFormLayoutItem Caption="Carer's Name" ColSpanMd="12">
                                         <DxTextBox @bind-Text="@person.CarerName"
                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -381,7 +383,7 @@ else
         var msg = "";
         if (person.Communication != Communication[0] && systemSettings.MailSurcharge > 0)
         {
-            msg += "<div class='text-center alert alert-danger text-dark col-12'>" +
+            msg += "<div class='text-center alert alert-danger col-12'>" +
             $"A Post mail preference incurs an additional <strong>{surcharge}</strong> postal surcharge per year.<br />" +
             "Click <strong>Cancel</strong> and change to <strong>Email</strong> which is free, or<br />" +
             "Click <strong>Ok</strong> again to confirm your choice." +

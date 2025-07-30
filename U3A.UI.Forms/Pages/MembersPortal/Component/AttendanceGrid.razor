@@ -1,7 +1,7 @@
 ﻿@namespace U3A.UI.Forms
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
-@inject WorkStation ws
+@inject WorkstationService ws
 
 <DxLayoutBreakpoint MaxWidth="768"
                     @bind-IsActive="@IsSmallLayout" />
@@ -26,7 +26,7 @@ else {
                           DisplayFormat="{0:F0}">
                 <CellDisplayTemplate>
                     @{
-                        <div class="text-success">@context.Value</div>
+                        <div class="text-fl-info">@context.Value</div>
                     }
                 </CellDisplayTemplate>
             </DxGridDataColumn>
@@ -36,7 +36,7 @@ else {
                           DisplayFormat="{0:F0}" >
                 <CellDisplayTemplate>
                     @{
-                        <div class="text-warning">@context.Value</div>
+                        <div class="text-fl-warning">@context.Value</div>
                     }
                 </CellDisplayTemplate>
             </DxGridDataColumn>
@@ -46,7 +46,7 @@ else {
                           DisplayFormat="{0:F0}" >
                 <CellDisplayTemplate>
                     @{
-                        <div class="text-danger">@context.Value</div>
+                        <div class="text-fl-danger">@context.Value</div>
                     }
                 </CellDisplayTemplate>
             </DxGridDataColumn>
@@ -54,9 +54,9 @@ else {
     </DxGrid>
     if (IsSmallLayout) {
         <div class="input-group text-center">
-            <div class="alert-success text-dark flex-grow-1">Present</div>
-            <div class="alert-warning text-dark flex-grow-1">With Apology</div>
-            <div class="alert-danger text-dark flex-grow-1">W/out Apology</div>
+            <div class="alert-success flex-grow-1">Present</div>
+            <div class="alert-warning flex-grow-1">With Apology</div>
+            <div class="alert-danger flex-grow-1">W/out Apology</div>
         </div>
 
     }

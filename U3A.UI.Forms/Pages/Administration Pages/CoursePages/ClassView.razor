@@ -1,31 +1,37 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 @if (!isReady)
+
 {
+
     <LoadingIndicator />
+
 }
+
 else
+
 {
+
     <DxWindow @ref=@viewWindow Width="65rem"
-              Visible=@(selectedCourse != null)
-              HorizontalAlignment="HorizontalAlignment.Center"
-              VerticalAlignment="VerticalAlignment.Center"
-              AllowResize="true"
-              Context="ViewContext"
-              CloseOnEscape=false
-              ShowCloseButton=false
-              ShowFooter=true
-              Scrollable=true
-              HeaderText="View Course Detail">
+    Visible=@(selectedCourse != null)
+    HorizontalAlignment="HorizontalAlignment.Center"
+    VerticalAlignment="VerticalAlignment.Center"
+    AllowResize="true"
+    Context="ViewContext"
+    CloseOnEscape=false
+    ShowCloseButton=false
+    ShowFooter=true
+    Scrollable=true
+    HeaderText="View Course Detail">
         <BodyTextTemplate>
             <CourseDetail @ref="@courseDetail"
-                          IsReadOnly="true"
-                          AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
-                          Settings=@Settings
-                          Course=@selectedCourse
-                          Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
-                          Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
-                          CourseParticipationTypes="@CourseParticipationTypes" />
+            IsReadOnly="true"
+            AnyEnrolmentsInYear="@AnyEnrolmentsInYear"
+            Settings=@Settings
+            Course=@selectedCourse
+            Persons="@Persons" CourseTypes="@CourseTypes" Occurrences="Occurrences"
+            Venues="@Venues" WeekDays="@WeekDays" DbContext="@dbc"
+            CourseParticipationTypes="@CourseParticipationTypes" />
         </BodyTextTemplate>
         <FooterTemplate>
             <div class="d-flex p-2">
@@ -35,11 +41,12 @@ else
         </FooterTemplate>
     </DxWindow>
 
+
     <FullScreen DisplayOffset="9">
         <ContentTemplate>
-            <DxGrid Data="@classes" @ref=@mainGrid>
+            <DxGrid id="my-grid" Data="@classes" @ref=@mainGrid>
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid SpreadsheetHeaderRows="2" LayoutKey="{98F98F24-51AD-46B2-9003-0D1574BCC21B}" />
+                    <GridToolbar LinkedGrid=@mainGrid SpreadsheetHeaderRows="2" LayoutKey="@GridLayoutKey" />
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridCommandColumn Caption="Details"
@@ -124,8 +131,10 @@ else
 }
 
 @code {
-    [Parameter] public int Year { get; set; }
 
+    [Parameter] public bool IsReadOnly { get; set; } = false;
+    [Parameter] public string GridLayoutKey { get; set; }
+    [Parameter] public int Year { get; set; }
     [Parameter]
     public bool AnyEnrolmentsInYear { get; set; }
     [Parameter]
@@ -159,6 +168,10 @@ else
         using (dbc = await U3Adbfactory.CreateDbContextAsync())
         {
             classes = await BusinessRule.SelectableClassesInYearAsync(dbc, Year);
+        }
+        if (string.IsNullOrWhiteSpace(GridLayoutKey))
+        {
+            GridLayoutKey = "{98F98F24-51AD-46B2-9003-0D1574BCC21B}";
         }
         isReady = true;
         await base.OnInitializedAsync();

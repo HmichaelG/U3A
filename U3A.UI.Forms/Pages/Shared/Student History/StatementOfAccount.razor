@@ -1,4 +1,6 @@
-﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+﻿@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
 <DxFormLayoutGroup Caption="@($"Statement of Account for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
     <div class="d-flex flex-row-reverse w-100">
@@ -11,7 +13,7 @@
         </DxDropDownButton>
     </div>
     <div class="h-25 overflow-auto">
-        <DxGrid Data="@memberFees"
+        <DxGrid id="do-not-print" @ref=@dxGrid Data="@memberFees"
                 AllowSorting=false
                 AllowFiltering=false
                 AllowGrouping=false
@@ -26,7 +28,7 @@
                     <CellDisplayTemplate>
                         @if (context.Value is decimal amount && amount < 0)
                         {
-                            <span class="text-danger">@context.Value</span>
+                            <span class="text-fl-danger">@context.Value</span>
                         }
                         else
                         {
@@ -47,6 +49,8 @@
 
 </DxFormLayoutGroup>
 
+<PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+
 @code {
 
     [Parameter]
@@ -63,6 +67,10 @@
     List<MemberFee> memberFees = new();
     MemberFeeCalculationService? service;
     bool showBalance;
+    DxGrid? dxGrid;
+    string reportTitle;
+    byte[] documentContent;
+    bool isPdfReady = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -94,4 +102,42 @@
         StateHasChanged();
     }
 
+    public async Task Print()
+    {
+        reportTitle = $"Statement of Account: {SelectedPerson.FullName}";
+        using var ms = new MemoryStream();
+        await dxGrid.ExportToPdfAsync(ms,
+            new GridPdfExportOptions()
+            {
+                FitToPage = true,
+                CustomizeDocument = OnCustomizeDocument,
+                CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
+                CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
+                CustomizeColumn = OnCustomizeColumn,
+            });
+        documentContent = ms.ToArray();
+        isPdfReady = true;
+    }
+
+    void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
+    {
+        args.ElementStyle.Font = new DXFont("Arial", 16);
+        args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+        args.Text = reportTitle;
+    }
+    void OnCustomizeColumn(GridDocumentExportCustomizeColumnEventArgs args)
+    {
+        if (args.FieldName == "Date") args.Width = 300;
+        if (args.FieldName == "Description") args.Width = 1500;
+    }
+    void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
+    {
+        args.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
+        args.PaperKind = DXPaperKind.A4;
+        args.Margins = new DXMargins(50, 50, 50, 50);
+    }
+    void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
+    {
+        args.Text = "Page {0} of {1}";
+    }
 }

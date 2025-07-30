@@ -8,7 +8,7 @@
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager NavigationManager
-@inject WorkStation ws
+@inject WorkstationService ws
 
 <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 <Progress @ref="@ProgressBar" />
@@ -171,7 +171,7 @@
                                         }
                                         else
                                         {
-                                            <div class='alert alert-danger text-dark pb-2'>
+                                            <div class='alert alert-danger  pb-2'>
                                                 <p>
                                                     No. A spam complaint is recorded when a subscriber clicks “This is Spam” or “Mark as Spam” in email clients like Outlook, Gmail, and other similar services.
                                                     In the email industry, spam complaints are a clear metric to determine abuse and poor sending practices.
@@ -202,7 +202,7 @@
                             else
                             {
                                 <tr>
-                                    <td class="h6 text-center text-info" colspan="2">
+                                    <td class="h6 text-center text-fl-info" colspan="2">
                                         This email address is no longer associated with a participant.<br />
                                         Normally, this indicates the issue has been resolved.
                                     </td>

@@ -29,7 +29,7 @@ else
                 <Items>
                     <DxFormLayoutItem Caption="Search for participant" ColSpanLg="12">
                         <ChildContent>
-                            <div class="d-flex">
+                            <div class="d-flex gap-1">
                                 <DxComboBox Data="@people" CssClass="flex-grow-1"
                                             AllowUserInput=true
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -39,7 +39,7 @@ else
                                             @bind-Value="@selectedPerson">
                                 </DxComboBox>
                                 <DxButton Text="Search" CssClass="flex-grow-0"
-                                          IconCssClass="h5 bi bi-search"
+                                          IconCssClass="bi bi-search"
                                           Tooltip="Click to search for the selected member"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline"
                                           Click="@OnSearch" />
@@ -49,7 +49,7 @@ else
 
                     <DxFormLayoutItem Caption="Or, email address" ColSpanLg="12">
                         <ChildContent>
-                            <div class="d-flex">
+                            <div class="d-flex gap-1">
                                 <DxComboBox Id="emailId" Data="@email" CssClass="flex-grow-1"
                                             AllowUserInput=true
                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -60,7 +60,7 @@ else
                                             TextChanged="@OnEnailChnaged">
                                 </DxComboBox>
                                 <DxButton Text="Search" CssClass="flex-grow-0"
-                                          IconCssClass="h5 bi bi-search"
+                                          IconCssClass="bi bi-search"
                                           Tooltip="Click to search for the selected member"
                                           RenderStyleMode="ButtonRenderStyleMode.Outline"
                                           Click="@OnEmailSearch" />
@@ -68,19 +68,18 @@ else
                         </ChildContent>
                     </DxFormLayoutItem>
 
-                    <DxFormLayoutItem Caption="Or, Date Range" ColSpanLg="6">
-                        <DxDateEdit @bind-Date="@fromDate" MinDate="@minDate" MaxDate="@maxDate" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="To" ColSpanLg="6">
+                    <DxFormLayoutItem Caption="Or, Date Range" ColSpanLg="12">
                         <ChildContent>
-                            <div class="d-flex">
+                            <div class="d-flex gap-1">
+                                <DxDateEdit @bind-Date="@fromDate" MinDate="@minDate" MaxDate="@maxDate" CssClass="flex-grow-1" />
+                                <div class="flex-grow-0 align-self-center">To</div>
                                 <DxDateEdit @bind-Date="@toDate" 
                                             CssClass="flex-grow-1"
                                             MinDate="@minDate" 
                                             MaxDate="@maxDate">
                                 </DxDateEdit>
                             <DxButton Text="Search" CssClass="flex-grow-0"
-                                            IconCssClass="h5 bi bi-search"
+                                            IconCssClass="bi bi-search"
                                             RenderStyleMode="ButtonRenderStyleMode.Outline"
                                             Tooltip="Click to search for the selected member"
                                             Click="@OnDateSearch" />
@@ -92,7 +91,7 @@ else
 
             <FullScreen @ref=@fullScreen DisplayOffset="22" AlternateDisplayOffset="13">
                 <ContentTemplate>
-                    <DxGrid Data=@messages @ref=@mainGrid
+                    <DxGrid id="my-grid" Data=@messages @ref=@mainGrid
                             AutoExpandAllGroupRows=false>
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid LayoutKey="{B8414CBE-49B9-47D4-A754-4FDC59A29115}" />

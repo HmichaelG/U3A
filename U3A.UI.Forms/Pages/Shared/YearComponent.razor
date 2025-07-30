@@ -3,7 +3,7 @@
 @implements IDisposable
 
 <MessageBox @ref="@messageBox" />
-<div class="@cssClass" styel="height: auto">
+<div class="@cssClass">
     <h3>@Year</h3>
     <DxDropDownButton RenderStyle="ButtonRenderStyle.Primary"
     Text="Change Year"
@@ -26,7 +26,7 @@
 </div>
 
 @code {
-    string cssClass = "card text-center";
+    string cssClass = "card text-center px-2";
 
     [Parameter, EditorRequired]
     public EventCallback<int> OnYearChangedEvent { get; set; }

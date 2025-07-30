@@ -16,89 +16,82 @@
 
 @attribute [Authorize]
 
+<PdfViewer @bind-PdfIsReady=@showPDF DocumentContent="@pdfContent" />
+
 @if (!IsReady)
 {
     <LoadingIndicator />
 }
 else
 {
-    if (showPDF)
-    {
-        <div class="row w-100 bg-secondary">
-            <PdfViewer DocumentContent="@pdfContent" OnCloseButtonClick="@(() => showPDF = false)" />
-        </div>
-    }
-    else
-    {
-        <div class="px-2">
-            <h3>@Title</h3>
-            <p>Queue Class reports for selected courses/leaders.</p>
-            <CollapsableContent DismissKey="{40D384A9-AA9E-49AD-8F70-BA65C97ACF0D}"
-                                AlertText=@(@"<p><strong>Leader Reports</strong> is now an automated procedure.<br />
-                        All reports are automatically sent to leaders one day prior (Sunday) to the
-                        start of term.</p>")
-                                OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
-                                OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
-            <DxFormLayout>
-                <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
-                    <TermsComboBox Terms="@terms"
-                                   @bind-SelectedTerm="@selectedTerm"
-                                   @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
-                </DxFormLayoutItem>
-            </DxFormLayout>
-            <br />
+    <div class="px-2">
+        <h3>@Title</h3>
+        <p>Queue Class reports for selected courses/leaders.</p>
+        <CollapsableContent DismissKey="{40D384A9-AA9E-49AD-8F70-BA65C97ACF0D}"
+                            AlertText=@(@"<p><strong>Leader Reports</strong> is now an automated procedure.<br />
+                                                All reports are automatically sent to leaders one day prior (Sunday) to the
+                                                start of term.</p>")
+                        OnDismissChanged="@((bool IsDismissed) => OnContentChange(IsDismissed))"
+                        OnToggleAlert="@(() => InvokeAsync(StateHasChanged))" />
+    <DxFormLayout>
+        <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="6">
+            <TermsComboBox Terms="@terms"
+                           @bind-SelectedTerm="@selectedTerm"
+                           @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+        </DxFormLayoutItem>
+    </DxFormLayout>
+    <br />
 
-            <MessageBox @ref="@messageBox" />
-            <Progress @ref="@ProgressBar" />
-            <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+        <MessageBox @ref="@messageBox" />
+        <Progress @ref="@ProgressBar" />
+        <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-            <DxFormLayout>
-                <div class="col-9 px-4">
-                    <FullScreen DisplayOffset="@contentSize">
-                        <ContentTemplate>
-                            <DxGrid Data="@Classes" @ref=@mainGrid
-                                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                                    ShowFilterRow="false"
-                                    ShowAllRows="true"
-                                    KeyFieldName="ID"
-                                    SelectionMode="@((AllowMultipleSelection) ? GridSelectionMode.Multiple : GridSelectionMode.Single)"
-                                    UnboundColumnData="Grid_CustomUnboundColumnData"
-                                    SelectedDataItemChanged="OnSelectedDataItemChanged"
-                                    @bind-SelectedDataItems="SelectedDataItems"
-                                    ValidationEnabled="true">
-                                <ToolbarTemplate>
-                                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{3607602E-7BF7-40D9-9D42-B3DEA3BCC287}" />
-                                </ToolbarTemplate>
-                                <Columns>
-                                    <DxGridSelectionColumn Width="2rem" />
-                                    <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
-                                    <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
-                                    <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
-                                    <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
-                                    <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
-                                    <DxGridDataColumn Caption="Send To 1" FieldName="Recipient0"
-                                                      UnboundType="GridUnboundColumnType.String" Width="10rem" />
-                                    <DxGridDataColumn Caption="Send To 2" FieldName="Recipient1"
-                                                      UnboundType="GridUnboundColumnType.String" />
-                                    <DxGridDataColumn Caption="Send To 3" FieldName="Recipient2"
-                                                      UnboundType="GridUnboundColumnType.String" />
-                                </Columns>
-                                <TotalSummary>
-                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
-                                </TotalSummary>
+        <DxFormLayout>
+            <div class="col-9 px-4">
+                <FullScreen DisplayOffset="@contentSize">
+                    <ContentTemplate>
+                        <DxGrid id="my-grid" Data="@Classes" @ref=@mainGrid
+                                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                                ShowFilterRow="false"
+                                ShowAllRows="true"
+                                KeyFieldName="ID"
+                                SelectionMode="@((AllowMultipleSelection) ? GridSelectionMode.Multiple : GridSelectionMode.Single)"
+                                UnboundColumnData="Grid_CustomUnboundColumnData"
+                                SelectedDataItemChanged="OnSelectedDataItemChanged"
+                                @bind-SelectedDataItems="SelectedDataItems"
+                                ValidationEnabled="true">
+                            <ToolbarTemplate>
+                                <GridToolbar LinkedGrid=@mainGrid LayoutKey="{3607602E-7BF7-40D9-9D42-B3DEA3BCC287}" />
+                            </ToolbarTemplate>
+                            <Columns>
+                                <DxGridSelectionColumn Width="2rem" />
+                                <DxGridDataColumn Caption="Name" FieldName="Course.Name" Width="20rem" />
+                                <DxGridDataColumn Caption="Offered" FieldName="OfferedSummary" />
+                                <DxGridDataColumn Caption="Venue" FieldName="Venue.Name" />
+                                <DxGridDataColumn Caption="Held" FieldName="OccurrenceTextBrief" />
+                                <DxGridDataColumn Caption="Start" FieldName="StartTime" DisplayFormat="hh:mm tt" />
+                                <DxGridDataColumn Caption="Send To 1" FieldName="Recipient0"
+                                                  UnboundType="GridUnboundColumnType.String" Width="10rem" />
+                                <DxGridDataColumn Caption="Send To 2" FieldName="Recipient1"
+                                                  UnboundType="GridUnboundColumnType.String" />
+                                <DxGridDataColumn Caption="Send To 3" FieldName="Recipient2"
+                                                  UnboundType="GridUnboundColumnType.String" />
+                            </Columns>
+                            <TotalSummary>
+                                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" Name="Course.Name" FieldName="Course.Name" />
+                            </TotalSummary>
 
-                            </DxGrid>
-                        </ContentTemplate>
-                    </FullScreen>
-                </div>
-                <div class="col col-3">
-                    <SelectLeaderReports @ref=@rptSelect AllowPrintAndEmail="@AllowPrintAndEmail"
-                                         AreSelectionsMade="@AreSelectionsMade" PrintSelectedReports="OnPrintReportsAsync"
-                                         QueueSelectedReports="OnQueueReportsSelected" />
-                </div>
-            </DxFormLayout>
-        </div>
-    }
+                        </DxGrid>
+                    </ContentTemplate>
+                </FullScreen>
+            </div>
+            <div class="col col-3">
+                <SelectLeaderReports @ref=@rptSelect AllowPrintAndEmail="@AllowPrintAndEmail"
+                                     AreSelectionsMade="@AreSelectionsMade" PrintSelectedReports="OnPrintReportsAsync"
+                                     QueueSelectedReports="OnQueueReportsSelected" />
+            </div>
+        </DxFormLayout>
+    </div>
 }
 
 
@@ -191,21 +184,21 @@ else
         {
             // create a dummy SendMail object
             var printDoc = new SendMail()
-                {
-                    ID = Guid.NewGuid(),
-                    DocumentName = "U3A Leaders Reports",
-                    PersonID = Class.LeaderID ?? Class.Leader2ID ?? Class.Leader3ID ?? Guid.Empty,
-                    TermID = selectedTerm.ID,
-                    PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
-                    PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
-                    PrintClassList = rptSelect.PrintClassList,
-                    PrintCSVFile = rptSelect.PrintCSVFile,
-                    PrintICEList = rptSelect.PrintICEList,
-                    PrintLeaderReport = rptSelect.PrintLeaderReport,
-                    PrintMemberBadges = rptSelect.PrintMemberBadges,
-                    RecordKey = Class.ID,
-                    IsUserRequested = true
-                };
+            {
+                ID = Guid.NewGuid(),
+                DocumentName = "U3A Leaders Reports",
+                PersonID = Class.LeaderID ?? Class.Leader2ID ?? Class.Leader3ID ?? Guid.Empty,
+                TermID = selectedTerm.ID,
+                PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
+                PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
+                PrintClassList = rptSelect.PrintClassList,
+                PrintCSVFile = rptSelect.PrintCSVFile,
+                PrintICEList = rptSelect.PrintICEList,
+                PrintLeaderReport = rptSelect.PrintLeaderReport,
+                PrintMemberBadges = rptSelect.PrintMemberBadges,
+                RecordKey = Class.ID,
+                IsUserRequested = true
+            };
             await ProcessPrintDocAsync(printDoc);
         }
         await ProgressBar.Close();
@@ -258,7 +251,7 @@ else
         ErrorMessage = "";
         await ProcessReportsAsync();
         var msg = $"<p>The selected documents have been queued for immediate processing and will be sent via email.</p>";
-        if (ErrorMessage != "") { msg += $"<div class='alert alert-danger text-dark'>{ErrorMessage}</div>"; }
+        if (ErrorMessage != "") { msg += $"<div class='alert alert-danger '>{ErrorMessage}</div>"; }
         await messageBox.ShowOkOnlyAsync("Communication Complete", msg);
     }
 
@@ -353,26 +346,27 @@ else
                                                 && x.TermID == selectedTerm.ID).ToList();
             enrolments.AddRange(await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT,
                                     await tenantService.GetTenantIdentifierAsync(), Course.ID));
-        };
+        }
+        ;
         if (enrolments.Count > 0 || !rptSelect.RequireEnrolements)
         {
             var mail = new SendMail()
-                {
-                    ID = Guid.NewGuid(),
-                    DocumentName = "U3A Leaders Reports",
-                    Person = await dbc.Person.FindAsync(Leader.ID),
-                    PersonID = Leader.ID,
-                    TermID = selectedTerm.ID,
-                    PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
-                    PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
-                    PrintClassList = rptSelect.PrintClassList,
-                    PrintCSVFile = rptSelect.PrintCSVFile,
-                    PrintICEList = rptSelect.PrintICEList,
-                    PrintLeaderReport = rptSelect.PrintLeaderReport,
-                    PrintMemberBadges = rptSelect.PrintMemberBadges,
-                    RecordKey = Class.ID,
-                    IsUserRequested = true
-                };
+            {
+                ID = Guid.NewGuid(),
+                DocumentName = "U3A Leaders Reports",
+                Person = await dbc.Person.FindAsync(Leader.ID),
+                PersonID = Leader.ID,
+                TermID = selectedTerm.ID,
+                PrintAttendanceRecord = rptSelect.PrintAttendanceRecord,
+                PrintAttendanceAnalysis = rptSelect.PrintAttendanceAnalysis,
+                PrintClassList = rptSelect.PrintClassList,
+                PrintCSVFile = rptSelect.PrintCSVFile,
+                PrintICEList = rptSelect.PrintICEList,
+                PrintLeaderReport = rptSelect.PrintLeaderReport,
+                PrintMemberBadges = rptSelect.PrintMemberBadges,
+                RecordKey = Class.ID,
+                IsUserRequested = true
+            };
             dbc.Add(mail);
             result.Add(mail.ID);
         }

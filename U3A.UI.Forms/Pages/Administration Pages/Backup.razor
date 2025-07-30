@@ -57,7 +57,7 @@
     <DxFormLayoutItem BeginRow="true" ColSpanMd="12"
                       Caption="Status" Visible="@(!string.IsNullOrWhiteSpace(state))"
                       CaptionPosition="CaptionPosition.Vertical">
-        <DxMemo @bind-Text="@state" ReadOnly="true" Rows="15" />
+        <DxMemo @bind-Text="@state" ReadOnly="true" Rows="15" CssClass="w-100 mb-2" />
     </DxFormLayoutItem>
     <div>@(new MarkupString(finishText))</div>
 </div>

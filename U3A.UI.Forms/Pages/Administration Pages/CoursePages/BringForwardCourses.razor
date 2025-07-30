@@ -36,7 +36,7 @@ else
 
     <FullScreen DisplayOffset="10">
         <ContentTemplate>
-            <DxGrid Data="@Courses" @ref=@mainGrid
+            <DxGrid id="my-grid" Data="@Courses" @ref=@mainGrid
             AutoCollapseDetailRow="true"
             @bind-SelectedDataItems="@SelectedDataItems"
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"

@@ -87,23 +87,14 @@ namespace U3A.Services
             request.CustomerReadOnly = true;
 
             int U3AFee = (int)(TotalFee * 100M);
-            int merchantFee = 0;
             request.Options = new();
-
-            if (settings.SeparateMerchantFeeAndU3AFee)
-            {
-                int baseFee = (int)(settings.MerchantFeeFixed * 100M);
-                int percentageFee = (int) System.Math.Round(TotalFee * settings.MerchantFeePercentage / 100M * 100M,0,MidpointRounding.AwayFromZero);
-                merchantFee = baseFee + percentageFee;
-                request.Options.Add(new Option() { Value = merchantFee.ToString("0") });
-                InvoiceDescription += $" {TotalFee.ToString("c2")} + merchant fee {(merchantFee / 100M).ToString("c2")}";
-            }
+            request.Options.Add(new Option() { Value = U3AFee.ToString("0") });
 
             if (request.TransactionType == TransactionTypes.Purchase)
             {
                 request.Payment = new Payment()
                 {
-                    TotalAmount = U3AFee + merchantFee,
+                    TotalAmount = U3AFee,
                     InvoiceDescription = InvoiceDescription,
                     InvoiceNumber = InvoiceNumber,
                     InvoiceReference = InvoiceReference
@@ -178,18 +169,11 @@ namespace U3A.Services
                     AccessCode = eWayResponse.AccessCode,
                     AuthorizationCode = eWayResponse.AuthorisationCode,
                     TransactionID = eWayResponse.TransactionID.GetValueOrDefault(),
-                    Amount = (decimal)(eWayResponse.TotalAmount.GetValueOrDefault() / 100.00),
+                    TotalPaid = (decimal)(eWayResponse.TotalAmount.GetValueOrDefault() / 100.00),
                     ResponseCode = eWayResponse.ResponseCode ?? "",
                     ResponseMessage = eWayResponse.ResponseMessage ?? ""
                 };
-                if (eWayResponse.Options != null && eWayResponse.Options.Any())
-                {
-                    result.MerchantFee = (decimal.Parse(eWayResponse.Options.First().Value) / 100.00M);
-                }
-                else
-                {
-                    result.MerchantFee = null;
-                }
+                result.OriginalFee = (decimal.Parse(eWayResponse.Options.First().Value) / 100.00M);
                 if (!CanSetPaymentStatusProcessed(result.ResponseCode, result.Date))
                 {
                     throw new EwayResponseException(@"The processing of your payment is incomplete.
@@ -238,16 +222,8 @@ namespace U3A.Services
                     Identifier = $"TransID: {result.TransactionID}",
                     Person = person
                 };
-                if (result.MerchantFee.HasValue)
-                {
-                    receipt.MerchantFee = result.MerchantFee.Value;
-                    receipt.Amount = result.Amount - result.MerchantFee.Value; // Merchant fee is separate, so amount is total minus fee
-                }
-                else
-                {
-                    receipt.MerchantFee = null;
-                    receipt.Amount = result.Amount; // No merchant fee, so amount is total
-                }
+                receipt.MerchantFee = result.MerchantFee;
+                receipt.Amount = result.OriginalFee;
                 var processingYear = term.Year;
                 var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(dbc, person);
 
@@ -343,8 +319,16 @@ namespace U3A.Services
         public string AccessCode { get; set; }
         public string AuthorizationCode { get; set; }
         public int TransactionID { get; set; }
-        public decimal Amount { get; set; }
-        public decimal? MerchantFee { get; set; }
+        public decimal TotalPaid { get; set; } // total paid including merchant surcharge
+        public decimal OriginalFee { get; set; } // membership fee without surcharge
+
+        public decimal MerchantFee
+        {
+            get
+            {
+                return TotalPaid - OriginalFee;
+            }
+        }
         public int? TermsPaid { get; set; }
         public string ResponseCode { get; set; }
         public string ResponseMessage { get; set; }

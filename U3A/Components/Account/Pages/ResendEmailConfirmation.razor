@@ -25,11 +25,13 @@
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
                 <label for="email" class="form-label">Email</label>
-                <ValidationMessage For="() => Input.Email" class="text-danger" />
+                <ValidationMessage For="() => Input.Email" class="text-fl-danger" />
             </div>
-            <div class="row p-2">
-                <button type="submit" class="w-50 btn btn-primary">Resend</button>
-                <a type="button" href="/" class="w-50 btn btn-secondary">Cancel</a>
+            <div class="button-container">
+                <DxButton CssClass="w-50" SubmitFormOnClick='true' Text="Resend" RenderStyle="ButtonRenderStyle.Primary" />
+                <NavLink href="/" class="button-link w-50">
+                    <DxButton Text="Cancel" CssClass="w-100" RenderStyle="ButtonRenderStyle.Secondary" />
+                </NavLink>
             </div>
         </EditForm>
     </div>

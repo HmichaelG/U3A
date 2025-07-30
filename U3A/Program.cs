@@ -26,6 +26,7 @@ builder.Services.AddRazorComponents(options =>
     options.DetailedErrors = builder.Environment.IsDevelopment())
     .AddInteractiveServerComponents();
 
+builder.Services.AddScoped<DxThemesService>();
 builder.Services.AddScoped<LocalTime>();
 builder.Services.AddScoped<TenantInfoService>();
 builder.UseSerilogLogging(tenantConnectionString);
@@ -38,7 +39,7 @@ if (recaptureKey != null) builder.Services.Configure<reCAPTCHAVerificationOption
 builder.Services.AddTransient<ReCaptchaV2API>();
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
-builder.Services.AddScoped<WorkStation>();
+builder.Services.AddScoped<WorkstationService>();
 builder.AddAIChatService(AIChatServiceExtension.ChatServiceType.Azure);
 builder.AddIdentityService();
 
@@ -89,21 +90,21 @@ app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
 
 app.UseAntiforgery();
-app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (BadHttpRequestException ex)
-    {
-        // Handle the exception
-        if (ex.InnerException is AntiforgeryValidationException)
-        {
-            context.Response.Redirect("/");
-        }
-    }
-});
+//app.Use(async (context, next) =>
+//{
+//    try
+//    {
+//        await next();
+//    }
+//    catch (BadHttpRequestException ex)
+//    {
+//        // Handle the exception
+//        if (ex.InnerException is AntiforgeryValidationException)
+//        {
+//            context.Response.Redirect("/");
+//        }
+//    }
+//});
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();

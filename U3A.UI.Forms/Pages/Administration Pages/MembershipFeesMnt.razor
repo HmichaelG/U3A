@@ -22,7 +22,7 @@ else {
         <EditForm Model="@systemSettings" OnValidSubmit=@ValidFormSubmitted Context="editContext">
             <DataAnnotationsValidator />
             <DxFormLayout>
-                <DxFormLayoutGroup Caption="Membership Fees" ColSpanLg="6" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                <DxFormLayoutGroup Caption="Membership Fees" ColSpanLg="7" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                     <DxFormLayoutItem Caption="Allowed Fee Payment Types" ColSpanMd="12">
                         <DxComboBox Data="@memberFeePaymentTypeList"
                                     @bind-Value="@systemSettings.AllowedMemberFeePaymentTypes"
@@ -46,18 +46,21 @@ else {
                         <DxMaskedInput @bind-Value="@systemSettings.MailSurcharge" Mask="@NumericMask.Currency" />
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
-                <DxFormLayoutGroup Caption="Eway Merchant Fees" ColSpanLg="6" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
-                    <DxFormLayoutItem Caption="Separate Merchant Fee from U3A Fees?" ColSpanMd="12">
-                        <DxCheckBox @bind-Checked="@systemSettings.SeparateMerchantFeeAndU3AFee" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Merchant Fee Fixed Amount" ColSpanMd="12">
-                        <DxMaskedInput @bind-Value="@systemSettings.MerchantFeeFixed" Mask="@NumericMask.Currency" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Merchant Fee Percent Amount" ColSpanMd="12">
-                        <DxMaskedInput @bind-Value="@systemSettings.MerchantFeePercentage" Mask="@NumericMask.Percentage" />
-                    </DxFormLayoutItem>
+                <DxFormLayoutGroup Caption="Eway Merchant Fees" ColSpanLg="5" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                    <div class="alert alert-info m-2">
+                        <p>
+                        By default, merchant fees are not included in fees charged to members. That is, liability for merchant fees
+                        is incurred and borne by the U3A. The link below explains how to charge the member a merchant fee surcharge
+                        in addition to membership fees.
+                        </p>
+                        <p>
+                            <a href="https://go.eway.io/s/article/Can-I-add-a-surcharge-to-payments?language=en_US">
+                                Add merchant fee surcharge.    
+                            </a>
+                        </p>
+                    </div>
                 </DxFormLayoutGroup>
-                <DxFormLayoutGroup Caption="Complimentary Membership Parameters" ColSpanLg="6" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
+                <DxFormLayoutGroup Caption="Complimentary Membership Parameters" ColSpanLg="7" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End">
                     <DxFormLayoutItem Caption="Include Membership Fee In Complimentary?" ColSpanMd="12">
                         <DxCheckBox @bind-Checked="@systemSettings.IncludeMembershipFeeInComplimentary" />
                     </DxFormLayoutItem>
@@ -72,7 +75,7 @@ else {
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Maximum Leader Enrolments In Complimentary?" ColSpanMd="12">
                         <DxSpinEdit @bind-Value="@systemSettings.LeaderMaxComplimentaryCourses" />
-                        <div>(0 = No max; all leaders complimentary)</div>
+                        <div class="w-100">(0 = No max; all leaders complimentary)</div>
                     </DxFormLayoutItem>
                 </DxFormLayoutGroup>
                 <DxFormLayoutItem ColSpanMd="12">

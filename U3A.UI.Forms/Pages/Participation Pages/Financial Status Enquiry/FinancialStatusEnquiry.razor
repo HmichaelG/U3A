@@ -24,9 +24,11 @@
         <MemberFeeAdjustment @ref="@adjustMemberFee" />
 
         <DxFormLayout CssClass="m-2">
-            <div class="col-12">
-                <h3>Financial Status Enquiry</h3>
-            </div>
+            @if (!IsReadOnly)
+            {
+                <ContextHelpTitle Title="Financial Status Enquiry" HelpTopic=""
+                                  Subtitle="Enquire about the financial status of members, including fees owed and payments made." />
+            }
             <DxFormLayoutGroup Caption="Enquiry Parameters">
                 <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="8">
                     <TermsComboBox Terms="@terms" @bind-SelectedTerm="@selectedTerm" />
@@ -36,17 +38,12 @@
                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                 @bind-Value="@balanceType" />
                 </DxFormLayoutItem>
-                <DxButton Text="Process" RenderStyle=ButtonRenderStyle.Primary CssClass="col-12 col-md-3 mt-2" Click="@OnProcess" />
                 <DxFormLayoutItem Caption="Financial To" ColSpanMd="8">
                     <DxTagBox Data="@FinancialYears" NullText="Ignore Financial To"
                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                               @bind-Values="@selectedFinancialYears" />
                 </DxFormLayoutItem>
-                <DxButton Text="Adjust Selected Fees"
-                          RenderStyle=ButtonRenderStyle.Primary
-                          CssClass="col-12 col-md-3 mt-2"
-                          Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
-                          Click="@OnFeeReversal" />
+                <DxButton Text="Process" RenderStyle=ButtonRenderStyle.Primary CssClass="col-12 col-md-3 mt-2" Click="@OnProcess" />
             </DxFormLayoutGroup>
 
         </DxFormLayout>
@@ -58,7 +55,7 @@
 
         <FullScreen DisplayOffset="17">
             <ContentTemplate>
-                <DxGrid Data="@Persons" @ref=@mainGrid
+                <DxGrid id="my-grid" Data="@Persons" @ref=@mainGrid
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
                         CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
@@ -77,60 +74,65 @@
                         PagerVisibleNumericButtonCount="10"
                         PagerVisible="true">
                     <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="{D82F7F55-5055-4E58-B07C-DDC2B73704EB}" />
+                        <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey" SpreadsheetHeaderRows="2" >
+                            <CustomButtonContent>
+                                <DxToolbarItem Text="Adjust Fees" Visible=@(!IsReadOnly)
+                                      IconCssClass="bi bi-currency-dollar"
+                                      RenderStyle=ButtonRenderStyle.Primary
+                                      Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
+                                      Click="@OnFeeReversal" />
+                            </CustomButtonContent>
+                        </GridToolbar>
                     </ToolbarTemplate>
                     <Columns>
-                        <DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" />
+                        <DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" Visible=@(!IsReadOnly) />
                         <DxGridDataColumn Caption="Member" FieldName="FullName" Width="10rem" FixedPosition="GridColumnFixedPosition.Left" />
-                        <DxGridDataColumn Caption="Joined" FieldName="DateJoined" DisplayFormat="dd-MMM-yy" Width="5rem" />
-                        <DxGridDataColumn Caption="Email" FieldName="Email" Width="12rem" Visible="false" />
-                        <DxGridDataColumn Caption="Mobile" FieldName="Mobile" Width="5rem" Visible="false" />
-                        <DxGridDataColumn Caption="Home" FieldName="HomePhone" Width="5rem" Visible="false" />
-                        <DxGridDataColumn Caption="Is Leader?" FieldName="IsCourseLeader" Visible="@true" Width="7rem">
-                            <CellDisplayTemplate>
-                                <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
-                            </CellDisplayTemplate>
-                            <FilterRowCellTemplate>
-                                <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                            AllowIndeterminateStateByClick="true"
-                                            Alignment="CheckBoxContentAlignment.Center" />
-                            </FilterRowCellTemplate>
-                        </DxGridDataColumn>
-                        <DxGridDataColumn Caption="Is Life Member?" FieldName="IsLifeMember" Visible="@true" Width="7rem">
-                            <CellDisplayTemplate>
-                                <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
-                            </CellDisplayTemplate>
-                            <FilterRowCellTemplate>
-                                <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                            AllowIndeterminateStateByClick="true"
-                                            Alignment="CheckBoxContentAlignment.Center" />
-                            </FilterRowCellTemplate>
-                        </DxGridDataColumn>
-                        <DxGridDataColumn Caption="Is Complimentary?" FieldName="IsComplimentary" Visible="@true" Width="7rem">
-                            <CellDisplayTemplate>
-                                <DxCheckBox Enabled="false" Checked="(bool)context.Value" Alignment="CheckBoxContentAlignment.Center" />
-                            </CellDisplayTemplate>
-                            <FilterRowCellTemplate>
-                                <DxCheckBox Checked="(bool?)context.FilterRowValue"
-                                            CheckedChanged="(bool? v) => context.FilterRowValue = v"
-                                            AllowIndeterminateStateByClick="true"
-                                            Alignment="CheckBoxContentAlignment.Center" />
-                            </FilterRowCellTemplate>
-                        </DxGridDataColumn>
-                        <DxGridDataColumn Caption="Active Enrolments" FieldName="Enrolments" DisplayFormat="N0" Width="5rem" />
-                        <DxGridDataColumn Caption="W/Listed Enrolments" FieldName="Waitlisted" DisplayFormat="N0" Width="5rem" />
-                        <DxGridDataColumn Caption="Last Receipt" FieldName="LastReceipt" DisplayFormat="dd-MMM-yy" Width="5rem" />
-                        <DxGridDataColumn Caption="Membership" FieldName="MembershipFees" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Postal" FieldName="MailSurcharge" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Course/Year" FieldName="CourseFeesPerYear" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Course/Term" FieldName="CourseFeesPerTerm" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Other" FieldName="OtherFees" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Received" FieldName="AmountReceived" DisplayFormat="c2" Width="5rem" />
+                        <DxGridBandColumn Caption="Contact Details" Visible=false>
+                            <Columns>
+                                <DxGridDataColumn Caption="Email" FieldName="Email" Width="12rem" />
+                                <DxGridDataColumn Caption="Mobile" FieldName="Mobile" Width="5rem" />
+                                <DxGridDataColumn Caption="Home" FieldName="HomePhone" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Membership">
+                            <Columns>
+                                <DxGridDataColumn Caption="Joined" FieldName="DateJoined" DisplayFormat="dd-MMM-yy" Width="5rem" />
+                                <DxGridDataColumn Caption="Leader?" FieldName="IsCourseLeader" Visible="@true" Width="7rem" />
+                                <DxGridDataColumn Caption="Life?" FieldName="IsLifeMember" Visible="@true" Width="7rem" />
+                                <DxGridDataColumn Caption="Comp?" FieldName="IsComplimentary" Visible="@true" Width="7rem" />
+                                <DxGridDataColumn Caption="Fin-To" FieldName=FinancialToBriefText Width="2.5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Enrolment">
+                            <Columns>
+                                <DxGridDataColumn Caption="Active" FieldName="Enrolments" DisplayFormat="N0" Width="5rem" />
+                                <DxGridDataColumn Caption="W/List" FieldName="Waitlisted" DisplayFormat="N0" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Membership Fees">
+                            <Columns>
+                                <DxGridDataColumn Caption="M'ship" FieldName="MembershipFees" DisplayFormat="c2" Width="5rem" />
+                                <DxGridDataColumn Caption="Postal" FieldName="MailSurcharge" DisplayFormat="c2" Width="5rem" />
+                                <DxGridDataColumn Caption="Other" FieldName="OtherFees" DisplayFormat="c2" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Course Fees">
+                            <Columns>
+                                <DxGridDataColumn Caption="Year" FieldName="CourseFeesPerYear" DisplayFormat="c2" Width="5rem" />
+                                <DxGridDataColumn Caption="Term" FieldName="CourseFeesPerTerm" DisplayFormat="c2" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
+                        <DxGridBandColumn Caption="Receipts">
+                            <Columns>
+                                <DxGridDataColumn Caption="Last Receipt" FieldName="LastReceipt" DisplayFormat="dd-MMM-yy" Width="5rem" />
+                                <DxGridDataColumn Caption="Received" FieldName="AmountReceived" DisplayFormat="c2" Width="5rem" />
+                            </Columns>
+                        </DxGridBandColumn>
                         <DxGridDataColumn Caption="Total" FieldName="TotalFees" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Caption="Fin-To" FieldName=FinancialToBriefText />
-                    <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
+                    <DxGridDataColumn Width="3rem" Visible=@(!IsReadOnly) 
+                                        Caption="Details" AllowGroup="false" 
+                                        ExportEnabled="false"  
+                                        FixedPosition="GridColumnFixedPosition.Right">
                         <CellDisplayTemplate>
                             <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
                                         RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
@@ -177,6 +179,10 @@
 </form>
 
 @code {
+    [Parameter]
+    public bool IsReadOnly { get; set; } = false;
+    [Parameter]
+    public string GridLayoutKey { get; set; } = "{D82F7F55-5055-4E58-B07C-DDC2B73704EB}";
     [Parameter]
     public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
 
@@ -246,7 +252,8 @@
                 service = new ();
                 await service.CalculateFeeAsync(dbc, p, selectedTerm);
                 Persons.Add(service.PersonWithFinancialStatus);
-                await ProgressBar.SetValueAsync(i++);
+                i++;
+                if (i % 50 == 0) { await ProgressBar.SetValueAsync(i); }
             }
             await ProgressBar.Close();
             lastTerm = selectedTerm;

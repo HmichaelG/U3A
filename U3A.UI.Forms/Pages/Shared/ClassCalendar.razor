@@ -3,8 +3,7 @@
 
 @if (IsReady)
 {
-    <DxFormLayout>
-        <div class="w-100 d-flex justify-content-center">
+    <DxFormLayout CssClass="w-100 d-flex flex-column justify-content-center" style="background-color=red;;">
             <DxFormLayoutGroup>
                 <HeaderContentTemplate>
                     <div class="input-group fs-6">
@@ -42,7 +41,7 @@
                                 <GroupRowTemplate>
                                     @{
                                         <div class="pt-2">
-                                            <div class="h6 text-info">@(((DateTime)context.GroupValue).ToString(constants.FULL_DAY_DATE_FORMAT))</div>
+                                            <div class="h6 text-fl-info">@(((DateTime)context.GroupValue).ToString(constants.FULL_DAY_DATE_FORMAT))</div>
                                         </div>
                                     }
                                 </GroupRowTemplate>
@@ -76,7 +75,6 @@
                     </DxGrid>
                 </Items>
             </DxFormLayoutGroup>
-        </div>
     </DxFormLayout>
 }
 <style>
@@ -160,7 +158,7 @@
     {
         string result = "text-body";
         if (Events is not null && Events.Any(d => DaysEqual(d.Start, date)))
-            result = "font-weight-bold text-info";
+            result = "font-weight-bold text-fl-info";
         return result;
     }
 

@@ -1,31 +1,19 @@
-﻿@inject WorkStation ws
+﻿@inject WorkstationService ws
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-<DxGridLayout>
-    <Rows>
-        <DxGridLayoutRow Areas="blank" Height="2.6rem"></DxGridLayoutRow>
-        <DxGridLayoutRow Areas="header" Height="auto"></DxGridLayoutRow>
-        <DxGridLayoutRow Areas="navigation"></DxGridLayoutRow>
-    </Rows>
-    <Columns>
-        <DxGridLayoutColumn />
-        <DxGridLayoutColumn Width="auto" />
-    </Columns>
-    <Items>
-        <DxGridLayoutItem Area="header" CssClass="d-flex-column sidebar-header">
-            <Template>
-                <img src="images/U3ALogo.png" />
-                <div class="h5 menu-title w-100">@OrganisationName</div>
-                <SidebarImageComponent />
-            </Template>
-        </DxGridLayoutItem>
-        <DxGridLayoutItem Area="navigation" CssClass="layout-item">
-            <Template>
-                <MainMenu IsTopMenu=false />
-            </Template>
-        </DxGridLayoutItem>
-    </Items>
-</DxGridLayout>
+<div class="d-flex flex-column sidebar-style">
+    <SidebarImageComponent />
+    <img src="images/U3ALogo.png" style="max-width: 81px; height: 28px" />
+    <div class="h5 flex-row text-fl-primary mt-1">@OrganisationName</div>
+    <MainMenu IsTopMenu=false />
+</div>
+
+<style>
+    .sidebar-style {
+        margin-top: 2.6rem;
+        width: 100%;
+    }
+</style>
 
 @code {
 

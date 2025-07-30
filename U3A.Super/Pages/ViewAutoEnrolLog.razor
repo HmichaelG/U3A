@@ -21,7 +21,7 @@
         <div class="pb-2 text-style">
             <FullScreen DisplayOffset="10" HideToggle="true">
                 <ContentTemplate>
-                    <DxGrid @ref="grid" Data="@logs"
+                    <DxGrid id="my-grid" @ref="grid" Data="@logs"
                             KeyFieldName="Id"
                             AutoExpandAllGroupRows="true"
                             ValidationEnabled="true">
@@ -31,7 +31,7 @@
                                     <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
                                         <Template>
                                             <div class="d-flex">
-                                                <div class="flex-grow-0 pt-1 pe-2 text-primary fw-bold">Date:</div>
+                                                <div class="flex-grow-0 pt-1 pe-2 text-accent fw-bold">Date:</div>
                                                 <DxDateEdit @bind-Date=@fromDate
                                                             @bind-Date:after=GetData
                                                             CssClass="flex-grow-1" />
@@ -53,18 +53,18 @@
                             <DxGridDataColumn FieldName="Message">
                                 <CellDisplayTemplate>
                                     <div class="@(((string)context.Value).StartsWith("Rank:")
-                                                        ? "fw-bold text-info mt-2"
-                                                        : "")">
-                                        @context.Value
-                                    </div>
-                                </CellDisplayTemplate>
-                            </DxGridDataColumn>
-                        </Columns>
-                    </DxGrid>
-                </ContentTemplate>
-            </FullScreen>
-        </div>
+                                                                                                                                                                                                                                             ? "fw-bold text-info mt-2"
+                                                                                                                                                                                                                                             : "")">
+                                    @context.Value
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
     </div>
+</div>
 }
 
 <style>
@@ -101,7 +101,7 @@
         {
             var utcDate = fromDate.Date - lt.UtcOffset;
             logs = await dbc.LogAutoEnrol
-                            .Where(x => x.TimeStamp > utcDate 
+                            .Where(x => x.TimeStamp > utcDate
                                             && x.TimeStamp < utcDate.AddHours(24)
                                             && !string.IsNullOrWhiteSpace(x.Message))
                             .OrderByDescending(x => x.Tenant).ThenBy(x => x.TimeStamp)

@@ -6,7 +6,7 @@
 @inject IConfiguration config
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject ILogger<MemberEnrolment> Logger
-@inject WorkStation ws
+@inject WorkstationService ws
 
 @using System.Web
 @using Microsoft.AspNetCore.Builder
@@ -43,13 +43,13 @@ else
     <MessageBox @ref="messageBox" />
     <div class=@((IsPreview)
      ? "col-10 mx-auto"
-     : "container mx-1 col col-12 col-md-10 col-lg-7 mx-auto")>
+     : "container mx-1 col col-12 col-lg-10 col-xxl-8 mx-auto")>
         <div class="h6 pt-2 col-12" align="center">
             @term?.TermSummary
         </div>
         @if (isNotInEnrolmentPeriod)
         {
-            <p class="alert alert-danger text-dark col-12 my-2" align="center">
+            <p class="alert alert-danger col-12 my-2" align="center">
                 @(enrolmentLockoutText)
             </p>
         }
@@ -139,12 +139,12 @@ else
                                         <Items>
                                             <div class="container mt-2 mb-1 py-1 border @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
                                                 <div class="d-flex flex-row align-items-center my-auto">
-                                                    <div class="flex-grow-1 pt-2 h6">
+                                                    <div class="flex-grow-1">
                                                         <div hidden="@(!c.Course.IsFeaturedCourse)" class="badge bg-primary">Featured</div>
-                                                        <div>@(HighlightSearchText(ClassTitle(c)))</div>
+                                                        <div><b>@(HighlightSearchText(ClassTitle(c)))</b></div>
                                                     </div>
                                                     <div hidden="@IsMobileLayout" class="flex-grow-0">
-                                                        <div hidden="@(!IsReadOnly)" class="h6 text-primary">@GetStatus(c)</div>
+                                                        <div hidden="@(!IsReadOnly)" class="text-primary">@GetStatus(c)</div>
                                                         <DxButton Text="@GetStatus(c)" Visible="@(!IsReadOnly)"
                                                                   IconCssClass="@($"bi {selectButtonIcon}")"
                                                                   RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -154,7 +154,7 @@ else
                                                 </div>
                                             </div>
                                             <div hidden="@(!IsMobileLayout)" class="mx-auto">
-                                                <div hidden="@(!IsReadOnly)" class="h6 text-primary">@GetStatus(c)</div>
+                                                <div hidden="@(!IsReadOnly)" class="text-primary">@GetStatus(c)</div>
                                                 <DxButton Text="@GetStatus(c)" Visible="@(!IsReadOnly)"
                                                           IconCssClass="@($"bi {selectButtonIcon}")"
                                                           RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -164,17 +164,17 @@ else
                                             @if (!string.IsNullOrEmpty(c.Course.OfferedBy))
                                             {
                                                 <div class="row px-2 px-md-3 col-12">
-                                                    <div class="text-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
+                                                    <div class="text-fl-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
                                                 </div>
                                             }
                                             <div class="w-100 text-center">
                                                 @if (c.Course.CourseFeePerYear != 0)
                                                 {
-                                                    <div class="text-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
+                                                    <div class="text-fl-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
                                                 }
                                                 @if (c.Course.HasTermFees)
                                                 {
-                                                    <div class="text-info"><strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong></div>
+                                                    <div class="text-fl-info"><strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong></div>
                                                 }
                                             </div>
 
@@ -347,7 +347,7 @@ else
         </DxGrid>
 
         <div class="align-items-end">
-            <div class="h6 col-12 text-primary" align="center">
+            <div class="h6 col-12 text-fl-primary" align="center">
                 @(new MarkupString(selectionCountText))
             </div>
 
@@ -1146,7 +1146,7 @@ else
                                     ? "Closed.<br/>A closed class is one in which new enrolments are currently suspended"
                                     : $"Closed because...</br><b>{selectedClass.Course.AutoEnrolDisabledReason}</b>";
             }
-            result = $@"<div class='alert alert-danger text-dark text-center'><h5>Class is {reason}</h5>
+            result = $@"<div class='alert alert-danger text-center'><h5>Class is {reason}</h5>
                         You have requested enrolment in a class that is {extendedReason}.<br/>
                         Your request will be <strong>Waitlisted</strong> meaning you will
                         be notified should a place become available in the future.</br>
@@ -1163,7 +1163,7 @@ else
             var alert = (selectedClass.OccurrenceID == (int)OccurrenceType.OnceOnly)
                             ? "warning"
                             : "danger";
-            result = $@"<div class='alert alert-{alert} text-dark text-center'><h5>Class is not available this term</h5>
+            result = $@"<div class='alert alert-{alert} text-center'><h5>Class is not available this term</h5>
                         You have requested enrolment in a class that unavailable this term.<br/>{action}
                         </div>";
 

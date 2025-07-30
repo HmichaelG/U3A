@@ -22,8 +22,8 @@
 <p>Register a new account by providing your email address and password below.
     We will send a confirmation email to your address with a link to complete the registration process.
 </p>
-<p class="text-danger mb-1 h6"><strong>Existing Member?</strong></p>
-<p class="text-danger"><strong>DO NOT</strong> use this form to change your email address.
+<p class="text-fl-danger mb-1 h6"><strong>Existing Member?</strong></p>
+<p class="text-fl-danger"><strong>DO NOT</strong> use this form to change your email address.
     Rather, login and select <strong>Change Email Address</strong> from the <strong>Manage Credentials</strong> menu group.</p>
 
 <div class="row">
@@ -32,25 +32,27 @@
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
             <hr />
-            @* <ValidationSummary class="text-danger" role="alert" /> *@
+            @* <ValidationSummary class="text-fl-danger" role="alert" /> *@
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                 <label for="email">Email</label>
-                <ValidationMessage For="() => Input.Email" class="text-danger" />
+                <ValidationMessage For="() => Input.Email" class="text-fl-danger" />
             </div>
             <div class="form-floating mb-3">
                 <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                 <label for="password">Password</label>
-                <ValidationMessage For="() => Input.Password" class="text-danger" />
+                <ValidationMessage For="() => Input.Password" class="text-fl-danger" />
             </div>
             <div class="form-floating mb-3">
                 <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                 <label for="confirm-password">Confirm Password</label>
-                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+                <ValidationMessage For="() => Input.ConfirmPassword" class="text-fl-danger" />
             </div>
-            <div class="row p-2">
-                <button type="submit" class="w-50 btn btn-primary">Register</button>
-                <a type="button" href="/" class="w-50 btn btn-secondary">Cancel</a>
+            <div class="button-container">
+                <DxButton CssClass="w-50" SubmitFormOnClick='true' Text="Register" RenderStyle="ButtonRenderStyle.Primary" />
+                <NavLink href="/" class="button-link w-50">
+                    <DxButton Text="Cancel" CssClass="w-100" RenderStyle="ButtonRenderStyle.Secondary" />
+                </NavLink>
             </div>
         </EditForm>
     </div>

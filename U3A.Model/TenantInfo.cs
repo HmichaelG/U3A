@@ -18,6 +18,7 @@ public class TenantInfo
 
     public string? ConnectionString { get; set; }
     public string Website { get; set; }
+    public string PrimaryWebsiteColor { get; set; }
     public string State { get; set; }
     public string? SendGridAPIKey { get; set; }
     public bool UseEmailTestEnviroment { get; set; }

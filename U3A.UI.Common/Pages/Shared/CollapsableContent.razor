@@ -1,0 +1,84 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+@if (!IsDismissed && Visible)
+{
+    <section class="@($"{CssClass} {alertRender}")" hidden="@isHidden">
+        <DxButton CssClass="dismiss-button" 
+            Click="@OnDismiss"
+            IconCssClass="bi bi-x-lg"
+            RenderStyle=ButtonRenderStyle.Primary
+            RenderStyleMode="ButtonRenderStyleMode.Text"
+            Visible="@(ShowCollapseButton)" />
+        @ContentTemplate
+        @(new MarkupString(AlertText))
+    </section>
+}
+
+<style>
+    .strong {
+        font-weight: 500;
+    }
+
+    .muted {
+        --bs-bg-opacity: 0.1;
+    }
+
+    .dismiss-button {
+        float: right;
+    }
+
+
+</style>
+@code {
+    [Parameter] public bool Visible { get; set; } = true;
+    [Parameter] public bool ShowCollapseButton { get; set; } = true;
+    [Parameter] public string AlertType { get; set; } = "info";
+    [Parameter] public string AlertText { get; set; }
+    [Parameter] public EventCallback OnToggleAlert { get; set; }
+    [Parameter] public EventCallback<bool> OnDismissChanged { get; set; }
+    [Parameter] public EventCallback OnContentExpanded { get; set; }
+    [Parameter] public EventCallback OnContentCollapsed { get; set; }
+    [Parameter] public RenderFragment ContentTemplate { get; set; }
+    [Parameter] public string CssClass { get; set; } = " text-center";
+    [Parameter] public string? DismissKey { get; set; }
+
+    bool IsDismissed = true;
+
+    bool isHidden = false;
+    string alertRender;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (AlertType.ToLower().Trim() == "none")
+        {
+            alertRender = $"border border-1";
+        }
+        else
+        {
+            alertRender = $"alert alert-{AlertType}";
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            var original = IsDismissed;
+            if (!await localStorage.ContainKeyAsync(DismissKey)) { IsDismissed = false; }
+            await OnDismissChanged.InvokeAsync(IsDismissed);
+            StateHasChanged();
+        }
+    }
+
+    async Task OnDismiss()
+    {
+        IsDismissed = true;
+        await localStorage.SetItemAsStringAsync(DismissKey, "Dismiss");
+        await OnDismissChanged.InvokeAsync(IsDismissed);
+        await InvokeAsync(StateHasChanged);
+    }
+
+}
+

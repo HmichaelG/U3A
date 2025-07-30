@@ -37,7 +37,7 @@ else
     <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
     DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
 
-    <DxGrid Data="@taggedContacts" @ref=@mainGrid
+    <DxGrid id="my-grid" Data="@taggedContacts" @ref=@mainGrid
     @bind-SelectedDataItems="@SelectedDataItems"
     AutoExpandAllGroupRows="true"
     AllowSelectRowByClick="true"

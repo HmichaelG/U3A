@@ -3,7 +3,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager navMan
 @inject IJSRuntime js
-@inject WorkStation ws
+@inject WorkstationService ws
 
 @using Microsoft.AspNetCore.Components.Authorization
 @using U3A.UI.Forms.Pages.MembersPortal
@@ -24,7 +24,7 @@ else
 
         <MessageBox @ref="@messageBox" />
 
-        <div class="container-xl mt-1">
+        <div class="container-xl mt-2">
             <div class="left-align-style">
                 <DxToolbar>
                     <Items>
@@ -78,8 +78,8 @@ else
                                 <DxFormLayout CssClass="my-2">
                                     <div class="mx-auto col col-12 @((isDrawerOpen) ? "col-xl-6" : "col-lg-6")">
                                         <div class="text-center" hidden="@(isSelected)">
-                                            <div class="h3 text-center">Member Portal (Administration)</div>
-                                            <div class="h6">Process enrolments and/or membership fees on behalf of members.</div>
+                                            <div class="h3 text-fl-primary text-center">Member Portal (Administration)</div>
+                                            <div>Process enrolments and/or membership fees on behalf of members.</div>
                                             <DxFormLayoutItem Caption="Process on behalf of" ColSpanMd="12" CssClass="mb-2">
                                                 <PersonsComboBox People="@people" SelectedPerson="@selectedPerson"
                                                                  SelectedPersonChanged="(Person newValue) => OnSelectedPersonChanged(newValue)" />
@@ -100,7 +100,7 @@ else
                                                 <DxTabPage Text="Received">
                                                     <FullScreen DisplayOffset="13" HideToggle="true">
                                                         <ContentTemplate>
-                                                            <DxGrid @ref=@receiptGrid Data="@ReceivedToday" CssClass="m-2"
+                                                            <DxGrid id="my-grid" @ref=@receiptGrid Data="@ReceivedToday" CssClass="m-2"
                                                                     UnboundColumnData="Grid_UnboundColumnData"
                                                                     TextWrapEnabled="false"
                                                                     ShowFilterRow="false"
@@ -112,7 +112,7 @@ else
                                                                             <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
                                                                                 <Template>
                                                                                     <div class="d-flex">
-                                                                                        <div class="flex-grow-0 pt-1 pe-2 text-primary fw-bold">From:</div>
+                                                                                        <div class="flex-grow-0 pt-1 pe-2 text-fl-primary fw-bold">From:</div>
                                                                                         <DxDateEdit Date=@startDate DateChanged="@((DateTime newValue) => OnStartDateChanged(newValue))" CssClass="flex-grow-1" />
                                                                                     </div>
                                                                                 </Template>
@@ -120,7 +120,7 @@ else
                                                                             <DxToolbarItem Context="a" Alignment="ToolbarItemAlignment.Right">
                                                                                 <Template>
                                                                                     <div class="d-flex">
-                                                                                        <div class="flex-grow-0 pt-1 px-2 text-primary fw-bold">To:</div>
+                                                                                        <div class="flex-grow-0 pt-1 px-2 text-fl-primary fw-bold">To:</div>
                                                                                         <DxDateEdit Date=@endDate DateChanged="@((DateTime newValue) => OnEndDateChanged(newValue))" CssClass="flex-grow-1" />
                                                                                     </div>
                                                                                 </Template>
@@ -161,19 +161,19 @@ else
                                                 </DxTabPage>
                                                 <DxTabPage Text="Email Status">
                                                     <div class="m-1">
-                                                        <div class="bi bi-question-circle-fill text-info"><small>&nbsp;Cash Receipt/Enrolment reports sent within the hour. Leader reports within 48 hours of next class</small></div>
+                                                        <div class="bi bi-question-circle-fill text-fl-info"><small>&nbsp;Cash Receipt/Enrolment reports sent within the hour. Leader reports within 48 hours of next class</small></div>
                                                         <QueuedTransactionalEmail IsEmbedded="true" />
                                                     </div>
                                                 </DxTabPage>
                                                 <DxTabPage Text="Add/Edit Member Details">
                                                     <div class="m-1">
-                                                        <div class="bi bi-question-circle-fill text-info"><small>&nbsp;Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
+                                                        <div class="bi bi-question-circle-fill text-fl-info"><small>&nbsp;Press the <strong>Refresh</strong> button to refresh data after adding/editing members</small></div>
                                                         <MemberDrawer TargetName="PersonMntEmbedded" />
                                                     </div>
                                                 </DxTabPage>
                                                 <DxTabPage Text="Review Logins">
                                                     <div class="m-1">
-                                                        <div class="bi bi-question-circle-fill text-info">
+                                                        <div class="bi bi-question-circle-fill text-fl-info">
                                                             <small>
                                                                 &nbsp;  <b>Note: </b>Deleting a login will require the member to re-register.
                                                                 Otherwise, it is a safe measure of last resort.

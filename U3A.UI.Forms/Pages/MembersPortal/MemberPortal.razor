@@ -12,7 +12,7 @@
 @implements IDisposable
 @inject NavigationManager navMan
 @inject SignInManager<ApplicationUser> SignInMgr
-@inject WorkStation ws
+@inject WorkstationService ws
 
 @attribute [Authorize]
 
@@ -100,19 +100,14 @@ else
                     break;
 
                 case PortalMenuSelection.PrintMemberBadge:
-                    <div class="row w-100">
-                        <PdfViewer Report="@(GetMemberBadgeReport())"
-                        DisplayHeightOffset="10"
-                        OnCloseButtonClick="@(() => menuSelection = PortalMenuSelection.ShowMenu)" />
-                        <DxButton Text="Return to menu"
-                        IconCssClass="bi-door-closed menu-icon me-3 h2"
-                        CssClass="mx-auto col-6 mt-4"
-                        Click="@OnReportComplete"
-                        RenderStyle="ButtonRenderStyle.Primary"
-                        RenderStyleMode="ButtonRenderStyleMode.Outline">
-                        </DxButton>
-                    </div>
-                    menuSelection = PortalMenuSelection.ShowMenu;
+                    <PdfViewer PdfIsReady=true 
+                        FileName="@(GetMemberBadgeReport())"
+                        PdfIsReadyChanged=@(() => 
+                        {
+                        menuSelection = PortalMenuSelection.ShowMenu;
+                        OnReportComplete();
+                        })
+                    />
                     break;
                 case PortalMenuSelection.DoReturnToAdminPortal:
                     OnReturnToAdminPortal.InvokeAsync();

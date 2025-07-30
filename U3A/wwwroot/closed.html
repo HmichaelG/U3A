@@ -24,10 +24,10 @@
             <div class="span4"><img class="center-block" src="/Favicon/android-chrome-512x512.png" width="100" height="100" /></div>
             <div class="span4"></div>
         </div>
-        <div class="row text-center text-primary mt-4">
+        <div class="row text-center text-fl-primary mt-4">
             <h2>Member Portal Timeout</h2>
         </div>
-        <div class="row text-center text-dark mt-2">
+        <div class="row text-center mt-2">
             <p>
                 You have reached this page because the software detected an extended period of inactivity.
             </p>
@@ -37,8 +37,10 @@
             </p>
             <p>To use the software again, click the link below...</p>
         </div>
-        <div class="row text-center text-primary">
-            <a class="center-block btn btn-primary" href="/">Member Portal</a>
+        <div class="button-container">
+            <NavLink href="/" class="button-link w-50">
+                <DxButton Text="Member Portal" CssClass="w-100" RenderStyle="ButtonRenderStyle.Secondary" />
+            </NavLink>
         </div>
     </div>
 

@@ -14,7 +14,9 @@
 @inject CircuitHandler circuitHandler
 @inject NavigationManager navMan
 @inject IJSRuntime js
-@inject WorkStation ws
+@inject WorkstationService ws
+@inject DxThemesService themeService
+@inject IThemeChangeService themeChangeService
 @implements IDisposable
 
 @if (isInteractive)
@@ -179,15 +181,15 @@
     int seq = 0;
     async Task processSizeChange(ScreenSizes size)
     {
-            await ws.SetScreenSizeAsync(size);
-            StateHasChanged();
-            seq++;
-            Log.Information($"{seq}: Screen size changed to: {size}", size);
+        await ws.SetScreenSizeAsync(size);
+        StateHasChanged();
+        seq++;
+        Log.Information($"{seq}: Screen size changed to: {size}", size);
     }
 
     private async Task GetWorkstationDetails()
     {
-        await ws.GetWorkstationDetail(localStorage);
+        await ws.GetWorkstationDetail();
         useTopMenu = ws.UseTopMenu;
         switch (ws.SizeMode)
         {
@@ -201,7 +203,7 @@
                 sizeMode = SizeMode.Small;
                 break;
         }
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)

@@ -1,4 +1,7 @@
-﻿@using Microsoft.JSInterop
+﻿@using DevExpress.Blazor.Reporting.Models
+@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@using Microsoft.JSInterop
 @using DevExpress.Export
 @using System.Drawing
 @using System.Collections
@@ -6,10 +9,14 @@
 @using DevExpress.Blazor
 @using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Components.Routing
+@using System.Text.RegularExpressions
+@using Serilog
+@using U3A.UI.Reports.Pages
 
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject NavigationManager navMan
 @inject IToastNotificationService ToastService
+@inject IJSRuntime js
 
 <DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
 <MessageBox @ref=messageBox />
@@ -112,26 +119,73 @@
                        Alignment="ToolbarItemAlignment.Right"
                        Tooltip="Filter / search for records">
         </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel Export"
-                       BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right">
-            <Items>
-                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportAll" Text="Export All"
-                               Tooltip="Export the entire grid to Excel">
-                </DxToolbarItem>
-                <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Name="ExportSelected" Text="Export Selected"
-                               Tooltip="Export selected rows to Excel" Visible="@areRowsSelectable">
-                </DxToolbarItem>
-            </Items>
-        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel" Name="ToExcel" BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                       Tooltip="Export the grid to Excel" />
+        <DxToolbarItem IconCssClass="bi bi-printer" Text="Print" Name="ToPdf"
+                       Alignment="ToolbarItemAlignment.Right"
+                       id="dropdown-target-container"
+                       Tooltip="Create a Pdf report from the grid" />
         @CustomButtonContent
     </Items>
 </DxToolbar>
+
+<DxDropDown @bind-IsOpen="@isDropDownOpen"
+            Id="dropDown-overview"
+            FooterVisible="true"
+            HeaderVisible="true"
+            HeaderText="@($"{((showPdfOptions) ? "Print" : "Excel")} Parameters")"
+            PositionMode="DropDownPositionMode.Bottom"
+            Width="max(25vw, 250px)"
+            PositionTarget="#dropdown-target-container"
+            RestrictionTarget="#dropdown-target-container"
+            CloseMode="DropDownCloseMode.Close"
+            PreventCloseOnPositionTargetClick="true">
+    <BodyContentTemplate>
+        <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+            <DxFormLayoutItem Caption="Title" ColSpanMd="12" Context="titleContext">
+                <DxMemo @bind-Text=@reportTitle Rows="3" CssClass="w-100" />
+            </DxFormLayoutItem>
+            @if (showPdfOptions)
+            {
+                <DxFormLayoutItem Caption="Print Portrait?" CssClass="mt-2"
+                                  ColSpanMd="12" Context="orientationContext">
+                    <DxCheckBox @bind-Checked=@IsPortrait />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Column Widths" CssClass="mt-1"
+                                  ColSpanMd="12" Context="orientationContext">
+                    <DxRadioGroup Items="@(new List<string> { DEFAULT_FIT_TO_PAGE, "Fit column width" })"
+                                  @bind-Value="@fitStyle" Layout="RadioGroupLayout.Horizontal" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Font Size" CssClass="mt-1"
+                                  ColSpanMd="12" Context="fontContext">
+                    <DxRadioGroup Items="@(new List<int> { 8, 10, 12 })"
+                                  @bind-Value="@pdfFontSize" Layout="RadioGroupLayout.Horizontal" />
+                </DxFormLayoutItem>
+                <DxFormLayoutItem Caption="Page Size" CssClass="mt-1"
+                                  ColSpanMd="12" Context="fontContext">
+                    <DxRadioGroup Items="@(new List<string> { DEFAULT_PAGE_SIZE, "A3" })"
+                                  @bind-Value="@pdfPageSize" Layout="RadioGroupLayout.Horizontal" />
+                </DxFormLayoutItem>
+            }
+        </DxFormLayoutGroup>
+    </BodyContentTemplate>
+    <FooterContentTemplate Context="footerContext">
+        <div class="links-container">
+            <DxWaitIndicator Visible="@isExporting" />
+            <DxButton Text="@((showExcelOptions) ? "Export" : "Print")" Click="OnDropDownClick" />
+            <DxButton Text="Close" RenderStyle=@ButtonRenderStyle.Secondary Click="@(() => isDropDownOpen = false)" />
+        </div>
+    </FooterContentTemplate>
+</DxDropDown>
+
+<PdfViewer @bind-PdfIsReady=@pdfIsReady DocumentContent="@pdfContent" ReportTitle="@reportTitle" />
 
 @code {
 
     [Parameter, EditorRequired]
     public IGrid? LinkedGrid { get; set; }
+    [Parameter] public string? LinkedGridId { get; set; } = "my-grid";
     [Parameter] public bool Visible { get; set; } = true;
     [Parameter] public bool HideGroupPanel { get; set; }
     [Parameter] public bool HideSearchBox { get; set; }
@@ -152,18 +206,25 @@
     string showSelectedOnlyText = string.Empty;
     string showSelectedOnlyTooltip = string.Empty;
     bool showSelectedOnly = true;
+    bool showExcelOptions = false;
+    bool showPdfOptions = false;
+    bool isDropDownOpen = false;
+    string reportTitle = "";
+    bool pdfIsReady = false;
+    Byte[]? pdfContent = null;
+
 
     protected override async Task OnInitializedAsync()
     {
-        if (LinkedGrid != null)
+        if (LinkedGrid is DxGrid dxGrid)
         {
             if (LayoutKey != null)
             {
-                defaultLayout = LinkedGrid.SaveLayout();
+                defaultLayout = dxGrid.SaveLayout();
                 layout = await localStorage.GetItemAsync<GridPersistentLayout>(LayoutKey);
                 if (layout != null)
                 {
-                    LinkedGrid.LoadLayout(layout);
+                    dxGrid.LoadLayout(layout);
                     ToastService.ShowToast(new ToastOptions()
                     {
                         Title = "Layout Restored",
@@ -175,12 +236,21 @@
                     });
                 }
             }
+            dxGrid.BeginUpdate();
+            dxGrid.CustomizeElement = (e) =>
+            {
+                if (e.ElementType == GridElementType.HeaderCell)
+                {
+                    e.CssClass = "my-header-cell";
+                    e.Attributes["fieldname"] = e.Column is DxGridDataColumn c ? c.FieldName : null;
+                }
+            };
+            dxGrid.EndUpdate();
         }
         ToggleShowSelectedOnly();
-        await base.OnInitializedAsync();
     }
 
-    object savedData = null; 
+    object? savedData = null;
     private void ToggleShowSelectedOnly()
     {
         if (LinkedGrid == null) { return; }
@@ -261,6 +331,7 @@
     async Task OnItemClick(ToolbarItemClickEventArgs e)
     {
         if (LinkedGrid == null) { return; }
+        var columnWidths = await js.InvokeAsync<Dictionary<string, float>>("getGridColumnWidths", $"#{LinkedGridId}");
         LinkedGrid.BeginUpdate();
         switch (e.ItemName)
         {
@@ -337,12 +408,6 @@
                     IconCssClass = "bi bi-check-circle"
                 });
                 break;
-            case "ExportAll":
-                await ExcelExport(false);
-                break;
-            case "ExportSelected":
-                await ExcelExport(true);
-                break;
             case "Filter":
                 if (LinkedGrid.FilterMenuButtonDisplayMode == GridFilterMenuButtonDisplayMode.Default)
                 {
@@ -358,12 +423,165 @@
             case "SelectedOnly":
                 ToggleShowSelectedOnly();
                 break;
+            case "ToExcel":
+                showExcelOptions = true;
+                showPdfOptions = false;
+                isDropDownOpen = true;
+                reportTitle = string.Empty;
+                break;
+            case "ToPdf":
+                showPdfOptions = true;
+                showExcelOptions = false;
+                isDropDownOpen = true;
+                reportTitle = string.Empty;
+                break;
         }
         LinkedGrid.EndUpdate();
     }
 
-    async Task ExcelExport(bool SelectedRowsOnly)
+    bool isExporting;
+    async Task OnDropDownClick()
     {
+        if (isExporting) return; // Prevent multiple clicks)
+        try
+        {
+            isExporting = true;
+            StateHasChanged();
+            await Task.Delay(500); // Allow UI to update before export
+            LinkedGrid!.BeginUpdate();
+            if (showExcelOptions) { await ExcelExport(); } else { await PdfExport(); }
+            LinkedGrid!.EndUpdate();
+        }
+        finally { isExporting = false; }
+    }
+
+    #region "Pdf Export"
+
+    const string DEFAULT_PDF_TITLE = "Pdf Export";
+    const string DEFAULT_FIT_TO_PAGE = "Fit to page";
+    const string DEFAULT_PAGE_SIZE = "A4";
+    const int DEFAULT_MARGIN = 25;
+    bool IsPortrait = false;
+    int pdfFontSize = 8;
+    string pdfPageSize = DEFAULT_PAGE_SIZE;
+    string fitStyle = DEFAULT_FIT_TO_PAGE;
+    float PaperWidth() => ((IsPortrait) ? 8.27f : 11.69f) - (DEFAULT_MARGIN * 2 / 100);
+
+    async Task PdfExport()
+    {
+        var columnWidths = await js.InvokeAsync<Dictionary<string, float>>("getGridColumnWidths", $"#{LinkedGridId}");
+        if (columnWidths is null || columnWidths.Count == 0)
+        {
+            ToastService.ShowToast(new ToastOptions()
+            {
+                Title = "Export Error",
+                Text = "No columns found to export.",
+                ProviderName = "Result",
+                ThemeMode = ToastThemeMode.Pastel,
+                RenderStyle = ToastRenderStyle.Danger,
+                IconCssClass = "bi bi-exclamation-triangle"
+            });
+            return;
+        }
+        ;
+
+        float gridWidth = columnWidths.Values.Sum();
+        Log.Information("");
+        Log.Information("Grid-width: {0}", gridWidth);
+        if (string.IsNullOrWhiteSpace(reportTitle)) reportTitle = DEFAULT_PDF_TITLE;
+        using var ms = new MemoryStream();
+        await LinkedGrid!.ExportToPdfAsync(ms, new GridPdfExportOptions()
+        {
+            FitToPage = (fitStyle == DEFAULT_FIT_TO_PAGE) ? true : false,
+
+            CustomizeColumn = (e) =>
+            {
+                if (e.IsHidden) return;
+                // Use the column width from the grid
+                if (columnWidths.TryGetValue(e.FieldName, out var width))
+                {
+                    if (width > 0)
+                    {
+                        float fitToPageAdjustment = (fitStyle == DEFAULT_FIT_TO_PAGE) ? gridWidth / PaperWidth() : 1;
+                        e.Width = (int)(width * fitToPageAdjustment * 300 / 96); // adjust for printer DPI
+                        Log.Information("Using grid width: {0} {1}", e.FieldName, e.Width);
+                    }
+                    else
+                    {
+                        e.Width = 300; // Default width if not found
+                        Log.Information("Default width: {0} {1}", e.FieldName, e.Width);
+                    }
+                }
+            },
+
+            CustomizeDocument = (e) =>
+            {
+                e.DefaultElementStyle.Font = new DXFont("Times New Roman", pdfFontSize);
+                e.PaperKind = (pdfPageSize == DEFAULT_PAGE_SIZE) ? DXPaperKind.A4 : DXPaperKind.A3;
+                e.Landscape = !IsPortrait;
+                e.Margins = new DXMargins(DEFAULT_MARGIN, DEFAULT_MARGIN, DEFAULT_MARGIN, 50);
+            },
+
+            CustomizeCell = OnCustomizeCell,
+
+            CustomizeDocumentHeader = (e) =>
+            {
+                if (reportTitle != DEFAULT_PDF_TITLE)
+                {
+                    e.ElementStyle.Font = new DXFont("Arial", 16);
+                    e.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+                    e.ElementStyle.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
+                    e.Text = reportTitle;
+                }
+            },
+
+            CustomizePageFooter = (e) => { e.Text = "Page {0} of {1}"; }
+        });
+        pdfContent = ms.ToArray();
+        pdfIsReady = true;
+        StateHasChanged();
+    }
+
+    public float CssToPixels(string cssValue, float fontSize, float gridWidth)
+    {
+        var match = Regex.Match(cssValue.Trim(), @"([\d.]+)([a-z%]+)");
+        if (!match.Success) throw new ArgumentException("Invalid CSS value");
+
+        float value = float.Parse(match.Groups[1].Value);
+        string unit = match.Groups[2].Value.ToLower();
+
+        return unit switch
+        {
+            "px" => value,
+            "%" => (gridWidth > 0) ? value * gridWidth / 100f : 100f,            // parent width
+            "em" => value * fontSize,               // current font size
+            "rem" => value * fontSize,              // root font size
+            _ => throw new NotSupportedException($"Unsupported unit: {unit}")
+        };
+    }
+
+    void OnCustomizeCell(GridDocumentExportCustomizeCellEventArgs args)
+    {
+        if (args.AreaType == DocumentExportAreaType.Header)
+        {
+            args.ElementStyle.BackColor = System.Drawing.Color.RoyalBlue;
+            args.ElementStyle.ForeColor = System.Drawing.Color.White;
+        }
+        if (args.AreaType == DocumentExportAreaType.DataArea && args.Value is bool)
+        {
+            var val = (bool)args.Value;
+            args.Text = (val) ? "✓" : "✕";
+        }
+        args.Handled = true;
+    }
+
+    #endregion
+
+    #region "Excel Export"
+
+    async Task ExcelExport()
+    {
+        if (string.IsNullOrEmpty(reportTitle)) reportTitle = "Excel Export";
         foreach (var col in LinkedGrid!.GetDataColumns())
         {
             col.ExportEnabled = col.Visible;
@@ -386,6 +604,7 @@
                 // Freeze the top row(s)
                 e.Sheet.SplitPosition = new DevExpress.Export.Xl.XlCellPosition(0, SpreadsheetHeaderRows);
             },
+
             CustomizeCell = e =>
             {
                 // Highlight header and footer
@@ -400,12 +619,12 @@
                     if (e.Formatting != null) e.Formatting.BackColor = ChangeColorBrightness(Color.Gainsboro, 0.6F);
                     e.Handled = true;
                 }
-            }
+            },
+
         };
-        options.ExportSelectedRowsOnly = SelectedRowsOnly;
         try
         {
-            await LinkedGrid.ExportToXlsxAsync("gridExport.Xlsx", options);
+            await LinkedGrid.ExportToXlsxAsync($"{reportTitle.Trim()}.Xlsx", options);
         }
         catch (NullReferenceException ex)
         {
@@ -450,4 +669,5 @@
         return Color.FromArgb(color.A, (int)red, (int)green, (int)blue);
     }
 
+    #endregion
 }

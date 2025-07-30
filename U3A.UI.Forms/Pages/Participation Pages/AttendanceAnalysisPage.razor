@@ -13,7 +13,7 @@
             AffirmativeButtonClicked=OnOkButtonClicked
             NegativeButtonClicked="OnCancelButtonClicked"
             IsInputBox=true
-            PopupVisible=@isPopupVisible>
+            PopupVisible=@(!reportIsReady)>
     <TextTemplate>
         <DxFormLayout>
             <DxFormLayoutItem Caption="Report for year" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -49,16 +49,14 @@
     </TextTemplate>
 </MessageBox>
 
-<XtraReportViewer @ref=@viewer
-                  OnCloseButtonClick="@(() => {CoursesToReport = new List<Course>(); isPopupVisible=true;})"
+<XtraReportViewer @bind-ReportIsReady="@reportIsReady"
                   Report="@report" />
 
 @code {
     MessageBox? messageBox;
     MessageBox? inputBox;
-    XtraReportViewer? viewer;
     AttendanceAnalysis? report;
-    bool isPopupVisible = true;
+    bool reportIsReady = false;
     bool isReportOK = false;
     U3ADbContext dbc;
 
@@ -98,7 +96,7 @@
         report.Parameters["prmCourseFilter"].Value = coursesToReport.Select(x => x.ID.ToString()).ToArray();
         report.Parameters["prmMinMonths"].Value = MinimumMonthsToReport;
         isReportOK = true;
-        isPopupVisible = false;
+        reportIsReady = true;
     }
 
     async Task OnReportForYearChanged(int newValue)

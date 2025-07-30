@@ -18,14 +18,14 @@ else
     <div class="row  align-content-start">
         <ContextHelpTitle Title="Add/Edit Fees & Credits" HelpTopic="Add_Edit-Fees.html" />
     </div>
-    <div class="row">
-        <div class="col-10 d-none d-md-inline">
+    <div class="d-flex flex-row">
+        <div class="flex-grow-1">
             This procedure is intended to make adjustments and correct errors only. It is rarely used as
             <br />membership fees are normally calculated by the system and in many cases are time of year dependent.
             <br />Please ensure fee parameters defined in <em>Membership Fees</em> and <em>Add/Edit Courses</em> are correct before adjusting fees using this procedure.
             <br /><strong>Note:</strong> Use <em>Complimentary Membership</em> to assign/deassign complimentary membership as these are not fee adjustments.
         </div>
-        <div class="col col-lg-2">
+        <div class="flex-grow-0">
             <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" />
         </div>
 
@@ -37,7 +37,7 @@ else
 
     <FullScreen DisplayOffset="11">
         <ContentTemplate>
-            <DxGrid Data="@Fees" @ref=@mainGrid
+            <DxGrid id="my-grid" Data="@Fees" @ref=@mainGrid
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
             GroupFooterDisplayMode="GridGroupFooterDisplayMode.Auto"
             ShowFilterRow="false"

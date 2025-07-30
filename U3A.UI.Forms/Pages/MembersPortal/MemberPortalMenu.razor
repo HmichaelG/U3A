@@ -22,11 +22,13 @@ else
 {
     <Progress @ref=@progress />
     <MessageBox @ref=@messageBox />
+
     <div class="col col-12 col-md-10 col-lg-6 mt-2 px-2 mx-auto">
-        <div class="text-center alert alert-success text-dark w-100">
+        <div class="text-center alert alert-primary w-100">
             <div class="w-100 pb-2">@welcomeText</div>
             <DxButton Text="Today's Schedule" Click="@SetupClassesToday"
-                      RenderStyle="ButtonRenderStyle.Success" IconCssClass="bi bi-alarm"
+                      RenderStyle="ButtonRenderStyle.Primary" IconCssClass="bi bi-alarm"
+                      RenderStyleMode="ButtonRenderStyleMode.Outline"
                       Visible=@(classText == null) />
             <div class="w-100">@classText</div>
         </div>
@@ -46,7 +48,7 @@ else
                                                 OnCollapsed="@(() => InvokeAsync(StateHasChanged))" />
                         </div>
                         <DxButton Text="Request course enrolments" Context="ThisContext"
-                                  IconCssClass="menu-icon bi bi-mortarboard me-3"
+                                  IconCssClass="bi bi-mortarboard me-3"
                                   CssClass="col-12 mt-1"
                                   Click="@(e => OnMenuSelected(e,PortalMenuSelection.DoRequestMemberEnrolment))"
                                   RenderStyle="ButtonRenderStyle.Primary"
@@ -74,7 +76,7 @@ else
                         <ContentTemplate>
                             @if (!string.IsNullOrWhiteSpace(InMaintenanceTill))
                             {
-                                <div class="alert alert-info text-dark text-center">
+                                <div class="alert alert-info  text-center">
                                     <h5>Member Portal Maintenance Mode</h5>
                                     <p>Access to the system is currently disabled while we perform important work on our database.</p>
                                     <p>@(new MarkupString($"We expect the system to resume normal operations on or after <br/><strong>{InMaintenanceTill}</strong>.")) </p>
@@ -182,7 +184,7 @@ else
 
                     <DxAccordionItem Text="Linked Members">
                         <ContentTemplate>
-                            <div class="text-center alert alert-info text-dark">
+                            <div class="text-center alert alert-info ">
                                 <p>
                                     A <strong>linked member</strong> is one who shares your email address.
                                     It is mainly intended for your spouse or partner but might also
@@ -246,13 +248,13 @@ else
             </Items>
         </DxAccordion>
         <p class="text-center">@($"There are {openCircuits} users logged in.")</p>
-        <footer class="mt-2 col col-12 text-muted">
-            <div align="center">
-                &copy; @(DateTime.Today.Year) - U3Admin.org.au
-                <a href="Public/Support">Click for support</a>
-            </div>
-        </footer>
     </div>
+    <footer class="w-100 links-container">
+        &copy; @(DateTime.Today.Year) M &amp; B Hanlon Pty Ltd
+        <div class="dot" />
+        <a href="Public/Support">Click for support</a>
+    </footer>
+
     <style>
 
         .schedule-table {

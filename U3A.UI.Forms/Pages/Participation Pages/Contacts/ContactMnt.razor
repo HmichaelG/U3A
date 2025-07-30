@@ -26,10 +26,11 @@
     }
     else
     {
-
-        <ContextHelpTitle Title="Contacts" HelpTopic="Add_Edit-Contacts.html"
-                          Subtitle="People associated with your U3A that are <b>not</b> Participants." />
-
+        @if (!IsReadOnly)
+        {
+            <ContextHelpTitle Title="Contacts" HelpTopic="Add_Edit-Contacts.html"
+            Subtitle="People associated with your U3A that are <b>not</b> Participants." />
+        }
         <MessageBox @ref=@tagSelectionMessageBox>
             <TextTemplate>
                 <DxFormLayout>
@@ -63,7 +64,7 @@
         <DxTabs @ref="@dxTabs" ActiveTabIndexChanged="() => StateHasChanged()">
             <DxTabPage Text="Contacts" />
             <DxTabPage Text="Contacts By Tag" />
-            <DxTabPage Text="Add/Edit Tags" />
+            <DxTabPage Text="Add/Edit Tags" Visible="@(!IsReadOnly)" />
         </DxTabs>
 
         <FullScreen>
@@ -73,7 +74,7 @@
                     switch (index)
                     {
                         case 0:
-                            <DxGrid Data="@contacts" @ref=@mainGrid
+                            <DxGrid id="my-grid" Data="@contacts" @ref=@mainGrid
                                     @bind-SelectedDataItems="@SelectedDataItems"
                                     UnboundColumnData="OnUnboundColumnData"
                                     AllowSelectRowByClick="false"
@@ -85,8 +86,8 @@
                                     PopupEditFormHeaderText="Add/Edit Contacts"
                                     DataItemDeleting="Grid_DataItemDeleting">
                                 <ToolbarTemplate>
-                                    <ContactToolbar LinkedGrid=@mainGrid
-                                                    LayoutKey="{660EF721-D17F-4A69-B28E-46063DE0B0C2}"
+                                    <ContactToolbar LinkedGrid=@mainGrid Visible="@(!IsReadOnly)"
+                                                    LayoutKey="@GridLayoutKey"
                                                     OnCommunicateClicked="@OnCommunicate"
                                                     OnDeleteClicked="@OnDelete"
                                                     OnAddTagsClicked="@OnAddTag"
@@ -96,9 +97,9 @@
                                 </ToolbarTemplate>
                                 <Columns>
                                     <DxGridSelectionColumn FixedPosition="GridColumnFixedPosition.Left"
-                                                           Width="2rem" />
+                                                           Width="2rem" Visible=@(!IsReadOnly) />
                                     <DxGridCommandColumnEx FixedPosition="GridColumnFixedPosition.Left"
-                                                           Width="6rem" />
+                                                           Width="6rem" Visible=@(!IsReadOnly) />
                                     <DxGridDataColumn FixedPosition="GridColumnFixedPosition.Left"
                                                       Caption="Name" FieldName="FullNameAlpha" Width="8rem" />
                                     <DxGridBandColumn Caption="Address" Visible="false">
@@ -123,7 +124,7 @@
                                         </Columns>
                                     </DxGridBandColumn>
                                     <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
-                                                      DisplayFormat="d/M/yy HH:mm" Visible="false" />
+                                                      DisplayFormat="dd-MMM-yy HH:mm" Visible="false" />
                                     <DxGridDataColumn Caption="Tags" FieldName="UnboundTags" AllowGroup="false" MInWidth="400"
                                                       UnboundType="GridUnboundColumnType.String">
                                         <CellDisplayTemplate>
@@ -266,6 +267,10 @@
     LoginState loginState { get; set; }
     [Parameter]
     public string gridHeight { get; set; } = "800px";
+    [Parameter]
+    public bool IsReadOnly { get; set; } = false;
+    [Parameter]
+    public string GridLayoutKey { get; set; } = "{660EF721-D17F-4A69-B28E-46063DE0B0C2}";
 
     bool IsReady;
     IReadOnlyList<object> SelectedDataItems { get; set; }

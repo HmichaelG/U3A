@@ -1,0 +1,184 @@
+﻿@page "/Settings"
+
+@inject IJSRuntime js
+@inject WorkstationService ws
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+@attribute [Authorize]
+
+@if (!IsReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+
+    <ContextHelpTitle Title="Workstation Settings" HelpTopic="Workstation-Settings.html"
+                      Subtitle="System Settings to coustomise your device." />
+
+    <EditForm Model="@ws" OnValidSubmit=@ValidFormSubmitted Context="editContext">
+        <DataAnnotationsValidator />
+        <div class="d-flex flex-column box-position">
+            <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12" ColSpanLg="8">
+                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="6">
+                    <DxFormLayoutItem Caption="Theme" ColSpanMd="12">
+                        <DxRadioGroup Items="@themes"
+                                      TextFieldName="@nameof(Theme.Title)"
+                                      ValueFieldName="@nameof(Theme.Key)"
+                                      @bind-Value="@ws.Theme" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Menu Style" ColSpanMd="12">
+                        <DxRadioGroup Items="@menuTypes"
+                                      TextFieldName="@nameof(MenuType.Title)"
+                                      ValueFieldName="@nameof(MenuType.Key)"
+                                      @bind-Value="@ws!.UseTopMenu" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Menu Behavior" ColSpanMd="12">
+                        <DxRadioGroup Items="@menuBehaviors"
+                                      TextFieldName="@nameof(MenuBehavior.Title)"
+                                      ValueFieldName="@nameof(MenuBehavior.Key)"
+                                      @bind-Value="@ws!.MenuBehavior" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Sidebar Image" ColSpanMd="12">
+                        <DxComboBox Data="@sidebarImageMenu"
+                                    TextFieldName="@nameof(SidebarImage.MenuName)"
+                                    ValueFieldName="@nameof(SidebarImage.MenuName)"
+                                    @bind-Value="@ws.SidebarImage" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Font Size" ColSpanMd="12">
+                        <DxRadioGroup Items="@fontSizes"
+                                      TextFieldName="@nameof(FontSize.Title)"
+                                      ValueFieldName="@nameof(FontSize.Key)"
+                                      @bind-Value="@ws.SizeMode" />
+                    </DxFormLayoutItem>
+                </DxFormLayoutGroup>
+                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="6">
+                    <DxFormLayoutItem Caption="Accent Color" CaptionPosition="CaptionPosition.Vertical">
+                        <div class="color-preset-container">
+                            @foreach (var palette in Palettes)
+                            {
+                                <div class="color-palette-container">
+                                    <label class="mb-1">
+                                        @palette.Key
+                                    </label>
+                                    <DxColorPalette ShowNoColorTile="false" @bind-Value=@ws.AccentColor>
+                                        <Groups>
+                                            @foreach (var presetType in palette.Value)
+                                            {
+                                                <DxColorPaletteGroup Colors="DxColorPalettePresets.GetPalette(presetType)" />
+                                            }
+                                        </Groups>
+                                    </DxColorPalette>
+                                </div>
+                            }
+                        </div>
+                    </DxFormLayoutItem>
+                </DxFormLayoutGroup>
+                <DxFormLayoutItem ColSpanMd="12">
+                    <Template>
+                        <DxButton SubmitFormOnClick="true" Text="Apply Settings" RenderStyle="@ButtonRenderStyle.Primary" CssClass="me-4" />
+                        <DxButton SubmitFormOnClick="false" Text="Close" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
+                    </Template>
+                </DxFormLayoutItem>
+            </DxFormLayoutGroup>
+        </div>
+    </EditForm>
+}
+<style>
+    .box-position {
+        align-items: @((ws.IsLargeScreen) ? "start" : "center");
+    }
+
+    .color-preset-container {
+        display: block;
+        overflow-y: scroll;
+        max-height: 25rem;
+        width: fit-content;
+        border: thin;
+        border-color: var(--DS-color-border-neutral-default-rest);
+        border-style: solid;
+    }
+
+    .color-palette-container {
+        display: flex;
+        flex-direction: column;
+        margin: 0.5rem;
+    }
+
+</style>
+
+@code {
+    bool IsReady = false;
+    public struct MenuType
+    {
+        public bool Key;
+        public string Title;
+    }
+    public struct Theme
+    {
+        public string Key;
+        public string Title;
+    }
+    public struct FontSize
+    {
+        public int Key;
+        public string Title;
+    }
+    public struct MenuBehavior
+    {
+        public string Key;
+        public string Title;
+    }
+    IEnumerable<MenuType> menuTypes = new[] { new MenuType() { Key = false, Title = "Use Sidebar" }, new MenuType() { Key = true, Title = "Use Top Menu" } };
+    IEnumerable<Theme> themes = new[]
+        {
+            new Theme() { Key = "light", Title = "Fluent Light" },
+            new Theme() { Key = "dark", Title = "Fluent Dark" },
+        };
+    IEnumerable<FontSize> fontSizes = new[]
+        {
+            new FontSize() { Key = 0, Title = "Small" },
+            new FontSize() { Key = 1, Title = "Medium" },
+            new FontSize() { Key = 2, Title = "Large" },
+        };
+    string selectedTheme;
+    IEnumerable<MenuBehavior> menuBehaviors = new[]
+        {
+            new MenuBehavior() { Key = "Auto", Title = "Use System Size" },
+            new MenuBehavior() { Key = "Small", Title = "Phones & smaller screens" },
+            new MenuBehavior() { Key = "Medium", Title = "Laptops & smaller monitors" },
+            new MenuBehavior() { Key = "Large", Title = "Desktops & larger monitors" },
+        };
+    string selectedBehavior;
+
+    readonly Dictionary<string, List<ColorPalettePresetType>> Palettes = new() {
+        { "Universal", new() { ColorPalettePresetType.Universal, ColorPalettePresetType.UniversalGradient } },
+        { "Fluent", new() { ColorPalettePresetType.FluentTheme, ColorPalettePresetType.FluentThemeGradient } },
+        { "Pastel", new() { ColorPalettePresetType.Pastel, ColorPalettePresetType.PastelGradient } },
+        { "Warm", new() { ColorPalettePresetType.Warm, ColorPalettePresetType.WarmGradient } },
+        { "Cold", new() { ColorPalettePresetType.Cold, ColorPalettePresetType.ColdGradient } },
+        { "Standard", new() { ColorPalettePresetType.Standard } }
+    };
+
+    IEnumerable<SidebarImage> sidebarImageMenu = new SidebarImageMenuOptions();
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsReady = true;
+    }
+
+    async void ValidFormSubmitted(EditContext editContext)
+    {
+        await ws.SetWorkstationDetail();
+        NavigationManager.Refresh();
+    }
+
+    void Close()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+
+}

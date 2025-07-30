@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @layout BasicLayout
 @inject NavigationManager NavigationManager
+@using U3A.Components.Layout
 @using U3A.Database
 
 
@@ -13,16 +14,15 @@ else
     <PageTitle>@($"{tenantId}: Account")</PageTitle>
     <PortalHeader NavigateTo="/" />
     <div class="container">
-        <main role="main" align="center">
-            <div align="center">
-                <div class="card p-2 my-4 col-12 col col-sm-8 col-md-6 col-lg-5">
-                    @Body
-                </div>
+        <div align="center">
+            <div class="alert alert-neutral p-2 my-4 col-12 col col-sm-8 col-md-6 col-lg-5">
+                @Body
             </div>
-        </main>
+        </div>
     </div>
-    <footer class="footer text-muted text-center" align="center" >
-        &copy; @(DateTime.Today.Year) - U3Admin.org.au
+    <footer class="w-100 links-container">
+        &copy; @(DateTime.Today.Year) M &amp; B Hanlon Pty Ltd
+        <div class="dot" />
         <a href="Public/Support">Click for support</a>
     </footer>
 

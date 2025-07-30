@@ -10,7 +10,7 @@
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> TenantDbfactory
 @inject TenantInfoService TenantService
-@inject WorkStation ws
+@inject WorkstationService ws
 @inject IConfiguration config
 @inject IJSRuntime js
 
@@ -25,7 +25,6 @@
 @using DevExpress.Blazor.Reporting
 @using DevExpress.Blazor.Reporting.Models
 @using U3A.Services
-@using U3A.UI.Common.Pages.Shared
 @using System.Globalization
 
 @attribute [Authorize]
@@ -33,37 +32,23 @@
 @using DevExpress.Blazor.Reporting
 @using Microsoft.Extensions.DependencyInjection
 
-@if (!isReady)
-{
-    <LoadingIndicator />
-}
-else
-{
-    <div class="@containerClass">
+<DxWaitIndicator Visible=true /><em>Loading...</em>
+<DxWindow Visible=@ReportIsReady Width="100dvw"
+          Height="100dvh"
+          PositionY="0"
+          CloseOnEscape="false"
+          ShowHeader="false">
+    <BodyContentTemplate Context="PopupContext">
         <DxReportViewer @ref="@reportViewer"
                         Report="@Report"
                         SinglePagePreview="false"
                         Zoom="1"
-                        CssClass="w-100"
-                        OnCustomizeToolbar="OnCustomizeToolbar"
-                        RootCssClasses="@RootCssClass" />
-    </div>
-}
-<style>
-    .view-normal {
-        height: @viewerHeight
-    }
-    .view-smallScreen{
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--bs-body-bg);
-        position: fixed;
-        z-index: 2000;
-        opacity: 1;
-        height: @viewerHeight
-    }
-</style>
+                        CssClass="w-100 h-100"
+                        OnCustomizeToolbar="OnCustomizeToolbar" />
+    </BodyContentTemplate>
+</DxWindow>
+
+
 
 @code {
     DxReportViewer? reportViewer;
@@ -75,9 +60,10 @@ else
     [Parameter]
     public XtraReport? Report { get; set; }
     [Parameter]
-    public string RootCssClass { get; set; } = "view-normal";
+    public bool ReportIsReady { get; set; } = false;
     [Parameter]
-    public EventCallback OnCloseButtonClick { get; set; }
+    public EventCallback<bool> ReportIsReadyChanged { get; set; }
+
 
     string viewerHeight;
 
@@ -86,13 +72,45 @@ else
     string? tenantId;
     bool isReady;
     string googleFontsAPIKey;
-    string containerClass = "view-normal";
 
     protected override async Task OnInitializedAsync()
     {
+        await SetupReport();
+        isReady = true;
+    }
+
+    private void Report_QueryNotFoundFont(object sender, NotFoundFontEventArgs e)
+    {
+        var service = new FontCollectorService();
+        var fontData = service.ProcessFont(googleFontsAPIKey, e.RequestedFont).Result;
+        e.FontFileData = fontData;
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (HideTabPanels)
+            {
+                reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
+                reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
+                reportViewer.TabPanelModel[TabContentKind.Search].Visible = false;
+            }
+            EditingFieldModelFactory.RegisterMaskEditor("Name", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z -.]+" });
+            EditingFieldModelFactory.RegisterMaskEditor("UppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z]+" });
+            EditingFieldModelFactory.RegisterMaskEditor("NumbersAndUppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9]+" });
+            EditingFieldModelFactory.RegisterMaskEditor("UppercaseText", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9 ,-/]+" });
+            EditingFieldModelFactory.RegisterMaskEditor("Day", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|([1-2][0-9])|(3[0-1])" });
+            EditingFieldModelFactory.RegisterMaskEditor("Month", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|(1[0-2])" });
+            EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
+        }
+    }
+
+    async Task SetupReport()
+    {
         googleFontsAPIKey = config.GetValue<string>("GoogleFontsAPIKey");
         DXFontRepository.QueryNotFoundFont += Report_QueryNotFoundFont;
-        viewerHeight = (ws.UseTopMenu) ? "calc(100dvh - 4rem) !important;" : "calc(100dvh - 1rem) !important;";
         dbc = await U3Adbfactory.CreateDbContextAsync();
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
         tenantId = textInfo.ToTitleCase(dbc.TenantInfo.Identifier!);
@@ -102,6 +120,7 @@ else
             Type? thisType = Type.GetType($"U3A.UI.Reports.{ReportName}");
             if (thisType != null)
             {
+                ReportIsReady = true;
                 Report = (XtraReport?)Activator.CreateInstance(thisType);
                 ReportName = Report.Name;
                 if (Report is IXtraReportWithNavManager)
@@ -138,53 +157,21 @@ else
         }
     }
 
-    private void Report_QueryNotFoundFont(object sender, NotFoundFontEventArgs e)
-    {
-        var service = new FontCollectorService();
-        var fontData = service.ProcessFont(googleFontsAPIKey, e.RequestedFont).Result;
-        e.FontFileData = fontData;
-    }
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            isReady = true;
-            await InvokeAsync(StateHasChanged);
-            if (HideTabPanels)
-            {
-                reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
-                reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
-                reportViewer.TabPanelModel[TabContentKind.Search].Visible = false;
-            }
-            EditingFieldModelFactory.RegisterMaskEditor("Name", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z -.]+" });
-            EditingFieldModelFactory.RegisterMaskEditor("UppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z]+" });
-            EditingFieldModelFactory.RegisterMaskEditor("NumbersAndUppercaseLatinLetters", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9]+" });
-            EditingFieldModelFactory.RegisterMaskEditor("UppercaseText", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[A-Z0-9 ,-/]+" });
-            EditingFieldModelFactory.RegisterMaskEditor("Day", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|([1-2][0-9])|(3[0-1])" });
-            EditingFieldModelFactory.RegisterMaskEditor("Month", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"(0[1-9])|(1[0-2])" });
-            EditingFieldModelFactory.RegisterMaskEditor("Year", new MaskEditorOptions() { MaskMode = MaskMode.RegEx, Mask = @"[0-2]([0-9]{3})" });
-            containerClass = (ws.IsLargeScreen) ? "view-normal" : "view-smallScreen";
-            StateHasChanged();
-        }
-        if (reportViewer != null) { reportViewer.LoadingPanelVisible = true; }
-    }
-
     void OnCustomizeToolbar(ToolbarModel toolbarModel)
     {
         toolbarModel.AllItems.Add(new ToolbarItem()
         {
-            IconCssClass = "fw-bold text-primary exit-icon",
+            IconCssClass = "fw-bold text-fl-primary exit-icon",
             BeginGroup = true,
             Text = "Close Report",
             AdaptiveText = "Close Report",
             AdaptivePriority = -99,
             Click = async (args) =>
             {
-                if (OnCloseButtonClick.HasDelegate)
+                ReportIsReady = false;
+                if (ReportIsReadyChanged.HasDelegate)
                 {
-                    await OnCloseButtonClick.InvokeAsync();
+                    await ReportIsReadyChanged.InvokeAsync();
                 }
                 else
                 {

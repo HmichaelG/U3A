@@ -25,7 +25,7 @@ namespace U3A.BusinessRules
                                  P_State = p.State,
                                  P_Postcode = p.Postcode,
                                  P_Gender = p.Gender,
-                                 P_BirthDate = (p.BirthDate == null) ? String.Empty : p.BirthDate.Value.ToString("D"),
+                                 P_BirthDate = (p.BirthDate == null) ? String.Empty : p.AdjustedBirthDateTo15th.Value.ToString(constants.SHORT_MONTH_AND_YEAR_FORMAT),
                                  P_DateJoined = (p.DateJoined == null) ? string.Empty : p.DateJoined.Value.ToString("D"),
                                  P_Email = p.Email,
                                  P_HomePhone = p.HomePhone,

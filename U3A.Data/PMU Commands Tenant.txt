@@ -1,8 +1,8 @@
-﻿update-database -cont TenantDbContext -project U3A.Database TdB_Tenant_TwoFactor
+﻿update-database -cont TenantDbContext -project U3A.Database TdB_RowVersion
 
-remove-migration -cont TenantDbContext -project U3A.Database -args TdB_RowVersion
+remove-migration -cont TenantDbContext -project U3A.Database -args TenantInfo_WebsiteColor
 
-add-migration -cont TenantDbContext -project U3A.Database TdB_RowVersion
+add-migration -cont TenantDbContext -project U3A.Database TenantInfo_WebsiteColor
 
 update-database -cont TenantDbContext -project U3A.Database
 
