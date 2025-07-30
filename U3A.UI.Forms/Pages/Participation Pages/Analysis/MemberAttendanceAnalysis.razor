@@ -43,7 +43,7 @@ else
                     <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Day"
                                        GroupInterval="PivotTableGroupInterval.DateDayOfWeek"
                                        Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Person.FullName" Caption="Attendee"
+                    <DxPivotTableField Field="Person.FullNameAlpha" Caption="Attendee"
                                        Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="Person.Gender" Caption="Gender"
                                        Area="@PivotTableArea.Filter" />
@@ -53,9 +53,9 @@ else
                                        Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="@nameof(AttendClass.Present)"
                                        Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.AbsentWithApology)" Caption="Absent with Apology"
+                    <DxPivotTableField Field="@nameof(AttendClass.AbsentWithApology)" Caption="Absent (Apology)"
                                        Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.AbsentWithoutApology)" Caption="Absent w'out Apology"
+                    <DxPivotTableField Field="@nameof(AttendClass.AbsentWithoutApology)" Caption="Absent (No Apology)"
                                        Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="@nameof(AttendClass.IsAdHoc)" Caption="AdHoc?"
                                        Area="@PivotTableArea.Filter" />
