@@ -19,7 +19,7 @@ else
              Closed="@(() => navMan.NavigateTo("/"))"
              ShowHeader="true">
         <BodyContentTemplate Context="PopupContext">
-            <DxPivotTable Data="@pivotData"
+            <DxPivotTable Data="@pivotData" VirtualScrollingEnabled=true
                           ShowRowGrandTotals="true"
                           ShowColumnGrandTotals="true" CssClass="w-100 h-100">
                 <Fields>
@@ -50,8 +50,6 @@ else
                     <DxPivotTableField Field="Class.Venue.Name" Caption="Venue"
                                        Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="@nameof(AttendClass.Comment)"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.Present)"
                                        Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="@nameof(AttendClass.AbsentWithApology)" Caption="Absent (Apology)"
                                        Area="@PivotTableArea.Filter" />

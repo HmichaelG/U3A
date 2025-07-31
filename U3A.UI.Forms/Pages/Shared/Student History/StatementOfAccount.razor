@@ -98,7 +98,7 @@
     {
         showBalance = true;
         memberFees = originalMemberFees.ToList();
-        memberFees = service.AllocateMemberPayments(memberFees, ShowFullAllocation);
+        memberFees = service.AllocateMemberPayments(memberFees,SelectedPerson, ShowFullAllocation);
         StateHasChanged();
     }
 

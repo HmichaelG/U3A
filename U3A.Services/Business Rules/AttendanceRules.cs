@@ -504,11 +504,14 @@ public static partial class BusinessRule
                             TenantDbContext dbct,
                             int Year, DateTime PeriodEndDate)
     {
-        var venues = await dbc.Venue.ToListAsync();
-        var persons = await dbc.Person.ToListAsync();
+        var venues = await dbc.Venue
+            .Select(x => new Venue() { ID = x.ID, Name = x.Name }).ToListAsync();
+        var persons = await dbc.Person
+            .Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, Gender = x.Gender, ID = x.ID }).ToListAsync();
         string tenant = dbc.TenantInfo.Identifier;
         var otherU3APersons = await dbct.MultiCampusPerson
                                     .Where(x => x.TenantIdentifier != tenant)
+                                    .Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, ID = x.ID })
                                     .ToListAsync();
         persons.AddRange(otherU3APersons.Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, ID = x.ID }));
         var courses = await dbc.Course.Include(x => x.CourseParticipationType).ToListAsync();
@@ -523,7 +526,7 @@ public static partial class BusinessRule
             if (c.LeaderID != null) { c.Leader = persons.Find(x => x.ID == c.LeaderID); }
             if (c.Leader2ID != null) { c.Leader2 = persons.Find(x => x.ID == c.Leader2ID); }
             if (c.Leader3ID != null) { c.Leader3 = persons.Find(x => x.ID == c.Leader3ID); }
-            if (c.Venue != null) { c.Venue = venues.Find(x => x.ID == c.VenueID); }
+            if (c.VenueID != null) { c.Venue = venues.Find(x => x.ID == c.VenueID); }
         });
         var attendClass = await dbc.AttendClass
                             .Include(x => x.Term)

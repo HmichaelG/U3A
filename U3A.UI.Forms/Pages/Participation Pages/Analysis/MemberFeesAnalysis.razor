@@ -1,0 +1,98 @@
+﻿@page "/MemberFeesAnalysis"
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> tenantDbFactory
+@inject NavigationManager navMan
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <Progress @ref="@ProgressBar" />
+    <DxWindow Visible=true Width="100dvw"
+              Height="100dvh"
+              PositionY="0"
+              CloseOnEscape="true"
+              ShowCloseButton="true"
+              HeaderText="Member Fees Analysis"
+              Closed="@(() => navMan.NavigateTo("/"))"
+              ShowHeader="true">
+        <BodyContentTemplate Context="PopupContext">
+            <DxPivotTable Data="@pivotData" @ref=@pivotTable
+                          ShowRowGrandTotals="true" VirtualScrollingEnabled=true
+                          ShowColumnGrandTotals="true" CssClass="w-100 h-100">
+                <Fields>
+                    <DxPivotTableField Field="Person.FinancialToText" Caption="Fin-To"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Fee-Month"
+                                       GroupInterval="PivotTableGroupInterval.DateMonth"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(MemberFee.SortOrder)" Caption="Fee Type"
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="@nameof(MemberFee.Course)" 
+                                       Area="@PivotTableArea.Filter" />
+                    <DxPivotTableField Field="Person.FullNameAlpha" Caption="Participant"
+                                       Area="@PivotTableArea.Row" />
+                    <DxPivotTableField Field="@nameof(MemberFee.Description)"
+                                       Area="@PivotTableArea.Row" />
+                    <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Date"
+                                       Area="@PivotTableArea.Row" />
+                    <DxPivotTableField Field="@nameof(MemberFee.Amount)" Caption="Due"
+                                       Area="@PivotTableArea.Data" />
+                    <DxPivotTableField Field="@nameof(MemberFee.Allocated)" Caption="Paid"
+                                       Area="@PivotTableArea.Data" />
+                    <DxPivotTableField Field="@nameof(MemberFee.Balance)"
+                                       Area="@PivotTableArea.Data" />
+
+                </Fields>
+            </DxPivotTable>
+        </BodyContentTemplate>
+    </DxWindow>
+}
+@code {
+    List<MemberFee>? pivotData { get; set; }
+    bool isReady = false;
+    Progress? ProgressBar;
+    DxPivotTable? pivotTable;
+    MemberFeeCalculationService service;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        isReady = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        await GetData();
+    }
+
+    async Task GetData()
+    {
+        while (pivotTable == null)
+        {
+            await Task.Delay(100);
+        }
+        pivotTable.BeginUpdate();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+        var people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+        await ProgressBar.ShowAsync("Processing Status .. Please Wait", people.Count);
+        pivotData = new List<MemberFee>();
+        var i = 0;
+        foreach (var p in people)
+        {
+            service = new();
+            await service.CalculateFeeAsync(dbc, p, currentTerm);
+            pivotData.AddRange(service.GetAllocatedMemberFees(p));
+            i++;
+            if (i % 50 == 0) { await ProgressBar.SetValueAsync(i); }
+        }
+        await ProgressBar.Close();
+        pivotTable.EndUpdate();
+        StateHasChanged();
+    }
+}

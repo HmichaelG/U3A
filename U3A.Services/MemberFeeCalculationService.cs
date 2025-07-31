@@ -39,6 +39,13 @@ public class MemberFeeCalculationService
                                                   .OrderBy(x => x.Date)
                                                   .ThenBy(x => x.SortOrder)
                                                   .ToList();
+    public List<MemberFee> GetAllocatedMemberFees(Person person)
+    {
+        return AllocateMemberPayments(MemberFees, person,
+                ShowFullAllocation: true, AddUnallocatedCredit: true)
+                .ToList();
+    }
+
     public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(U3ADbContext dbc, Person person)
     {
         var result = new List<MemberPaymentAvailable>();
@@ -114,6 +121,7 @@ public class MemberFeeCalculationService
         var result = decimal.Zero;
         BillingTerm = term;
         BillingYear = term.Year;
+        var defaultDate = new DateTime(term.Year, 1, 1);
         var fees = new ConcurrentBag<MemberFee>();
         PersonWithFinancialStatus = new PersonFinancialStatus()
         {
@@ -145,13 +153,13 @@ public class MemberFeeCalculationService
                     var complimentaryCalcDate = await GetComplimentaryCalculationDate(dbc, person, term.Year);
                     if (complimentaryCalcDate != null)
                     {
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.Complimentary, null, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {term.Year} complimentary membership", 0.00M);
+                        AddFee(person,
+                            MemberFeeSortOrder.Complimentary, defaultDate, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {term.Year} complimentary membership", 0.00M);
                     }
                     else
                     {
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.Complimentary, null, $"{term.Year} complimentary membership", 0.00M);
+                        AddFee(person,
+                            MemberFeeSortOrder.Complimentary, defaultDate, $"{term.Year} complimentary membership", 0.00M);
                     }
                 }
                 else
@@ -161,22 +169,22 @@ public class MemberFeeCalculationService
                     if (fee != 0)
                     {
                         if (CalculateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalculateForTerm, 2); }
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.MemberFee, null, $"{term.Year} membership fee", fee);
+                        AddFee(person,
+                            MemberFeeSortOrder.MemberFee, defaultDate, $"{term.Year} membership fee", fee);
                     }
                 }
                 if (person.Communication != "Email")
                 {
                     if (isComplimentary && settings.IncludeMailSurchargeInComplimentary)
                     {
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.MailSurcharge, null, $"{term.Year} complimentary mail surcharge", 0.00M);
+                        AddFee(person,
+                            MemberFeeSortOrder.MailSurcharge, defaultDate, $"{term.Year} complimentary mail surcharge", 0.00M);
                     }
                     else
                     {
                         PersonWithFinancialStatus.MailSurcharge = settings.MailSurcharge;
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.MailSurcharge, null, $"{term.Year} mail surcharge", settings.MailSurcharge);
+                        AddFee(person,
+                            MemberFeeSortOrder.MailSurcharge, defaultDate, $"{term.Year} mail surcharge", settings.MailSurcharge);
                     }
                 }
                 // course fees
@@ -357,7 +365,7 @@ public class MemberFeeCalculationService
                                                 && x.Amount != 0
                                                 && x.ProcessingYear == term.Year).ToArrayAsync())
         {
-            AddFee(person.ID,
+            AddFee(person,
                     MemberFeeSortOrder.AdditionalFee, r.Date, r.Description, r.Amount);
             PersonWithFinancialStatus.OtherFees += r.Amount;
         }
@@ -378,7 +386,7 @@ public class MemberFeeCalculationService
                 sortOrder = MemberFeeSortOrder.Refund;
                 description = $"Refund: {r.Description}";
             }
-            AddFee(person.ID, sortOrder, r.Date, description, -r.Amount);
+            AddFee(person, sortOrder, r.Date, description, -r.Amount);
             if (PersonWithFinancialStatus != null)
             {
                 PersonWithFinancialStatus.AmountReceived += r.Amount;
@@ -427,8 +435,10 @@ public class MemberFeeCalculationService
                         {
                             description += $": {e.Course.CourseFeePerYearDescription}";
                         }
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.CourseFee, ConvertDateOnlyToDateTime(dateDue), description, amount);
+                        AddFee(person,
+                            MemberFeeSortOrder.CourseFee, 
+                                ConvertDateOnlyToDateTime(dateDue), 
+                                description, amount, e.Course.Name);
                         if (PersonWithFinancialStatus != null)
                             PersonWithFinancialStatus.CourseFeesPerYear += amount;
                         courseFeeAdded.Add(e.CourseID);
@@ -456,19 +466,24 @@ public class MemberFeeCalculationService
                     {
                         var description = $"{e.Course.Name} fee";
                         var amount = 0M;
+                        MemberFeeSortOrder sortOrder = default;
                         switch (t.TermNumber)
                         {
                             case 1:
                                 amount = e.Course.CourseFeeTerm1;
+                                sortOrder = MemberFeeSortOrder.Term1Fee;
                                 break;
                             case 2:
                                 amount = e.Course.CourseFeeTerm2;
+                                sortOrder = MemberFeeSortOrder.Term2Fee;
                                 break;
                             case 3:
                                 amount = e.Course.CourseFeeTerm3;
+                                sortOrder = MemberFeeSortOrder.Term3Fee;
                                 break;
                             case 4:
                                 amount = e.Course.CourseFeeTerm4;
+                                sortOrder = MemberFeeSortOrder.Term4Fee;
                                 break;
                             default:
                                 break;
@@ -483,9 +498,8 @@ public class MemberFeeCalculationService
                         {
                             description += $": {e.Course.CourseFeePerTermDescription}";
                         }
-                        AddFee(person.ID,
-                            MemberFeeSortOrder.TermFee, ConvertDateOnlyToDateTime(dateDue),
-                            $"{t.Name}: {description}", amount);
+                        AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dateDue),
+                            $"{t.Name}: {description}", amount,e.Course.Name);
                         if (PersonWithFinancialStatus != null)
                             PersonWithFinancialStatus.CourseFeesPerTerm += amount;
                     }
@@ -526,8 +540,8 @@ public class MemberFeeCalculationService
                     {
                         description += $": {c.Course.CourseFeePerYearDescription}";
                     }
-                    AddFee(person.ID, MemberFeeSortOrder.TermFee, ConvertDateOnlyToDateTime(dueDate),
-                                description, amount);
+                    AddFee(person, MemberFeeSortOrder.CourseFee, ConvertDateOnlyToDateTime(dueDate),
+                                description, amount, c.Course.Name);
                     if (PersonWithFinancialStatus != null)
                         PersonWithFinancialStatus.CourseFeesPerYear += amount;
                     courseFeeAdded.Add(c.CourseID);
@@ -551,15 +565,33 @@ public class MemberFeeCalculationService
                         {
                             description += $": {c.Course.CourseFeePerTermDescription}";
                         }
-                        AddFee(person.ID, MemberFeeSortOrder.TermFee, ConvertDateOnlyToDateTime(dueDate),
-                            $"{t.Name}: {description}", amount);
-                        if (PersonWithFinancialStatus != null)
-                            PersonWithFinancialStatus.CourseFeesPerTerm += amount;
+                        MemberFeeSortOrder sortOrder = default;
+                        switch (t.TermNumber)
+                            {
+                            case 1:
+                                sortOrder = MemberFeeSortOrder.Term1Fee;
+                                break;
+                            case 2:
+                                sortOrder = MemberFeeSortOrder.Term2Fee;
+                                break;
+                            case 3:
+                                sortOrder = MemberFeeSortOrder.Term3Fee;
+                                break;
+                            case 4:
+                                sortOrder = MemberFeeSortOrder.Term4Fee;
+                                break;
+                            default:
+                                break;
+                            }
+                            AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dueDate),
+                                $"{t.Name}: {description}", amount,c.Course.Name);
+                            if (PersonWithFinancialStatus != null)
+                                PersonWithFinancialStatus.CourseFeesPerTerm += amount;
+                        }
                     }
                 }
             }
         }
-    }
 
     private bool isClassHeldThisTerm(Class c, Term term)
     {
@@ -571,16 +603,23 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private void AddFee(Guid personID, MemberFeeSortOrder sortOrder, DateTime? date, string description, decimal amount)
+    private void AddFee(Person person, 
+        MemberFeeSortOrder sortOrder, 
+        DateTime? date, 
+        string description, 
+        decimal amount,
+        string Course = "")
     {
         var value = decimal.Round(amount, 2);
         MemberFees.Add(new MemberFee
         {
-            PersonID = personID,
+            PersonID = person.ID,
+            Person = person,
             SortOrder = sortOrder,
             Date = date,
             Description = description,
-            Amount = value
+            Amount = value,
+            Course = Course,
         });
     }
 
@@ -605,13 +644,18 @@ public class MemberFeeCalculationService
                             x.IsWaitlisted).ToListAsync()).DistinctBy(x => x.CourseID).Count();
     }
 
-    public List<MemberFee> AllocateMemberPayments(IEnumerable<MemberFee> ItemsToAllocate, bool ShowFullAllocation)
+    public List<MemberFee> AllocateMemberPayments(IEnumerable<MemberFee> ItemsToAllocate, Person person,
+                            bool ShowFullAllocation, bool AddUnallocatedCredit = false)
     {
         List<MemberFee> result = new List<MemberFee>();
         List<MemberFee> allocatedItems = new List<MemberFee>();
         List<List<MemberFee>> combinations = new List<List<MemberFee>>();
-        var fees = ItemsToAllocate.Where(x => x.SortOrder != MemberFeeSortOrder.Receipt).ToArray();
-        var receipts = ItemsToAllocate.Where(x => x.SortOrder == MemberFeeSortOrder.Receipt).ToArray();
+        var fees = ItemsToAllocate
+            .OrderBy(x => x.Date).ThenBy(x => x.SortOrder)
+            .Where(x => x.Amount > 0).ToArray();
+        var receipts = ItemsToAllocate
+            .OrderBy(x => x.Date).ThenBy(x => x.SortOrder)
+            .Where(x => x.Amount < 0).ToArray();
 
         int n = fees.Count();
         decimal totalDue = ItemsToAllocate.Sum(x => x.Amount);
@@ -662,7 +706,7 @@ public class MemberFeeCalculationService
             foreach (var item in ItemsToAllocate.Where(x => !keys.Contains(x.ID)))
             {
                 if (totalDue != 0) { item.IsNotAllocated = true; } // Mark as not allocated
-                    result.Add(item);
+                result.Add(item);
             }
         }
         else foreach (var item in ItemsToAllocate.Where(x => !keys.Contains(x.ID)))
@@ -672,18 +716,18 @@ public class MemberFeeCalculationService
 
         foreach (var item in result)
         {
-            if (!item.IsNotAllocated && item.SortOrder != MemberFeeSortOrder.Receipt)
+            if (!item.IsNotAllocated && item.Amount > 0)
             {
                 item.Allocated = item.Amount;
             }
         }
 
-        var unallocatedFees = result.Where(x => x.IsNotAllocated && x.SortOrder != MemberFeeSortOrder.Receipt);
-        var remainingCredits = result.Where(x => x.IsNotAllocated && x.SortOrder== MemberFeeSortOrder.Receipt).Sum(x => x.Amount);
+        var unallocatedFees = result.Where(x => x.IsNotAllocated && x.Amount > 0);
+        var remainingCredits = result.Where(x => x.IsNotAllocated && x.Amount < 0).Sum(x => x.Amount);
         // Allocate remaining credits to unallocated fees
         if (remainingCredits < 0)
         {
-            foreach (var fee in unallocatedFees)
+            foreach (var fee in unallocatedFees.OrderBy(x => x.Date).ThenBy(x => x.SortOrder))
             {
                 if (remainingCredits >= 0) break;
                 var allocation = Math.Min(-remainingCredits, fee.Amount);
@@ -691,11 +735,29 @@ public class MemberFeeCalculationService
                 remainingCredits += allocation;
             }
         }
-        CalculateBalance(result);
+        CalculateBalance(result, AddUnallocatedCredit);
+        if (AddUnallocatedCredit)
+        {
+            result = result.Where(x => x.Amount > 0).ToList();
+            if (totalDue < 0)
+            {
+                result.Add(new MemberFee()
+                {
+                    PersonID = person.ID,
+                    Person = person,
+                    SortOrder = MemberFeeSortOrder.UnallocatedCredit,
+                    Date = DateTime.Now.Date,
+                    Description = "Unallocated Credit",
+                    Amount = totalDue,
+                    Allocated = 0m,
+                    Balance = totalDue,
+                });
+            }
+        }
         return result;
     }
 
-    void CalculateBalance(IEnumerable<MemberFee> memberFees)
+    void CalculateBalance(IEnumerable<MemberFee> memberFees, bool AddUnallocatedCredit)
     {
         var result = decimal.Zero;
         var itemCount = memberFees.Count();
@@ -704,7 +766,14 @@ public class MemberFeeCalculationService
         {
             i += 1;
             result += item.Amount;
-            item.Balance = ((item.SortOrder == MemberFeeSortOrder.Receipt && result == 0) || i == itemCount) ? result : null;
+            if (AddUnallocatedCredit)
+            {
+                item.Balance = item.Amount - item.Allocated.GetValueOrDefault();
+            }
+            else
+            {
+                item.Balance = ((item.Amount < 0 && result == 0) || i == itemCount) ? result : null;
+            }
         }
     }
 

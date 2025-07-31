@@ -12,9 +12,11 @@ namespace U3A.Model
     {
         public Guid ID { get; set; } = Guid.NewGuid();
         public Guid PersonID { get; set; }
+        public Person Person { get; set; }
         public MemberFeeSortOrder SortOrder { get; set; }
         public DateTime? Date { get; set; }
         public string Description { get; set; }
+        public string Course { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public decimal? Allocated { get; set; } = null;
         public decimal? Balance { get; set; } = null;
@@ -27,10 +29,14 @@ namespace U3A.Model
         Complimentary,
         MailSurcharge,
         CourseFee,
-        TermFee,
+        Term1Fee,
+        Term2Fee,
+        Term3Fee,
+        Term4Fee,
         AdditionalFee,
         Refund,
-        Receipt
+        Receipt,
+        UnallocatedCredit
     }
 
 }
