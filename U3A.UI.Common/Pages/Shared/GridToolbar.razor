@@ -331,7 +331,6 @@
     async Task OnItemClick(ToolbarItemClickEventArgs e)
     {
         if (LinkedGrid == null) { return; }
-        var columnWidths = await js.InvokeAsync<Dictionary<string, float>>("getGridColumnWidths", $"#{LinkedGridId}");
         LinkedGrid.BeginUpdate();
         switch (e.ItemName)
         {
@@ -540,24 +539,6 @@
         pdfContent = ms.ToArray();
         pdfIsReady = true;
         StateHasChanged();
-    }
-
-    public float CssToPixels(string cssValue, float fontSize, float gridWidth)
-    {
-        var match = Regex.Match(cssValue.Trim(), @"([\d.]+)([a-z%]+)");
-        if (!match.Success) throw new ArgumentException("Invalid CSS value");
-
-        float value = float.Parse(match.Groups[1].Value);
-        string unit = match.Groups[2].Value.ToLower();
-
-        return unit switch
-        {
-            "px" => value,
-            "%" => (gridWidth > 0) ? value * gridWidth / 100f : 100f,            // parent width
-            "em" => value * fontSize,               // current font size
-            "rem" => value * fontSize,              // root font size
-            _ => throw new NotSupportedException($"Unsupported unit: {unit}")
-        };
     }
 
     void OnCustomizeCell(GridDocumentExportCustomizeCellEventArgs args)

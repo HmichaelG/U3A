@@ -9,6 +9,7 @@
 @using U3A.UI.Forms.Pages.MembersPortal
 @using U3A.UI.Forms.Pages.Identity
 @using U3A.UI.Forms
+@using U3A.UI.Forms.Pages.Participation_Pages.Analysis
 
 @implements IDisposable
 
@@ -207,7 +208,7 @@ else
                                 break;
 
                             case buttonClicks.AttendanceAnalysis:
-                                <AttendanceAnalysis />
+                                <MemberAttendanceAnalysis />
                                 break;
 
                             case buttonClicks.AdminLeaderReport:

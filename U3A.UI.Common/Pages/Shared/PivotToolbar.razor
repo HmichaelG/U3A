@@ -1,0 +1,177 @@
+﻿@using DevExpress.Blazor.Reporting.Models
+@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@using Microsoft.JSInterop
+@using DevExpress.Export
+@using System.Drawing
+@using System.Collections
+@using System.Text.Json
+@using DevExpress.Blazor
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Routing
+@using System.Text.RegularExpressions
+@using Serilog
+@using U3A.UI.Reports.Pages
+
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager navMan
+@inject IToastNotificationService ToastService
+@inject IJSRuntime js
+
+<DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
+
+<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" CssClass="mb-1 w-100" 
+           ItemClick="OnItemClick">
+    <Items>
+        @CustomButtonContentAtStart
+        <DxToolbarItem IconCssClass="bi bi-list" Text="Rows"
+                       BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                       Tooltip="Customise row layout">
+            <Items>
+                <DxToolbarItem Text="Collapse all Rows"
+                               Click="@(() => LinkedGrid!.CollapseAllRows())"
+                               Tooltip="Collapse all rows in the Pivot Table">
+                </DxToolbarItem>
+                <DxToolbarItem Text="Expand all Rows"
+                               Click="@(() => LinkedGrid!.ExpandAllRows())"
+                               Tooltip="Expand all rows in the Pivot Table">
+                </DxToolbarItem>
+            </Items>
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-list-columns" Text="Columns"
+                       BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                       Tooltip="Customise column layout">
+            <Items>
+                <DxToolbarItem Text="Collapse all columns"
+                               Click="@(() => LinkedGrid!.CollapseAllColumns())"
+                               Tooltip="Collapse all columns in the Pivot Table">
+                </DxToolbarItem>
+                <DxToolbarItem Text="Expand all columns"
+                               Click="@(() => LinkedGrid!.ExpandAllColumns())"
+                               Tooltip="Expand all columns in the Pivot Table">
+                </DxToolbarItem>
+            </Items>
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Layout" Text="Layout"
+                       BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                       CssClass="column-chooser-button"
+                       Tooltip="Customise column layout">
+            <Items>
+                <DxToolbarItem IconCssClass="bi bi-floppy"
+                               Name="SaveLayout" Text="Save Layout"
+                               Tooltip="Save the current layout">
+                </DxToolbarItem>
+                <DxToolbarItem IconCssClass="bi bi-arrow-counterclockwise"
+                               Name="ResetLayout" Text="Reset Default Layout"
+                               Tooltip="Reset column layout to its default">
+                </DxToolbarItem>
+            </Items>
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-funnel" Name="ClearFilter" Text="Clear Filters"
+                       BeginGroup=true
+                       Alignment="ToolbarItemAlignment.Right"
+                       Tooltip="Clear all filters">
+        </DxToolbarItem>
+        <DxToolbarItem IconCssClass="bi bi-database" Name="DataLoad" Text="Load Data"
+                       BeginGroup=true
+                       RenderStyle="ButtonRenderStyle.Primary"
+                       Alignment="ToolbarItemAlignment.Right"
+                       Tooltip="Load the pivot table's data'">
+        </DxToolbarItem>
+        @CustomButtonContent
+    </Items>
+</DxToolbar>
+
+
+@code {
+
+    [Parameter, EditorRequired]
+    public IPivotTable? LinkedGrid { get; set; }
+    [Parameter] public string? LayoutKey { get; set; }
+    [Parameter] public RenderFragment? CustomButtonContentAtStart { get; set; }
+    [Parameter] public RenderFragment? CustomButtonContent { get; set; }
+    [Parameter] public EventCallback DataLoadRequested { get; set; }
+
+    PivotTablePersistentLayout? defaultLayout;
+    PivotTablePersistentLayout? layout;
+
+    async Task OnItemClick(ToolbarItemClickEventArgs e)
+    {
+        if (LinkedGrid == null) { return; }
+        LinkedGrid.BeginUpdate();
+        switch (e.ItemName)
+        {
+            case "SaveLayout":
+                await localStorage.SetItemAsync(LayoutKey!, LinkedGrid.SaveLayout());
+                ToastService.ShowToast(new ToastOptions()
+                {
+                    Title = "Layout Saved",
+                    Text = "Your pivot table's layout has been saved.",
+                    ProviderName = "Result",
+                    ThemeMode = ToastThemeMode.Pastel,
+                    RenderStyle = ToastRenderStyle.Success,
+                    IconCssClass = "bi bi-check-circle"
+                });
+                break;
+            case "ResetLayout":
+                await localStorage.RemoveItemAsync(LayoutKey!);
+                LinkedGrid.LoadLayout(defaultLayout);
+                ToastService.ShowToast(new ToastOptions()
+                {
+                    Title = "Reset Layout",
+                    Text = "The default layout is restored.",
+                    ProviderName = "Result",
+                    ThemeMode = ToastThemeMode.Pastel,
+                    RenderStyle = ToastRenderStyle.Success,
+                    IconCssClass = "bi bi-check-circle"
+                });
+                break;
+            case "ClearFilter":
+                LinkedGrid.ClearFilter();
+                ToastService.ShowToast(new ToastOptions()
+                {
+                    Title = "Filters Cleared",
+                    Text = "All pivot table filters have been cleared.",
+                    ProviderName = "Result",
+                    ThemeMode = ToastThemeMode.Pastel,
+                    RenderStyle = ToastRenderStyle.Success,
+                    IconCssClass = "bi bi-check-circle"
+                });
+                break;
+            case "DataLoad":
+                await LoadLayoutAsync();
+                await DataLoadRequested.InvokeAsync();
+                break;
+        }
+        LinkedGrid.EndUpdate();
+    }
+
+    async Task LoadLayoutAsync()
+    {
+        if (LinkedGrid is DxPivotTable dxPivot)
+        {
+            if (LayoutKey != null)
+            {
+                defaultLayout = dxPivot.SaveLayout();
+                layout = await localStorage.GetItemAsync<PivotTablePersistentLayout>(LayoutKey);
+                if (layout != null)
+                {
+                    dxPivot.LoadLayout(layout);
+                    ToastService.ShowToast(new ToastOptions()
+                    {
+                        Title = "Layout Restored",
+                        Text = "Grid restored from saved layout.",
+                        ProviderName = "Result",
+                        ThemeMode = ToastThemeMode.Pastel,
+                        RenderStyle = ToastRenderStyle.Success,
+                        IconCssClass = "bi bi-check-circle"
+                    });
+                }
+            }
+        }
+    }
+
+}

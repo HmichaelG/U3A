@@ -20,9 +20,12 @@ else
               Closed="@(() => navMan.NavigateTo("/"))"
               ShowHeader="true">
         <BodyContentTemplate Context="PopupContext">
+            <PivotToolbar LinkedGrid="@pivotTable"
+                          DataLoadRequested="GetData"
+                          LayoutKey="{3A39E5E9-34A3-47B6-92B3-83A7356C1F2E}" />
             <DxPivotTable Data="@pivotData" @ref=@pivotTable
                           ShowRowGrandTotals="true" VirtualScrollingEnabled=true
-                          ShowColumnGrandTotals="true" CssClass="w-100 h-100">
+                          ShowColumnGrandTotals="true" CssClass="pivot-table-style">
                 <Fields>
                     <DxPivotTableField Field="Person.FinancialToText" Caption="Fin-To"
                                        Area="@PivotTableArea.Filter" />
@@ -31,7 +34,7 @@ else
                                        Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="@nameof(MemberFee.SortOrder)" Caption="Fee Type"
                                        Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(MemberFee.Course)" 
+                    <DxPivotTableField Field="@nameof(MemberFee.Course)"
                                        Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="Person.FullNameAlpha" Caption="Participant"
                                        Area="@PivotTableArea.Row" />
@@ -51,23 +54,23 @@ else
         </BodyContentTemplate>
     </DxWindow>
 }
+<style>
+    .pivot-table-style {
+        width: 100%;
+        height: calc(100% - 2rem);
+    }
+</style>
 @code {
     List<MemberFee>? pivotData { get; set; }
     bool isReady = false;
     Progress? ProgressBar;
-    DxPivotTable? pivotTable;
+    IPivotTable? pivotTable;
     MemberFeeCalculationService service;
 
 
     protected override async Task OnInitializedAsync()
     {
         isReady = true;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender) return;
-        await GetData();
     }
 
     async Task GetData()
@@ -80,7 +83,7 @@ else
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
         var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
         var people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
-        await ProgressBar.ShowAsync("Processing Status .. Please Wait", people.Count);
+        await ProgressBar.ShowAsync("Loading Data .. Please Wait", people.Count);
         pivotData = new List<MemberFee>();
         var i = 0;
         foreach (var p in people)

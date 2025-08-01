@@ -10,6 +10,7 @@
 }
 else
 {
+    <Progress @ref="@ProgressBar" />
     <DxWindow Visible=true Width="100dvw"
              Height="100dvh"
              PositionY="0"
@@ -19,13 +20,16 @@ else
              Closed="@(() => navMan.NavigateTo("/"))"
              ShowHeader="true">
         <BodyContentTemplate Context="PopupContext">
+            <PivotToolbar LinkedGrid="@pivotTable"
+                          DataLoadRequested="GetData"
+                          LayoutKey="{D91B6321-580F-4E1F-9AB8-B026FFA373A3}" />
             <DxPivotTable Data="@pivotData" VirtualScrollingEnabled=true
-                          ShowRowGrandTotals="true"
-                          ShowColumnGrandTotals="true" CssClass="w-100 h-100">
+                          ShowRowGrandTotals="true" @ref=@pivotTable
+                          ShowColumnGrandTotals="true" CssClass="pivot-table-style">
                 <Fields>
-                    <DxPivotTableField Field="@nameof(AttendClass.Actual)" Caption="Act"
+                    <DxPivotTableField Field="@nameof(AttendClass.Actual)" Caption="Present"
                                        Area="@PivotTableArea.Data" />
-                    <DxPivotTableField Field="@nameof(AttendClass.Expected)" Caption="Exp"
+                    <DxPivotTableField Field="@nameof(AttendClass.Expected)" Caption="Expected"
                                        Area="@PivotTableArea.Data" />
                     <DxPivotTableField Field="@nameof(AttendClass.Difference)" Caption="+/-"
                                        Area="@PivotTableArea.Data" />
@@ -70,19 +74,32 @@ else
         </BodyContentTemplate>
     </DxWindow>
 }
+<style>
+    .pivot-table-style {
+        width: 100%;
+        height: calc(100% - 2rem);
+    }
+</style>
 
 @code {
     IEnumerable<AttendClass>? pivotData { get; set; }
+    IPivotTable? pivotTable { get; set; }
+    Progress? ProgressBar;
     bool isReady = false;
 
     protected override async Task OnInitializedAsync()
     {
+        isReady = true;
+    }
+
+    async Task GetData()
+    {
+        await ProgressBar.ShowSpinnerAsync("Loading Attendance Data...");
         pivotData = new List<AttendClass>();
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
         using var dbct = await tenantDbFactory.CreateDbContextAsync();
         var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
         pivotData = await BusinessRule.GetAttendanceAsync(dbc, dbct, currentTerm.Year, dbc.GetLocalDate());
-        isReady = true;
+        await ProgressBar.Close();
     }
-
 }

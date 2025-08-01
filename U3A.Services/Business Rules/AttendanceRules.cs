@@ -511,7 +511,7 @@ public static partial class BusinessRule
         string tenant = dbc.TenantInfo.Identifier;
         var otherU3APersons = await dbct.MultiCampusPerson
                                     .Where(x => x.TenantIdentifier != tenant)
-                                    .Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, ID = x.ID })
+                                    .Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, Gender="Visitor", ID = x.ID })
                                     .ToListAsync();
         persons.AddRange(otherU3APersons.Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, ID = x.ID }));
         var courses = await dbc.Course.Include(x => x.CourseParticipationType).ToListAsync();
@@ -534,7 +534,7 @@ public static partial class BusinessRule
                             .Where(x => x.Date.Year == Year && x.Date <= PeriodEndDate).ToListAsync();
         Parallel.ForEach(attendClass, a =>
         {
-            a.Person = persons.Find(x => x.ID == a.PersonID);
+            a.Person = persons.Find(x => x.ID == a.PersonID) ?? new Person() { ID = a.PersonID, LastName = "*Not on File", FirstName = "(Deleted/Unknown Visitor)", Gender = "Deleted/Unknown Visitor" };
             a.Class = classes.Find(x => x.ID == a.ClassID);
         });
         return attendClass;
