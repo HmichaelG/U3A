@@ -79,16 +79,16 @@ else
         {
             await Task.Delay(100);
         }
+        await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
         pivotTable.BeginUpdate();
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
         var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
         var people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
-        await ProgressBar.ShowAsync("Loading Data .. Please Wait", people.Count);
         pivotData = new List<MemberFee>();
         var i = 0;
+        service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
         foreach (var p in people)
         {
-            service = new();
             await service.CalculateFeeAsync(dbc, p, currentTerm);
             pivotData.AddRange(service.GetAllocatedMemberFees(p));
             i++;

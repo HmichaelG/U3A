@@ -243,13 +243,13 @@
     {
         if (selectedTerm == null || selectedTerm != lastTerm)
         {
-            await ProgressBar.ShowAsync("Processing Status .. Please Wait", people.Count);
+            await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
             MemberFeeCalculationService service;
             Persons = new List<PersonFinancialStatus>();
             var i = 0;
+            service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
             foreach (var p in people)
             {
-                service = new ();
                 await service.CalculateFeeAsync(dbc, p, selectedTerm);
                 Persons.Add(service.PersonWithFinancialStatus);
                 i++;
