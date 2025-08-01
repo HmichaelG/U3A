@@ -14,6 +14,29 @@ namespace U3A.Model
         public Guid PersonID { get; set; }
         public Person Person { get; set; }
         public MemberFeeSortOrder SortOrder { get; set; }
+
+        public string MemberFeeType
+        {
+            get
+            {
+                return SortOrder switch
+                {
+                    MemberFeeSortOrder.MemberFee => "Member Fee",
+                    MemberFeeSortOrder.Complimentary => "Complimentary",
+                    MemberFeeSortOrder.MailSurcharge => "Mail Surcharge",
+                    MemberFeeSortOrder.CourseFee => "Course Fee",
+                    MemberFeeSortOrder.Term1Fee => "Term 1 Fee",
+                    MemberFeeSortOrder.Term2Fee => "Term 2 Fee",
+                    MemberFeeSortOrder.Term3Fee => "Term 3 Fee",
+                    MemberFeeSortOrder.Term4Fee => "Term 4 Fee",
+                    MemberFeeSortOrder.AdditionalFee => "Additional Fee",
+                    MemberFeeSortOrder.Refund => "Refund",
+                    MemberFeeSortOrder.Receipt => "Receipt",
+                    MemberFeeSortOrder.UnallocatedCredit => "Unallocated Credit",
+                    _ => "Unknown"
+                };
+            }
+        }
         public DateTime? Date { get; set; }
         public string Description { get; set; }
         public string Course { get; set; } = string.Empty;

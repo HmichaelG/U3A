@@ -23,7 +23,7 @@ else
             <PivotToolbar LinkedGrid="@pivotTable"
                           DataLoadRequested="GetData"
                           LayoutKey="{3A39E5E9-34A3-47B6-92B3-83A7356C1F2E}" />
-            <DxPivotTable Data="@pivotData" @ref=@pivotTable
+            <DxPivotTable Data="@pivotData" @ref=@pivotTable Context="context"
                           ShowRowGrandTotals="true" VirtualScrollingEnabled=true
                           ShowColumnGrandTotals="true" CssClass="pivot-table-style">
                 <Fields>
@@ -32,7 +32,7 @@ else
                     <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Fee-Month"
                                        GroupInterval="PivotTableGroupInterval.DateMonth"
                                        Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(MemberFee.SortOrder)" Caption="Fee Type"
+                    <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
                                        Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="@nameof(MemberFee.Course)"
                                        Area="@PivotTableArea.Filter" />
