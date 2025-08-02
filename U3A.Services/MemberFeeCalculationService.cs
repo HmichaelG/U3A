@@ -33,9 +33,9 @@ public class MemberFeeCalculationService
     List<Person> People { get; set; } = null;
     SystemSettings Settings { get; set; } = null;
     List<Fee> Fees { get; set; } = null;
-    List<Receipt> Receipts { get; set; } = null;
+    Dictionary<Guid, List<Receipt>> Receipts { get; set; } = null;
     Term[] Terms { get; set; } = null;
-    List<Enrolment> Enrolments { get; set; } = null;
+    Dictionary<Guid, List<Enrolment>> Enrolments { get; set; } = null;
     List<Class> Classes { get; set; } = null;
 
     DateTime localTime;
@@ -87,13 +87,17 @@ public class MemberFeeCalculationService
         Receipts = await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
                             .Where(x => (person == null || x.PersonID == person.ID)
                                         && !x.IsDeleted && x.ProcessingYear >= BillingYear)
-                            .ToListAsync();
-        Enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
+                            .GroupBy(x => x.PersonID)
+                            .ToDictionaryAsync(g => g.Key, g => g.ToList());
+        Enrolments = await dbc.Enrolment.AsNoTracking()
+                            .IgnoreQueryFilters()
                             .Include(x => x.Term)
                             .Include(x => x.Course).ThenInclude(x => x.Classes)
                             .Include(x => x.Class)
                             .Where(x => (person == null || x.PersonID == person.ID)
-                                        && !x.IsDeleted && x.Term.Year == BillingYear).ToListAsync();
+                                && !x.IsDeleted && x.Term.Year == BillingYear)
+                            .GroupBy(x => x.PersonID)
+                            .ToDictionaryAsync(g => g.Key, g => g.ToList()); 
         Classes = await dbc.Class.AsNoTracking()
                                 .Include(x => x.Course)
                                 .Where(x => x.Course.Year == BillingYear).ToListAsync();
@@ -260,7 +264,8 @@ public class MemberFeeCalculationService
         else
         {
             // A zero-valued receipt is created when a person is given complimentary membership
-            result = Receipts.Any(x => x.PersonID == person.ID
+            var receipts = Receipts.TryGetValue(person.ID, out var list) ? list : new List<Receipt>(); 
+            result = receipts.Any(x => x.PersonID == person.ID
                                     && x.FinancialTo >= BillingYear
                                     && x.Amount == 0);
         }
@@ -272,8 +277,8 @@ public class MemberFeeCalculationService
     {
         DateTime? result = null;
         Receipt? receipt;
-        receipt = Receipts.FirstOrDefault(x => x.PersonID == person.ID
-                                        && x.Amount == 0);
+        var receipts = Receipts.TryGetValue(person.ID, out var list) ? list : new List<Receipt>();
+        receipt = receipts.OrderBy(x => x.Date).FirstOrDefault(x => x.Amount == 0);
         if (receipt != null) { result = receipt.Date; }
         return result;
     }
@@ -296,11 +301,11 @@ public class MemberFeeCalculationService
 
     public decimal CalculateMinimumFeePayable()
     {
-        return CalculateMinimumFeePayable(People.FirstOrDefault(), null);
+        return CalculateMinimumFeePayable(null, null);
     }
     public decimal CalculateMinimumFeePayable(int CalculateForTerm)
     {
-        return CalculateMinimumFeePayable(People.FirstOrDefault(), CalculateForTerm);
+        return CalculateMinimumFeePayable(null, CalculateForTerm);
     }
     public decimal CalculateMinimumFeePayable(Person? person = null, int? CalculateForTerm = null)
     {
@@ -368,7 +373,8 @@ public class MemberFeeCalculationService
     {
         DateTime? result = null;
         Receipt? receipt = null;
-        receipt = Receipts.OrderBy(x => x.Date).FirstOrDefault(x => !x.IsDeleted
+        var receipts = Receipts.TryGetValue(person.ID, out var list) ? list : new List<Receipt>();
+        receipt = receipts.OrderBy(x => x.Date).FirstOrDefault(x => !x.IsDeleted
                                         && x.PersonID == person.ID
                                         && x.Amount != 0
                                         && x.ProcessingYear == BillingYear);
@@ -411,8 +417,8 @@ public class MemberFeeCalculationService
     }
     private void SubtractReceipts(Person person)
     {
-        List<Receipt> receipts;
-        receipts = Receipts.Where(x => !x.IsDeleted
+        var receipts = Receipts.TryGetValue(person.ID, out var list) ? list : new List<Receipt>();
+        receipts = receipts.Where(x => !x.IsDeleted
                                         && x.PersonID == person.ID
                                         && x.Amount != 0
                                         && x.ProcessingYear == BillingYear)
@@ -439,8 +445,8 @@ public class MemberFeeCalculationService
     {
         DateOnly today = DateOnly.FromDateTime(localTime);
         var courseFeeAdded = new List<Guid>();
-        List<Enrolment> enrolments;
-        enrolments = Enrolments.Where(x => !x.IsDeleted
+        List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
+        enrolments = enrolments.Where(x => !x.IsDeleted
                                         && x.PersonID == person.ID
                                         && x.Term.Year == BillingYear
                                         && !x.IsWaitlisted).ToList();
@@ -660,7 +666,8 @@ public class MemberFeeCalculationService
     }
     private int ActiveCourseCount(Person person)
     {
-        return Enrolments.Where(x => x.PersonID == person.ID &&
+        List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
+        return enrolments.Where(x => x.PersonID == person.ID &&
                                     x.TermID == BillingTerm.ID &&
                                     !x.Course.ExcludeFromLeaderComplimentaryCount &&
                                     !x.IsWaitlisted)
@@ -668,7 +675,8 @@ public class MemberFeeCalculationService
     }
     private int WaitlistedCourseCount(Person person)
     {
-        return Enrolments.Where(x => x.PersonID == person.ID &&
+        List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
+        return enrolments.Where(x => x.PersonID == person.ID &&
                                     x.TermID == BillingTerm.ID &&
                                     !x.Course.ExcludeFromLeaderComplimentaryCount &&
                                     x.IsWaitlisted)
