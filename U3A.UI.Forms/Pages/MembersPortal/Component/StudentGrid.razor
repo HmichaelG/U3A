@@ -148,7 +148,7 @@ else
                     {
                         var person = e.Person;
                         service = await MemberFeeCalculationService.CreateAsync(dbc, person);
-                        var due = await service.CalculateFeeAsync(person);
+                        var due = service.CalculateFee(person);
                         FeeDue.Add(person.ID, due);
                     }
                 }

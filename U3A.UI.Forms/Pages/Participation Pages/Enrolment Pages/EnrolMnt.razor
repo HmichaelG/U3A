@@ -564,7 +564,7 @@ else
                 if (!feesDue.ContainsKey(e.PersonID))
                 {
                     service = await MemberFeeCalculationService.CreateAsync(dbc,currentTerm,e.Person);
-                    feesDue.Add(e.PersonID, await service.CalculateFeeAsync(e.Person));
+                    feesDue.Add(e.PersonID, service.CalculateFee(e.Person));
                 }
             }
             await InvokeAsync(StateHasChanged);

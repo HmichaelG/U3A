@@ -241,22 +241,21 @@
 
     async Task OnProcess()
     {
-        if (selectedTerm == null || selectedTerm != lastTerm)
+        if (selectedTerm == null) return;
+        await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
+        Persons = new List<PersonFinancialStatus>();
+        MemberFeeCalculationService service;
+        using (dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
-            Persons = new List<PersonFinancialStatus>();
-            var i = 0;
-            var service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
-            foreach (var p in people)
-            {
-                await service.CalculateFeeAsync(p);
-                Persons.Add(service.PersonWithFinancialStatus);
-                i++;
-                if (i % 50 == 0) { await ProgressBar.SetValueAsync(i); }
-            }
-            await ProgressBar.Close();
-            lastTerm = selectedTerm;
+        service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
         }
+        foreach (var p in people)
+        {
+            service.CalculateFee(p);
+            Persons.Add(service.PersonWithFinancialStatus);
+        }
+        await ProgressBar.Close();
+        lastTerm = selectedTerm;
         mainGrid.ClearFilter();
         CriteriaOperator? opFees = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => x.TotalFees >= decimal.MinValue && x.TotalFees <= decimal.MaxValue);
         CriteriaOperator? opFinToYears = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => x.FinancialTo >= int.MinValue && x.FinancialTo <= int.MaxValue); ;

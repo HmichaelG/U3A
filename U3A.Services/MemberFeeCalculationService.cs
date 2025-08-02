@@ -115,17 +115,17 @@ public class MemberFeeCalculationService
                 .ToList();
     }
 
-    public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(Person person = null)
+    public List<MemberPaymentAvailable> GetAvailableMemberPayments(Person person = null)
     {
         var result = new List<MemberPaymentAvailable>();
         if (person == null) { person = People.FirstOrDefault(); }
         if (Settings.AllowedMemberFeePaymentTypes == MemberFeePaymentType.PerYearAndPerSemester)
         {
-            if (await IsComplimentaryMembership(person)) { return result; }
+            if (IsComplimentaryMembership(person)) { return result; }
             decimal yearlyFee = GetTermFee(BillingTerm.TermNumber)
-                                    + await GetTotalOtherMembershipFees(person);
+                                    + GetTotalOtherMembershipFees(person);
             decimal semesterFee = decimal.Round(yearlyFee / 2, 2);
-            var totalFee = await CalculateFeeAsync(person);
+            var totalFee = CalculateFee(person);
             if (totalFee < yearlyFee) { return result; }
             if (BillingTerm.TermNumber <= 2)
             {
@@ -145,7 +145,7 @@ public class MemberFeeCalculationService
         }
         return result;
     }
-    async Task<decimal> GetTotalOtherMembershipFees(Person person)
+    private decimal GetTotalOtherMembershipFees(Person person)
     {
         var result = 0m;
         result = Fees
@@ -162,16 +162,16 @@ public class MemberFeeCalculationService
     /// <param name="U3Adbfactory"></param>
     /// <param name="person"></param>
     /// <returns></returns>
-    public async Task<decimal> CalculateFeeAsync()
+    public decimal CalculateFee()
     {
-        return await CalculateFeeAsync(null, null);
+        return CalculateFee(null, null);
     }
-    public async Task<decimal> CalculateFeeAsync(int CalculateForTerm)
+    public decimal CalculateFee(int CalculateForTerm)
     {
-        return await CalculateFeeAsync(null, CalculateForTerm);
+        return CalculateFee(null, CalculateForTerm);
     }
 
-    public async Task<decimal> CalculateFeeAsync(Person? person = null, int? CalculateForTerm = null)
+    public decimal CalculateFee(Person? person = null, int? CalculateForTerm = null)
     {
         var result = decimal.Zero;
         if (person == null) { person = People.FirstOrDefault(); }
@@ -192,16 +192,16 @@ public class MemberFeeCalculationService
             Mobile = person.AdjustedMobile,
             HomePhone = person.AdjustedHomePhone,
             Email = person.Email,
-            Enrolments = await ActiveCourseCountAsync(person),
-            Waitlisted = await WaitlistedCourseCountAsync(person)
+            Enrolments = ActiveCourseCount(person),
+            Waitlisted = WaitlistedCourseCount(person)
         };
         if (Settings != null)
         {
-            var isComplimentary = await IsComplimentaryMembership(person);
+            var isComplimentary = IsComplimentaryMembership(person);
             // membership fees
             if (isComplimentary && Settings.IncludeMembershipFeeInComplimentary)
             {
-                var complimentaryCalcDate = await GetComplimentaryCalculationDate(person);
+                var complimentaryCalcDate = GetComplimentaryCalculationDate(person);
                 if (complimentaryCalcDate != null)
                 {
                     AddFee(person,
@@ -215,7 +215,7 @@ public class MemberFeeCalculationService
             }
             else
             {
-                PersonWithFinancialStatus.MembershipFees = await CalculateMembershipFeeAsync(person);
+                PersonWithFinancialStatus.MembershipFees = CalculateMembershipFee(person);
                 var fee = PersonWithFinancialStatus.MembershipFees;
                 if (fee != 0)
                 {
@@ -239,12 +239,12 @@ public class MemberFeeCalculationService
                 }
             }
             // course fees
-            await AddCourseFeesAsync(person, isComplimentary);
-            await AddLeadersFeesAsync(person);
+            AddCourseFees(person, isComplimentary);
+            AddLeadersFees(person);
             // add fee adjustments
-            await AddFeesAsync(person);
+            AddFees(person);
             // less payments
-            await SubtractReceiptsAsync(person);
+            SubtractReceipts(person);
             // total due
             result = MemberFees
                         .Where(x => x.PersonID == person.ID)
@@ -253,7 +253,7 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private async Task<bool> IsComplimentaryMembership(Person person)
+    private bool IsComplimentaryMembership(Person person)
     {
         bool result = false;
         if (person.IsLifeMember) { result = true; }
@@ -268,7 +268,7 @@ public class MemberFeeCalculationService
             PersonWithFinancialStatus.IsComplimentary = result;
         return result;
     }
-    private async Task<DateTime?> GetComplimentaryCalculationDate(Person person)
+    private DateTime? GetComplimentaryCalculationDate(Person person)
     {
         DateTime? result = null;
         Receipt? receipt;
@@ -278,7 +278,7 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private async Task<Term> GetBillingTerm()
+    private Term GetBillingTerm()
     {
         Term result = null;
         result = BusinessRule.CurrentEnrolmentTerm(Terms, localTime);
@@ -294,21 +294,21 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    public async Task<decimal> CalculateMinimumFeePayableAsync()
+    public decimal CalculateMinimumFeePayable()
     {
-        return await CalculateMinimumFeePayableAsync(People.FirstOrDefault(), null);
+        return CalculateMinimumFeePayable(People.FirstOrDefault(), null);
     }
-    public async Task<decimal> CalculateMinimumFeePayableAsync(int CalculateForTerm)
+    public decimal CalculateMinimumFeePayable(int CalculateForTerm)
     {
-        return await CalculateMinimumFeePayableAsync(People.FirstOrDefault(), CalculateForTerm);
+        return CalculateMinimumFeePayable(People.FirstOrDefault(), CalculateForTerm);
     }
-    public async Task<decimal> CalculateMinimumFeePayableAsync(Person? person = null, int? CalculateForTerm = null)
+    public decimal CalculateMinimumFeePayable(Person? person = null, int? CalculateForTerm = null)
     {
         var result = decimal.Zero;
         if (person == null) { person = People.FirstOrDefault(); }
-        if (BillingTerm != null && !await IsComplimentaryMembership(person))
+        if (BillingTerm != null && !IsComplimentaryMembership(person))
         {
-            result = await CalculateMembershipFeeAsync(person);
+            result = CalculateMembershipFee(person);
             result += Fees
                         .Where(x => !x.Person.IsDeleted
                                     && x.PersonID == person.ID
@@ -319,7 +319,7 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private async Task<decimal> CalculateMembershipFeeAsync(Person person)
+    private decimal CalculateMembershipFee(Person person)
     {
         if (person is Contact) { return 0; }
         decimal result = 0;
@@ -329,7 +329,7 @@ public class MemberFeeCalculationService
         if (person.DateJoined?.Year == BillingYear) feeDueDate = person.DateJoined; // New member; use join date
         if (feeDueDate == null) // Renewing member
         {
-            var firstReceiptDate = await GetFirstReceiptDateAsync(person);
+            var firstReceiptDate = GetFirstReceiptDate(person);
             feeDueDate = firstReceiptDate ?? localTime.Date;
         }
         if (Terms.Length > 1)
@@ -364,7 +364,7 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private async Task<DateTime?> GetFirstReceiptDateAsync(Person person)
+    private DateTime? GetFirstReceiptDate(Person person)
     {
         DateTime? result = null;
         Receipt? receipt = null;
@@ -396,7 +396,7 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private async Task AddFeesAsync(Person person)
+    private void AddFees(Person person)
     {
         List<Fee> fees;
         fees = Fees.Where(x => x.PersonID == person.ID
@@ -409,7 +409,7 @@ public class MemberFeeCalculationService
             PersonWithFinancialStatus.OtherFees += f.Amount;
         }
     }
-    private async Task SubtractReceiptsAsync(Person person)
+    private void SubtractReceipts(Person person)
     {
         List<Receipt> receipts;
         receipts = Receipts.Where(x => !x.IsDeleted
@@ -435,7 +435,7 @@ public class MemberFeeCalculationService
             }
         }
     }
-    private async Task AddCourseFeesAsync(Person person, bool IsComplimentary)
+    private void AddCourseFees(Person person, bool IsComplimentary)
     {
         DateOnly today = DateOnly.FromDateTime(localTime);
         var courseFeeAdded = new List<Guid>();
@@ -540,7 +540,7 @@ public class MemberFeeCalculationService
         }
     }
 
-    private async Task AddLeadersFeesAsync(Person person)
+    private void AddLeadersFees(Person person)
     {
         DateOnly today = DateOnly.FromDateTime(localTime);
         var courseFeeAdded = new List<Guid>();
@@ -658,7 +658,7 @@ public class MemberFeeCalculationService
     {
         return new DateTime(date.Year, date.Month, date.Day);
     }
-    private async Task<int> ActiveCourseCountAsync(Person person)
+    private int ActiveCourseCount(Person person)
     {
         return Enrolments.Where(x => x.PersonID == person.ID &&
                                     x.TermID == BillingTerm.ID &&
@@ -666,7 +666,7 @@ public class MemberFeeCalculationService
                                     !x.IsWaitlisted)
                         .DistinctBy(x => x.CourseID).Count();
     }
-    private async Task<int> WaitlistedCourseCountAsync(Person person)
+    private int WaitlistedCourseCount(Person person)
     {
         return Enrolments.Where(x => x.PersonID == person.ID &&
                                     x.TermID == BillingTerm.ID &&

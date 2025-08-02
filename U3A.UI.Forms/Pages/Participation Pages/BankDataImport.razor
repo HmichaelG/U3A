@@ -527,11 +527,11 @@ else
     async Task CalcculateFinancialTo(U3ADbContext dbc, ReceiptDataImport importItem, DateTime startTime)
     {
         var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
-        var totalDue = await service.CalculateFeeAsync();
+        var totalDue = service.CalculateFee();
         var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, importItem.PersonID, ProcessingYear, startTime);
-        var minFullMembershipFee = await service.CalculateMinimumFeePayableAsync();
+        var minFullMembershipFee = service.CalculateMinimumFeePayable();
         var calculationMonths = 2; //First semester number of months
-        var minPartMembershipFee = await service.CalculateMinimumFeePayableAsync(calculationMonths);
+        var minPartMembershipFee = service.CalculateMinimumFeePayable(calculationMonths);
         // assume tests fail
         importItem.FinancialTo = importItem.Person.FinancialTo;
         importItem.FinancialToTerm = null;
@@ -569,7 +569,7 @@ else
     {
         var result = false;
         var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm,person);
-        var fees = await service.CalculateFeeAsync();
+        var fees = service.CalculateFee();
         if (fees == receipt) { result = true; }
         else if (fees > 0)
         {
@@ -580,7 +580,7 @@ else
                 && currentTerm.TermNumber <= 2)
         {
             var calculationMonths = 2; //First semester number of months
-            fees = await service.CalculateFeeAsync(calculationMonths);
+            fees = service.CalculateFee(calculationMonths);
             if (fees == receipt) { result = true; }
         }
         return result;
@@ -589,7 +589,7 @@ else
     async Task<Decimal> GetFees(Person person)
     {
         var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, person);
-        return await service.CalculateFeeAsync();
+        return service.CalculateFee();
     }
 
 
@@ -619,7 +619,7 @@ else
                         p = await dbc.Contact.FindAsync(prevReceipt.PersonID);
                     }
                     var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, p);
-                    var minMembershipFee = await service.CalculateMinimumFeePayableAsync();
+                    var minMembershipFee = service.CalculateMinimumFeePayable();
                     if (prevReceipt.Amount >= minMembershipFee)
                     {
                         p.FinancialTo = p.PreviousFinancialTo.GetValueOrDefault();

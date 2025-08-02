@@ -81,18 +81,20 @@ else
         }
         await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
         pivotTable.BeginUpdate();
-        using var dbc = await U3Adbfactory.CreateDbContextAsync();
-        var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-        var people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
         pivotData = new List<MemberFee>();
         var i = 0;
-        service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
+        MemberFeeCalculationService service;
+        List<Person> people;
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        {
+            var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+            people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
+            service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
+        }
         foreach (var p in people)
         {
-            await service.CalculateFeeAsync(p);
+            service.CalculateFee(p);
             pivotData.AddRange(service.GetAllocatedMemberFees(p));
-            i++;
-            if (i % 50 == 0) { await ProgressBar.SetValueAsync(i); }
         }
         await ProgressBar.Close();
         pivotTable.EndUpdate();

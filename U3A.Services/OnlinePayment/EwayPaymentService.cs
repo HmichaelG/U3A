@@ -225,7 +225,7 @@ namespace U3A.Services
                 receipt.MerchantFee = result.MerchantFee;
                 receipt.Amount = result.OriginalFee;
                 var processingYear = term.Year;
-                var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(person);
+                var minMembershipFee = feeService.CalculateMinimumFeePayable(person);
 
                 // Special Rule: set Financial To if amount paid greater than minimum amount
                 var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, processingYear, DateTime.UtcNow);

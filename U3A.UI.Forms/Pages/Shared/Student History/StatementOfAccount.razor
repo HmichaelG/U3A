@@ -80,7 +80,7 @@
             {
                 showBalance = false;
                 service = await MemberFeeCalculationService.CreateAsync(dbContext,SelectedTerm,SelectedPerson);
-                var totalFees = await service.CalculateFeeAsync();
+                var totalFees = service.CalculateFee();
                 originalMemberFees = service.GetMemberFees(SelectedPerson.ID);
                 memberFees = originalMemberFees.ToList();
             }

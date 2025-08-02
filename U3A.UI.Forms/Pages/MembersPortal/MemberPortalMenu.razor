@@ -342,7 +342,7 @@ else
                 welcome += $"<br/>Financial to: <strong>{person.FinancialToText}</strong>";
                 using var dbc = await U3Adbfactory.CreateDbContextAsync();
                 var service = await MemberFeeCalculationService.CreateAsync(dbc,CurrentTerm,person);
-                decimal fee = await service.CalculateFeeAsync(person);
+                decimal fee = service.CalculateFee(person);
                 if (fee > 0) welcome += $" Remaining: <strong>{fee.ToString("c2")}</strong>";
             }
             else

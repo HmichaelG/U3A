@@ -228,7 +228,7 @@ else
             term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
             feeService = await MemberFeeCalculationService.CreateAsync(dbc, term, loginState?.SelectedPerson);
-            availablePayments = await feeService.GetAvailableMemberPaymentsAsync();
+            availablePayments = feeService.GetAvailableMemberPayments();
             if (availablePayments.Count() > 0) selectedPaymentType = availablePayments.First();
         }
         await CalculateFeeAsync();
@@ -327,7 +327,7 @@ else
     {
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
         feeService = await MemberFeeCalculationService.CreateAsync(dbc, term, loginState.SelectedPerson);
-        decimal  result = await feeService.CalculateFeeAsync();
+        decimal  result = feeService.CalculateFee();
         feeAsString = GetFeeAsString(result);
         return result;
     }

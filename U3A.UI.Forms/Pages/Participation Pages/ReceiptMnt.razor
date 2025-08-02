@@ -348,11 +348,11 @@ else
         var currentTerm = await BusinessRule.CurrentTermAsync(dbc, receipt.Date);
         if (currentTerm == null) { currentTerm = await BusinessRule.CurrentTermAsync(dbc); }
         service = await MemberFeeCalculationService.CreateAsync(dbc,currentTerm,receipt.Person);
-        var totalDue = await service.CalculateFeeAsync();
+        var totalDue = service.CalculateFee();
         var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, receipt.PersonID, ProcessingYear, startTime);
-        var minFullMembershipFee = await service.CalculateMinimumFeePayableAsync();
+        var minFullMembershipFee = service.CalculateMinimumFeePayable();
         var calculationMonths = 2; //First semester number of months
-        var minPartMembershipFee = await service.CalculateMinimumFeePayableAsync(calculationMonths);
+        var minPartMembershipFee = service.CalculateMinimumFeePayable(calculationMonths);
         // Calculate financials
         if (receipt.Amount >= 0)
         {
