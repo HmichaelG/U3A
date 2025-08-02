@@ -368,7 +368,6 @@ else
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         dbcT = await tenantDbfactory.CreateDbContextAsync();
-        service = new MemberFeeCalculationService();
         Communication = new Communication();
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         server = new DocumentServer(dbc);
@@ -564,8 +563,8 @@ else
             {
                 if (!feesDue.ContainsKey(e.PersonID))
                 {
-                    service = new MemberFeeCalculationService();
-                    feesDue.Add(e.PersonID, await service.CalculateFeeAsync(dbc, e.Person, selectedTerm));
+                    service = await MemberFeeCalculationService.CreateAsync(dbc,currentTerm,e.Person);
+                    feesDue.Add(e.PersonID, await service.CalculateFeeAsync(e.Person));
                 }
             }
             await InvokeAsync(StateHasChanged);

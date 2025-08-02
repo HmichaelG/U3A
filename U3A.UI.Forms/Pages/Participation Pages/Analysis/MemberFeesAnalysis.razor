@@ -89,7 +89,7 @@ else
         service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
         foreach (var p in people)
         {
-            await service.CalculateFeeAsync(dbc, p, currentTerm);
+            await service.CalculateFeeAsync(p);
             pivotData.AddRange(service.GetAllocatedMemberFees(p));
             i++;
             if (i % 50 == 0) { await ProgressBar.SetValueAsync(i); }

@@ -212,7 +212,7 @@ namespace U3A.Services
 
         private async Task CreateReceipt(U3ADbContext dbc, PaymentResult result, Person person, Term term)
         {
-            var feeService = new MemberFeeCalculationService();
+            var feeService = await MemberFeeCalculationService.CreateAsync(dbc,term,person);
             if (result.AccessCode != null && (result.ResponseCode == "00" || result.ResponseCode == "08"))
             {
                 var receipt = new Receipt()
@@ -225,7 +225,7 @@ namespace U3A.Services
                 receipt.MerchantFee = result.MerchantFee;
                 receipt.Amount = result.OriginalFee;
                 var processingYear = term.Year;
-                var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(dbc, person);
+                var minMembershipFee = await feeService.CalculateMinimumFeePayableAsync(person);
 
                 // Special Rule: set Financial To if amount paid greater than minimum amount
                 var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, processingYear, DateTime.UtcNow);

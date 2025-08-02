@@ -236,7 +236,6 @@ else
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        service = new MemberFeeCalculationService();
         allowPartPayments = settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly;
         await RefreshData();
         IsReady = true;
@@ -348,12 +347,12 @@ else
         var startTime = DateTime.UtcNow;
         var currentTerm = await BusinessRule.CurrentTermAsync(dbc, receipt.Date);
         if (currentTerm == null) { currentTerm = await BusinessRule.CurrentTermAsync(dbc); }
-        service = new MemberFeeCalculationService();
-        var totalDue = await service.CalculateFeeAsync(dbc, receipt.Person, currentTerm);
+        service = await MemberFeeCalculationService.CreateAsync(dbc,currentTerm,receipt.Person);
+        var totalDue = await service.CalculateFeeAsync();
         var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, receipt.PersonID, ProcessingYear, startTime);
-        var minFullMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, receipt.Person);
+        var minFullMembershipFee = await service.CalculateMinimumFeePayableAsync();
         var calculationMonths = 2; //First semester number of months
-        var minPartMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, receipt.Person, calculationMonths);
+        var minPartMembershipFee = await service.CalculateMinimumFeePayableAsync(calculationMonths);
         // Calculate financials
         if (receipt.Amount >= 0)
         {

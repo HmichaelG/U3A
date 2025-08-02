@@ -94,6 +94,15 @@ namespace U3A.BusinessRules
                         .Where(x => today >= x.EnrolmentStartDate && today <= x.EnrolmentEndDate)
                         .FirstOrDefault();
         }
+        public static Term? CurrentEnrolmentTerm(IEnumerable<Term> Terms, DateTime AsAt)
+        {
+            var today = AsAt.Date;
+            return Terms
+                        .OrderByDescending(x => x.Year)
+                        .ThenByDescending(x => x.TermNumber)
+                        .Where(x => today >= x.EnrolmentStartDate && today <= x.EnrolmentEndDate)
+                        .FirstOrDefault();
+        }
 
         public static Term? CurrentEnrolmentTerm(U3ADbContext dbc)
         {

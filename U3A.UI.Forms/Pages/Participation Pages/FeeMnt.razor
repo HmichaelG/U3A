@@ -151,7 +151,6 @@ else
         dbc = await U3Adbfactory.CreateDbContextAsync();
         settings = dbc.SystemSettings.FirstOrDefault();
         await RefreshData();
-        service = new MemberFeeCalculationService();
         IsReady = true;
     }
 
@@ -254,7 +253,7 @@ else
     {
         var person = fee.Person;
         var maxDate = DateTime.MaxValue;
-        var minMembershipFee = await service.CalculateMinimumFeePayableAsync(U3Adbfactory, person);
+        var minMembershipFee = await service.CalculateMinimumFeePayableAsync(person);
         var paidToDate = await BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, ProcessingYear, maxDate);
         // Set FinancialTo if amount paid greater than minimum amount
         if (paidToDate >= minMembershipFee)

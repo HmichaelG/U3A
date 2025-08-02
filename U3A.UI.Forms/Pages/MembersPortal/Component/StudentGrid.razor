@@ -15,22 +15,22 @@ else
 {
     <div class="mt-3">
         <DxGrid @ref=@grid Data="@Enrolments" CssClass="student-grid-style" id="myGrid"
-        ShowAllRows="true"
-        ShowSearchBox=true
-        ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-        KeyFieldName="ID"
-        ValidationEnabled="true"
-        SelectionMode="GridSelectionMode.Multiple"
-        AllowSelectRowByClick="false"
-        UnboundColumnData="Grid_CustomUnboundColumnData"
-        @bind-SelectedDataItems="SelectedDataItems">
+                ShowAllRows="true"
+                ShowSearchBox=true
+                ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+                KeyFieldName="ID"
+                ValidationEnabled="true"
+                SelectionMode="GridSelectionMode.Multiple"
+                AllowSelectRowByClick="false"
+                UnboundColumnData="Grid_CustomUnboundColumnData"
+                @bind-SelectedDataItems="SelectedDataItems">
             <Columns>
                 <DxGridSelectionColumn Width="1rem" />
                 @*                 <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
                                   Visible="@(!IsManageEnrolmentsView)"
                                   UnboundType="GridUnboundColumnType.Integer" />
  *@                <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
-                Visible="@IsManageEnrolmentsView" />
+                                                    Visible="@IsManageEnrolmentsView" />
                 <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag">
                     <CellDisplayTemplate>
                         @{
@@ -60,34 +60,34 @@ else
                     </CellDisplayTemplate>
                 </DxGridDataColumn>
                 <DxGridDataColumn Caption="No-SMS" FieldName="Person.SMSOptOut" Visible="false"
-                Width="3rem">
+                                  Width="3rem">
                 </DxGridDataColumn>
                 <DxGridDataColumn Caption="Vax?" FieldName="Person.VaxCertificateViewed"
-                Width="3rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
+                                  Width="3rem" Visible="@(Settings.RequireVaxCertificate && !IsSmallLayout)">
                 </DxGridDataColumn>
                 <DxGridDataColumn Caption="Enrolled"
-                FieldName="DateEnrolled"
-                Visible="!IsSmallLayout"
-                Width="4rem" DisplayFormat="{0:dd/MM/yy}" />
+                                  FieldName="DateEnrolled"
+                                  Visible="!IsSmallLayout"
+                                  Width="4rem" DisplayFormat="{0:dd/MM/yy}" />
                 <DxGridDataColumn Caption="Fin-To"
-                FieldName="Person.FinancialToBriefText"
-                Visible="!IsSmallLayout"
-                Width="4rem" />
+                                  FieldName="Person.FinancialToBriefText"
+                                  Visible="!IsSmallLayout"
+                                  Width="4rem" />
                 <DxGridDataColumn Caption="Email"
-                Visible="!IsSmallLayout"
-                FieldName="Person.Email" />
+                                  Visible="!IsSmallLayout"
+                                  FieldName="Person.Email" />
                 <DxGridDataColumn Caption="Mobile"
-                Visible="!IsSmallLayout"
-                FieldName="Person.MobileOrSilent"
-                Width="6rem" />
+                                  Visible="!IsSmallLayout"
+                                  FieldName="Person.MobileOrSilent"
+                                  Width="6rem" />
                 <DxGridDataColumn Caption="Home"
-                Visible="!IsSmallLayout"
-                FieldName="Person.HomePhoneOrSilent"
-                Width="6rem" />
+                                  Visible="!IsSmallLayout"
+                                  FieldName="Person.HomePhoneOrSilent"
+                                  Width="6rem" />
                 <DxGridDataColumn Caption="Due" Width="3rem" FieldName="Due"
-                Visible="@(!IsSmallLayout && AreFeesPayable)"
-                DisplayFormat="c2"
-                UnboundType="GridUnboundColumnType.Decimal" />
+                                  Visible="@(!IsSmallLayout && AreFeesPayable)"
+                                  DisplayFormat="c2"
+                                  UnboundType="GridUnboundColumnType.Decimal" />
             </Columns>
         </DxGrid>
         <p>
@@ -98,11 +98,11 @@ else
 }
 <style>
     .student-grid-style {
-    height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "22rem" : "20rem" : "20rem") );
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "22rem" : "20rem" : "20rem") );
     }
 
     .badge-size {
-    font-size: 0.7rem !important;
+        font-size: 0.7rem !important;
     }
 
 </style>
@@ -142,12 +142,15 @@ else
             AreFeesPayable = (course.HasTermFees || course.CourseFeePerYear > 0);
             if (AreFeesPayable)
             {
-                foreach (var e in Enrolments)
+                using (var dbc = this.U3Adbfactory.CreateDbContext())
                 {
-                    var person = e.Person;
-                    service = new MemberFeeCalculationService();
-                    var due = await service.CalculateFeeAsync(U3Adbfactory, person);
-                    FeeDue.Add(person.ID, due);
+                    foreach (var e in Enrolments)
+                    {
+                        var person = e.Person;
+                        service = await MemberFeeCalculationService.CreateAsync(dbc, person);
+                        var due = await service.CalculateFeeAsync(person);
+                        FeeDue.Add(person.ID, due);
+                    }
                 }
             }
         }

@@ -340,8 +340,9 @@ else
             else if (person.FinancialTo >= CurrentTerm.Year)
             {
                 welcome += $"<br/>Financial to: <strong>{person.FinancialToText}</strong>";
-                var services = new MemberFeeCalculationService();
-                decimal fee = await services.CalculateFeeAsync(U3Adbfactory, person);
+                using var dbc = await U3Adbfactory.CreateDbContextAsync();
+                var service = await MemberFeeCalculationService.CreateAsync(dbc,CurrentTerm,person);
+                decimal fee = await service.CalculateFeeAsync(person);
                 if (fee > 0) welcome += $" Remaining: <strong>{fee.ToString("c2")}</strong>";
             }
             else

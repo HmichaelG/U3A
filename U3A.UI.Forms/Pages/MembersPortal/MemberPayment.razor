@@ -222,14 +222,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         IsProcessing = true;
-        feeService = new MemberFeeCalculationService();
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-            availablePayments = await feeService.GetAvailableMemberPaymentsAsync(dbc, loginState?.SelectedPerson);
-            if (availablePayments.Count() > 0) selectedPaymentType = availablePayments.First();
+            settings = await dbc.SystemSettings.FirstOrDefaultAsync();
             term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
             if (term == null) term = await BusinessRule.CurrentTermAsync(dbc);
-            settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+            feeService = await MemberFeeCalculationService.CreateAsync(dbc, term, loginState?.SelectedPerson);
+            availablePayments = await feeService.GetAvailableMemberPaymentsAsync();
+            if (availablePayments.Count() > 0) selectedPaymentType = availablePayments.First();
         }
         await CalculateFeeAsync();
         Title = settings?.U3AGroup;
@@ -294,8 +294,8 @@ else
 
     async Task OnMenuSelected(MouseEventArgs e, PortalMenuSelection selection)
     {
-            if (!await AreThereFeesToBePaid()) return;
-            if (!await AreTermsConfirmed()) return;
+        if (!await AreThereFeesToBePaid()) return;
+        if (!await AreTermsConfirmed()) return;
         menuSelection = selection;
         StateHasChanged();
     }
@@ -325,8 +325,9 @@ else
 
     async Task<decimal> CalculateFeeAsync()
     {
-        feeService = new();
-        decimal  result = await feeService.CalculateFeeAsync(U3Adbfactory, loginState.SelectedPerson, term);
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        feeService = await MemberFeeCalculationService.CreateAsync(dbc, term, loginState.SelectedPerson);
+        decimal  result = await feeService.CalculateFeeAsync();
         feeAsString = GetFeeAsString(result);
         return result;
     }

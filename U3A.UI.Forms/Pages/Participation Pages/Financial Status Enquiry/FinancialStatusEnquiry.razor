@@ -244,13 +244,12 @@
         if (selectedTerm == null || selectedTerm != lastTerm)
         {
             await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
-            MemberFeeCalculationService service;
             Persons = new List<PersonFinancialStatus>();
             var i = 0;
-            service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
+            var service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
             foreach (var p in people)
             {
-                await service.CalculateFeeAsync(dbc, p, selectedTerm);
+                await service.CalculateFeeAsync(p);
                 Persons.Add(service.PersonWithFinancialStatus);
                 i++;
                 if (i % 50 == 0) { await ProgressBar.SetValueAsync(i); }
@@ -339,7 +338,6 @@
     {
         if (await adjustMemberFee.ShowAsync())
         {
-            var service = new MemberFeeCalculationService();
             foreach (var p in SelectedDataItems)
             {
                 PersonFinancialStatus person = (PersonFinancialStatus)p;

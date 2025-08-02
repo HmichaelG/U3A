@@ -37,36 +37,63 @@ public class MemberFeeCalculationService
     Term[] Terms { get; set; } = null;
     List<Enrolment> Enrolments { get; set; } = null;
     List<Class> Classes { get; set; } = null;
-    public MemberFeeCalculationService()
+
+    DateTime localTime;
+    private MemberFeeCalculationService()
     {
         MemberFees = new ConcurrentBag<MemberFee>();
     }
 
-    public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, Term Term)
+    public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, Term Term, Person? Person = null)
     {
         var instance = new MemberFeeCalculationService();
-        await instance.InitializeAsync(dbc,Term);
+        await instance.InitializeAsync(dbc, Term, Person);
+        return instance;
+    }
+    public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, Person? Person = null)
+    {
+        var instance = new MemberFeeCalculationService();
+        await instance.InitializeAsync(dbc,null, Person);
         return instance;
     }
 
-    private async Task InitializeAsync(U3ADbContext dbc, Term Term)
+    private async Task InitializeAsync(U3ADbContext dbc, Term? Term, Person? person)
     {
-        BillingTerm = Term;
-        BillingYear = Term.Year;
+        localTime = dbc.GetLocalTime(DateTime.UtcNow);
         Settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        People = await dbc.Person.AsNoTracking().ToListAsync();
-        Terms = await dbc.Term.Where(x => x.Year == BillingYear).OrderBy(x => x.TermNumber).ToArrayAsync();
+        if (Term != null)
+        {
+            BillingTerm = Term;
+            BillingYear = Term.Year;
+            Terms = await dbc.Term
+                        .Where(x => x.Year == BillingYear)
+                        .OrderBy(x => x.TermNumber)
+                        .ToArrayAsync();
+        }
+        else {
+            Terms = await dbc.Term
+                        .Where(x => x.Year == localTime.Year)
+                        .OrderBy(x => x.TermNumber)
+                        .ToArrayAsync();
+            GetBillingTerm(); 
+        }
+        People = await dbc.Person.AsNoTracking()
+                        .Where(x => person == null || x.ID == person.ID)
+                        .ToListAsync();
         Fees = await dbc.Fee.AsNoTracking().IgnoreQueryFilters()
-                            .Where(x => !x.IsDeleted && x.ProcessingYear >= BillingYear)
+                            .Where(x => (person == null || x.PersonID == person.ID)
+                                        && !x.IsDeleted && x.ProcessingYear >= BillingYear)
                             .ToListAsync();
         Receipts = await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
-                            .Where(x => !x.IsDeleted && x.ProcessingYear >= BillingYear)
+                            .Where(x => (person == null || x.PersonID == person.ID)
+                                        && !x.IsDeleted && x.ProcessingYear >= BillingYear)
                             .ToListAsync();
         Enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
                             .Include(x => x.Term)
                             .Include(x => x.Course).ThenInclude(x => x.Classes)
                             .Include(x => x.Class)
-                            .Where(x => !x.IsDeleted && x.Term.Year == BillingYear).ToListAsync();
+                            .Where(x => (person == null || x.PersonID == person.ID)
+                                        && !x.IsDeleted && x.Term.Year == BillingYear).ToListAsync();
         Classes = await dbc.Class.AsNoTracking()
                                 .Include(x => x.Course)
                                 .Where(x => x.Course.Year == BillingYear).ToListAsync();
@@ -88,57 +115,44 @@ public class MemberFeeCalculationService
                 .ToList();
     }
 
-    public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(U3ADbContext dbc, Person person)
+    public async Task<List<MemberPaymentAvailable>> GetAvailableMemberPaymentsAsync(Person person = null)
     {
         var result = new List<MemberPaymentAvailable>();
-        var settings = Settings ?? await dbc.SystemSettings.FirstOrDefaultAsync();
-        if (settings.AllowedMemberFeePaymentTypes == MemberFeePaymentType.PerYearAndPerSemester)
+        if (person == null) { person = People.FirstOrDefault(); }
+        if (Settings.AllowedMemberFeePaymentTypes == MemberFeePaymentType.PerYearAndPerSemester)
         {
-            var term = BillingTerm ?? await GetBillingTermAsync(dbc);
-            if (await IsComplimentaryMembership(dbc, person, term.Year)) { return result; }
-            decimal yearlyFee = GetTermFee(settings, term.TermNumber)
-                                    + await GetTotalOtherMembershipFees(dbc, person, term);
+            if (await IsComplimentaryMembership(person)) { return result; }
+            decimal yearlyFee = GetTermFee(BillingTerm.TermNumber)
+                                    + await GetTotalOtherMembershipFees(person);
             decimal semesterFee = decimal.Round(yearlyFee / 2, 2);
-            var totalFee = await CalculateFeeAsync(dbc, person, term);
+            var totalFee = await CalculateFeeAsync(person);
             if (totalFee < yearlyFee) { return result; }
-            if (term.TermNumber <= 2)
+            if (BillingTerm.TermNumber <= 2)
             {
                 result.Add(new MemberPaymentAvailable()
                 {
                     Amount = totalFee,
-                    Description = $"{totalFee.ToString("c2")} {term.Year} Full Year Fee",
+                    Description = $"{totalFee.ToString("c2")} {BillingYear} Full Year Fee",
                     TermsPaid = null
                 });
                 result.Add(new MemberPaymentAvailable()
                 {
                     Amount = totalFee - semesterFee,
-                    Description = $"{(totalFee - semesterFee).ToString("c2")} {term.Year} Semester (Term 1 & 2) Fee",
+                    Description = $"{(totalFee - semesterFee).ToString("c2")} {BillingYear} Semester (Term 1 & 2) Fee",
                     TermsPaid = 2
                 }); ;
             }
         }
         return result;
     }
-    async Task<decimal> GetTotalOtherMembershipFees(U3ADbContext dbc, Person person, Term term)
+    async Task<decimal> GetTotalOtherMembershipFees(Person person)
     {
         var result = 0m;
-        if (Fees == null)
-        {
-            result = await dbc.Fee.AsNoTracking().IgnoreQueryFilters()
-                                .Where(x => !x.Person.IsDeleted
-                                        && x.PersonID == person.ID
-                                        && x.IsMembershipFee
-                                        && x.ProcessingYear == term.Year)
-                                .Select(x => x.Amount).SumAsync();
-        }
-        else
-        {
-            result = Fees
-                        .Where(x => !x.Person.IsDeleted
-                                    && x.PersonID == person.ID
-                                    && x.IsMembershipFee)
-                        .Sum(x => x.Amount);
-        }
+        result = Fees
+                    .Where(x => !x.Person.IsDeleted
+                                && x.PersonID == person.ID
+                                && x.IsMembershipFee)
+                    .Sum(x => x.Amount);
         return result;
     }
 
@@ -148,35 +162,20 @@ public class MemberFeeCalculationService
     /// <param name="U3Adbfactory"></param>
     /// <param name="person"></param>
     /// <returns></returns>
-    public async Task<decimal> CalculateFeeAsync(IDbContextFactory<U3ADbContext> U3Adbfactory,
-                                    Person person, int? CalclateForTerm = null)
+    public async Task<decimal> CalculateFeeAsync()
     {
-        var result = decimal.Zero;
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            var term = await GetBillingTermAsync(dbc);
-            if (term != null) { result = await CalculateFeeAsync(dbc, person, term, CalclateForTerm); }
-        }
-        return result;
+        return await CalculateFeeAsync(null, null);
     }
-    public async Task<decimal> CalculateFeeAsync(IDbContextFactory<U3ADbContext> U3Adbfactory,
-                                    Person person, Term term, int? CalculateForTerm = null)
+    public async Task<decimal> CalculateFeeAsync(int CalculateForTerm)
     {
-        var result = decimal.Zero;
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            if (term != null) { result = await CalculateFeeAsync(dbc, person, term, CalculateForTerm); }
-        }
-        return result;
+        return await CalculateFeeAsync(null, CalculateForTerm);
     }
 
-    public async Task<decimal> CalculateFeeAsync(U3ADbContext dbc,
-                                    Person person, Term term, int? CalculateForTerm = null)
+    public async Task<decimal> CalculateFeeAsync(Person? person = null, int? CalculateForTerm = null)
     {
         var result = decimal.Zero;
-        BillingTerm = term;
-        BillingYear = term.Year;
-        var defaultDate = new DateTime(term.Year, 1, 1);
+        if (person == null) { person = People.FirstOrDefault(); }
+        var defaultDate = new DateTime(BillingYear, 1, 1);
         MemberFees.Clear();
         PersonWithFinancialStatus = new PersonFinancialStatus()
         {
@@ -193,122 +192,100 @@ public class MemberFeeCalculationService
             Mobile = person.AdjustedMobile,
             HomePhone = person.AdjustedHomePhone,
             Email = person.Email,
-            Enrolments = await ActiveCourseCountAsync(dbc, person, term),
-            Waitlisted = await WaitlistedCourseCountAsync(dbc, person, term)
+            Enrolments = await ActiveCourseCountAsync(person),
+            Waitlisted = await WaitlistedCourseCountAsync(person)
         };
-        if (term != null)
+        if (Settings != null)
         {
-            var settings = Settings ?? await dbc.SystemSettings.FirstOrDefaultAsync();
-            if (settings != null)
+            var isComplimentary = await IsComplimentaryMembership(person);
+            // membership fees
+            if (isComplimentary && Settings.IncludeMembershipFeeInComplimentary)
             {
-                var isComplimentary = await IsComplimentaryMembership(dbc, person, term.Year);
-                // membership fees
-                if (isComplimentary && settings.IncludeMembershipFeeInComplimentary)
+                var complimentaryCalcDate = await GetComplimentaryCalculationDate(person);
+                if (complimentaryCalcDate != null)
                 {
-                    var complimentaryCalcDate = await GetComplimentaryCalculationDate(dbc, person, term.Year);
-                    if (complimentaryCalcDate != null)
-                    {
-                        AddFee(person,
-                            MemberFeeSortOrder.Complimentary, defaultDate, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {term.Year} complimentary membership", 0.00M);
-                    }
-                    else
-                    {
-                        AddFee(person,
-                            MemberFeeSortOrder.Complimentary, defaultDate, $"{term.Year} complimentary membership", 0.00M);
-                    }
+                    AddFee(person,
+                        MemberFeeSortOrder.Complimentary, defaultDate, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {BillingYear} complimentary membership", 0.00M);
                 }
                 else
                 {
-                    PersonWithFinancialStatus.MembershipFees = await CalculateMembershipFeeAsync(dbc, term, person);
-                    var fee = PersonWithFinancialStatus.MembershipFees;
-                    if (fee != 0)
-                    {
-                        if (CalculateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalculateForTerm, 2); }
-                        AddFee(person,
-                            MemberFeeSortOrder.MemberFee, defaultDate, $"{term.Year} membership fee", fee);
-                    }
+                    AddFee(person,
+                        MemberFeeSortOrder.Complimentary, defaultDate, $"{BillingYear} complimentary membership", 0.00M);
                 }
-                if (person.Communication != "Email")
-                {
-                    if (isComplimentary && settings.IncludeMailSurchargeInComplimentary)
-                    {
-                        AddFee(person,
-                            MemberFeeSortOrder.MailSurcharge, defaultDate, $"{term.Year} complimentary mail surcharge", 0.00M);
-                    }
-                    else
-                    {
-                        PersonWithFinancialStatus.MailSurcharge = settings.MailSurcharge;
-                        AddFee(person,
-                            MemberFeeSortOrder.MailSurcharge, defaultDate, $"{term.Year} mail surcharge", settings.MailSurcharge);
-                    }
-                }
-                // course fees
-                await AddCourseFeesAsync(dbc, person, term, settings, isComplimentary);
-                await AddLeadersFeesAsync(dbc, person, term, settings);
-                // add fee adjustments
-                await AddFeesAsync(dbc, person, term);
-                // less payments
-                await SubtractReceiptsAsync(dbc, person, term);
-                // total due
-                result = MemberFees
-                            .Where(x => x.PersonID == person.ID)
-                            .Sum(x => x.Amount);
             }
+            else
+            {
+                PersonWithFinancialStatus.MembershipFees = await CalculateMembershipFeeAsync(person);
+                var fee = PersonWithFinancialStatus.MembershipFees;
+                if (fee != 0)
+                {
+                    if (CalculateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalculateForTerm, 2); }
+                    AddFee(person,
+                        MemberFeeSortOrder.MemberFee, defaultDate, $"{BillingYear} membership fee", fee);
+                }
+            }
+            if (person.Communication != "Email")
+            {
+                if (isComplimentary && Settings.IncludeMailSurchargeInComplimentary)
+                {
+                    AddFee(person,
+                        MemberFeeSortOrder.MailSurcharge, defaultDate, $"{BillingYear} complimentary mail surcharge", 0.00M);
+                }
+                else
+                {
+                    PersonWithFinancialStatus.MailSurcharge = Settings.MailSurcharge;
+                    AddFee(person,
+                        MemberFeeSortOrder.MailSurcharge, defaultDate, $"{BillingYear} mail surcharge", Settings.MailSurcharge);
+                }
+            }
+            // course fees
+            await AddCourseFeesAsync(person, isComplimentary);
+            await AddLeadersFeesAsync(person);
+            // add fee adjustments
+            await AddFeesAsync(person);
+            // less payments
+            await SubtractReceiptsAsync(person);
+            // total due
+            result = MemberFees
+                        .Where(x => x.PersonID == person.ID)
+                        .Sum(x => x.Amount);
         }
         return result;
     }
 
-    private async Task<bool> IsComplimentaryMembership(U3ADbContext dbc, Person person, int Yaer)
+    private async Task<bool> IsComplimentaryMembership(Person person)
     {
         bool result = false;
         if (person.IsLifeMember) { result = true; }
         else
         {
             // A zero-valued receipt is created when a person is given complimentary membership
-            if (Receipts == null)
-            {
-                result = await dbc.Receipt.AnyAsync(x => x.PersonID == person.ID
-                                            && x.FinancialTo >= BillingYear
-                                            && x.Amount == 0);
-            }
-            else
-            {
-                result = Receipts.Any(x => x.PersonID == person.ID
-                                        && x.FinancialTo >= BillingYear
-                                        && x.Amount == 0);
-            }
+            result = Receipts.Any(x => x.PersonID == person.ID
+                                    && x.FinancialTo >= BillingYear
+                                    && x.Amount == 0);
         }
         if (PersonWithFinancialStatus != null)
             PersonWithFinancialStatus.IsComplimentary = result;
         return result;
     }
-    private async Task<DateTime?> GetComplimentaryCalculationDate(U3ADbContext dbc, Person person, int Yaer)
+    private async Task<DateTime?> GetComplimentaryCalculationDate(Person person)
     {
         DateTime? result = null;
         Receipt? receipt;
-        if (Receipts == null)
-        {
-            receipt = await dbc.Receipt.FirstOrDefaultAsync(x => x.PersonID == person.ID
-                                            && x.FinancialTo >= BillingYear
-                                            && x.Amount == 0);
-        }
-        else
-        {
-            receipt = Receipts.FirstOrDefault(x => x.PersonID == person.ID
-                                            && x.Amount == 0);
-        }
+        receipt = Receipts.FirstOrDefault(x => x.PersonID == person.ID
+                                        && x.Amount == 0);
         if (receipt != null) { result = receipt.Date; }
         return result;
     }
 
-    private async Task<Term> GetBillingTermAsync(U3ADbContext dbc)
+    private async Task<Term> GetBillingTerm()
     {
         Term result = null;
-        result = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+        result = BusinessRule.CurrentEnrolmentTerm(Terms, localTime);
         if (result == null)
         {
-            result = await BusinessRule.CurrentTermAsync(dbc);
-            if (result.TermNumber == 4 && dbc.GetLocalTime(DateTime.UtcNow) > result.EndDate)
+            result = Terms.FirstOrDefault(x => x.IsDefaultTerm);
+            if (result.TermNumber == 4 && localTime > result.EndDate)
             {
                 result = null; // End of year, no enrolment period - no man's land.
             }
@@ -317,88 +294,69 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    public async Task<decimal> CalculateMinimumFeePayableAsync(IDbContextFactory<U3ADbContext> U3Adbfactory,
-                                    Person person, int? CalclateForTerm = null)
+    public async Task<decimal> CalculateMinimumFeePayableAsync()
     {
-        var result = decimal.Zero;
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            result = await CalculateMinimumFeePayableAsync(dbc, person, CalclateForTerm);
-        }
-        return result;
+        return await CalculateMinimumFeePayableAsync(People.FirstOrDefault(), null);
     }
-    public async Task<decimal> CalculateMinimumFeePayableAsync(U3ADbContext dbc,
-                                    Person person, int? CalculateForTerm = null)
+    public async Task<decimal> CalculateMinimumFeePayableAsync(int CalculateForTerm)
+    {
+        return await CalculateMinimumFeePayableAsync(People.FirstOrDefault(), CalculateForTerm);
+    }
+    public async Task<decimal> CalculateMinimumFeePayableAsync(Person? person = null, int? CalculateForTerm = null)
     {
         var result = decimal.Zero;
-        var term = BillingTerm ?? await GetBillingTermAsync(dbc);
-        if (term != null && !await IsComplimentaryMembership(dbc, person, term.Year))
+        if (person == null) { person = People.FirstOrDefault(); }
+        if (BillingTerm != null && !await IsComplimentaryMembership(person))
         {
-            result = await CalculateMembershipFeeAsync(dbc, term, person);
-            if (Fees == null)
-            {
-                result += dbc.Fee.IgnoreQueryFilters()
-                                            .Where(x => !x.Person.IsDeleted
-                                             && x.PersonID == person.ID
-                                             && x.IsMembershipFee
-                                             && x.ProcessingYear == term.Year).Select(x => x.Amount).Sum();
-            }
-            else
-            {
-                result += Fees
-                            .Where(x => !x.Person.IsDeleted
-                                        && x.PersonID == person.ID
-                                        && x.IsMembershipFee)
-                            .Sum(x => x.Amount);
-            }
+            result = await CalculateMembershipFeeAsync(person);
+            result += Fees
+                        .Where(x => !x.Person.IsDeleted
+                                    && x.PersonID == person.ID
+                                    && x.IsMembershipFee)
+                        .Sum(x => x.Amount);
             if (CalculateForTerm.HasValue) { result = decimal.Round(result / 4m * (decimal)CalculateForTerm, 2); }
         }
         return result;
     }
 
-    private async Task<decimal> CalculateMembershipFeeAsync(U3ADbContext dbc, Term term, Person person)
+    private async Task<decimal> CalculateMembershipFeeAsync(Person person)
     {
         if (person is Contact) { return 0; }
         decimal result = 0;
         bool foundTerm = false;
-        var settings = Settings ?? await dbc.SystemSettings.FirstOrDefaultAsync();
-        if (settings != null)
+        result = Settings.MembershipFee; // set the default
+        DateTime? feeDueDate = null;
+        if (person.DateJoined?.Year == BillingYear) feeDueDate = person.DateJoined; // New member; use join date
+        if (feeDueDate == null) // Renewing member
         {
-            result = settings.MembershipFee; // set the default
-            DateTime? feeDueDate = null;
-            if (person.DateJoined?.Year == term.Year) feeDueDate = person.DateJoined; // New member; use join date
-            if (feeDueDate == null) // Renewing member
-            {
-                var firstReceiptDate = await GetFirstReceiptDateAsync(dbc, term, person);
-                feeDueDate = firstReceiptDate ?? dbc.GetLocalDate();
-            }
-            var terms = Terms ?? await dbc.Term.Where(x => x.Year == term.Year).OrderBy(x => x.TermNumber).ToArrayAsync();
-            if (terms.Length > 1)
-            {
-                // Ues the term fee if fee due date is within term enrollment period
-                for (int i = 1; i < terms.Length; i++)
-                { // for terms 2 thru 4
-                    var lastTerm = terms[i - 1];
-                    var thisTerm = terms[i];
-                    if (feeDueDate > lastTerm.EnrolmentEndDate && feeDueDate <= thisTerm.EnrolmentEndDate)
-                    {
-                        result = GetTermFee(settings, thisTerm.TermNumber);
-                        foundTerm = true;
-                        break; // exit for
-                    }
-                }
-                // otherwise, use the term fee if date is within the current term.
-                if (!foundTerm)
+            var firstReceiptDate = await GetFirstReceiptDateAsync(person);
+            feeDueDate = firstReceiptDate ?? localTime.Date;
+        }
+        if (Terms.Length > 1)
+        {
+            // Ues the term fee if fee due date is within term enrollment period
+            for (int i = 1; i < Terms.Length; i++)
+            { // for terms 2 thru 4
+                var lastTerm = Terms[i - 1];
+                var thisTerm = Terms[i];
+                if (feeDueDate > lastTerm.EnrolmentEndDate && feeDueDate <= thisTerm.EnrolmentEndDate)
                 {
-                    for (int i = 1; i < terms.Length; i++)
-                    { // for terms 2 thru 4
-                        var lastTerm = terms[i - 1];
-                        var thisTerm = terms[i];
-                        if (feeDueDate > lastTerm.EndDate && feeDueDate <= thisTerm.EndDate)
-                        {
-                            result = GetTermFee(settings, thisTerm.TermNumber);
-                            break; // exit for
-                        }
+                    result = GetTermFee(thisTerm.TermNumber);
+                    foundTerm = true;
+                    break; // exit for
+                }
+            }
+            // otherwise, use the term fee if date is within the current term.
+            if (!foundTerm)
+            {
+                for (int i = 1; i < Terms.Length; i++)
+                { // for terms 2 thru 4
+                    var lastTerm = Terms[i - 1];
+                    var thisTerm = Terms[i];
+                    if (feeDueDate > lastTerm.EndDate && feeDueDate <= thisTerm.EndDate)
+                    {
+                        result = GetTermFee(thisTerm.TermNumber);
+                        break; // exit for
                     }
                 }
             }
@@ -406,44 +364,31 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private async Task<DateTime?> GetFirstReceiptDateAsync(U3ADbContext dbc, Term term, Person person)
+    private async Task<DateTime?> GetFirstReceiptDateAsync(Person person)
     {
         DateTime? result = null;
         Receipt? receipt = null;
-        if (Receipts == null)
-        {
-            receipt = await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
-                                        .OrderBy(x => x.Date)
-                                        .Where(x => !x.IsDeleted
-                                            && x.PersonID == person.ID
-                                            && x.Amount != 0
-                                            && x.ProcessingYear == term.Year)
-                                        .FirstOrDefaultAsync();
-        }
-        else
-        {
-            receipt = Receipts.OrderBy(x => x.Date).FirstOrDefault(x => !x.IsDeleted
-                                            && x.PersonID == person.ID
-                                            && x.Amount != 0
-                                            && x.ProcessingYear == term.Year);
-        }
+        receipt = Receipts.OrderBy(x => x.Date).FirstOrDefault(x => !x.IsDeleted
+                                        && x.PersonID == person.ID
+                                        && x.Amount != 0
+                                        && x.ProcessingYear == BillingYear);
         if (receipt != null) { result = receipt.Date; }
         return result;
     }
 
-    private decimal GetTermFee(SystemSettings settings, int TermNumber)
+    private decimal GetTermFee(int TermNumber)
     {
-        var result = settings.MembershipFee;
+        var result = Settings.MembershipFee;
         switch (TermNumber)
         {
             case 2:
-                result = settings.MembershipFeeTerm2;
+                result = Settings.MembershipFeeTerm2;
                 break;
             case 3:
-                result = settings.MembershipFeeTerm3;
+                result = Settings.MembershipFeeTerm3;
                 break;
             case 4:
-                result = settings.MembershipFeeTerm4;
+                result = Settings.MembershipFeeTerm4;
                 break;
             default:
                 break;
@@ -451,23 +396,12 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private async Task AddFeesAsync(U3ADbContext dbc, Person person, Term term)
+    private async Task AddFeesAsync(Person person)
     {
         List<Fee> fees;
-        if (Fees == null)
-        {
-            fees = await dbc.Fee.IgnoreQueryFilters().AsNoTracking()
-                                        .Where(x => !x.Person.IsDeleted
-                                                && x.PersonID == person.ID
-                                                && x.Amount != 0
-                                                && x.ProcessingYear == term.Year).ToListAsync();
-        }
-        else
-        {
-            fees = Fees.Where(x => x.PersonID == person.ID
-                                    && x.Amount != 0
-                                    && x.ProcessingYear == term.Year).ToList();
-        }
+        fees = Fees.Where(x => x.PersonID == person.ID
+                                && x.Amount != 0
+                                && x.ProcessingYear == BillingYear).ToList();
         foreach (var f in fees)
         {
             AddFee(person,
@@ -475,26 +409,14 @@ public class MemberFeeCalculationService
             PersonWithFinancialStatus.OtherFees += f.Amount;
         }
     }
-    private async Task SubtractReceiptsAsync(U3ADbContext dbc, Person person, Term term)
+    private async Task SubtractReceiptsAsync(Person person)
     {
         List<Receipt> receipts;
-        if (Receipts == null)
-        {
-            receipts = await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
-                                        .OrderBy(x => x.Date)
-                                        .Where(x => !x.IsDeleted
-                                            && x.PersonID == person.ID
-                                            && x.Amount != 0
-                                            && x.ProcessingYear == term.Year).ToListAsync();
-        }
-        else
-        {
-            receipts = Receipts.Where(x => !x.IsDeleted
-                                            && x.PersonID == person.ID
-                                            && x.Amount != 0
-                                            && x.ProcessingYear == term.Year)
-                                .OrderBy(x => x.Date).ToList();
-        }
+        receipts = Receipts.Where(x => !x.IsDeleted
+                                        && x.PersonID == person.ID
+                                        && x.Amount != 0
+                                        && x.ProcessingYear == BillingYear)
+                            .OrderBy(x => x.Date).ToList();
         foreach (var r in receipts)
         {
             var description = "Payment received - thank you";
@@ -513,37 +435,16 @@ public class MemberFeeCalculationService
             }
         }
     }
-    private async Task AddCourseFeesAsync(U3ADbContext dbc,
-                            Person person,
-                            Term term,
-                            SystemSettings settings,
-                            bool IsComplimentary)
+    private async Task AddCourseFeesAsync(Person person, bool IsComplimentary)
     {
-        DateOnly today = DateOnly.FromDateTime(dbc.GetLocalDate());
-        var terms = Terms ?? await dbc.Term.AsNoTracking()
-                            .Where(x => x.Year == term.Year)
-                            .OrderBy(x => x.TermNumber)
-                            .ToArrayAsync();
+        DateOnly today = DateOnly.FromDateTime(localTime);
         var courseFeeAdded = new List<Guid>();
         List<Enrolment> enrolments;
-        if (Enrolments == null)
-        {
-            enrolments = await dbc.Enrolment.AsNoTracking().IgnoreQueryFilters()
-                                .Include(x => x.Course).ThenInclude(x => x.Classes)
-                                .Include(x => x.Class)
-                                .Where(x => !x.IsDeleted
-                                            && x.PersonID == person.ID
-                                            && x.Term.Year == term.Year
-                                            && !x.IsWaitlisted).ToListAsync();
-        }
-        else
-        {
-            enrolments = Enrolments.Where(x => !x.IsDeleted
-                                            && x.PersonID == person.ID
-                                            && x.Term.Year == BillingYear
-                                            && !x.IsWaitlisted).ToList();
-        }
-        foreach (var t in terms)
+        enrolments = Enrolments.Where(x => !x.IsDeleted
+                                        && x.PersonID == person.ID
+                                        && x.Term.Year == BillingYear
+                                        && !x.IsWaitlisted).ToList();
+        foreach (var t in Terms)
         {
             foreach (var e in enrolments.Where(x => x.TermID == t.ID))
             {
@@ -555,7 +456,7 @@ public class MemberFeeCalculationService
                     {
                         var description = $"{e.Course.Name} course fee";
                         var amount = e.Course.CourseFeePerYear;
-                        var includeInComplimentary = settings.IncludeCourseFeePerYearInComplimentary;
+                        var includeInComplimentary = Settings.IncludeCourseFeePerYearInComplimentary;
                         if (e.Course.OverrideComplimentaryPerYearFee) includeInComplimentary = false;
                         if (IsComplimentary && includeInComplimentary)
                         {
@@ -618,7 +519,7 @@ public class MemberFeeCalculationService
                             default:
                                 break;
                         }
-                        var includeInComplimentary = settings.IncludeCourseFeePerTermInComplimentary;
+                        var includeInComplimentary = Settings.IncludeCourseFeePerTermInComplimentary;
                         if (e.Course.OverrideComplimentaryPerTermFee) includeInComplimentary = false;
                         if (IsComplimentary && includeInComplimentary)
                         {
@@ -639,41 +540,21 @@ public class MemberFeeCalculationService
         }
     }
 
-    private async Task AddLeadersFeesAsync(U3ADbContext dbc,
-                            Person person,
-                            Term term,
-                            SystemSettings settings)
+    private async Task AddLeadersFeesAsync(Person person)
     {
-        DateOnly today = DateOnly.FromDateTime(dbc.GetLocalDate());
-        var terms = Terms ?? await dbc.Term.AsNoTracking()
-                            .Where(x => x.Year == term.Year)
-                            .OrderBy(x => x.TermNumber)
-                            .ToArrayAsync();
+        DateOnly today = DateOnly.FromDateTime(localTime);
         var courseFeeAdded = new List<Guid>();
         List<Class> classesLead;
-        if (Classes == null)
-        {
-            classesLead = await dbc.Class
-                                    .Include(x => x.Course)
-                                    .Where(x =>
-                                            x.Course.Year == term.Year && (x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee &&
-                                            (x.LeaderID == person.ID ||
-                                            x.Leader2ID == person.ID ||
-                                            x.Leader3ID == person.ID))).ToListAsync();
-        }
-        else
-        {
-            classesLead = Classes.Where(x =>
-                                            x.Course.Year == term.Year && (x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee &&
-                                            (x.LeaderID == person.ID ||
-                                            x.Leader2ID == person.ID ||
-                                            x.Leader3ID == person.ID))).ToList();
-        }
+        classesLead = Classes.Where(x =>
+                                        x.Course.Year == BillingYear && (x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee &&
+                                        (x.LeaderID == person.ID ||
+                                        x.Leader2ID == person.ID ||
+                                        x.Leader3ID == person.ID))).ToList();
         DateOnly dueDate;
         foreach (var c in classesLead)
         {
             //Fees per year
-            dueDate = c.Course.CourseFeePerYearDueDate ?? new DateOnly(term.Year, 1, 1);
+            dueDate = c.Course.CourseFeePerYearDueDate ?? new DateOnly(BillingYear, 1, 1);
             if (dueDate <= today)
             {
                 if (c.Course.CourseFeePerYear != 0 && c.Course.LeadersPayYearFee && !courseFeeAdded.Contains(c.CourseID))
@@ -694,11 +575,11 @@ public class MemberFeeCalculationService
         }
         //Fees per term
         List<(Class Class, Term Term)> classTerms = new();
-        foreach (var t in terms)
+        foreach (var t in Terms)
         {
             foreach (var c in classesLead)
             {
-                if (classTerms.Contains((c,t))) continue;
+                if (classTerms.Contains((c, t))) continue;
                 var dueDateAdjustment = c.Course.CourseFeePerTermDueWeeks ?? 0;
                 dueDate = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
                 Log.Information($"Leader: {person.FullName} {c.Course.Name} {t.TermNumber} {dueDate}");
@@ -777,43 +658,21 @@ public class MemberFeeCalculationService
     {
         return new DateTime(date.Year, date.Month, date.Day);
     }
-    private async Task<int> ActiveCourseCountAsync(U3ADbContext dbc, Person person, Term SelectedTerm)
+    private async Task<int> ActiveCourseCountAsync(Person person)
     {
-        if (Enrolments == null)
-        {
-            return (await dbc.Enrolment.Include(x => x.Course)
-                            .Where(x => x.PersonID == person.ID &&
-                                x.TermID == SelectedTerm.ID &&
-                                !x.Course.ExcludeFromLeaderComplimentaryCount &&
-                                !x.IsWaitlisted).ToListAsync()).DistinctBy(x => x.CourseID).Count();
-        }
-        else
-        {
-            return Enrolments.Where(x => x.PersonID == person.ID &&
-                                        x.TermID == SelectedTerm.ID &&
-                                        !x.Course.ExcludeFromLeaderComplimentaryCount &&
-                                        !x.IsWaitlisted)
-                            .DistinctBy(x => x.CourseID).Count();
-        }
+        return Enrolments.Where(x => x.PersonID == person.ID &&
+                                    x.TermID == BillingTerm.ID &&
+                                    !x.Course.ExcludeFromLeaderComplimentaryCount &&
+                                    !x.IsWaitlisted)
+                        .DistinctBy(x => x.CourseID).Count();
     }
-    private async Task<int> WaitlistedCourseCountAsync(U3ADbContext dbc, Person person, Term SelectedTerm)
+    private async Task<int> WaitlistedCourseCountAsync(Person person)
     {
-        if (Enrolments == null)
-        {
-            return (await dbc.Enrolment.Include(x => x.Course)
-                            .Where(x => x.PersonID == person.ID &&
-                                x.TermID == SelectedTerm.ID &&
-                                !x.Course.ExcludeFromLeaderComplimentaryCount &&
-                                x.IsWaitlisted).ToListAsync()).DistinctBy(x => x.CourseID).Count();
-        }
-        else
-        {
-            return Enrolments.Where(x => x.PersonID == person.ID &&
-                                        x.TermID == SelectedTerm.ID &&
-                                        !x.Course.ExcludeFromLeaderComplimentaryCount &&
-                                        x.IsWaitlisted)
-                            .DistinctBy(x => x.CourseID).Count();
-        }
+        return Enrolments.Where(x => x.PersonID == person.ID &&
+                                    x.TermID == BillingTerm.ID &&
+                                    !x.Course.ExcludeFromLeaderComplimentaryCount &&
+                                    x.IsWaitlisted)
+                        .DistinctBy(x => x.CourseID).Count();
     }
 
     public List<MemberFee> AllocateMemberPayments(IEnumerable<MemberFee> ItemsToAllocate, Person person,
