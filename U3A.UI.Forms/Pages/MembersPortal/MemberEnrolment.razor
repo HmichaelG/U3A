@@ -109,12 +109,12 @@ else
                             @if (reportStyle == ReportStyle.Brief && !isListboxShowingSummary)
                             {
                                 <div class="mx-1 d-flex">
-                                    <div class="flex-grow-1 @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "")">
+                                    <div class="flex-grow-1 @((IsEnrolmentRequestView && c.IsSelected) ? "bg-fl-warning-subtle" : "")">
                                         @if (c.Course.IsFeaturedCourse)
                                         {
-                                            <div class="badge bg-primary me-1">Featured</div>
+                                            <div class="badge bg-fl-primary me-1">Featured</div>
                                         }
-                                        @(HighlightSearchText(ClassTitle(c)))
+                                    <span class="text-fl-primary"><b>@(HighlightSearchText(ClassTitle(c)))</b></span>
                                         <span>
                                             @(
                                             (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
@@ -137,24 +137,24 @@ else
                                 <DxFormLayout>
                                     <DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
                                         <Items>
-                                            <div class="container mt-2 mb-1 py-1 border @((IsEnrolmentRequestView && c.IsSelected) ? "bg-primary-subtle" : "bg-body-tertiary")">
+                                            <div class="container mt-2 mb-1 py-1 @((IsEnrolmentRequestView && c.IsSelected) ? "bg-fl-warning-subtle" : "bg-fl-neutral-subtle")">
                                                 <div class="d-flex flex-row align-items-center my-auto">
                                                     <div class="flex-grow-1">
-                                                        <div hidden="@(!c.Course.IsFeaturedCourse)" class="badge bg-primary">Featured</div>
-                                                        <div><b>@(HighlightSearchText(ClassTitle(c)))</b></div>
+                                                        <div hidden="@(!c.Course.IsFeaturedCourse)" class="badge bg-fl-primary">Featured</div>
+                                                        <div class="text-fl-primary"><b>@(HighlightSearchText(ClassTitle(c)))</b></div>
                                                     </div>
                                                     <div hidden="@IsMobileLayout" class="flex-grow-0">
-                                                        <div hidden="@(!IsReadOnly)" class="text-primary">@GetStatus(c)</div>
+                                                        <div hidden="@(!IsReadOnly)" class="text-fl-primary">@GetStatus(c)</div>
                                                         <DxButton Text="@GetStatus(c)" Visible="@(!IsReadOnly)"
                                                                   IconCssClass="@($"bi {selectButtonIcon}")"
-                                                                  RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                                  RenderStyleMode="ButtonRenderStyleMode.Contained"
                                                                   RenderStyle="ButtonRenderStyle.Primary"
                                                                   Click="@(async () => await SelectedDataItemChanged(c))" />
                                                     </div>
                                                 </div>
                                             </div>
                                             <div hidden="@(!IsMobileLayout)" class="mx-auto">
-                                                <div hidden="@(!IsReadOnly)" class="text-primary">@GetStatus(c)</div>
+                                                <div hidden="@(!IsReadOnly)" class="text-fl-primary">@GetStatus(c)</div>
                                                 <DxButton Text="@GetStatus(c)" Visible="@(!IsReadOnly)"
                                                           IconCssClass="@($"bi {selectButtonIcon}")"
                                                           RenderStyleMode="ButtonRenderStyleMode.Outline"
@@ -178,7 +178,7 @@ else
                                                 }
                                             </div>
 
-                                            <div class="description-style border border-light-subtle" hidden="@isListboxShowingSummary">
+                                            <div class="description-style" hidden="@isListboxShowingSummary">
                                                 @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                             </div>
 

@@ -37,7 +37,7 @@ else
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
     <Progress @ref="@ProgressBar" />
 
-    <FullScreen DisplayOffset="13">
+    <FullScreen DisplayOffset="13" @ref=@fullScreen>
         <ContentTemplate>
             <DxGrid id="my-grid" Data="@Receipts" @ref=@mainGrid
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -79,6 +79,7 @@ else
                             <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
                                       RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
                                       Click="async() => {var selectedPerson = (((Receipt)context.DataItem)).Person;
+                                                await fullScreen.ResetFullScreen();
                                                 await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
                             </DxButton>
                         </CellDisplayTemplate>
@@ -203,6 +204,7 @@ else
     YearComponent? yearComponent;
     Receipt originalReceipt;
     int ProcessingYear;
+    FullScreen? fullScreen;
 
     DxGridCommandColumnEx? GridCommandColumn;
     MessageBox? messageBox;

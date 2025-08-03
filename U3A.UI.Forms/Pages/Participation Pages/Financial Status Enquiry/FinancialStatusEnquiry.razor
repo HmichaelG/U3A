@@ -54,7 +54,7 @@
         <Progress @ref="@ProgressBar" />
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-        <FullScreen DisplayOffset="17">
+        <FullScreen DisplayOffset="17" @ref=@fullScreen >
             <ContentTemplate>
                 <DxGrid id="my-grid" Data="@Persons" @ref=@mainGrid
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -138,6 +138,7 @@
                             <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
                                         RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
                                         Click="async() => {var selectedPerson = (((PersonFinancialStatus)context.DataItem).PersonBase);
+                                            await fullScreen.ResetFullScreen();
                                             await MemberDrawerRequested.InvokeAsync((selectedPerson,selectedTerm)); }">
                             </DxButton>
                         </CellDisplayTemplate>
@@ -198,6 +199,7 @@
     IEnumerable<int>? selectedFinancialYears;
     string[] BalanceTypes = { "Debit (Money Owing)", "Credit (Refund Due)", "All Non-Zero" };
     string balanceType;
+    FullScreen? fullScreen;
 
     IGrid? mainGrid { get; set; }
     ErrorPopup? ErrorPopup { get; set; }

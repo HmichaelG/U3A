@@ -35,7 +35,7 @@ else
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 
-    <FullScreen DisplayOffset="11">
+    <FullScreen DisplayOffset="11" @ref=@fullScreen >
         <ContentTemplate>
             <DxGrid id="my-grid" Data="@Fees" @ref=@mainGrid
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -67,6 +67,7 @@ else
                             <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
                                         RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
                                         Click="async() => {var selectedPerson = (((Fee)context.DataItem)).Person;
+                                            await fullScreen.ResetFullScreen();
                                             await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
                             </DxButton>
                         </CellDisplayTemplate>
@@ -131,6 +132,7 @@ else
     YearComponent? yearComponent;
     int ProcessingYear;
     Fee? originalFee;
+    FullScreen? fullScreen;
 
     DxGridCommandColumnEx? GridCommandColumn;
     MessageBox? messageBox;

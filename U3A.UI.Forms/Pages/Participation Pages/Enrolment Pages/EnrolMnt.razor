@@ -175,7 +175,8 @@ else
                                     <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
                                               RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
                                               Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
-                                                                        await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
+                                                    await fullScreen.ResetFullScreen();
+                                                    await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
                                     </DxButton>
                                 </CellDisplayTemplate>
                             </DxGridDataColumn>
