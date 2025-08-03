@@ -348,9 +348,9 @@
                                     </DxGrid>
                                 </DxSplitterPane>
                         <DxSplitterPane Size="10rem" AllowCollapse="@(!IsEmbedded)"
-                                                Collapsed="@isSplitterCollapsed" Visible="@(!(IsSelectionList || IsReadOnly))">
+                                                Collapsed="@isSplitterCollapsed" Visible="@(isSplitterCollapsed || (!(IsSelectionList || IsReadOnly)))">
                                     <div class="h6">Queued Broadcast Email</div>
-                                    <QueuedBroadcastEmailGrid @ref=@queueGrid IsEmbedded="true" />
+                                    <QueuedBroadcastEmailGrid GridCssClass="allow-for-title" @ref=@queueGrid IsEmbedded="true" />
                                 </DxSplitterPane>
                             </Panes>
                         </DxSplitter>

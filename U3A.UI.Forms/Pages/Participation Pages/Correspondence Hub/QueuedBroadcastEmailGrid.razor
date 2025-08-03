@@ -19,59 +19,68 @@
 }
 else
 {
-    <DxGrid id="my-grid" Data=@Queue @ref=@emailGrid CssClass="@gridCss"
-            UnboundColumnData="Grid_CustomUnboundColumnData"
-            DataItemDeleting="Grid_DataItemDeleting">
-        <ToolbarTemplate>
-            <GridToolbar HideGroupPanel=@IsEmbedded
-                         HideSearchBox=@IsEmbedded
-                         LinkedGrid=@emailGrid
-                         LayoutKey="{66C4FC8C-9CE5-4483-AD10-9F4A70048B07}">
-                <CustomButtonContent>
-                    <DxToolbarItem Text="Refresh" IconCssClass="bi bi-arrow-clockwise"
-                                   Click="@GetData" Tooltip="Refresh data"
-                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                   RenderStyle="ButtonRenderStyle.Success" />
-                </CustomButtonContent>
-            </GridToolbar>
-        </ToolbarTemplate>
-        <Columns>
-            <DxGridCommandColumnEx Caption="Delete" EditButtonVisible=false NewButtonVisible=false
-                                   FixedPosition="GridColumnFixedPosition.Right" />
-            <DxGridDataColumn Width="8rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Queued"
-                              UnboundType="GridUnboundColumnType.DateTime"
-                              FieldName="Created" DisplayFormat="{0:dd-MMM-yy hh:mm tt}" />
-            <DxGridDataColumn Caption="Subject" FieldName="Subject" FixedPosition="GridColumnFixedPosition.Left"
-                              UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Caption="From" FieldName="From"
-                              UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Width="6rem" Caption="MergeCode #" FieldName="MergeCodeCount"
-                              UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Width="6rem" Caption="Attachment #" FieldName="AttachmnetCount"
-                              UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
-                              UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
-            <DxGridDataColumn Width="6rem" Caption="Selected #" FieldName="Recipients"
-                              UnboundType="GridUnboundColumnType.Integer" />
-            <DxGridDataColumn Caption="Delay (Hrs)" FieldName=@(nameof(DocumentQueue.DelayInHours)) />
-            <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
-            <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
-                              UnboundType="GridUnboundColumnType.DateTime"
-                              DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-            <DxGridDataColumn Caption="Email #" FieldName="unboundEmailCount"
-                              UnboundType="GridUnboundColumnType.String" />
-            <DxGridDataColumn Caption="Result" FieldName="Result" />
-        </Columns>
+    <div class=@GridCssClass>
+        <DxGrid id="my-grid" Data=@Queue @ref=@emailGrid
+                UnboundColumnData="Grid_CustomUnboundColumnData"
+                DataItemDeleting="Grid_DataItemDeleting">
+            <ToolbarTemplate>
+                <GridToolbar HideGroupPanel=@IsEmbedded
+                             HideSearchBox=@IsEmbedded
+                             LinkedGrid=@emailGrid
+                             LayoutKey="{66C4FC8C-9CE5-4483-AD10-9F4A70048B07}">
+                    <CustomButtonContent>
+                        <DxToolbarItem Text="Refresh" IconCssClass="bi bi-arrow-clockwise"
+                                       Click="@GetData" Tooltip="Refresh data"
+                                       RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                       RenderStyle="ButtonRenderStyle.Success" />
+                    </CustomButtonContent>
+                </GridToolbar>
+            </ToolbarTemplate>
+            <Columns>
+                <DxGridCommandColumnEx Caption="Delete" EditButtonVisible=false NewButtonVisible=false
+                                       FixedPosition="GridColumnFixedPosition.Right" />
+                <DxGridDataColumn Width="8rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Queued"
+                                  UnboundType="GridUnboundColumnType.DateTime"
+                                  FieldName="Created" DisplayFormat="{0:dd-MMM-yy hh:mm tt}" />
+                <DxGridDataColumn Caption="Subject" FieldName="Subject" FixedPosition="GridColumnFixedPosition.Left"
+                                  UnboundType="GridUnboundColumnType.String" />
+                <DxGridDataColumn Caption="From" FieldName="From"
+                                  UnboundType="GridUnboundColumnType.String" />
+                <DxGridDataColumn Width="6rem" Caption="MergeCode #" FieldName="MergeCodeCount"
+                                  UnboundType="GridUnboundColumnType.Integer" />
+                <DxGridDataColumn Width="6rem" Caption="Attachment #" FieldName="AttachmnetCount"
+                                  UnboundType="GridUnboundColumnType.Integer" />
+                <DxGridDataColumn Width="8rem" Caption="Attachment Size" FieldName="AttachmnetSize"
+                                  UnboundType="GridUnboundColumnType.Decimal" DisplayFormat="{0:n2} MB" />
+                <DxGridDataColumn Width="6rem" Caption="Selected #" FieldName="Recipients"
+                                  UnboundType="GridUnboundColumnType.Integer" />
+                <DxGridDataColumn Caption="Delay (Hrs)" FieldName=@(nameof(DocumentQueue.DelayInHours)) />
+                <DxGridDataColumn Width="8rem" Caption="Status" FieldName="Status" />
+                <DxGridDataColumn Width="10rem" Caption="Processed" FieldName="Processed"
+                                  UnboundType="GridUnboundColumnType.DateTime"
+                                  DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                <DxGridDataColumn Caption="Email #" FieldName="unboundEmailCount"
+                                  UnboundType="GridUnboundColumnType.String" />
+                <DxGridDataColumn Caption="Result" FieldName="Result" />
+            </Columns>
 
-    </DxGrid>
+        </DxGrid>
+    </div>
 }
+
+<style>
+    .allow-for-title {
+        height: calc(100% - 5rem);
+    }
+</style>
 
 @code {
 
     [Parameter]
     public bool IsEmbedded { get; set; }
 
-    string gridCss = "";
+    [Parameter]
+    public string GridCssClass { get; set; }
 
     bool isReady;
     List<DocumentQueue> Queue { get; set; }
@@ -89,7 +98,7 @@ else
     {
         if (IsEmbedded)
         {
-            gridCss = "p-2 h-100";
+            GridCssClass = "p-2 h-100";
         }
         // wire up the data
         dbc = await U3Adbfactory.CreateDbContextAsync();
