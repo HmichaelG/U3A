@@ -24,7 +24,7 @@ else
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <FullScreen DisplayOffset="@((IsEmbedded) ? 13 : 8)" HideToggle="@IsEmbedded">
+    <FullScreen DisplayOffset="@((IsEmbedded) ? 15 : 8)" HideToggle="@IsEmbedded">
         <ContentTemplate>
             <DxGrid id="my-grid" Data="@PaymentStatus" @ref=@mainGrid
             AutoExpandAllGroupRows="true"
