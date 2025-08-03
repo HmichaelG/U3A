@@ -12,11 +12,11 @@
 
 <style>
     .toggle-button {
-        z-index: 99; /* dxDrawer z-index = 100 */
+        z-index: 2;
         height: 1.5rem;
         width: 1.5rem;
-        top: @((ws.UseTopMenu) ? "3rem" : "10px");
-        right: 0;
+        top: @((ws.UseTopMenu) ? "3rem" : "2px");
+        right: 1.1rem;
         position: fixed;
         opacity: 1;
     }
@@ -24,7 +24,11 @@
     .fullscreen {
         z-index: 98;
         width: 100% !important;
-        padding-right: 1rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        padding-top: 1.75rem;
+        padding-bottom: 0.25rem;
+        background-color: var(--DS-color-surface-primary-subdued-rest);
         height: 100dvh !important;
         top: 0px;
         left: 0px;
