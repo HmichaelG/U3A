@@ -26,7 +26,7 @@ namespace U3A.Services;
 
 public class MemberFeeCalculationService
 {
-    ConcurrentBag<MemberFee> MemberFees { get; set; } = new();
+    ConcurrentDictionary<Guid, ConcurrentBag<MemberFee>> MemberFees { get; set; }
     public int BillingYear { get; set; }
     public Term BillingTerm { get; set; }
 
@@ -41,7 +41,7 @@ public class MemberFeeCalculationService
     DateTime localTime;
     private MemberFeeCalculationService()
     {
-        MemberFees = new ConcurrentBag<MemberFee>();
+        MemberFees = new();
     }
 
     public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, Term Term, Person? Person = null)
@@ -53,7 +53,7 @@ public class MemberFeeCalculationService
     public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, Person? Person = null)
     {
         var instance = new MemberFeeCalculationService();
-        await instance.InitializeAsync(dbc,null, Person);
+        await instance.InitializeAsync(dbc, null, Person);
         return instance;
     }
 
@@ -70,12 +70,13 @@ public class MemberFeeCalculationService
                         .OrderBy(x => x.TermNumber)
                         .ToArrayAsync();
         }
-        else {
+        else
+        {
             Terms = await dbc.Term
                         .Where(x => x.Year == localTime.Year)
                         .OrderBy(x => x.TermNumber)
                         .ToArrayAsync();
-            GetBillingTerm(); 
+            GetBillingTerm();
         }
         People = await dbc.Person.AsNoTracking()
                         .Where(x => person == null || x.ID == person.ID)
@@ -97,7 +98,7 @@ public class MemberFeeCalculationService
                             .Where(x => (person == null || x.PersonID == person.ID)
                                 && !x.IsDeleted && x.Term.Year == BillingYear)
                             .GroupBy(x => x.PersonID)
-                            .ToDictionaryAsync(g => g.Key, g => g.ToList()); 
+                            .ToDictionaryAsync(g => g.Key, g => g.ToList());
         Classes = await dbc.Class.AsNoTracking()
                                 .Include(x => x.Course)
                                 .Where(x => x.Course.Year == BillingYear).ToListAsync();
@@ -107,14 +108,19 @@ public class MemberFeeCalculationService
 
     public PersonFinancialStatus? PersonWithFinancialStatus { get; set; }
 
-    public List<MemberFee> GetMemberFees(Guid PersonID) => MemberFees
-                                                  .Where(x => x.PersonID == PersonID)
-                                                  .OrderBy(x => x.Date)
-                                                  .ThenBy(x => x.SortOrder)
-                                                  .ToList();
+    public List<MemberFee> GetMemberFees(Guid PersonID)
+    {
+        var fees = MemberFees.TryGetValue(PersonID, out var list) ? list : new ConcurrentBag<MemberFee>();
+        return fees
+                .Where(x => x.PersonID == PersonID)
+                .OrderBy(x => x.Date)
+                .ThenBy(x => x.SortOrder)
+                .ToList();
+    }
     public List<MemberFee> GetAllocatedMemberFees(Person person)
     {
-        return AllocateMemberPayments(MemberFees, person,
+        var fees = MemberFees.TryGetValue(person.ID, out var list) ? list : new ConcurrentBag<MemberFee>();
+        return AllocateMemberPayments(fees, person,
                 ShowFullAllocation: true, AddUnallocatedCredit: true)
                 .ToList();
     }
@@ -175,84 +181,86 @@ public class MemberFeeCalculationService
         return CalculateFee(null, CalculateForTerm);
     }
 
+    object lockObject = new();
     public decimal CalculateFee(Person? person = null, int? CalculateForTerm = null)
     {
         var result = decimal.Zero;
         if (person == null) { person = People.FirstOrDefault(); }
         var defaultDate = new DateTime(BillingYear, 1, 1);
-        MemberFees.Clear();
-        PersonWithFinancialStatus = new PersonFinancialStatus()
+        lock (lockObject)
         {
-            PersonBase = person,
-            FirstName = person.FirstName,
-            LastName = person.LastName,
-            IsLifeMember = person.IsLifeMember,
-            IsCourseLeader = person.IsCourseLeader,
-            FinancialTo = person.FinancialTo,
-            FinancialToTerm = person.FinancialToTerm,
-            FinancialToText = person.FinancialToText,
-            FinancialToBriefText = person.FinancialToBriefText,
-            DateJoined = person.DateJoined,
-            Mobile = person.AdjustedMobile,
-            HomePhone = person.AdjustedHomePhone,
-            Email = person.Email,
-            Enrolments = ActiveCourseCount(person),
-            Waitlisted = WaitlistedCourseCount(person)
-        };
-        if (Settings != null)
-        {
-            var isComplimentary = IsComplimentaryMembership(person);
-            // membership fees
-            if (isComplimentary && Settings.IncludeMembershipFeeInComplimentary)
+            PersonWithFinancialStatus = new PersonFinancialStatus()
             {
-                var complimentaryCalcDate = GetComplimentaryCalculationDate(person);
-                if (complimentaryCalcDate != null)
+                PersonBase = person,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                IsLifeMember = person.IsLifeMember,
+                IsCourseLeader = person.IsCourseLeader,
+                FinancialTo = person.FinancialTo,
+                FinancialToTerm = person.FinancialToTerm,
+                FinancialToText = person.FinancialToText,
+                FinancialToBriefText = person.FinancialToBriefText,
+                DateJoined = person.DateJoined,
+                Mobile = person.AdjustedMobile,
+                HomePhone = person.AdjustedHomePhone,
+                Email = person.Email,
+                Enrolments = ActiveCourseCount(person),
+                Waitlisted = WaitlistedCourseCount(person)
+            };
+            if (Settings != null)
+            {
+                var isComplimentary = IsComplimentaryMembership(person);
+                // membership fees
+                if (isComplimentary && Settings.IncludeMembershipFeeInComplimentary)
                 {
-                    AddFee(person,
-                        MemberFeeSortOrder.Complimentary, defaultDate, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {BillingYear} complimentary membership", 0.00M);
+                    var complimentaryCalcDate = GetComplimentaryCalculationDate(person);
+                    if (complimentaryCalcDate != null)
+                    {
+                        AddFee(person,
+                            MemberFeeSortOrder.Complimentary, defaultDate, $"{complimentaryCalcDate?.ToString("dd-MMM-yyyy")} {BillingYear} complimentary membership", 0.00M);
+                    }
+                    else
+                    {
+                        AddFee(person,
+                            MemberFeeSortOrder.Complimentary, defaultDate, $"{BillingYear} complimentary membership", 0.00M);
+                    }
                 }
                 else
                 {
-                    AddFee(person,
-                        MemberFeeSortOrder.Complimentary, defaultDate, $"{BillingYear} complimentary membership", 0.00M);
+                    PersonWithFinancialStatus.MembershipFees = CalculateMembershipFee(person);
+                    var fee = PersonWithFinancialStatus.MembershipFees;
+                    if (fee != 0)
+                    {
+                        if (CalculateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalculateForTerm, 2); }
+                        AddFee(person,
+                            MemberFeeSortOrder.MemberFee, defaultDate, $"{BillingYear} membership fee", fee);
+                    }
                 }
-            }
-            else
-            {
-                PersonWithFinancialStatus.MembershipFees = CalculateMembershipFee(person);
-                var fee = PersonWithFinancialStatus.MembershipFees;
-                if (fee != 0)
+                if (person.Communication != "Email")
                 {
-                    if (CalculateForTerm.HasValue) { fee = decimal.Round(fee / 4m * (decimal)CalculateForTerm, 2); }
-                    AddFee(person,
-                        MemberFeeSortOrder.MemberFee, defaultDate, $"{BillingYear} membership fee", fee);
+                    if (isComplimentary && Settings.IncludeMailSurchargeInComplimentary)
+                    {
+                        AddFee(person,
+                            MemberFeeSortOrder.MailSurcharge, defaultDate, $"{BillingYear} complimentary mail surcharge", 0.00M);
+                    }
+                    else
+                    {
+                        PersonWithFinancialStatus.MailSurcharge = Settings.MailSurcharge;
+                        AddFee(person,
+                            MemberFeeSortOrder.MailSurcharge, defaultDate, $"{BillingYear} mail surcharge", Settings.MailSurcharge);
+                    }
                 }
+                // course fees
+                AddCourseFees(person, isComplimentary);
+                AddLeadersFees(person);
+                // add fee adjustments
+                AddFees(person);
+                // less payments
+                SubtractReceipts(person);
+                // total due
+                var fees = MemberFees.TryGetValue(person.ID, out var list) ? list : new ConcurrentBag<MemberFee>();
+                result = fees.Sum(x => x.Amount);
             }
-            if (person.Communication != "Email")
-            {
-                if (isComplimentary && Settings.IncludeMailSurchargeInComplimentary)
-                {
-                    AddFee(person,
-                        MemberFeeSortOrder.MailSurcharge, defaultDate, $"{BillingYear} complimentary mail surcharge", 0.00M);
-                }
-                else
-                {
-                    PersonWithFinancialStatus.MailSurcharge = Settings.MailSurcharge;
-                    AddFee(person,
-                        MemberFeeSortOrder.MailSurcharge, defaultDate, $"{BillingYear} mail surcharge", Settings.MailSurcharge);
-                }
-            }
-            // course fees
-            AddCourseFees(person, isComplimentary);
-            AddLeadersFees(person);
-            // add fee adjustments
-            AddFees(person);
-            // less payments
-            SubtractReceipts(person);
-            // total due
-            result = MemberFees
-                        .Where(x => x.PersonID == person.ID)
-                        .Sum(x => x.Amount);
         }
         return result;
     }
@@ -264,7 +272,7 @@ public class MemberFeeCalculationService
         else
         {
             // A zero-valued receipt is created when a person is given complimentary membership
-            var receipts = Receipts.TryGetValue(person.ID, out var list) ? list : new List<Receipt>(); 
+            var receipts = Receipts.TryGetValue(person.ID, out var list) ? list : new List<Receipt>();
             result = receipts.Any(x => x.PersonID == person.ID
                                     && x.FinancialTo >= BillingYear
                                     && x.Amount == 0);
@@ -444,7 +452,7 @@ public class MemberFeeCalculationService
     private void AddCourseFees(Person person, bool IsComplimentary)
     {
         DateOnly today = DateOnly.FromDateTime(localTime);
-        var courseFeeAdded = new List<Guid>();
+        var courseFeeAdded = new ConcurrentBag<Guid>();
         List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
         enrolments = enrolments.Where(x => !x.IsDeleted
                                         && x.PersonID == person.ID
@@ -549,7 +557,7 @@ public class MemberFeeCalculationService
     private void AddLeadersFees(Person person)
     {
         DateOnly today = DateOnly.FromDateTime(localTime);
-        var courseFeeAdded = new List<Guid>();
+        var courseFeeAdded = new ConcurrentBag<Guid>();
         List<Class> classesLead;
         classesLead = Classes.Where(x =>
                                         x.Course.Year == BillingYear && (x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee &&
@@ -580,7 +588,7 @@ public class MemberFeeCalculationService
             }
         }
         //Fees per term
-        List<(Class Class, Term Term)> classTerms = new();
+        ConcurrentBag<(Class Class, Term Term)> classTerms = new();
         foreach (var t in Terms)
         {
             foreach (var c in classesLead)
@@ -648,7 +656,7 @@ public class MemberFeeCalculationService
         string Course = "")
     {
         var value = decimal.Round(amount, 2);
-        MemberFees.Add(new MemberFee
+        var fee = (new MemberFee
         {
             PersonID = person.ID,
             Person = person,
@@ -658,6 +666,13 @@ public class MemberFeeCalculationService
             Amount = value,
             Course = Course,
         });
+        ConcurrentBag<MemberFee> fees;
+        if (!MemberFees.TryGetValue(person.ID, out fees))
+        {
+            fees = new();
+            MemberFees.TryAdd(person.ID, fees);
+        }
+        fees.Add(fee);
     }
 
     public DateTime ConvertDateOnlyToDateTime(DateOnly date)

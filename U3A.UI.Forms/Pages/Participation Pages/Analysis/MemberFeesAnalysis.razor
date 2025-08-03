@@ -1,4 +1,5 @@
 ﻿@page "/MemberFeesAnalysis"
+@using System.Collections.Concurrent
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> tenantDbFactory
@@ -91,11 +92,17 @@ else
             people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
             service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
         }
-        foreach (var p in people)
+        var memberFeesList = new ConcurrentBag<MemberFee>();
+        Parallel.ForEach(people, p =>
         {
             service.CalculateFee(p);
-            pivotData.AddRange(service.GetAllocatedMemberFees(p));
-        }
+            var allocatedFees = service.GetAllocatedMemberFees(p);
+            foreach (var fee in allocatedFees)
+            {
+                memberFeesList.Add(fee);
+            }
+        });
+        pivotData = memberFeesList.ToList();
         await ProgressBar.Close();
         pivotTable.EndUpdate();
         StateHasChanged();

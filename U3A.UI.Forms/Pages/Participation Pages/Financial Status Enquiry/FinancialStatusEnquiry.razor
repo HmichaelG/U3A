@@ -3,6 +3,7 @@
 @using System.Diagnostics
 @using Microsoft.AspNetCore.Hosting
 @using DevExpress.Data.Filtering
+@using System.Collections.Concurrent
 
 @inject NavigationManager NavMan
 @inject IJSRuntime js
@@ -243,17 +244,18 @@
     {
         if (selectedTerm == null) return;
         await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
-        Persons = new List<PersonFinancialStatus>();
+        var peopleWithStatus = new ConcurrentBag<PersonFinancialStatus>();
         MemberFeeCalculationService service;
         using (dbc = await U3Adbfactory.CreateDbContextAsync())
         {
         service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
         }
-        foreach (var p in people)
+        Parallel.ForEach(people, p =>
         {
             service.CalculateFee(p);
-            Persons.Add(service.PersonWithFinancialStatus);
-        }
+            peopleWithStatus.Add(service.PersonWithFinancialStatus);
+        });
+        Persons = peopleWithStatus.OrderBy(x => x.FullName).ToList();
         await ProgressBar.Close();
         lastTerm = selectedTerm;
         mainGrid.ClearFilter();
