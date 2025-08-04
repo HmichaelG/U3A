@@ -246,7 +246,6 @@
     {
         if (selectedTerm == null) return;
         await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
-        var peopleWithStatus = new ConcurrentBag<PersonFinancialStatus>();
         MemberFeeCalculationService service;
         using (dbc = await U3Adbfactory.CreateDbContextAsync())
         {
@@ -255,9 +254,8 @@
         Parallel.ForEach(people, p =>
         {
             service.CalculateFee(p);
-            peopleWithStatus.Add(service.PersonWithFinancialStatus);
         });
-        Persons = peopleWithStatus.OrderBy(x => x.FullName).ToList();
+        Persons = service.PeopleWithFinancialStatus.OrderBy(x => x.FullName).ToList();
         await ProgressBar.Close();
         lastTerm = selectedTerm;
         mainGrid.ClearFilter();

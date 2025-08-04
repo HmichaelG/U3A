@@ -142,11 +142,11 @@ namespace U3A.BusinessRules
                     {
                         isCourseLeader = true;
                     }
-                    if (c.Leader != null && Leader.ID == c.Leader2ID)
+                    if (c.Leader2 != null && Leader.ID == c.Leader2ID)
                     {
                         isCourseLeader = true;
                     }
-                    if (c.Leader != null && Leader.ID == c.Leader3ID)
+                    if (c.Leader3 != null && Leader.ID == c.Leader3ID)
                     {
                         isCourseLeader = true;
                     }
