@@ -2,54 +2,61 @@
 @using DevExpress.Drawing.Printing
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-<DxFormLayoutGroup Caption="@($"Statement of Account for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
-    <div class="d-flex flex-row-reverse w-100">
-        <DxDropDownButton Text="Allocate">
-            <Items>
-                <DxDropDownButtonItem Text="Full Detail" Click="@(() => AllocateTransactions(true))" />
-                <DxDropDownButtonItem Text="Outstanding Only" Click="@(() => AllocateTransactions(false))" />
-                <DxDropDownButtonItem BeginGroup Text="Unallocate" Click="@RestoreOriginal" />
-            </Items>
-        </DxDropDownButton>
-    </div>
-    <div class="h-25 overflow-auto">
-        <DxGrid id="do-not-print" @ref=@dxGrid Data="@memberFees"
-                AllowSorting=false
-                AllowFiltering=false
-                AllowGrouping=false
-                TextWrapEnabled=false
-                VirtualScrollingEnabled=true
-                CssClass="@CssClass">
-            <Columns>
-                <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Date)" Caption="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="6rem" />
-                <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Description)" Caption="Description" />
-                <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Amount)"
-                                  Caption="Amount" DisplayFormat="c2" Width="5rem">
-                    <CellDisplayTemplate>
-                        @if (context.Value is decimal amount && amount < 0)
-                        {
-                            <span class="text-fl-danger">@context.Value</span>
-                        }
-                        else
-                        {
-                            <span>@context.Value</span>
-                        }
-                    </CellDisplayTemplate>
-                </DxGridDataColumn>
-                <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Balance)"
-                                  Visible="@showBalance"
-                                  Caption="Balance" DisplayFormat="c2" Width="75px" />
-            </Columns>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Description" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
-            </TotalSummary>
-        </DxGrid>
-    </div>
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxFormLayoutGroup Caption="@($"Statement of Account for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
+        <div class="d-flex flex-row-reverse w-100">
+            <DxDropDownButton Text="Allocate">
+                <Items>
+                    <DxDropDownButtonItem Text="Full Detail" Click="@(() => AllocateTransactions(true))" />
+                    <DxDropDownButtonItem Text="Outstanding Only" Click="@(() => AllocateTransactions(false))" />
+                    <DxDropDownButtonItem BeginGroup Text="Unallocate" Click="@RestoreOriginal" />
+                </Items>
+            </DxDropDownButton>
+        </div>
+        <div class="h-25 overflow-auto">
+            <DxGrid id="do-not-print" @ref=@dxGrid Data="@memberFees"
+                    AllowSorting=false
+                    AllowFiltering=false
+                    AllowGrouping=false
+                    TextWrapEnabled=false
+                    VirtualScrollingEnabled=true
+                    CssClass="@CssClass">
+                <Columns>
+                    <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Date)" Caption="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="6rem" />
+                    <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Description)" Caption="Description" />
+                    <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Amount)"
+                                      Caption="Amount" DisplayFormat="c2" Width="5rem">
+                        <CellDisplayTemplate>
+                            @if (context.Value is decimal amount && amount < 0)
+                            {
+                                <span class="text-fl-danger">@context.Value</span>
+                            }
+                            else
+                            {
+                                <span>@context.Value</span>
+                            }
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Balance)"
+                                      Visible="@showBalance"
+                                      Caption="Balance" DisplayFormat="c2" Width="75px" />
+                </Columns>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Description" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
+                </TotalSummary>
+            </DxGrid>
+        </div>
 
-</DxFormLayoutGroup>
+    </DxFormLayoutGroup>
 
-<PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+    <PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+}
 
 @code {
 
@@ -71,6 +78,7 @@
     string reportTitle;
     byte[] documentContent;
     bool isPdfReady = false;
+    bool isReady;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -79,12 +87,13 @@
             using (var dbContext = U3Adbfactory.CreateDbContext())
             {
                 showBalance = false;
-                service = await MemberFeeCalculationService.CreateAsync(dbContext,SelectedTerm,SelectedPerson);
+                service = await MemberFeeCalculationService.CreateAsync(dbContext, SelectedTerm, SelectedPerson);
                 var totalFees = service.CalculateFee();
                 originalMemberFees = service.GetMemberFees(SelectedPerson.ID);
                 memberFees = originalMemberFees.ToList();
             }
         }
+        isReady = true;
     }
 
     void RestoreOriginal()
@@ -98,7 +107,7 @@
     {
         showBalance = true;
         memberFees = originalMemberFees.ToList();
-        memberFees = service.AllocateMemberPayments(memberFees,SelectedPerson, ShowFullAllocation);
+        memberFees = service.AllocateMemberPayments(memberFees, SelectedPerson, ShowFullAllocation);
         StateHasChanged();
     }
 

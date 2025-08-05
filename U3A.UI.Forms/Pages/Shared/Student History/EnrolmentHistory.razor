@@ -2,44 +2,50 @@
 @using DevExpress.Drawing.Printing
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-<DxFormLayoutGroup Caption="@($"Enrolment History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
-    <div class="h-25 overflow-auto">
-        <DxGrid id="do-not-print" Data="@enrolments" @ref="@dxGrid"
-                TextWrapEnabled=false
-                ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                AllowSorting=false
-                AllowFiltering=false
-                AllowResize="true"
-                AllowGrouping=true
-                AutoExpandAllGroupRows=true
-                VirtualScrollingEnabled=true
-                CssClass="@CssClass">
-            <Columns>
-                <DxGridDataColumn FieldName="Term" Caption="Term" GroupIndex="0" />
-                <DxGridDataColumn FieldName="IsWaitlisted" Caption="Waitlist?" Width="3rem" />
-                <DxGridDataColumn FieldName="Course" Caption="Course" Width="40%" />
-                <DxGridDataColumn FieldName="Class" Caption="Class" />
-                <DxGridDataColumn FieldName="DateEnrolled" Caption="Enrolled" Width="5rem" />
-            </Columns>
-            <GroupSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
-                                   DisplayText="Term Sub-Total"
-                                   FooterColumnName="Course" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                   DisplayText="{0:c2}"
-                                   FooterColumnName="Class" />
-            </GroupSummary>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Course" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:c2}" FieldName="Class" />
-            </TotalSummary>
-        </DxGrid>
-    </div>
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxFormLayoutGroup Caption="@($"Enrolment History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
+        <div class="h-25 overflow-auto">
+            <DxGrid id="do-not-print" Data="@enrolments" @ref="@dxGrid"
+                    TextWrapEnabled=false
+                    ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                    AllowSorting=false
+                    AllowFiltering=false
+                    AllowResize="true"
+                    AllowGrouping=true
+                    AutoExpandAllGroupRows=true
+                    VirtualScrollingEnabled=true
+                    CssClass="@CssClass">
+                <Columns>
+                    <DxGridDataColumn FieldName="Term" Caption="Term" GroupIndex="0" />
+                    <DxGridDataColumn FieldName="IsWaitlisted" Caption="Waitlist?" Width="3rem" />
+                    <DxGridDataColumn FieldName="Course" Caption="Course" Width="40%" />
+                    <DxGridDataColumn FieldName="Class" Caption="Class" />
+                    <DxGridDataColumn FieldName="DateEnrolled" Caption="Enrolled" Width="5rem" />
+                </Columns>
+                <GroupSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                       DisplayText="Term Sub-Total"
+                                       FooterColumnName="Course" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                       DisplayText="{0:c2}"
+                                       FooterColumnName="Class" />
+                </GroupSummary>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Course" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:c2}" FieldName="Class" />
+                </TotalSummary>
+            </DxGrid>
+        </div>
 
-</DxFormLayoutGroup>
+    </DxFormLayoutGroup>
 
-<PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
-
+    <PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+}
 @code {
 
     [Parameter]
@@ -57,6 +63,7 @@
     string reportTitle;
 
     bool isPdfReady = false;
+    bool isReady = false;
 
     byte[] documentContent;
 
@@ -69,6 +76,7 @@
                 enrolments = await BusinessRule.GetAllEnrolmentsForStudent(dbc, SelectedTerm, SelectedPerson);
             }
         }
+        isReady = true;
     }
 
     public async Task Print()

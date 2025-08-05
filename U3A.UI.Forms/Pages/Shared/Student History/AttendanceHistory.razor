@@ -2,91 +2,97 @@
 @using DevExpress.Drawing.Printing
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
-<DxFormLayoutGroup Caption="@($"Attendance History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
-    <div class="h-25 overflow-auto">
-        <DxGrid id="do-not-print" Data="@attendance" @ref="@dxGrid"
-                TextWrapEnabled=false
-                ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                AllowSorting=false
-                AllowFiltering=false
-                AllowResize="true"
-                AllowGrouping=true
-                AutoExpandAllGroupRows=true
-                VirtualScrollingEnabled=true
-                CustomSummary="Grid_CustomSummary"
-                CssClass="@CssClass">
-            <Columns>
-                <DxGridDataColumn FieldName="Term.Name" Caption="Term" GroupIndex="0" />
-                <DxGridDataColumn FieldName="CourseName" Caption="Course" Width="40%" GroupIndex="1" />
-                <DxGridDataColumn FieldName="Date" Caption="Date">
-                    <GroupFooterTemplate>
-                        @{
-                            var summaryItems = context.SummaryItems;
-                            if (summaryItems.Any())
-                            {
-                                foreach (var item in summaryItems)
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxFormLayoutGroup Caption="@($"Attendance History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
+        <div class="h-25 overflow-auto">
+            <DxGrid id="do-not-print" Data="@attendance" @ref="@dxGrid"
+                    TextWrapEnabled=false
+                    ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                    AllowSorting=false
+                    AllowFiltering=false
+                    AllowResize="true"
+                    AllowGrouping=true
+                    AutoExpandAllGroupRows=true
+                    VirtualScrollingEnabled=true
+                    CustomSummary="Grid_CustomSummary"
+                    CssClass="@CssClass">
+                <Columns>
+                    <DxGridDataColumn FieldName="Term.Name" Caption="Term" GroupIndex="0" />
+                    <DxGridDataColumn FieldName="CourseName" Caption="Course" Width="40%" GroupIndex="1" />
+                    <DxGridDataColumn FieldName="Date" Caption="Date">
+                        <GroupFooterTemplate>
+                            @{
+                                var summaryItems = context.SummaryItems;
+                                if (summaryItems.Any())
                                 {
-                                    string groupName = "";
-                                    var rowLevel = context.Grid.GetRowLevel(context.GroupRowVisibleIndex);
-                                    if (rowLevel == 0)
-                                        groupName = (string)context.Grid.GetRowValue(context.GroupRowVisibleIndex, "Term.Name");
-                                    else
-                                        groupName = "Course Sub-Total";
+                                    foreach (var item in summaryItems)
+                                    {
+                                        string groupName = "";
+                                        var rowLevel = context.Grid.GetRowLevel(context.GroupRowVisibleIndex);
+                                        if (rowLevel == 0)
+                                            groupName = (string)context.Grid.GetRowValue(context.GroupRowVisibleIndex, "Term.Name");
+                                        else
+                                            groupName = "Course Sub-Total";
 
-                                    <span>
-                                        @groupName
-                                    </span>
+                                        <span>
+                                            @groupName
+                                        </span>
+                                    }
                                 }
                             }
-                        }
-                    </GroupFooterTemplate>
-                </DxGridDataColumn>
-                <DxGridDataColumn FieldName="Present" Caption="Present" />
-                <DxGridDataColumn FieldName="AbsentWithApology" Caption="Apology" />
-                <DxGridDataColumn FieldName="AbsentWithoutApology" Caption="W/out Apology" />
-                <DxGridDataColumn FieldName="Comment" Caption="Comment" />
-            </Columns>
-            <GroupSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom"
-                                   DisplayText="Sub-Total"
-                                   FooterColumnName="Date" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
-                                   DisplayText="{0:n0}"
-                                   FieldName="Present"
-                                   FooterColumnName="Present" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
-                                   DisplayText="{0:n0}"
-                                   FieldName="AbsentWithApology"
-                                   FooterColumnName="AbsentWithApology" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
-                                   DisplayText="{0:n0}"
-                                   FieldName="AbsentWithoutApology"
-                                   FooterColumnName="AbsentWithoutApology" />
-            </GroupSummary>
-            <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
-                                   DisplayText="Participant Total"
-                                   FooterColumnName="Date" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
-                                   DisplayText="{0:n0}"
-                                   FieldName="Present"
-                                   FooterColumnName="Present" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
-                                   DisplayText="{0:n0}"
-                                   FieldName="AbsentWithApology"
-                                   FooterColumnName="AbsentWithApology" />
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
-                                   DisplayText="{0:n0}"
-                                   FieldName="AbsentWithoutApology"
-                                   FooterColumnName="AbsentWithoutApology" />
-            </TotalSummary>
-        </DxGrid>
-    </div>
+                        </GroupFooterTemplate>
+                    </DxGridDataColumn>
+                    <DxGridDataColumn FieldName="Present" Caption="Present" />
+                    <DxGridDataColumn FieldName="AbsentWithApology" Caption="Apology" />
+                    <DxGridDataColumn FieldName="AbsentWithoutApology" Caption="W/out Apology" />
+                    <DxGridDataColumn FieldName="Comment" Caption="Comment" />
+                </Columns>
+                <GroupSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom"
+                                       DisplayText="Sub-Total"
+                                       FooterColumnName="Date" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                       DisplayText="{0:n0}"
+                                       FieldName="Present"
+                                       FooterColumnName="Present" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                       DisplayText="{0:n0}"
+                                       FieldName="AbsentWithApology"
+                                       FooterColumnName="AbsentWithApology" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                       DisplayText="{0:n0}"
+                                       FieldName="AbsentWithoutApology"
+                                       FooterColumnName="AbsentWithoutApology" />
+                </GroupSummary>
+                <TotalSummary>
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                       DisplayText="Participant Total"
+                                       FooterColumnName="Date" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                       DisplayText="{0:n0}"
+                                       FieldName="Present"
+                                       FooterColumnName="Present" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                       DisplayText="{0:n0}"
+                                       FieldName="AbsentWithApology"
+                                       FooterColumnName="AbsentWithApology" />
+                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom"
+                                       DisplayText="{0:n0}"
+                                       FieldName="AbsentWithoutApology"
+                                       FooterColumnName="AbsentWithoutApology" />
+                </TotalSummary>
+            </DxGrid>
+        </div>
 
-</DxFormLayoutGroup>
+    </DxFormLayoutGroup>
 
-<PdfViewer PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
-
+    <PdfViewer PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+}
 
 @code {
 
@@ -106,6 +112,7 @@
     string reportTitle;
 
     bool isPdfReady;
+    bool isReady;
 
     byte[] documentContent;
 
@@ -118,6 +125,7 @@
                 attendance = await BusinessRule.GetAttendanceHistoryForStudentAsync(dbc, SelectedTerm.Year, SelectedPerson.ID);
             }
         }
+        isReady = true;
     }
 
     void Grid_CustomSummary(GridCustomSummaryEventArgs e)

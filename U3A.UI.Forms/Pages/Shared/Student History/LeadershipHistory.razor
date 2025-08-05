@@ -2,6 +2,12 @@
 @using DevExpress.Drawing.Printing
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 
+    @if (!isReady)
+    {
+        <LoadingIndicator />
+    }
+    else
+    {
 <DxFormLayoutGroup Caption="@($"Leadership History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
     <div class="h-25 overflow-auto">
         <DxGrid id="do-not-print" Data="@leadersHistory" @ref="@dxGrid"
@@ -30,7 +36,7 @@
 </DxFormLayoutGroup>
 
 <PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
-
+}
 @code {
 
     [Parameter]
@@ -44,6 +50,7 @@
 
     string reportTitle;
     bool isPdfReady = false;
+    bool isReady = false;
     byte[] documentContent;
 
     protected override async Task OnParametersSetAsync()
@@ -55,6 +62,7 @@
                 leadersHistory = await BusinessRule.GetLeaderHistoryForPersonAsync(dbc, SelectedPerson.ID);
             }
         }
+        isReady = true;
     }
 
     public async Task Print()
