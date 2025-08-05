@@ -104,22 +104,33 @@ public class MemberFeeCalculationService
                             .ToDictionaryAsync(g => g.Key, g => g.ToList());
         Log.Information("MemberFeeCalculationService: Receipts loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
         s.Restart();
-        Classes = await dbc.Class.AsNoTracking()
-                                .Where(x => x.Course.Year == BillingYear)
-                                .Include(x => x.Course).ToListAsync();
-        Log.Information("MemberFeeCalculationService: Classes loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
-        s.Restart();
         Enrolments = await dbc.Enrolment.AsNoTracking()
                             .AsSplitQuery()
                             .IgnoreQueryFilters()
                             .Where(x => (person == null || x.PersonID == person.ID)
-                                && !x.IsDeleted && x.Term.Year == BillingYear)
+                                && !x.IsDeleted && x.Term.Year == BillingYear
+                                && (x.Course.CourseFeePerYear != 0
+                                    || x.Course.CourseFeeTerm1 != 0
+                                    || x.Course.CourseFeeTerm2 != 0
+                                    || x.Course.CourseFeeTerm3 != 0
+                                    || x.Course.CourseFeeTerm4 != 0
+                                    ))
                             .Include(x => x.Term)
                             .Include(x => x.Course).ThenInclude(x => x.Classes)
                             .Include(x => x.Class)
                             .GroupBy(x => x.PersonID)
                             .ToDictionaryAsync(g => g.Key, g => g.ToList());
-        Log.Information("MemberFeeCalculationService: Enrolments loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
+        Log.Information("MemberFeeCalculationService: {count} Enrolments loaded in {ElapsedMilliseconds} ms", Enrolments.Count, s.ElapsedMilliseconds);
+        s.Restart();
+        Classes = Enrolments
+            .SelectMany(kvp => kvp.Value) // Flatten all enrolments
+            .SelectMany(enrolment =>
+                enrolment.Course.Classes
+                    .Where(c => c != null))  // Filter out any nulls
+            .Distinct() // Optional: remove duplicates
+            .ToList() ?? new();
+
+        Log.Information("MemberFeeCalculationService: Classes loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
     }
 
 
@@ -583,10 +594,10 @@ public class MemberFeeCalculationService
         var courseFeeAdded = new ConcurrentBag<Guid>();
         List<Class> classesLead;
         classesLead = Classes.Where(x =>
-                                        x.Course.Year == BillingYear && (x.Course.CourseFeePerTerm > 0 && x.Course.LeadersPayTermFee &&
+                                        x.Course.LeadersPayTermFee &&
                                         (x.LeaderID == person.ID ||
                                         x.Leader2ID == person.ID ||
-                                        x.Leader3ID == person.ID))).ToList();
+                                        x.Leader3ID == person.ID)).ToList();
         DateOnly dueDate;
         foreach (var c in classesLead)
         {
