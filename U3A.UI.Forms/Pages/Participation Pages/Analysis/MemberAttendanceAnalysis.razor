@@ -11,21 +11,16 @@
 else
 {
     <Progress @ref="@ProgressBar" />
-    <DxWindow Visible=true Width="100dvw"
-             Height="100dvh"
-             PositionY="0"
-             CloseOnEscape="true"
-             ShowCloseButton="true"
-             HeaderText="Attendance Analysis"
-             Closed="@(() => navMan.NavigateTo("/"))"
-             ShowHeader="true">
-        <BodyContentTemplate Context="PopupContext">
+    <ContextHelpTitle Title="Attendance Analysis" HelpTopic="" Subtitle="" />
+    <FullScreen DisplayOffset="4">
+        <ContentTemplate>
+            <div class="d-flex flex-column w-100">
             <PivotToolbar LinkedGrid="@pivotTable"
                           DataLoadRequested="GetData"
                           LayoutKey="{D91B6321-580F-4E1F-9AB8-B026FFA373A3}" />
             <DxPivotTable Data="@pivotData" VirtualScrollingEnabled=true
                           ShowRowGrandTotals="true" @ref=@pivotTable
-                          ShowColumnGrandTotals="true" CssClass="pivot-table-style">
+                          ShowColumnGrandTotals="true" CssClass="w-100 h-100">
                 <Fields>
                     <DxPivotTableField Field="@nameof(AttendClass.Actual)" Caption="Present"
                                        Area="@PivotTableArea.Data" />
@@ -38,9 +33,9 @@ else
                     <DxPivotTableField Field="@nameof(AttendClass.CourseName)"
                                        Area="@PivotTableArea.Row" />
                     <DxPivotTableField Field="Term.Name" Caption="Term"
-                                       Area="@PivotTableArea.Row" />
+                                       Area="@PivotTableArea.Column" />
                     <DxPivotTableField Field="@nameof(AttendClass.Date)"
-                                       Area="@PivotTableArea.Row" />
+                                       Area="@PivotTableArea.Filter" />
                     <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Month"
                                        GroupInterval="PivotTableGroupInterval.DateMonth"
                                        Area="@PivotTableArea.Filter" />
@@ -71,15 +66,10 @@ else
                                        Area="@PivotTableArea.Filter" />
                 </Fields>
             </DxPivotTable>
-        </BodyContentTemplate>
-    </DxWindow>
+            </div>
+        </ContentTemplate>
+    </FullScreen>
 }
-<style>
-    .pivot-table-style {
-        width: 100%;
-        height: calc(100% - 2rem);
-    }
-</style>
 
 @code {
     IEnumerable<AttendClass>? pivotData { get; set; }

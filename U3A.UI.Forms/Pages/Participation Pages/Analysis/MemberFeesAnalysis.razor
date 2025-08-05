@@ -12,60 +12,52 @@
 else
 {
     <Progress @ref="@ProgressBar" />
-    <DxWindow Visible=true Width="100dvw"
-              Height="100dvh"
-              PositionY="0"
-              CloseOnEscape="true"
-              ShowCloseButton="true"
-              HeaderText="Member Fees Analysis"
-              Closed="@(() => navMan.NavigateTo("/"))"
-              ShowHeader="true">
-        <BodyContentTemplate Context="PopupContext">
-            <PivotToolbar LinkedGrid="@pivotTable"
-                          DataLoadRequested="GetData"
-                          LayoutKey="{3A39E5E9-34A3-47B6-92B3-83A7356C1F2E}" />
-            <DxPivotTable Data="@pivotData" @ref=@pivotTable Context="context"
-                          ShowRowGrandTotals="true" VirtualScrollingEnabled=true
-                          ShowColumnGrandTotals="true" CssClass="pivot-table-style">
-                <Fields>
-                    <DxPivotTableField Field="Person.FinancialToText" Caption="Fin-To"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Fee-Month"
-                                       GroupInterval="PivotTableGroupInterval.DateMonth"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(MemberFee.Course)"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Person.FullNameAlpha" Caption="Participant"
-                                       Area="@PivotTableArea.Row" />
-                    <DxPivotTableField Field="@nameof(MemberFee.Description)"
-                                       Area="@PivotTableArea.Row" />
-                    <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Date"
-                                       Area="@PivotTableArea.Row" />
-                    <DxPivotTableField Field="@nameof(MemberFee.Amount)" Caption="Due"
-                                       Area="@PivotTableArea.Data" />
-                    <DxPivotTableField Field="@nameof(MemberFee.Allocated)" Caption="Paid"
-                                       Area="@PivotTableArea.Data" />
-                    <DxPivotTableField Field="@nameof(MemberFee.Balance)"
-                                       Area="@PivotTableArea.Data" />
+    <ContextHelpTitle Title="Participant Fees Analysis" HelpTopic=""
+                      Subtitle="" />
+    <FullScreen DisplayOffset="4">
+        <ContentTemplate>
+            <div class="d-flex flex-column w-100">
+                <PivotToolbar LinkedGrid="@pivotTable"
+                              DataLoadRequested="GetData"
+                              LayoutKey="{3A39E5E9-34A3-47B6-92B3-83A7356C1F2E}" />
+                <DxPivotTable Data="@pivotData" @ref=@pivotTable Context="context"
+                              ShowRowGrandTotals="true" VirtualScrollingEnabled=true
+                              ShowColumnGrandTotals="true" CssClass="w-100 h-100">
+                    <Fields>
+                        <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Due Month"
+                                           GroupInterval="PivotTableGroupInterval.DateMonth"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Course)"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Person.FullNameAlpha" Caption="Participant"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Description)"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Due Date"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Person.FinancialToText" Caption="Fin-To"
+                                           Area="@PivotTableArea.Row" />
+                        <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
+                                           Area="@PivotTableArea.Row" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Amount)" Caption="Due"
+                                           Area="@PivotTableArea.Data" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Allocated)" Caption="Paid"
+                                           Area="@PivotTableArea.Data" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Balance)"
+                                           Area="@PivotTableArea.Data" />
 
-                </Fields>
-            </DxPivotTable>
-        </BodyContentTemplate>
-    </DxWindow>
+                    </Fields>
+                </DxPivotTable>
+            </div>
+        </ContentTemplate>
+    </FullScreen>
 }
-<style>
-    .pivot-table-style {
-        width: 100%;
-        height: calc(100% - 2rem);
-    }
-</style>
+
 @code {
     List<MemberFee>? pivotData { get; set; }
     bool isReady = false;
     Progress? ProgressBar;
-    IPivotTable? pivotTable;
+    IPivotTable pivotTable;
     MemberFeeCalculationService service;
 
 
@@ -76,10 +68,6 @@ else
 
     async Task GetData()
     {
-        while (pivotTable == null)
-        {
-            await Task.Delay(100);
-        }
         await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
         pivotTable.BeginUpdate();
         pivotData = new List<MemberFee>();
