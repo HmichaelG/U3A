@@ -1,0 +1,63 @@
+﻿@using System.Collections.Concurrent
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject WorkstationService ws
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <DxFormLayoutGroup Caption="Student Fees Paid" CssClass="pivot-table-container">
+        <DxPivotTable Data="@pivotData" @ref=@pivotTable Context="context"
+        ShowRowGrandTotals="true" VirtualScrollingEnabled=true
+        ShowColumnGrandTotals="true"
+        FilterHeaderAreaDisplayMode="PivotTableFilterHeaderAreaDisplayMode.Never"
+        CssClass="pivot-table">
+            <Fields>
+                <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
+                Area="@PivotTableArea.Column" />
+                <DxPivotTableField Field="Person.FullNameAlpha" Caption="Participant"
+                Area="@PivotTableArea.Row" />
+                <DxPivotTableField Field="@nameof(MemberFee.Allocated)" Caption="Paid"
+                Area="@PivotTableArea.Data" />
+            </Fields>
+        </DxPivotTable>
+    </DxFormLayoutGroup>
+}
+<style>
+    .pivot-table-container {
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "18rem" : "16rem" : "18rem") );
+    }
+    .pivot-table {
+        height: calc(100dvh - @(ws.UseTopMenu ? (loginState.IsAdminOnBehalfOfMember) ? "20rem" : "18rem" : "20rem") );
+    }
+</style>
+@code {
+
+    [CascadingParameter]
+    public LoginState loginState { get; set; }
+    [Parameter] public List<StudentDetails>? StudentsAndLeaders { get; set; }
+    [Parameter] public Course Course { get; set; }
+    [Parameter] public Term Term { get; set; }
+
+    List<MemberFee>? pivotData { get; set; }
+    bool isReady = false;
+    IPivotTable? pivotTable;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pivotData = new();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        foreach (var s in StudentsAndLeaders)
+        {
+            var service = await MemberFeeCalculationService.CreateAsync(dbc, Term, s.Person);
+            service.CalculateFee(s.Person);
+            var allocatedFees = service.GetAllocatedMemberFees(s.Person).Where(x => x.CourseID == Course.ID);
+            pivotData.AddRange(allocatedFees);
+        }
+        isReady = true;
+    }
+
+}

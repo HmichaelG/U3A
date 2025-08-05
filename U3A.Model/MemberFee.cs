@@ -44,6 +44,7 @@ namespace U3A.Model
         public decimal? Allocated { get; set; } = null;
         public decimal? Balance { get; set; } = null;
         public bool IsNotAllocated { get; set; } = false;
+        public Guid? CourseID { get; set; } = default;
     }
 
     public enum MemberFeeSortOrder

@@ -279,7 +279,7 @@ else
 
     async Task<Person?> GetPersonAsync()
     {
-        if (loginState == null) return null;
+        while (loginState == null) { await Task.Delay(100); }
         if (loginState.SelectedPerson == null) return null;
         using (var dbc = await U3Adbfactory.CreateDbContextAsync())
         {

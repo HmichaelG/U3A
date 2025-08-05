@@ -27,38 +27,40 @@
     <DxLayoutBreakpoint DeviceSize="DeviceSize.Large" IsActive="isLarge" IsActiveChanged="OnLargeChanged" />
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge" IsActive="isXLarge" IsActiveChanged="OnXLargeChanged" />
 
-    <div class="container-fluid">
-        <DxFormLayout SizeMode="@sizeMode">
+    @if (isReady)
+    {
+        <div class="container-fluid">
+            <DxFormLayout SizeMode="@sizeMode">
 
-            <CascadingValue Value=@openCircuits Name="OpenCircuits">
-                <CascadingValue Value="@loginState">
-                    <CascadingValue Value="@hasRole" Name="HasRole">
-                        @if (hasRole)
-                        {
-                            if (useTopMenu.HasValue)
+                <CascadingValue Value=@openCircuits Name="OpenCircuits">
+                    <CascadingValue Value="@loginState">
+                        <CascadingValue Value="@hasRole" Name="HasRole">
+                            @if (hasRole)
                             {
-                                if (useTopMenu.Value)
+                                if (useTopMenu.HasValue)
                                 {
-                                    <MainLayoutTopMenu Body="@Body" />
-                                }
-                                else
-                                {
-                                    <MainLayoutSideMenu Body="@Body" />
+                                    if (useTopMenu.Value)
+                                    {
+                                        <MainLayoutTopMenu Body="@Body" />
+                                    }
+                                    else
+                                    {
+                                        <MainLayoutSideMenu Body="@Body" />
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            <MainLayoutTopMenu Body="@Body" />
-                        }
+                            else
+                            {
+                                <MainLayoutTopMenu Body="@Body" />
+                            }
+                        </CascadingValue>
                     </CascadingValue>
                 </CascadingValue>
-            </CascadingValue>
-        </DxFormLayout>
-    </div>
+            </DxFormLayout>
+        </div>
+    }
 }
-
-@if (!isInteractive)
+else
 {
     <NotInteractive />
 }
@@ -91,6 +93,7 @@
     SizeMode sizeMode;
     private DotNetObjectReference<MainLayout>? objRef;
     string Orientation { get; set; } = "unknown";
+    bool isReady;
 
 
     protected override async Task OnInitializedAsync()
@@ -153,6 +156,7 @@
         ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count();
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
+        isReady = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -506,7 +506,7 @@ public class MemberFeeCalculationService
                         AddFee(person,
                             MemberFeeSortOrder.CourseFee,
                                 ConvertDateOnlyToDateTime(dateDue),
-                                description, amount, e.Course.Name);
+                                description, amount, e.Course.Name,e.CourseID);
                         result.TotalCourseFeesPerYear += amount;
                         courseFeeAdded.Add(e.CourseID);
                     }
@@ -566,7 +566,7 @@ public class MemberFeeCalculationService
                             description += $": {e.Course.CourseFeePerTermDescription}";
                         }
                         AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dateDue),
-                            $"{t.Name}: {description}", amount, e.Course.Name);
+                            $"{t.Name}: {description}", amount, e.Course.Name,e.CourseID);
                         Log.Information($"Student: {person.FullName} {e.Course.Name} {t.TermNumber} {dateDue}");
                         result.TotalCourseFeesPerTerm += amount;
                     }
@@ -603,7 +603,7 @@ public class MemberFeeCalculationService
                         description += $": {c.Course.CourseFeePerYearDescription}";
                     }
                     AddFee(person, MemberFeeSortOrder.CourseFee, ConvertDateOnlyToDateTime(dueDate),
-                                description, amount, c.Course.Name);
+                                description, amount, c.Course.Name,c.CourseID);
                     result.TotalCourseFeesPerYear += amount;
                     courseFeeAdded.Add(c.CourseID);
                 }
@@ -649,7 +649,7 @@ public class MemberFeeCalculationService
                                 break;
                         }
                         AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dueDate),
-                            $"{t.Name}: {description}", amount, c.Course.Name);
+                            $"{t.Name}: {description}", amount, c.Course.Name, c.CourseID);
                         Log.Information($"Leader: {person.FullName} {c.Course.Name} {t.TermNumber} {dueDate}");
                         result.TotalCourseFeesPerTerm += amount;
                         classTerms.Add((c, t));
@@ -675,7 +675,8 @@ public class MemberFeeCalculationService
         DateTime? date,
         string description,
         decimal amount,
-        string Course = "")
+        string Course = "",
+        Guid? CourseID = null)
     {
         var value = decimal.Round(amount, 2);
         var fee = (new MemberFee
@@ -687,6 +688,7 @@ public class MemberFeeCalculationService
             Description = description,
             Amount = value,
             Course = Course,
+            CourseID= CourseID
         });
         ConcurrentBag<MemberFee> fees;
         if (!MemberFees.TryGetValue(person.ID, out fees))
