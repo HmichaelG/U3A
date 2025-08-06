@@ -75,7 +75,7 @@ else
                 <footer class="input-group px-2 mt-2" id="footer">
                     <DxButton Enabled="@enableSubmitButton"
                               CssClass="flex-grow-1" IconCssClass="bi bi-save" SubmitFormOnClick="true" Text="Submit" />
-                    <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" onclick="window.location = '/';" />
+                    <DxButton CssClass="flex-grow-1" IconCssClass="bi bi-x-circle" SubmitFormOnClick="false" Text="Cancel" RenderStyle="@ButtonRenderStyle.Secondary" onclick="history.back();" />
                 </footer>
             </DxFormLayout>
         </EditForm>
