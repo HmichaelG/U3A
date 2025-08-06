@@ -20,7 +20,7 @@
 
 <DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
 
-<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" CssClass="mb-1 w-100" 
+<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" CssClass="mb-1 w-100"
            ItemClick="OnItemClick">
     <Items>
         @CustomButtonContentAtStart
@@ -29,13 +29,17 @@
                        Alignment="ToolbarItemAlignment.Right"
                        Tooltip="Customise row layout">
             <Items>
-                <DxToolbarItem Text="Collapse all Rows"
-                               Click="@(() => LinkedGrid!.CollapseAllRows())"
-                               Tooltip="Collapse all rows in the Pivot Table">
+                <DxToolbarItem Text="@((isRowsCollapsed) ? "Expand All" : "Collapse All")"
+                               Click="CollapseExpandRows"
+                               Tooltip="Collapse/Expand all rows in the Pivot Table">
                 </DxToolbarItem>
-                <DxToolbarItem Text="Expand all Rows"
-                               Click="@(() => LinkedGrid!.ExpandAllRows())"
-                               Tooltip="Expand all rows in the Pivot Table">
+                <DxToolbarItem Text="@((isRowGrandTotalsHidden) ? "Show Totals" : "Hide Totals")"
+                               Click="ShowHideRowTotals" BeginGroup=true
+                               Tooltip="Hide/Show row totals">
+                </DxToolbarItem>
+                <DxToolbarItem Text="@((isRowGrandTotalsHidden) ? "Show Grand Totals" : "Hide Grand Totals")"
+                               Click="ShowHideRowGrandTotals"
+                               Tooltip="Hide/Show row grand totals">
                 </DxToolbarItem>
             </Items>
         </DxToolbarItem>
@@ -44,13 +48,17 @@
                        Alignment="ToolbarItemAlignment.Right"
                        Tooltip="Customise column layout">
             <Items>
-                <DxToolbarItem Text="Collapse all columns"
-                               Click="@(() => LinkedGrid!.CollapseAllColumns())"
-                               Tooltip="Collapse all columns in the Pivot Table">
+                <DxToolbarItem Text="@((isColumnsCollapsed) ? "Expand All" : "Collapse All")"
+                               Click="CollapseExpandColumns"
+                               Tooltip="Collapse/Expand all columns in the Pivot Table">
                 </DxToolbarItem>
-                <DxToolbarItem Text="Expand all columns"
-                               Click="@(() => LinkedGrid!.ExpandAllColumns())"
-                               Tooltip="Expand all columns in the Pivot Table">
+                <DxToolbarItem Text="@((isColumnTotalsHidden) ? "Show Totals" : "Hide Totals")"
+                               Click="ShowHideColumnTotals" BeginGroup=true
+                               Tooltip="Hide/Show row grand totals">
+                </DxToolbarItem>
+                <DxToolbarItem Text="@((isColumnGrandTotalsHidden) ? "Show Grand Totals" : "Hide Grand Totals")"
+                               Click="ShowHideColumnGrandTotals"
+                               Tooltip="Hide/Show row grand totals">
                 </DxToolbarItem>
             </Items>
         </DxToolbarItem>
@@ -60,6 +68,9 @@
                        CssClass="column-chooser-button"
                        Tooltip="Customise column layout">
             <Items>
+                <DxToolbarItem Text="Show Field List" Name="FieldList"
+                               Tooltip="Customise the Pivot Table">
+                </DxToolbarItem>
                 <DxToolbarItem IconCssClass="bi bi-floppy"
                                Name="SaveLayout" Text="Save Layout"
                                Tooltip="Save the current layout">
@@ -97,13 +108,23 @@
 
     PivotTablePersistentLayout? defaultLayout;
     PivotTablePersistentLayout? layout;
+    bool isRowsCollapsed;
+    bool isColumnsCollapsed;
+    bool isRowGrandTotalsHidden;
+    bool isColumnGrandTotalsHidden;
+    bool isRowTotalsHidden;
+    bool isColumnTotalsHidden;
 
     async Task OnItemClick(ToolbarItemClickEventArgs e)
     {
         if (LinkedGrid == null) { return; }
         LinkedGrid.BeginUpdate();
+        if (defaultLayout == null) { defaultLayout = LinkedGrid.SaveLayout(); }
         switch (e.ItemName)
         {
+            case "FieldList":
+                LinkedGrid!.ShowFieldList();
+                break;
             case "SaveLayout":
                 await localStorage.SetItemAsync(LayoutKey!, LinkedGrid.SaveLayout());
                 ToastService.ShowToast(new ToastOptions()
@@ -144,9 +165,64 @@
             case "DataLoad":
                 await LoadLayoutAsync();
                 await DataLoadRequested.InvokeAsync();
+                isRowsCollapsed = false;
+                isColumnsCollapsed = false;
                 break;
         }
         LinkedGrid.EndUpdate();
+    }
+
+    void CollapseExpandRows()
+    {
+        isRowsCollapsed = !isRowsCollapsed;
+        if (isRowsCollapsed)
+        {
+            LinkedGrid!.CollapseAllRows();
+        }
+        else
+        {
+            LinkedGrid!.ExpandAllRows();
+        }
+    }
+    void CollapseExpandColumns()
+    {
+        isColumnsCollapsed = !isColumnsCollapsed;
+        if (isColumnsCollapsed)
+        {
+            LinkedGrid!.CollapseAllColumns();
+        }
+        else
+        {
+            LinkedGrid!.ExpandAllColumns();
+        }
+    }
+    void ShowHideRowTotals()
+    {
+        isRowTotalsHidden = !isRowTotalsHidden;
+        LinkedGrid!.BeginUpdate();
+        LinkedGrid!.ShowRowTotals = !isRowTotalsHidden;
+        LinkedGrid!.EndUpdate();
+    }
+    void ShowHideColumnTotals()
+    {
+        isColumnTotalsHidden = !isColumnTotalsHidden;
+        LinkedGrid!.BeginUpdate();
+        LinkedGrid!.ShowColumnTotals = !isColumnTotalsHidden;
+        LinkedGrid!.EndUpdate();
+    }
+    void ShowHideRowGrandTotals()
+    {
+        isRowGrandTotalsHidden = !isRowGrandTotalsHidden;
+        LinkedGrid!.BeginUpdate();
+        LinkedGrid!.ShowRowGrandTotals = !isRowGrandTotalsHidden;
+        LinkedGrid!.EndUpdate();
+    }
+    void ShowHideColumnGrandTotals()
+    {
+        isColumnGrandTotalsHidden = !isColumnGrandTotalsHidden;
+        LinkedGrid!.BeginUpdate();
+        LinkedGrid!.ShowColumnGrandTotals = !isColumnGrandTotalsHidden;
+        LinkedGrid!.EndUpdate();
     }
 
     async Task LoadLayoutAsync()

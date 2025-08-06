@@ -15,57 +15,74 @@ else
     <FullScreen DisplayOffset="4">
         <ContentTemplate>
             <div class="d-flex flex-column w-100">
-            <PivotToolbar LinkedGrid="@pivotTable"
-                          DataLoadRequested="GetData"
-                          LayoutKey="{D91B6321-580F-4E1F-9AB8-B026FFA373A3}" />
-            <DxPivotTable Data="@pivotData" VirtualScrollingEnabled=true
-                          ShowRowGrandTotals="true" @ref=@pivotTable
-                          ShowColumnGrandTotals="true" CssClass="w-100 h-100">
-                <Fields>
-                    <DxPivotTableField Field="@nameof(AttendClass.Actual)" Caption="Present"
-                                       Area="@PivotTableArea.Data" />
-                    <DxPivotTableField Field="@nameof(AttendClass.Expected)" Caption="Expected"
-                                       Area="@PivotTableArea.Data" />
-                    <DxPivotTableField Field="@nameof(AttendClass.Difference)" Caption="+/-"
-                                       Area="@PivotTableArea.Data" />
-                    <DxPivotTableField Field="@nameof(AttendClass.CourseTypeName)" Caption="Course Type"
-                                       Area="@PivotTableArea.Row" />
-                    <DxPivotTableField Field="@nameof(AttendClass.CourseName)"
-                                       Area="@PivotTableArea.Row" />
-                    <DxPivotTableField Field="Term.Name" Caption="Term"
-                                       Area="@PivotTableArea.Column" />
-                    <DxPivotTableField Field="@nameof(AttendClass.Date)"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Month"
-                                       GroupInterval="PivotTableGroupInterval.DateMonth"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Day"
-                                       GroupInterval="PivotTableGroupInterval.DateDayOfWeek"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Person.FullNameAlpha" Caption="Attendee"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Person.Gender" Caption="Gender"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Class.Venue.Name" Caption="Venue"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.Comment)"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.AbsentWithApology)" Caption="Absent (Apology)"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.AbsentWithoutApology)" Caption="Absent (No Apology)"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="@nameof(AttendClass.IsAdHoc)" Caption="AdHoc?"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Class.GuestLeader" Caption="Guest Leader"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Class.Leader.FullName" Caption="Leader"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Class.Leader2.FullName" Caption="Leader-2"
-                                       Area="@PivotTableArea.Filter" />
-                    <DxPivotTableField Field="Class.Leader3.FullName" Caption="Leader-3"
-                                       Area="@PivotTableArea.Filter" />
-                </Fields>
-            </DxPivotTable>
+                <PivotToolbar LinkedGrid="@pivotTable"
+                              DataLoadRequested="GetData"
+                              LayoutKey="{D91B6321-580F-4E1F-9AB8-B026FFA373A3}" />
+                <DxPivotTable Data="@pivotData" VirtualScrollingEnabled=true
+                              ShowRowGrandTotals="true" @ref=@pivotTable
+                              ShowColumnGrandTotals="true" CssClass="w-100 h-100">
+                    <Fields>
+                        <DxPivotTableField Field="@nameof(AttendClass.Actual)" Caption="Present"
+                                           AllowedAreas="@allowDataAndFilter"
+                                           Area="@PivotTableArea.Data" />
+                        <DxPivotTableField Field="@nameof(AttendClass.Expected)" Caption="Expected"
+                                           AllowedAreas="@allowDataAndFilter"
+                                           Area="@PivotTableArea.Data" />
+                        <DxPivotTableField Field="@nameof(AttendClass.Difference)" Caption="+/-"
+                                           AllowedAreas="@allowDataAndFilter"
+                                           Area="@PivotTableArea.Data" />
+                        <DxPivotTableField Field="@nameof(AttendClass.CourseTypeName)" Caption="Course Type"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Row" />
+                        <DxPivotTableField Field="@nameof(AttendClass.CourseName)"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Term.Name" Caption="Term"
+                                           AllowedAreas="@allowFilterRowColumn"
+                                           Area="@PivotTableArea.Column" />
+                        <DxPivotTableField Field="@nameof(AttendClass.Date)"
+                                           AllowedAreas="@allowFilterRowColumn"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Month"
+                                           AllowedAreas="@allowFilterRowColumn"
+                                           GroupInterval="PivotTableGroupInterval.DateMonth"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Day"
+                                           AllowedAreas="@allowFilterRowColumn"
+                                           GroupInterval="PivotTableGroupInterval.DateDayOfWeek"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Person.FullNameAlpha" Caption="Attendee"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Person.Gender" Caption="Gender"
+                                           AllowedAreas="@allowFilterRowColumn"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Class.Venue.Name" Caption="Venue"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(AttendClass.Comment)"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(AttendClass.AbsentWithApology)" Caption="Absent"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(AttendClass.AbsentWithoutApology)" Caption="Absent (NA)"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(AttendClass.IsAdHoc)" Caption="AdHoc?"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Class.GuestLeader" Caption="Guest Leader"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Class.Leader.FullName" Caption="Leader"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Class.Leader2.FullName" Caption="Leader-2"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Class.Leader3.FullName" Caption="Leader-3"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                    </Fields>
+                </DxPivotTable>
             </div>
         </ContentTemplate>
     </FullScreen>
@@ -76,6 +93,9 @@ else
     IPivotTable? pivotTable { get; set; }
     Progress? ProgressBar;
     bool isReady = false;
+    PivotTableAllowedAreas allowDataAndFilter = PivotTableAllowedAreas.Data | PivotTableAllowedAreas.Filter;
+    PivotTableAllowedAreas allowFilterRow = PivotTableAllowedAreas.Filter | PivotTableAllowedAreas.Row;
+    PivotTableAllowedAreas allowFilterRowColumn = PivotTableAllowedAreas.Filter | PivotTableAllowedAreas.Row | PivotTableAllowedAreas.Column;
 
     protected override async Task OnInitializedAsync()
     {

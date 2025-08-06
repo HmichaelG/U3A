@@ -24,28 +24,46 @@ else
                               ShowRowGrandTotals="true" VirtualScrollingEnabled=true
                               ShowColumnGrandTotals="true" CssClass="w-100 h-100">
                     <Fields>
-                        <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Due Month"
-                                           GroupInterval="PivotTableGroupInterval.DateMonth"
+                        <DxPivotTableField Field="@nameof(MemberFee.Amount)" Caption="Due Filter"
+                                           AllowedAreas="@PivotTableAllowedAreas.Filter"
                                            Area="@PivotTableArea.Filter" />
-                        <DxPivotTableField Field="@nameof(MemberFee.Course)"
+                        <DxPivotTableField Field="@nameof(MemberFee.Allocated)" Caption="Paid Filter"
+                                           AllowedAreas="@PivotTableAllowedAreas.Filter"
                                            Area="@PivotTableArea.Filter" />
-                        <DxPivotTableField Field="Person.FullNameAlpha" Caption="Participant"
-                                           Area="@PivotTableArea.Filter" />
-                        <DxPivotTableField Field="@nameof(MemberFee.Description)"
+                        <DxPivotTableField Field="@nameof(MemberFee.Balance)" Caption="Balance Filter"
+                                           AllowedAreas="@PivotTableAllowedAreas.Filter"
                                            Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Due Date"
+                                           AllowedAreas="@allowFilterRowColumn"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Date)" Caption="Due Month"
+                                           GroupInterval="PivotTableGroupInterval.DateMonth"
+                                           AllowedAreas="@allowFilterRowColumn"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Course)"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="Person.FullNameAlpha" Caption="Participant"
+                                           AllowedAreas="@allowFilterRow"
+                                           Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(MemberFee.Description)"
+                                           AllowedAreas="@allowFilterRow"
                                            Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="Person.FinancialToText" Caption="Fin-To"
+                                           AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Row" />
                         <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
+                                           AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Row" />
                         <DxPivotTableField Field="@nameof(MemberFee.Amount)" Caption="Due"
+                                           AllowedAreas="@allowDataAndFilter"
                                            Area="@PivotTableArea.Data" />
                         <DxPivotTableField Field="@nameof(MemberFee.Allocated)" Caption="Paid"
+                                           AllowedAreas="allowDataAndFilter"
                                            Area="@PivotTableArea.Data" />
                         <DxPivotTableField Field="@nameof(MemberFee.Balance)"
+                                           AllowedAreas="@allowDataAndFilter"
                                            Area="@PivotTableArea.Data" />
-
                     </Fields>
                 </DxPivotTable>
             </div>
@@ -59,6 +77,9 @@ else
     Progress? ProgressBar;
     IPivotTable pivotTable;
     MemberFeeCalculationService service;
+    PivotTableAllowedAreas allowDataAndFilter = PivotTableAllowedAreas.Data | PivotTableAllowedAreas.Filter;
+    PivotTableAllowedAreas allowFilterRow = PivotTableAllowedAreas.Filter | PivotTableAllowedAreas.Row;
+    PivotTableAllowedAreas allowFilterRowColumn = PivotTableAllowedAreas.Filter | PivotTableAllowedAreas.Row | PivotTableAllowedAreas.Column;
 
 
     protected override async Task OnInitializedAsync()
