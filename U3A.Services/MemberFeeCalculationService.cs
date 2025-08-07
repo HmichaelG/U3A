@@ -578,7 +578,6 @@ public class MemberFeeCalculationService
                         }
                         AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dateDue),
                             $"{t.Name}: {description}", amount, e.Course.Name,e.CourseID);
-                        Log.Information($"Student: {person.FullName} {e.Course.Name} {t.TermNumber} {dateDue}");
                         result.TotalCourseFeesPerTerm += amount;
                     }
                 }
@@ -629,7 +628,6 @@ public class MemberFeeCalculationService
                 if (classTerms.Contains((c, t))) continue;
                 var dueDateAdjustment = c.Course.CourseFeePerTermDueWeeks ?? 0;
                 dueDate = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
-                Log.Information($"Leader: {person.FullName} {c.Course.Name} {t.TermNumber} {dueDate}");
                 if (c.Course.CourseFeePerTerm != 0
                         && c.Course.LeadersPayTermFee && dueDate <= today)
                 {
@@ -661,7 +659,6 @@ public class MemberFeeCalculationService
                         }
                         AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dueDate),
                             $"{t.Name}: {description}", amount, c.Course.Name, c.CourseID);
-                        Log.Information($"Leader: {person.FullName} {c.Course.Name} {t.TermNumber} {dueDate}");
                         result.TotalCourseFeesPerTerm += amount;
                         classTerms.Add((c, t));
                     }

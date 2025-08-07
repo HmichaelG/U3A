@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Hosting
 @using DevExpress.Data.Filtering
 @using System.Collections.Concurrent
+@using Serilog
 
 @inject NavigationManager NavMan
 @inject IJSRuntime js
@@ -245,13 +246,15 @@
     async Task OnProcess()
     {
         if (selectedTerm == null) return;
+        var s = new Stopwatch();
+        s.Start();
         await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
         MemberFeeCalculationService service;
         using (dbc = await U3Adbfactory.CreateDbContextAsync())
         {
-        service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
+            service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
         }
-        Parallel.ForEach(people, p =>
+        await Parallel.ForEachAsync(people, async(p,_) =>
         {
             service.CalculateFee(p);
         });
@@ -282,6 +285,7 @@
         }
         var op = GroupOperator.And(opFees, opFinToYears);
         mainGrid.SetFilterCriteria(op);
+        Log.Information("Financial Status Enquiry: On Process {0}",s.ElapsedMilliseconds);
     }
 
     string[] customBools = { "IsComplimentary",

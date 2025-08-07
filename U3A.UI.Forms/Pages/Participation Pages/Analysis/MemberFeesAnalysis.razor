@@ -1,5 +1,7 @@
 ﻿@page "/MemberFeesAnalysis"
 @using System.Collections.Concurrent
+@using System.Diagnostics
+@using Serilog
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IDbContextFactory<TenantDbContext> tenantDbFactory
@@ -55,6 +57,12 @@ else
                         <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
                                            AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Row" />
+                        <DxPivotTableField Field="@nameof(MemberFee.PersonID)" Caption="Count"
+                                           SummaryType="PivotTableSummaryType.Count"
+                                           AllowedAreas="@allowDataAndFilter"
+                                           Area="@PivotTableArea.Data">
+                                           
+                        </DxPivotTableField>
                         <DxPivotTableField Field="@nameof(MemberFee.Amount)" Caption="Due"
                                            AllowedAreas="@allowDataAndFilter"
                                            Area="@PivotTableArea.Data" />
@@ -89,6 +97,8 @@ else
 
     async Task GetData()
     {
+        var s = new Stopwatch();
+        s.Start();
         await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
         pivotTable.BeginUpdate();
         pivotData = new List<MemberFee>();
@@ -102,7 +112,7 @@ else
             service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
         }
         var memberFeesList = new ConcurrentBag<MemberFee>();
-        Parallel.ForEach(people, p =>
+        await Parallel.ForEachAsync(people, async (p, _) =>
         {
             service.CalculateFee(p);
             var allocatedFees = service.GetAllocatedMemberFees(p);
@@ -115,5 +125,6 @@ else
         await ProgressBar.Close();
         pivotTable.EndUpdate();
         StateHasChanged();
+        Log.Information("MemberFeesAnalysis: GetData {0} milliseconds.", s.ElapsedMilliseconds);
     }
 }

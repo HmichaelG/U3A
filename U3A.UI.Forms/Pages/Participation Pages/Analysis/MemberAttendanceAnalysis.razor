@@ -104,7 +104,7 @@ else
 
     async Task GetData()
     {
-        await ProgressBar.ShowSpinnerAsync("Loading Attendance Data...");
+        await ProgressBar.ShowSpinnerAsync("Loading Attendance Data ... Please Wait");
         pivotData = new List<AttendClass>();
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
         using var dbct = await tenantDbFactory.CreateDbContextAsync();
