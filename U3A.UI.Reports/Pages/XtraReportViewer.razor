@@ -32,24 +32,23 @@
 @using DevExpress.Blazor.Reporting
 @using Microsoft.Extensions.DependencyInjection
 
-<DxWaitIndicator Visible=true /><em>Loading...</em>
-<DxWindow Visible=@ReportIsReady Width="100dvw"
-          Height="100dvh"
-          PositionY="0"
-          CloseOnEscape="false"
-          ShowHeader="false">
-    <BodyContentTemplate Context="PopupContext">
-        <DxReportViewer @ref="@reportViewer"
-                        Report="@Report"
-                        SinglePagePreview="false"
-                        Zoom="1"
-                        CssClass="w-100 h-100"
-                        OnCustomizeToolbar="OnCustomizeToolbar" />
-    </BodyContentTemplate>
-</DxWindow>
-
-
-
+@if (isReady)
+{
+    <DxWindow @bind-Visible=@ReportIsReady Width="100dvw"
+              Height="100dvh"
+              PositionY="0"
+              CloseOnEscape="false"
+              ShowHeader="false">
+        <BodyContentTemplate Context="PopupContext">
+            <DxReportViewer @ref="@reportViewer"
+                            Report="@Report"
+                            SinglePagePreview="false"
+                            Zoom="1"
+                            CssClass="w-100 h-100"
+                            OnCustomizeToolbar="OnCustomizeToolbar" />
+        </BodyContentTemplate>
+    </DxWindow>
+}
 @code {
     DxReportViewer? reportViewer;
     [Inject] public EditingFieldModelFactory EditingFieldModelFactory { get; set; }
@@ -91,7 +90,7 @@
     {
         if (firstRender)
         {
-            if (HideTabPanels)
+            if (HideTabPanels && reportViewer is not null)
             {
                 reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
                 reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;

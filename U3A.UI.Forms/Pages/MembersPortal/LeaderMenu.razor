@@ -40,14 +40,12 @@ else
             </DxFormLayout>
         }
 
+        <XtraReportViewer HideTabPanels=true ReportIsReady=badgeReportIsReady
+                          ReportIsReadyChanged="@OnReportComplete"
+                          Report="@memberBadgeReport" />
+
         @switch (menuSelection)
         {
-            case MenuOptions.MemberBadges:
-                <XtraReportViewer RootCssClass="vh-75"
-                                  HideTabPanels=true
-                                  OnCloseButtonClick="@OnReportComplete"
-                                  Report="GetMemberBadgeReport()" />
-                break;
             case MenuOptions.AddEditStudentLeave:
                 <DxFormLayout CssClass="col col-12 col-md-8 col-lg-6 mx-auto">
                     <DxFormLayoutGroup Caption="Add / Edit Student Leave" ColSpanMd="12">
@@ -225,7 +223,7 @@ else
             case MenuOptions.Communicate:
                 <DxFormLayout CssClass="px-4 col col-12 col-md-10 mx-auto">
                     <StudentGrid @ref="studentGrid"
-                                 Enrolments="EnrolmentsToSelectFrom"
+                                 Enrolments=@(termAndCourse.EnrolmentsWithLeaders)
                                  Settings="settings" />
                     <div class="input-group">
                         <DxButton Text="Email"
@@ -439,6 +437,7 @@ else
     SelectEnrolmentType? selectEnrolmentType;
     int enrolmentTypeSelected = 1;
     bool focusRequired;
+    MemberBadge memberBadgeReport;
 
     private List<ClassDate> ClassDates;
     ClassDate? SelectedClassDate;
@@ -461,6 +460,7 @@ else
     MarkupString welcomeText;
     string? SuccessMsg = null;
     LocalTime localTime;
+    bool badgeReportIsReady;
 
     enum MenuOptions
     {
@@ -474,7 +474,6 @@ else
         AttendanceHistory,
         LeaderReports,
         CancelClass,
-        MemberBadges,
         ConfigureEmail,
         StudentFees
     }
@@ -844,20 +843,15 @@ else
         if (!await AreEnrolmentsSelected()) return;
         if (studentGrid == null) return;
         if (studentGrid.SelectedDataItems == null) return;
-        await OnMenuSelected(MenuOptions.MemberBadges);
-    }
-
-    XtraReport GetMemberBadgeReport()
-    {
-        MemberBadge report = new() { U3Adbfactory = U3Adbfactory };
+        memberBadgeReport = new() { U3Adbfactory = U3Adbfactory };
         List<Guid> PrintID = new();
         foreach (var e in studentGrid.SelectedDataItems)
         {
             PrintID.Add(((Enrolment)e).PersonID);
         }
-        report.SetParameters(PrintID);
-        return report;
-
+        memberBadgeReport.SetParameters(PrintID);
+        badgeReportIsReady = true;
+        StateHasChanged();
     }
 
     async Task OnSelectedStudentChanged(Person student)
@@ -916,7 +910,12 @@ else
         await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
     }
 
-    void OnReportComplete() => menuSelection = MenuOptions.Nothing;
+    void OnReportComplete() 
+    {
+        badgeReportIsReady = false;
+        menuSelection = MenuOptions.Nothing;
+        StateHasChanged();
+    }
 
     async Task ReturnToMenu(PortalMenuResult result)
     {
