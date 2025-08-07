@@ -37,11 +37,11 @@ else
                             if (context.DataItem != null)
                             {
                                 Enrolment e = (Enrolment)context.DataItem;
-                                var isCourseClerk = e.IsCourseClerk;
+                                var isCourseClerkOrLeader = e.IsCourseClerk || e.isLeader;
                                 var hasEmail = !e.Person.IsEmailSilent;
                                 var hasMobile = !string.IsNullOrEmpty(e.Person.Mobile) && !e.Person.IsPhoneSilent && !e.Person.SMSOptOut;
                                 var hasPhone = !string.IsNullOrEmpty(e.Person.HomePhone) && !e.Person.IsPhoneSilent;
-                                var highlightcss = (isCourseClerk)
+                                var highlightcss = (isCourseClerkOrLeader)
                                 ? "alert-link text-fl-primary"
                                 : "";
                                 var width = (IsSmallLayout) ? "col col-9" : "col col-12";
