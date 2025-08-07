@@ -68,13 +68,27 @@ namespace U3A.BusinessRules
                                 .Include(x => x.Term)
                                 .Where(x => x.DropoutDate > lastSchedule.UpdatedOn).ToListAsync();
             var schedule = await dbc.Schedule.AsNoTracking().ToListAsync();
-            Parallel.ForEach(schedule, s =>
+            await Parallel.ForEachAsync(schedule, async(s,_) =>
             {
-                var c = JsonSerializer.Deserialize<Class>(s.jsonClass.Unzip());
+                Class c;
+                using Stream classStream = new MemoryStream(Encoding.UTF8.GetBytes(s.jsonClass.Unzip()));
+                if (classStream.Length > 0)
+                {
+                    c = JsonSerializer.Deserialize<Class>(classStream);
+                }
+                else return;
                 if (!excludeOffScheduleActivities || !c.Course.IsOffScheduleActivity)
                 {
-                    c.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonClassEnrolments.Unzip());
-                    c.Course.Enrolments = JsonSerializer.Deserialize<List<Enrolment>>(s.jsonCourseEnrolments.Unzip());
+                    using Stream classEnrolments = new MemoryStream(Encoding.UTF8.GetBytes(s.jsonClassEnrolments.Unzip()));
+                    if (classEnrolments.Length > 0)
+                    {
+                        c.Enrolments = await JsonSerializer.DeserializeAsync<List<Enrolment>>(classEnrolments);
+                    }
+                    using Stream courseEnrolments = new MemoryStream(Encoding.UTF8.GetBytes(s.jsonCourseEnrolments.Unzip()));
+                    if (courseEnrolments.Length > 0)
+                    {
+                        c.Course.Enrolments = await JsonSerializer.DeserializeAsync<List<Enrolment>>(courseEnrolments);
+                    }
                     // add new enrolments
                     c.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID != null && x.ClassID == c.ID));
                     c.Course.Enrolments.AddRange(newEnrolments.Where(x => x.ClassID == null && x.CourseID == c.CourseID));
@@ -97,13 +111,14 @@ namespace U3A.BusinessRules
                     classes.Add(c);
                 }
             });
+
             // Remove deleted classes from cache
             var liveKeys = await dbc.Class
-                            .AsNoTracking()
-                            .Include(x => x.Course)
-                            .Where(x => (x.Course.Year == term.Year ||
-                                                x.StartDate != null && x.StartDate >= dbc.GetLocalDate()))
-                            .Select(x => x.ID).ToListAsync();
+                        .AsNoTracking()
+                        .Include(x => x.Course)
+                        .Where(x => (x.Course.Year == term.Year ||
+                                            x.StartDate != null && x.StartDate >= dbc.GetLocalDate()))
+                        .Select(x => x.ID).ToListAsync();
             var deletions = new List<Class>();
             Parallel.ForEach(classes, c =>
             {
@@ -111,7 +126,7 @@ namespace U3A.BusinessRules
             });
             List<Class> result = classes.Except(deletions).ToList();
 
-            Parallel.ForEach(result, c =>
+            await Parallel.ForEachAsync(result, async(c, _) =>
             {
                 AssignClassCounts(term, c);
             });
@@ -278,7 +293,7 @@ namespace U3A.BusinessRules
                 dbc.ChangeTracker.Clear();
                 await UpdateScheduleCache(dbc, schedules, TenantIdentifier);
                 await dbc.SaveChangesAsync();
-                Log.Information("Schedule cache created for {TenantIdentifier}, {classes} active classes.", 
+                Log.Information("Schedule cache created for {TenantIdentifier}, {classes} active classes.",
                                     TenantIdentifier, schedules.Count);
 
                 //multi-campus
@@ -295,8 +310,8 @@ namespace U3A.BusinessRules
                         // members
                         await UpdatePersonCache(dbc, dbcT, TenantIdentifier);
                         await dbcT.SaveChangesAsync();
-                        Log.Information("Multi-campus schedule cache created for {TenantIdentifier}, {classes} active classes.", 
-                                            TenantIdentifier,multiCampusSchedules.Count);
+                        Log.Information("Multi-campus schedule cache created for {TenantIdentifier}, {classes} active classes.",
+                                            TenantIdentifier, multiCampusSchedules.Count);
                     }
                 }
             }
