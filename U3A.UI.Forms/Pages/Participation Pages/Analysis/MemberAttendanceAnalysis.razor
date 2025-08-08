@@ -11,7 +11,7 @@
 else
 {
     <Progress @ref="@ProgressBar" />
-    <ContextHelpTitle Title="Attendance Analysis" HelpTopic="" Subtitle="" />
+    <ContextHelpTitle Title="Attendance Analysis" HelpTopic="Pivot-Table.html" Subtitle="" />
     <FullScreen DisplayOffset="4">
         <ContentTemplate>
             <div class="d-flex flex-column w-100">
@@ -42,6 +42,7 @@ else
                                            Area="@PivotTableArea.Column" />
                         <DxPivotTableField Field="@nameof(AttendClass.Date)"
                                            AllowedAreas="@allowFilterRowColumn"
+                                           GroupInterval="PivotTableGroupInterval.Date"
                                            Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Month"
                                            AllowedAreas="@allowFilterRowColumn"
