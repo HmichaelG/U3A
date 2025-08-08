@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" modified="2025-08-08T11:19:33.961+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title>Pivot Table</title>
+  <body>
+    <header>
+      <para styleclass="Heading1">Pivot Table</para>
+    </header>
+    <para styleclass="Normal">A <text style="font-weight:bold;">Pivot Table</text> is a conceptual data structure used to summarize, reorganize, and analyze multidimensional data. It is a powerful abstraction for transforming raw tabular data into meaningful insights.</para>
+    <para styleclass="Normal">It works by grouping data along one or more <text style="font-weight:bold;">dimensions</text> and applying aggregation functions (like sum, count, average) to the grouped values.</para>
+    <para styleclass="Normal">A pivot table is smart summary of your data. It is used to identify patterns in your data. Instead of counting or adding things up manually, a pivot table does it for you—automatically grouping and calculating the numbers based on what you care about.</para>
+    <para styleclass="Normal" style="margin-top:14px; margin-bottom:0px; line-height:1.00; tabstops:none;"><text style="font-family:&apos;Times New Roman&apos;; font-size:12pt; font-weight:bold; text-decoration:none; vertical-align:baseline; color:#000000;">Components of a Pivot table</text></para>
+    <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"><table styleclass="Default" rowcount="5" colcount="2">
+      <thead style="vertical-align:top">
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"><text style="font-family:&apos;Times New Roman&apos;; font-size:12pt; font-weight:bold; text-decoration:none; vertical-align:baseline; color:#000000;">Component</text></para>
+        </td>
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"><text style="font-family:&apos;Times New Roman&apos;; font-size:12pt; font-weight:bold; text-decoration:none; vertical-align:baseline; color:#000000;">Description</text></para>
+        </td>
+      </thead>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal">Rows</para>
+        </td>
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal">Categories or dimensions used to group data vertically</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal">Columns</para>
+        </td>
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal">Categories or dimensions used to group data horizontally</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal">Data</para>
+        </td>
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal">Aggregated metrics (e.g., totals, averages) calculated for each row-column pair</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal">Filter</para>
+        </td>
+        <td style="vertical-align:middle;">
+          <para styleclass="Normal">Criteria used to include/exclude data from the summary</para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"></para>
+    <para styleclass="Normal">These components are represented on the Pivot Table as Areas as shown in the image below. Items in the Filter Area can usually be dragged to to the Column or Row Areas and vice-versa. Items in the Data Area can be moved to the Filter Area. The effect of moving an item to the Filter Area is to remove that item (Dimension) from the aggregation.</para>
+    <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"><image src="clip0004.png" imagestyleclass="Default" scale="100.00%" styleclass="Image Caption" figurelistinclude="0"></image></para>
+  </body>
+</topic>

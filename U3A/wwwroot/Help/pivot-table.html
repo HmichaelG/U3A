@@ -1,13 +1,13 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-   <title>User Interface (UI) elements &gt; UI Components &gt; Form</title>
+   <title>User Interface (UI) elements &gt; UI Components &gt; Pivot Table</title>
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />   
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
    <meta name="generator" content="Help &amp; Manual" />
    <meta name="keywords" content="" />
-   <meta name="description" content="Normally, data is entered via a Form. A form is accessed usually via the grid or directly from the menu if a grid is not required." />
+   <meta name="description" content="A Pivot Table is a conceptual data structure used to summarize, reorganize, and analyze multidimensional data. It is a powerful abstraction for transforming raw tabular data..." />
    <link type="text/css" href="default.css" rel="stylesheet" />
    <link type="text/css" href="custom.css" rel="stylesheet" />
 
@@ -85,7 +85,7 @@
    <script type="text/javascript" src="helpman_topicinit.js"></script>
 
    <script type="text/javascript">
-     HMSyncTOC("index.html", "form.html");
+     HMSyncTOC("index.html", "pivot-table.html");
    </script>
    <script type="text/javascript" src="highlight.js"></script>
    <script type="text/javascript">
@@ -95,26 +95,26 @@
 <body>
 
 
-<div id="printheader"><h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Form</span></h1>
+<div id="printheader"><h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Pivot Table</span></h1>
 </div>
 <div id="idheader">
 <div id="idheaderbg">
 <table style="width:100%;border:none;margin:0px;" cellspacing="0" cellpadding="0"> 
   <tr>
     <td class="topichead" style="text-align:left; vertical-align:middle">
-      <p class="sync-toc">&lt;&lt; <a rel="nofollow" href="index.html?form.html" target="_top">Click to Display Table of Contents</a> &gt;&gt;</p>
+      <p class="sync-toc">&lt;&lt; <a rel="nofollow" href="index.html?pivot-table.html" target="_top">Click to Display Table of Contents</a> &gt;&gt;</p>
       <p class="crumbs"><b>Navigation:</b>&nbsp;
       
       <a href="user-interface-(ui)-elements.html">User Interface (UI) elements</a> &gt; <a href="ui-components.html">UI Components</a>&nbsp;&gt;</p>
    
-      <h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Form</span></h1>
+      <h1 class="p_Heading1" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading1">Pivot Table</span></h1>
 
     </td>
     <td class="topichead" id="idnav">
       
-      <a href="pivot-table.html" title="Previous Topic"><span class="hmbtnprev"></span></a>
+      <a href="grid.html" title="Previous Topic"><span class="hmbtnprev"></span></a>
       <a href="ui-components.html" title="Parent Chapter"><span class="hmbtntop"></span></a>
-      <a href="report.html" title="Next Topic"><span class="hmbtnnext"></span></a>
+      <a href="form.html" title="Next Topic"><span class="hmbtnnext"></span></a>
       
     </td>
   </tr>  
@@ -127,34 +127,55 @@
 <!--[if lt IE 7]><div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;'><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." /></a></div><![endif]-->
 
 <!--ZOOMRESTART-->
-<p class="p_Normal">Normally, data is entered via a <span style="font-style: italic;">Form</span>. A form is accessed usually via the grid or directly from the menu if a grid is not required.</p>
-<p class="p_Normal">If accessed via the grid, that grid will have a combination of add, change or delete buttons. The buttons displayed will be determined by the developer. The <span style="font-style: italic;">Add</span> button is displayed as a plus (+) symbol on the grid's column header. The <span style="font-style: italic;">Edit</span> and <span style="font-style: italic;">Delete</span> buttons are displayed as a pencil and bin on each row respectively.</p>
-<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;" role="cell">
+<p class="p_Normal">A <span style="font-weight: bold;">Pivot Table</span> is a conceptual data structure used to summarize, reorganize, and analyze multidimensional data. It is a powerful abstraction for transforming raw tabular data into meaningful insights.</p>
+<p class="p_Normal">It works by grouping data along one or more <span style="font-weight: bold;">dimensions</span> and applying aggregation functions (like sum, count, average) to the grouped values.</p>
+<p class="p_Normal">A pivot table is smart summary of your data. It is used to identify patterns in your data. Instead of counting or adding things up manually, a pivot table does it for you, automatically grouping and calculating the numbers based on what you care about.</p>
+<p class="p_Normal">It helps you spot trends, compare categories, and make decisions faster.</p>
+<p class="p_Normal" style="margin: 14px 0 0 0;"><span style="font-size: 16px; font-family: 'Times New Roman',Times,Georgia,serif; font-weight: bold;">Components of a Pivot table</span></p>
+<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 0 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;">
+<thead>
 <tr>
-<td style="vertical-align:top; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><img alt="grid edit buttons" width="487" height="192" style="margin:0;width:487px;height:192px;border:none" src="hmfile_hash_92e37fd6.png"/></p>
+<th style="vertical-align:middle; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;" scope="col"><p class="p_Normal" style="margin: 0 0 0 0;"><span style="font-size: 16px; font-family: 'Times New Roman',Times,Georgia,serif; font-weight: bold;">Component</span></p>
+</th>
+<th style="vertical-align:middle; background-color:#C0C0C0; padding:1px; border:solid thin #c0c0c0;" scope="col"><p class="p_Normal" style="margin: 0 0 0 0;"><span style="font-size: 16px; font-family: 'Times New Roman',Times,Georgia,serif; font-weight: bold;">Description</span></p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="vertical-align:middle; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Rows</p>
+</td>
+<td style="vertical-align:middle; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Categories or dimensions used to group data vertically</p>
 </td>
 </tr>
-</table>
-</div>
-<p class="p_Normal">The form is displayed as a modal window above the grid...</p>
-<div style="text-align: left; text-indent: 0; padding: 0 0 0 0; margin: 0 0 16px 0;"><table style="width:100%; border:solid 2px #c0c0c0; border-spacing:0; border-collapse:collapse;" role="cell">
 <tr>
-<td style="vertical-align:top; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal"><img alt="form" width="579" height="326" style="margin:0;width:579px;height:326px;border:none" src="form.png"/></p>
+<td style="vertical-align:middle; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Columns</p>
+</td>
+<td style="vertical-align:middle; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Categories or dimensions used to group data horizontally</p>
 </td>
 </tr>
+<tr>
+<td style="vertical-align:middle; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Data</p>
+</td>
+<td style="vertical-align:middle; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Aggregated metrics (e.g., totals, averages) calculated for each row-column pair</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:middle; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Filter</p>
+</td>
+<td style="vertical-align:middle; padding:1px; border:solid thin #c0c0c0;"><p class="p_Normal">Criteria used to include/exclude data from the summary</p>
+</td>
+</tr>
+</tbody>
 </table>
 </div>
-<p class="p_Normal">Enter the data as required and click the <span style="font-style: italic;">Save</span> button. If you are simply viewing the data, click the <span style="font-style: italic;">Cancel</span> button to ensure you do not save any unwanted changes.</p>
-<p class="p_Normal">When <span style="font-style: italic;">Save</span> is clicked, the software will validate your input. If there are issues the system will display messages to inform you of what needs to be changed. Change your input until it is acceptable and click <span style="font-style: italic;">Save</span> again.</p>
-<p class="p_Normal">Sometimes a form will contain a <span style="font-style: italic;">Discontinued</span> check box. This will be provided in place of the <span style="font-style: italic;">Delete</span> button on the grid. A discontinued record is a record you no longer require within the system, yet other records may depend on it so that it cannot be deleted. Discontinuing a record can therefore be thought of as a <span style="font-style: italic;">soft delete</span>; it is no longer available for use but remains to ensure data integrity within the database.</p>
-<p class="p_Normal" style="text-align: center; margin: 0 0 0 0;"><span style="font-weight: bold;">Hint:</span> Find Required Fields</p>
-<p class="p_Normal" style="text-align: center;">To find all required fields on a new record, press the <span style="font-style: italic;">Save</span> button prior to entering any data. All required fields will be displayed as validation errors.</p>
-<h2 class="p_Heading2" style="border-top: none; border-right: none; border-left: none;"><span class="f_Heading2">Data Editors</span></h2>
-<p class="p_Normal">Editors are the boxes into which you enter data. They range from the humble text box into which any character may be entered through to the rich text editor providing word processing functionality to the system.</p>
-<p class="p_Normal">In between there are editors for each type of data; the date editor to enter dates, spin editor to enter whole numbers, selection editors to select one or more items from a list and editors to enter currency and decimal numbers. The purpose of these editors is to reduce the opportunity to enter invalid data into the database. Thus a date editor, for example will only accept valid dates.</p>
-<p class="p_Normal">All editors other than the simple text editor will have a button to provide additional functionality via a drop-down window. This will be specific for the data type being entered. The date editor for example, will display a calendar from which to select the date. It is not compulsory to use the calendar as the date may be entered using the keyboard.</p>
-<p class="p_Normal" style="text-align: center; line-height: 1.38; margin: 0 0 0 0;"><span style="font-weight: bold;">Hint: </span>Use <span style="font-style: italic;">Tab</span> to move between editors</p>
-<p class="p_Normal" style="text-align: center; line-height: 1.38; margin: 0 0 0 0;">Use the <span style="font-style: italic;">tab</span> key to move between editors. The tab key will move to the next editor in sequence. The SHIFT-tab combination will move to the previous editor. The tab key is a far more efficient method of data entry than using a mouse. Importantly, it reduces the potential of Repetitive Strain Injury (RSI) that can accompany heavy mouse use.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;">&nbsp;</p>
+<p class="p_Normal">These components are represented on the Pivot Table as Areas as shown in the image below. Items in the Filter Area can usually be dragged to to the Column or Row Areas and vice-versa. Items in the Data Area can be moved to the Filter Area. The effect of moving an item to the Filter Area is to remove that item (Dimension) from the aggregation.</p>
+<p class="p_Normal" style="margin: 0 0 0 0;"><img alt="clip0004" width="971" height="740" style="margin:0;width:971px;height:740px;border:none" src="clip0004.png"/></p>
+<h3 class="p_Heading3"><span class="f_Heading3">Suggested Workflow</span></h3>
+<p class="p_Normal">It is usually a good idea to start with a summarised view of your data such as that displayed above. A summarised view will quite often highlight anomalies or insights into your data. Then, rearrange your dimensions to obtain the analysis you want.</p>
+<p class="p_Normal">For example, below is the same data as above but rearranged to show Course fees paid for each term. Moving the <span style="font-style: italic;">Participant</span> dimension to the Row Area would show the fees paid by each student in the course.</p>
+<p class="p_Normal"><img alt="clip0005" width="978" height="323" style="margin:0;width:978px;height:323px;border:none" src="clip0005.png"/> &nbsp;</p>
 
 <!--ZOOMSTOP-->
 
