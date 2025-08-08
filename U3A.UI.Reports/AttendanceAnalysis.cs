@@ -60,11 +60,12 @@ namespace U3A.UI.Reports
             if (year == 0) { year = DbContext.GetLocalTime().Year; }
             xrChart1.Titles[0].Text = $"{year} Attendance Analysis";
             data = BusinessRule.GetClassAttendanceDetailByWeek(DbContext, year);
-            objectDataSource1.DataSource = data;
             if (prmCourseFilter.Value != null)
             {
                 courseFilter = (string[])prmCourseFilter.Value;
+                data = data.Where(x => courseFilter.Contains(x.CourseID.ToString())).ToList();
             }
+            objectDataSource1.DataSource = data.OrderBy(x => x.CourseDescription).ThenBy(x => x.CourseID).ThenBy(x => x.ClassID);
         }
 
         Guid LastClass { get; set; } = Guid.Empty;
@@ -104,9 +105,9 @@ namespace U3A.UI.Reports
             xrChart1.Series[1].FilterString = $"CourseTypeID = '{ac.CourseTypeID}' and {occurrenceFilter}";
             xrChart1.Series[1].Name = $"All {ac.CourseTypeDescription}: Present";
             // The Course
-            xrChart1.Series[2].FilterString = $"CourseID = '{courseIDFilter}'";    // Present
-            xrChart1.Series[3].FilterString = $"CourseID = '{courseIDFilter}'";    // Absent with
-            xrChart1.Series[4].FilterString = $"CourseID = '{courseIDFilter}'";    // Absent without
+            xrChart1.Series[2].FilterString = $"CourseID = '{courseIDFilter}' AND ClassID = '{LastClass}'";    // Present
+            xrChart1.Series[3].FilterString = $"CourseID = '{courseIDFilter}' AND ClassID = '{LastClass}'";    // Absent with
+            xrChart1.Series[4].FilterString = $"CourseID = '{courseIDFilter}' AND ClassID = '{LastClass}'";    // Absent without
         }
 
         private void ReportFooter_BeforePrint(object sender, CancelEventArgs e)
