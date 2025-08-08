@@ -81,9 +81,7 @@
         // move to local to prevent UI corruption.
         var coursesToReport = CoursesToReport.ToList();
         // if no courses selected, but course types selected, then select all courses of those types.
-        if ((coursesToReport == null || coursesToReport.Count() <= 0)
-            &&
-            (CourseTypesToReport == null || CourseTypesToReport.Count() > 0))
+        if (coursesToReport == null || coursesToReport.Count() == 0)
         {
             coursesToReport = Courses.ToList();
         }

@@ -32,10 +32,10 @@ else
                                            AllowedAreas="@allowDataAndFilter"
                                            Area="@PivotTableArea.Data" />
                         <DxPivotTableField Field="@nameof(AttendClass.CourseTypeName)" Caption="Course Type"
-                                           AllowedAreas="@allowFilterRow"
+                                           AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Row" />
                         <DxPivotTableField Field="@nameof(AttendClass.CourseName)"
-                                           AllowedAreas="@allowFilterRow"
+                                           AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="Term.Name" Caption="Term"
                                            AllowedAreas="@allowFilterRowColumn"
@@ -53,13 +53,13 @@ else
                                            GroupInterval="PivotTableGroupInterval.DateDayOfWeek"
                                            Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="Person.FullNameAlpha" Caption="Attendee"
-                                           AllowedAreas="@allowFilterRow"
+                                           AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="Person.Gender" Caption="Gender"
                                            AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="Class.Venue.Name" Caption="Venue"
-                                           AllowedAreas="@allowFilterRow"
+                                           AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="@nameof(AttendClass.Comment)"
                                            AllowedAreas="@allowFilterRow"
