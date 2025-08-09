@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-08-08T11:19:33.961+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-08-08T11:46:49.154+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Pivot Table</title>
   <body>
     <header>
@@ -8,7 +8,8 @@
     </header>
     <para styleclass="Normal">A <text style="font-weight:bold;">Pivot Table</text> is a conceptual data structure used to summarize, reorganize, and analyze multidimensional data. It is a powerful abstraction for transforming raw tabular data into meaningful insights.</para>
     <para styleclass="Normal">It works by grouping data along one or more <text style="font-weight:bold;">dimensions</text> and applying aggregation functions (like sum, count, average) to the grouped values.</para>
-    <para styleclass="Normal">A pivot table is smart summary of your data. It is used to identify patterns in your data. Instead of counting or adding things up manually, a pivot table does it for you—automatically grouping and calculating the numbers based on what you care about.</para>
+    <para styleclass="Normal">A pivot table is smart summary of your data. It is used to identify patterns in your data. Instead of counting or adding things up manually, a pivot table does it for you, automatically grouping and calculating the numbers based on what you care about.</para>
+    <para styleclass="Normal">It helps you spot trends, compare categories, and make decisions faster.</para>
     <para styleclass="Normal" style="margin-top:14px; margin-bottom:0px; line-height:1.00; tabstops:none;"><text style="font-family:&apos;Times New Roman&apos;; font-size:12pt; font-weight:bold; text-decoration:none; vertical-align:baseline; color:#000000;">Components of a Pivot table</text></para>
     <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"><table styleclass="Default" rowcount="5" colcount="2">
       <thead style="vertical-align:top">
@@ -55,5 +56,9 @@
     <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"></para>
     <para styleclass="Normal">These components are represented on the Pivot Table as Areas as shown in the image below. Items in the Filter Area can usually be dragged to to the Column or Row Areas and vice-versa. Items in the Data Area can be moved to the Filter Area. The effect of moving an item to the Filter Area is to remove that item (Dimension) from the aggregation.</para>
     <para styleclass="Normal" style="margin-bottom:0px; line-height:1.00; tabstops:none;"><image src="clip0004.png" imagestyleclass="Default" scale="100.00%" styleclass="Image Caption" figurelistinclude="0"></image></para>
+    <para styleclass="Heading3">Suggested Workflow</para>
+    <para styleclass="Normal">It is usually a good idea to start with a summarised view of your data such as that displayed above. A summarised view will quite often highlight anomalies or insights into your data. Then, rearrange your dimensions to obtain the analysis you want.</para>
+    <para styleclass="Normal">For example, below is the same data as above but rearranged to show Course fees paid for each term. Moving the <text style="font-style:italic;">Participant</text> dimension to the Row Area would show the fees paid by each student in the course.</para>
+    <para styleclass="Normal"><image src="clip0005.png" imagestyleclass="Default" scale="100.00%" styleclass="Image Caption" figurelistinclude="0"></image> &#160;</para>
   </body>
 </topic>
