@@ -102,10 +102,7 @@
                                         NullText="if blank, immediately payable."
                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                         </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
-                            <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerYearFee" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
+                        <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="12">
                             <DxCheckBox @bind-Checked="Course.LeadersPayYearFee" />
                         </DxFormLayoutItem>
                     </Items>
@@ -145,10 +142,7 @@
                                         MinValue="-12" MaxValue="12" />
                         </DxFormLayoutItem>
                         <DxFormLayoutItem Caption="@(BusinessRule.TermDueDateText(Course.CourseFeePerTermDueWeeks))" ColSpanMd="5" />
-                        <DxFormLayoutItem Caption="Override Complimentary?" ColSpanMd="6">
-                            <DxCheckBox @bind-Checked="Course.OverrideComplimentaryPerTermFee" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="6">
+                        <DxFormLayoutItem Caption="Leaders Pay Fee?" ColSpanMd="12">
                             <DxCheckBox @bind-Checked="Course.LeadersPayTermFee" />
                         </DxFormLayoutItem>
                     </Items>
