@@ -122,14 +122,16 @@ public class MemberFeeCalculationService
                             .ToDictionaryAsync(g => g.Key, g => g.ToList());
         Log.Information("MemberFeeCalculationService: {count} Enrolments loaded in {ElapsedMilliseconds} ms", Enrolments.Count, s.ElapsedMilliseconds);
         s.Restart();
-        Classes = Enrolments
-            .SelectMany(kvp => kvp.Value) // Flatten all enrolments
-            .SelectMany(enrolment =>
-                enrolment.Course.Classes
-                    .Where(c => c != null))  // Filter out any nulls
-            .Distinct() // Optional: remove duplicates
-            .ToList() ?? new();
-
+        Classes = await dbc.Class
+                    .Where(x => x.Course.Year == BillingYear &&
+                                    (x.Course.CourseFeePerYear != 0
+                                    || x.Course.CourseFeeTerm1 != 0
+                                    || x.Course.CourseFeeTerm2 != 0
+                                    || x.Course.CourseFeeTerm3 != 0
+                                    || x.Course.CourseFeeTerm4 != 0)
+                                    )
+                    .Include(x => x.Course)
+                    .ToListAsync();
         Log.Information("MemberFeeCalculationService: Classes loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
     }
 
@@ -280,16 +282,16 @@ public class MemberFeeCalculationService
             }
         }
         // course fees
-       var courseFeeTotal = AddCourseFees(person, isComplimentary);
+        var courseFeeTotal = AddCourseFees(person, isComplimentary);
         personFinancialStatus.CourseFeesPerYear = courseFeeTotal.TotalCourseFeesPerYear;
         personFinancialStatus.CourseFeesPerTerm = courseFeeTotal.TotalCourseFeesPerTerm;
-        var leaderFeeTotal = AddLeadersFees(person);
+        var leaderFeeTotal = AddLeadersFees(person, isComplimentary);
         personFinancialStatus.CourseFeesPerYear += leaderFeeTotal.TotalCourseFeesPerYear;
         personFinancialStatus.CourseFeesPerTerm += leaderFeeTotal.TotalCourseFeesPerTerm;
         // add fee adjustments
-        personFinancialStatus.OtherFees =  AddFees(person);
+        personFinancialStatus.OtherFees = AddFees(person);
         // less payments
-       var receiptTotal = SubtractReceipts(person);
+        var receiptTotal = SubtractReceipts(person);
         personFinancialStatus.AmountReceived = receiptTotal.TotalReceipts;
         personFinancialStatus.LastReceipt = receiptTotal.LastReceiptDate ?? defaultDate;
         // total due
@@ -503,21 +505,22 @@ public class MemberFeeCalculationService
                     if (e.Course.CourseFeePerYear != 0 && !courseFeeAdded.Contains(e.CourseID))
                     {
                         var description = $"{e.Course.Name} course fee";
-                        var amount = e.Course.CourseFeePerYear;
+                        decimal amount = e.Course.CourseFeePerYear;
                         var includeInComplimentary = Settings.IncludeCourseFeePerYearInComplimentary;
-                        if (e.Course.OverrideComplimentaryPerYearFee) includeInComplimentary = false;
-                        if (IsComplimentary && includeInComplimentary)
-                        {
-                            amount = 0;
-                        }
+                        if (e.Course.OverrideComplimentaryPerYearFee) includeInComplimentary = !includeInComplimentary;
                         if (!string.IsNullOrWhiteSpace(e.Course.CourseFeePerYearDescription))
                         {
                             description += $": {e.Course.CourseFeePerYearDescription}";
                         }
+                        if (IsComplimentary && includeInComplimentary)
+                        {
+                            description = $"(Complimentary) {description}";
+                            amount = 0.00M;
+                        }
                         AddFee(person,
                             MemberFeeSortOrder.CourseFee,
                                 ConvertDateOnlyToDateTime(dateDue),
-                                description, amount, e.Course.Name,e.CourseID);
+                                description, amount, e.Course.Name, e.CourseID);
                         result.TotalCourseFeesPerYear += amount;
                         courseFeeAdded.Add(e.CourseID);
                     }
@@ -543,7 +546,7 @@ public class MemberFeeCalculationService
                     if (isTermFeeDue)
                     {
                         var description = $"{e.Course.Name} fee";
-                        var amount = 0M;
+                        decimal amount = 0.00M;
                         MemberFeeSortOrder sortOrder = default;
                         switch (t.TermNumber)
                         {
@@ -567,17 +570,18 @@ public class MemberFeeCalculationService
                                 break;
                         }
                         var includeInComplimentary = Settings.IncludeCourseFeePerTermInComplimentary;
-                        if (e.Course.OverrideComplimentaryPerTermFee) includeInComplimentary = false;
-                        if (IsComplimentary && includeInComplimentary)
-                        {
-                            amount = 0;
-                        }
+                        if (e.Course.OverrideComplimentaryPerTermFee) includeInComplimentary = !includeInComplimentary;
                         if (!string.IsNullOrWhiteSpace(e.Course.CourseFeePerTermDescription))
                         {
                             description += $": {e.Course.CourseFeePerTermDescription}";
                         }
+                        if (IsComplimentary && includeInComplimentary)
+                        {
+                            amount = 0.00M;
+                            description = $"Complimentary) {description}";
+                        }
                         AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dateDue),
-                            $"{t.Name}: {description}", amount, e.Course.Name,e.CourseID);
+                            $"{t.Name}: {description}", amount, e.Course.Name, e.CourseID);
                         result.TotalCourseFeesPerTerm += amount;
                     }
                 }
@@ -586,7 +590,7 @@ public class MemberFeeCalculationService
         return result;
     }
 
-    private (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) AddLeadersFees(Person person)
+    private (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) AddLeadersFees(Person person, bool isComplimentary)
     {
         (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) result = (0, 0);
         DateOnly today = DateOnly.FromDateTime(localTime);
@@ -604,16 +608,25 @@ public class MemberFeeCalculationService
             dueDate = c.Course.CourseFeePerYearDueDate ?? new DateOnly(BillingYear, 1, 1);
             if (dueDate <= today)
             {
-                if (c.Course.CourseFeePerYear != 0 && c.Course.LeadersPayYearFee && !courseFeeAdded.Contains(c.CourseID))
+                if (c.Course.CourseFeePerYear != 0
+                        && c.Course.LeadersPayYearFee
+                        && !courseFeeAdded.Contains(c.CourseID))
                 {
                     var description = $"{c.Course.Name} course fee";
-                    var amount = c.Course.CourseFeePerYear;
+                    decimal amount = c.Course.CourseFeePerYear;
                     if (!string.IsNullOrWhiteSpace(c.Course.CourseFeePerYearDescription))
                     {
                         description += $": {c.Course.CourseFeePerYearDescription}";
                     }
+                    var includeInComplimentary = Settings.IncludeCourseFeePerYearInComplimentary;
+                    if (c.Course.OverrideComplimentaryPerYearFee) includeInComplimentary = !includeInComplimentary;
+                    if (isComplimentary && includeInComplimentary)
+                    {
+                        amount = 0.00M;
+                        description = $"(Complimentary) {description}";
+                    }
                     AddFee(person, MemberFeeSortOrder.CourseFee, ConvertDateOnlyToDateTime(dueDate),
-                                description, amount, c.Course.Name,c.CourseID);
+                                description, amount, c.Course.Name, c.CourseID);
                     result.TotalCourseFeesPerYear += amount;
                     courseFeeAdded.Add(c.CourseID);
                 }
@@ -628,13 +641,13 @@ public class MemberFeeCalculationService
                 if (classTerms.Contains((c, t))) continue;
                 var dueDateAdjustment = c.Course.CourseFeePerTermDueWeeks ?? 0;
                 dueDate = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
-                if (c.Course.CourseFeePerTerm != 0
-                        && c.Course.LeadersPayTermFee && dueDate <= today)
+                if (c.Course.LeadersPayTermFee
+                        && dueDate <= today)
                 {
                     if (isClassHeldThisTerm(c, t))
                     {
                         var description = $"{c.Course.Name} fee";
-                        var amount = c.Course.CourseFeePerTerm;
+                        decimal amount = 0.00M;
                         if (!string.IsNullOrWhiteSpace(c.Course.CourseFeePerTermDescription))
                         {
                             description += $": {c.Course.CourseFeePerTermDescription}";
@@ -643,19 +656,30 @@ public class MemberFeeCalculationService
                         switch (t.TermNumber)
                         {
                             case 1:
+                                amount = c.Course.CourseFeeTerm1;
                                 sortOrder = MemberFeeSortOrder.Term1Fee;
                                 break;
                             case 2:
+                                amount = c.Course.CourseFeeTerm2;
                                 sortOrder = MemberFeeSortOrder.Term2Fee;
                                 break;
                             case 3:
+                                amount = c.Course.CourseFeeTerm3;
                                 sortOrder = MemberFeeSortOrder.Term3Fee;
                                 break;
                             case 4:
+                                amount = c.Course.CourseFeeTerm4;
                                 sortOrder = MemberFeeSortOrder.Term4Fee;
                                 break;
                             default:
                                 break;
+                        }
+                        var includeInComplimentary = Settings.IncludeCourseFeePerTermInComplimentary;
+                        if (c.Course.OverrideComplimentaryPerTermFee) includeInComplimentary = !includeInComplimentary;
+                        if (isComplimentary && includeInComplimentary)
+                        {
+                            amount = 0.00M;
+                            description = $"(Complimentary) {description}";
                         }
                         AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dueDate),
                             $"{t.Name}: {description}", amount, c.Course.Name, c.CourseID);
@@ -696,7 +720,7 @@ public class MemberFeeCalculationService
             Description = description,
             Amount = value,
             Course = Course,
-            CourseID= CourseID
+            CourseID = CourseID
         });
         ConcurrentBag<MemberFee> fees;
         if (!MemberFees.TryGetValue(person.ID, out fees))
