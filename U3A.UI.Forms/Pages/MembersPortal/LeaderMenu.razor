@@ -171,30 +171,22 @@ else
             case MenuOptions.VenueDetails:
                 <DxFormLayout CssClass="col col-12 col-md-8 col-lg-6 mx-auto">
                     <div class="fw-bold text-fl-primary mt-3">Venue</div>
-                    <DxFormLayoutItem Caption="Name" ColSpanMd="12" Context="layoutContext">
-                        <Template>
-                            <div class="text-box border-fl-neutral">@selectedVenue.Name</div>
-                        </Template>
-                    </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Address" ColSpanMd="12" Context="layoutContext">
                         <Template>
-                            <div class="text-box border-fl-neutral">@selectedVenue.Address</div>
+                            <div class="text-box border-fl-neutral">
+                                @selectedVenue.Name<br />
+                                @selectedVenue.Address
+                            </div>
                         </Template>
                     </DxFormLayoutItem>
                     <div class="fw-bold text-fl-primary mt-1">Contact</div>
                     <DxFormLayoutItem Caption="Coordinator" ColSpanMd="12" Context="layoutContext">
                         <Template>
-                            <div class="text-box border-fl-neutral">@selectedVenue.Coordinator</div>
-                        </Template>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Phone" ColSpanMd="12" Context="layoutContext">
-                        <Template>
-                            <div class="text-box border-fl-neutral">@selectedVenue.Phone</div>
-                        </Template>
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Email" ColSpanMd="12" Context="layoutContext">
-                        <Template>
-                            <div class="text-box border-fl-neutral">@selectedVenue.Email</div>
+                            <div class="text-box border-fl-neutral">
+                                <span>@selectedVenue.Coordinator</span>
+                                <span><b>Phone:</b>&nbsp;@selectedVenue.Phone</span>
+                                <span><b>Email:</b>&nbsp;@selectedVenue.Email</span>
+                            </div>
                         </Template>
                     </DxFormLayoutItem>
                     <div class="fw-bold text-fl-primary mt-1">Access</div>
@@ -209,7 +201,7 @@ else
                         </Template>
                     </DxFormLayoutItem>
                     <div class="fw-bold text-fl-primary mt-1">Other</div>
-                    <DxFormLayoutItem Caption="Equipment Available" ColSpanMd="12" Context="layoutContext">
+                    <DxFormLayoutItem Caption="Equipment" ColSpanMd="12" Context="layoutContext">
                         <Template>
                             <div class="text-box border-fl-neutral">@(new MarkupString(selectedVenue.Equipment?.Replace("\n", "<br/>")))</div>
                         </Template>
@@ -473,10 +465,12 @@ else
     </div>
 }
 <style>
-    /* d-flex p-1 border align-text-center */
     .text-box {
         display: flex;
-        text-align: center;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-wrap: wrap;
         min-height: 1.75rem;
         padding: 0.25rem;
     }
