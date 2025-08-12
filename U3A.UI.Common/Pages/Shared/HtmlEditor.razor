@@ -5,6 +5,7 @@
 @using AngleSharp.Html
 @using AngleSharp.Html.Dom
 @using AngleSharp.Html.Parser
+@using Ganss.Xss
 @using DevExpress.AIIntegration.Blazor.HtmlEditor
 @using DevExpress.Blazor
 
@@ -40,6 +41,7 @@
             </AdditionalItems>
         </DxHtmlEditor>
         <div class="pt-1">
+            <DxButton Text="Sanitize" Click="@OnSanitize" />
             <small>
                 <b>Hint:</b> <span class=key-style>Enter</span> = paragraph break;
                 <span class=key-style>SHIFT</span> +
@@ -172,10 +174,10 @@
                 if (current.ChildNodes.Length == 1 &&
                     current.FirstChild is IHtmlBreakRowElement &&
                     next is IHtmlParagraphElement)
-                    {
-                        // Remove the <br> paragraph
-                        current.Remove();
-                    }
+                {
+                    // Remove the <br> paragraph
+                    current.Remove();
+                }
             }
             result = document.Minify();
         }
@@ -190,4 +192,14 @@
                     Do you wish to continue?");
     }
 
+    async Task OnSanitize()
+    {
+        var sanitizer = new HtmlSanitizer();
+        sanitizer.AllowedCssProperties.Remove("font-family");
+        sanitizer.AllowedCssProperties.Remove("font-size");
+        sanitizer.AllowedCssProperties.Remove("color");
+        sanitizer.AllowedCssProperties.Remove("background-color");
+        Markup = sanitizer.SanitizeDocument(Markup, "");
+        await messageBox!.ShowAsync("Sanitize complete", "Your html code has been successfully sanitized.");
+    }
 }
