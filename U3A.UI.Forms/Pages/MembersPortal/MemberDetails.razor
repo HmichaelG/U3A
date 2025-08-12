@@ -90,7 +90,9 @@ else
                                                 Mask="@DateTimeMask.MonthAndYear"
                                                 NullText="(Optional) Month & Year only."
                                                 CalendarViewMode="CalendarViewMode.Year"
-                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password" />
+                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" autocomplete="new-password">
+                                        <DxDateTimeMaskProperties CaretMode="@MaskCaretMode.Advancing" />
+                                    </DxDateEdit>
                                 </DxFormLayoutItem>
                                 <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                                     <DxMemo @bind-Text="@person.Occupation" Rows="3" CssClass="w-100"

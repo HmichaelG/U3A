@@ -229,7 +229,9 @@
                                                         <DxDateEdit @bind-Date="@editItem.BirthDate" DisplayFormat="@constants.LONG_MONTH_AND_YEAR_FORMAT"   
                                                                     Mask="@DateTimeMask.MonthAndYear"
                                                                     NullText="(Optional) Month & Year only."
-                                                                    CalendarViewMode="CalendarViewMode.Year" />
+                                                                    CalendarViewMode="CalendarViewMode.Year" >
+                                                                    <DxDateTimeMaskProperties CaretMode="@MaskCaretMode.Advancing" />
+                                                        </DxDateEdit>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                                                         <DxMemo @bind-Text="@editItem.Occupation" Rows="3" autocomplete="new-password" CssClass="w-100" />
