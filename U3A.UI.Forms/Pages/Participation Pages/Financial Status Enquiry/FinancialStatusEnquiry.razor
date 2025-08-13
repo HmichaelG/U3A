@@ -286,6 +286,7 @@
         var op = GroupOperator.And(opFees, opFinToYears);
         mainGrid.SetFilterCriteria(op);
         Log.Information("Financial Status Enquiry: On Process {0}",s.ElapsedMilliseconds);
+        StateHasChanged();
     }
 
     string[] customBools = { "IsComplimentary",
