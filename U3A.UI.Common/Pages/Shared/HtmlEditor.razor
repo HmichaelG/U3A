@@ -40,14 +40,14 @@
                 }
             </AdditionalItems>
         </DxHtmlEditor>
-        <div class="pt-1">
-            <DxButton Text="Sanitize" Click="@OnSanitize" />
             <small>
-                <b>Hint:</b> <span class=key-style>Enter</span> = paragraph break;
+            <div class="py-1">Always <DxButton Text="Sanitise" Click="@OnSanitise" /> after you copy / paste text.</div>
+                <div>
+                    <b>Hint:</b> <span class=key-style>Enter</span> = paragraph break;
                 <span class=key-style>SHIFT</span> +
                 <span class=key-style>Enter</span> = line break.
+                </div>
             </small>
-        </div>
     </DxTabPage>
     <DxTabPage Text="Code" Click="() => {Markup = PrettyPrint(Markup);
                                             isCodeEditable=false;
@@ -192,7 +192,7 @@
                     Do you wish to continue?");
     }
 
-    async Task OnSanitize()
+    async Task OnSanitise()
     {
         var sanitizer = new HtmlSanitizer();
         sanitizer.AllowedCssProperties.Remove("font-family");
@@ -200,6 +200,6 @@
         sanitizer.AllowedCssProperties.Remove("color");
         sanitizer.AllowedCssProperties.Remove("background-color");
         Markup = sanitizer.SanitizeDocument(Markup, "");
-        await messageBox!.ShowAsync("Sanitize complete", "Your html code has been successfully sanitized.");
+        await messageBox!.ShowAsync("Sanitise complete", "Your html code has been successfully sanitised.");
     }
 }
