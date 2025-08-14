@@ -57,12 +57,6 @@ else
                         <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
                                            AllowedAreas="@allowFilterRowColumn"
                                            Area="@PivotTableArea.Row" />
-                        <DxPivotTableField Field="@nameof(MemberFee.PersonID)" Caption="Count"
-                                           SummaryType="PivotTableSummaryType.Count"
-                                           AllowedAreas="@allowDataAndFilter"
-                                           Area="@PivotTableArea.Data">
-                                           
-                        </DxPivotTableField>
                         <DxPivotTableField Field="@nameof(MemberFee.Amount)" Caption="Due"
                                            AllowedAreas="@allowDataAndFilter"
                                            Area="@PivotTableArea.Data" />
