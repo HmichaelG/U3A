@@ -144,7 +144,6 @@ else
     string? ErrorHeader;
     string? ErrorMessage;
     U3ADbContext? dbc { get; set; }
-    MemberFeeCalculationService service;
     Term? currentTerm;
 
     protected override async Task OnInitializedAsync()
@@ -255,6 +254,7 @@ else
     {
         var person = fee.Person;
         var maxDate = DateTime.MaxValue;
+        var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, person);
         var minMembershipFee = service.CalculateMinimumFeePayable(person);
         var paidToDate = await BusinessRule.GetPreviouslyPaidAsync(dbc, person.ID, ProcessingYear, maxDate);
         // Set FinancialTo if amount paid greater than minimum amount

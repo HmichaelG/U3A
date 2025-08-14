@@ -190,8 +190,7 @@ public class MemberFeeCalculationService
     {
         var result = 0m;
         result = Fees
-                    .Where(x => !x.Person.IsDeleted
-                                && x.PersonID == person.ID
+                    .Where(x => x.PersonID == person.ID
                                 && x.IsMembershipFee)
                     .Sum(x => x.Amount);
         return result;
@@ -357,8 +356,7 @@ public class MemberFeeCalculationService
         {
             result = CalculateMembershipFee(person);
             result += Fees
-                        .Where(x => !x.Person.IsDeleted
-                                    && x.PersonID == person.ID
+                        .Where(x => x.PersonID == person.ID
                                     && x.IsMembershipFee)
                         .Sum(x => x.Amount);
             if (CalculateForTerm.HasValue) { result = decimal.Round(result / 4m * (decimal)CalculateForTerm, 2); }
@@ -731,10 +729,7 @@ public class MemberFeeCalculationService
         fees.Add(fee);
     }
 
-    public DateTime ConvertDateOnlyToDateTime(DateOnly date)
-    {
-        return new DateTime(date.Year, date.Month, date.Day);
-    }
+    private DateTime ConvertDateOnlyToDateTime(DateOnly date) => new DateTime(date.Year, date.Month, date.Day);
     private int ActiveCourseCount(Person person)
     {
         List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
