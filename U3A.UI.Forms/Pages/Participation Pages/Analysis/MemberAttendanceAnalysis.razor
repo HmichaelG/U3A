@@ -44,6 +44,10 @@ else
                                            AllowedAreas="@allowFilterRowColumn"
                                            GroupInterval="PivotTableGroupInterval.Date"
                                            Area="@PivotTableArea.Filter" />
+                        <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Classes"
+                                           AllowedAreas="@allowDataAndFilter"
+                                           SummaryType="PivotTableSummaryType.CountDistinct" 
+                                           Area="@PivotTableArea.Filter" />
                         <DxPivotTableField Field="@nameof(AttendClass.Date)" Caption="Month"
                                            AllowedAreas="@allowFilterRowColumn"
                                            GroupInterval="PivotTableGroupInterval.DateMonth"

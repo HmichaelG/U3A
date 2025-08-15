@@ -9,8 +9,15 @@ public static class DatabaseContextServiceExtension
 {
     public static WebApplicationBuilder AddDatabaseContext(this WebApplicationBuilder builder, string connectionString)
     {
-        builder.Services.AddDbContext<U3ADbContext>();
-        builder.Services.AddDbContext<TenantDbContext>();
+        builder.Services.AddDbContext<U3ADbContext>(options =>
+        {
+            options.UseSqlServer(connectionString);
+        }, ServiceLifetime.Scoped);
+
+        builder.Services.AddDbContext<TenantDbContext>(options =>
+        {
+            options.UseSqlServer(connectionString);
+        }, ServiceLifetime.Scoped);
 
         // TenantDbContextFactory
 
