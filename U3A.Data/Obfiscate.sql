@@ -21,7 +21,7 @@ IF (@OBFISCATE = 1)
                 ,ICEPhone
                 ,Postcode
                 ,Email
-                ,LastName
+                --,LastName
                 ,Address
                 ,ICEContact
                 ,City
@@ -30,8 +30,8 @@ IF (@OBFISCATE = 1)
     )
     UPDATE Person
             SET
-		       LastName = (SELECT TOP 1 LastName FROM cte WHERE p.Id = p.Id ORDER BY NEWID())
-		       ,mobile = (SELECT TOP 1 mobile FROM cte WHERE p.Id = p.Id ORDER BY NEWID())
+		       --LastName = (SELECT TOP 1 LastName FROM cte WHERE p.Id = p.Id ORDER BY NEWID()),
+		       mobile = (SELECT TOP 1 mobile FROM cte WHERE p.Id = p.Id ORDER BY NEWID())
 		       ,HomePhone = (SELECT TOP 1 HomePhone FROM cte WHERE p.Id = p.Id ORDER BY NEWID())
  		       ,ICEContact = (SELECT TOP 1 ICEContact FROM cte WHERE p.Id = p.Id ORDER BY NEWID())
 		       ,ICEPhone = (SELECT TOP 1 ICEPhone FROM cte WHERE p.Id = p.Id ORDER BY NEWID())
@@ -41,7 +41,7 @@ IF (@OBFISCATE = 1)
 		       ,City = (SELECT TOP 1 City FROM cte WHERE p.Id = p.Id ORDER BY NEWID())
 		    from cte p
 
-        UPDATE Person
-            SET LastName = UPPER(substring(LastName,1,1)) + RIGHT(LastName,LEN(LastName)-1)
+        --UPDATE Person
+        --    SET LastName = UPPER(substring(LastName,1,1)) + RIGHT(LastName,LEN(LastName)-1)
     END
 

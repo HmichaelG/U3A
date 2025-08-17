@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.Security.Cryptography;
+using U3A.Model;
 
 namespace U3A.Extensions.HostBuilder;
 
@@ -39,7 +40,10 @@ public static class SerilogLoggingExtensions
                     logEvent.Exception is ObjectDisposedException ||
                     logEvent.Exception is AntiforgeryValidationException ||
                     logEvent.Exception is CryptographicException ||
-                    logEvent.Exception is JSDisconnectedException)
+                    logEvent.Exception is JSDisconnectedException ||
+                    (logEvent.Properties["LogEvent"] == null
+                        && logEvent.Properties["Tenant"] == null
+                        && logEvent.Properties["User"] == null))
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
             .WriteTo.Logger(lc => lc
