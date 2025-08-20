@@ -18,168 +18,171 @@
 @inject IToastNotificationService ToastService
 @inject IJSRuntime js
 
-<DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
-<MessageBox @ref=messageBox />
+@if (isReady)
+{
+    <DxToastProvider Name="Result" AnimationType="ToastAnimationType.Slide" ShowIcon="true" />
+    <MessageBox @ref=messageBox />
 
-<NavigationLock ConfirmExternalNavigation="@(IsGridEditing())"
-                OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+    <NavigationLock ConfirmExternalNavigation="@(IsGridEditing())"
+                    OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
-<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" hidden="@(!Visible)"
-           ItemClick="OnItemClick">
-    <Items>
-        @CustomButtonContentAtStart
-        <DxToolbarItem IconCssClass="bi bi-check2-square" Name="SelectedOnly" Text="@showSelectedOnlyText"
-                       BeginGroup=true Visible="@areRowsSelectable"
-                       Alignment="ToolbarItemAlignment.Left"
-                       CssClass="column-chooser-button"
-                       Tooltip="@showSelectedOnlyTooltip">
-        </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
-                       Visible="@(LinkedGrid?.GetGroupCount() > 0 && !HideGroupPanel)"
-                       BeginGroup="true"
-                       Alignment="ToolbarItemAlignment.Left">
-            <Items>
-                <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
-                               Name="CollapseGroups" Text="Collapse Group Rows"
-                               Tooltip="Collapse grouped rows">
-                </DxToolbarItem>
-                <DxToolbarItem IconCssClass="bi bi-arrows-expand"
-                               Name="ExpandGroups" Text="Expand Group Rows"
-                               Tooltip="Expand grouped rows">
-                </DxToolbarItem>
-                <DxToolbarItem BeginGroup IconCssClass="bi bi-calendar3" Text="Group Dates By">
-                    <Items>
-                        <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Day" Text="Day"
-                                       Tooltip="Group dates by day">
-                        </DxToolbarItem>
-                        <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Month" Text="Month"
-                                       Tooltip="Group dates by month">
-                        </DxToolbarItem>
-                        <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Year" Text="Year"
-                                       Tooltip="Group dates by year">
-                        </DxToolbarItem>
-                    </Items>
-                </DxToolbarItem>
-            </Items>
-        </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-collection" Text="Master/Detail" Visible=@IsMasterDetail
-                       Alignment="ToolbarItemAlignment.Right"
-                       BeginGroup=true>
-            <Items>
-                <DxToolbarItem IconCssClass="bi bi-arrows-expand"
-                               Name="ShowDetails" Text="Show Detail Rows"
-                               Tooltip="Show Detail rows">
-                </DxToolbarItem>
-                <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
-                               Name="HideDetails" Text="Hide Detail Rows"
-                               Tooltip="Hide Detail rows">
-                </DxToolbarItem>
-            </Items>
-        </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-arrows" Name="AutoFit" Text="Auto Fit"
-                       BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right"
-                       CssClass="column-chooser-button"
-                       Tooltip="Adjust column size to fit cell content">
-        </DxToolbarItem>
-        @if (LayoutKey == null)
-        {
-            <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Choose" Text="Choose"
-                           BeginGroup=true
-                           Alignment="ToolbarItemAlignment.Right"
+    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" hidden="@(!Visible)"
+               ItemClick="OnItemClick">
+        <Items>
+            @CustomButtonContentAtStart
+            <DxToolbarItem IconCssClass="bi bi-check2-square" Name="SelectedOnly" Text="@showSelectedOnlyText"
+                           BeginGroup=true Visible="@areRowsSelectable"
+                           Alignment="ToolbarItemAlignment.Left"
                            CssClass="column-chooser-button"
-                           Tooltip="Customise column display">
+                           Tooltip="@showSelectedOnlyTooltip">
             </DxToolbarItem>
-        }
-        else
-        {
-            <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Layout" Text="Layout"
-                           BeginGroup=true
-                           Alignment="ToolbarItemAlignment.Right"
-                           CssClass="column-chooser-button"
-                           Tooltip="Customise column layout">
+            <DxToolbarItem IconCssClass="bi bi-collection" Text="Group Rows..."
+                           Visible="@(LinkedGrid?.GetGroupCount() > 0 && !HideGroupPanel)"
+                           BeginGroup="true"
+                           Alignment="ToolbarItemAlignment.Left">
                 <Items>
-                    <DxToolbarItem IconCssClass="bi bi-list-columns-reverse"
-                                   Name="Choose" Text="Choose fields"
-                                   Tooltip="Choose columns to display">
+                    <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
+                                   Name="CollapseGroups" Text="Collapse Group Rows"
+                                   Tooltip="Collapse grouped rows">
                     </DxToolbarItem>
-                    <DxToolbarItem IconCssClass="bi bi-floppy"
-                                   Name="SaveLayout" Text="Save Layout"
-                                   Tooltip="Save the current layout">
+                    <DxToolbarItem IconCssClass="bi bi-arrows-expand"
+                                   Name="ExpandGroups" Text="Expand Group Rows"
+                                   Tooltip="Expand grouped rows">
                     </DxToolbarItem>
-                    <DxToolbarItem IconCssClass="bi bi-arrow-counterclockwise"
-                                   Name="ResetLayout" Text="Reset Default Layout"
-                                   Tooltip="Reset column layout to its default">
+                    <DxToolbarItem BeginGroup IconCssClass="bi bi-calendar3" Text="Group Dates By">
+                        <Items>
+                            <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Day" Text="Day"
+                                           Tooltip="Group dates by day">
+                            </DxToolbarItem>
+                            <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Month" Text="Month"
+                                           Tooltip="Group dates by month">
+                            </DxToolbarItem>
+                            <DxToolbarItem IconCssClass="bi bi-calendar3" Name="Year" Text="Year"
+                                           Tooltip="Group dates by year">
+                            </DxToolbarItem>
+                        </Items>
                     </DxToolbarItem>
                 </Items>
             </DxToolbarItem>
-        }
-        <DxToolbarItem IconCssClass="bi bi-funnel" Name="Filter" Text="Filter"
-                       BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right"
-                       Tooltip="Filter / search for records">
-        </DxToolbarItem>
-        <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel" Name="ToExcel" BeginGroup=true
-                       Alignment="ToolbarItemAlignment.Right"
-                       Tooltip="Export the grid to Excel" />
-        <DxToolbarItem IconCssClass="bi bi-printer" Text="Print" Name="ToPdf"
-                       Alignment="ToolbarItemAlignment.Right"
-                       id="dropdown-target-container"
-                       Tooltip="Create a Pdf report from the grid" />
-        @CustomButtonContent
-    </Items>
-</DxToolbar>
-
-<DxDropDown @bind-IsOpen="@isDropDownOpen"
-            Id="dropDown-overview"
-            FooterVisible="true"
-            HeaderVisible="true"
-            HeaderText="@($"{((showPdfOptions) ? "Print" : "Excel")} Parameters")"
-            PositionMode="DropDownPositionMode.Bottom"
-            Width="max(25vw, 250px)"
-            PositionTarget="#dropdown-target-container"
-            RestrictionTarget="#dropdown-target-container"
-            CloseMode="DropDownCloseMode.Close"
-            PreventCloseOnPositionTargetClick="true">
-    <BodyContentTemplate>
-        <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
-            <DxFormLayoutItem Caption="Title" ColSpanMd="12" Context="titleContext">
-                <DxMemo @bind-Text=@reportTitle Rows="3" CssClass="w-100" />
-            </DxFormLayoutItem>
-            @if (showPdfOptions)
+            <DxToolbarItem IconCssClass="bi bi-collection" Text="Master/Detail" Visible=@IsMasterDetail
+                           Alignment="ToolbarItemAlignment.Right"
+                           BeginGroup=true>
+                <Items>
+                    <DxToolbarItem IconCssClass="bi bi-arrows-expand"
+                                   Name="ShowDetails" Text="Show Detail Rows"
+                                   Tooltip="Show Detail rows">
+                    </DxToolbarItem>
+                    <DxToolbarItem IconCssClass="bi bi-arrows-collapse"
+                                   Name="HideDetails" Text="Hide Detail Rows"
+                                   Tooltip="Hide Detail rows">
+                    </DxToolbarItem>
+                </Items>
+            </DxToolbarItem>
+            <DxToolbarItem IconCssClass="bi bi-arrows" Name="AutoFit" Text="Auto Fit"
+                           BeginGroup=true
+                           Alignment="ToolbarItemAlignment.Right"
+                           CssClass="column-chooser-button"
+                           Tooltip="Adjust column size to fit cell content">
+            </DxToolbarItem>
+            @if (LayoutKey == null)
             {
-                <DxFormLayoutItem Caption="Print Portrait?" CssClass="mt-2"
-                                  ColSpanMd="12" Context="orientationContext">
-                    <DxCheckBox @bind-Checked=@IsPortrait />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Column Widths" CssClass="mt-1"
-                                  ColSpanMd="12" Context="orientationContext">
-                    <DxRadioGroup Items="@(new List<string> { DEFAULT_FIT_TO_PAGE, "Fit column width" })"
-                                  @bind-Value="@fitStyle" Layout="RadioGroupLayout.Horizontal" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Font Size" CssClass="mt-1"
-                                  ColSpanMd="12" Context="fontContext">
-                    <DxRadioGroup Items="@(new List<int> { 8, 10, 12 })"
-                                  @bind-Value="@pdfFontSize" Layout="RadioGroupLayout.Horizontal" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Page Size" CssClass="mt-1"
-                                  ColSpanMd="12" Context="fontContext">
-                    <DxRadioGroup Items="@(new List<string> { DEFAULT_PAGE_SIZE, "A3" })"
-                                  @bind-Value="@pdfPageSize" Layout="RadioGroupLayout.Horizontal" />
-                </DxFormLayoutItem>
+                <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Choose" Text="Choose"
+                               BeginGroup=true
+                               Alignment="ToolbarItemAlignment.Right"
+                               CssClass="column-chooser-button"
+                               Tooltip="Customise column display">
+                </DxToolbarItem>
             }
-        </DxFormLayoutGroup>
-    </BodyContentTemplate>
-    <FooterContentTemplate Context="footerContext">
-        <div class="links-container">
-            <DxWaitIndicator Visible="@isExporting" />
-            <DxButton Text="@((showExcelOptions) ? "Export" : "Print")" Click="OnDropDownClick" />
-            <DxButton Text="Close" RenderStyle=@ButtonRenderStyle.Secondary Click="@(() => isDropDownOpen = false)" />
-        </div>
-    </FooterContentTemplate>
-</DxDropDown>
+            else
+            {
+                <DxToolbarItem IconCssClass="bi bi-list-columns-reverse" Name="Layout" Text="Layout"
+                               BeginGroup=true
+                               Alignment="ToolbarItemAlignment.Right"
+                               CssClass="column-chooser-button"
+                               Tooltip="Customise column layout">
+                    <Items>
+                        <DxToolbarItem IconCssClass="bi bi-list-columns-reverse"
+                                       Name="Choose" Text="Choose fields"
+                                       Tooltip="Choose columns to display">
+                        </DxToolbarItem>
+                        <DxToolbarItem IconCssClass="bi bi-floppy"
+                                       Name="SaveLayout" Text="Save Layout"
+                                       Tooltip="Save the current layout">
+                        </DxToolbarItem>
+                        <DxToolbarItem IconCssClass="bi bi-arrow-counterclockwise"
+                                       Name="ResetLayout" Text="Reset Default Layout"
+                                       Tooltip="Reset column layout to its default">
+                        </DxToolbarItem>
+                    </Items>
+                </DxToolbarItem>
+            }
+            <DxToolbarItem IconCssClass="bi bi-funnel" Name="Filter" Text="Filter"
+                           BeginGroup=true
+                           Alignment="ToolbarItemAlignment.Right"
+                           Tooltip="Filter / search for records">
+            </DxToolbarItem>
+            <DxToolbarItem IconCssClass="bi bi-file-spreadsheet" Text="Excel" Name="ToExcel" BeginGroup=true
+                           Alignment="ToolbarItemAlignment.Right"
+                           Tooltip="Export the grid to Excel" />
+            <DxToolbarItem IconCssClass="bi bi-printer" Text="Print" Name="ToPdf"
+                           Alignment="ToolbarItemAlignment.Right"
+                           id="dropdown-target-container"
+                           Tooltip="Create a Pdf report from the grid" />
+            @CustomButtonContent
+        </Items>
+    </DxToolbar>
 
-<PdfViewer @bind-PdfIsReady=@pdfIsReady DocumentContent="@pdfContent" ReportTitle="@reportTitle" />
+    <DxDropDown @bind-IsOpen="@isDropDownOpen"
+                Id="dropDown-overview"
+                FooterVisible="true"
+                HeaderVisible="true"
+                HeaderText="@($"{((showPdfOptions) ? "Print" : "Excel")} Parameters")"
+                PositionMode="DropDownPositionMode.Bottom"
+                Width="max(25vw, 250px)"
+                PositionTarget="#dropdown-target-container"
+                RestrictionTarget="#dropdown-target-container"
+                CloseMode="DropDownCloseMode.Close"
+                PreventCloseOnPositionTargetClick="true">
+        <BodyContentTemplate>
+            <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+                <DxFormLayoutItem Caption="Title" ColSpanMd="12" Context="titleContext">
+                    <DxMemo @bind-Text=@reportTitle Rows="3" CssClass="w-100" />
+                </DxFormLayoutItem>
+                @if (showPdfOptions)
+                {
+                    <DxFormLayoutItem Caption="Print Portrait?" CssClass="mt-2"
+                                      ColSpanMd="12" Context="orientationContext">
+                        <DxCheckBox @bind-Checked=@IsPortrait />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Column Widths" CssClass="mt-1"
+                                      ColSpanMd="12" Context="orientationContext">
+                        <DxRadioGroup Items="@(new List<string> { DEFAULT_FIT_TO_PAGE, "Fit column width" })"
+                                      @bind-Value="@fitStyle" Layout="RadioGroupLayout.Horizontal" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Font Size" CssClass="mt-1"
+                                      ColSpanMd="12" Context="fontContext">
+                        <DxRadioGroup Items="@(new List<int> { 8, 10, 12 })"
+                                      @bind-Value="@pdfFontSize" Layout="RadioGroupLayout.Horizontal" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Page Size" CssClass="mt-1"
+                                      ColSpanMd="12" Context="fontContext">
+                        <DxRadioGroup Items="@(new List<string> { DEFAULT_PAGE_SIZE, "A3" })"
+                                      @bind-Value="@pdfPageSize" Layout="RadioGroupLayout.Horizontal" />
+                    </DxFormLayoutItem>
+                }
+            </DxFormLayoutGroup>
+        </BodyContentTemplate>
+        <FooterContentTemplate Context="footerContext">
+            <div class="links-container">
+                <DxWaitIndicator Visible="@isExporting" />
+                <DxButton Text="@((showExcelOptions) ? "Export" : "Print")" Click="OnDropDownClick" />
+                <DxButton Text="Close" RenderStyle=@ButtonRenderStyle.Secondary Click="@(() => isDropDownOpen = false)" />
+            </div>
+        </FooterContentTemplate>
+    </DxDropDown>
+
+    <PdfViewer @bind-PdfIsReady=@pdfIsReady DocumentContent="@pdfContent" ReportTitle="@reportTitle" />
+}
 
 @code {
 
@@ -212,6 +215,7 @@
     string reportTitle = "";
     bool pdfIsReady = false;
     Byte[]? pdfContent = null;
+    bool isReady;
 
 
     protected override async Task OnInitializedAsync()
@@ -248,6 +252,7 @@
             dxGrid.EndUpdate();
         }
         ToggleShowSelectedOnly();
+        isReady = true;
     }
 
     object? savedData = null;

@@ -739,6 +739,7 @@ public class MemberFeeCalculationService
                                     !x.IsWaitlisted)
                         .DistinctBy(x => x.CourseID).Count();
     }
+
     private int WaitlistedCourseCount(Person person)
     {
         List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
