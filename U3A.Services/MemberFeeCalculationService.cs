@@ -485,7 +485,7 @@ public class MemberFeeCalculationService
     private (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) AddCourseFees(Person person, bool IsComplimentary)
     {
         (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) result = (0, 0);
-        DateOnly today = DateOnly.FromDateTime(localTime);
+        DateTime today = localTime.Date;
         var courseFeeAdded = new ConcurrentBag<Guid>();
         List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
         enrolments = enrolments.Where(x => !x.IsDeleted
@@ -496,8 +496,10 @@ public class MemberFeeCalculationService
         {
             foreach (var e in enrolments.Where(x => x.TermID == t.ID))
             {
-                DateOnly dateEnrolled = DateOnly.FromDateTime(e.DateEnrolled.Value);
-                DateOnly dateDue = e.Course.CourseFeePerYearDueDate ?? dateEnrolled;
+                DateTime dateEnrolled = e.DateEnrolled.Value;
+                DateTime dateDue = (e.Course.CourseFeePerYearDueDate.HasValue) 
+                                        ? e.Course.CourseFeePerYearDueDate.Value.ToDateTime(TimeOnly.MinValue)
+                                        : dateEnrolled;
                 if (dateDue <= today)
                 {
                     if (e.Course.CourseFeePerYear != 0 && !courseFeeAdded.Contains(e.CourseID))
@@ -517,14 +519,13 @@ public class MemberFeeCalculationService
                         }
                         AddFee(person,
                             MemberFeeSortOrder.CourseFee,
-                                ConvertDateOnlyToDateTime(dateDue),
-                                description, amount, e.Course.Name, e.CourseID);
+                                dateDue, description, amount, e.Course.Name, e.CourseID);
                         result.TotalCourseFeesPerYear += amount;
                         courseFeeAdded.Add(e.CourseID);
                     }
                 }
                 var dueDateAdjustment = e.Course.CourseFeePerTermDueWeeks ?? 0;
-                dateDue = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
+                dateDue = t.StartDate.AddDays(dueDateAdjustment * 7);
                 if (dateDue < dateEnrolled) dateDue = dateEnrolled;
                 if (e.Course.HasTermFees && dateDue <= today)
                 {
@@ -578,7 +579,7 @@ public class MemberFeeCalculationService
                             amount = 0.00M;
                             description = $"Complimentary) {description}";
                         }
-                        AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dateDue),
+                        AddFee(person, sortOrder, dateDue,
                             $"{t.Name}: {description}", amount, e.Course.Name, e.CourseID);
                         result.TotalCourseFeesPerTerm += amount;
                     }
@@ -591,7 +592,7 @@ public class MemberFeeCalculationService
     private (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) AddLeadersFees(Person person, bool isComplimentary)
     {
         (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) result = (0, 0);
-        DateOnly today = DateOnly.FromDateTime(localTime);
+        DateTime today = localTime.Date;
         var courseFeeAdded = new ConcurrentBag<Guid>();
         List<Class> classesLead;
         classesLead = Classes.Where(x =>
@@ -599,11 +600,13 @@ public class MemberFeeCalculationService
                                         (x.LeaderID == person.ID ||
                                         x.Leader2ID == person.ID ||
                                         x.Leader3ID == person.ID)).ToList();
-        DateOnly dueDate;
+        DateTime dueDate;
         foreach (var c in classesLead)
         {
             //Fees per year
-            dueDate = c.Course.CourseFeePerYearDueDate ?? new DateOnly(BillingYear, 1, 1);
+            dueDate = (c.Course.CourseFeePerYearDueDate.HasValue) 
+                ? c.Course.CourseFeePerYearDueDate.Value.ToDateTime(TimeOnly.MinValue)
+                : new DateTime(BillingYear, 1, 1);
             if (dueDate <= today)
             {
                 if (c.Course.CourseFeePerYear != 0
@@ -623,7 +626,7 @@ public class MemberFeeCalculationService
                         amount = 0.00M;
                         description = $"(Complimentary) {description}";
                     }
-                    AddFee(person, MemberFeeSortOrder.CourseFee, ConvertDateOnlyToDateTime(dueDate),
+                    AddFee(person, MemberFeeSortOrder.CourseFee, dueDate,
                                 description, amount, c.Course.Name, c.CourseID);
                     result.TotalCourseFeesPerYear += amount;
                     courseFeeAdded.Add(c.CourseID);
@@ -638,7 +641,7 @@ public class MemberFeeCalculationService
             {
                 if (classTerms.Contains((c, t))) continue;
                 var dueDateAdjustment = c.Course.CourseFeePerTermDueWeeks ?? 0;
-                dueDate = DateOnly.FromDateTime(t.StartDate.AddDays(dueDateAdjustment * 7));
+                dueDate = t.StartDate.AddDays(dueDateAdjustment * 7);
                 if (c.Course.LeadersPayTermFee
                         && dueDate <= today)
                 {
@@ -679,7 +682,7 @@ public class MemberFeeCalculationService
                             amount = 0.00M;
                             description = $"(Complimentary) {description}";
                         }
-                        AddFee(person, sortOrder, ConvertDateOnlyToDateTime(dueDate),
+                        AddFee(person, sortOrder, dueDate,
                             $"{t.Name}: {description}", amount, c.Course.Name, c.CourseID);
                         result.TotalCourseFeesPerTerm += amount;
                         classTerms.Add((c, t));
@@ -729,7 +732,6 @@ public class MemberFeeCalculationService
         fees.Add(fee);
     }
 
-    private DateTime ConvertDateOnlyToDateTime(DateOnly date) => new DateTime(date.Year, date.Month, date.Day);
     private int ActiveCourseCount(Person person)
     {
         List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
