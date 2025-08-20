@@ -141,7 +141,7 @@ else
 
             @quickMessage
 
-            <DxGrid Data="@ClassAttendance" @ref=@mainGrid id="myGrid"
+            <DxGrid Data="@ClassAttendance" @ref=@mainGrid id="my-grid"
                     ShowSearchBox=true
                     CustomizeElement="OnCustomizeElement"
                     CssClass="grid-height"
@@ -155,7 +155,7 @@ else
                     EditMode="GridEditMode.PopupEditForm"
                     EditModelSaving="Grid_EditModelSaving">
                 <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid Visible="@(IsLargeLayout || IsXtraLargeLayout)" LayoutKey="{9C4F6177-3FAB-407A-A515-C1B30F04D836}"
+                    <GridToolbar LinkedGridId="my-grid" LinkedGrid=@mainGrid Visible="@(IsLargeLayout || IsXtraLargeLayout)" LayoutKey="{9C4F6177-3FAB-407A-A515-C1B30F04D836}"
                                  HideGroupPanel="@(!IsLargeLayout && !IsXtraLargeLayout)"
                                  HideSearchBox="@(!IsLargeLayout && !IsXtraLargeLayout)">
                         <CustomButtonContent>
@@ -528,7 +528,7 @@ else
         {
             offset = 0.4;
         }
-        var newHeight = await Window.FitToRemainingHeight(js, "myGrid", gridHeight, offset);
+        var newHeight = await Window.FitToRemainingHeight(js, "my-grid", gridHeight, offset);
         if (newHeight != gridHeight)
         {
             gridHeight = newHeight; await InvokeAsync(StateHasChanged);
