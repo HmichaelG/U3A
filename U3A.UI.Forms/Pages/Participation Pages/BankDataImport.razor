@@ -875,6 +875,11 @@ else
         {
             e.Style = "padding: 0rem; color: red; text-align: center;";
         }
+        if (e.ElementType == GridElementType.HeaderCell)
+        {
+            e.CssClass = "my-header-cell";
+            e.Attributes["fieldname"] = e.Column is DxGridDataColumn c ? c.FieldName : null;
+        }
     }
 
     async Task OnSplit()

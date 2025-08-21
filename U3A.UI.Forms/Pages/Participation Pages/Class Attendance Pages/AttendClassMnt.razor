@@ -143,7 +143,6 @@ else
 
             <DxGrid Data="@ClassAttendance" @ref=@mainGrid id="my-grid"
                     ShowSearchBox=true
-                    CustomizeElement="OnCustomizeElement"
                     CssClass="grid-height"
                     ShowAllRows="true"
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -368,12 +367,6 @@ else
 
     .grid-height {
         height: @gridHeight;
-    }
-
-    .removeWrapping {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
 
 </style>
@@ -1048,14 +1041,6 @@ else
                 delayedStart);
             await ProgressBar.Close();
             await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
-        }
-    }
-
-    void OnCustomizeElement(GridCustomizeElementEventArgs args)
-    {
-        if (args.ElementType == GridElementType.DataCell)
-        {
-            args.CssClass = "removeWrapping";
         }
     }
 

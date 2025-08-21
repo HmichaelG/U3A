@@ -25,7 +25,7 @@ else
                 then click <span class="text-fl-warning h6 bi bi-pencil"></span> to edit,
                 click the <span class="text-fl-danger h6 bi bi-trash"></span> to delete.
             </div>
-            <DxGrid @ref="Grid" CustomizeElement="OnCustomizeElement"
+            <DxGrid @ref="Grid" 
                     CssClass="grid-height" id="myGrid"
                     Data="DataSource"
                     PageSize="12"
@@ -91,12 +91,6 @@ else
     </DxFormLayout>
 }
 <style>
-    .removeWrapping {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
     .grid-height {
         height: calc(100dvh - @(SetGridHeightOffset()))
     }
@@ -240,14 +234,6 @@ else
             await RefreshData();
             selectedLeave = null;
             InvokeAsync(StateHasChanged);
-        }
-    }
-
-    void OnCustomizeElement(GridCustomizeElementEventArgs args)
-    {
-        if (args.ElementType == GridElementType.DataCell)
-        {
-            args.CssClass = "removeWrapping";
         }
     }
 
