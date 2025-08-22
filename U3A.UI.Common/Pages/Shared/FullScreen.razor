@@ -16,7 +16,7 @@
         height: 1.5rem;
         width: 1.5rem;
         top: @((ws.UseTopMenu) ? "3rem" : "2px");
-        right: 1.1rem;
+        right: @ToggleButtonRightSideOffset;
         position: fixed;
         opacity: 1;
     }
@@ -45,16 +45,26 @@
 @code {
     [Parameter]
     public RenderFragment? ContentTemplate { get; set; } = default;
-    [Parameter]
-    public bool HideToggle { get; set; } = false;
-    [Parameter]
-    public double DisplayOffset { get; set; } = 8;
+
+    /// <summary>
+    /// Hides the toggle button for full screen mode.
+    /// </summary>
+    [Parameter] public bool HideToggle { get; set; } = false;
+
+    /// <summary>
+    /// Vertical offset in Rem to apply to the component when it is displayed in normal mode.
+    /// </summary>
+    [Parameter] public double DisplayOffset { get; set; } = 8;
 
     /// <summary>
     /// An alternate display offset to use when a component is collapsed on the page.
     /// </summary>
-    [Parameter]
-    public double AlternateDisplayOffset { get; set; } = 10;
+    [Parameter] public double AlternateDisplayOffset { get; set; } = 10;
+
+    /// <summary>
+    /// Indent from the right side of the screen for the toggle button.
+    /// </summary>
+    [Parameter] public string ToggleButtonRightSideOffset { get; set; } = "1.1rem";
 
     bool isFullscreen = false;
     bool isRefresh;
