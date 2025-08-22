@@ -40,51 +40,55 @@ else
             </DxFormLayoutItem>
         </div>
     }
-    <div class="schedule-height" id="mySchedule">
-        <DxScheduler StartDate="@StartDate"
-                     AllowCreateAppointment="false"
-                     AllowDeleteAppointment="false"
-                     AllowEditAppointment="false"
-                     ShowAppointmentTooltip="true"
-                     ActiveViewType=@viewType
-                     DataStorage="@DataStorage"
-                     StartDateChanged="OnStartDateChanged"
-                     ActiveViewTypeChanged="OnViewTypeChanged"
-                     CssClass="w-100">
-            <Views>
-                <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
-                @if (!IsPortal)
-                {
-                    <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
-                    <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
-                    <DxSchedulerMonthView ShowWorkDaysOnly="true" MonthCount="1"></DxSchedulerMonthView>
-                    <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(14)" CellMinWidth="80">
-                        <Scales>
-                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1"></DxSchedulerTimeScale>
-                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Hour" UnitCount="2"></DxSchedulerTimeScale>
-                        </Scales>
-                    </DxSchedulerTimelineView>
-                }
-            </Views>
-            <AppointmentTooltipHeaderTemplate>
-                <div class="fs-5">
-                    @context.Label?.Caption
-                </div>
-            </AppointmentTooltipHeaderTemplate>
-            <AppointmentTooltipTemplate>
-                <div class="container">
-                    <span style="card-fl vertical-align: middle;">
-                        <strong>Subject:</strong>  @context.Appointment.Subject<br />
-                        <strong>Leader:</strong>  @context.Appointment.Description<br />
-                        <strong>Location:</strong>  @context.Appointment.Location<br />
-                        <strong>From:</strong>  @context.Appointment.Start.ToString("hh:mm tt") <strong>To:</strong>
-                        @context.Appointment.End.ToString("hh:mm tt")<br />
-                        <strong>Status:</strong>  @context.Label?.Caption<br />
-                    </span>
-                </div>
-            </AppointmentTooltipTemplate>
-        </DxScheduler>
-    </div>
+    <FullScreen DisplayOffset=@((IsAdminPortal) ? 10 : 8) 
+                ToggleButtonRightSideOffset="1px"
+                HideToggle=@(IsPortal)>
+        <ContentTemplate>
+            <DxScheduler StartDate="@StartDate"
+                         AllowCreateAppointment="false"
+                         AllowDeleteAppointment="false"
+                         AllowEditAppointment="false"
+                         ShowAppointmentTooltip="true"
+                         ActiveViewType=@viewType
+                         DataStorage="@DataStorage"
+                         StartDateChanged="OnStartDateChanged"
+                         ActiveViewTypeChanged="OnViewTypeChanged"
+                         CssClass="w-100">
+                <Views>
+                    <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
+                    @if (!IsPortal)
+                    {
+                        <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
+                        <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
+                        <DxSchedulerMonthView ShowWorkDaysOnly="true" MonthCount="1"></DxSchedulerMonthView>
+                        <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(14)" CellMinWidth="80">
+                            <Scales>
+                                <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1"></DxSchedulerTimeScale>
+                                <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Hour" UnitCount="2"></DxSchedulerTimeScale>
+                            </Scales>
+                        </DxSchedulerTimelineView>
+                    }
+                </Views>
+                <AppointmentTooltipHeaderTemplate>
+                    <div class="fs-5">
+                        @context.Label?.Caption
+                    </div>
+                </AppointmentTooltipHeaderTemplate>
+                <AppointmentTooltipTemplate>
+                    <div class="container">
+                        <span style="card-fl vertical-align: middle;">
+                            <strong>Subject:</strong>  @context.Appointment.Subject<br />
+                            <strong>Leader:</strong>  @context.Appointment.Description<br />
+                            <strong>Location:</strong>  @context.Appointment.Location<br />
+                            <strong>From:</strong>  @context.Appointment.Start.ToString("hh:mm tt") <strong>To:</strong>
+                            @context.Appointment.End.ToString("hh:mm tt")<br />
+                            <strong>Status:</strong>  @context.Label?.Caption<br />
+                        </span>
+                    </div>
+                </AppointmentTooltipTemplate>
+            </DxScheduler>
+        </ContentTemplate>
+    </FullScreen>
     <div class="row col col-12 col-md-7 mx-auto mt-2">
         <DxButton Text="Return to menu" id="exitButton" Visible="@IsPortal"
                   IconCssClass="menu-icon bi-door-closed me-1"
@@ -96,18 +100,12 @@ else
     </div>
 }
 
-<style>
-    .schedule-height {
-        overflow: auto;
-        height: calc(100dvh - @((IsPortal) ? "7rem" : (ws.UseTopMenu) ? "10rem" : "7rem") );
-    }
-
-</style>
-
 @code {
 
     [Parameter]
     public bool IsPortal { get; set; }
+    [Parameter]
+    public bool IsAdminPortal { get; set; }
     [Parameter]
     public bool IsPublic { get; set; }
     [Parameter]
@@ -125,9 +123,6 @@ else
     private Term? selectedTerm { get; set; }
     DateTime StartDate { get; set; } = DateTime.Today;
     U3ADbContext dbc { get; set; }
-
-    string SpinnerVisibility = "hidden";
-    string ProcessButtonText = "Process";
 
     DxSchedulerTimeSpanRange VisibleTime = new DxSchedulerTimeSpanRange(TimeSpan.FromHours(6), TimeSpan.FromHours(22));
 
@@ -170,17 +165,12 @@ else
     {
         await ProcessSelection();
         viewType = (VenuesToFilter.Count() > 0)
-                        ? SchedulerViewType.WorkWeek 
+                        ? SchedulerViewType.WorkWeek
                         : SchedulerViewType.Day;
     }
 
     async Task ProcessSelection()
     {
-        if (!IsPortal)
-        {
-            ProcessButtonText = "Loading...";
-            SpinnerVisibility = "visible";
-        }
         if (selectedTerm != null)
         {
             if (VenuesToFilter == null) { VenuesToFilter = new List<Venue>(); }
@@ -194,11 +184,6 @@ else
                     AvailableVenues = venues.Where(x => venueNames.Contains(x.Name)).ToList();
                 }
             }
-        }
-        if (!IsPortal)
-        {
-            ProcessButtonText = "Process";
-            SpinnerVisibility = "hidden";
         }
     }
 
