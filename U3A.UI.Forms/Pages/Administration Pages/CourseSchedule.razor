@@ -24,24 +24,8 @@ else
     if (!IsPortal)
     {
         <ContextHelpTitle Title="Course Schedule" HelpTopic="course-schedule.html" />
-        <div class="d-flex flex-row w-100 px-4 px-auto mb-2">
-            <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="3">
-                <TermsComboBox Terms="@terms"
-                               @bind-SelectedTerm="@selectedTerm"
-                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
-            </DxFormLayoutItem>
-            <DxFormLayoutItem Caption="Filter By Venue" Cssclass="flex-grow-1">
-                <DxTagBox Data="@AvailableVenues"
-                          ClearButtonDisplayMode="default"
-                          TextFieldName="@nameof(Venue.Name)"
-                          NullText="Optionally filter by one or more venue locations."
-                          @bind-Values="@VenuesToFilter" @bind-Values:after=@SelectedVenuesChanged>
-                </DxTagBox>
-            </DxFormLayoutItem>
-        </div>
     }
-    <FullScreen DisplayOffset=@((IsAdminPortal) ? 10 : 8) 
-                ToggleButtonRightSideOffset="1px"
+    <FullScreen DisplayOffset=@((IsAdminPortal) ? 7 : 4)
                 HideToggle=@(IsPortal)>
         <ContentTemplate>
             <DxScheduler StartDate="@StartDate"
@@ -54,6 +38,36 @@ else
                          StartDateChanged="OnStartDateChanged"
                          ActiveViewTypeChanged="OnViewTypeChanged"
                          CssClass="w-100">
+                <ToolbarItems>
+                    <DxToolbarItem Visible=@(!IsPortal) >
+                        <Template Context="termContext">
+                            <div class="d-flex">
+                                <div class="flex-grow-0 pt-1 pe-2">Term:</div>
+                                <TermsComboBox Terms="@terms"
+                                               @bind-SelectedTerm="@selectedTerm"
+                                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+                            </div>
+                        </Template>
+                    </DxToolbarItem>
+                    <DxToolbarItem BeginGroup="true" Visible=@(!IsPortal)>
+                        <Template Context="venueContext">
+                            <div class="d-flex">
+                                <div class="flex-grow-0 pt-1 pe-2">Venue(s):</div>
+                                <DxTagBox Data="@AvailableVenues"
+                                          ClearButtonDisplayMode="default"
+                                          TextFieldName="@nameof(Venue.Name)"
+                                          NullText="Optionally filter by one or more venue locations."
+                                          @bind-Values="@VenuesToFilter" @bind-Values:after=@SelectedVenuesChanged>
+                                </DxTagBox>
+                            </div>
+                        </Template>
+                    </DxToolbarItem>
+                    <DxSchedulerDateNavigatorToolbarItem Alignment="ToolbarItemAlignment.Right" />
+                    <DxSchedulerPreviousIntervalToolbarItem Alignment="ToolbarItemAlignment.Right" />
+                    <DxSchedulerNextIntervalToolbarItem Alignment="ToolbarItemAlignment.Right" />
+                    <DxSchedulerResourceNavigatorToolbarItem Visible=@(!IsPortal) />
+                    <DxSchedulerViewNavigatorToolbarItem Visible=@(!IsPortal) />
+                </ToolbarItems>
                 <Views>
                     <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
                     @if (!IsPortal)
@@ -117,7 +131,7 @@ else
     public List<Venue>? AvailableVenues { get; set; }
     public IEnumerable<Venue>? VenuesToFilter { get; set; }
     LocalTime localTime;
-    SchedulerViewType viewType = SchedulerViewType.Day;
+    SchedulerViewType viewType = SchedulerViewType.WorkWeek;
 
     private List<Term> terms { get; set; }
     private Term? selectedTerm { get; set; }
@@ -164,9 +178,6 @@ else
     async Task SelectedVenuesChanged()
     {
         await ProcessSelection();
-        viewType = (VenuesToFilter.Count() > 0)
-                        ? SchedulerViewType.WorkWeek
-                        : SchedulerViewType.Day;
     }
 
     async Task ProcessSelection()
