@@ -1,8 +1,9 @@
 ﻿@inherits DxGridCommandColumn
 
 @code {
-    [Parameter]
-    public EventCallback<object> OnDeleteButtonClick { get; set; }
+    [Parameter] public bool CustomCommandButtonVisible { get; set; } = false;
+    [Parameter] public EventCallback<object> OnDeleteButtonClick { get; set; }
+    [Parameter] public EventCallback<object> OnCustomEditButtonClick { get; set; }
 
     IGrid? MyGrid;
     protected override bool ShouldRender() => false;
@@ -23,6 +24,11 @@
     ;
         CellDisplayTemplate = context =>
     @<text>
+        @if (CustomCommandButtonVisible) {
+            <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+              RenderStyleMode="ButtonRenderStyleMode.Outline" title="Edit this record"
+              IconCssClass="bi bi-pencil text-fl-warning" Click="async() => await OnCustomEditButtonClick.InvokeAsync(context.DataItem)" />
+        }
         @if (EditButtonVisible) {
             <DxButton RenderStyle="ButtonRenderStyle.Secondary"
               RenderStyleMode="ButtonRenderStyleMode.Outline" title="Edit this record"
