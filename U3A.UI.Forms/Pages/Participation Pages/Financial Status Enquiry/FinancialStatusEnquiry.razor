@@ -31,23 +31,6 @@
                 <ContextHelpTitle Title="Financial Status Enquiry" HelpTopic=""
                                   Subtitle="Enquire about the financial status of members, including fees owed and payments made." />
             }
-            <DxFormLayoutGroup Caption="Enquiry Parameters">
-                <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="8">
-                    <TermsComboBox Terms="@terms" @bind-SelectedTerm="@selectedTerm" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Balance Type" ColSpanMd="8">
-                    <DxComboBox Data="@BalanceTypes" NullText="All Account Balances"
-                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                @bind-Value="@balanceType" />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Financial To" ColSpanMd="8">
-                    <DxTagBox Data="@FinancialYears" NullText="Ignore Financial To"
-                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                              @bind-Values="@selectedFinancialYears" />
-                </DxFormLayoutItem>
-                <DxButton Text="Process" RenderStyle=ButtonRenderStyle.Primary CssClass="col-12 col-md-3 mt-2" Click="@OnProcess" />
-            </DxFormLayoutGroup>
-
         </DxFormLayout>
 
 
@@ -55,7 +38,7 @@
         <Progress @ref="@ProgressBar" />
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-        <FullScreen ToggleButtonRightSideOffset="1.1rem" DisplayOffset="17" @ref=@fullScreen >
+        <FullScreen ToggleButtonRightSideOffset="1.1rem" DisplayOffset="6" @ref=@fullScreen >
             <ContentTemplate>
                 <DxGrid id="my-grid" Data="@Persons" @ref=@mainGrid
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
@@ -63,31 +46,56 @@
                         CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
                         CustomSummary="Grid_CustomSummary"
                         GroupFooterDisplayMode="GridGroupFooterDisplayMode.Always"
-                        AllowSelectRowByClick="false"
                         ShowFilterRow="false"
                         ShowAllRows="false"
-                        ValidationEnabled="true"
-                        @bind-SelectedDataItems="SelectedDataItems"
-                        PageSize="30"
-                        PageSizeSelectorVisible="true"
-                        PageSizeSelectorItems="@(new int[] {10,15, 20,30, 40,60,80, 100, 200,400 })"
-                        PageSizeSelectorAllRowsItemVisible="true"
-                        PagerSwitchToInputBoxButtonCount="10"
-                        PagerVisibleNumericButtonCount="10"
-                        PagerVisible="true">
+                        >
                     <ToolbarTemplate>
                         <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey" SpreadsheetHeaderRows="2" >
-                            <CustomButtonContent>
-                                <DxToolbarItem Text="Adjust Fees" Visible=@(!IsReadOnly)
-                                      IconCssClass="bi bi-currency-dollar"
-                                      RenderStyle=ButtonRenderStyle.Primary
-                                      Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
-                                      Click="@OnFeeReversal" />
-                            </CustomButtonContent>
+                            <CustomButtonContentAtStart>
+                            <DxToolbarItem>
+                                <Template Context="termContext">
+                                    <div class="d-flex">
+                                        <div class="text-fl-primary pt-1 pe-2">Term:</div>
+                                        <TermsComboBox Terms="@terms" 
+                                                @bind-SelectedTerm="@selectedTerm"
+                                                @bind-SelectedTerm:after=@OnProcess/>
+                                    </div>
+                                </Template>
+                                </DxToolbarItem>
+                                <DxToolbarItem>
+                                <Template Context="balanceContext">
+                                    <div class="d-flex">
+                                        <div class="text-fl-primary pt-1 px-2">Balance:</div>
+                                        <DxComboBox Data="@BalanceTypes" NullText="All Account Balances"
+                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                    @bind-Value="@balanceType"
+                                                    @bind-Value:after=@ApplyFilter />
+                                    </div>
+                                </Template>
+                            </DxToolbarItem>
+                                <DxToolbarItem>
+                                <Template Context="fintoContext">
+                                    <div class="d-flex">
+                                        <div class="text-fl-primary pt-1 px-2">Fin-To:</div>
+                                        <DxTagBox Data="@FinancialYears" NullText="All Financial To" style="min-width: 10rem;"
+                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                  @bind-Values="@selectedFinancialYears"
+                                                  @bind-Values:after=@ApplyFilter/>
+                                    </div>
+                                </Template>
+                            </DxToolbarItem>
+                            </CustomButtonContentAtStart>
                         </GridToolbar>
                     </ToolbarTemplate>
                     <Columns>
-                        <DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" Visible=@(!IsReadOnly) />
+                        <DxGridCommandColumnEx 
+                            DeleteButtonVisible="false" 
+                            NewButtonVisible="false"
+                            EditButtonVisible="false"
+                            CustomCommandButtonVisible="true" 
+                            OnCustomEditButtonClick="(dataItem) => OnFeeReversal(dataItem)"
+                            FixedPosition="GridColumnFixedPosition.Left" 
+                            Visible=@(!IsReadOnly) />
                         <DxGridDataColumn Caption="Member" FieldName="FullName" Width="10rem" FixedPosition="GridColumnFixedPosition.Left" />
                         <DxGridBandColumn Caption="Contact Details" Visible=false>
                             <Columns>
@@ -196,8 +204,8 @@
     List<Term>? terms { get; set; }
     Term? selectedTerm { get; set; }
     Term? lastTerm;
-    List<int> FinancialYears;
-    IEnumerable<int>? selectedFinancialYears;
+    List<string> FinancialYears;
+    IEnumerable<string>? selectedFinancialYears;
     string[] BalanceTypes = { "Debit (Money Owing)", "Credit (Refund Due)", "All Non-Zero" };
     string balanceType;
     FullScreen? fullScreen;
@@ -213,7 +221,7 @@
 
     MessageBox? messageBox { get; set; }
     IReadOnlyList<object> SelectedDataItems { get; set; }
-
+    bool isCalculationDone = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -222,10 +230,10 @@
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         terms = await BusinessRule.GetAllTermsInCurrentYearAsync(dbc, selectedTerm);
         people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
-        FinancialYears = new List<int>();
+        FinancialYears = new List<string>();
         FinancialYears.AddRange(people
-                                .OrderByDescending(x => x.FinancialTo)
-                                .Select(x => x.FinancialTo).Distinct());
+                                .OrderBy(x => x.FinancialToText)
+                                .Select(x => x.FinancialToText).Distinct());
         IsReady = true;
     }
 
@@ -239,8 +247,11 @@
                 await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");
                 NavMan.NavigateTo("/");
             }
+            else
+            {
+                if (!isCalculationDone) {await OnProcess(); isCalculationDone = true; }
+            }
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task OnProcess()
@@ -261,6 +272,12 @@
         Persons = service.PeopleWithFinancialStatus.OrderBy(x => x.FullName).ToList();
         await ProgressBar.Close();
         lastTerm = selectedTerm;
+        ApplyFilter();
+        Log.Information("Financial Status Enquiry: On Process {0}",s.ElapsedMilliseconds);
+    }
+
+    void ApplyFilter()
+    {
         mainGrid.ClearFilter();
         CriteriaOperator? opFees = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => x.TotalFees >= decimal.MinValue && x.TotalFees <= decimal.MaxValue);
         CriteriaOperator? opFinToYears = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => x.FinancialTo >= int.MinValue && x.FinancialTo <= int.MaxValue); ;
@@ -281,11 +298,10 @@
         }
         if (selectedFinancialYears?.Count() > 0)
         {
-            opFinToYears = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => selectedFinancialYears.Contains(x.FinancialTo));
+            opFinToYears = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => selectedFinancialYears.Contains(x.FinancialToText));
         }
         var op = GroupOperator.And(opFees, opFinToYears);
         mainGrid.SetFilterCriteria(op);
-        Log.Information("Financial Status Enquiry: On Process {0}",s.ElapsedMilliseconds);
         StateHasChanged();
     }
 
@@ -340,7 +356,7 @@
             e.DisplayText = string.Format("{0:N0}", e.Value);
     }
 
-    async Task OnFeeReversal()
+    async Task OnFeeReversal(object dataItem)
     {
         if (await adjustMemberFee.ShowAsync())
         {
