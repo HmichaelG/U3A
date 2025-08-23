@@ -1,4 +1,4 @@
-﻿@page "/FeeMnt"
+﻿ @page "/FeeMnt"
 
 @inject NavigationManager NavManager
 @inject IJSRuntime js
@@ -35,7 +35,7 @@ else
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 
-    <FullScreen DisplayOffset="11" @ref=@fullScreen >
+    <FullScreen ToggleButtonRightSideOffset="1.1rem" DisplayOffset="11" @ref=@fullScreen >
         <ContentTemplate>
             <DxGrid id="my-grid" Data="@Fees" @ref=@mainGrid
             ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"

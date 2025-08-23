@@ -55,7 +55,7 @@
         <Progress @ref="@ProgressBar" />
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-        <FullScreen DisplayOffset="17" @ref=@fullScreen >
+        <FullScreen ToggleButtonRightSideOffset="1.1rem" DisplayOffset="17" @ref=@fullScreen >
             <ContentTemplate>
                 <DxGrid id="my-grid" Data="@Persons" @ref=@mainGrid
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"

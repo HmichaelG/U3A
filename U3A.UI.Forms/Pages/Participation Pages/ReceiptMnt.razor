@@ -37,7 +37,7 @@ else
     <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
     <Progress @ref="@ProgressBar" />
 
-    <FullScreen DisplayOffset="13" @ref=@fullScreen>
+    <FullScreen ToggleButtonRightSideOffset="1.1rem" DisplayOffset="13" @ref=@fullScreen>
         <ContentTemplate>
             <DxGrid id="my-grid" Data="@Receipts" @ref=@mainGrid
                     ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"

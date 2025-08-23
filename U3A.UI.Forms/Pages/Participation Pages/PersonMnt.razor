@@ -42,7 +42,8 @@
 
                 <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-                <FullScreen @ref=@fullScreen DisplayOffset="@GridDisplayOffset" HideToggle="@IsEmbedded">
+                <FullScreen @ref=@fullScreen ToggleButtonRightSideOffset="1.1rem"
+                    DisplayOffset="@GridDisplayOffset" HideToggle="@IsEmbedded">
                     <ContentTemplate>
                         <DxSplitter Orientation="Orientation.Vertical">
                             <Panes>
