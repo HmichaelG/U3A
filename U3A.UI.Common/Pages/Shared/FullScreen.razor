@@ -3,9 +3,9 @@
 
 <div id="fullscreen-element" class="@($"d-flex {screenClass}")">
     <DxButton Click="@OnClick" Visible="@(!HideToggle)"
-              tooltip="Click to display full screen"
+              tooltip="Click to toggle full screen"
               CssClass="toggle-button"
-              IconCssClass="bi bi-arrows-fullscreen"
+              IconCssClass=@($"bi {((isFullscreen) ? "bi-fullscreen-exit" : "bi-arrows-fullscreen")}")
               RenderStyle="ButtonRenderStyle.Secondary" />
         @ContentTemplate
 </div>
