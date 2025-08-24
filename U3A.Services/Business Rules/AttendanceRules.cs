@@ -95,7 +95,7 @@ public static partial class BusinessRule
         var validAttendance = (dbc.AttendClass.IgnoreQueryFilters().Include(x => x.Class)
             .Where(ac => !ac.Class.IsDeleted && ac.Date >= startDate && ac.Date <= endDate)
             .ToList())
-            .GroupBy(ac => new { ac.ClassID, ac.Date.Date })
+            .GroupBy(ac => new {ac.ClassID, ac.Date.Date })
             .Select(g => new
             {
                 ClassID = g.Key.ClassID,
@@ -135,44 +135,49 @@ public static partial class BusinessRule
     }
     public static async Task<List<AttendClassSummaryByCourse>> GetClassAttendanceSummaryByCourse(U3ADbContext dbc, Term term, DateTime Now)
     {
-        var validAttendance = (await dbc.AttendClass
-            .Include(ac => ac.Class).ThenInclude(c => c.Course)
+        // Query only required fields and group in the database
+        var validAttendance = await dbc.AttendClass
+            .AsNoTracking()
             .Where(ac => ac.TermID == term.ID && ac.Date.Date <= Now.Date)
-            .ToListAsync())
-                .GroupBy(ac => new
-                {
-                    ClassID = ac.ClassID,
-                    ClassDate = ac.Date
-                })
+            .Select(ac => new
+            {
+                ac.ClassID,
+                ac.Date,
+                CourseName = ac.Class.Course.Name,
+                ac.AttendClassStatusID
+            })
+            .ToListAsync();
+
+        // Group by class and date, aggregate counts
+        var groupedByClassDate = validAttendance
+            .GroupBy(ac => new { ac.ClassID, ac.Date, ac.CourseName })
             .Select(g => new
             {
-                ClassID = g.Key.ClassID,
-                ClassDate = g.Key.ClassDate,
-                Course = g.Max(x => x.Class.Course.Name),
+                g.Key.ClassID,
+                g.Key.Date,
+                Course = g.Key.CourseName,
                 Present = g.Count(ac => (AttendClassStatusType)ac.AttendClassStatusID == AttendClassStatusType.Present),
                 AbsentWithApology = g.Count(ac => (AttendClassStatusType)ac.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithApology),
                 AbsentWithoutApology = g.Count(ac => (AttendClassStatusType)ac.AttendClassStatusID == AttendClassStatusType.AbsentFromClassWithoutApology)
             })
             .Where(x => x.Present > 0 || x.AbsentWithApology > 0)
-            ;
+            .ToList();
 
-
-        var result = validAttendance
-                .GroupBy(ac => new
-                {
-                    Course = ac.Course,
-                    ClassID = ac.ClassID
-                })
-                .Select(g => new AttendClassSummaryByCourse
-                {
-                    Course = g.Key.Course,
-                    ClassID = g.Key.ClassID,
-                    DateSummary = g.Max(ac => ac.ClassDate).ToString("ddd, hh:mm tt"),
-                    ClassesRecorded = g.DistinctBy(ac => ac.ClassDate).Count(),
-                    Present = g.Sum(ac => ac.Present),
-                    AbsentWithApology = g.Sum(ac => ac.AbsentWithApology),
-                    AbsentWithoutApology = g.Sum(ac => ac.AbsentWithoutApology)
-                }).OrderBy(x => x.Course).ToList();
+        // Group by course and class, aggregate for summary
+        var result = groupedByClassDate
+            .GroupBy(ac => new { ac.Course, ac.ClassID })
+            .Select(g => new AttendClassSummaryByCourse
+            {
+                Course = g.Key.Course,
+                ClassID = g.Key.ClassID,
+                DateSummary = g.Max(ac => ac.Date).ToString("ddd, hh:mm tt"),
+                ClassesRecorded = g.Select(ac => ac.Date).Distinct().Count(),
+                Present = g.Sum(ac => ac.Present),
+                AbsentWithApology = g.Sum(ac => ac.AbsentWithApology),
+                AbsentWithoutApology = g.Sum(ac => ac.AbsentWithoutApology)
+            })
+            .OrderBy(x => x.Course)
+            .ToList();
 
         return result;
     }
