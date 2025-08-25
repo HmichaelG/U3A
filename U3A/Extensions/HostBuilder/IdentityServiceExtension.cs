@@ -35,6 +35,8 @@ public static class IdentityServiceExtension
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = false;
             options.Password.RequireLowercase = false;
+            options.Lockout.AllowedForNewUsers = false;
+            options.Lockout.MaxFailedAccessAttempts = int.MaxValue;
         })
             .AddTop100000PasswordValidator<ApplicationUser>()
             .AddRoles<IdentityRole>()
