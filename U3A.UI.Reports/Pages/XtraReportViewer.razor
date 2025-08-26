@@ -78,14 +78,6 @@
         isReady = true;
     }
 
-    private void Report_QueryNotFoundFont(object sender, NotFoundFontEventArgs e)
-    {
-        var service = new FontCollectorService();
-        var fontData = service.ProcessFont(googleFontsAPIKey, e.RequestedFont).Result;
-        e.FontFileData = fontData;
-    }
-
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -109,7 +101,6 @@
     async Task SetupReport()
     {
         googleFontsAPIKey = config.GetValue<string>("GoogleFontsAPIKey");
-        DXFontRepository.QueryNotFoundFont += Report_QueryNotFoundFont;
         dbc = await U3Adbfactory.CreateDbContextAsync();
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
         tenantId = textInfo.ToTitleCase(dbc.TenantInfo.Identifier!);
