@@ -539,7 +539,7 @@ public static partial class BusinessRule
                             .Where(x => x.Date.Year == Year && x.Date <= PeriodEndDate).ToListAsync();
         Parallel.ForEach(attendClass, a =>
         {
-            a.Person = persons.Find(x => x.ID == a.PersonID) ?? new Person() { ID = a.PersonID, LastName = "*Not on File", FirstName = "(Deleted/Unknown Visitor)", Gender = "Deleted/Unknown Visitor" };
+            a.Person = persons.Find(x => x.ID == a.PersonID) ?? new Person() { ID = a.PersonID, LastName = "*Not on File", FirstName = "(Visitor)", Gender = "Visitor" };
             a.Class = classes.Find(x => x.ID == a.ClassID);
         });
         return attendClass;
