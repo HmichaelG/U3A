@@ -24,13 +24,11 @@
 else
 {
     <DxFlyout @bind-IsOpen=@isFlyoutOpen
-              CloseOnOutsideClick="true"
+              CloseOnOutsideClick="false"
               PositionTarget="#helpButton"
               Position="FlyoutPosition.Bottom"
               Width="18rem"
               HeaderVisible="true"
-              FooterVisible="true"
-              HeaderText="🎁 A New Software Update"
               BodyText="Our software has been updated. Click the button above to see what has changed."
               CssClass="text-fl-info">
         <HeaderContentTemplate>
