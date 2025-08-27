@@ -24,54 +24,69 @@
 else
 {
     <DxFlyout @bind-IsOpen=@isFlyoutOpen
-              CloseOnOutsideClick="false"
+              CloseOnOutsideClick="true"
               PositionTarget="#helpButton"
               Position="FlyoutPosition.Bottom"
-              Width="15rem"
+              Width="18rem"
               HeaderVisible="true"
+              FooterVisible="true"
               HeaderText="🎁 A New Software Update"
               BodyText="Our software has been updated. Click the button above to see what has changed."
-              CssClass="text-fl-info" />
+              CssClass="text-fl-info">
+        <HeaderContentTemplate>
+            <div class="d-flex w-100">
+                <div class="h6 flex-grow-1">🎁 A New Software Update</div>
+                <DxButton CssClass="flex-grow-0 bi bi-x-lg"
+                          RenderStyle="ButtonRenderStyle.Primary"
+                          RenderStyleMode="ButtonRenderStyleMode.Outline"
+                          Click="@(async() =>
+                                {
+                                    await helpAndTitle!.SaveVersionState();
+                                    isFlyoutOpen = false;
+                                })" />
+        </div>
+    </HeaderContentTemplate>
+</DxFlyout>
 
-    <DxWindow HeaderText="Open Circuits" Width="800px" ShowFooter="true"
-              ShowCloseButton="true"
-              CloseOnEscape="true"
-              @ref="@circuitDisplay"
-              @bind-Visible=@showPopup>
-        <BodyTemplate>
-            <FullScreen DisplayOffset="20" HideToggle="true">
-                <ContentTemplate>
-                    <DxGrid id="my-grid" Data="@circuitDetails"
-                            ShowGroupPanel="true"
-                            VirtualScrollingEnabled="true"
-                            AutoExpandAllGroupRows="true"
-                            FooterDisplayMode="GridFooterDisplayMode.Always">
-                        <Columns>
-                            <DxGridDataColumn Fieldname="Status" GroupIndex="0" />
-                            <DxGridDataColumn Fieldname="UpTime" SortIndex="0" />
-                            <DxGridDataColumn Fieldname="DownTime" />
-                            <DxGridDataColumn Fieldname="Name" Caption="Login" />
-                            <DxGridDataColumn Fieldname="Tenant" />
-                        </Columns>
-                        <GroupSummary>
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="UpTime" FooterColumnName="UpTime" />
-                        </GroupSummary>
-                        <TotalSummary>
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="UpTime" FooterColumnName="UpTime" />
-                        </TotalSummary>
-                    </DxGrid>
-                </ContentTemplate>
-            </FullScreen>
-        </BodyTemplate>
-        <FooterTemplate>
-            <DxButton Text="Refresh" CssClass="m-1"
-                      Click="() => {GetCircuitData();StateHasChanged();}" />
-        </FooterTemplate>
-    </DxWindow>
-    <MessageBox @ref="@messageBox" />
+<DxWindow HeaderText="Open Circuits" Width="800px" ShowFooter="true"
+            ShowCloseButton="true"
+            CloseOnEscape="true"
+            @ref="@circuitDisplay"
+            @bind-Visible=@showPopup>
+    <BodyTemplate>
+        <FullScreen DisplayOffset="20" HideToggle="true">
+            <ContentTemplate>
+                <DxGrid id="my-grid" Data="@circuitDetails"
+                        ShowGroupPanel="true"
+                        VirtualScrollingEnabled="true"
+                        AutoExpandAllGroupRows="true"
+                        FooterDisplayMode="GridFooterDisplayMode.Always">
+                    <Columns>
+                        <DxGridDataColumn Fieldname="Status" GroupIndex="0" />
+                        <DxGridDataColumn Fieldname="UpTime" SortIndex="0" />
+                        <DxGridDataColumn Fieldname="DownTime" />
+                        <DxGridDataColumn Fieldname="Name" Caption="Login" />
+                        <DxGridDataColumn Fieldname="Tenant" />
+                    </Columns>
+                    <GroupSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="UpTime" FooterColumnName="UpTime" />
+                    </GroupSummary>
+                    <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="UpTime" FooterColumnName="UpTime" />
+                    </TotalSummary>
+                </DxGrid>
+            </ContentTemplate>
+        </FullScreen>
+    </BodyTemplate>
+    <FooterTemplate>
+        <DxButton Text="Refresh" CssClass="m-1"
+                    Click="() => {GetCircuitData();StateHasChanged();}" />
+    </FooterTemplate>
+</DxWindow>
+<MessageBox @ref="@messageBox" />
 
     <div class="@($"px-2 mt-{ws.SizeMode + 2}")">
-        @if (!hasRole)
+    @if (!hasRole)
         {
             <PageTitle>@($"{tenantId}: Member Portal")</PageTitle>
             <U3A.UI.Forms.Pages.MembersPortal.MemberPortal />
@@ -91,7 +106,7 @@ else
                         <div class="mx-2" ondblclick="@(() => OnCircuitClick())">@($"{openCircuits} users logged in.")</div>
                     </span>
 
-                    <ContextHelpTitle Title=@($"Ver: {GetAssemblyVersion()}")
+                    <ContextHelpTitle @ref=helpAndTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                       IsVersionButton=true
                                       ShowNewSoftwareUpdateFlyout=@((value) => {isFlyoutOpen = value;})
                                       ButtonIconCssClass="fs-4 text-fl-primary bi bi-check2-circle"
@@ -109,32 +124,36 @@ else
                                       ActivationStyle="@HelpActivationStyle.ButtonOnlyNoMessges" />
                 }
             </div>
-            <DxTabs class="w-100 mb-4">
-                <DxTabPage Text="Member Summary">
-                    <GeneralSummaryChart />
-                </DxTabPage>
-                <DxTabPage Text="Cash Receipts">
-                    <ReceiptSummaryChart />
-                </DxTabPage>
-                <DxTabPage Text="New Members">
-                    <NewMemberSummaryChart />
-                </DxTabPage>
-                <DxTabPage Text="Attrition">
-                    <AttritionDetailsChart />
-                </DxTabPage>
-                <DxTabPage Text="Participation">
-                    <MemberParticipationChart />
-                </DxTabPage>
-                <DxTabPage Text="Enrolments">
-                    <EnrolmentSummaryChart />
-                </DxTabPage>
-                <DxTabPage Text="Attendance">
-                    <AttendanceChart />
-                </DxTabPage>
-                <DxTabPage Text="u3admin.org.au">
-                    <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-style"></iframe>
-                </DxTabPage>
-            </DxTabs>
+            <FullScreen DisplayOffset="3">
+                <ContentTemplate>
+                    <DxTabs class="w-100 mb-4">
+                        <DxTabPage Text="Member Summary">
+                            <GeneralSummaryChart />
+                        </DxTabPage>
+                        <DxTabPage Text="Cash Receipts">
+                            <ReceiptSummaryChart />
+                        </DxTabPage>
+                        <DxTabPage Text="New Members">
+                            <NewMemberSummaryChart />
+                        </DxTabPage>
+                        <DxTabPage Text="Attrition">
+                            <AttritionDetailsChart />
+                        </DxTabPage>
+                        <DxTabPage Text="Participation">
+                            <MemberParticipationChart />
+                        </DxTabPage>
+                        <DxTabPage Text="Enrolments">
+                            <EnrolmentSummaryChart />
+                        </DxTabPage>
+                        <DxTabPage Text="Attendance">
+                            <AttendanceChart />
+                        </DxTabPage>
+                        <DxTabPage Text="u3admin.org.au">
+                            <iframe src="https://u3admin.org.au" class="shadow card p-1 iframe-style"></iframe>
+                        </DxTabPage>
+                    </DxTabs>
+                </ContentTemplate>
+            </FullScreen>
             <footer class="text-fl-muted" style="position: fixed; bottom: 0; left: 0;">
                 &copy; @(DateTime.Today.Year) M &amp; B Hanlon Pty Ltd
             </footer>
@@ -179,6 +198,7 @@ else
     string tenantId;
     bool isFlyoutOpen;
     bool isSmallScreen = true;
+    ContextHelpTitle? helpAndTitle;
 
     protected override async Task OnInitializedAsync()
     {

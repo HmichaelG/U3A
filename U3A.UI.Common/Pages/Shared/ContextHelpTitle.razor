@@ -293,11 +293,16 @@
     {
         if (IsVersionButton)
         {
-            savedVersion = Title;
-            await localStorage.SetItemAsync(versionDetails, savedVersion);
+            await SaveVersionState();
             isFlyoutOpen = false;
             StateHasChanged();
         }
+    }
+
+    public async Task SaveVersionState()
+    {
+        savedVersion = Title;
+        await localStorage.SetItemAsync(versionDetails, savedVersion);
     }
 
     async Task OnClosed()
