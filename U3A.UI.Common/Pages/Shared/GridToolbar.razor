@@ -305,7 +305,7 @@
                 {
                     if (col.MinWidth < 75) { col.MinWidth = 75; }
                 }
-                if (col is DxGridSelectionColumn)
+                if (col is DxGridSelectionColumn && col.Visible)
                 {
                     areRowsSelectable = true;
                     if (!LinkedGrid.AllowSelectRowByClick) { LinkedGrid.AllowSelectRowByClick = true; }
