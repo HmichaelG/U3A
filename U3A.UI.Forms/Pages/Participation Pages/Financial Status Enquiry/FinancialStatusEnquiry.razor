@@ -38,64 +38,81 @@
         <Progress @ref="@ProgressBar" />
         <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-        <FullScreen ToggleButtonRightSideOffset="1.1rem" DisplayOffset="6" @ref=@fullScreen >
+                <DxToolbar CssClass="col col-12 mb-1 me-2">
+                    <Items>
+                        <DxToolbarItem>
+                            <Template Context="termContext">
+                                <div class="text-fl-primary pe-2">Term</div>
+                                <TermsComboBox Terms="@terms"
+                                               @bind-SelectedTerm="@selectedTerm"
+                                               @bind-SelectedTerm:after=@OnProcess />
+                            </Template>
+                        </DxToolbarItem>
+                        <DxToolbarItem BeginGroup="true">
+                            <Template Context="balanceContext">
+                                <div class="text-fl-primary px-2">Balance</div>
+                                <DxComboBox Data="@BalanceTypes" NullText="All Account Balances"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            @bind-Value="@balanceType"
+                                            @bind-Value:after=@ApplyFilter />
+                            </Template>
+                        </DxToolbarItem>
+                        <DxToolbarItem BeginGroup="true">
+                            <Template Context="fintoContext">
+                                <div class="text-fl-primary px-2">Fin-To</div>
+                                <DxTagBox Data="@FinancialYears" NullText="All Financial To" style="min-width: 15em;"
+                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                          @bind-Values="@selectedFinancialYears"
+                                          @bind-Values:after=@ApplyFilter />
+                            </Template>
+                        </DxToolbarItem>
+                        <DxToolbarItem BeginGroup="true">
+                            <Template Context="courseContext">
+                                <div class="text-fl-primary px-2">Course</div>
+                                <DxComboBox Data="@courses" style="min-width: 30em;"
+                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                            NullText="Ignore Courses"
+                                            SearchMode="ListSearchMode.AutoSearch"
+                                            ListRenderMode="ListRenderMode.Virtual"
+                                            TextFieldName="@nameof(Course.Name)"
+                                            @bind-Value="@selectedCourse"
+                                            @bind-Value:after=@ApplyFilter />
+                            </Template>
+                        </DxToolbarItem>
+                        <DxToolbarItem Text="Refresh" Visible=@(!IsReadOnly) 
+                                       BeginGroup="true" CssClass="my-2"
+                                       Alignment=ToolbarItemAlignment.Right                                       
+                                       IconCssClass="bi bi-database"
+                                       RenderStyle=ButtonRenderStyle.Primary
+                                       Click="@OnProcess" />
+                    </Items>
+                </DxToolbar>
+        <FullScreen ToggleButtonRightSideOffset="1.1rem" DisplayOffset="7" @ref=@fullScreen>
             <ContentTemplate>
                 <DxGrid id="my-grid" Data="@Persons" @ref=@mainGrid
+                        @bind-SelectedDataItems="SelectedDataItems"
                         ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
                         CustomizeSummaryDisplayText="Grid_CustomizeSummaryDisplayText"
                         CustomizeGroupValueDisplayText="Grid_CustomizeGroupValueDisplayText"
                         CustomSummary="Grid_CustomSummary"
                         GroupFooterDisplayMode="GridGroupFooterDisplayMode.Always"
                         ShowFilterRow="false"
-                        ShowAllRows="false"
-                        >
+                        ShowAllRows="false">
                     <ToolbarTemplate>
                         <GridToolbar LinkedGrid=@mainGrid LayoutKey="@GridLayoutKey" SpreadsheetHeaderRows="2" >
-                            <CustomButtonContentAtStart>
-                            <DxToolbarItem>
-                                <Template Context="termContext">
-                                    <div class="d-flex">
-                                        <div class="text-fl-primary pt-1 pe-2">Term:</div>
-                                        <TermsComboBox Terms="@terms" 
-                                                @bind-SelectedTerm="@selectedTerm"
-                                                @bind-SelectedTerm:after=@OnProcess/>
-                                    </div>
-                                </Template>
-                                </DxToolbarItem>
-                                <DxToolbarItem>
-                                <Template Context="balanceContext">
-                                    <div class="d-flex">
-                                        <div class="text-fl-primary pt-1 px-2">Balance:</div>
-                                        <DxComboBox Data="@BalanceTypes" NullText="All Account Balances"
-                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                    @bind-Value="@balanceType"
-                                                    @bind-Value:after=@ApplyFilter />
-                                    </div>
-                                </Template>
-                            </DxToolbarItem>
-                                <DxToolbarItem>
-                                <Template Context="fintoContext">
-                                    <div class="d-flex">
-                                        <div class="text-fl-primary pt-1 px-2">Fin-To:</div>
-                                        <DxTagBox Data="@FinancialYears" NullText="All Financial To" style="min-width: 10rem;"
-                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                  @bind-Values="@selectedFinancialYears"
-                                                  @bind-Values:after=@ApplyFilter/>
-                                    </div>
-                                </Template>
-                            </DxToolbarItem>
-                            </CustomButtonContentAtStart>
+                            <CustomButtonContent>
+                                      <DxToolbarItem Text="Adjust Fees" Visible=@(!IsReadOnly) 
+                                       BeginGroup="true"              
+                                        Alignment=ToolbarItemAlignment.Right
+                                       IconCssClass="bi bi-currency-dollar"
+                                       RenderStyle=ButtonRenderStyle.Primary
+                                       Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
+                                       Click="@OnFeeReversal" />
+                            </CustomButtonContent>
                         </GridToolbar>
                     </ToolbarTemplate>
                     <Columns>
-                        <DxGridCommandColumnEx 
-                            DeleteButtonVisible="false" 
-                            NewButtonVisible="false"
-                            EditButtonVisible="false"
-                            CustomCommandButtonVisible="true" 
-                            OnCustomEditButtonClick="(dataItem) => OnFeeReversal(dataItem)"
-                            FixedPosition="GridColumnFixedPosition.Left" 
-                            Visible=@(!IsReadOnly) />
+                        <DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" Visible=@(!IsReadOnly) />
                         <DxGridDataColumn Caption="Member" FieldName="FullName" Width="10rem" FixedPosition="GridColumnFixedPosition.Left" />
                         <DxGridBandColumn Caption="Contact Details" Visible=false>
                             <Columns>
@@ -139,19 +156,19 @@
                             </Columns>
                         </DxGridBandColumn>
                         <DxGridDataColumn Caption="Total" FieldName="TotalFees" DisplayFormat="c2" Width="5rem" />
-                    <DxGridDataColumn Width="3rem" Visible=@(!IsReadOnly) 
-                                        Caption="Details" AllowGroup="false" 
-                                        ExportEnabled="false"  
-                                        FixedPosition="GridColumnFixedPosition.Right">
-                        <CellDisplayTemplate>
-                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
-                                        RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
-                                        Click="async() => {var selectedPerson = (((PersonFinancialStatus)context.DataItem).PersonBase);
-                                            await fullScreen.ResetFullScreen();
-                                            await MemberDrawerRequested.InvokeAsync((selectedPerson,selectedTerm)); }">
-                            </DxButton>
-                        </CellDisplayTemplate>
-                    </DxGridDataColumn>
+                        <DxGridDataColumn Width="3rem" Visible=@(!IsReadOnly)
+                                          Caption="Details" AllowGroup="false"
+                                          ExportEnabled="false"
+                                          FixedPosition="GridColumnFixedPosition.Right">
+                            <CellDisplayTemplate>
+                                <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
+                                          RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
+                                          Click="async() => {var selectedPerson = (((PersonFinancialStatus)context.DataItem).PersonBase);
+                                                    await fullScreen.ResetFullScreen();
+                                                    await MemberDrawerRequested.InvokeAsync((selectedPerson,selectedTerm)); }">
+                                </DxButton>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
                     </Columns>
                     <GroupSummary>
                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsComplimentary" />
@@ -199,11 +216,20 @@
 
     bool IsReady;
 
+    // values for fee adjustment
+    string FeeDescription = "Fee adjustment";
+    DateTime ProcessingDate = DateTime.Today;
+    decimal FeeAmount = 0.00M;
+
     List<PersonFinancialStatus>? Persons { get; set; }
     List<Person>? people { get; set; }
     List<Term>? terms { get; set; }
     Term? selectedTerm { get; set; }
     Term? lastTerm;
+
+    private List<Course> courses { get; set; }
+    private Course? selectedCourse { get; set; }
+
     List<string> FinancialYears;
     IEnumerable<string>? selectedFinancialYears;
     string[] BalanceTypes = { "Debit (Money Owing)", "Credit (Refund Due)", "All Non-Zero" };
@@ -222,11 +248,12 @@
     MessageBox? messageBox { get; set; }
     IReadOnlyList<object> SelectedDataItems { get; set; }
     bool isCalculationDone = false;
+    List<(Guid CourseID, Guid PersonID)> enrolmentsByCourseIDOnly;
 
     protected override async Task OnInitializedAsync()
     {
         // wire up the data
-        dbc = await U3Adbfactory.CreateDbContextAsync();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         terms = await BusinessRule.GetAllTermsInCurrentYearAsync(dbc, selectedTerm);
         people = await BusinessRule.SelectablePersonsIncludeUnfinancialAsync(dbc);
@@ -249,7 +276,7 @@
             }
             else
             {
-                if (!isCalculationDone) {await OnProcess(); isCalculationDone = true; }
+                if (!isCalculationDone) { await OnProcess(); isCalculationDone = true; }
             }
         }
     }
@@ -257,30 +284,32 @@
     async Task OnProcess()
     {
         if (selectedTerm == null) return;
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
         var s = new Stopwatch();
         s.Start();
         await ProgressBar.ShowSpinnerAsync("Calculating Financial Status .. Please Wait");
         MemberFeeCalculationService service;
-        using (dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
-        }
-        await Parallel.ForEachAsync(people, async(p,_) =>
+        service = await MemberFeeCalculationService.CreateAsync(dbc, selectedTerm);
+        await Parallel.ForEachAsync(people, async (p, _) =>
         {
             service.CalculateFee(p);
         });
         Persons = service.PeopleWithFinancialStatus.OrderBy(x => x.FullName).ToList();
+        courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, selectedTerm.Year, selectedTerm.TermNumber);
+        enrolmentsByCourseIDOnly =
+            await BusinessRule.EnrolmentsByCourseIDOnlyAsync(dbc, selectedTerm);
         await ProgressBar.Close();
         lastTerm = selectedTerm;
         ApplyFilter();
-        Log.Information("Financial Status Enquiry: On Process {0}",s.ElapsedMilliseconds);
+        Log.Information("Financial Status Enquiry: On Process {0}", s.ElapsedMilliseconds);
     }
 
     void ApplyFilter()
     {
         mainGrid.ClearFilter();
         CriteriaOperator? opFees = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => x.TotalFees >= decimal.MinValue && x.TotalFees <= decimal.MaxValue);
-        CriteriaOperator? opFinToYears = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => x.FinancialTo >= int.MinValue && x.FinancialTo <= int.MaxValue); ;
+        CriteriaOperator? opFinToYears = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => x.FinancialTo >= int.MinValue && x.FinancialTo <= int.MaxValue); 
+        CriteriaOperator? opCourse = null;
         if (balanceType != null)
         {
             if (balanceType.StartsWith("Debit"))
@@ -300,7 +329,16 @@
         {
             opFinToYears = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => selectedFinancialYears.Contains(x.FinancialToText));
         }
-        var op = GroupOperator.And(opFees, opFinToYears);
+        if (selectedCourse != null)
+        {
+            var personsInCourse = enrolmentsByCourseIDOnly
+                                    .Where(x => x.CourseID == selectedCourse.ID)
+                                    .Select(x => x.PersonID)
+                                    .Distinct()
+                                    .ToList();
+            opCourse = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => personsInCourse.Contains(x.PersonBase.ID));
+        }
+        var op = GroupOperator.And(opFees, opFinToYears,opCourse);
         mainGrid.SetFilterCriteria(op);
         StateHasChanged();
     }
@@ -308,7 +346,7 @@
     string[] customBools = { "IsComplimentary",
                                 "IsLifeMember",
                                 "IsCourseLeader"
-                    };
+    };
 
     void Grid_CustomSummary(GridCustomSummaryEventArgs e)
     {
@@ -356,32 +394,42 @@
             e.DisplayText = string.Format("{0:N0}", e.Value);
     }
 
-    async Task OnFeeReversal(object dataItem)
+    async Task OnFeeReversal()
     {
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
         if (await adjustMemberFee.ShowAsync())
         {
-            foreach (var p in SelectedDataItems)
+            if (adjustMemberFee.FeeAmount != 0)
             {
-                PersonFinancialStatus person = (PersonFinancialStatus)p;
-                if (adjustMemberFee.FeeAmount != 0)
+                foreach (var p in SelectedDataItems)
                 {
-                    Fee fee = new Fee
-                        {
-                            Amount = adjustMemberFee.FeeAmount,
-                            Date = adjustMemberFee.ProcessingDate,
-                            Description = adjustMemberFee.FeeDescription,
-                            Person = await dbc.Person.FindAsync(person.PersonBase.ID),
-                            IsMembershipFee = false,
-                            ProcessingYear = selectedTerm.Year
-                        };
+                    PersonFinancialStatus person = (PersonFinancialStatus)p;
+                    Fee fee = new()
+                    {
+                        Amount = adjustMemberFee.FeeAmount,
+                        Date = adjustMemberFee.ProcessingDate,
+                        Description = adjustMemberFee.FeeDescription,
+                        PersonID = person.PersonBase.ID,
+                        IsMembershipFee = false,
+                        ProcessingYear = selectedTerm.Year
+                    };
                     await dbc.Fee.AddAsync(fee);
                 }
+                await dbc.SaveChangesAsync();
+                mainGrid.ClearSelection();
+                lastTerm = null;
+                if (await messageBox.ShowAsync("Fees Adjusted!",
+                        @"The selected fee adjustments have been made. 
+                            <br/>Click <b>Ok</b> to refresh totals now.
+                            <br/>Click <b>Cancel</b> to skip the refresh."))
+                        {
+                            await OnProcess();
+                        }
             }
-            await dbc.SaveChangesAsync();
-            mainGrid.ClearSelection();
-            lastTerm = null;
-            await messageBox.ShowOkOnlyAsync("Fees Adjusted!",
-            "The selected fee adjustments have been made. Click the <strong>Process</strong> to review the changes.");
+            else
+            {
+                await messageBox.ShowOkOnlyAsync("No Adjustment Made!", "No adjustment made because the fee adjustment amount was zero.");
+            }
         }
         else
         {

@@ -106,6 +106,19 @@ namespace U3A.BusinessRules
 
             return result.Select(x => (x.CourseID, x.PersonID, $"{x.ShortDay} {x.StartTime.ToShortTimeString()}")).ToList();
         }
+        public static async Task<List<(Guid CourseID, Guid PersonID)>> EnrolmentsByCourseIDOnlyAsync(U3ADbContext dbc, Term SelectedTerm)
+        {
+            var result = await dbc.Enrolment.IgnoreQueryFilters().AsNoTracking()
+                                .Where(x => !x.IsDeleted && !x.Person.IsDeleted
+                                                    && x.TermID == SelectedTerm.ID
+                                                    && x.Person.DateCeased == null
+                                                    && !x.IsWaitlisted)
+                                .Distinct()
+                                .Select(x => new { x.CourseID, x.PersonID })
+                                .ToListAsync();
+            return result.Select(x => (x.CourseID, x.PersonID)).ToList();
+        }
+
 
         public static async Task<List<Enrolment>> GetEnrolmentIncludeLeadersAsync(U3ADbContext dbc,
                                                   Course thisCourse, Class thisClass, Term thisTerm)

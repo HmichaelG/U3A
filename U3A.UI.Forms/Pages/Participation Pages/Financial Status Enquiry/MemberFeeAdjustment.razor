@@ -20,12 +20,13 @@
                 <DxDateEdit @bind-Date=@ProcessingDate />
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Fee Amount" ColSpanMd="12">
-                <DxMaskedInput @bind-Value=@FeeAmount 
-                        Mask="c2" MaskMode="MaskMode.Numeric" />
+                <DxMaskedInput @bind-Value=@FeeAmount
+                               Mask="c2" MaskMode="MaskMode.Numeric" />
             </DxFormLayoutItem>
         </DxFormLayout>
     </BodyTemplate>
     <FooterContentTemplate>
+        <div class="button-container">
         <DxButton CssClass="popup-button"
                   RenderStyle="ButtonRenderStyle.Primary"
                   Text="Adjust Fees!"
@@ -33,6 +34,7 @@
         <DxButton CssClass="popup-button"
                   RenderStyle="ButtonRenderStyle.Secondary"
                   Text="Cancel" Click="@NegativeButtonClicked" />
+        </div>
     </FooterContentTemplate>
 </DxPopup>
 
