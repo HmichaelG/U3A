@@ -336,6 +336,21 @@
                                     .Select(x => x.PersonID)
                                     .Distinct()
                                     .ToList();
+            foreach (var c in selectedCourse.Classes)
+            {
+                if (c.LeaderID != null)
+                {
+                    personsInCourse.Add(c.LeaderID.Value);
+                }   
+                if (c.Leader2ID != null)
+                {
+                    personsInCourse.Add(c.Leader2ID.Value);
+                }   
+                if (c.Leader3ID != null)
+                {
+                    personsInCourse.Add(c.Leader3ID.Value);
+                }   
+            }
             opCourse = CriteriaOperator.FromLambda<PersonFinancialStatus>(x => personsInCourse.Contains(x.PersonBase.ID));
         }
         var op = GroupOperator.And(opFees, opFinToYears,opCourse);
