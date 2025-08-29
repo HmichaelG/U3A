@@ -1,4 +1,5 @@
 ﻿@page "/EnrolMnt"
+@using U3A.UI.Forms.Pages.Participation_Pages.Financial_Status_Enquiry
 
 @inject NavigationManager NavMan
 @inject IJSRuntime js
@@ -18,6 +19,7 @@
 else
 {
 
+    <MemberFeeAdjustment @ref="@adjustMemberFee" />
     <MessageBox @ref="@messageBox" />
     <TransferOrCopyEnrolment @ref="@transferOrCopyEnrolment" />
 
@@ -114,6 +116,13 @@ else
                         <ToolbarTemplate>
                             <GridToolbar LinkedGrid=@mainGrid LayoutKey="{95A32121-B773-4562-A285-00E3B9378590}">
                                 <CustomButtonContent>
+                                      <DxToolbarItem Text="Adjust Fees" 
+                                       BeginGroup="true"              
+                                        Alignment=ToolbarItemAlignment.Right
+                                       IconCssClass="bi bi-currency-dollar"
+                                       RenderStyle=ButtonRenderStyle.Primary
+                                       Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
+                                       Click="@OnFeeReversal" />
                                     <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
                                                    BeginGroup=true
                                                    RenderStyle="ButtonRenderStyle.Primary"
@@ -163,7 +172,7 @@ else
                                               FieldName="Person.IsMultiCampusVisitor" />
                             <DxGridDataColumn ReadOnly=true Caption="City" FieldName="Person.City" Visible=false />
                             <DxGridDataColumn ReadOnly=true Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
-                            <DxGridDataColumn ReadOnly=true Caption="Email" FieldName="Person.Email" />
+                            <DxGridDataColumn ReadOnly=true Caption="Email" FieldName="Person.Email" Visible=false />
                             <DxGridDataColumn ReadOnly=true Caption="Enrolled" FieldName="DateEnrolled"
                                               DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
                             <DxGridDataColumn ReadOnly=true Caption="Joined" FieldName="Person.DateJoined"
@@ -288,12 +297,12 @@ else
 
 
 @code {
-    [Parameter]
-    public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+        [Parameter]
+        public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
 
-    bool IsReady;
-    int ShowEnrolmentType;
-    SystemSettings? settings;
+        bool IsReady;
+        int ShowEnrolmentType;
+        SystemSettings? settings;
 
     private List<Enrolment>? Enrolments { get; set; }
     Enrolment? thisEnrolment;
@@ -365,6 +374,8 @@ else
     internal Progress? ProgressBar;
     MemberFeeCalculationService service;
     bool hasMultiCampusVisitors = false;
+    MemberFeeAdjustment? adjustMemberFee;
+
 
     List<(Guid CourseID, Guid PersonID, string ClassStart)> AllEnrolmentsForDifferentParticipantsInEachClass;
 
@@ -1097,6 +1108,45 @@ else
             await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
         }
     }
+
+    async Task OnFeeReversal()
+    {
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        if (await adjustMemberFee.ShowAsync())
+        {
+            if (adjustMemberFee.FeeAmount != 0)
+            {
+                foreach (var e in SelectedDataItems)
+                {
+                    Enrolment enrolment = e as Enrolment;
+                    Fee fee = new()
+                    {
+                        Amount = adjustMemberFee.FeeAmount,
+                        Date = adjustMemberFee.ProcessingDate,
+                        Description = adjustMemberFee.FeeDescription,
+                        PersonID = enrolment.PersonID,
+                        IsMembershipFee = false,
+                        ProcessingYear = selectedTerm.Year
+                    };
+                    await dbc.Fee.AddAsync(fee);
+                }
+                await dbc.SaveChangesAsync();
+                mainGrid.ClearSelection();
+                await GetEnrolments();
+                await messageBox.ShowAsync("Fees Adjusted!",
+                        @"The selected fee adjustments have been made.");
+            }
+            else
+            {
+                await messageBox.ShowOkOnlyAsync("No Adjustment Made!", "No adjustment made because the fee adjustment amount was zero.");
+            }
+        }
+        else
+        {
+            await messageBox.ShowOkOnlyAsync("Cancelled!", "Fee adjustment was cancelled by you.");
+        }
+    }
+
 
     public void Dispose()
     {
