@@ -6,24 +6,6 @@ function logout() {
     }
 }
 
-// Full screen / normal screen functions
-function toggleFullscreen() {
-    var e = document.getElementById('fullscreen-element');
-    if (e != null) {
-        e.classList.toggle('normalscreen');
-        e.classList.toggle('fullscreen');
-    }
-}
-
-function refreshNormalscreen() {
-    var e = document.getElementById('fullscreen-element');
-    if (e != null) {
-        e.classList.remove('normalscreen');
-        e.classList.remove('fullscreen');
-        e.classList.add('normalscreen');
-    }
-}
-
 window.getWindowDimensions = function () {
         return {
             width: window.innerWidth,
