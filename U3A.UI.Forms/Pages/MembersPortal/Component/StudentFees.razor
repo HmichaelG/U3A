@@ -14,14 +14,19 @@ else
         ShowRowGrandTotals="true" VirtualScrollingEnabled=true
         ShowColumnGrandTotals="true"
         FilterHeaderAreaDisplayMode="PivotTableFilterHeaderAreaDisplayMode.Never"
+        AllowDragFields="false"
         CssClass="pivot-table">
             <Fields>
-                <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
-                Area="@PivotTableArea.Column" />
                 <DxPivotTableField Field="Person.FullNameAlpha" Caption="Participant"
                 Area="@PivotTableArea.Row" />
+                <DxPivotTableField Field="@nameof(MemberFee.MemberFeeType)" Caption="Fee Type"
+                                   Area="@PivotTableArea.Row" />
+                <DxPivotTableField Field="@nameof(MemberFee.Amount)" Caption="Due"
+                                   Area="@PivotTableArea.Data" />
                 <DxPivotTableField Field="@nameof(MemberFee.Allocated)" Caption="Paid"
-                Area="@PivotTableArea.Data" />
+                                   Area="@PivotTableArea.Data" />
+                <DxPivotTableField Field="@nameof(MemberFee.Balance)" Caption="Balance"
+                                   Area="@PivotTableArea.Data" />
             </Fields>
         </DxPivotTable>
     </DxFormLayoutGroup>
