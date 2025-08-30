@@ -55,7 +55,7 @@ else
     {
         pivotData = new();
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
-        foreach (var s in StudentsAndLeaders)
+        foreach (var s in StudentsAndLeaders.DistinctBy(x => x.ID))
         {
             var service = await MemberFeeCalculationService.CreateAsync(dbc, Term, s.Person);
             service.CalculateFee(s.Person);
