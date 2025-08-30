@@ -39,6 +39,8 @@ public class MemberFeeCalculationService
     Term[] Terms { get; set; } = null;
     Dictionary<Guid, List<Enrolment>> Enrolments { get; set; } = null;
     List<Class> Classes { get; set; } = null;
+    ConcurrentBag<Guid> CourseFeeAdded;
+    ConcurrentBag<(Guid,Guid)> TermFeeAdded;
 
     DateTime localTime;
     private MemberFeeCalculationService()
@@ -281,6 +283,8 @@ public class MemberFeeCalculationService
             }
         }
         // course fees
+        CourseFeeAdded = new();
+        TermFeeAdded = new();
         var courseFeeTotal = AddCourseFees(person, isComplimentary);
         personFinancialStatus.CourseFeesPerYear = courseFeeTotal.TotalCourseFeesPerYear;
         personFinancialStatus.CourseFeesPerTerm = courseFeeTotal.TotalCourseFeesPerTerm;
@@ -486,7 +490,6 @@ public class MemberFeeCalculationService
     {
         (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) result = (0, 0);
         DateTime today = localTime.Date;
-        var courseFeeAdded = new ConcurrentBag<Guid>();
         List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
         enrolments = enrolments.Where(x => !x.IsDeleted
                                         && x.PersonID == person.ID
@@ -502,7 +505,7 @@ public class MemberFeeCalculationService
                                         : dateEnrolled;
                 if (dateDue <= today)
                 {
-                    if (e.Course.CourseFeePerYear != 0 && !courseFeeAdded.Contains(e.CourseID))
+                    if (e.Course.CourseFeePerYear != 0 && !CourseFeeAdded.Contains(e.CourseID))
                     {
                         var description = $"{e.Course.Name} course fee";
                         decimal amount = e.Course.CourseFeePerYear;
@@ -521,7 +524,7 @@ public class MemberFeeCalculationService
                             MemberFeeSortOrder.CourseFee,
                                 dateDue, description, amount, e.Course.Name, e.CourseID);
                         result.TotalCourseFeesPerYear += amount;
-                        courseFeeAdded.Add(e.CourseID);
+                        CourseFeeAdded.Add(e.CourseID);
                     }
                 }
                 var dueDateAdjustment = e.Course.CourseFeePerTermDueWeeks ?? 0;
@@ -582,6 +585,7 @@ public class MemberFeeCalculationService
                         AddFee(person, sortOrder, dateDue,
                             $"{t.Name}: {description}", amount, e.Course.Name, e.CourseID);
                         result.TotalCourseFeesPerTerm += amount;
+                        TermFeeAdded.Add((e.CourseID, e.TermID));
                     }
                 }
             }
@@ -593,10 +597,9 @@ public class MemberFeeCalculationService
     {
         (decimal TotalCourseFeesPerYear, decimal TotalCourseFeesPerTerm) result = (0, 0);
         DateTime today = localTime.Date;
-        var courseFeeAdded = new ConcurrentBag<Guid>();
         List<Class> classesLead;
         classesLead = Classes.Where(x =>
-                                        x.Course.LeadersPayTermFee &&
+                                        x.Course.LeadersPayYearFee &&
                                         (x.LeaderID == person.ID ||
                                         x.Leader2ID == person.ID ||
                                         x.Leader3ID == person.ID)).ToList();
@@ -606,12 +609,12 @@ public class MemberFeeCalculationService
             //Fees per year
             dueDate = (c.Course.CourseFeePerYearDueDate.HasValue) 
                 ? c.Course.CourseFeePerYearDueDate.Value.ToDateTime(TimeOnly.MinValue)
-                : new DateTime(BillingYear, 1, 1);
+                : (c.StartDate.HasValue) ? c.StartDate.Value : new DateTime(BillingYear, 1, 1);
             if (dueDate <= today)
             {
                 if (c.Course.CourseFeePerYear != 0
                         && c.Course.LeadersPayYearFee
-                        && !courseFeeAdded.Contains(c.CourseID))
+                        && !CourseFeeAdded.Contains(c.CourseID))
                 {
                     var description = $"{c.Course.Name} course fee";
                     decimal amount = c.Course.CourseFeePerYear;
@@ -629,17 +632,16 @@ public class MemberFeeCalculationService
                     AddFee(person, MemberFeeSortOrder.CourseFee, dueDate,
                                 description, amount, c.Course.Name, c.CourseID);
                     result.TotalCourseFeesPerYear += amount;
-                    courseFeeAdded.Add(c.CourseID);
+                    CourseFeeAdded.Add(c.CourseID);
                 }
             }
         }
         //Fees per term
-        ConcurrentBag<(Class Class, Term Term)> classTerms = new();
         foreach (var t in Terms)
         {
             foreach (var c in classesLead)
             {
-                if (classTerms.Contains((c, t))) continue;
+                if (TermFeeAdded.Contains((c.CourseID, t.ID))) continue;
                 var dueDateAdjustment = c.Course.CourseFeePerTermDueWeeks ?? 0;
                 dueDate = t.StartDate.AddDays(dueDateAdjustment * 7);
                 if (c.Course.LeadersPayTermFee
@@ -685,7 +687,7 @@ public class MemberFeeCalculationService
                         AddFee(person, sortOrder, dueDate,
                             $"{t.Name}: {description}", amount, c.Course.Name, c.CourseID);
                         result.TotalCourseFeesPerTerm += amount;
-                        classTerms.Add((c, t));
+                        TermFeeAdded.Add((c.CourseID, t.ID));
                     }
                 }
             }
