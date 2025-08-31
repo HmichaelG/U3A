@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using Twilio.TwiML.Fax;
 using U3A.Database;
 using U3A.Model;
+using U3A.Services;
 
 namespace U3A.BusinessRules
 {
@@ -35,7 +37,6 @@ namespace U3A.BusinessRules
             var enrolmentTerm = await CurrentEnrolmentTermAsync(dbc)
                         ?? await CurrentTermAsync(dbc)
                         ?? throw new ArgumentNullException(nameof(Term));
-
             var cr = await dbc.Course.Where(x => x.ID == enrolment.CourseID).Include(x => x.Enrolments).FirstOrDefaultAsync();
             var pt = await dbc.CourseParticpationType.FindAsync(cr.CourseParticipationTypeID);
             var ct = await dbc.CourseType.FindAsync(cr.CourseTypeID);
@@ -122,6 +123,13 @@ namespace U3A.BusinessRules
                     EnrolmentStatus = GetEnrolmentStatus(enrolment, t, settings, dbc.GetLocalTime()),
                     WaitlistSort = enrolment.WaitlistSort
                 };
+                if (cr.HasTermFees || cr.CourseFeePerYear > 0)
+                {
+                    var service = await MemberFeeCalculationService.CreateAsync(dbc, p);
+                    service.CalculateFee(p);
+                    var allocatedFees = service.GetAllocatedMemberFees(p).Where(x => x.CourseID == enrolment.CourseID);
+                    ed.TotalFeesDue = allocatedFees.Sum(x => x.Balance ?? 0m);
+                }
                 ed.ClassLeader = c.LeaderNamesOnly;
                 ed.ClassContact = c.CourseContactDetails;
                 if (enrolment.IsWaitlisted)

@@ -26,10 +26,7 @@ else
                 @bind-SelectedDataItems="SelectedDataItems">
             <Columns>
                 <DxGridSelectionColumn Width="1rem" />
-                @*                 <DxGridDataColumn Caption="#" Width="1rem" FieldName="Sequence"
-                                  Visible="@(!IsManageEnrolmentsView)"
-                                  UnboundType="GridUnboundColumnType.Integer" />
- *@                <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
+                <DxGridDataColumn Caption="Waitlist?" FieldName="IsWaitlisted" Width="4rem"
                                                     Visible="@IsManageEnrolmentsView" />
                 <DxGridDataColumn Caption="Name" FieldName="Person.FullNameWithVisitorTag">
                     <CellDisplayTemplate>
@@ -85,6 +82,7 @@ else
                                   FieldName="Person.HomePhoneOrSilent"
                                   Width="6rem" />
                 <DxGridDataColumn Caption="Due" Width="3rem" FieldName="Due"
+                                  FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                   Visible="@(!IsSmallLayout && AreFeesPayable)"
                                   DisplayFormat="c2"
                                   UnboundType="GridUnboundColumnType.Decimal" />
@@ -109,28 +107,28 @@ else
 
 
 @code {
-    bool IsReady;
+        bool IsReady;
 
-    [CascadingParameter]
-    public LoginState loginState { get; set; }
-    [Parameter]
-    public SystemSettings? Settings { get; set; }
-    [Parameter]
-    public List<Enrolment>? Enrolments { get; set; }
-    [Parameter]
-    public IReadOnlyList<object> SelectedDataItems { get; set; }
-    [Parameter]
-    public bool IsManageEnrolmentsView { get; set; }
-    [Parameter]
-    public double FooterHeight { get; set; } = 0.25;  // percent of remaining window height for footer
+        [CascadingParameter]
+        public LoginState loginState { get; set; }
+        [Parameter]
+        public SystemSettings? Settings { get; set; }
+        [Parameter]
+        public List<Enrolment>? Enrolments { get; set; }
+        [Parameter]
+        public IReadOnlyList<object> SelectedDataItems { get; set; }
+        [Parameter]
+        public bool IsManageEnrolmentsView { get; set; }
+        [Parameter]
+        public double FooterHeight { get; set; } = 0.25;  // percent of remaining window height for footer
 
-    bool IsSmallLayout;
-    int sequence = 1;
-    DxGrid? grid;
-    string gridHeight = "100px";
-    MemberFeeCalculationService service;
-    Dictionary<Guid, decimal> FeeDue;
-    bool AreFeesPayable = false;
+        bool IsSmallLayout;
+        int sequence = 1;
+        DxGrid? grid;
+        string gridHeight = "100px";
+        MemberFeeCalculationService service;
+        Dictionary<Guid, decimal> FeeDue;
+        bool AreFeesPayable = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,14 +140,20 @@ else
             AreFeesPayable = (course.HasTermFees || course.CourseFeePerYear > 0);
             if (AreFeesPayable)
             {
+                FeeDue.Clear();
                 using (var dbc = this.U3Adbfactory.CreateDbContext())
                 {
+                    var service = await MemberFeeCalculationService.CreateAsync(dbc,
+                                    Enrolments.Select(x => x.Person).ToList());
                     foreach (var e in Enrolments)
                     {
-                        var person = e.Person;
-                        service = await MemberFeeCalculationService.CreateAsync(dbc, person);
-                        var due = service.CalculateFee(person);
-                        FeeDue.Add(person.ID, due);
+                        if (!FeeDue.TryGetValue(e.PersonID, out _))
+                        {
+                            var person = e.Person;
+                            service.CalculateFee(person);
+                            var allocatedFees = service.GetAllocatedMemberFees(person).Where(x => x.CourseID == e.CourseID);
+                            FeeDue.Add(e.PersonID, allocatedFees.Sum(x => x.Balance ?? 0m));
+                        }
                     }
                 }
             }

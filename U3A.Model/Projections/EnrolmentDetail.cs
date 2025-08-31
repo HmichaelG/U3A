@@ -58,5 +58,7 @@ namespace U3A.Model
 
         public DateTime? WaitlistSort { get; set; }
 
+        public Decimal TotalFeesDue { get; set; } = 0;
+
     }
 }

@@ -9,7 +9,7 @@
 }
 else
 {
-    <DxFormLayoutGroup Caption="Student Fees Paid" CssClass="pivot-table-container">
+    <DxFormLayoutGroup Caption="Student Fees Analysis" CssClass="pivot-table-container">
         <DxPivotTable Data="@pivotData" @ref=@pivotTable Context="context"
         ShowRowGrandTotals="true" VirtualScrollingEnabled=true
         ShowColumnGrandTotals="true"
@@ -55,9 +55,11 @@ else
     {
         pivotData = new();
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        var service = await MemberFeeCalculationService.CreateAsync(dbc,
+                Term,
+                StudentsAndLeaders.Select(x => x.Person).ToList());
         foreach (var s in StudentsAndLeaders.DistinctBy(x => x.ID))
         {
-            var service = await MemberFeeCalculationService.CreateAsync(dbc, Term, s.Person);
             service.CalculateFee(s.Person);
             var allocatedFees = service.GetAllocatedMemberFees(s.Person).Where(x => x.CourseID == Course.ID);
             pivotData.AddRange(allocatedFees);

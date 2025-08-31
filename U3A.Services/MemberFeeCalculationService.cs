@@ -19,6 +19,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Twilio.Rest.Api.V2010.Account.Usage.Record;
 using U3A.BusinessRules;
 using U3A.Database;
 using U3A.Model;
@@ -46,8 +47,25 @@ public class MemberFeeCalculationService
     private MemberFeeCalculationService()
     {
         MemberFees = new();
+        People = null;
     }
 
+    public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, Term Term, IEnumerable<Person> PeopleToCalculate)
+    {
+        var instance = new MemberFeeCalculationService();
+        instance.People = new();
+        instance.People.AddRange(PeopleToCalculate);
+        await instance.InitializeAsync(dbc, Term, null);
+        return instance;
+    }
+    public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, IEnumerable<Person> PeopleToCalculate)
+    {
+        var instance = new MemberFeeCalculationService();
+        instance.People = new();
+        instance.People.AddRange(PeopleToCalculate);
+        await instance.InitializeAsync(dbc, null, null);
+        return instance;
+    }
     public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, Term Term, Person? Person = null)
     {
         var instance = new MemberFeeCalculationService();
@@ -88,11 +106,14 @@ public class MemberFeeCalculationService
         }
         Log.Information("MemberFeeCalculationService: Terms loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
         s.Restart();
-        People = await dbc.Person.AsNoTracking()
-                        .Where(x => person == null || x.ID == person.ID)
-                        .ToListAsync();
-        Log.Information("MemberFeeCalculationService: People loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
-        s.Restart();
+        if (People == null)
+        {
+            People = await dbc.Person.AsNoTracking()
+                            .Where(x => person == null || x.ID == person.ID)
+                            .ToListAsync();
+            Log.Information("MemberFeeCalculationService: People loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
+            s.Restart();
+        }
         Fees = await dbc.Fee.AsNoTracking().IgnoreQueryFilters()
                             .Where(x => (person == null || x.PersonID == person.ID)
                                         && !x.IsDeleted && x.ProcessingYear >= BillingYear)

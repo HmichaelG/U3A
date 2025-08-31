@@ -181,6 +181,7 @@ else
                                               DisplayFormat="{0:dd-MMM-yy HH:mm:ss}" Width="8rem" Visible="false" />
                             <DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
                             <DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
+                                              FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                               Visible=@(selectedCourse != null && (selectedCourse.HasTermFees || selectedCourse.CourseFeePerYear > 0))
                                               UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
                             <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
@@ -575,12 +576,16 @@ else
             Enrolments.AddRange(mcE);
             Enrolments = Enrolments.OrderBy(x => x.Person.FullNameAlphaKey).ToList();
             feesDue = new();
+            service = await MemberFeeCalculationService.CreateAsync(dbc,
+                            currentTerm,
+                            Enrolments.Select(x => x.Person).ToList());
             foreach (var e in Enrolments)
             {
                 if (!feesDue.ContainsKey(e.PersonID))
                 {
-                    service = await MemberFeeCalculationService.CreateAsync(dbc,currentTerm,e.Person);
-                    feesDue.Add(e.PersonID, service.CalculateFee(e.Person));
+                    service.CalculateFee(e.Person);
+                    var allocatedFees = service.GetAllocatedMemberFees(e.Person).Where(x => x.CourseID == e.CourseID);
+                    feesDue.Add(e.PersonID, allocatedFees.Sum(x => x.Balance ?? 0m));
                 }
             }
             await InvokeAsync(StateHasChanged);
