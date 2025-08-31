@@ -152,15 +152,30 @@ namespace U3A.BusinessRules
             }
             ;
             Enrolment? dummy;
+            List<Enrolment> dummies = new();
+
             if (enrolments.Count > 0)
             {
                 var template = enrolments[0];
                 dummy = await CreateDummyLeaderEnrolment(dbc, template, thisClass.LeaderID);
-                if (dummy != null) enrolments.Add(dummy);
+                if (dummy != null) dummies.Add(dummy);
                 dummy = await CreateDummyLeaderEnrolment(dbc, template, thisClass.Leader2ID);
-                if (dummy != null) enrolments.Add(dummy);
+                if (dummy != null) dummies.Add(dummy);
                 dummy = await CreateDummyLeaderEnrolment(dbc, template, thisClass.Leader3ID);
-                if (dummy != null) enrolments.Add(dummy);
+                if (dummy != null) dummies.Add(dummy);
+
+                foreach (var d in dummies)
+                {
+                    if (!enrolments.Any(x => x.PersonID == d.PersonID))
+                    {
+                        enrolments.Add(d);
+                    }
+                    else
+                    {
+                        var existing = enrolments.Where(x => x.PersonID == d.PersonID).FirstOrDefault();
+                        if (existing != null) existing.isLeader = true;
+                    }
+                }
             }
             return enrolments.OrderBy(x => x.Person.FullNameAlpha).ToList();
         }
