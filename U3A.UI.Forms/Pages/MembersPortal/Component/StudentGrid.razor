@@ -137,7 +137,7 @@ else
         if (Enrolments != null && Enrolments.Count > 0)
         {
             var course = Enrolments.First().Course;
-            AreFeesPayable = (course.HasTermFees || course.CourseFeePerYear > 0);
+            AreFeesPayable = course.HasFees;
             if (AreFeesPayable)
             {
                 FeeDue.Clear();

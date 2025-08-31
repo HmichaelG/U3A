@@ -108,6 +108,14 @@ namespace U3A.Model
                 return result;
             }
         }
+        [NotMapped]
+        public bool HasFees
+        {
+            get
+            {
+                return HasTermFees || CourseFeePerYear != 0;
+            }
+        }
 
         [NotMapped]
         public string TermFeesText

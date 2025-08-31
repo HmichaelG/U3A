@@ -123,7 +123,7 @@ namespace U3A.BusinessRules
                     EnrolmentStatus = GetEnrolmentStatus(enrolment, t, settings, dbc.GetLocalTime()),
                     WaitlistSort = enrolment.WaitlistSort
                 };
-                if (cr.HasTermFees || cr.CourseFeePerYear > 0)
+                if (cr.HasFees)
                 {
                     var service = await MemberFeeCalculationService.CreateAsync(dbc, p);
                     service.CalculateFee(p);

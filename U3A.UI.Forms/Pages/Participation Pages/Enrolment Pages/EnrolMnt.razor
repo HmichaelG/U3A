@@ -182,7 +182,7 @@ else
                             <DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
                             <DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
                                               FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                              Visible=@(selectedCourse != null && (selectedCourse.HasTermFees || selectedCourse.CourseFeePerYear > 0))
+                                              Visible=@(selectedCourse != null && selectedCourse.HasFees)
                                               UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
                             <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                 <CellDisplayTemplate>
