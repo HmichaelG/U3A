@@ -49,8 +49,5 @@ namespace U3A.Model
         public string FinancialToText { get; set; }
         public string FinancialToBriefText { get; set; }
         public DateTime? LastReceipt { get; set; }
-
-        // Not automatically populated
-        public List<MemberFee> MemberFees { get; set; } = new();
     }
 }
