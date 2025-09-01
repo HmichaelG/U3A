@@ -55,15 +55,7 @@
         {
             Year = currentTerm.Year;
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            await OnYearChangedEvent.InvokeAsync(Year);
-        }
+        await OnYearChangedEvent.InvokeAsync(Year);
     }
 
     async Task OnYearItemClick(DropDownButtonItemClickEventArgs args)
