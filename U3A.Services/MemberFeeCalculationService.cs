@@ -40,13 +40,15 @@ public class MemberFeeCalculationService
     Term[] Terms { get; set; } = null;
     Dictionary<Guid, List<Enrolment>> Enrolments { get; set; } = null;
     List<Class> Classes { get; set; } = null;
-    ConcurrentBag<Guid> CourseFeeAdded;
-    ConcurrentBag<(Guid,Guid)> TermFeeAdded;
+    ConcurrentBag<(Guid MemberID, Guid CourseID)> CourseFeeAdded;
+    ConcurrentBag<(Guid MemberID, Guid CourseID, Guid TermID)> TermFeeAdded;
 
     DateTime localTime;
     private MemberFeeCalculationService()
     {
         MemberFees = new();
+        CourseFeeAdded = new();
+        TermFeeAdded = new();
         People = null;
     }
 
@@ -304,8 +306,6 @@ public class MemberFeeCalculationService
             }
         }
         // course fees
-        CourseFeeAdded = new();
-        TermFeeAdded = new();
         var courseFeeTotal = AddCourseFees(person, isComplimentary);
         personFinancialStatus.CourseFeesPerYear = courseFeeTotal.TotalCourseFeesPerYear;
         personFinancialStatus.CourseFeesPerTerm = courseFeeTotal.TotalCourseFeesPerTerm;
@@ -526,7 +526,7 @@ public class MemberFeeCalculationService
                                         : dateEnrolled;
                 if (dateDue <= today)
                 {
-                    if (e.Course.CourseFeePerYear != 0 && !CourseFeeAdded.Contains(e.CourseID))
+                    if (e.Course.CourseFeePerYear != 0 && !CourseFeeAdded.Contains((person.ID, e.CourseID)))
                     {
                         var description = $"{e.Course.Name} course fee";
                         decimal amount = e.Course.CourseFeePerYear;
@@ -545,7 +545,7 @@ public class MemberFeeCalculationService
                             MemberFeeSortOrder.CourseFee,
                                 dateDue, description, amount, e.Course.Name, e.CourseID);
                         result.TotalCourseFeesPerYear += amount;
-                        CourseFeeAdded.Add(e.CourseID);
+                        CourseFeeAdded.Add((person.ID, e.CourseID));
                     }
                 }
                 var dueDateAdjustment = e.Course.CourseFeePerTermDueWeeks ?? 0;
@@ -606,7 +606,7 @@ public class MemberFeeCalculationService
                         AddFee(person, sortOrder, dateDue,
                             $"{t.Name}: {description}", amount, e.Course.Name, e.CourseID);
                         result.TotalCourseFeesPerTerm += amount;
-                        TermFeeAdded.Add((e.CourseID, e.TermID));
+                        TermFeeAdded.Add((e.PersonID, e.CourseID, e.TermID));
                     }
                 }
             }
@@ -635,7 +635,7 @@ public class MemberFeeCalculationService
             {
                 if (c.Course.CourseFeePerYear != 0
                         && c.Course.LeadersPayYearFee
-                        && !CourseFeeAdded.Contains(c.CourseID))
+                        && !CourseFeeAdded.Contains((person.ID, c.CourseID)))
                 {
                     var description = $"{c.Course.Name} course fee";
                     decimal amount = c.Course.CourseFeePerYear;
@@ -653,7 +653,7 @@ public class MemberFeeCalculationService
                     AddFee(person, MemberFeeSortOrder.CourseFee, dueDate,
                                 description, amount, c.Course.Name, c.CourseID);
                     result.TotalCourseFeesPerYear += amount;
-                    CourseFeeAdded.Add(c.CourseID);
+                    CourseFeeAdded.Add((person.ID, c.CourseID));
                 }
             }
         }
@@ -662,7 +662,7 @@ public class MemberFeeCalculationService
         {
             foreach (var c in classesLead)
             {
-                if (TermFeeAdded.Contains((c.CourseID, t.ID))) continue;
+                if (TermFeeAdded.Contains((person.ID, c.CourseID, t.ID))) continue;
                 var dueDateAdjustment = c.Course.CourseFeePerTermDueWeeks ?? 0;
                 dueDate = t.StartDate.AddDays(dueDateAdjustment * 7);
                 if (c.Course.LeadersPayTermFee
@@ -708,7 +708,7 @@ public class MemberFeeCalculationService
                         AddFee(person, sortOrder, dueDate,
                             $"{t.Name}: {description}", amount, c.Course.Name, c.CourseID);
                         result.TotalCourseFeesPerTerm += amount;
-                        TermFeeAdded.Add((c.CourseID, t.ID));
+                        TermFeeAdded.Add((person.ID, c.CourseID, t.ID));
                     }
                 }
             }

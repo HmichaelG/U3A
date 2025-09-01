@@ -1,0 +1,67 @@
+﻿@page "/MemberFinancialReportPreloader/{ReportName}"
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+@using System.Collections.Concurrent
+@using U3A.BusinessRules
+@using U3A.Services
+
+
+@if (!isReady)
+{
+    <em>Loading report data ...</em>
+}
+else
+{
+    <XtraReportViewer Report="@report" ReportIsReady=true />
+}
+
+
+@code {
+    [Parameter]
+    public string ReportName { get; set; }
+
+    XtraReport report;
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        MemberFeeCalculationService service;
+        List<Person> people;
+        string asAt;
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        {
+            asAt = dbc.GetLocalTime().ToString(constants.STD_DATETIME_FORMAT);
+            var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+            people = await BusinessRule.SelectablePersonsAsync(dbc,currentTerm);
+            service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
+        }
+        var memberFeesList = new ConcurrentBag<MemberFee>();
+        await Parallel.ForEachAsync(people, async (p, _) =>
+        {
+            service.CalculateFee(p);
+            var allocatedFees = service.GetAllocatedMemberFees(p);
+            foreach (var fee in allocatedFees)
+            {
+                memberFeesList.Add(fee);
+            }
+        });
+        switch (ReportName)
+        {
+            case "MemberFinancialReport":
+                report = new MemberFinancialReport();
+                report.Parameters["prmAsAt"].Value = asAt;
+                report.DataSource = memberFeesList.ToList();
+                break;
+            case "CourseFeesReport":
+                report = new CourseFeesReport();
+                report.Parameters["prmAsAt"].Value = asAt;
+                report.DataSource = memberFeesList.ToList();
+                report.FilterString = "[CourseID] != null";
+
+                break;
+        }
+        isReady = true;
+    }
+
+}

@@ -11,7 +11,37 @@ namespace U3A.Model
     public class MemberFee
     {
         public Guid ID { get; set; } = Guid.NewGuid();
+
+        public string CourseKey
+        {
+            get
+            {
+                return $"{Course}-{CourseID}";
+            }
+        }
+        public string PersonKey
+        {
+            get
+            {
+                return $"{PersonName}-{PersonID}";
+            }
+        }
+        public string AggregateKey
+        {
+            get
+            {
+                return $"{CourseKey}-{PersonKey}";
+            }
+        }
         public Guid PersonID { get; set; }
+
+    public string PersonName
+        {
+            get
+            {
+               return Person.FullNameAlpha;
+            }
+        }
         public Person Person { get; set; }
         public MemberFeeSortOrder SortOrder { get; set; }
 
