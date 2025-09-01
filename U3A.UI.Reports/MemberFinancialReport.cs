@@ -22,6 +22,7 @@ namespace U3A.UI.Reports
 
         private void MemberFinancialReport_ParametersRequestSubmit(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
+            FilterString = string.Empty;
             if ((bool)prmShowCourseFeesOnly.Value)
             {
                 FilterString = "[Course] != ''";
