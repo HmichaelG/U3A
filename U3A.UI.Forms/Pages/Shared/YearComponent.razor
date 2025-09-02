@@ -33,7 +33,7 @@
     [Parameter]
     public int Year { get; set; }
     [Parameter]
-    public string CssClass { get { return CssClass; } set { cssClass = $"{value} {cssClass}".Trim(); } }
+    public string CssClass { get => cssClass; set { if (!string.IsNullOrWhiteSpace(value)) cssClass = $"{value} {cssClass}".Trim(); } }
     Term currentTerm;
     MessageBox? messageBox;
     U3ADbContext dbc { get; set; }
@@ -44,26 +44,41 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-        years = await dbc.Term
-                        .OrderByDescending(x=>x.Year)
-                        .Select(x => x.Year)
-                        .Distinct()
-                        .ToListAsync();
-        if (currentTerm != null)
+        try
         {
-            Year = currentTerm.Year;
+            dbc = await U3Adbfactory.CreateDbContextAsync();
+
+            // Load current term and available years. Keep queries simple and efficient.
+            currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+
+            // Select distinct years then order in memory by using LINQ operators in the right order for EF translation
+            years = await dbc.Term
+                            .Select(x => x.Year)
+                            .Distinct()
+                            .OrderByDescending(y => y)
+                            .ToListAsync();
+
+            // Choose sensible default year: current term year, otherwise the newest year from the DB, otherwise current year
+            Year = currentTerm?.Year ?? years.FirstOrDefault();
+            if (Year == 0) Year = DateTime.Now.Year;
+
+            await OnYearChangedEvent.InvokeAsync(Year);
         }
-        await OnYearChangedEvent.InvokeAsync(Year);
+        catch (Exception ex)
+        {
+            // Swallowing the exception would hide issues; rethrow so the host can handle/log it.
+            // Optionally you can display a friendly message using the MessageBox component if available.
+            Console.Error.WriteLine($"YearComponent initialization failed: {ex}");
+            throw;
+        }
     }
 
     async Task OnYearItemClick(DropDownButtonItemClickEventArgs args)
     {
         if (args != null)
         {
-            int value;
-            if (int.TryParse( args.ItemInfo.Text, out value)) {
+            if (int.TryParse(args.ItemInfo.Text, out var value))
+            {
                 Year = value;
                 await OnYearChangedEvent.InvokeAsync(Year);
             }
