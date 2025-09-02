@@ -267,7 +267,7 @@ else
             case MenuOptions.Communicate:
                 <DxFormLayout CssClass="px-4 col col-12 col-md-10 mx-auto">
                     <StudentGrid @ref="studentGrid"
-                                 Enrolments=@(termAndCourse.EnrolmentsWithLeaders)
+                                 Enrolments=@EnrolmentsToSelectFrom
                                  Settings="settings" />
                     <div class="input-group">
                         <DxButton Text="Email"
