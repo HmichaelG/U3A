@@ -43,7 +43,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         try
         {
             dbc = await U3Adbfactory.CreateDbContextAsync();
