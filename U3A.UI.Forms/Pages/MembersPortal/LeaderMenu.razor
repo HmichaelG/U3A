@@ -243,7 +243,7 @@ else
             case MenuOptions.ManageEnrolments:
                 <DxFormLayout CssClass="px-4 col col-12 col-md-10 mx-auto">
                     <StudentGrid @ref="studentGrid"
-                                 Enrolments="EnrolmentsToSelectFrom"
+                                 Enrolments="@Enrolments"
                                  Settings="settings" IsManageEnrolmentsView=true />
                     <div class="input-group">
                         <DxButton Text="Delete Selected"
@@ -761,6 +761,7 @@ else
         selectedClass = termAndCourse.selectedClass;
         selectedVenue = selectedClass.Venue;
         Enrolments = termAndCourse.Enrolments;
+        selectedStudent = null;
         menuSelection = selection;
         if (menuSelection == MenuOptions.ManageEnrolments &&
                 !selectedTerm.IsClassAllocationFinalised)
@@ -787,8 +788,7 @@ else
             });
         }
         foreach (var e in Enrolments) { Students.Add(e.Person); }
-        selectedStudent = null;
-        EnrolmentsToSelectFrom = Enrolments; // set the default
+        EnrolmentsToSelectFrom = StudentsAndLeaders.Select(x => x.Enrolment).ToList(); // set the default
         if (menuSelection == MenuOptions.Communicate)
         {
             if (await selectEnrolmentType.ShowAsync())
@@ -796,13 +796,12 @@ else
                 switch (selectEnrolmentType.EnrolmentType)
                 {
                     case 1:
-                        EnrolmentsToSelectFrom = Enrolments.Where(x => !x.IsWaitlisted).ToList();
+                        EnrolmentsToSelectFrom = EnrolmentsToSelectFrom.Where(x => !x.IsWaitlisted).ToList();
                         break;
                     case 2:
-                        EnrolmentsToSelectFrom = Enrolments.Where(x => x.IsWaitlisted).ToList();
+                        EnrolmentsToSelectFrom = EnrolmentsToSelectFrom.Where(x => x.IsWaitlisted).ToList();
                         break;
                     default:
-                        EnrolmentsToSelectFrom = Enrolments;
                         break;
                 }
             }

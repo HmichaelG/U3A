@@ -187,6 +187,7 @@ namespace U3A.BusinessRules
             if (person == null) return null;
             var result = new Enrolment();
             template.CopyTo(result);
+            result.ID = Guid.NewGuid();
             result.PersonID = person.ID;
             result.Person = person;
             result.isLeader = true;
