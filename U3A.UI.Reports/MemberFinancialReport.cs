@@ -28,7 +28,6 @@ namespace U3A.UI.Reports
                 FilterString = "[Course] != ''";
             }
             xrCourse.CanGrow = !(bool)prmSummaryTextOnly.Value;
-            xrDescription.CanGrow = !(bool)prmSummaryTextOnly.Value;
         }
     }
 }
