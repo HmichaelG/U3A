@@ -584,7 +584,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        newEnrolmentGuids = new List<Guid>();
+        newEnrolmentGuids = [];
         var listHeightValue = 0;
         if (ws.UseTopMenu) listHeightValue = 4;
         listHeightValue += (loginState.IsAdminOnBehalfOfMember) ? 9 : 4;
@@ -1086,7 +1086,10 @@ else
                     if (addedEnrolment != null)
                     {
                         await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolment, term, settings));
-                        newEnrolmentGuids.Add(addedEnrolment.ID);
+                        if (!newEnrolmentGuids.Contains(addedEnrolment.ID)) 
+                        {
+                            newEnrolmentGuids.Add(addedEnrolment.ID);
+                        }
                     }
                     isDirty = false;
                 }

@@ -180,6 +180,13 @@ public class MemberFeeCalculationService
                 ShowFullAllocation: true, AddUnallocatedCredit: true)
                 .ToList();
     }
+    public List<MemberFee> GetTransactionDetail(Person person)
+    {
+        var fees = MemberFees.TryGetValue(person.ID, out var list) ? list : new ConcurrentBag<MemberFee>();
+        return AllocateMemberPayments(fees, person,
+                ShowFullAllocation: true, AddUnallocatedCredit: false)
+                .ToList();
+    }
 
     public List<MemberPaymentAvailable> GetAvailableMemberPayments(Person person = null)
     {
@@ -237,7 +244,8 @@ public class MemberFeeCalculationService
     }
 
     object lockObject = new();
-    public decimal CalculateFee(Person? person = null, int? CalculateForTerm = null)
+    public decimal CalculateFee(Person? person = null,
+                                int? CalculateForTerm = null)
     {
         var result = decimal.Zero;
         if (person == null) { person = People.FirstOrDefault(); }
@@ -521,7 +529,7 @@ public class MemberFeeCalculationService
             foreach (var e in enrolments.Where(x => x.TermID == t.ID))
             {
                 DateTime dateEnrolled = e.DateEnrolled.Value;
-                DateTime dateDue = (e.Course.CourseFeePerYearDueDate.HasValue) 
+                DateTime dateDue = (e.Course.CourseFeePerYearDueDate.HasValue)
                                         ? e.Course.CourseFeePerYearDueDate.Value.ToDateTime(TimeOnly.MinValue)
                                         : dateEnrolled;
                 if (dateDue <= today)
@@ -628,7 +636,7 @@ public class MemberFeeCalculationService
         foreach (var c in classesLead)
         {
             //Fees per year
-            dueDate = (c.Course.CourseFeePerYearDueDate.HasValue) 
+            dueDate = (c.Course.CourseFeePerYearDueDate.HasValue)
                 ? c.Course.CourseFeePerYearDueDate.Value.ToDateTime(TimeOnly.MinValue)
                 : (c.StartDate.HasValue) ? c.StartDate.Value : new DateTime(BillingYear, 1, 1);
             if (dueDate <= today)
@@ -781,6 +789,11 @@ public class MemberFeeCalculationService
         List<MemberFee> result = new List<MemberFee>();
         List<MemberFee> allocatedItems = new List<MemberFee>();
         List<List<MemberFee>> combinations = new List<List<MemberFee>>();
+        foreach (var item in ItemsToAllocate)
+        {
+            item.Allocated = item.Balance = null;
+            item.IsNotAllocated = false;
+        }
         var fees = ItemsToAllocate.Where(x => x.PersonID == person.ID)
             .OrderBy(x => x.Date).ThenBy(x => x.SortOrder)
             .Where(x => x.Amount > 0).ToArray();

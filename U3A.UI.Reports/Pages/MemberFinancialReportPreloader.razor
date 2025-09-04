@@ -33,35 +33,63 @@ else
         {
             asAt = dbc.GetLocalTime().ToString(constants.STD_DATETIME_FORMAT);
             var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-            people = await BusinessRule.SelectablePersonsAsync(dbc,currentTerm);
+            people = await BusinessRule.SelectablePersonsAsync(dbc, currentTerm);
             service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
         }
-        var memberFeesList = new ConcurrentBag<MemberFee>();
-        await Parallel.ForEachAsync(people, async (p, _) =>
-        {
-            service.CalculateFee(p);
-            var allocatedFees = service.GetAllocatedMemberFees(p);
-            foreach (var fee in allocatedFees)
-            {
-                memberFeesList.Add(fee);
-            }
-        });
+        var peopleWithFinancialStatus = service.PeopleWithFinancialStatus.OrderBy(x => x.FullName).ToList(); ;
         switch (ReportName)
         {
             case "MemberFinancialReport":
                 report = new MemberFinancialReport();
                 report.Parameters["prmAsAt"].Value = asAt;
-                report.DataSource = memberFeesList.ToList();
+                report.DataSource = await GetFeeSummary(people, service);
+                break;
+            case "TrialBalanceReport":
+                report = new TrialBalanceReport();
+                report.Parameters["prmAsAt"].Value = asAt;
+                report.DataSource = await GetTransactionDetail(people,service);
                 break;
             case "CourseFeesReport":
                 report = new CourseFeesReport();
                 report.Parameters["prmAsAt"].Value = asAt;
-                report.DataSource = memberFeesList.ToList();
+                report.DataSource = await GetFeeSummary(people, service);
                 report.FilterString = "[CourseID] != null";
 
                 break;
         }
         isReady = true;
+    }
+
+    private async Task<List<MemberFee>> GetFeeSummary(IEnumerable<Person> people,
+        MemberFeeCalculationService service)
+    {
+        var memberFeesList = new ConcurrentBag<MemberFee>();
+        await Parallel.ForEachAsync(people, async (p, _) =>
+        {
+            service.CalculateFee(p);
+            var allocatedFees = service.GetAllocatedMemberFees(p); // fees + unallocated credits
+            foreach (var fee in allocatedFees)
+            {
+                memberFeesList.Add(fee);
+            }
+        });
+        return memberFeesList.ToList();
+    }
+
+    private async Task<List<PersonFinancialStatus>> GetTransactionDetail(IEnumerable<Person> people,
+        MemberFeeCalculationService service)
+    {
+        await Parallel.ForEachAsync(people, async (p, _) =>
+        {
+            service.CalculateFee(p);
+        });
+        var peopleWithStatus = service.PeopleWithFinancialStatus;
+        await Parallel.ForEachAsync(peopleWithStatus, async (p, _) =>
+        {
+            p.MemberFees = service.GetTransactionDetail(p.PersonBase);
+        });
+
+        return peopleWithStatus.OrderBy(x => x.FullName).ToList();
     }
 
 }

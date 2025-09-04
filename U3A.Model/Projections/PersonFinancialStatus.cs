@@ -43,11 +43,20 @@ namespace U3A.Model
                 return $"{LastName}, {FirstName}";
             }
         }
+        public string PersonKey
+        {
+            get
+            {
+                return $"{FullName}-{PersonBase.ID}";
+            }
+        }
+
         public DateTime? DateJoined { get; set; }
         public int FinancialTo { get; set; } = constants.START_OF_TIME;
         public int? FinancialToTerm { get; set; }
         public string FinancialToText { get; set; }
         public string FinancialToBriefText { get; set; }
         public DateTime? LastReceipt { get; set; }
+        public List<MemberFee> MemberFees { get; set; } = [];
     }
 }
