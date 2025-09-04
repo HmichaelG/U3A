@@ -45,7 +45,7 @@
             this.xrTableRow1 = new DevExpress.XtraReports.UI.XRTableRow();
             this.xrTableCell1 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell2 = new DevExpress.XtraReports.UI.XRTableCell();
-            this.xrTableCell3 = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrCourse = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell4 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell5 = new DevExpress.XtraReports.UI.XRTableCell();
             this.objectDataSource1 = new DevExpress.DataAccess.ObjectBinding.ObjectDataSource(this.components);
@@ -75,6 +75,8 @@
             this.xrTableCell9 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell10 = new DevExpress.XtraReports.UI.XRTableCell();
             this.prmAsAt = new DevExpress.XtraReports.Parameters.Parameter();
+            this.prmOutstandingOnly = new DevExpress.XtraReports.Parameters.Parameter();
+            this.prmSummaryTextOnly = new DevExpress.XtraReports.Parameters.Parameter();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable4)).BeginInit();
@@ -156,7 +158,8 @@
             // xrLabel1
             // 
             this.xrLabel1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[FullName]")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[FullName]"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Iif(?prmOutstandingOnly,Iif([TotalFees] != 0,true , False) , true)")});
             this.xrLabel1.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Bold);
             this.xrLabel1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrLabel1.Multiline = true;
@@ -171,6 +174,7 @@
             // Detail
             // 
             this.Detail.HeightF = 0F;
+            this.Detail.KeepTogether = true;
             this.Detail.Name = "Detail";
             // 
             // xrTable1
@@ -188,7 +192,7 @@
             this.xrTableRow1.Cells.AddRange(new DevExpress.XtraReports.UI.XRTableCell[] {
             this.xrTableCell1,
             this.xrTableCell2,
-            this.xrTableCell3,
+            this.xrCourse,
             this.xrTableCell4,
             this.xrTableCell5});
             this.xrTableRow1.Name = "xrTableRow1";
@@ -215,15 +219,16 @@
             this.xrTableCell2.Text = "xrLabel2";
             this.xrTableCell2.Weight = 72.572155392138171D;
             // 
-            // xrTableCell3
+            // xrCourse
             // 
-            this.xrTableCell3.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+            this.xrCourse.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[Description]")});
-            this.xrTableCell3.Multiline = true;
-            this.xrTableCell3.Name = "xrTableCell3";
-            this.xrTableCell3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2F, 2F, 0F, 0F, 100F);
-            this.xrTableCell3.Text = "xrLabel3";
-            this.xrTableCell3.Weight = 344.41123462699568D;
+            this.xrCourse.Multiline = true;
+            this.xrCourse.Name = "xrCourse";
+            this.xrCourse.Padding = new DevExpress.XtraPrinting.PaddingInfo(2F, 2F, 0F, 0F, 100F);
+            this.xrCourse.Text = "xrLabel3";
+            this.xrCourse.TextTrimming = DevExpress.Drawing.DXStringTrimming.EllipsisWord;
+            this.xrCourse.Weight = 344.41123462699568D;
             // 
             // xrTableCell4
             // 
@@ -479,7 +484,10 @@
             // 
             this.groupFooterBand1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrLine1});
+            this.groupFooterBand1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Iif(?prmOutstandingOnly,Iif([TotalFees] != 0,true , False) , true)\n\n")});
             this.groupFooterBand1.HeightF = 6.861116F;
+            this.groupFooterBand1.KeepTogether = true;
             this.groupFooterBand1.Name = "groupFooterBand1";
             // 
             // xrLine1
@@ -503,6 +511,8 @@
             // 
             this.Detail1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrTable1});
+            this.Detail1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Iif(?prmOutstandingOnly,Iif([TotalFees] != 0,true , False) , true)\n")});
             this.Detail1.HeightF = 23F;
             this.Detail1.Name = "Detail1";
             // 
@@ -589,6 +599,20 @@
             this.prmAsAt.Name = "prmAsAt";
             this.prmAsAt.Visible = false;
             // 
+            // prmOutstandingOnly
+            // 
+            this.prmOutstandingOnly.Description = "Show Outstanding Only?";
+            this.prmOutstandingOnly.Name = "prmOutstandingOnly";
+            this.prmOutstandingOnly.Type = typeof(bool);
+            this.prmOutstandingOnly.ValueInfo = "True";
+            // 
+            // prmSummaryTextOnly
+            // 
+            this.prmSummaryTextOnly.Description = "Show Summary Text Only?";
+            this.prmSummaryTextOnly.Name = "prmSummaryTextOnly";
+            this.prmSummaryTextOnly.Type = typeof(bool);
+            this.prmSummaryTextOnly.ValueInfo = "True";
+            // 
             // TrialBalanceReport
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -610,9 +634,13 @@
             this.PageWidthF = 826.7717F;
             this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
-            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmAsAt, DevExpress.XtraReports.Parameters.Orientation.Horizontal)});
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmAsAt, DevExpress.XtraReports.Parameters.Orientation.Horizontal),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmOutstandingOnly, DevExpress.XtraReports.Parameters.Orientation.Vertical),
+            new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.prmSummaryTextOnly, DevExpress.XtraReports.Parameters.Orientation.Vertical)});
             this.Parameters.AddRange(new DevExpress.XtraReports.Parameters.Parameter[] {
-            this.prmAsAt});
+            this.prmAsAt,
+            this.prmOutstandingOnly,
+            this.prmSummaryTextOnly});
             this.StyleSheet.AddRange(new DevExpress.XtraReports.UI.XRControlStyle[] {
             this.Title,
             this.GroupCaption1,
@@ -620,6 +648,7 @@
             this.GroupFooterBackground3,
             this.PageInfo});
             this.Version = "25.1";
+            this.ParametersRequestSubmit += new System.EventHandler<DevExpress.XtraReports.Parameters.ParametersRequestEventArgs>(this.TrialBalanceReport_ParametersRequestSubmit);
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectDataSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable4)).EndInit();
@@ -649,7 +678,7 @@
         private DevExpress.XtraReports.UI.XRTableRow xrTableRow1;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell1;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell2;
-        private DevExpress.XtraReports.UI.XRTableCell xrTableCell3;
+        private DevExpress.XtraReports.UI.XRTableCell xrCourse;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell4;
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell5;
         private DevExpress.XtraReports.UI.GroupFooterBand groupFooterBand1;
@@ -674,5 +703,7 @@
         private DevExpress.XtraReports.UI.XRTableCell xrTableCell21;
         private DevExpress.XtraReports.UI.XRLabel xrLabel3;
         private DevExpress.XtraReports.Parameters.Parameter prmAsAt;
+        private DevExpress.XtraReports.Parameters.Parameter prmOutstandingOnly;
+        private DevExpress.XtraReports.Parameters.Parameter prmSummaryTextOnly;
     }
 }
