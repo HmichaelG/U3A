@@ -2,6 +2,7 @@
 
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@using Ganss.Xss
 @using U3A.Services
 @using U3A.Services.Email;
 
@@ -150,8 +151,8 @@ else
                     </Columns>
                 </DxGrid>
                 <DxFormLayoutGroup Caption="Message">
-                    <div class="p-4">
-                        @(new MarkupString(messageEvents.FirstOrDefault()?.HtmlBody))
+                    <div class="m-4">
+                        @(new MarkupString(SanitizeHtml()))
                     </div>
                 </DxFormLayoutGroup>
             </DxFormLayout>
@@ -292,5 +293,16 @@ else
             await progressBar.Close();
         }
         else await messageBox.ShowOkOnlyAsync("Invalid Dates", "The From date must be prior to the To date.");
+    }
+
+    string SanitizeHtml()
+    {
+        string result = "";
+        var sanitizer = new HtmlSanitizer();
+        sanitizer.AllowedCssProperties.Clear();
+        sanitizer.AllowedAttributes.Clear();
+        result = sanitizer.SanitizeDocument(messageEvents.FirstOrDefault().HtmlBody, "");
+        //get all empty spans or spans that only contain &nbsp; and remove them
+        return System.Text.RegularExpressions.Regex.Replace(result, @"<span[^>]*>(&nbsp;|\s)*<\/span>", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
 }
