@@ -29,10 +29,11 @@ else
         MemberFeeCalculationService service;
         List<Person> people;
         string asAt;
+        Term currentTerm = null;
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
         {
             asAt = dbc.GetLocalTime().ToString(constants.STD_DATETIME_FORMAT);
-            var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+            currentTerm = await BusinessRule.CurrentTermAsync(dbc);
             people = await BusinessRule.SelectablePersonsAsync(dbc, currentTerm);
             service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm);
         }
@@ -48,6 +49,7 @@ else
                 report = new TrialBalanceReport();
                 report.Parameters["prmAsAt"].Value = asAt;
                 report.DataSource = await GetTransactionDetail(people,service);
+                report.FilterString = $"[FinancialTo] >= {currentTerm.Year}";
                 break;
             case "CourseFeesReport":
                 report = new CourseFeesReport();
