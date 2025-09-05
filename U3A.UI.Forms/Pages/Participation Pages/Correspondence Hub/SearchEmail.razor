@@ -301,6 +301,23 @@ else
         var sanitizer = new HtmlSanitizer();
         sanitizer.AllowedCssProperties.Clear();
         sanitizer.AllowedAttributes.Clear();
+        // Allow styles only for <table>, <td>, <th>, etc.
+        sanitizer.AllowedTags.Add("table");
+        sanitizer.AllowedTags.Add("tr");
+        sanitizer.AllowedTags.Add("td");
+        sanitizer.AllowedTags.Add("th");
+
+        // Allow style attribute only on table-related tags
+        sanitizer.AllowedAttributes.Add("style");
+
+        // Whitelist specific CSS properties for table elements
+        sanitizer.AllowedCssProperties.Add("width");
+        sanitizer.AllowedCssProperties.Add("height");
+        sanitizer.AllowedCssProperties.Add("text-align");
+        sanitizer.AllowedCssProperties.Add("vertical-align");
+        sanitizer.AllowedCssProperties.Add("overflow");
+        sanitizer.AllowedCssProperties.Add("display");
+
         result = sanitizer.SanitizeDocument(messageEvents.FirstOrDefault().HtmlBody, "");
         //get all empty spans or spans that only contain &nbsp; and remove them
         return System.Text.RegularExpressions.Regex.Replace(result, @"<span[^>]*>(&nbsp;|\s)*<\/span>", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
