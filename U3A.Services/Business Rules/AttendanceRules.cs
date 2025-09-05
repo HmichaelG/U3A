@@ -264,13 +264,14 @@ public static partial class BusinessRule
                 Term selectedTerm, Class selectedClass, DateTime Today)
     {
         var startDate = selectedTerm.StartDate;
+        var onFileCutoffDate = Today.Date.AddDays(1).AddSeconds(-1);
         List<ClassDate> result = new();
 
         // a list of attendance records already created up till today's date
         List<ClassDate> onFileDates = await dbc.AttendClass
                                                 .Where(x => x.TermID == selectedTerm.ID
                                                             && x.ClassID == selectedClass.ID
-                                                            && x.Date <= startDate)
+                                                            && x.Date <= onFileCutoffDate )
                                                 .Select(x => new ClassDate()
                                                 {
                                                     Date = x.Date,
@@ -293,7 +294,7 @@ public static partial class BusinessRule
 
         // merge what is already on file & sort
         result.AddRange(onFileDates);
-        return result.OrderBy(a => a.Date).ToList();
+        return result.DistinctBy(a => a.Date).OrderBy(a => a.Date).ToList();
     }
 
     public static async Task<List<AttendClass>> GetAttendanceDetailAsync(U3ADbContext dbc, Term SelectedTerm, Guid ClassID, DateTime ClassDate)

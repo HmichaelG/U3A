@@ -599,8 +599,7 @@ else
     {
         if (ClassDate.Date.Date > now.Date)
         {
-            if (!await messageBox.ShowAsync("Welcome Time Lord!",
-                                                                                                                                        @"The class date you have selected is in the future.<br/>
+            if (!await messageBox.ShowAsync("Welcome Time Lord!",@"The class date you have selected is in the future.<br/>
                 Entering attendance into the future can be problematic for mere mortals.<br/><br/>
                 Do you wish to continue?")) return;
         }
@@ -653,8 +652,8 @@ else
 
     async Task OnNewDateButtonClick()
     {
-        maxDate = now.Date;
-        newClassDate = maxDate.Date;
+        newClassDate = dbc.GetLocalDate().AddHours(SelectedClass.StartTime.Hour).AddMinutes(SelectedClass.StartTime.Minute);
+        maxDate = dbc.GetLocalDate().AddDays(8).AddSeconds(-1);
         if (maxDate <= SelectedTerm.StartDate)
         {
             await messageBox.ShowOkOnlyAsync("Re-select term",
