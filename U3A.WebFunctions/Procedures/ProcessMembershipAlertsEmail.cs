@@ -112,6 +112,7 @@ namespace U3A.WebFunctions.Procedures
             {
                 var introduction = $@"<p>The following email suppressions have been received in the last 7 days. Please investigate carefully.</p>";
                 msg += FormatSuppressions(suppressions, introduction);
+                msg += "<p></p>";
             }
 
             // public holidays
@@ -127,6 +128,7 @@ namespace U3A.WebFunctions.Procedures
                     var introduction = $@"<p>The following public holidays will occur in the next week.
                                             <br/>If classes are to be held on these day(s) please delete from the Public Holidays list.</p>";
                     msg += FormatPublicHolidays(publicHolidays, introduction);
+                    msg += "<p></p>";
                 }
             }
 
@@ -141,6 +143,7 @@ namespace U3A.WebFunctions.Procedures
             {
                 var introduction = "<p>The following members have joined the U3A but are still unfinancial. Do you need to import Direct Payment details?</p>";
                 msg += FormatPeople(people, introduction);
+                msg += "<p></p>";
             }
 
             // new persons joined, financial but not enrolled
@@ -157,6 +160,7 @@ namespace U3A.WebFunctions.Procedures
                     var introduction = $@"<p>The following members have joined the U3A in the last 14 days and are financial.
                                             <br/>However, they have yet to enroll in a course. Do they need assistance?</p>";
                     msg += FormatPeople(people, introduction);
+                    msg += "<p></p>";
                 }
                 people = await BusinessRule.SelectableNewPersonsWaitlistedOnlyAsync(dbc,
                                 term,
@@ -167,6 +171,7 @@ namespace U3A.WebFunctions.Procedures
                     var introduction = $@"<p>The following members have joined the U3A in the last day and are financial.
                                             <br/>However, all their course enrollment requests have been waitlisted. Do they understand what this means?</p>";
                     msg += FormatPeople(people, introduction);
+                    msg += "<p></p>";
                 }
                 if (DoEnrolledButUnfinancial)
                 {
@@ -181,6 +186,7 @@ namespace U3A.WebFunctions.Procedures
                                             <br>For detail on classes requested review the report, <strong>Course By Participant List</strong>
                                                 and filter by <strong>financial status</strong>.</p>";
                         msg += FormatPeopleAndClasses(people, introduction);
+                        msg += "<p></p>";
                     }
                 }
             }
@@ -188,7 +194,7 @@ namespace U3A.WebFunctions.Procedures
             if (!string.IsNullOrWhiteSpace(msg))
             {
                 msg = $@"<p>Good day!</p> {msg}
-                        <p><p>Thank you<br/>
+                        <p>Thank you<br/>
                         Please do not reply. This email address is not monitored.";
 
             }
