@@ -74,8 +74,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await SetupReport();
         isReady = true;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await SetupReport();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -112,7 +116,6 @@
             {
                 ReportIsReady = true;
                 Report = (XtraReport?)Activator.CreateInstance(thisType);
-                ReportName = Report.Name;
                 if (Report is IXtraReportWithNavManager)
                 {
                     (Report as IXtraReportWithNavManager).NavManager = NavMan;
@@ -161,7 +164,8 @@
                 ReportIsReady = false;
                 if (ReportIsReadyChanged.HasDelegate)
                 {
-                    await ReportIsReadyChanged.InvokeAsync();
+                    Report = null;
+                    await ReportIsReadyChanged.InvokeAsync(false);
                 }
                 else
                 {
