@@ -47,8 +47,8 @@ else
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <XtraReportViewer Report="@venueConflictList" 
-        ReportIsReady=@isReportReady ReportIsReadyChanged="() => {isReportReady = false; StateHasChanged(); }" />
+    <XtraReportViewer ReportName="VenueConflictList" 
+        ReportIsReady=@isReportReady ReportIsReadyChanged="() => isReportReady = false" />
 
     <DxTabs @ref=@tabs ActiveTabIndexChanged="GetData">
         <DxTabPage Text="All Courses" />
@@ -115,7 +115,7 @@ else
                                                Text="Venue Conflicts" Visible="!IsReadOnly"
                                                RenderStyle="@ButtonRenderStyle.Warning"
                                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                               Click="() => { venueConflictList = new() {DbContext = dbc}; isReportReady = true;}" />
+                                               Click="() => isReportReady = true" />
                             </CustomButtonContent>
                         </GridToolbar>
                     </ToolbarTemplate>
