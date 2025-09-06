@@ -45,6 +45,7 @@
                             SinglePagePreview="false"
                             Zoom="1"
                             CssClass="w-100 h-100"
+                            TabPanelWidth="400"
                             OnCustomizeToolbar="OnCustomizeToolbar" />
         </BodyContentTemplate>
     </DxWindow>
@@ -59,7 +60,7 @@
     [Parameter]
     public XtraReport? Report { get; set; }
     [Parameter]
-    public bool ReportIsReady { get; set; } = false;
+    public bool ReportIsReady { get; set; } = true;
     [Parameter]
     public EventCallback<bool> ReportIsReadyChanged { get; set; }
 
@@ -79,7 +80,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        await SetupReport();
+        if (ReportIsReady) { await SetupReport(); }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -132,7 +133,6 @@
                     {
                         (Report as IXtraReportWithDbContextAndTenantDbContext).DbContext = dbc;
                         (Report as IXtraReportWithDbContextAndTenantDbContext).TenantDbContext = dbcT;
-                        //(Report as IXtraReportWithDbContextAndTenantDbContext).TenantService = TenantService;
                     }
                     if (Report is IXtraReportWithDbContextFactory)
                     {
@@ -152,6 +152,10 @@
 
     void OnCustomizeToolbar(ToolbarModel toolbarModel)
     {
+        var item = toolbarModel.AllItems.Find(x => x.Text == "Cancel Document Creation");
+        if (item != null) { toolbarModel.AllItems.Remove(item); }
+        item = toolbarModel.AllItems.Find(x => x.Text == "Highlight Editing Fields");
+        if (item != null) { toolbarModel.AllItems.Remove(item); }
         toolbarModel.AllItems.Add(new ToolbarItem()
         {
             IconCssClass = "fw-bold text-fl-primary exit-icon",
@@ -164,8 +168,9 @@
                 ReportIsReady = false;
                 if (ReportIsReadyChanged.HasDelegate)
                 {
-                    Report = null;
+                    reportViewer.ShouldDisposeReport = true;
                     await ReportIsReadyChanged.InvokeAsync(false);
+                    Report = null;
                 }
                 else
                 {
