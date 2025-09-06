@@ -132,26 +132,32 @@ else
               HeaderText="Email Message Details">
         <BodyTextTemplate>
             <DxFormLayout>
-                <DxFormLayoutGroup Caption="Email Details" CssClass="my-2">
+                <DxFormLayoutGroup Caption="Email Details" CssClass="my-2 w-100">
                     <div class="px-4 w-100">
-                        <table class="table">
-                            <tbody>
-                                <tr><th scope="row" class="col-2">Time</th> <td>@selectedEmail.ReceivedAt.ToString("dd-MMM-yy hh:mm tt")</td></tr>
-                                <tr><th scope="row" class="col-2">Subject</th> <td>@selectedEmail.Subject</td></tr>
-                                <tr><th scope="row" class="col-2">From</th> <td>@selectedEmail.From</td></tr>
-                            </tbody>
-                        </table>
+                    <div class="d-flex flex-row detail-row">
+                        <div class="col-2"><b>Time</b></div>
+                        <div class="col-10">@selectedEmail.ReceivedAt.ToString("dd-MMM-yy hh:mm tt")</div>
+                        </div>
+                    <div class="d-flex flex-row detail-row">
+                        <div class="col-2"><b>Subject</b></div> 
+                        <div class="col-10">@selectedEmail.Subject</div>
+                        </div>
+                    <div class="d-flex flex-row detail-row">
+                        <div class="col-2"><b>From</b></div> 
+                        <div class="col-10">@selectedEmail.From</div>
+                    </div>
                     </div>
                 </DxFormLayoutGroup>
-                <DxGrid Data=@messageEvents @ref=@eventGrid
-                        CssClass="m-2" id="myGrid">
+                <DxFormLayoutGroup Caption="Events">
+                <DxGrid Data=@messageEvents @ref=@eventGrid CssClass="m-2" id="myGrid">
                     <Columns>
                         <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Time" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
                         <DxGridDataColumn Caption="Event" FieldName="Type" />
                     </Columns>
                 </DxGrid>
+                </DxFormLayoutGroup>
                 <DxFormLayoutGroup Caption="Message">
-                    <div class="m-4">
+                    <div class="w-100 m-4">
                         @(new MarkupString(SanitizeHtml()))
                     </div>
                 </DxFormLayoutGroup>
@@ -160,13 +166,11 @@ else
     </DxWindow>
 
     <style>
-        .window-height {
-            height: 40vh;
+        .detail-row {
+            line-height: 2.5;
+            border-bottom: 1px solid #ddd;
         }
 
-        .event-grid-height {
-            height: 40vh;
-        }
     </style>
 }
 
