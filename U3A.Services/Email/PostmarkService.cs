@@ -317,6 +317,8 @@ namespace U3A.Services.Email
                     Type = detail.Type,
                     ReceivedAt = detail.ReceivedAt + offset,
                     HtmlBody = details.HtmlBody,
+                    Subject = details.Subject,
+                    Stream = message.Stream
                 };
                 result.Add(ev);
             }

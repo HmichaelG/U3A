@@ -80,6 +80,7 @@ namespace U3A.Model
         public string Type { get; set; }
         public DateTime ReceivedAt { get; set; }
         public string Subject { get; set; }
+        public string Stream { get; set; }
 
         public string HtmlBody { get; set; }
     }
