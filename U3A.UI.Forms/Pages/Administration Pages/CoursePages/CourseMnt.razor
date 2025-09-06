@@ -47,6 +47,9 @@ else
 
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
+    <XtraReportViewer ReportName="VenueConflictList" 
+        ReportIsReady=@isReportReady ReportIsReadyChanged="() => isReportReady = false" />
+
     <DxTabs @ref=@tabs ActiveTabIndexChanged="GetData">
         <DxTabPage Text="All Courses" />
         <DxTabPage Text="Current" />
@@ -87,12 +90,12 @@ else
                                      IsMasterDetail=@(!IsReadOnly)
                                      LayoutKey="@GridLayoutKey">
                             <CustomButtonContent>
-                                <DxToolbarItem CssClass="w-100 mx-1" IconCssClass="bi bi-database"
+                                <DxToolbarItem IconCssClass="bi bi-database"
                                                Text="Rebuild Cache" Visible="!IsReadOnly"
                                                RenderStyle="@ButtonRenderStyle.Primary"
                                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
                                                Click="@OnRebuild" />
-                                <DxToolbarItem CssClass="w-100" IconCssClass="bi bi-check-circle"
+                                <DxToolbarItem IconCssClass="bi bi-check-circle"
                                                Text="Preview Schedule" Visible="!IsReadOnly"
                                                RenderStyle="@ButtonRenderStyle.Info"
                                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained">
@@ -108,6 +111,11 @@ else
 
                                     </Items>
                                 </DxToolbarItem>
+                                <DxToolbarItem IconCssClass="bi bi-cone-striped"
+                                               Text="Venue Conflicts" Visible="!IsReadOnly"
+                                               RenderStyle="@ButtonRenderStyle.Warning"
+                                               RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                               Click="() => isReportReady = true" />
                             </CustomButtonContent>
                         </GridToolbar>
                     </ToolbarTemplate>
@@ -241,6 +249,7 @@ else
     public string GridLayoutKey { get; set; } = "{2A9D0137-5DD2-4290-A9B7-4C4F5676F224}";
 
     bool IsReady;
+    bool isReportReady;
 
     DxTabs? tabs;
     Progress? progressBar;
