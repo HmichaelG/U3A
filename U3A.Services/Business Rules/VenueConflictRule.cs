@@ -13,14 +13,16 @@ namespace U3A.BusinessRules
             List<VenueConflict> potentialConflicts = new List<VenueConflict>();
             Task<DxSchedulerDataStorage> syncTask = Task.Run(async () =>
             {
-                return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm);
+                return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm,IncludeOffScheduleActivities: true);
             });
             syncTask.Wait();
             var scheduleStorage = syncTask.Result;
 
             DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(selectedTerm.StartDate,
                         selectedTerm.EndDate.AddDays(1));
-            var appointments = scheduleStorage.GetAppointments(range);
+            var appointments = scheduleStorage.GetAppointments(range)
+                                .OrderBy(x => x.Start)
+                                .ToList();
             foreach (var a in scheduleStorage.GetAppointments(range))
             {
                 if ((int)a.LabelId != 9)

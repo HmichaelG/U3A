@@ -1,4 +1,5 @@
-﻿using DevExpress.XtraReports.UI;
+﻿using DevExpress.Blazor;
+using DevExpress.XtraReports.UI;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -20,19 +21,24 @@ namespace U3A.UI.Reports
 
         private void VenueConflictList_DataSourceDemanded(object sender, EventArgs e)
         {
-            Term term = new Term()
-            {
-                Duration = (int)WeeksReqd.Value,
-                StartDate = (DateTime)StartDate.Value,
-                TermNumber = 1,
-                Year = 9999
-            };
+            var term = DbContext.Term.Find((Guid)prmTerm.Value); 
             DataSource = BusinessRule.ReportableVenueConflicts(DbContext, term);
         }
 
         private void VenueConflictList_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
-            StartDate.Value = DateTime.Today;
+            var term = BusinessRule.CurrentTerm(DbContext);
+            var terms = BusinessRule.SelectableTerms(DbContext).Where(x => x.Comparer >= term.Comparer).ToList();
+            objectDataSource2.DataSource = terms;
+            prmTerm.Value = term?.TermSummary;
+            prmTerm.Value = term?.ID;
+
+        }
+
+        private void xrSubTitle_BeforePrint(object sender, CancelEventArgs e)
+        {
+            var term = DbContext.Term.Find((Guid)prmTerm.Value);
+            xrSubTitle.Text = $"For {term?.TermSummary}";
         }
     }
 }
