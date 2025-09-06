@@ -176,34 +176,34 @@ else
 
 
 @code {
-    IEnumerable<EmailMessage> messages;
-    IEnumerable<EmailMessageEvent> messageEvents;
-    IEnumerable<string> email;
-    EmailMessage selectedEmail;
-    List<Person> people { get; set; }
-    Person selectedPerson { get; set; }
-    MessageBox? messageBox;
-    Progress? progressBar;
-    U3ADbContext dbc { get; set; }
-    PostmarkService service;
-    bool IsReady;
-    bool isSearchByEmailAddress;
-    string emailAddress;
-    string emailAddressValue;
-    bool IsSearchByDateRange;
-    bool areDetailsExpanded = true;
-    FullScreen? fullScreen;
+        IEnumerable<EmailMessage> messages;
+        IEnumerable<EmailMessageEvent> messageEvents;
+        IEnumerable<string> email;
+        EmailMessage selectedEmail;
+        List<Person> people { get; set; }
+        Person selectedPerson { get; set; }
+        MessageBox? messageBox;
+        Progress? progressBar;
+        U3ADbContext dbc { get; set; }
+        PostmarkService service;
+        bool IsReady;
+        bool isSearchByEmailAddress;
+        string emailAddress;
+        string emailAddressValue;
+        bool IsSearchByDateRange;
+        bool areDetailsExpanded = true;
+        FullScreen? fullScreen;
 
-    IGrid? mainGrid { get; set; }
-    IGrid? eventGrid { get; set; }
-    GridToolbar? Toolbar;
-    DxWindow emailDetailsForm;
-    DateTime fromDate;
-    DateTime toDate;
-    DateTime minDate;
-    DateTime maxDate;
-    TimeSpan tzOffset;
-    LocalTime? localTime;
+        IGrid? mainGrid { get; set; }
+        IGrid? eventGrid { get; set; }
+        GridToolbar? Toolbar;
+        DxWindow emailDetailsForm;
+        DateTime fromDate;
+        DateTime toDate;
+        DateTime minDate;
+        DateTime maxDate;
+        TimeSpan tzOffset;
+        LocalTime? localTime;
 
     protected override async Task OnInitializedAsync()
     {
@@ -301,7 +301,9 @@ else
 
     string SanitizeHtml()
     {
-        string result = "";
+        string html = messageEvents.FirstOrDefault().HtmlBody;
+        var stream = messageEvents.FirstOrDefault().Stream;
+        if (stream != null && stream.ToLowerInvariant().Contains("transaction")) { return html; }
         var sanitizer = new HtmlSanitizer();
         sanitizer.AllowedCssProperties.Clear();
         sanitizer.AllowedAttributes.Clear();
@@ -322,7 +324,7 @@ else
         sanitizer.AllowedCssProperties.Add("overflow");
         sanitizer.AllowedCssProperties.Add("display");
 
-        result = sanitizer.SanitizeDocument(messageEvents.FirstOrDefault().HtmlBody, "");
+        var result = sanitizer.SanitizeDocument(html, "");
         //get all empty spans or spans that only contain &nbsp; and remove them
         return System.Text.RegularExpressions.Regex.Replace(result, @"<span[^>]*>(&nbsp;|\s)*<\/span>", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
