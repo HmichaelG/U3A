@@ -5,6 +5,7 @@
 @using Ganss.Xss
 @using U3A.Services
 @using U3A.Services.Email;
+@using DevExpress.Blazor.Viewer.Internal.Editors
 
 
 <Progress @ref=progressBar />
@@ -18,85 +19,73 @@ else
 {
     <div class="w-100 px-2">
         <h4>Search Email</h4>
-        <DxFormLayout>
-            <DxFormLayoutGroup Caption="Search Email" Expanded="@areDetailsExpanded"
-                               ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End" ColSpanMd="8"
-                               ExpandedChanged="@(async () => {if (fullScreen != null)
-                                                            {
-                                                                areDetailsExpanded = !areDetailsExpanded;
-                                                                fullScreen.RefreshLayout(!areDetailsExpanded);
-                                                            }
-                                                           })">
-                <Items>
-                    <DxFormLayoutItem Caption="Search for participant" ColSpanLg="12">
-                        <ChildContent>
-                            <div class="d-flex gap-1">
-                                <DxComboBox Data="@people" CssClass="flex-grow-1"
-                                            AllowUserInput=true
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            SearchMode="ListSearchMode.AutoSearch"
-                                            ListRenderMode="ListRenderMode.Virtual"
-                                            TextFieldName="@nameof(Person.PersonSummary)"
-                                            @bind-Value="@selectedPerson">
-                                </DxComboBox>
-                                <DxButton Text="Search" CssClass="flex-grow-0"
-                                          IconCssClass="bi bi-search"
-                                          Tooltip="Click to search for the selected member"
-                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                          Click="@OnSearch" />
-                            </div>
-                        </ChildContent>
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem Caption="Or, email address" ColSpanLg="12">
-                        <ChildContent>
-                            <div class="d-flex gap-1">
-                                <DxComboBox Id="emailId" Data="@email" CssClass="flex-grow-1"
-                                            AllowUserInput=true
-                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                            SearchMode="ListSearchMode.AutoSearch"
-                                            ListRenderMode="ListRenderMode.Virtual"
-                                            @bind-Value="@emailAddressValue"
-                                            Text="@emailAddress"
-                                            TextChanged="@OnEnailChnaged">
-                                </DxComboBox>
-                                <DxButton Text="Search" CssClass="flex-grow-0"
-                                          IconCssClass="bi bi-search"
-                                          Tooltip="Click to search for the selected member"
-                                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                          Click="@OnEmailSearch" />
-                            </div>
-                        </ChildContent>
-                    </DxFormLayoutItem>
-
-                    <DxFormLayoutItem Caption="Or, Date Range" ColSpanLg="12">
-                        <ChildContent>
-                            <div class="d-flex gap-1">
-                                <DxDateEdit @bind-Date="@fromDate" MinDate="@minDate" MaxDate="@maxDate" CssClass="flex-grow-1" />
-                                <div class="flex-grow-0 align-self-center">To</div>
-                                <DxDateEdit @bind-Date="@toDate" 
-                                            CssClass="flex-grow-1"
-                                            MinDate="@minDate" 
-                                            MaxDate="@maxDate">
-                                </DxDateEdit>
-                            <DxButton Text="Search" CssClass="flex-grow-0"
-                                            IconCssClass="bi bi-search"
-                                            RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                            Tooltip="Click to search for the selected member"
-                                            Click="@OnDateSearch" />
-                            </div>
-                        </ChildContent>
-                        </DxFormLayoutItem>
-                </Items>
-            </DxFormLayoutGroup>
-
-            <FullScreen @ref=@fullScreen DisplayOffset="22" AlternateDisplayOffset="13">
+        <DxFormLayout CssClass="mt-4">
+            <FullScreen @ref=@fullScreen>
                 <ContentTemplate>
                     <DxGrid id="my-grid" Data=@messages @ref=@mainGrid
                             AutoExpandAllGroupRows=false>
                         <ToolbarTemplate>
-                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{B8414CBE-49B9-47D4-A754-4FDC59A29115}" />
+                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{B8414CBE-49B9-47D4-A754-4FDC59A29115}">
+                                <CustomButtonContentAtStart>
+                                    <DxToolbarItem Context="searchByContext">
+                                        <Template>
+                                            <div class="d-flex" style="max-width: 10rem;">
+                                                <div class="flex-grow-0 pt-1 pe-2">Search By:</div>
+                                                <DxComboBox Data=@searchBy
+                                                            @bind-Value="@selectedSearchBy" />
+                                            </div>
+                                        </Template>
+                                    </DxToolbarItem>
+                                    <DxToolbarItem Context="participantContext"
+                                                   Visible="@(selectedSearchBy == "Participant")">
+                                        <Template>
+                                            <div class="d-flex" style="min-width: 15rem;">
+                                                <div class="flex-grow-0 pt-1 px-2">Name:</div>
+                                                <PersonsComboBox People="@people"
+                                                            @bind-SelectedPerson="@selectedPerson"
+                                                            @bind-SelectedPerson:after="@OnSearch" />
+                                            </div>
+                                        </Template>
+                                    </DxToolbarItem>
+                                    <DxToolbarItem Context="emailContext"
+                                                   Visible="@(selectedSearchBy == "Email")">
+                                        <Template>
+                                            <div class="d-flex" style="min-width: 30rem;">
+                                                <div class="flex-grow-0 pt-1 px-2">Address:</div>
+                                                <DxComboBox Id="emailId" Data="@email" CssClass="flex-grow-1"
+                                                            AllowUserInput=true
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            SearchMode="ListSearchMode.AutoSearch"
+                                                            ListRenderMode="ListRenderMode.Virtual"
+                                                            @bind-Value="@emailAddress"
+                                                            @bind-Value:after=@OnEmailSearch />
+                                            </div>
+                                        </Template>
+                                    </DxToolbarItem>
+                                    <DxToolbarItem Context="dateContext"
+                                                   Visible="@(selectedSearchBy == "Date")">
+                                        <Template>
+                                            <div class="d-flex gap-1">
+                                                <div class="flex-grow-0 pt-1 px-2">From:</div>
+                                                <DxDateEdit @bind-Date="@fromDate" MinDate="@minDate" MaxDate="@maxDate" CssClass="flex-grow-1" />
+                                                <div class="flex-grow-0 align-self-center">To</div>
+                                                <DxDateEdit @bind-Date="@toDate"
+                                                            CssClass="flex-grow-1"
+                                                            MinDate="@minDate"
+                                                            MaxDate="@maxDate">
+                                                </DxDateEdit>
+                                                <DxButton Text="Search" CssClass="flex-grow-0"
+                                                          IconCssClass="bi bi-search"
+                                                          RenderStyleMode="ButtonRenderStyleMode.Contained"
+                                                          Tooltip="Click to search for the selected member"
+                                                          Click="@OnDateSearch" />
+                                            </div>
+                                        </Template>
+                                    </DxToolbarItem>
+                                </CustomButtonContentAtStart>
+                            </GridToolbar>
                         </ToolbarTemplate>
+
                         <Columns>
                             <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Received" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
                             <DxGridDataColumn Caption="Stream" FieldName="Stream" />
@@ -134,27 +123,27 @@ else
             <DxFormLayout>
                 <DxFormLayoutGroup Caption="Email Details" CssClass="my-2 w-100">
                     <div class="px-4 w-100">
-                    <div class="d-flex flex-row detail-row">
-                        <div class="col-2"><b>Time</b></div>
-                        <div class="col-10">@selectedEmail.ReceivedAt.ToString("dd-MMM-yy hh:mm tt")</div>
+                        <div class="d-flex flex-row detail-row">
+                            <div class="col-2"><b>Time</b></div>
+                            <div class="col-10">@selectedEmail.ReceivedAt.ToString("dd-MMM-yy hh:mm tt")</div>
                         </div>
-                    <div class="d-flex flex-row detail-row">
-                        <div class="col-2"><b>Subject</b></div> 
-                        <div class="col-10">@selectedEmail.Subject</div>
+                        <div class="d-flex flex-row detail-row">
+                            <div class="col-2"><b>Subject</b></div>
+                            <div class="col-10">@selectedEmail.Subject</div>
                         </div>
-                    <div class="d-flex flex-row detail-row">
-                        <div class="col-2"><b>From</b></div> 
-                        <div class="col-10">@selectedEmail.From</div>
-                    </div>
+                        <div class="d-flex flex-row detail-row">
+                            <div class="col-2"><b>From</b></div>
+                            <div class="col-10">@selectedEmail.From</div>
+                        </div>
                     </div>
                 </DxFormLayoutGroup>
                 <DxFormLayoutGroup Caption="Events">
-                <DxGrid Data=@messageEvents @ref=@eventGrid CssClass="m-2" id="myGrid">
-                    <Columns>
-                        <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Time" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
-                        <DxGridDataColumn Caption="Event" FieldName="Type" />
-                    </Columns>
-                </DxGrid>
+                    <DxGrid Data=@messageEvents @ref=@eventGrid CssClass="m-2" id="myGrid">
+                        <Columns>
+                            <DxGridDataColumn Width="10rem" FixedPosition="GridColumnFixedPosition.Left" Caption="Time" FieldName="ReceivedAt" DisplayFormat="{0:dd-MMM-yyyy hh:mm tt}" />
+                            <DxGridDataColumn Caption="Event" FieldName="Type" />
+                        </Columns>
+                    </DxGrid>
                 </DxFormLayoutGroup>
                 <DxFormLayoutGroup Caption="Message">
                     <div class="w-100 m-4">
@@ -167,7 +156,8 @@ else
 
     <style>
         .detail-row {
-            line-height: 2.5;
+            padding-bottom: 0.25rem;
+            padding-top: 0.25rem;
             border-bottom: 1px solid #ddd;
         }
 
@@ -176,34 +166,35 @@ else
 
 
 @code {
-        IEnumerable<EmailMessage> messages;
-        IEnumerable<EmailMessageEvent> messageEvents;
-        IEnumerable<string> email;
-        EmailMessage selectedEmail;
-        List<Person> people { get; set; }
-        Person selectedPerson { get; set; }
-        MessageBox? messageBox;
-        Progress? progressBar;
-        U3ADbContext dbc { get; set; }
-        PostmarkService service;
-        bool IsReady;
-        bool isSearchByEmailAddress;
-        string emailAddress;
-        string emailAddressValue;
-        bool IsSearchByDateRange;
-        bool areDetailsExpanded = true;
-        FullScreen? fullScreen;
+    IEnumerable<EmailMessage> messages;
+    IEnumerable<EmailMessageEvent> messageEvents;
+    IEnumerable<string> email;
+    EmailMessage selectedEmail;
+    List<Person> people { get; set; }
+    Person selectedPerson { get; set; }
+    MessageBox? messageBox;
+    Progress? progressBar;
+    U3ADbContext dbc { get; set; }
+    PostmarkService service;
+    bool IsReady;
+    bool isSearchByEmailAddress;
+    string emailAddress;
+    bool IsSearchByDateRange;
+    bool areDetailsExpanded = true;
+    FullScreen? fullScreen;
 
-        IGrid? mainGrid { get; set; }
-        IGrid? eventGrid { get; set; }
-        GridToolbar? Toolbar;
-        DxWindow emailDetailsForm;
-        DateTime fromDate;
-        DateTime toDate;
-        DateTime minDate;
-        DateTime maxDate;
-        TimeSpan tzOffset;
-        LocalTime? localTime;
+    IGrid? mainGrid { get; set; }
+    IGrid? eventGrid { get; set; }
+    GridToolbar? Toolbar;
+    DxWindow emailDetailsForm;
+    DateTime fromDate;
+    DateTime toDate;
+    DateTime minDate;
+    DateTime maxDate;
+    TimeSpan tzOffset;
+    LocalTime? localTime;
+    string[] searchBy = new string[] { "Participant", "Email", "Date" };
+    string selectedSearchBy = "Participant";
 
     protected override async Task OnInitializedAsync()
     {
@@ -258,12 +249,6 @@ else
             isSearchByEmailAddress = false;
             await SearchMessagesAsync(selectedPerson.Email);
         }
-        else await messageBox.ShowOkOnlyAsync("Select a participant", "You must select a participant before you click the Search button.");
-    }
-
-    void OnEnailChnaged(string newVaule)
-    {
-        emailAddress = newVaule;
     }
 
     async Task OnEmailSearch()
@@ -275,7 +260,6 @@ else
             isSearchByEmailAddress = true;
             await SearchMessagesAsync(emailAddress);
         }
-        else await messageBox.ShowOkOnlyAsync("Enter email address", "You must enter a email address before you click the Search button.");
     }
 
     async Task SearchMessagesAsync(string emailAddress)
