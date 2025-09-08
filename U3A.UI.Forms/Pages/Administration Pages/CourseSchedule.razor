@@ -74,7 +74,7 @@ else
                     {
                         <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
                         <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
-                        <DxSchedulerMonthView ShowWorkDaysOnly="true" MonthCount="1"></DxSchedulerMonthView>
+                        <DxSchedulerMonthView MonthCount="1"></DxSchedulerMonthView>
                         <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(14)" CellMinWidth="80">
                             <Scales>
                                 <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1"></DxSchedulerTimeScale>
@@ -149,7 +149,7 @@ else
         venues = await BusinessRule.SelectableVenuesAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         if (IsPublic) IsPortal = true;
-        viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
+        viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.Day;
         if (selectedTerm != null)
         {
             await SelectedTermChanged(selectedTerm);
