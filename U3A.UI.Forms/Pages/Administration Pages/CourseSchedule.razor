@@ -39,7 +39,7 @@ else
                          ActiveViewTypeChanged="OnViewTypeChanged"
                          CssClass="w-100">
                 <ToolbarItems>
-                    <DxToolbarItem Visible=@(!IsPortal) >
+                    <DxToolbarItem Visible=@(!IsPortal)>
                         <Template Context="termContext">
                             <div class="d-flex">
                                 <div class="flex-grow-0 pt-1 pe-2">Term:</div>
@@ -131,7 +131,7 @@ else
     public List<Venue>? AvailableVenues { get; set; }
     public IEnumerable<Venue>? VenuesToFilter { get; set; }
     LocalTime localTime;
-    SchedulerViewType viewType = SchedulerViewType.WorkWeek;
+    SchedulerViewType viewType;
 
     private List<Term> terms { get; set; }
     private Term? selectedTerm { get; set; }
@@ -149,13 +149,15 @@ else
         venues = await BusinessRule.SelectableVenuesAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         if (IsPublic) IsPortal = true;
+        viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.WorkWeek;
         if (selectedTerm != null)
         {
-            SelectedTermChanged(selectedTerm);
-            await ProcessSelection();
+            await SelectedTermChanged(selectedTerm);
+            DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(StartDate, StartDate.AddYears(1));
+            var venueNames = DataStorage.GetAppointments(range).Select(x => x.Location);
+            AvailableVenues = venues.Where(x => venueNames.Contains(x.Name)).ToList();
         }
         IsReady = true;
-        await base.OnInitializedAsync();
     }
 
     async void OnStartDateChanged(DateTime newStartDate) => StartDate = dbc.GetLocalTime(newStartDate).Date;
@@ -188,12 +190,6 @@ else
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IncludeOffScheduleActivities: !IsPortal);
-                if (!IsReady)
-                {
-                    DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(StartDate, StartDate.AddYears(1));
-                    var venueNames = DataStorage.GetAppointments(range).Select(x => x.Location);
-                    AvailableVenues = venues.Where(x => venueNames.Contains(x.Name)).ToList();
-                }
             }
         }
     }
