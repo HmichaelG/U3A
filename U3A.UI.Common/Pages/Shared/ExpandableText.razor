@@ -1,4 +1,5 @@
-﻿@inject IJSRuntime JS
+﻿@using System.Collections.Concurrent
+@inject IJSRuntime JS
 
 <div class="expandable-text-wrapper">
     <div class="expandable-text-container @(isExpanded ? "expanded" : "")"
@@ -16,9 +17,9 @@
     @if (showToggle)
     {
         <DxButton CssClass="toggle-button"
-                  RenderStyleMode="ButtonRenderStyleMode.Outline"
-                  Click="ToggleExpanded"
-                  Text=@(isExpanded ? "Show Less" : "Show More") />
+        RenderStyleMode="ButtonRenderStyleMode.Outline"
+        Click="ToggleExpanded"
+        Text=@(isExpanded ? "Show Less" : "Show More") />
     }
 </div>
 
@@ -28,31 +29,31 @@
     private ElementReference containerRef;
     private RenderFragment? savedContent;
 
+    [Parameter, EditorRequired]
+    public Guid Key { get; set; }
+
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public string MaxHeight { get; set; } = "7rem";
 
-    SemaphoreSlim semaphore = new SemaphoreSlim(initialCount: 0);
+    private ConcurrentDictionary<Guid,bool?> bag = new();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await semaphore.WaitAsync(); // Asynchronously wait for access
-        try
+        if (!bag.TryGetValue(Key, out var showToggleState))
         {
-            if (savedContent != ChildContent)
-            {
-                savedContent = ChildContent;
-                isExpanded = false; // Reset to collapsed state when content changes
-                await Task.Delay(100); // Let layout settle
-                showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
-                StateHasChanged();
-            }
+            await Task.Delay(100); // Let layout settle
+            showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
+            isExpanded = false;
+            bag[Key] = showToggle;
         }
-        finally
+        else
         {
-            semaphore.Release(); // Always release, even on exception
+            if (showToggleState.HasValue) showToggle = showToggleState.Value;
         }
+        StateHasChanged();
     }
 
     private void ToggleExpanded()
