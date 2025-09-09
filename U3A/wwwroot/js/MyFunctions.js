@@ -1,5 +1,5 @@
 ﻿
-// return true if text overflows the given maxHeight (e.g. "200px" or "50vh")
+// return true if text overflows the given maxHeight (e.g. "200px" or "50vh") 
 window.checkOverflow = (element, maxHeight) => {
     if (!element) return false;
 
