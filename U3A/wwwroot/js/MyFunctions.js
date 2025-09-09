@@ -1,4 +1,15 @@
 ﻿
+// return true if text overflows the given maxHeight (e.g. "200px" or "50vh")
+window.checkOverflow = (element, maxHeight) => {
+    if (!element) return false;
+
+    const computedStyle = getComputedStyle(element);
+    const max = parseInt(computedStyle.maxHeight.replace(/[^0-9]/g, ''));
+    const actual = element.scrollHeight;
+
+    return actual > max;
+};
+
 // Orientation Change
 
 function registerOrientationChange(dotNetHelper) {

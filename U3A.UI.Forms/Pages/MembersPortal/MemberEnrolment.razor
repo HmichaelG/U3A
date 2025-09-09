@@ -42,12 +42,12 @@ else
 
     <MessageBox @ref="messageBox" />
     <div class=@((IsPreview)
-     ? "col-10 mx-auto"
-     : "container mx-1 col col-12 col-lg-10 col-xxl-8 mx-auto")>
-        <div class="h6 pt-2 col-12" align="center">
-            @term?.TermSummary
-        </div>
-        @if (isNotInEnrolmentPeriod)
+              ? "col-10 mx-auto"
+              : "container mx-1 col col-12 col-lg-10 col-xxl-8 mx-auto")>
+    <div class="h6 pt-2 col-12" align="center">
+        @term?.TermSummary
+    </div>
+    @if (isNotInEnrolmentPeriod)
         {
             <p class="alert alert-danger col-12 my-2" align="center">
                 @(enrolmentLockoutText)
@@ -115,14 +115,14 @@ else
                                             <div class="badge bg-fl-primary me-1">Featured</div>
                                         }
                                     <span class="text-fl-primary"><b>@(HighlightSearchText(ClassTitle(c)))</b></span>
-                                        <span>
-                                            @(
-                                            (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
-                                            ? $" | {c.Course.OfferedBy}" : "")
-                                                )
-                                        </span>
-                                    </div>
-                                    @if (IsEnrolmentRequestView)
+                                    <span>
+                                        @(
+                                                                        (!string.IsNullOrWhiteSpace(c.Course.OfferedBy)
+                                                                        ? $" | {c.Course.OfferedBy}" : "")
+                                                                        )
+                                    </span>
+                                </div>
+                        @if (IsEnrolmentRequestView)
                                     {
                                         <DxButton Text="@GetBriefStatus(c)" CssClass="flex-grow-0"
                                                   IconCssClass="@($"menu-icon bi {selectButtonIcon}")"
@@ -179,7 +179,11 @@ else
                                             </div>
 
                                             <div class="description-style" hidden="@isListboxShowingSummary">
-                                                @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
+                                                <ExpandableText>
+                                                    <ChildContent>
+                                                        @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
+                                                    </ChildContent>
+                                                </ExpandableText>
                                             </div>
 
                                             @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
@@ -340,7 +344,8 @@ else
                                     </DxFormLayoutGroup>
                                 </DxFormLayout>
                             }
-                        }<!-- Report Style not Brief -->
+                        }
+                        <!-- Report Style not Brief -->
                     </CellDisplayTemplate>
                 </DxGridDataColumn>
             </Columns>
@@ -1086,7 +1091,7 @@ else
                     if (addedEnrolment != null)
                     {
                         await messageBox.ShowOkOnlyAsync("Enrolment summary", await BusinessRule.GetEnrolmentStatusMarkup(dbc, addedEnrolment, term, settings));
-                        if (!newEnrolmentGuids.Contains(addedEnrolment.ID)) 
+                        if (!newEnrolmentGuids.Contains(addedEnrolment.ID))
                         {
                             newEnrolmentGuids.Add(addedEnrolment.ID);
                         }

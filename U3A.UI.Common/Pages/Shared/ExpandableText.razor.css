@@ -1,0 +1,41 @@
+﻿.expandable-text-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.expandable-text-container {
+    max-height: var(--max-height);
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+}
+
+    .expandable-text-container.expanded {
+        max-height: 9999px;
+    }
+
+.text-content {
+    padding: 0;
+}
+
+.fade-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 5rem;
+    background: linear-gradient(to bottom, transparent, var(--DS-color-surface-neutral-default-rest));
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.expandable-text-container.expanded .fade-overlay {
+    opacity: 0;
+}
+
+.toggle-button {
+    margin-top: 0.5rem;
+    cursor: pointer;
+}
