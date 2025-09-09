@@ -24,7 +24,7 @@
 
 @code {
     private bool isExpanded = false;
-    private bool showToggle = false;
+    private bool showToggle = true;
     private ElementReference containerRef;
     private RenderFragment? savedContent;
 
@@ -34,15 +34,24 @@
     [Parameter]
     public string MaxHeight { get; set; } = "7rem";
 
+    SemaphoreSlim semaphore = new SemaphoreSlim(initialCount: 0);
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (savedContent != ChildContent)
+        await semaphore.WaitAsync(); // Asynchronously wait for access
+        try
         {
-            savedContent = ChildContent;
-            isExpanded = false; // Reset to collapsed state when content changes
-            await Task.Delay(100); // Let layout settle
-            showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
-            StateHasChanged();
+            if (savedContent != ChildContent)
+            {
+                savedContent = ChildContent;
+                isExpanded = false; // Reset to collapsed state when content changes
+                await Task.Delay(100); // Let layout settle
+                showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
+                StateHasChanged();
+            }
+        }
+        finally
+        {
+            semaphore.Release(); // Always release, even on exception
         }
     }
 
