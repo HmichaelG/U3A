@@ -1,29 +1,30 @@
 ﻿@using System.Collections.Concurrent
 @inject IJSRuntime JS
 
-<div class="expandable-text-wrapper">
-    <div class="expandable-text-container @(isExpanded ? "expanded" : "")"
-         style="--max-height:@MaxHeight"
-         @ref="containerRef">
-        <div class="text-content">
-            @ChildContent
+    <div class="expandable-text-wrapper">
+        <div class="expandable-text-container @(isExpanded ? "expanded" : "")"
+             style="--max-height:@MaxHeight"
+             @ref="containerRef">
+            <div class="text-content">
+                @ChildContent
+            </div>
+            @if (showToggle)
+            {
+                <div class="fade-overlay"></div>
+            }
         </div>
+
         @if (showToggle)
         {
-            <div class="fade-overlay"></div>
+            <DxButton CssClass="toggle-button"
+            RenderStyleMode="ButtonRenderStyleMode.Outline"
+            Click="ToggleExpanded"
+            Text=@(isExpanded ? "Show Less" : "Show More") />
         }
     </div>
 
-    @if (showToggle)
-    {
-        <DxButton CssClass="toggle-button"
-        RenderStyleMode="ButtonRenderStyleMode.Outline"
-        Click="ToggleExpanded"
-        Text=@(isExpanded ? "Show Less" : "Show More") />
-    }
-</div>
-
 @code {
+
     private bool isExpanded = false;
     private bool showToggle = true;
     private ElementReference containerRef;
@@ -38,26 +39,29 @@
     [Parameter]
     public string MaxHeight { get; set; } = "7rem";
 
-    private ConcurrentDictionary<Guid,bool?> bag = new();
+    private ConcurrentDictionary<Guid,(bool? showToggle,bool? isExpanded)> bag = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!bag.TryGetValue(Key, out var showToggleState))
+        if (!bag.TryGetValue(Key, out var state))
         {
             await Task.Delay(100); // Let layout settle
             showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
             isExpanded = false;
-            bag[Key] = showToggle;
+            bag[Key] = (showToggle,false);
         }
         else
         {
-            if (showToggleState.HasValue) showToggle = showToggleState.Value;
+            showToggle = state.showToggle ?? false;
+            isExpanded = state.isExpanded ?? true;
         }
         StateHasChanged();
     }
 
     private void ToggleExpanded()
     {
+        var state = bag[Key];
         isExpanded = !isExpanded;
+        bag[Key] = (state.showToggle,isExpanded);
     }
 }
