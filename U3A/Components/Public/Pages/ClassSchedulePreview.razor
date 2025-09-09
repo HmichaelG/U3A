@@ -107,8 +107,12 @@ else
                                             }
                                         </div>
 
-                                        <div class="description-style border border-light-subtle" hidden="@isListboxShowingSummary">
-                                            @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
+                                        <div class="description-style" hidden="@isListboxShowingSummary">
+                                            <ExpandableText Key="c.ID">
+                                                <ChildContent>
+                                                    @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
+                                                </ChildContent>
+                                            </ExpandableText>
                                         </div>
 
                                         @if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
