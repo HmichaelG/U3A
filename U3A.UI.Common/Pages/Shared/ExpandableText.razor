@@ -39,6 +39,9 @@
     [Parameter]
     public string MaxHeight { get; set; } = "8rem";
 
+    [Parameter]
+    public EventCallback<bool> OnExpandedChanged { get; set; }
+
     private ConcurrentDictionary<Guid, (bool? showToggle, bool? isExpanded)> bag = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -63,5 +66,6 @@
         var state = bag[Key];
         isExpanded = !isExpanded;
         bag[Key] = (state.showToggle, isExpanded);
+        OnExpandedChanged.InvokeAsync(isExpanded);
     }
 }

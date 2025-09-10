@@ -179,7 +179,7 @@ else
                                             </div>
 
                                             <div class="description-style" hidden="@isListboxShowingSummary">
-                                                <ExpandableText Key="c.ID">
+                                                <ExpandableText Key="c.ID" OnExpandedChanged="@((isExpanded) => { if (!isExpanded) ScrollListboxToIndex(context.VisibleIndex); })">
                                                     <ChildContent>
                                                         @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                                     </ChildContent>
@@ -394,9 +394,8 @@ else
 
     .description-style {
         width: 100%;
-        margin: 0.25rem 1rem;
-        padding: 0.25rem;
-        border-radius: 0.25rem;
+        margin: 0.5rem;
+        padding: 0rem;
     }
 
     .col-small {
@@ -979,7 +978,11 @@ else
 
     void ScrollListboxToTop()
     {
-        listGrid?.MakeRowVisible(0);
+        ScrollListboxToIndex(0);
+    }
+    void ScrollListboxToIndex(int index)
+    {
+        listGrid?.MakeRowVisible(index);
     }
 
     bool showingWebLink { get; set; } = false;
