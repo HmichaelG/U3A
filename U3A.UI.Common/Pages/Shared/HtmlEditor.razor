@@ -165,7 +165,6 @@
             // replace <p><br><p> sequence with <p>
             if (document is null) return result;
             var paragraphs = document.QuerySelectorAll("p");
-
             for (int i = 0; i < paragraphs.Length - 1; i++)
             {
                 var current = paragraphs[i];
@@ -178,6 +177,21 @@
                 {
                     // Remove the <br> paragraph
                     current.Remove();
+                }
+            }
+            while (true)
+            {
+                var body = document.Body;
+                if (body is null) break;
+                var element = body.LastElementChild;
+                if (element is null) break;
+                if (element is IHtmlBreakRowElement || (element is IHtmlParagraphElement p && string.IsNullOrWhiteSpace(p.TextContent)))
+                {
+                    element.Remove();
+                }
+                else
+                {
+                    break;
                 }
             }
             result = document.Minify();
