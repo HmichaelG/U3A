@@ -179,7 +179,7 @@ else
                                             </div>
 
                                             <div class="description-style" hidden="@isListboxShowingSummary">
-                                                <ExpandableText Key="c.ID" OnExpandedChanged="@((isExpanded) => { if (!isExpanded) ScrollListboxToIndex(context.VisibleIndex); })">
+                                                <ExpandableText Key="c.ID" OnExpandedChanged="@((isExpanded) => { ScrollListboxToIndex(context.VisibleIndex); })">
                                                     <ChildContent>
                                                         @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                                     </ChildContent>
