@@ -225,10 +225,8 @@ else
               HeaderText="Preview">
         <BodyTextTemplate>
             <DxLoadingPanel Visible="@(!isPreviewReady)" ApplyBackgroundShading="true">
-                <div class="overflow-hidden">
                     <MemberEnrolment OneReadyStatusChanged="@((bool value) => { isPreviewReady = value; StateHasChanged(); })"
                                      IsPreview=true PreviewTerm="previewTerm" />
-                </div>
             </DxLoadingPanel>
         </BodyTextTemplate>
     </DxWindow>
