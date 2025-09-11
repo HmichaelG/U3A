@@ -51,7 +51,7 @@ else
         <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
                 KeyFieldName="ID"
                 ShowAllRows=true
-                VirtualScrollingEnabled=true
+                VirtualScrollingEnabled=false
                 AllowSelectRowByClick=false
                 AllowGroup=false
                 AllowSort=false
@@ -108,7 +108,7 @@ else
                                         </div>
 
                                         <div class="description-style" hidden="@isListboxShowingSummary">
-                                            <ExpandableText Key="c.ID">
+                                            <ExpandableText Key="@c.ID" OnExpandedChanged="@((isExpanded) => { ScrollListboxToIndex(context.VisibleIndex); })">
                                                 <ChildContent>
                                                     @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                                 </ChildContent>
@@ -519,7 +519,12 @@ else
 
     void ScrollListboxToTop()
     {
-        listGrid?.MakeRowVisible(0);
+        ScrollListboxToIndex(0);
+    }
+    void ScrollListboxToIndex(int index)
+    {
+        if (index < 0) return;
+        listGrid?.MakeRowVisible(index);
     }
 
     void OnTabClick(TabClickEventArgs e)
