@@ -124,9 +124,11 @@
         foreach (var image in images)
         {
             //if source is embedded image, ensure it is base64 encoded & less than 100KB
-            if (image.Source is not null && image.Source.StartsWith("data:image/") && image.Source.Length > MAX_IMAGE_SIZE * 1024)
+            if (image.Source == null) continue;
+            var imageLength = image.Source.Length * 0.754;
+            if (image.Source is not null && image.Source.StartsWith("data:image/") && imageLength > MAX_IMAGE_SIZE * 1024)
             {
-                errorText = $"Your image is too large. Please use an image smaller than {MAX_IMAGE_SIZE}KB.";
+                errorText = $"Your image is {(imageLength / 1024).ToString("n2")}KB in size. Please use an image smaller than {MAX_IMAGE_SIZE}KB.";
                 isValid = false;
                 return;
             }
