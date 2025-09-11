@@ -38,6 +38,7 @@ namespace U3A.Model
         public string? Description { get; set; }
 
         public string DisplayDescription { get; set; }
+        public string DisplayDescriptionWithoutImages { get; set; }
 
         public bool IsOffScheduleActivity { get; set; }
 

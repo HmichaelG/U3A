@@ -1,6 +1,7 @@
 ﻿using DevExpress.Data.Helpers;
 using DevExpress.DataAccess.ObjectBinding;
 using DevExpress.ReportServer.ServiceModel.DataContracts;
+using DevExpress.XtraGauges.Core.Styles;
 using DevExpress.XtraPrinting.BarCode;
 using DevExpress.XtraReports.UI;
 using DevExpress.XtraRichEdit;
@@ -177,6 +178,14 @@ namespace U3A.UI.Reports
             xrClosedReason.Text = (c.Course.AllowAutoEnrol)
                                 ? "Class is Full"
                                 : c.Course.AutoEnrolDisabledReason ?? "Class is Closed";
+        }
+
+        private void xrRichText1_BeforePrint(object sender, CancelEventArgs e)
+        {
+            Class c = (Class)GetCurrentRow();
+            if (c == null) { return; }
+            var html = ((bool)prmExcludeImages.Value) ? c.Course.DisplayDescriptionWithoutImages : c.Course.DisplayDescription;
+            xrRichText1.Html = $"<div style=\"font-family:Times New Roman; font-size:9.75pt;\">{html}</div>";
         }
     }
 

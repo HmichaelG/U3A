@@ -93,32 +93,25 @@
     protected override Task OnInitializedAsync()
     {
         isValid = true;
-        Markup = AdjustAndMinifyHtml(Markup);
         return base.OnInitializedAsync();
-    }
-
-    static IHtmlDocument? ParseHtml(string html)
-    {
-        IHtmlDocument result = null!;
-        var parser = new HtmlParser();
-        try
-        {
-            result = parser.ParseDocument(html);
-        }
-        catch (Exception e) { errorText = e.ToString(); }
-        return result;
     }
 
     async Task OnMarkupChanged()
     {
         ValidateImages();
-        if (isValid)  await MarkupChanged.InvokeAsync(Markup);
+        if (isValid) 
+        { 
+            await MarkupChanged.InvokeAsync(Markup);
+        }
     }
 
     async Task OnEditorTextChanged()
     {
         ValidateImages();
-        if (isValid) await MarkupChanged.InvokeAsync(Markup);
+        if (isValid)
+        {
+            await MarkupChanged.InvokeAsync(Markup);
+        }
     }
 
     void ValidateImages()
@@ -156,14 +149,14 @@
         return result;
     }
 
-    public static string AdjustAndMinifyHtml(string html)
+    public static (string WithImages, string WithoutImages) AdjustAndMinifyHtml(string Html)
     {
-        string result = string.Empty;
-        if (string.IsNullOrWhiteSpace(html)) return result;
-        using (var document = ParseHtml(html))
+        (string WithImages, string WithoutImages) result;
+        if (string.IsNullOrWhiteSpace(Html)) return (string.Empty,string.Empty);
+        using (var document = ParseHtml(Html))
         {
             // replace <p><br><p> sequence with <p>
-            if (document is null) return result;
+            if (document is null)  return (string.Empty,string.Empty);
             var paragraphs = document.QuerySelectorAll("p");
             for (int i = 0; i < paragraphs.Length - 1; i++)
             {
@@ -179,23 +172,25 @@
                     current.Remove();
                 }
             }
-            while (true)
-            {
-                var body = document.Body;
-                if (body is null) break;
-                var element = body.LastElementChild;
-                if (element is null) break;
-                if (element is IHtmlBreakRowElement || (element is IHtmlParagraphElement p && string.IsNullOrWhiteSpace(p.TextContent)))
-                {
-                    element.Remove();
-                }
-                else
-                {
-                    break;
-                }
-            }
-            result = document.Minify();
+            var minified = document.Minify();
+            result.WithImages = minified;
+            var sanitizer = new HtmlSanitizer();
+            sanitizer.AllowedTags.Remove("img");
+            using var documentWithoutImages = ParseHtml( sanitizer.SanitizeDocument(minified, ""));
+            result.WithoutImages = documentWithoutImages?.Minify() ?? string.Empty;
         }
+        return result;
+    }
+
+    static IHtmlDocument? ParseHtml(string html)
+    {
+        IHtmlDocument result = null!;
+        var parser = new HtmlParser();
+        try
+        {
+            result = parser.ParseDocument(html);
+        }
+        catch (Exception e) { errorText = e.ToString(); }
         return result;
     }
 

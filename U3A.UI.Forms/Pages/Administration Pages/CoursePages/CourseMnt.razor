@@ -348,7 +348,9 @@ else
                 if (c != null)
                 {
                     c.Description = descriptionEditor.descriptionHtml;
-                    c.DisplayDescription = HtmlEditor.AdjustAndMinifyHtml(c.Description);
+                    var adjustedHtml = HtmlEditor.AdjustAndMinifyHtml(c.Description);
+                    c.DisplayDescription = adjustedHtml.WithImages;
+                    c.DisplayDescriptionWithoutImages = adjustedHtml.WithoutImages;
                     dbc.Update(c);
                     await dbc.SaveChangesAsync();
                     await GetData();
@@ -553,7 +555,9 @@ else
         if (dataItem != null)
         {
             editModel.CopyTo(dataItem);
-            dataItem.DisplayDescription = HtmlEditor.AdjustAndMinifyHtml(dataItem.Description);
+            var adjustedHtml = HtmlEditor.AdjustAndMinifyHtml(dataItem.Description);
+            dataItem.DisplayDescription = adjustedHtml.WithImages;
+            dataItem.DisplayDescriptionWithoutImages = adjustedHtml.WithoutImages;
             dataItem.CourseType = dbc.CourseType.Find(editModel.CourseType.ID);
             if (editModel.CourseParticipationType != null)
             {
