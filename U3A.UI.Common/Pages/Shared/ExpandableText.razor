@@ -1,4 +1,5 @@
 ﻿@using System.Collections.Concurrent
+
 @inject IJSRuntime JS
 
 <div class="expandable-text-wrapper">
@@ -42,7 +43,8 @@
     [Parameter]
     public EventCallback<bool> OnExpandedChanged { get; set; }
 
-    private ConcurrentDictionary<Guid, (bool? showToggle, bool? isExpanded)> bag = new();
+    Guid lastKey = Guid.Empty;
+    ConcurrentDictionary<Guid, (bool? showToggle, bool? isExpanded)> bag = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -58,7 +60,6 @@
             showToggle = state.showToggle ?? false;
             isExpanded = state.isExpanded ?? true;
         }
-        StateHasChanged();
     }
 
     private void ToggleExpanded()
