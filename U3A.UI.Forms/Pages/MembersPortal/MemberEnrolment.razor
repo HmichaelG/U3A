@@ -83,7 +83,7 @@ else
         <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
                 KeyFieldName="ID"
                 ShowAllRows=true
-                VirtualScrollingEnabled=false
+                VirtualScrollingEnabled=true
                 AllowSelectRowByClick=false
                 AllowGroup=false
                 AllowSort=false
@@ -179,7 +179,16 @@ else
                                             </div>
 
                                             <div class="description-style" hidden="@isListboxShowingSummary">
-                                                <ExpandableText Key="@c.ID" OnExpandedChanged="@((isExpanded) => { ScrollListboxToIndex(context.VisibleIndex); })">
+                                                <ExpandableText Key="@c.ID"
+                                                                Expanded="@(expandStates.TryGetValue(c.ID, out var ex) && ex)"
+                                                                ExpandedChanged="@(async (isExpanded) =>
+                                                                               {
+                                                                                   expandStates[c.ID] = isExpanded;
+                                                                                   if (!isExpanded)
+                                                                                   {
+                                                                                       ScrollListboxToIndex(context.VisibleIndex);
+                                                                                   }
+                                                                               })">
                                                     <ChildContent>
                                                         @(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
                                                     </ChildContent>
@@ -500,6 +509,7 @@ else
     MarkupString? enrolmentLockoutText;
     string selectButtonIcon;
     List<Guid> newEnrolmentGuids;
+    private readonly Dictionary<Guid, bool> expandStates = new();
 
     // Search filter function
     string? _filterText = null;
@@ -982,7 +992,7 @@ else
     }
     void ScrollListboxToIndex(int index)
     {
-        if (index < 0) return;
+        if (index < 0 || index >= ListboxData.Count - 1) return;
         listGrid?.MakeRowVisible(index);
     }
 
