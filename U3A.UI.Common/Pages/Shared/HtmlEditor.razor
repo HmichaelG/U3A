@@ -155,33 +155,52 @@
     {
         (string WithImages, string WithoutImages) result;
         if (string.IsNullOrWhiteSpace(Html)) return (string.Empty,string.Empty);
-        using (var document = ParseHtml(Html))
-        {
-            // replace <p><br><p> sequence with <p>
-            if (document is null)  return (string.Empty,string.Empty);
-            var paragraphs = document.QuerySelectorAll("p");
-            for (int i = 0; i < paragraphs.Length - 1; i++)
-            {
-                var current = paragraphs[i];
-                var next = paragraphs[i + 1];
+        var minified = RemoveEmptyElements(Html);
+        result.WithImages = minified;
+        var sanitizer = new HtmlSanitizer();
+        sanitizer.AllowedTags.Remove("img");
+        using var documentWithoutImages = ParseHtml( sanitizer.SanitizeDocument(minified, ""));
+        result.WithoutImages = documentWithoutImages?.Minify() ?? string.Empty;
+        return result;
+    }
 
-                // Check if current <p> contains only a <br> and is followed by another <p>
-                if (current.ChildNodes.Length == 1 &&
-                    current.FirstChild is IHtmlBreakRowElement &&
-                    next is IHtmlParagraphElement)
+    private static readonly string[] VoidElements = { "img", "hr", "input", "iframe", "embed", "source" };
+
+    public static string RemoveEmptyElements(string html)
+    {
+        var tagsToCheck = new[] { "p", "span", "div" };
+
+        var parser = new HtmlParser();
+        var document = parser.ParseDocument(html);
+        if (document is null) return html;
+        document.Minify();
+        foreach (var tag in tagsToCheck)
+        {
+            var elements = document.QuerySelectorAll(tag).ToList();
+            foreach (var element in elements)
+            {
+                if (IsEffectivelyEmpty(element))
                 {
-                    // Remove the <br> paragraph
-                    current.Remove();
+                    element.Remove();
                 }
             }
-            var minified = document.Minify();
-            result.WithImages = minified;
-            var sanitizer = new HtmlSanitizer();
-            sanitizer.AllowedTags.Remove("img");
-            using var documentWithoutImages = ParseHtml( sanitizer.SanitizeDocument(minified, ""));
-            result.WithoutImages = documentWithoutImages?.Minify() ?? string.Empty;
         }
-        return result;
+
+        return document.ToHtml();
+    }
+
+    private static bool IsEffectivelyEmpty(IElement element)
+    {
+        // Check for non-whitespace text
+        if (!string.IsNullOrWhiteSpace(element.TextContent))
+            return false;
+
+        // Check for meaningful void/self-closing elements
+        if (element.Children.Any(child => VoidElements.Contains(child.TagName.ToLower())))
+            return false;
+
+        // Recursively check children
+        return !element.Children.Any(child => !IsEffectivelyEmpty(child));
     }
 
     static IHtmlDocument? ParseHtml(string html)
