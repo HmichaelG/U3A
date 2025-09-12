@@ -67,6 +67,6 @@
         var state = bag[Key];
         isExpanded = !isExpanded;
         bag[Key] = (state.showToggle, isExpanded);
-        OnExpandedChanged.InvokeAsync(isExpanded);
+        if (!isExpanded) OnExpandedChanged.InvokeAsync(isExpanded);
     }
 }
