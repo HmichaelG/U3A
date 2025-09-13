@@ -82,7 +82,6 @@ else
         </div>
         <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
                 KeyFieldName="ID"
-                ShowAllRows=true
                 VirtualScrollingEnabled=true
                 AllowSelectRowByClick=false
                 AllowGroup=false
@@ -105,7 +104,6 @@ else
                     <CellDisplayTemplate>
                         @{
                             var c = (Class)context.DataItem;
-
                             @if (reportStyle == ReportStyle.Brief && !isListboxShowingSummary)
                             {
                                 <div class="mx-1 d-flex">

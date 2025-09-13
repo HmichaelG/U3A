@@ -1,97 +1,96 @@
 ﻿@inject IJSRuntime JS
 
 <div class="expandable-text-wrapper">
-    <div class="expandable-text-container @(isExpanded ? "expanded" : "")"
-         style="--max-height:@MaxHeight"
-         @ref="containerRef">
-        <div class="text-content">
-            @ChildContent
-        </div>
-        @if (showToggle)
-        {
-            <div class="fade-overlay"></div>
-        }
-    </div>
-    @if (showToggle)
-    {
-        <div class="expanded-text-toggle-button">
-            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline"
-                      Click="ToggleExpanded"
-                      Text=@(isExpanded ? "Show Less" : "Show More") />
-        </div>
-    }
+	<div class="expandable-text-container @(isExpanded ? "expanded" : "")"
+		 style="--max-height:@MaxHeight"
+		 @ref="containerRef">
+		<div class="text-content">
+			@ChildContent
+		</div>
+		@if (showToggle)
+		{
+			<div class="fade-overlay"></div>
+		}
+	</div>
+	@if (showToggle)
+	{
+		<div class="expanded-text-toggle-button">
+			<DxButton RenderStyleMode="ButtonRenderStyleMode.Outline"
+					  Click="ToggleExpanded"
+					  Text=@(isExpanded ? "Show Less" : "Show More") />
+		</div>
+	}
 </div>
 
 @code {
-    private bool isExpanded = false;
-    private bool showToggle = false;
-    private ElementReference containerRef;
+	private bool isExpanded = false;
+	private bool showToggle = false;
+	private ElementReference containerRef;
 
-    [Parameter, EditorRequired]
-    public Guid Key { get; set; }
+	[Parameter, EditorRequired]
+	public Guid Key { get; set; }
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
 
-    [Parameter]
-    public string MaxHeight { get; set; } = "8rem";
+	[Parameter]
+	public string MaxHeight { get; set; } = "8rem";
 
-    // explicit two-way bindable parameter so parent is the source of truth
-    [Parameter]
-    public bool Expanded { get; set; }
+	// explicit two-way bindable parameter so parent is the source of truth
+	[Parameter]
+	public bool Expanded { get; set; }
 
-    [Parameter]
-    public EventCallback<bool> ExpandedChanged { get; set; }
+	[Parameter]
+	public EventCallback<bool> ExpandedChanged { get; set; }
 
-    private Guid lastKey = Guid.Empty;
-    private bool lastParamExpanded;
+	private Guid lastKey = Guid.Empty;
+	private bool lastParamExpanded;
 
-    protected override void OnParametersSet()
-    {
-        // If component instance was recycled for a different Key, reset internal state
-        if (Key != lastKey)
-        {
-            // Prefer incoming Expanded parameter as the authoritative state
-            isExpanded = Expanded;
-            showToggle = false;
-            lastKey = Key;
-            lastParamExpanded = Expanded;
-        }
-        else if (Expanded != lastParamExpanded)
-        {
-            // Parent changed the Expanded parameter externally
-            isExpanded = Expanded;
-            lastParamExpanded = Expanded;
-        }
-    }
+	protected override void OnParametersSet()
+	{
+		// If component instance was recycled for a different Key, reset internal state
+		if (Key != lastKey)
+		{
+			// Prefer incoming Expanded parameter as the authoritative state
+			isExpanded = Expanded;
+			showToggle = false;
+			lastKey = Key;
+			lastParamExpanded = Expanded;
+		}
+		else if (Expanded != lastParamExpanded)
+		{
+			// Parent changed the Expanded parameter externally
+			isExpanded = Expanded;
+			lastParamExpanded = Expanded;
+		}
+	}
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        // Only measure overflow when first rendered or when collapsed.
-        // (Consider adding visibility checks if measurements are unreliable.)
-        if (firstRender || !isExpanded)
-        {
-            try
-            {
-                showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
-            }
-            catch
-            {
-                showToggle = false;
-            }
-            StateHasChanged();
-        }
-    }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		// Only measure overflow when first rendered or when collapsed.
+		if (firstRender || !isExpanded)
+		{
+			try
+			{
+				showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
+			}
+			catch
+			{
+				showToggle = false;
+			}
+			StateHasChanged();
+		}
+	}
 
-    private async Task ToggleExpanded()
-    {
-        isExpanded = !isExpanded;
+	private async Task ToggleExpanded()
+	{
+		isExpanded = !isExpanded;
 
-        // Notify parent (two-way binding)
-        if (ExpandedChanged.HasDelegate)
-        {
-            await ExpandedChanged.InvokeAsync(isExpanded);
-            lastParamExpanded = isExpanded;
-        }
-    }
+		// Notify parent
+		if (ExpandedChanged.HasDelegate)
+		{
+			await ExpandedChanged.InvokeAsync(isExpanded);
+			lastParamExpanded = isExpanded;
+		}
+	}
 }
