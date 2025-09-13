@@ -23,15 +23,8 @@
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" @bind-IsActive="@IsMobileLayout" />
 
-@if (!IsReady)
-{
-    if (!IsPreview)
-    {
-        <LoadingIndicator />
-    }
-}
-else
-{
+<DxLoadingPanel Visible=@(!IsReady) Text="Loading..." >
+    <ChildContent>
     <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
     <Progress @ref="ProgressBar" PopupVisible=@isProgressVisible />
     <MessageBox @ref="messageBoxWithClassDetail">
@@ -82,7 +75,8 @@ else
         </div>
         <DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
                 KeyFieldName="ID"
-                VirtualScrollingEnabled=true
+                VirtualScrollingEnabled=false
+                ShowAllRows=true
                 AllowSelectRowByClick=false
                 AllowGroup=false
                 AllowSort=false
@@ -372,7 +366,8 @@ else
             </div>
         </div>
     </div>
-}
+    </ChildContent>
+</DxLoadingPanel>
 <style>
     .filter-text-box {
         margin: auto;
@@ -402,7 +397,6 @@ else
     .description-style {
         width: 100%;
         margin: 0.5rem;
-        padding: 0rem;
     }
 
     .col-small {
@@ -595,96 +589,94 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-        newEnrolmentGuids = [];
-        var listHeightValue = 0;
-        if (ws.UseTopMenu) listHeightValue = 4;
-        listHeightValue += (loginState.IsAdminOnBehalfOfMember) ? 9 : 4;
-        listHeightValue += (IsReadOnly || IsEnrolmentWithdrawalView) ? 3 : 7;
-        listHeight = $"{listHeightValue}rem";
+            newEnrolmentGuids = [];
+            var listHeightValue = 0;
+            if (ws.UseTopMenu) listHeightValue = 4;
+            listHeightValue += (loginState.IsAdminOnBehalfOfMember) ? 9 : 4;
+            listHeightValue += (IsReadOnly || IsEnrolmentWithdrawalView) ? 3 : 7;
+            listHeight = $"{listHeightValue}rem";
 
-        await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
+            await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
 
-        var watch = Stopwatch.StartNew();
+            var watch = Stopwatch.StartNew();
 
-        deletedClasses = new List<Class>();
-        activeTabIndex = 0;
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            today = dbc.GetLocalTime().Date;
-            using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
+            deletedClasses = new List<Class>();
+            activeTabIndex = 0;
+            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                // wire up the data
-                settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-                if (IsPreview)
+                today = dbc.GetLocalTime().Date;
+                using (var dbcT = await TenantDbfactory.CreateDbContextAsync())
                 {
-                    term = PreviewTerm;
-                }
-                else
-                {
-                    term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
-                }
-                if (term == null)
-                {
-                    var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-                    if (dbc.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
+                    // wire up the data
+                    settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
+                    if (IsPreview)
                     {
-                        SetUnavailable(currentTerm);
+                        term = PreviewTerm;
                     }
                     else
                     {
-                        // Fallback to read-only mode if enrolment term is null
-                        var nextTerm = await BusinessRule.GetNextTermAsync(dbc);
-                        if (nextTerm != null)
+                        term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+                    }
+                    if (term == null)
+                    {
+                        var currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+                        if (dbc.GetLocalTime().Date < currentTerm.EnrolmentStartDate)
                         {
-                            term = currentTerm = nextTerm;
-                            SetUnavailable(nextTerm);
+                            SetUnavailable(currentTerm);
+                        }
+                        else
+                        {
+                            // Fallback to read-only mode if enrolment term is null
+                            var nextTerm = await BusinessRule.GetNextTermAsync(dbc);
+                            if (nextTerm != null)
+                            {
+                                term = currentTerm = nextTerm;
+                                SetUnavailable(nextTerm);
+                            }
                         }
                     }
-                }
-                if (term != null)
-                {
-                    prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
-                    var exludeOffScheduleActivities = (IsReadOnly) ? false : true;
+                    if (term != null)
+                    {
+                        prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
+                        var exludeOffScheduleActivities = (IsReadOnly) ? false : true;
 
-                    if (PreviewTerm != null)
-                    {
-                        // slow database lookup, required because PreviewTerm is selectable.
-                        Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
-                    }
-                    else
-                    {
-                        // Fast lookup from Schedule cache
-                        isFinancial = false;
-                        if (loginState?.SelectedPerson?.FinancialTo >= term.Year) { isFinancial = true; }
-                        Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
-                    }
-                    if (Classes != null)
-                    {
-                        if (loginState?.SelectedPerson != null)
+                        if (PreviewTerm != null)
                         {
-                            selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
-                            if (selectedClasses.Count() > 0) isListboxShowingSummary = false;
-                            if (IsReadOnly && selectedClasses.Count() <= 0) Classes.Clear();
-                            SetReviewButtonText();
+                            // slow database lookup, required because PreviewTerm is selectable.
+                            Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
                         }
-                        else if (IsPreview)
+                        else
                         {
-                            isListboxShowingSummary = true; // force a flip
+                            // Fast lookup from Schedule cache
+                            isFinancial = false;
+                            if (loginState?.SelectedPerson?.FinancialTo >= term.Year) { isFinancial = true; }
+                            Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
+                        }
+                        if (Classes != null)
+                        {
+                            if (loginState?.SelectedPerson != null)
+                            {
+                                selectedClasses = BusinessRule.GetClassDetailsForStudent(Classes, loginState.SelectedPerson);
+                                if (selectedClasses.Count() > 0) isListboxShowingSummary = false;
+                                if (IsReadOnly && selectedClasses.Count() <= 0) Classes.Clear();
+                                SetReviewButtonText();
+                            }
+                            else if (IsPreview)
+                            {
+                                isListboxShowingSummary = true; // force a flip
+                            }
                         }
                     }
                 }
             }
-        }
-        googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
-        if (string.IsNullOrWhiteSpace(googleMapAPIKey)) googleMapAPIKey = config.GetConnectionString("GoogleMapAPIKey");
+            googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
+            if (string.IsNullOrWhiteSpace(googleMapAPIKey)) googleMapAPIKey = config.GetConnectionString("GoogleMapAPIKey");
 
-        watch.Stop();
-        Logger.LogInformation("Member Enrolment: OnInitializedAsync() {duration}ms", watch.ElapsedMilliseconds);
-
-        IsReady = true;
+            watch.Stop();
+            Logger.LogInformation("Member Enrolment: OnInitializedAsync() {duration}ms", watch.ElapsedMilliseconds);
         await ShowSelectedClasses(scrollToTop: true);
         await OneReadyStatusChanged.InvokeAsync(true); // enable external user input
+        IsReady = true;
     }
 
     void SetUnavailable(Term? term)
