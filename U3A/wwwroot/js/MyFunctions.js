@@ -1,14 +1,72 @@
-﻿
-// return true if text overflows the given maxHeight (e.g. "200px" or "50vh") 
+﻿// return true if text overflows the given maxHeight (e.g. "200px" or "50vh")
 window.checkOverflow = (element, maxHeight) => {
-    if (!element) return false;
+    try {
+        if (!element) return false;
 
-    const computedStyle = getComputedStyle(element);
-    const max = parseInt(computedStyle.maxHeight.replace(/[^0-9]/g, ''));
-    const actual = element.scrollHeight;
+        const computedStyle = getComputedStyle(element);
+        let max = 0;
 
-    return actual > max;
+        // Prefer computedStyle.maxHeight when available and not 'none'
+        if (computedStyle && computedStyle.maxHeight && computedStyle.maxHeight !== 'none') {
+            // computedStyle.maxHeight is typically returned in px; parseFloat will extract numeric px value
+            max = parseFloat(computedStyle.maxHeight) || 0;
+        }
+
+        // Fallback to provided maxHeight parameter (e.g. "8rem", "200px", "50vh")
+        if ((!max || max === 0) && maxHeight) {
+            max = parseSizeToPx(maxHeight);
+        }
+
+        // If still no valid max, don't report overflow
+        if (!max || max <= 0) return false;
+
+        const actual = element.scrollHeight;
+
+        return actual > max;
+    } catch (e) {
+        // Fail-safe: don't claim overflow on error
+        return false;
+    }
 };
+
+function parseSizeToPx(size) {
+    if (!size) return 0;
+    const s = String(size).trim().toLowerCase();
+
+    // px
+    if (s.endsWith('px')) {
+        return parseFloat(s) || 0;
+    }
+
+    // rem
+    if (s.endsWith('rem')) {
+        const val = parseFloat(s) || 0;
+        const rootFont = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        return val * rootFont;
+    }
+
+    // vh
+    if (s.endsWith('vh')) {
+        const val = parseFloat(s) || 0;
+        return (window.innerHeight || document.documentElement.clientHeight) * (val / 100);
+    }
+
+    // vw
+    if (s.endsWith('vw')) {
+        const val = parseFloat(s) || 0;
+        return (window.innerWidth || document.documentElement.clientWidth) * (val / 100);
+    }
+
+    // percentage relative to viewport height (e.g. "50%") - assume percentage of viewport height
+    if (s.endsWith('%')) {
+        const val = parseFloat(s) || 0;
+        return (window.innerHeight || document.documentElement.clientHeight) * (val / 100);
+    }
+
+    // bare number - assume pixels
+    const num = parseFloat(s);
+    return isNaN(num) ? 0 : num;
+}
 
 // Orientation Change
 

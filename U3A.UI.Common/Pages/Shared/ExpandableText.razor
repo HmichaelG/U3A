@@ -36,11 +36,7 @@
     [Parameter]
     public string MaxHeight { get; set; } = "8rem";
 
-    // Backwards-compatible event (parent may still use this)
-    [Parameter]
-    public EventCallback<bool> OnExpandedChanged { get; set; }
-
-    // New: explicit two-way bindable parameter so parent is the source of truth
+    // explicit two-way bindable parameter so parent is the source of truth
     [Parameter]
     public bool Expanded { get; set; }
 
@@ -97,13 +93,5 @@
             await ExpandedChanged.InvokeAsync(isExpanded);
             lastParamExpanded = isExpanded;
         }
-
-        // Backwards-compatible notification
-        if (OnExpandedChanged.HasDelegate)
-        {
-            await OnExpandedChanged.InvokeAsync(isExpanded);
-        }
-
-        StateHasChanged();
     }
 }
