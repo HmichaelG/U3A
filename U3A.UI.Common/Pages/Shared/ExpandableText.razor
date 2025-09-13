@@ -85,12 +85,12 @@
 	private async Task ToggleExpanded()
 	{
 		isExpanded = !isExpanded;
-
 		// Notify parent
 		if (ExpandedChanged.HasDelegate)
 		{
 			await ExpandedChanged.InvokeAsync(isExpanded);
 			lastParamExpanded = isExpanded;
 		}
+		StateHasChanged();
 	}
 }

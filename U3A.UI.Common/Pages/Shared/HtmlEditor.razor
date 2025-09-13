@@ -8,6 +8,8 @@
 @using Ganss.Xss
 @using DevExpress.AIIntegration.Blazor.HtmlEditor
 @using DevExpress.Blazor
+@using System.Text.RegularExpressions
+@using System.Globalization
 
 
 
@@ -155,11 +157,19 @@
     {
         (string WithImages, string WithoutImages) result;
         if (string.IsNullOrWhiteSpace(Html)) return (string.Empty,string.Empty);
+
+        // First remove empty elements and minify the structure
         var minified = RemoveEmptyElements(Html);
-        result.WithImages = minified;
+
+        // Remove white/black (and close variants) color/background-color declarations/attributes
+        var processed = RemoveWhiteBlackColors(minified);
+
+        result.WithImages = processed;
+
+        // Sanitize and remove images for the 'WithoutImages' variant
         var sanitizer = new HtmlSanitizer();
         sanitizer.AllowedTags.Remove("img");
-        using var documentWithoutImages = ParseHtml( sanitizer.SanitizeDocument(minified, ""));
+        using var documentWithoutImages = ParseHtml(sanitizer.SanitizeDocument(processed, ""));
         result.WithoutImages = documentWithoutImages?.Minify() ?? string.Empty;
         return result;
     }
@@ -201,6 +211,221 @@
 
         // Recursively check children
         return !element.Children.Any(child => !IsEffectivelyEmpty(child));
+    }
+
+    /// <summary>
+    /// Removes color and background-color declarations/attributes when they represent white/black or close variants.
+    /// </summary>
+    private static string RemoveWhiteBlackColors(string html)
+    {
+        var parser = new HtmlParser();
+        var document = parser.ParseDocument(html);
+        if (document is null) return html;
+
+        // Iterate all elements
+        foreach (var element in document.All)
+        {
+            // 1) Handle style attribute: remove color/background-color declarations that match white/black
+            if (element.HasAttribute("style"))
+            {
+                var style = element.GetAttribute("style") ?? string.Empty;
+                var newStyle = ProcessStyleAttribute(style);
+                if (string.IsNullOrWhiteSpace(newStyle))
+                    element.RemoveAttribute("style");
+                else
+                    element.SetAttribute("style", newStyle);
+            }
+
+            // 2) Remove legacy color attribute (e.g., <font color="...">) when matches
+            if (element.HasAttribute("color"))
+            {
+                var val = element.GetAttribute("color") ?? string.Empty;
+                if (IsCssColorWhiteOrBlack(val))
+                    element.RemoveAttribute("color");
+            }
+
+            // 3) Remove bgcolor attribute when matches (e.g., <table bgcolor="...">)
+            if (element.HasAttribute("bgcolor"))
+            {
+                var val = element.GetAttribute("bgcolor") ?? string.Empty;
+                if (IsCssColorWhiteOrBlack(val))
+                    element.RemoveAttribute("bgcolor");
+            }
+        }
+
+        return document.ToHtml();
+    }
+
+    private static string ProcessStyleAttribute(string style)
+    {
+        // Use regex to robustly parse declarations (handles spaces, missing trailing semicolon, etc.)
+        var matches = Regex.Matches(style, @"(?<prop>[^:;]+)\s*:\s*(?<val>[^;]+)", RegexOptions.Compiled);
+        var keep = new List<string>();
+
+        foreach (Match m in matches)
+        {
+            var prop = m.Groups["prop"].Value.Trim().ToLowerInvariant();
+            var val = m.Groups["val"].Value.Trim();
+
+            // If it's color or background-color and the value is white/black-ish, drop it
+            if ((prop == "color" || prop == "background-color") && IsCssColorWhiteOrBlack(val))
+            {
+                continue;
+            }
+
+            // preserve original property name casing? we normalise to lower-case property names here
+            keep.Add($"{prop}: {val}");
+        }
+
+        return string.Join("; ", keep);
+    }
+
+    /// <summary>
+    /// Determines whether a css color value represents white or black (including close variants).
+    /// Supports: hex (#fff, #ffffff), rgb(a), named 'white'/'black' plus some common near variants.
+    /// </summary>
+    private static bool IsCssColorWhiteOrBlack(string cssColor)
+    {
+        if (string.IsNullOrWhiteSpace(cssColor)) return false;
+        var parsed = ParseCssColor(cssColor);
+        if (parsed is null) return false;
+        var (r, g, b) = parsed.Value;
+
+        // Compute relative luminance approximation
+        // Normalize to 0..1
+        double rn = r / 255.0;
+        double gn = g / 255.0;
+        double bn = b / 255.0;
+
+        // sRGB luminance
+        double luminance = 0.2126 * rn + 0.7152 * gn + 0.0722 * bn;
+
+        // thresholds: very close to white or black
+        if (luminance >= 0.75) return true; // white-ish
+        if (luminance <= 0.25) return true; // black-ish
+
+        return false;
+    }
+
+    /// <summary>
+    /// Parses simple CSS color strings into RGB. Returns null if not recognized.
+    /// Supported: #rgb, #rrggbb, rgb(), rgba(), and basic named colors 'white'/'black' plus some common near variants.
+    /// This parser is tolerant of both comma- and space-separated rgb() values.
+    /// </summary>
+    private static (int r, int g, int b)? ParseCssColor(string cssColor)
+    {
+        var s = cssColor.Trim().ToLowerInvariant();
+
+        // Strip !important if present
+        s = Regex.Replace(s, @"\s*!important\s*$", "", RegexOptions.IgnoreCase).Trim();
+
+        // hex formats
+        if (s.StartsWith("#"))
+        {
+            var hex = s.Substring(1);
+            if (hex.Length == 3)
+            {
+                // e.g., #abc => aa, bb, cc
+                var r = Convert.ToInt32(new string(hex[0], 2), 16);
+                var g = Convert.ToInt32(new string(hex[1], 2), 16);
+                var b = Convert.ToInt32(new string(hex[2], 2), 16);
+                return (r, g, b);
+            }
+            else if (hex.Length == 6)
+            {
+                var r = Convert.ToInt32(hex.Substring(0, 2), 16);
+                var g = Convert.ToInt32(hex.Substring(2, 2), 16);
+                var b = Convert.ToInt32(hex.Substring(4, 2), 16);
+                return (r, g, b);
+            }
+            // other lengths not supported
+            return null;
+        }
+
+        // rgb(...) or rgba(...) - be tolerant of commas or spaces (CSS4 allows space-separated)
+        if (s.StartsWith("rgb(") || s.StartsWith("rgba("))
+        {
+            var inside = s.Substring(s.IndexOf('(') + 1).TrimEnd(')');
+            // normalize separators: replace commas with spaces, remove multiple spaces
+            inside = inside.Replace(",", " ");
+            inside = Regex.Replace(inside, @"\s+\/\s+|\s+/", " / "); // keep possible alpha separator
+            var parts = inside.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                              .Where(p => p != "/")
+                              .ToArray();
+            if (parts.Length >= 3)
+            {
+                bool successR = TryParseCssComponent(parts[0], out int r);
+                bool successG = TryParseCssComponent(parts[1], out int g);
+                bool successB = TryParseCssComponent(parts[2], out int b);
+                if (successR && successG && successB) return (r, g, b);
+            }
+            return null;
+        }
+
+        // named colors: handle common white/black variants
+        switch (s)
+        {
+            case "white":
+            case "snow":
+            case "ghostwhite":
+            case "whitesmoke":
+            case "ivory":
+            case "azure":
+            case "lightyellow":
+                return (255, 255, 255);
+
+            case "black":
+            case "gray":
+            case "grey":
+            case "dimgray":
+            case "dimgrey":
+            case "onyx":
+            case "charcoal":
+                return (0, 0, 0);
+
+            default:
+                break;
+        }
+
+        return null;
+    }
+
+    private static bool TryParseCssComponent(string component, out int value)
+    {
+        value = 0;
+        component = component.Trim();
+        // percentage
+        if (component.EndsWith("%"))
+        {
+            var numPart = component.TrimEnd('%');
+            if (double.TryParse(numPart, NumberStyles.Float, CultureInfo.InvariantCulture, out double pct))
+            {
+                value = (int)Math.Round(255.0 * Math.Clamp(pct / 100.0, 0.0, 1.0));
+                return true;
+            }
+            return false;
+        }
+
+        // numeric 0..255 or float 0..1
+        if (int.TryParse(component, NumberStyles.Integer, CultureInfo.InvariantCulture, out int iv))
+        {
+            value = Math.Clamp(iv, 0, 255);
+            return true;
+        }
+        if (double.TryParse(component, NumberStyles.Float, CultureInfo.InvariantCulture, out double dv))
+        {
+            // if fractional 0..1 => scale
+            if (dv <= 1.0)
+            {
+                value = (int)Math.Round(255.0 * Math.Clamp(dv, 0.0, 1.0));
+                return true;
+            }
+            // otherwise try to clamp to 0..255
+            value = (int)Math.Clamp(dv, 0.0, 255.0);
+            return true;
+        }
+
+        return false;
     }
 
     static IHtmlDocument? ParseHtml(string html)
