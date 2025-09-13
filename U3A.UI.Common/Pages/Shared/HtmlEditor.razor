@@ -301,8 +301,8 @@
         double luminance = 0.2126 * rn + 0.7152 * gn + 0.0722 * bn;
 
         // thresholds: very close to white or black
-        if (luminance >= 0.75) return true; // white-ish
-        if (luminance <= 0.25) return true; // black-ish
+        if (luminance >= 0.9) return true; // white-ish
+        if (luminance <= 0.1) return true; // black-ish
 
         return false;
     }
