@@ -21,31 +21,34 @@ public static class SerilogLoggingExtensions
         var columnOptions = new ColumnOptions
         {
             AdditionalColumns = new Collection<SqlColumn>
-{
-    new SqlColumn
-            { ColumnName = "Tenant", PropertyName = "Tenant", DataType = SqlDbType.NVarChar, DataLength = 64 },
-    new SqlColumn
-            { ColumnName = "User", PropertyName = "User", DataType = SqlDbType.NVarChar, DataLength = 64 },
-    new SqlColumn
-            { ColumnName = "LogEvent", PropertyName = "LogEvent", DataType = SqlDbType.NVarChar, DataLength = 64 },
-}
+            {
+                new SqlColumn
+                { ColumnName = "Tenant", PropertyName = "Tenant", DataType = SqlDbType.NVarChar, DataLength = 64 },
+                new SqlColumn
+                { ColumnName = "User", PropertyName = "User", DataType = SqlDbType.NVarChar, DataLength = 64 },
+                new SqlColumn
+                { ColumnName = "LogEvent", PropertyName = "LogEvent", DataType = SqlDbType.NVarChar, DataLength = 64 },
+            }
         };
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Override(nameof(Microsoft.EntityFrameworkCore), LogEventLevel.Warning)
             .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Error)
-            .Filter
-                  .ByExcluding(logEvent =>
-                    logEvent.Exception is OperationCanceledException ||
-                    logEvent.Exception is ObjectDisposedException ||
-                    logEvent.Exception is AntiforgeryValidationException ||
-                    logEvent.Exception is CryptographicException ||
-                    logEvent.Exception is JSDisconnectedException ||
-                    (logEvent.Properties["LogEvent"] == null
-                        && logEvent.Properties["Tenant"] == null
-                        && logEvent.Properties["User"] == null))
+            // Ensure enrichers run before the filter so properties are present
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
+            .Filter.ByExcluding(logEvent =>
+                logEvent.Exception is OperationCanceledException ||
+                logEvent.Exception is ObjectDisposedException ||
+                logEvent.Exception is AntiforgeryValidationException ||
+                logEvent.Exception is CryptographicException ||
+                logEvent.Exception is JSDisconnectedException ||
+                (
+                    // Use ContainsKey to avoid KeyNotFoundException when a property is absent
+                    !logEvent.Properties.ContainsKey("LogEvent")
+                    && !logEvent.Properties.ContainsKey("Tenant")
+                    && !logEvent.Properties.ContainsKey("User")
+                ))
             .WriteTo.Logger(lc => lc
                 .Filter.ByIncludingOnly(Matching.WithProperty("AutoEnrolParticipants"))
                 .WriteTo.MSSqlServer(connectionString: TenantConnectionString,
@@ -54,8 +57,8 @@ public static class SerilogLoggingExtensions
                                         {
                                             TableName = "LogAutoEnrol"
                                         },
-                                            columnOptions: columnOptions
-                                        )
+                                        columnOptions: columnOptions
+                                    )
                 )
             .WriteTo.Console(formatProvider: new CultureInfo("en-AU"),
                         theme: AnsiConsoleTheme.Sixteen,
@@ -68,8 +71,8 @@ public static class SerilogLoggingExtensions
                                     {
                                         TableName = "LogEvents"
                                     },
-                                        columnOptions: columnOptions
-                                    )
+                                    columnOptions: columnOptions
+                                )
             .CreateLogger();
 
         builder.Host.UseSerilog(Log.Logger);
