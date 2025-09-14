@@ -959,9 +959,9 @@
 		else
 		{
 			ListboxViewButtonText = "Show selected only";
-			await GetData();
+			await GetDataAsync();
 		}
-		await InvokeAsync(StateHasChanged);
+		StateHasChanged();
 	}
 
 	async Task ShowSelectedClasses(bool scrollToTop)
@@ -971,7 +971,7 @@
 		if (IsEnrolmentRequestView || IsPreview)
 		{
 			//Enrolment request view
-			await GetData();
+			await GetDataAsync();
 			isListboxShowingSummary = false;
 			filterText = null;
 		}
@@ -989,8 +989,9 @@
 		SetReviewButtonText();
 	}
 
-	async Task GetData()
+	async Task GetDataAsync()
 	{
+		StateHasChanged();
 		List<Class> c = new();
 		if (term != null)
 		{
@@ -1005,7 +1006,9 @@
 												&& BusinessRule.IsClassEndDateInInterTermPeriod(dbc, x, prevTerm, prevTerm.EndDate, term.StartDate)).ToList());
 			}
 		}
-		ListboxData = c.Distinct<Class>().ToList();
+		ListboxData = c.Distinct<Class>()
+						.OrderByDescending(x => x.Course.IsFeaturedCourse).ThenBy(x => x.OnDayID).ThenBy(x => x.Course.Name)
+						.ToList();
 	}
 
 	void ScrollListboxToTop()
