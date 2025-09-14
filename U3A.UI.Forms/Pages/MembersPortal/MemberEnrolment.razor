@@ -371,15 +371,47 @@
 <style>
 	.filter-text-box {
 		margin: auto;
-		background: url(images/search.svg) no-repeat scroll 5px 5px;
-		padding-left: 30px;
+		position: relative;
+		padding-left: 34px; /* reserve space for the icon */
 	}
+
+		/* Use a pseudo-element with mask to color the SVG via CSS variable used by text-fl-primary */
+		.filter-text-box::before {
+			content: "";
+			position: absolute;
+			left: 8px;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 16px;
+			height: 16px;
+			background-color: var(--DS-color-content-primary-default-rest);
+			-webkit-mask: url('/images/search.svg') no-repeat center / contain;
+			mask: url('/images/search.svg') no-repeat center / contain;
+			-webkit-mask-repeat: no-repeat;
+			mask-repeat: no-repeat;
+		}
 
 	.combo-list-box {
 		margin: auto;
-		background: url(images/list-ul.svg) no-repeat scroll 5px 5px;
-		padding-left: 30px;
+		position: relative;
+		padding-left: 34px; /* reserve space for the icon */
 	}
+
+		/* Color the combo list icon using the same fluent variable via mask */
+		.combo-list-box::before {
+			content: "";
+			position: absolute;
+			left: 8px;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 16px;
+			height: 16px;
+			background-color: var(--DS-color-content-primary-default-rest);
+			-webkit-mask: url('/images/list-ul.svg') no-repeat center / contain;
+			mask: url('/images/list-ul.svg') no-repeat center / contain;
+			-webkit-mask-repeat: no-repeat;
+			mask-repeat: no-repeat;
+		}
 
 	.weblink-button {
 		width: 80%;
