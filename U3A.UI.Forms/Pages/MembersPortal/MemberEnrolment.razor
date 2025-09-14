@@ -173,13 +173,13 @@
 													<ExpandableText Key="@c.ID"
 																	Expanded="@(expandStates.TryGetValue(c.ID, out var ex) && ex)"
 																	ExpandedChanged="@(async (isExpanded) =>
-																																	 			   {
-																																		 			   expandStates[c.ID] = isExpanded;
-																																		 			   if (!isExpanded)
-																																		 			   {
-																																			 			   ScrollListboxToIndex(context.VisibleIndex);
-																																		 			   }
-																																	 			   })">
+																																										   {
+																																											   expandStates[c.ID] = isExpanded;
+																																											   if (!isExpanded)
+																																											   {
+																																												   ScrollListboxToIndex(context.VisibleIndex);
+																																											   }
+																																										   })">
 												<ChildContent>
 													@(HighlightSearchText((ws.Theme == "light") ? c.Course.DisplayDescription : c.Course.DisplayDescriptionDarkMode, isHTMLtext: true))
 												</ChildContent>
