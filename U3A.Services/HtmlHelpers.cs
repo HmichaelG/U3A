@@ -196,7 +196,8 @@ public static class HtmlHelpers
 
     /// <summary>
     /// Determines whether a css color value represents white or black (including close variants).
-    /// Supports: hex (#fff, #ffffff), rgb(a), named 'white'/'black' plus some common near variants.
+    /// Uses proper sRGB linearization per WCAG before computing relative luminance,
+    /// and performs an additional quick contrast check against pure white/black.
     /// </summary>
     private static bool IsCssColorWhiteOrBlack(string cssColor)
     {
@@ -205,20 +206,43 @@ public static class HtmlHelpers
         if (parsed is null) return false;
         var (r, g, b) = parsed.Value;
 
-        // Compute relative luminance approximation
         // Normalize to 0..1
         double rn = r / 255.0;
         double gn = g / 255.0;
         double bn = b / 255.0;
 
-        // sRGB luminance
-        double luminance = 0.2126 * rn + 0.7152 * gn + 0.0722 * bn;
+        // Linearize sRGB channels (gamma expansion) per WCAG
+        double rLin = SrgbToLinear(rn);
+        double gLin = SrgbToLinear(gn);
+        double bLin = SrgbToLinear(bn);
 
-        // thresholds: very close to white or black
-        if (luminance >= 0.92) return true; // white-ish
-        if (luminance <= 0.08) return true; // black-ish
+        // Relative luminance (WCAG)
+        double luminance = 0.2126 * rLin + 0.7152 * gLin + 0.0722 * bLin;
+
+        // Tight luminance thresholds for "very close" white/black
+        if (luminance >= 0.95) return true; // white-ish
+        if (luminance <= 0.05) return true; // black-ish
+
+        // Also check contrast ratio to pure white and pure black for borderline cases.
+        // contrast = (L1 + 0.05) / (L2 + 0.05) where L1 >= L2.
+        double contrastToWhite = (1.0 + 0.05) / (luminance + 0.05);
+        double contrastToBlack = (luminance + 0.05) / (0.0 + 0.05);
+
+        // If color is so close that its contrast to white or black is very low (≈1.0),
+        // treat it as white/black. Adjust threshold as needed (1.1..1.3).
+        const double contrastThreshold = 1.16;
+        if (contrastToWhite < contrastThreshold) return true;
+        if (contrastToBlack < contrastThreshold) return true;
 
         return false;
+    }
+
+    // Convert sRGB channel value in [0,1] to linear value per WCAG (gamma expansion)
+    private static double SrgbToLinear(double v)
+    {
+        if (v <= 0.04045)
+            return v / 12.92;
+        return Math.Pow((v + 0.055) / 1.055, 2.4);
     }
 
     /// <summary>
