@@ -7,6 +7,7 @@ using DevExpress.Blazor;
 using Ganss.Xss;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -47,7 +48,7 @@ public static class HtmlHelpers
 
     public static (bool isValid, string errorText) ValidateImages(string Html)
     {
-        (bool isValid, string errorText) result = (true,string.Empty);
+        (bool isValid, string errorText) result = (true, string.Empty);
         if (Html is null) return result;
         var document = ParseHtml(Html);
         if (document is null) return result;
@@ -67,24 +68,26 @@ public static class HtmlHelpers
         return result;
     }
 
-    public static (string WithImages, string WithoutImages) AdjustAndMinifyHtml(string Html)
+    public static (string WithImages, string WithImagesDarkMode, string WithoutImages) AdjustAndMinifyHtml(string Html)
     {
-        (string WithImages, string WithoutImages) result;
-        if (string.IsNullOrWhiteSpace(Html)) return (string.Empty, string.Empty);
+        (string WithImages, string WithImagesDarkMode, string WithoutImages) result = (string.Empty, string.Empty, string.Empty);
+        if (string.IsNullOrWhiteSpace(Html)) return result;
 
         // First remove empty elements and minify the structure
         var minified = RemoveEmptyElements(Html);
-
-        // Remove white/black (and close variants) color/background-color declarations/attributes
-        var processed = RemoveWhiteBlackColors(minified);
-
-        result.WithImages = processed;
+        result.WithImages = minified;
 
         // Sanitize and remove images for the 'WithoutImages' variant
         var sanitizer = new HtmlSanitizer();
         sanitizer.AllowedTags.Remove("img");
-        using var documentWithoutImages = ParseHtml(sanitizer.SanitizeDocument(processed, ""));
+        using var documentWithoutImages = ParseHtml(sanitizer.SanitizeDocument(minified, ""));
         result.WithoutImages = documentWithoutImages?.Minify() ?? string.Empty;
+
+        // Remove white/black (and close variants) color/background-color declarations/attributes
+        string documentWithColorRemoved = RemoveWhiteBlackColors(minified);
+        using var documentDarkMode = ParseHtml(documentWithColorRemoved);
+        result.WithImagesDarkMode = documentDarkMode.Minify() ?? string.Empty;
+
         return result;
     }
 

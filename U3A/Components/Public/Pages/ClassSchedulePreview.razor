@@ -115,7 +115,7 @@
 																					   }
 																				   })">
 												<ChildContent>
-													@(HighlightSearchText(c.Course.DisplayDescription, isHTMLtext: true))
+													@(HighlightSearchText((ws.Theme == "light") ? c.Course.DisplayDescription : c.Course.DisplayDescriptionDarkMode, isHTMLtext: true))
 												</ChildContent>
 											</ExpandableText>
 										</div>

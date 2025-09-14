@@ -350,6 +350,7 @@ else
                     c.Description = descriptionEditor.descriptionHtml;
                     var adjustedHtml = HtmlHelpers.AdjustAndMinifyHtml(c.Description);
                     c.DisplayDescription = adjustedHtml.WithImages;
+                    c.DisplayDescriptionDarkMode = adjustedHtml.WithImagesDarkMode;
                     c.DisplayDescriptionWithoutImages = adjustedHtml.WithoutImages;
                     dbc.Update(c);
                     await dbc.SaveChangesAsync();
@@ -557,6 +558,7 @@ else
             editModel.CopyTo(dataItem);
             var adjustedHtml = HtmlHelpers.AdjustAndMinifyHtml(dataItem.Description);
             dataItem.DisplayDescription = adjustedHtml.WithImages;
+            dataItem.DisplayDescriptionDarkMode = adjustedHtml.WithImagesDarkMode;
             dataItem.DisplayDescriptionWithoutImages = adjustedHtml.WithoutImages;
             dataItem.CourseType = dbc.CourseType.Find(editModel.CourseType.ID);
             if (editModel.CourseParticipationType != null)

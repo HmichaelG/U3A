@@ -84,7 +84,7 @@ namespace U3A.BusinessRules
                     // Course
                     CourseLegacyID = cr.ConversionID,
                     CourseName = cr.Name,
-                    CourseDescription = cr.DisplayDescription ?? String.Empty,
+                    CourseDescription = cr.DisplayDescriptionWithoutImages ?? String.Empty,
                     CourseParticipationType = pt.Name,
                     CourseFeePerYear = cr.CourseFeePerYear,
                     CourseFeePerYearDescription = cr.CourseFeePerYearDescription ?? String.Empty,

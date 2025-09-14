@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Receipt_Reinstate_MerchantFee
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_DisplayDescriptionWithoutImages
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_DisplayDescriptionWithoutImages
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_DisplayDescriptionDarkMode
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_DisplayDescriptionWithoutImages
+add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_DisplayDescriptionDarkMode
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

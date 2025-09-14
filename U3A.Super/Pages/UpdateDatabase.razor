@@ -119,6 +119,7 @@
             {
                 var adjustedHtml = HtmlHelpers.AdjustAndMinifyHtml(course.Description ?? string.Empty);
                 course.DisplayDescription = adjustedHtml.WithImages;
+                course.DisplayDescriptionDarkMode = adjustedHtml.WithImagesDarkMode;
                 course.DisplayDescriptionWithoutImages = adjustedHtml.WithoutImages;
             }
         }
