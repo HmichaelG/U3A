@@ -7,6 +7,7 @@
 
 .expandable-text-container {
     max-height: var(--max-height);
+    min-height: var(--max-height);
     overflow: hidden;
     width: 100%;
     position: relative;
@@ -28,7 +29,6 @@
     height: 5rem;
     background: linear-gradient(to bottom, transparent, var(--DS-color-surface-neutral-default-rest));
     pointer-events: none;
-    transition: opacity 0.3s ease;
 }
 
 .expandable-text-container.expanded .fade-overlay {

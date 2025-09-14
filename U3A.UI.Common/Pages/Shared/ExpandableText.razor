@@ -12,14 +12,11 @@
 			<div class="fade-overlay"></div>
 		}
 	</div>
-	@if (showToggle)
-	{
-		<div class="expanded-text-toggle-button">
-			<DxButton RenderStyleMode="ButtonRenderStyleMode.Outline"
-					  Click="ToggleExpanded"
-					  Text=@(isExpanded ? "Show Less" : "Show More") />
-		</div>
-	}
+	<div class="expanded-text-toggle-button">
+		<DxButton RenderStyleMode="ButtonRenderStyleMode.Outline"
+				  Click="ToggleExpanded" Enabled=@(showToggle || lastParamExpanded)
+				  Text=@(isExpanded ? "Show Less" : "Show More") />
+	</div>
 </div>
 
 @code {
@@ -74,7 +71,7 @@
 			{
 				showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
 			}
-			catch
+			catch 
 			{
 				showToggle = false;
 			}
@@ -85,12 +82,12 @@
 	private async Task ToggleExpanded()
 	{
 		isExpanded = !isExpanded;
+		StateHasChanged();
 		// Notify parent
 		if (ExpandedChanged.HasDelegate)
 		{
 			await ExpandedChanged.InvokeAsync(isExpanded);
 			lastParamExpanded = isExpanded;
 		}
-		StateHasChanged();
 	}
 }

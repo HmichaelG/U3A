@@ -75,8 +75,7 @@
 			</div>
 			<DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
 					KeyFieldName="ID"
-					VirtualScrollingEnabled=false
-					ShowAllRows=true
+					VirtualScrollingEnabled=true
 					AllowSelectRowByClick=false
 					AllowGroup=false
 					AllowSort=false
@@ -85,15 +84,15 @@
 				<Columns>
 					<DxGridDataColumn>
 						<HeaderCaptionTemplate>
-							<div class="d-flex my-auto">
-								@if (IsEnrolmentRequestView)
-								{
-									<div class="flex-grow-1" />
-									<DxButton @ref=@listboxViewButton Text="@ListboxViewButtonText"
-											  RenderStyle="ButtonRenderStyle.Primary"
-											  Click="ToggleListboxViewButton" CssClass="flex-grow-0" />
-								}
-							</div>
+							<DxToolbar CssClass="w-100">
+								<Items>
+									<DxToolbarItem @ref=@listboxViewButton Text="@ListboxViewButtonText"
+												   Alignment="ToolbarItemAlignment.Right"
+												   RenderStyle="ButtonRenderStyle.Primary"
+												   Visible=@IsEnrolmentRequestView
+												   Click="ToggleListboxViewButton" />
+								</Items>
+							</DxToolbar>
 						</HeaderCaptionTemplate>
 						<CellDisplayTemplate>
 							@{
@@ -174,13 +173,13 @@
 													<ExpandableText Key="@c.ID"
 																	Expanded="@(expandStates.TryGetValue(c.ID, out var ex) && ex)"
 																	ExpandedChanged="@(async (isExpanded) =>
-																					   			   {
-																						   			   expandStates[c.ID] = isExpanded;
-																						   			   if (!isExpanded)
-																						   			   {
-																							   			   ScrollListboxToIndex(context.VisibleIndex);
-																						   			   }
-																					   			   })">
+																																	 			   {
+																																		 			   expandStates[c.ID] = isExpanded;
+																																		 			   if (!isExpanded)
+																																		 			   {
+																																			 			   ScrollListboxToIndex(context.VisibleIndex);
+																																		 			   }
+																																	 			   })">
 												<ChildContent>
 													@(HighlightSearchText((ws.Theme == "light") ? c.Course.DisplayDescription : c.Course.DisplayDescriptionDarkMode, isHTMLtext: true))
 												</ChildContent>
@@ -502,7 +501,7 @@
 	List<ReportStyleWrapper> ReportStyleList = new ReportStyleList();
 	ReportStyle reportStyle = ReportStyle.Detail;
 
-	DxButton? listboxViewButton;
+	DxToolbarItem? listboxViewButton;
 	DxTabs? dxTabs;
 	DxGrid? listGrid;
 	DxTextBox filterTextBox;
@@ -710,6 +709,7 @@
 		await OneReadyStatusChanged.InvokeAsync(true); // enable external user input
 		IsReady = true;
 	}
+
 
 	void SetUnavailable(Term? term)
 	{
@@ -1014,8 +1014,9 @@
 	}
 	void ScrollListboxToIndex(int index)
 	{
-		if (index < 0 || index >= ListboxData.Count - 1) return;
+		if (index < 0 || index > ListboxData.Count - 1) return;
 		listGrid?.MakeRowVisible(index);
+		StateHasChanged();
 	}
 
 	bool showingWebLink { get; set; } = false;
