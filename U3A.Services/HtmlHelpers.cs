@@ -84,6 +84,7 @@ public static class HtmlHelpers
         result.WithoutImages = documentWithoutImages?.Minify() ?? string.Empty;
 
         // Remove white/black (and close variants) color/background-color declarations/attributes
+        // and ADJUST other non-white/non-dark colors to "pop" in dark mode
         string documentWithColorRemoved = RemoveWhiteBlackColors(minified);
         using var documentDarkMode = ParseHtml(documentWithColorRemoved);
         result.WithImagesDarkMode = documentDarkMode.Minify() ?? string.Empty;
@@ -132,6 +133,7 @@ public static class HtmlHelpers
 
     /// <summary>
     /// Removes color and background-color declarations/attributes when they represent white/black or close variants.
+    /// Also adjusts non-white/non-black colors so they "pop" in dark mode (increase saturation/adjust lightness).
     /// </summary>
     private static string RemoveWhiteBlackColors(string html)
     {
@@ -142,38 +144,55 @@ public static class HtmlHelpers
         // Iterate all elements
         foreach (var element in document.All)
         {
-            // 1) Handle style attribute: remove color/background-color declarations that match white/black
+            // 1) Handle style attribute: remove color/background-color declarations that match white/black,
+            //    adjust other colors so they "pop" in dark mode.
             if (element.HasAttribute("style"))
             {
                 var style = element.GetAttribute("style") ?? string.Empty;
-                var newStyle = ProcessStyleAttribute(style);
+                var newStyle = ProcessStyleAttributeForDarkMode(style);
                 if (string.IsNullOrWhiteSpace(newStyle))
                     element.RemoveAttribute("style");
                 else
                     element.SetAttribute("style", newStyle);
             }
 
-            // 2) Remove legacy color attribute (e.g., <font color="...">) when matches
+            // 2) Handle legacy color attribute (e.g., <font color="...">)
             if (element.HasAttribute("color"))
             {
                 var val = element.GetAttribute("color") ?? string.Empty;
                 if (IsCssColorWhiteOrBlack(val))
+                {
                     element.RemoveAttribute("color");
+                }
+                else
+                {
+                    var adjusted = AdjustCssColorForDarkMode(val, isBackground: false);
+                    if (!string.IsNullOrWhiteSpace(adjusted))
+                        element.SetAttribute("color", adjusted);
+                }
             }
 
-            // 3) Remove bgcolor attribute when matches (e.g., <table bgcolor="...">)
+            // 3) Handle bgcolor attribute
             if (element.HasAttribute("bgcolor"))
             {
                 var val = element.GetAttribute("bgcolor") ?? string.Empty;
                 if (IsCssColorWhiteOrBlack(val))
+                {
                     element.RemoveAttribute("bgcolor");
+                }
+                else
+                {
+                    var adjusted = AdjustCssColorForDarkMode(val, isBackground: true);
+                    if (!string.IsNullOrWhiteSpace(adjusted))
+                        element.SetAttribute("bgcolor", adjusted);
+                }
             }
         }
 
         return document.ToHtml();
     }
 
-    private static string ProcessStyleAttribute(string style)
+    private static string ProcessStyleAttributeForDarkMode(string style)
     {
         // Use regex to robustly parse declarations (handles spaces, missing trailing semicolon, etc.)
         var matches = Regex.Matches(style, @"(?<prop>[^:;]+)\s*:\s*(?<val>[^;]+)", RegexOptions.Compiled);
@@ -184,17 +203,135 @@ public static class HtmlHelpers
             var prop = m.Groups["prop"].Value.Trim().ToLowerInvariant();
             var val = m.Groups["val"].Value.Trim();
 
-            // If it's color or background-color and the value is white/black-ish, drop it
-            if ((prop == "color" || prop == "background-color") && IsCssColorWhiteOrBlack(val))
+            // If it's color or background-color and the value is white/black-ish, drop it.
+            // Otherwise, for non-white/non-dark colors adjust to "pop" in dark mode.
+            if (prop == "color" || prop == "background-color")
             {
-                continue;
+                if (IsCssColorWhiteOrBlack(val))
+                {
+                    continue;
+                }
+                else
+                {
+                    var adjusted = AdjustCssColorForDarkMode(val, isBackground: prop == "background-color");
+                    if (!string.IsNullOrWhiteSpace(adjusted))
+                        keep.Add($"{prop}: {adjusted}");
+                    // else skip (safer to remove if can't parse)
+                    continue;
+                }
             }
 
-            // preserve original property name casing? we normalise to lower-case property names here
+            // preserve other properties unchanged
             keep.Add($"{prop}: {val}");
         }
 
         return string.Join("; ", keep);
+    }
+
+    /// <summary>
+    /// Adjusts a css color string to be more vibrant (pop) in dark mode.
+    /// Returns a hex color string like #rrggbb when parsed, otherwise returns original trimmed string.
+    /// isBackground flag allows slightly different adjustment for background colors (a tad darker).
+    /// </summary>
+    private static string AdjustCssColorForDarkMode(string cssColor, bool isBackground)
+    {
+        if (string.IsNullOrWhiteSpace(cssColor)) return cssColor;
+        var parsed = ParseCssColor(cssColor);
+        if (parsed is null) return cssColor; // leave unknown tokens untouched
+
+        var (r, g, b) = parsed.Value;
+
+        // Convert to HSL
+        ColorToHsl(r, g, b, out double h, out double s, out double l);
+
+        // Increase saturation to make color more vivid
+        s = Math.Clamp(s * 1.25 + 0.03, 0.0, 1.0);
+
+        // Adjust lightness:
+        // - For text colors: lift very dark colors, slightly reduce very light colors.
+        // - For background colors: reduce lightness slightly so they don't glow too much.
+        if (isBackground)
+        {
+            l = Math.Clamp(l * 0.90, 0.03, 0.85);
+        }
+        else
+        {
+            if (l < 0.28) l = Math.Clamp(0.36, 0.0, 1.0);
+            else l = Math.Clamp(l * 1.10, 0.20, 0.92);
+        }
+
+        // Convert back to RGB
+        var (nr, ng, nb) = HslToColor(h, s, l);
+        return $"#{nr:X2}{ng:X2}{nb:X2}";
+    }
+
+    // Convert RGB (0..255) to HSL (h in degrees 0..360, s,l in 0..1)
+    private static void ColorToHsl(int r, int g, int b, out double h, out double s, out double l)
+    {
+        double rn = r / 255.0;
+        double gn = g / 255.0;
+        double bn = b / 255.0;
+
+        double max = Math.Max(rn, Math.Max(gn, bn));
+        double min = Math.Min(rn, Math.Min(gn, bn));
+        l = (max + min) / 2.0;
+
+        if (Math.Abs(max - min) < 1e-9)
+        {
+            s = 0.0;
+            h = 0.0;
+        }
+        else
+        {
+            double d = max - min;
+            s = (l > 0.5) ? d / (2.0 - max - min) : d / (max + min);
+
+            if (max == rn) h = (gn - bn) / d + (gn < bn ? 6.0 : 0.0);
+            else if (max == gn) h = (bn - rn) / d + 2.0;
+            else h = (rn - gn) / d + 4.0;
+
+            h *= 60.0;
+        }
+    }
+
+    // Convert HSL (h degrees 0..360, s,l in 0..1) to RGB (0..255)
+    private static (int r, int g, int b) HslToColor(double h, double s, double l)
+    {
+        double r, g, b;
+
+        if (s == 0.0)
+        {
+            r = g = b = l; // achromatic
+        }
+        else
+        {
+            double q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
+            double p = 2.0 * l - q;
+            double hk = (h % 360.0) / 360.0;
+
+            double[] t = new double[3] { hk + 1.0 / 3.0, hk, hk - 1.0 / 3.0 };
+            double[] clr = new double[3];
+
+            for (int i = 0; i < 3; i++)
+            {
+                double tc = t[i];
+                if (tc < 0) tc += 1.0;
+                if (tc > 1) tc -= 1.0;
+                if (tc < 1.0 / 6.0) clr[i] = p + ((q - p) * 6.0 * tc);
+                else if (tc < 1.0 / 2.0) clr[i] = q;
+                else if (tc < 2.0 / 3.0) clr[i] = p + ((q - p) * (2.0 / 3.0 - tc) * 6.0);
+                else clr[i] = p;
+            }
+
+            r = clr[0];
+            g = clr[1];
+            b = clr[2];
+        }
+
+        int ri = (int)Math.Round(Math.Clamp(r * 255.0, 0.0, 255.0));
+        int gi = (int)Math.Round(Math.Clamp(g * 255.0, 0.0, 255.0));
+        int bi = (int)Math.Round(Math.Clamp(b * 255.0, 0.0, 255.0));
+        return (ri, gi, bi);
     }
 
     /// <summary>
