@@ -12,8 +12,6 @@
 @using U3A.Data
 @using U3A.UI.Common
 
-<HtmlEditor @ref=@htmlEditor DisableAIExtensions=true />
-
 <div class="page-width">
     <h2 class="pb-2">Update Database Schema</h2>
     <div class="alert alert-info col-md-8">
@@ -41,7 +39,6 @@
     List<TenantInfo>? tenantInfo { get; set; }
     string result = string.Empty;
     string msgComplete = string.Empty;
-    HtmlEditor? htmlEditor;
 
     async Task DoUpdate()
     {
@@ -120,7 +117,7 @@
         {
             if (course.Description != null)
             {
-                var adjustedHtml = HtmlEditor.AdjustAndMinifyHtml(course.Description ?? string.Empty);
+                var adjustedHtml = HtmlHelpers.AdjustAndMinifyHtml(course.Description ?? string.Empty);
                 course.DisplayDescription = adjustedHtml.WithImages;
                 course.DisplayDescriptionWithoutImages = adjustedHtml.WithoutImages;
             }
