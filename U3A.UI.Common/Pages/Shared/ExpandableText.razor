@@ -43,6 +43,9 @@
 	private Guid lastKey = Guid.Empty;
 	private bool lastParamExpanded;
 
+	// avoid repeated JS checks for the same Key while collapsed
+	private bool hasMeasuredForKey = false;
+
 	protected override void OnParametersSet()
 	{
 		// If component instance was recycled for a different Key, reset internal state
@@ -53,28 +56,46 @@
 			showToggle = false;
 			lastKey = Key;
 			lastParamExpanded = Expanded;
+			hasMeasuredForKey = false;
 		}
 		else if (Expanded != lastParamExpanded)
 		{
 			// Parent changed the Expanded parameter externally
 			isExpanded = Expanded;
 			lastParamExpanded = Expanded;
+
+			// if parent collapses, allow a re-measure once
+			if (!isExpanded)
+			{
+				hasMeasuredForKey = false;
+			}
 		}
 	}
 
+	int count = 0;
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		// Only measure overflow when first rendered or when collapsed.
-		if (firstRender || !isExpanded)
+		// Only measure overflow on first render, or on collapsed state if we haven't measured yet.
+		if (!(firstRender || (!isExpanded && !hasMeasuredForKey)))
 		{
-			try
-			{
-				showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
-			}
-			catch 
-			{
-				showToggle = false;
-			}
+			return;
+		}
+
+		bool previousShowToggle = showToggle;
+		try
+		{
+			showToggle = await JS.InvokeAsync<bool>("checkOverflow", containerRef, MaxHeight);
+			hasMeasuredForKey = true;
+		}
+		catch
+		{
+			showToggle = false;
+			hasMeasuredForKey = false;
+		}
+
+		// Only re-render if visible state changed
+		if (previousShowToggle != showToggle)
+		{
 			StateHasChanged();
 		}
 	}
@@ -82,7 +103,15 @@
 	private async Task ToggleExpanded()
 	{
 		isExpanded = !isExpanded;
+
+		// When collapsing, allow a single re-measure of overflow for this Key
+		if (!isExpanded)
+		{
+			hasMeasuredForKey = false;
+		}
+
 		StateHasChanged();
+
 		// Notify parent
 		if (ExpandedChanged.HasDelegate)
 		{
