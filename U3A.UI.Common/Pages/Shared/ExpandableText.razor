@@ -12,11 +12,9 @@
 			<div class="fade-overlay"></div>
 		}
 	</div>
-	<div class="expanded-text-toggle-button">
-		<DxButton RenderStyleMode="ButtonRenderStyleMode.Outline"
-				  Click="ToggleExpanded" Enabled=@(showToggle || lastParamExpanded)
-				  Text=@(isExpanded ? "Show Less" : "Show More") />
-	</div>
+	<DxButton RenderStyleMode="ButtonRenderStyleMode.Outline"
+			  Click="ToggleExpanded" Visible=@(showToggle || lastParamExpanded)
+			  Text=@(isExpanded ? "Show Less" : "Show More") />
 </div>
 
 @code {
