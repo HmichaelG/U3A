@@ -38,7 +38,7 @@ public static class DatabaseCleanup
         {
             while (true)
             {
-                var cmd = $"delete top (5000) from [dbo].[{tableName}] where timestamp < '{cutOff.ToString("dd-MMM-yyyy")}'";
+                var cmd = $"delete top (5000) from [dbo].[{tableName}] where timestamp < '{cutOff.ToString("dd-MMMM-yyyy")}'";
                 var count = await dbc.Database.ExecuteSqlRawAsync(cmd);
                 total += count;
                 Log.Information("[{identifier}]: {total} records deleted from [{tableName}]",
