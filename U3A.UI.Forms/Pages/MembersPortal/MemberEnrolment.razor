@@ -724,30 +724,19 @@
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		await base.OnAfterRenderAsync(firstRender);
-		if (firstRender)
+		if (!firstRender)
 		{
-			filterText = null;
 			if (IsEnrolmentRequestView && isNotInEnrolmentPeriod && (term == null || Classes == null))
 			{
 				await ReturnToMenu(PortalMenuResult.EnrolmentCancelledTermNotDefined);
 			}
-			else
+			if (selectedClasses?.Count() <= 0)
 			{
-				if (IsReadOnly && messageBox != null)
-				{
-					if (selectedClasses?.Count() <= 0)
-					{
-						await messageBox?.ShowOkOnlyAsync("No Enrolment In Current Term",
-								$"You have no enrolments in {term.Year} Term {term.TermNumber}.<br>" +
-								"Use <strong>Manage your course enrolments</strong> to request course enrolment.");
-						if (ListboxData.Count == 0) await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
-					}
-				}
+				await messageBox?.ShowOkOnlyAsync("No Enrolment In Current Term",
+						$"You have no enrolments in {term.Year} Term {term.TermNumber}.<br>" +
+						"Use <strong>Manage your course enrolments</strong> to request enrolment.");
+				if (ListboxData.Count == 0) await ReturnToMenu(PortalMenuResult.MenuOptionCancelled);
 			}
-		}
-		else
-		{
 			await SetReportStyle();
 			if (Classes != null && QRClassID != null)
 			{
@@ -765,7 +754,6 @@
 				}
 			}
 		}
-		ProgressBar?.Close();
 	}
 
 	async Task SetReportStyle()
