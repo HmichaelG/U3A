@@ -21,8 +21,8 @@ namespace U3A.WebFunctions.Procedures
                     if (targetTerm != null)
                     {
                         var dayDiff = (targetTerm.EnrolmentStartDate - today).Days;
-                        // Run it 3 times to make sure it occurs
-                        if (dayDiff > 0 && dayDiff < 4)
+                        // Run it multiple times to make sure it occurs
+                        if (dayDiff >= -4 && dayDiff < 4)
                         {
                             await BusinessRule.BringForwardEnrolmentsAsync(dbc, sourceTerm, targetTerm, false);
                             var d = targetTerm.EnrolmentStartDate;
