@@ -20,173 +20,172 @@
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" @bind-IsActive="@IsMobileLayout" />
 
-<DxLoadingPanel Visible=@(!IsReady) Text="Loading...">
-	<ChildContent>
-		<PortalHeader NavigateTo="/public" NoU3AGroup="true" />
-		<div class="container col mx-1 col-md-10 col-lg-8 col-xl-6 mx-md-auto">
-			<div class="h6 pt-2 col-12" align="center">
-				@term?.TermSummary
-			</div>
-			@if (isNotInEnrolmentPeriod)
-			{
-				<p class="alert alert-danger col-12 my-2" align="center">
-					@(enrolmentLockoutText)
-				</p>
-			}
-			<div class="list-detail mx-auto">
-				<DxTextBox @ref=@filterTextBox
-						   CssClass="filter-text-box flex-grow-1"
-						   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-						   Text="@filterText"
-						   TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
-						   BindValueMode="BindValueMode.OnInput"
-						   InputDelay="500"
-						   NullText="Search">
-				</DxTextBox>
-			</div>
-			<DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
-					KeyFieldName="ID"
-					VirtualScrollingEnabled=true
-					AllowSelectRowByClick=false
-					AllowGroup=false
-					AllowSort=false
-					PagerVisible=false
-					CssClass="mt-1 listbox-scroll">
-				<Columns>
-					<DxGridDataColumn>
-						<HeaderCaptionTemplate>
-							<DxTabs @ref="dxTabs"
-									TabClick="@OnTabClick"
-									@bind-ActiveTabIndex=@activeTabIndex CssClass="">
-								<DxTabPage Text="All" />
-								<DxTabPage Text="Mon" />
-								<DxTabPage Text="Tue" />
-								<DxTabPage Text="Wed" />
-								<DxTabPage Text="Thu" />
-								<DxTabPage Text="Fri" />
-								<DxTabPage Text="W/E" />
-							</DxTabs>
-						</HeaderCaptionTemplate>
-						<CellDisplayTemplate>
-							@{
-								var c = (Class)context.DataItem;
+@if (!IsReady)
+{
+	<LoadingIndicator />
+}
+else
+{
+	<PortalHeader NavigateTo="/public" NoU3AGroup="true" />
+	<div class="container col mx-1 col-md-10 col-lg-8 col-xl-6 mx-md-auto">
+		<div class="h6 pt-2 col-12" align="center">
+			@term?.TermSummary
+		</div>
+		@if (isNotInEnrolmentPeriod)
+		{
+			<p class="alert alert-danger col-12 my-2" align="center">
+				@(enrolmentLockoutText)
+			</p>
+		}
+		<div class="list-detail mx-auto">
+			<DxTextBox @ref=@filterTextBox
+					   CssClass="filter-text-box flex-grow-1"
+					   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+					   Text="@filterText"
+					   TextChanged="@(async (newValue) => await OnFilterTextChanged(newValue))"
+					   BindValueMode="BindValueMode.OnInput"
+					   InputDelay="500"
+					   NullText="Search">
+			</DxTextBox>
+		</div>
+		<DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
+				KeyFieldName="ID"
+				VirtualScrollingEnabled=true
+				AllowSelectRowByClick=false
+				AllowGroup=false
+				AllowSort=false
+				PagerVisible=false
+				CssClass="mt-1 listbox-scroll">
+			<Columns>
+				<DxGridDataColumn>
+					<HeaderCaptionTemplate>
+						<DxTabs @ref="dxTabs"
+								TabClick="@OnTabClick"
+								@bind-ActiveTabIndex=@activeTabIndex CssClass="">
+							<DxTabPage Text="All" />
+							<DxTabPage Text="Mon" />
+							<DxTabPage Text="Tue" />
+							<DxTabPage Text="Wed" />
+							<DxTabPage Text="Thu" />
+							<DxTabPage Text="Fri" />
+							<DxTabPage Text="W/E" />
+						</DxTabs>
+					</HeaderCaptionTemplate>
+					<CellDisplayTemplate>
+						@{
+							var c = (Class)context.DataItem;
 
-								<DxFormLayout>
-									<DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
-										<Items>
-											<div class="container mt-2 py-1 border bg-fl-neutral-subtle">
-												<div class="d-flex">
-													@if (c.Course.IsFeaturedCourse)
-													{
-														<div class="me-2 flex-grow-0 badge bg-fl-primary">Featured</div>
+							<DxFormLayout>
+								<DxFormLayoutGroup Context="titleContext" Decoration="FormLayoutGroupDecoration.None">
+									<Items>
+										<div class="container mt-2 py-1 border bg-fl-neutral-subtle">
+											<div class="d-flex">
+												@if (c.Course.IsFeaturedCourse)
+												{
+													<div class="me-2 flex-grow-0 badge bg-fl-primary">Featured</div>
+												}
+												<div class="flex-grow-1 text-fl-primary">@(HighlightSearchText(ClassTitle(c)))</div>
+											</div>
+										</div>
+
+										<div class="description-style">
+											<ExpandableText Key="@c.ID"
+															Expanded="@(expandStates.TryGetValue(c.ID, out var ex) && ex)"
+															ExpandedChanged="@(async (isExpanded) =>
+																					 {
+																						 expandStates[c.ID] = isExpanded;
+																						 if (!isExpanded)
+																						 {
+																							 ScrollListboxToIndex(context.VisibleIndex);
+																						 }
+																					 })">
+										<ChildContent>
+											<div class="w-100 text-fl-info text-center h6" hidden="@(string.IsNullOrWhiteSpace(c.Course.OfferedBy))">
+												@($"Offered By: {c.Course.OfferedBy}")
+											</div>
+											@{
+														string? message = null;
+														if (c.TermNumber != term.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
+														if (c.TermNumber == prevTerm.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
+														if (c.TotalActiveStudents >= c.Course.MaximumStudents) { message = "Class is Full"; }
+														if (message != null)
+														{
+															<div class="h6 watermark">
+																@message
+															</div>
+														}
 													}
-													<div class="flex-grow-1 text-fl-primary">@(HighlightSearchText(ClassTitle(c)))</div>
-												</div>
-											</div>
-
-											@if (!string.IsNullOrEmpty(c.Course.OfferedBy))
-											{
-												<div class="row px-2 px-md-3 col-12">
-													<div class="text-fl-info col-12 text-center h6">@($"Offered By: {c.Course.OfferedBy}")</div>
-												</div>
-											}
-
-											<div class="w-100 text-center">
-												@if (c.Course.CourseFeePerYear != 0)
-												{
-													<div class="text-fl-info"><strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong></div>
-												}
-												@if (c.Course.HasTermFees)
-												{
-													<div class="text-fl-info"><strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong></div>
-												}
-											</div>
-
-											<div class="description-style" hidden="@isListboxShowingSummary">
-												<ExpandableText Key="@c.ID"
-																Expanded="@(expandStates.TryGetValue(c.ID, out var ex) && ex)"
-																ExpandedChanged="@((isExpanded) =>
-																				   {
-																					   expandStates[c.ID] = isExpanded;
-																					   if (!isExpanded)
-																					   {
-																						   ScrollListboxToIndex(context.VisibleIndex);
-																					   }
-																				   })">
-												<ChildContent>
+													<div hidden="@(c.Course.CourseFeePerYear == 0)"
+														 class="w-100 text-center text-fl-info">
+														<strong>Course Fee: @($"{c.Course.CourseFeePerYear.ToString("c2")} {c.Course.CourseFeePerYearDescription}")</strong>
+													</div>
+													<div hidden="@(!c.Course.HasTermFees)"
+														 class="w-100 text-center text-fl-info">
+														<strong>@($"{c.Course.TermFeesText} {c.Course.CourseFeePerTermDescription}")</strong>
+													</div>
+													<div hidden="@(!c.Course.HasFees)" class="mb-2" />
 													@(HighlightSearchText((ws.Theme == "light") ? c.Course.DisplayDescription : c.Course.DisplayDescriptionDarkMode, isHTMLtext: true))
 												</ChildContent>
 											</ExpandableText>
 										</div>
 
-										@if (reportStyle == ReportStyle.Detail || isListboxShowingSummary)
+										<div class="col-small"><strong>Offered</strong></div>
+										<div class="col-large">@c.OfferedSummary</div>
+										<div class="col-small"><strong>Type</strong></div>
+										<div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
+										<div class="col-small"><strong>Class</strong></div>
+										<div class="col-large">@(GetClassDetails(c))</div>
+										@if (c.Course.ClassSummaries.Count <= 1)
+										{
+											<div class="col-small"><strong>Venue</strong></div>
+											<div class="col-large">@HighlightSearchText(c!.Venue!.Name)</div>
+											<div class="offset-small col-large">@c.Venue?.Address</div>
+										}
+
+										<div class="row col col-12 mt-2">
+											<div class="col-3 px-1 text-center"><strong>Max</strong></div>
+											<div class="col-3 px-1 text-center"><strong>Min</strong></div>
+											<div class="col-3 px-1 text-center"><strong>Enrolled</strong></div>
+											<div class="col-3 px-1 text-center"><strong>Waitlist</strong></div>
+											<div class="col-3 px-1 text-center">@c.Course.MaximumStudents</div>
+											<div class="col-3 px-1 text-center">@c.Course.RequiredStudents</div>
+											<div class="col-3 px-1 text-center">@c.TotalActiveStudents</div>
+											<div class="col-3 px-1 text-center">@c.TotalWaitlistedStudents</div>
+										</div>
+
+										@{
+											string? message = null;
+											if (!c.Course.AllowAutoEnrol) { message = c.Course.AutoEnrolDisabledReason ?? "Class is Closed"; }
+											if (message != null)
 											{
-												<div class="col-small"><strong>Offered</strong></div>
-												<div class="col-large">@c.OfferedSummary</div>
-												<div class="col-small"><strong>Type</strong></div>
-												<div class="col-large">@HighlightSearchText(c.Course.CourseType.Name)</div>
-												<div class="col-small"><strong>Class</strong></div>
-												<div class="col-large">@(GetClassDetails(c))</div>
-												@if (c.Course.ClassSummaries.Count <= 1)
-												{
-													<div class="col-small"><strong>Venue</strong></div>
-													<div class="col-large">@HighlightSearchText(c!.Venue!.Name)</div>
-													<div class="offset-small col-large">@c.Venue?.Address</div>
-												}
+												<div class="watermark">
+													@message
+												</div>
 											}
-											<!-- Report Style Detail -->
+										}
+									</Items>
+								</DxFormLayoutGroup>
+							</DxFormLayout>
+						}
 
-											<div class="row col col-12 mt-2">
-												<div class="col-3 px-1 text-center"><strong>Max</strong></div>
-												<div class="col-3 px-1 text-center"><strong>Min</strong></div>
-												<div class="col-3 px-1 text-center"><strong>Enrolled</strong></div>
-												<div class="col-3 px-1 text-center"><strong>Waitlist</strong></div>
-												<div class="col-3 px-1 text-center">@c.Course.MaximumStudents</div>
-												<div class="col-3 px-1 text-center">@c.Course.RequiredStudents</div>
-												<div class="col-3 px-1 text-center">@c.TotalActiveStudents</div>
-												<div class="col-3 px-1 text-center">@c.TotalWaitlistedStudents</div>
-											</div>
+					</CellDisplayTemplate>
+				</DxGridDataColumn>
+			</Columns>
+		</DxGrid>
 
-											@{
-												string? message = null;
-												if (c.TermNumber != term!.TermNumber) { message = $"Enrol for {c.OfferedSummaryAdjusted}"; }
-												if (c.TermNumber == prevTerm!.TermNumber) { message = $"This is a Term {prevTerm.TermNumber} class"; }
-												if (c.TotalActiveStudents >= c.Course.MaximumStudents) { message = "Class is Full"; }
-												if (!c.Course.AllowAutoEnrol) { message = c.Course.AutoEnrolDisabledReason ?? "Class is Closed"; }
-												if (message != null)
-												{
-													<div class="watermark"
-														 hidden="@(isListboxShowingSummary)">
-														@message
-													</div>
-												}
-											}
+		<div class="align-items-end">
+			<div class="h6 col-12 text-fl-primary" align="center">
+				@(new MarkupString(selectionCountText))
+			</div>
 
-										</Items>
-									</DxFormLayoutGroup>
-								</DxFormLayout>
-							}
-
-						</CellDisplayTemplate>
-					</DxGridDataColumn>
-				</Columns>
-			</DxGrid>
-
-			<div class="align-items-end">
-				<div class="h6 col-12 text-fl-primary" align="center">
-					@(new MarkupString(selectionCountText))
-				</div>
-
-				<div class="input-group">
-					<DxButton CssClass="flex-grow-1"
-							  IconCssClass="menu-icon bi-door-open"
-							  Text="Return to Portal"
-							  RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
-				</div>
+			<div class="input-group">
+				<DxButton CssClass="flex-grow-1"
+						  IconCssClass="menu-icon bi-door-open"
+						  Text="Return to Portal"
+						  RenderStyle="@ButtonRenderStyle.Secondary" Click="@OnReturnToMenu" />
 			</div>
 		</div>
-	</ChildContent>
-</DxLoadingPanel>
+	</div>
 }
 <style>
 	.filter-text-box {
@@ -253,9 +252,6 @@
 	.watermark {
 		width: 100%;
 		text-align: center;
-		font-size: 1.5rem;
-		font-weight: 700;
-		opacity: 0.4;
 		color: magenta;
 	}
 </style>
@@ -267,8 +263,6 @@
 	List<Class>? Classes;
 	List<Class> selectedClasses = new List<Class>();
 	List<Class> deletedClasses = new List<Class>();
-	List<ReportStyleWrapper> ReportStyleList = new ReportStyleList();
-	ReportStyle reportStyle = ReportStyle.Detail;
 	int activeTabIndex = 0;
 
 	DxTabs? dxTabs;
@@ -276,7 +270,6 @@
 	DxTextBox? filterTextBox;
 
 	string selectionCountText = string.Empty;
-	bool isListboxShowingSummary = true;
 	string? googleMapAPIKey;
 	bool IsMobileLayout;
 
@@ -349,30 +342,23 @@
 
 	List<Class>? ResetFilter()
 	{
-		if (isListboxShowingSummary)
+		if (dxTabs == null || activeTabIndex == 0)
 		{
-			return selectedClasses.ToList();
+			return Classes;
 		}
 		else
 		{
-			if (dxTabs == null || activeTabIndex == 0)
+			if (Classes == null) return null;
+			if (activeTabIndex < 6)
 			{
-				return Classes;
+				//Monday - Friday
+				return Classes.Where(x => x.OnDayID == activeTabIndex).ToList();
 			}
 			else
 			{
-				if (Classes == null) return null;
-				if (activeTabIndex < 6)
-				{
-					//Monday - Friday
-					return Classes.Where(x => x.OnDayID == activeTabIndex).ToList();
-				}
-				else
-				{
-					//Weekend
-					return Classes.Where(x => x.OnDayID == activeTabIndex ||
-												x.OnDayID == 0).ToList();
-				}
+				//Weekend
+				return Classes.Where(x => x.OnDayID == activeTabIndex ||
+											x.OnDayID == 0).ToList();
 			}
 		}
 	}
@@ -421,10 +407,6 @@
 					// Fast lookup from Schedule cache
 					isFinancial = false;
 					Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, excludeOffScheduleActivities, isFinancial);
-					if (Classes != null)
-					{
-						isListboxShowingSummary = true; // force a flip
-					}
 				}
 			}
 		}
@@ -442,7 +424,6 @@
 			var sOpeningTime = term.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
 			enrolmentLockoutText = new MarkupString($@"<h6><strong>{term.Year} Term-{term.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.</h6>");
 		}
-		isListboxShowingSummary = false;
 		isNotInEnrolmentPeriod = true;
 	}
 
@@ -453,13 +434,6 @@
 		{
 			filterText = null;
 		}
-	}
-
-	async Task OnReportStyleChanged(ReportStyle value)
-	{
-		reportStyle = value;
-		await localStorage.SetItemAsync<int>("ClassListStyle", (int)reportStyle);
-		await InvokeAsync(StateHasChanged);
 	}
 
 	MarkupString GetClassDetails(Class c)
@@ -495,7 +469,6 @@
 	{
 		var savedFilter = filterText;
 		await GetData();
-		isListboxShowingSummary = false;
 		filterText = null;
 		if (!string.IsNullOrWhiteSpace(savedFilter)) { await OnFilterTextChanged(savedFilter); }
 		if (scrollToTop)
