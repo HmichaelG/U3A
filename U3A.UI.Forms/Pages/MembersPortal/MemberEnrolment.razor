@@ -154,13 +154,13 @@
 													<ExpandableText Key="@c.ID"
 																	Expanded="@(expandStates.TryGetValue(c.ID, out var ex) && ex)"
 																	ExpandedChanged="@(async (isExpanded) =>
-																																																								 			   {
-																																																									 			   expandStates[c.ID] = isExpanded;
-																																																									 			   if (!isExpanded)
-																																																									 			   {
-																																																										 			   ScrollListboxToIndex(context.VisibleIndex);
-																																																									 			   }
-																																																								 			   })">
+																		{
+																			expandStates[c.ID] = isExpanded;
+																			if (!isExpanded)
+																			{
+																				ScrollListboxToIndex(context.VisibleIndex);
+																			}
+																		})">
 												<ChildContent>
 													<div class="w-100 text-fl-info text-center h6" hidden="@(string.IsNullOrWhiteSpace(c.Course.OfferedBy))">
 														@($"Offered By: {c.Course.OfferedBy}")
@@ -722,8 +722,10 @@
 		isNotInEnrolmentPeriod = true;
 	}
 
+	int count=0;
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
+		Console.WriteLine($"rendering {count} times");
 		if (!firstRender)
 		{
 			if (IsEnrolmentRequestView && isNotInEnrolmentPeriod && (term == null || Classes == null))
@@ -755,8 +757,10 @@
 		if (style != null)
 		{
 			var thisStyle = (ReportStyle)style;
-			if (thisStyle != reportStyle) { reportStyle = thisStyle; }
-			InvokeAsync(StateHasChanged);
+			if (thisStyle != reportStyle) { 
+				reportStyle = thisStyle; 
+				StateHasChanged();
+			}
 		}
 	}
 
@@ -764,7 +768,7 @@
 	{
 		reportStyle = value;
 		await localStorage.SetItemAsync<int>("ClassListStyle", (int)reportStyle);
-		InvokeAsync(StateHasChanged);
+		StateHasChanged();
 	}
 
 	async Task OnEmail(string courseName, string email)
