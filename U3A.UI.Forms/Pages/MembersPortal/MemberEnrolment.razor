@@ -79,7 +79,8 @@ else
 		</div>
 		<DxGrid Data="@ListboxData" id="listBox" @ref=@listGrid
 				KeyFieldName="ID"
-				VirtualScrollingEnabled=true
+				VirtualScrollingEnabled=false
+				ShowAllRows=true
 				AllowSelectRowByClick=false
 				AllowGroup=false
 				AllowSort=false
@@ -100,8 +101,9 @@ else
 					</HeaderCaptionTemplate>
 					<CellDisplayTemplate>
 						@{
-							var c = (Class)context.DataItem;
-							@if (reportStyle == ReportStyle.Brief && !isListboxShowingSummary)
+						var c = (Class)context.DataItem;
+
+						@if (reportStyle == ReportStyle.Brief && !isListboxShowingSummary)
 							{
 								<div class="mx-1 d-flex">
 									<div class="flex-grow-1 @((IsEnrolmentRequestView && c.IsSelected) ? "bg-fl-warning-subtle" : "")">
@@ -313,15 +315,12 @@ else
 												<div class="col-3 px-1 text-center">@c.TotalActiveStudents</div>
 												<div class="col-3 px-1 text-center">@c.TotalWaitlistedStudents</div>
 												@{
-													string? message = null;
+													string? message = string.Empty;
 													if (!c.Course.AllowAutoEnrol) { message = c.Course.AutoEnrolDisabledReason ?? "Class is Closed"; }
-													if (message != null)
-													{
-														<div class="watermark"
-															 hidden="@(isListboxShowingSummary)">
-															@message
-														</div>
-													}
+													<div class="watermark"
+															hidden="@(isListboxShowingSummary)">
+														@message
+													</div>
 												}
 											</div>
 
@@ -536,6 +535,7 @@ else
 	string selectButtonIcon;
 	List<Guid> newEnrolmentGuids;
 	private readonly Dictionary<Guid, bool> expandStates = new();
+	bool isLastRecord = false;
 
 	// Search filter function
 	string? _filterText = null;
