@@ -1,4 +1,5 @@
 ﻿// return true if text overflows the given maxHeight (e.g. "200px" or "50vh")
+// THis function is used by the ExpandableText component
 window.checkOverflow = (element, maxHeight) => {
     try {
         if (!element) return false;
