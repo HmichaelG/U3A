@@ -30,6 +30,7 @@
         {
             _ = await localTime.GetTimezoneOffsetAsync();
         }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
 }
