@@ -90,9 +90,4 @@
     private IComponentRenderMode? PageRenderMode =>
             HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        return base.OnAfterRenderAsync(firstRender);
-    }
-
 }
