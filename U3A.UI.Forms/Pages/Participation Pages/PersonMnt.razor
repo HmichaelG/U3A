@@ -65,6 +65,7 @@
                     </DxTabs>
                 </div>
                                     <DxGrid id="my-grid" Data="@Persons" @ref=@mainGrid CssClass="grid-style"
+                                            AllowSelectRowByClick=false
                                             SelectionMode="GridSelectionMode.Multiple"
                                             SelectedDataItems="@SelectedParticipants"
                                             SelectedDataItemsChanged="@OnSelectedParticipantsChanged"

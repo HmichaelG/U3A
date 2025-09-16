@@ -81,11 +81,11 @@ else
     bool? useTopMenu = null; // default is sidebar
     LoginState? loginState { get; set; }
 
-    bool isXSmall;
-    bool isSmall;
-    bool isMedium;
-    bool isLarge;
-    bool isXLarge;
+    bool isXSmall = false;
+    bool isSmall = false;
+    bool isMedium = false;
+    bool isLarge = false;
+    bool isXLarge = false;
 
     U3ADbContext? dbc { get; set; }
     string? currentUrl;
@@ -191,8 +191,10 @@ else
         Log.Information($"{seq}: Screen size changed to: {size}", size);
     }
 
+    bool hasGetWorkstationProcessed = false;
     private async Task GetWorkstationDetails()
     {
+        if (hasGetWorkstationProcessed) return;
         await ws.GetWorkstationDetail();
         useTopMenu = ws.UseTopMenu;
         switch (ws.SizeMode)
@@ -208,12 +210,13 @@ else
                 break;
         }
         StateHasChanged();
+        hasGetWorkstationProcessed = true;
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)
     {
         openCircuits = (circuitHandler as CircuitHandlerService)!.CircuitDetails.Count();
-        InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     public void Dispose()

@@ -322,12 +322,7 @@ else
             selectedPerson = null;
             var authenticationState = await authenticationStateTask;
             authEmail = authenticationState.User.Identity.Name;
-            if (selectedPerson != null)
-            {
-                await OnProcess();
-            }
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     async Task CheckEwayStatus()
