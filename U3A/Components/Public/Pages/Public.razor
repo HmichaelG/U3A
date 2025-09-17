@@ -35,8 +35,6 @@
 }
 else
 {
-    @if (isInteractive)
-    {
         <DxButton Text="@((IsSmallLayout || IsXtraSmallLayout) ? "" : "Website")"
                   IconCssClass="fs-4 bi bi-arrow-left-circle"
                   CssClass="back-button-style"
@@ -211,11 +209,6 @@ else
                 }
             </Items>
         </DxGridLayout>
-    }
-    if (!isInteractive)
-    {
-        <NotInteractive />
-    }
 }
 <style>
     .back-button-style {
@@ -246,7 +239,6 @@ else
     bool isNoEnrolmentTermAvailable = false;
     string lockoutMessage = string.Empty;
     bool isReady;
-    bool isInteractive = false;
     Term? currentTerm;
 
     ErrorBoundary? errorBoundary;
@@ -260,7 +252,6 @@ else
             tenantId = dbc.TenantInfo.Name;
             settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
         }
-        isInteractive = false;
         isReady = true;
     }
 
@@ -274,7 +265,6 @@ else
     {
         if (firstRender)
         {
-            isInteractive = RendererInfo.IsInteractive;
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
                 // no ernolment term in force

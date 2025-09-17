@@ -19,7 +19,11 @@
 @inject IThemeChangeService themeChangeService
 @implements IDisposable
 
-@if (isInteractive)
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
 {
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" IsActive="isXSmall" IsActiveChanged="OnXSmallChanged" />
     <DxLayoutBreakpoint DeviceSize="DeviceSize.Small" IsActive="isSmall" IsActiveChanged="OnSmallChanged" />
@@ -60,10 +64,7 @@
         </div>
     }
 }
-else
-{
-    <NotInteractive />
-}
+
 <style>
     .container-main {
         width: 100%;
@@ -81,15 +82,14 @@ else
     bool? useTopMenu = null; // default is sidebar
     LoginState? loginState { get; set; }
 
-    bool isXSmall;
-    bool isSmall;
-    bool isMedium;
-    bool isLarge;
-    bool isXLarge;
+    bool isXSmall = false;
+    bool isSmall = false;
+    bool isMedium = false;
+    bool isLarge = false;
+    bool isXLarge = false;
 
     U3ADbContext? dbc { get; set; }
     string? currentUrl;
-    bool isInteractive = false;
     SizeMode sizeMode;
     private DotNetObjectReference<MainLayout>? objRef;
     string Orientation { get; set; } = "unknown";
@@ -161,7 +161,6 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        isInteractive = RendererInfo.IsInteractive;
         if (firstRender)
         {
             await GetWorkstationDetails();
@@ -191,8 +190,10 @@ else
         Log.Information($"{seq}: Screen size changed to: {size}", size);
     }
 
+    bool hasGetWorkstationProcessed = false;
     private async Task GetWorkstationDetails()
     {
+        if (hasGetWorkstationProcessed) return;
         await ws.GetWorkstationDetail();
         useTopMenu = ws.UseTopMenu;
         switch (ws.SizeMode)
@@ -208,12 +209,13 @@ else
                 break;
         }
         StateHasChanged();
+        hasGetWorkstationProcessed = true;
     }
 
     public void HandleCircuitsChanged(object sender, EventArgs args)
     {
         openCircuits = (circuitHandler as CircuitHandlerService)!.CircuitDetails.Count();
-        InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     public void Dispose()

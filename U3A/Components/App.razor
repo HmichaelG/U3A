@@ -76,7 +76,16 @@
         anchorElement.remove();
         }
     </script>
-
+    <script>
+        (function () {
+          if (!window.WebSocket) {
+            const warning = document.createElement('div');
+            warning.innerHTML = "⚠️ Your browser does not support WebSockets, which are required for interactive features. Please update your browser or switch to a supported one.";
+            warning.style = "background: #fff3cd; color: #856404; padding: 1em; border: 1px solid #ffeeba; margin: 1em;";
+            document.body.prepend(warning);
+          }
+        })();
+    </script>
 
 </body>
 
@@ -89,10 +98,5 @@
     private string AppendVersion(string path) => FileVersionProvider.AddFileVersionToPath("/", path);
     private IComponentRenderMode? PageRenderMode =>
             HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
-
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        return base.OnAfterRenderAsync(firstRender);
-    }
 
 }

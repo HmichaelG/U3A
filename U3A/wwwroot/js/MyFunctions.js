@@ -1,4 +1,18 @@
-﻿// return true if text overflows the given maxHeight (e.g. "200px" or "50vh")
+﻿
+
+window.isOldAppleDevice = () => {
+    const ua = navigator.userAgent;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isMac = /Macintosh/.test(ua);
+    const isOldVersion = /OS [0-9_]{1,4}/.test(ua) && !window.WebSocket;
+
+    return (isIOS || isMac) && isSafari && isOldVersion;
+};
+
+
+// return true if text overflows the given maxHeight (e.g. "200px" or "50vh")
+// THis function is used by the ExpandableText component
 window.checkOverflow = (element, maxHeight) => {
     try {
         if (!element) return false;
