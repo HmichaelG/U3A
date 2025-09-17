@@ -19,7 +19,11 @@
 @inject IThemeChangeService themeChangeService
 @implements IDisposable
 
-@if (isInteractive)
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
 {
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" IsActive="isXSmall" IsActiveChanged="OnXSmallChanged" />
     <DxLayoutBreakpoint DeviceSize="DeviceSize.Small" IsActive="isSmall" IsActiveChanged="OnSmallChanged" />
@@ -60,10 +64,7 @@
         </div>
     }
 }
-else
-{
-    <NotInteractive />
-}
+
 <style>
     .container-main {
         width: 100%;
@@ -89,7 +90,6 @@ else
 
     U3ADbContext? dbc { get; set; }
     string? currentUrl;
-    bool isInteractive = false;
     SizeMode sizeMode;
     private DotNetObjectReference<MainLayout>? objRef;
     string Orientation { get; set; } = "unknown";
@@ -161,7 +161,6 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        isInteractive = RendererInfo.IsInteractive;
         if (firstRender)
         {
             await GetWorkstationDetails();
