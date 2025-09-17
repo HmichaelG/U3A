@@ -166,7 +166,7 @@ else
                                         </div>
                                         @if (isBeforeEnrolmentDay || isNoEnrolmentTermAvailable)
                                         {
-                                            <div class="card card-body border-info alert-info w-100 text-center h5">
+                                            <div class="card-fl card-body border-info alert-info w-100 text-center h5">
                                                 @(new MarkupString(lockoutMessage))
                                             </div>
 
@@ -251,22 +251,6 @@ else
         {
             tenantId = dbc.TenantInfo.Name;
             settings = await dbc.SystemSettings.OrderBy(x => x.ID).FirstOrDefaultAsync();
-        }
-        isReady = true;
-    }
-
-    private void ResetError()
-    {
-        errorBoundary?.Recover();
-        NavigationManager.NavigateTo("/", true);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-            {
                 // no ernolment term in force
                 var localTime = await lt.GetLocalTimeAsync();
                 currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc, localTime);
@@ -298,9 +282,14 @@ else
                     var sOpeningTime = openingTime?.ToString("ddd dd-MMM-yy hh:mm tt");
                     lockoutMessage = $@"<strong>{term!.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.";
                 }
-            }
         }
-        await base.OnAfterRenderAsync(firstRender);
+        isReady = true;
+    }
+
+    private void ResetError()
+    {
+        errorBoundary?.Recover();
+        NavigationManager.NavigateTo("/", true);
     }
 
     async Task SetUnavailableMessage(Term term)
@@ -309,7 +298,6 @@ else
         lockoutMessage = $@"<h6><strong>{term!.Year} Term-{term.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.
                                                     <br/>New member registration is unavailable till that time.</h6>";
         isNoEnrolmentTermAvailable = true;
-        await InvokeAsync(StateHasChanged);
     }
 
     void OnReportClick()

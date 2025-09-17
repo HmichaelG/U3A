@@ -19,12 +19,6 @@
 @inject IThemeChangeService themeChangeService
 @implements IDisposable
 
-@if (!isReady)
-{
-    <LoadingIndicator />
-}
-else
-{
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" IsActive="isXSmall" IsActiveChanged="OnXSmallChanged" />
     <DxLayoutBreakpoint DeviceSize="DeviceSize.Small" IsActive="isSmall" IsActiveChanged="OnSmallChanged" />
     <DxLayoutBreakpoint DeviceSize="DeviceSize.Medium" IsActive="isMedium" IsActiveChanged="OnMediumChanged" />
@@ -63,7 +57,6 @@ else
             </DxFormLayout>
         </div>
     }
-}
 
 <style>
     .container-main {
