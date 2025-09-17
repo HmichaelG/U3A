@@ -1,8 +1,11 @@
 ﻿
-<div class="indicator-style"><DxWaitIndicator Visible=true /><em>Loading...</em></div>
+<div class="loading-indicator-style">
+    <DxWaitIndicator Visible=true CssClass="text-fl-primary" />
+        <em>Loading...</em>
+    </div>
 
 <style>
-    .indicator-style {
+    .loading-indicator-style {
         display: flex;
         flex-direction: row;
         align-items: flex-start;
@@ -11,4 +14,5 @@
         margin-top: 2.5rem;
         gap: 0.5rem;
     }
+
 </style>
