@@ -1,6 +1,7 @@
 ﻿@namespace U3A.UI.Forms
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject WorkstationService ws
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" @bind-IsActive="@isMobileLayout" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Small" @bind-IsActive="@isTabletLayout" />
@@ -9,7 +10,7 @@
 
 @if (isReady)
 {
-    <section class="card border-subdued alert-primary w-100 p-1" hidden="@isHidden">
+    <section class="card-fl border-subdued alert-primary w-100 p-1" hidden="@isHidden">
         <div class=@($"text-center p-2 {fontSizeCssClass}")>
             <button class="btn-close float-right" onclick="@onCloseButtonClick" />
             <strong>Terms &amp; Conditions</strong><br />@introduction
@@ -21,7 +22,7 @@
                   : "popup-button mx-auto flex-grow-0")
                       IconCssClass="bi bi-eyeglasses menu-icon pe-2"
                       Click="@(e => OnTandCClicked())"
-                      RenderStyleMode="ButtonRenderStyleMode.Contained">
+                      RenderStyleMode="ButtonRenderStyleMode.Outline">
             </DxButton>
             <DxCheckBox CssClass="flex-grow-1 mx-1 mt-2 text-fl-danger" hidden="@(!isConfirmationRequired)"
                         CheckedChanged="@(async (bool value) => await ConfirmationChanged(value))"
@@ -33,6 +34,7 @@
     </section>
 
     <DxWindow @ref=@detailsForm
+              Height="40rem"
               AllowResize="false"
               AllowDrag=false
               Context="windowContext"
@@ -41,13 +43,12 @@
               ShowFooter=true
               Scrollable=true
               CssClass=@windowCssClass
+              BodyCssClass="border border-1 m-4"
               HeaderText="Terms & Conditions">
         <BodyTextTemplate>
-            <div class="card overflow-scroll">
-                <div class="card-body">
+                <div class="p-2">
                     @(new MarkupString(htmlText))
                 </div>
-            </div>
         </BodyTextTemplate>
         <FooterContentTemplate>
             <DxButton CssClass="popup-button" Text="Close" RenderStyle="ButtonRenderStyle.Primary" Click="onClick" />
@@ -109,6 +110,11 @@
         if (SystemSettings != null && SystemSettings.TermsAndConditionsEnabled)
         {
             htmlText = SystemSettings.TermsAndConditionsHTML;
+            if (ws.Theme != "light")
+            {
+                var htmlAdjusted = HtmlHelpers.AdjustAndMinifyHtml(htmlText);
+                htmlText = htmlAdjusted.WithImagesDarkMode;
+            }
             introduction = (IsEnrolmentNotice)
                                 ? $"By participation, you acknowledge and accept the {SystemSettings?.U3AGroup} terms and conditions of membership."
                                 : $"By your fee payment, you acknowledge and accept the {SystemSettings?.U3AGroup} terms and conditions of membership.";
@@ -145,10 +151,10 @@
     async void OnTandCClicked()
     {
         windowCssClass = (isMobileLayout)
-                            ? "mobile-device vh-100"
+                            ? "mobile-device"
                             : (isTabletLayout)
-                                ? "tablet-device vh-100"
-                                : "other-device vh-100";
+                                ? "tablet-device"
+                                : "other-device";
         await detailsForm.ShowAsync();
     }
 
