@@ -159,6 +159,10 @@
         string result = "text-body";
         if (Events is not null && Events.Any(d => DaysEqual(d.Start, date)))
             result = "font-weight-bold text-fl-info";
+        else
+        {
+            result = "text-fl-body";
+        }
         return result;
     }
 
