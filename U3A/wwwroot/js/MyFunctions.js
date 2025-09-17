@@ -1,14 +1,29 @@
 ﻿
-
-window.isOldAppleDevice = () => {
+(function () {
     const ua = navigator.userAgent;
-    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-    const isIOS = /iPad|iPhone|iPod/.test(ua);
-    const isMac = /Macintosh/.test(ua);
-    const isOldVersion = /OS [0-9_]{1,4}/.test(ua) && !window.WebSocket;
 
-    return (isIOS || isMac) && isSafari && isOldVersion;
-};
+    // Check for Safari and extract version
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+    const safariVersionMatch = ua.match(/Version\/(\d+)\.(\d+)/); // e.g., "Version/16.3"
+    let safariVersion = 0;
+
+    if (safariVersionMatch) {
+        const major = parseInt(safariVersionMatch[1], 10);
+        const minor = parseInt(safariVersionMatch[2], 10);
+        safariVersion = major + minor / 10;
+    }
+
+    // Final condition
+    const isOldSafari = isSafari && safariVersion > 0 && safariVersion < 16.4;
+    const lacksWebSocket = !window.WebSocket;
+
+    if (isOldSafari || lacksWebSocket) {
+        const warning = document.createElement('div');
+        warning.innerHTML = "<p>⚠️ Your browser does not support interactive features.<p>If using an Apple device please update Safari to version 16.4+.</br>Otherwise, update your browser to the latest version. It must have modern WebSocket support.";
+        warning.style = "background: #fff3cd; color: #856404; padding: 1em; border: 1px solid #ffeeba; margin: 1em;";
+        document.body.prepend(warning);
+    }
+})();
 
 
 // return true if text overflows the given maxHeight (e.g. "200px" or "50vh")
@@ -218,19 +233,6 @@ function GetSessionState(key) {
 function GetLocalStorage(key) {
     return window.localStorage.getItem(key);
 }
-
-window.onload = function () {
-    displayNonInteractive();
-}
-
-function displayNonInteractive() {
-    setTimeout(function () {
-        let element = document.getElementById("notInteractive");
-        if (element != null) {
-            element.style.display = "block";
-        }
-    }, 10000);
-};
 
 window.cookieInterop = {
     setCookie: function (name, value, days) {
