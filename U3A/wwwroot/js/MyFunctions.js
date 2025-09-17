@@ -14,12 +14,12 @@
     }
 
     // Final condition
-    const isOldSafari = isSafari && safariVersion > 0 && safariVersion < 16.4;
+    const isOldSafari = isSafari && safariVersion > 0 && safariVersion < 16.7;
     const lacksWebSocket = !window.WebSocket;
 
     if (isOldSafari || lacksWebSocket) {
         const warning = document.createElement('div');
-        warning.innerHTML = "<p>⚠️ Your browser does not support interactive features.<p>If using an Apple device please update Safari to version 16.4+.</br>Otherwise, update your browser to the latest version. It must have modern WebSocket support.";
+        warning.innerHTML = "<p>⚠️ Your browser does not support interactive features.<p>If using an Apple device please update Safari to version 16.7+.</br>Otherwise, update your browser to the latest version. It must have modern WebSocket support.";
         warning.style = "background: #fff3cd; color: #856404; padding: 1em; border: 1px solid #ffeeba; margin: 1em;";
         document.body.prepend(warning);
     }
