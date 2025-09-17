@@ -134,6 +134,7 @@ public static class HtmlHelpers
     /// <summary>
     /// Removes color and background-color declarations/attributes when they represent white/black or close variants.
     /// Also adjusts non-white/non-black colors so they "pop" in dark mode (increase saturation/adjust lightness).
+    /// Now additionally processes CSS rules inside &lt;style&gt; blocks (all selectors, classes, etc.).
     /// </summary>
     private static string RemoveWhiteBlackColors(string html)
     {
@@ -141,7 +142,7 @@ public static class HtmlHelpers
         var document = parser.ParseDocument(html);
         if (document is null) return html;
 
-        // Iterate all elements
+        // Iterate all elements for inline style/attributes
         foreach (var element in document.All)
         {
             // 1) Handle style attribute: remove color/background-color declarations that match white/black,
@@ -189,6 +190,19 @@ public static class HtmlHelpers
             }
         }
 
+        // 4) Process <style> blocks: update color/background-color declarations inside CSS rules
+        var styleElements = document.QuerySelectorAll("style").OfType<IElement>().ToList();
+        foreach (var styleEl in styleElements)
+        {
+            var cssText = styleEl.TextContent ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(cssText)) continue;
+
+            var processedCss = ProcessStyleBlockForDarkMode(cssText);
+            // Replace content preserving element
+            // AngleSharp allows setting TextContent
+            styleEl.TextContent = processedCss;
+        }
+
         return document.ToHtml();
     }
 
@@ -226,6 +240,79 @@ public static class HtmlHelpers
         }
 
         return string.Join("; ", keep);
+    }
+
+    /// <summary>
+    /// Process CSS inside a &lt;style&gt; block:
+    /// - strips comments
+    /// - iterates rules and adjusts/removes color and background-color declarations using same logic as inline styles
+    /// This method aims to be tolerant rather than a full CSS parser.
+    /// </summary>
+    private static string ProcessStyleBlockForDarkMode(string css)
+    {
+        if (string.IsNullOrWhiteSpace(css)) return css;
+
+        // remove comments /* ... */
+        var withoutComments = Regex.Replace(css, @"/\*.*?\*/", "", RegexOptions.Singleline);
+
+        var sb = new StringBuilder();
+        // Match selectors and declaration blocks
+        var ruleRegex = new Regex(@"(?<selector>[^{]+)\{(?<decls>[^}]+)\}", RegexOptions.Singleline);
+        var pos = 0;
+        foreach (Match m in ruleRegex.Matches(withoutComments))
+        {
+            // append any text between previous pos and this rule start (to keep @-rules or whitespace)
+            if (m.Index > pos)
+                sb.Append(withoutComments.Substring(pos, m.Index - pos));
+
+            var selector = m.Groups["selector"].Value.Trim();
+            var decls = m.Groups["decls"].Value;
+
+            // parse declarations
+            var declMatches = Regex.Matches(decls, @"(?<prop>[^:;]+)\s*:\s*(?<val>[^;]+)", RegexOptions.Compiled);
+            var keepDecls = new List<string>();
+
+            foreach (Match dm in declMatches)
+            {
+                var prop = dm.Groups["prop"].Value.Trim().ToLowerInvariant();
+                var val = dm.Groups["val"].Value.Trim();
+
+                if (prop == "color" || prop == "background-color")
+                {
+                    if (IsCssColorWhiteOrBlack(val))
+                    {
+                        // drop the declaration
+                        continue;
+                    }
+                    else
+                    {
+                        var adjusted = AdjustCssColorForDarkMode(val, isBackground: prop == "background-color");
+                        if (!string.IsNullOrWhiteSpace(adjusted))
+                            keepDecls.Add($"{prop}: {adjusted}");
+                        // else skip
+                        continue;
+                    }
+                }
+
+                // preserve other properties unchanged
+                keepDecls.Add($"{prop}: {val}");
+            }
+
+            sb.Append(selector);
+            sb.Append(" { ");
+            sb.Append(string.Join("; ", keepDecls));
+            if (keepDecls.Count > 0)
+                sb.Append("; ");
+            sb.Append("}"); // close rule
+
+            pos = m.Index + m.Length;
+        }
+
+        // append any trailing text after last match
+        if (pos < withoutComments.Length)
+            sb.Append(withoutComments.Substring(pos));
+
+        return sb.ToString();
     }
 
     /// <summary>
