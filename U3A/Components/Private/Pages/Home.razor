@@ -184,7 +184,6 @@ else
     [CascadingParameter(Name = "HasRole")]
     public bool hasRole { get; set; }
 
-    U3ADbContext? dbc { get; set; }
     MessageBox? messageBox;
     string homePage = "";
     DateTime now;
@@ -200,7 +199,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        dbc = await U3Adbfactory.CreateDbContextAsync();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
         tenantId = textInfo.ToTitleCase(dbc.TenantInfo.Identifier!);
         now = dbc.GetLocalTime();
@@ -243,6 +242,7 @@ else
             {
                 string accessCode = colQueryString[1]!;
                 var service = new EwayPaymentService();
+                using var dbc = await U3Adbfactory.CreateDbContextAsync();
                 await service.CancelPaymentAsync(dbc!, accessCode);
             }
         }
@@ -302,6 +302,5 @@ else
 
     public void Dispose()
     {
-        dbc?.Dispose();
     }
 }
