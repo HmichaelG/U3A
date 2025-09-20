@@ -19,21 +19,27 @@
     @DxResourceManager.RegisterTheme(ThemesService.ActiveTheme)
     @DxResourceManager.RegisterScripts()
 
-    <link href=@AppendVersion("_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.css") rel="stylesheet" />
-    <link href=@AppendVersion("_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css") rel="stylesheet" />
+    <link href=@AppendVersion("_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.css") rel="stylesheet" defer />
+    <link href=@AppendVersion("_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css") rel="stylesheet" defer />
     <link href=@Assets["css/site.css"] rel="stylesheet" />
     <link href=@Assets["css/theme-fluent.css"] rel="stylesheet" />
     <link href=@Assets["U3A.styles.css"] rel="stylesheet" />
+    <script type="text/javascript" src=@Assets["/js/MyFunctions.js"] ></script>
+    <script type="text/javascript" src=@Assets["/js/qr.js"] defer ></script>
+    <script type="text/javascript" src=@Assets["/lib/qrcode.min.js"] defer ></script>
+    <script type="text/javascript" src=@Assets["/js/reCaptchaV2.js"] defer ></script>
+    <script type="text/javascript" src=@Assets["/js/timeout.js"] defer ></script>
+    <script type="text/javascript" src=@Assets["https://secure.ewaypayments.com/scripts/eCrypt.min.js"] defer></script>
+    <ImportMap />
 
-    <link rel="apple-touch-icon" href=@Assets["/favicon/apple-touch-icon.png"]>
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png">
     <meta name="web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-    <link rel="icon" type="image/png" sizes="32x32" href=@Assets["/favicon/favicon-32x32.png"]>
-    <link rel="icon" type="image/png" sizes="16x16" href=@Assets["/favicon/favicon-16x16.png"]>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
     <link rel="icon" type="image/ico" href=@Assets["/favicon/favicon.ico"]>
-    <link rel="manifest" href=@Assets["/favicon/site.webmanifest"]>
-    <ImportMap />
+    <link rel="manifest" href="/favicon/site.webmanifest">
 
     <HeadOutlet @rendermode="@PageRenderMode" />
 </head>
@@ -49,24 +55,16 @@
 
     <Routes @rendermode="@PageRenderMode" />
 
-    <script src=@Assets["_framework/blazor.web.js"]></script>
-    <script type="text/javascript" src=@Assets["/js/qr.js"]></script>
-    <script type="text/javascript" src=@Assets["/lib/qrcode.min.js"]></script>
+    <script src="_framework/blazor.web.js"></script>
+    <script defer >navigator.serviceWorker.register('service-worker.js');</script>
 
-
-    <script type="text/javascript" src=@Assets["/js/MyFunctions.js"]></script>
-    <script type="text/javascript" src=@Assets["/js/reCaptchaV2.js"]></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
-    <script type="text/javascript" src=@Assets["/js/timeout.js"]></script>
-    <script src=@Assets["https://secure.ewaypayments.com/scripts/eCrypt.min.js"]></script>
-
-    <script>
+    <script defer>
         function GetTimezoneOffset() {
         // Returns the time difference in minutes between UTC time and local time.
         return new Date().getTimezoneOffset();
         }
     </script>
-    <script>
+    <script defer>
 
         window.triggerFileDownload = (fileName, url) => {
         const anchorElement = document.createElement('a');
