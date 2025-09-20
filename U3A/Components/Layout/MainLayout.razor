@@ -25,9 +25,13 @@
     <DxLayoutBreakpoint DeviceSize="DeviceSize.Large" IsActive="isLarge" IsActiveChanged="OnLargeChanged" />
     <DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge" IsActive="isXLarge" IsActiveChanged="OnXLargeChanged" />
 
-    @if (isReady)
-    {
-        <div class="container-fluid">
+<div class="container-fluid">
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
             <DxFormLayout SizeMode="@sizeMode">
 
                 <CascadingValue Value=@openCircuits Name="OpenCircuits">
@@ -55,8 +59,8 @@
                     </CascadingValue>
                 </CascadingValue>
             </DxFormLayout>
-        </div>
     }
+</div>
 
 <style>
     .container-main {
@@ -149,7 +153,6 @@
         ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count();
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
-        isReady = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -159,6 +162,7 @@
             await GetWorkstationDetails();
             objRef = DotNetObjectReference.Create(this);
             await js.InvokeVoidAsync("registerOrientationChange", objRef);
+            isReady = true; await InvokeAsync(StateHasChanged);
         }
     }
 

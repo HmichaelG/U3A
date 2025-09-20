@@ -283,7 +283,6 @@ else
                 lockoutMessage = $@"<strong>{term!.Year}</strong> membership and course enrolments will open</br>{sOpeningTime}.";
             }
         }
-        isReady = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -291,6 +290,7 @@ else
         if (firstRender)
         {
             await ws.GetWorkstationDetail();
+            isReady = true; await InvokeAsync(StateHasChanged);
         }
     }
 
