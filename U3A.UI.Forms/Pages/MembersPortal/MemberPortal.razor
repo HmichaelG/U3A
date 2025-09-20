@@ -194,7 +194,6 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (loginState == null) { return; }
-        await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
             EnsureSelectedPersonSet();
