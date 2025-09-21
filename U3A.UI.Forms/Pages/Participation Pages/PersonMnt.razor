@@ -239,7 +239,7 @@
                                                     <DxFormLayoutItem Caption="Occupation/Skill" ColSpanMd="12">
                                                         <DxMemo @bind-Text="@editItem.Occupation" Rows="3" autocomplete="new-password" CssClass="w-100" />
                                                     </DxFormLayoutItem>
-                                                </DxFormLayoutGroup>
+                                                    </DxFormLayoutGroup>
                                                 <DxFormLayoutGroup Caption="Address / Contact Information" ColSpanMd="6">
                                                     <DxFormLayoutItem Caption="Street" ColSpanMd="12">
                                                         <DxTextBox @bind-Text="@editItem.Address" autocomplete="new-password" />
@@ -328,8 +328,10 @@
                                                 </DxTabs>
                                                 </DxFormLayoutGroup>
 
-                                                <DxFormLayoutGroup Caption="Membership" ColSpanMd="6">
-                                                    <Items>
+                                                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="6">
+                                                    <DxTabs>
+                                                        <DxTabPage Text="Membership" >
+                                                        <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
                                                         <DxFormLayoutItem Caption="Financial To" ColSpanMd="6">
                                                             <DxTextBox Text="@editItem.FinancialToText"
                                                                        TextExpression="@(() => editItem.FinancialToText)"
@@ -355,7 +357,9 @@
                                                             <DxCheckBox @bind-Checked="@editItem.VaxCertificateViewed"
                                                                         Alignment="CheckBoxContentAlignment.Right" />
                                                         </DxFormLayoutItem>
-                                                    </Items>
+                                                        </DxFormLayoutGroup>
+                                                        </DxTabPage>
+                                                    </DxTabs>
                                                 </DxFormLayoutGroup>
                                             </DxFormLayout>
                                         </EditFormTemplate>
