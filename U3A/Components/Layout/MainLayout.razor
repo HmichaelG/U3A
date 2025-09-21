@@ -182,7 +182,7 @@ else
     async Task processSizeChange(ScreenSizes size)
     {
         await ws.SetScreenSizeAsync(size);
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
         seq++;
         Log.Information($"{seq}: Screen size changed to: {size}", size);
     }
@@ -205,14 +205,14 @@ else
                 sizeMode = SizeMode.Small;
                 break;
         }
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
         hasGetWorkstationProcessed = true;
     }
 
-    public void HandleCircuitsChanged(object sender, EventArgs args)
+    public async void HandleCircuitsChanged(object sender, EventArgs args)
     {
         openCircuits = (circuitHandler as CircuitHandlerService)!.CircuitDetails.Count();
-        StateHasChanged();
+        await  InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
