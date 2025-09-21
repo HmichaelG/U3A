@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
@@ -12,21 +13,25 @@ using U3A.Data;
 
 namespace U3A.Components.Account
 {
+    // These endpoints are required by the Identity Razor components defined in the /Components/Account/Pages directory of this project.
     internal static class IdentityComponentsEndpointRouteBuilderExtensions
     {
-        // These endpoints are required by the Identity Razor components defined in the /Components/Account/Pages directory of this project.
         public static IEndpointConventionBuilder MapAdditionalIdentityEndpoints(this IEndpointRouteBuilder endpoints)
         {
             ArgumentNullException.ThrowIfNull(endpoints);
 
             var accountGroup = endpoints.MapGroup("/Account");
 
-            _ = accountGroup.MapPost("/PerformExternalLogin", (
+            _ = accountGroup.MapPost("/PerformExternalLogin", async (
                 HttpContext context,
+                [FromServices] IAntiforgery antiforgery,
                 [FromServices] SignInManager<ApplicationUser> signInManager,
                 [FromForm] string provider,
                 [FromForm] string returnUrl) =>
             {
+                // Validate antiforgery token on incoming POST
+                await antiforgery.ValidateRequestAsync(context);
+
                 IEnumerable<KeyValuePair<string, StringValues>> query = [
                     new("ReturnUrl", returnUrl),
                     new("Action", ExternalLogin.LoginCallbackAction)];
@@ -41,10 +46,15 @@ namespace U3A.Components.Account
             });
 
             _ = accountGroup.MapPost("/Logout", async (
+                HttpContext context,
                 ClaimsPrincipal user,
+                [FromServices] IAntiforgery antiforgery,
                 [FromServices] SignInManager<ApplicationUser> signInManager,
                 [FromForm] string returnUrl) =>
             {
+                // Validate antiforgery token on incoming POST
+                await antiforgery.ValidateRequestAsync(context);
+
                 await signInManager.SignOutAsync();
                 return TypedResults.LocalRedirect($"~/{returnUrl}");
             });
@@ -53,9 +63,13 @@ namespace U3A.Components.Account
 
             _ = manageGroup.MapPost("/LinkExternalLogin", async (
                 HttpContext context,
+                [FromServices] IAntiforgery antiforgery,
                 [FromServices] SignInManager<ApplicationUser> signInManager,
                 [FromForm] string provider) =>
             {
+                // Validate antiforgery token on incoming POST
+                await antiforgery.ValidateRequestAsync(context);
+
                 // Clear the existing external cookie to ensure a clean login process
                 await context.SignOutAsync(IdentityConstants.ExternalScheme);
 
@@ -73,9 +87,13 @@ namespace U3A.Components.Account
 
             _ = manageGroup.MapPost("/DownloadPersonalData", async (
                 HttpContext context,
+                [FromServices] IAntiforgery antiforgery,
                 [FromServices] UserManager<ApplicationUser> userManager,
                 [FromServices] AuthenticationStateProvider authenticationStateProvider) =>
             {
+                // Validate antiforgery token on incoming POST
+                await antiforgery.ValidateRequestAsync(context);
+
                 var user = await userManager.GetUserAsync(context.User);
                 if (user is null)
                 {
