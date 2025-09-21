@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-05-09T12:44:50.572+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-09-22T09:55:21.324+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Add/Edit Participants</title>
   <body>
     <header>
@@ -277,7 +277,7 @@
       </tr>
     </table></para>
     <para styleclass="Heading3">The Membership group</para>
-    <para styleclass="Normal"><table styleclass="Default" rowcount="5" colcount="2">
+    <para styleclass="Normal"><table styleclass="Default" rowcount="6" colcount="2">
       <thead style="vertical-align:top">
         <td style="width:208px;">
           <para styleclass="Normal">Field</para>
@@ -309,6 +309,14 @@
         </td>
         <td style="width:743px;">
           <para styleclass="Normal">The date the participant ceased, if any. Ceased members are never reported unless specifically selected via the <text style="font-style:italic;">Date Ceased</text> tab in this procedure.</para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:208px;">
+          <para styleclass="Normal">Reason</para>
+        </td>
+        <td style="width:743px;">
+          <para styleclass="Normal">This field is enabled when a valid <text style="font-style:italic;">Date Ceased</text> is entered. Select the reason the person ceased membership from the available list.</para>
         </td>
       </tr>
       <tr style="vertical-align:top">

@@ -24,6 +24,13 @@
               <task-config-value name="make4status">*</task-config-value>
             </task-config-group>
           </export-task>
+          <export-task name="Publish as RTF" format="RTF">
+            <task-config-group name="settings">
+              <task-config-value name="outputfile">U3Admin_manual.docx</task-config-value>
+              <task-config-value name="make5include">PRINT</task-config-value>
+              <task-config-value name="make5status">*</task-config-value>
+            </task-config-group>
+          </export-task>
         </export-tasks>
       </export-task-group>
     </export-task-groups>
@@ -104,6 +111,11 @@
       <config-value name="make4include">PDF</config-value>
       <config-value name="make4status">*</config-value>
       <config-value name="contents">Introduction</config-value>
+      <config-group name="spellcheck">
+        <config-value name="project">0</config-value>
+      </config-group>
+      <config-value name="make5include">PRINT</config-value>
+      <config-value name="make5status">*</config-value>
     </config-group>
     <config-group name="pdf">
       <config-value name="style">0</config-value>
@@ -524,6 +536,9 @@
       <config-value name="insertseealsostyle">-1</config-value>
       <config-value name="printoptions">0</config-value>
       <config-value name="printoptionscutmarks">0</config-value>
+    </config-group>
+    <config-group name="rtf">
+      <config-value name="outputfile">U3Admin_manual.docx</config-value>
     </config-group>
     <variables/>
     <helpcontext-numbers/>
