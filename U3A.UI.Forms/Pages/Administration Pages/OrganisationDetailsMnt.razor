@@ -127,6 +127,9 @@ else
                                                 <DxFormLayoutGroup Caption="Volunteer Activities (1 per line)" ColSpanMd="6">
                                                     <DxMemo @bind-Text="@systemSettings.VolunteerActivities" Rows="16" CssClass="w-100" />
                                                 </DxFormLayoutGroup>
+                                                <DxFormLayoutGroup Caption="Ceased Reasons (1 per line)" ColSpanMd="6">
+                                                    <DxMemo @bind-Text="@systemSettings.CeasedReasons" Rows="5" CssClass="w-100" />
+                                                </DxFormLayoutGroup>
                                             </Items>
                                         </DxFormLayoutGroup>
                                     </Template>
@@ -443,9 +446,10 @@ else
                     MailLabelLeftMargin = 0.79,
                     MailLabelRightMargin = 0.0,
                     MailLabelWidth = 64,
-                    MailLabelHeight = 25
+                    MailLabelHeight = 25,
                 };
         }
+		if (string.IsNullOrWhiteSpace(systemSettings.CeasedReasons)) systemSettings.CeasedReasons = "Deceased\nMoved away\nHealth reasons\nOther";
         var tz = TimeZoneInfo.FindSystemTimeZoneById(systemSettings.TimeZoneId);
         if (systemSettings.TimeZoneId != tz.Id) { systemSettings.TimeZoneId = tz.Id; dbc.Update(systemSettings); }
         await GetTenantData();

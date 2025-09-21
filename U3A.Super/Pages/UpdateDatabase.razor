@@ -123,6 +123,9 @@
                 course.DisplayDescriptionWithoutImages = adjustedHtml.WithoutImages;
             }
         }
+		var settings = dbc.SystemSettings.FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(settings!.CeasedReasons)) settings.CeasedReasons = "Deceased\nMoved away\nHealth reasons\nOther";
+
         await dbc.SaveChangesAsync();
     }
 

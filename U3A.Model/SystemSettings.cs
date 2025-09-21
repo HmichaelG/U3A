@@ -179,7 +179,11 @@ namespace U3A.Model
             }
         }
         [NotMapped]
+
         public TimeSpan UTCOffset { get; set; }
+
+        public string CeasedReasons { get; set; }
+
 
     }
 

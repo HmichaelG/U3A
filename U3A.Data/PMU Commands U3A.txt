@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Course_DisplayDescriptionWithoutImages
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_CeasedReasons
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Course_DisplayDescriptionDarkMode
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Person_CeasedReason
 
-add-migration -context U3ADbContextSeed -project U3A.Database U3A_Course_DisplayDescriptionDarkMode
+add-migration -context U3ADbContextSeed -project U3A.Database  U3A_Person_CeasedReason
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

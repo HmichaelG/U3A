@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using U3A.Database;
 
@@ -11,9 +12,11 @@ using U3A.Database;
 namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
 {
     [DbContext(typeof(U3ADbContextSeed))]
-    partial class U3ADbContextSeedModelSnapshot : ModelSnapshot
+    [Migration("20250921195103_U3A_Settings_CeasedReasons")]
+    partial class U3A_Settings_CeasedReasons
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1578,10 +1581,6 @@ namespace U3A.Database.Migrations.U3ADbContextSeedMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CarerPhone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CeasedReason")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")

@@ -171,7 +171,8 @@
                                                               UnboundType="GridUnboundColumnType.DateTime"
                                                               FieldName="TermsLastAgreed" Width="6rem" DisplayFormat="d/M/yy HH:mm" />
                                             <DxGridDataColumn Caption="Fin-To" FieldName="FinancialToBriefText" Width="6rem" SortMode="GridColumnSortMode.Value" />
-                                            <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Width="6rem" Visible="@(DateCeasedTabCaption != "Date Ceased" || dxTabs.ActiveTabIndex == 9)" />
+                                            <DxGridDataColumn Caption="Ceased" FieldName="DateCeased" Width="6rem" Visible="@(selectedTab == Tabs.DateCeased || selectedTab == Tabs.AllRecords)" />
+                                            <DxGridDataColumn Caption="Reason" FieldName="CeasedReason" Width="10rem" Visible="@(selectedTab == Tabs.DateCeased || selectedTab == Tabs.AllRecords)" />
                                             <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
                                                               DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" />
                                             <DxGridDataColumn Visible="@(!(IsSelectionList || IsReadOnly))" Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
@@ -288,8 +289,10 @@
                                                                     Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
                                                     </DxFormLayoutItem>
                                                 </DxFormLayoutGroup>
-                                                <DxTabs CssClass="col col-6">
+                                                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="6">
+                                                <DxTabs>
                                                     <DxTabPage Text="In Case of Emergency">
+                                                        <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
                                                         <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
                                                             <DxFormLayoutItem Caption="Contact" ColSpanMd="12">
                                                                 <DxTextBox @bind-Text="@editItem.ICEContact" autocomplete="new-password" />
@@ -297,6 +300,7 @@
                                                             <DxFormLayoutItem Caption="Phone" ColSpanMd="12">
                                                                 <DxTextBox @bind-Text="@editItem.ICEPhone" autocomplete="new-password" />
                                                             </DxFormLayoutItem>
+                                                        </DxFormLayoutGroup>
                                                         </DxFormLayoutGroup>
                                                     </DxTabPage>
                                                     <DxTabPage Text="Carer's Details">
@@ -322,6 +326,7 @@
                                                         </DxFormLayoutGroup>
                                                     </DxTabPage>
                                                 </DxTabs>
+                                                </DxFormLayoutGroup>
 
                                                 <DxFormLayoutGroup Caption="Membership" ColSpanMd="6">
                                                     <Items>
@@ -330,11 +335,16 @@
                                                                        TextExpression="@(() => editItem.FinancialToText)"
                                                                        ReadOnly="true" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption="Date Joined" ColSpanMd="6">
+                                                        <DxFormLayoutItem Caption="Joined" ColSpanMd="6">
                                                             <DxDateEdit @bind-Date="@editItem.DateJoined" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem Caption="Date Ceased" ColSpanMd="6">
-                                                            <DxDateEdit @bind-Date="@editItem.DateCeased" />
+                                                            <DxDateEdit @bind-Date="@editItem.DateCeased" 
+                                                                @bind-Date:after="@(() => { if (editItem.DateCeased == null) editItem.CeasedReason = string.Empty; })"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem Caption="Reason" ColSpanMd="6" >
+                                                            <DxComboBox Data="@ceasedReasons" @bind-Value="@editItem.CeasedReason" Enabled=@(editItem.DateCeased != null) />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem Caption="Life Member?" ColSpanMd="6">
                                                             <DxCheckBox @bind-Checked="@editItem.IsLifeMember"
@@ -456,6 +466,7 @@
         AllRecords
     }
     Tabs selectedTab = Tabs.Participants;
+    List<string> ceasedReasons;
 
     protected override async Task OnInitializedAsync()
     {
@@ -467,6 +478,9 @@
         monthName = dbc.GetLocalDate().ToString("MMM");
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+        ceasedReasons = settings.CeasedReasons.Split(new string[] { "\n" },
+                                StringSplitOptions.None)
+                                .Where(x => !string.IsNullOrWhiteSpace(x)).ToList();        
         server = new DocumentServer(dbc);
         currentTerm = await BusinessRule.CurrentTermAsync(dbc);
         await GetData();
