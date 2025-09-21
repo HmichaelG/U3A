@@ -207,7 +207,11 @@
                                                     <strong>NB:</strong> The recommended way of changing an Email address is via <b>Manage Credentials</b> within the  Member Portal.
                                                     <br />Changing an Email address using this procedure should be considered a measure of last resort as it bypasses important validation checks.
                                                 </div>
-                                                <DxFormLayoutGroup Caption="Personal" ColSpanMd="6">
+                                                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="6">
+                                                    <DxTabs>
+                                                        <DxTabPage Text="Personal">
+                                                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+
                                                     <DxFormLayoutItem Caption="Title" ColSpanMd="12">
                                                         <DxComboBox TData="string" TValue="string"
                                                                     NullText="(Optional) Select or Enter Title"
@@ -240,7 +244,16 @@
                                                         <DxMemo @bind-Text="@editItem.Occupation" Rows="3" autocomplete="new-password" CssClass="w-100" />
                                                     </DxFormLayoutItem>
                                                     </DxFormLayoutGroup>
-                                                <DxFormLayoutGroup Caption="Address / Contact Information" ColSpanMd="6">
+                                                        </DxTabPage>
+                                                    </DxTabs>
+                                                    </DxFormLayoutGroup>
+
+
+
+                                                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="6">
+                                                    <DxTabs>
+                                                        <DxTabPage Text="Address & Contact Details">
+                                                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
                                                     <DxFormLayoutItem Caption="Street" ColSpanMd="12">
                                                         <DxTextBox @bind-Text="@editItem.Address" autocomplete="new-password" />
                                                     </DxFormLayoutItem>
@@ -288,7 +301,12 @@
                                                         <DxCheckBox @bind-Checked="@editItem.SMSOptOut"
                                                                     Alignment="CheckBoxContentAlignment.Right" autocomplete="new-password" />
                                                     </DxFormLayoutItem>
+                                                    </DxFormLayoutGroup>
+                                                        </DxTabPage>
+                                                        </DxTabs>
                                                 </DxFormLayoutGroup>
+                                                
+
                                                 <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="6">
                                                 <DxTabs>
                                                     <DxTabPage Text="In Case of Emergency">
