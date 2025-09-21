@@ -20,7 +20,8 @@ namespace U3A.UI.Reports
         public U3ADbContext DbContext { get; set; }
         private void CeasedParticipantList_DataSourceDemanded(object sender, EventArgs e)
         {
-            DataSource = DbContext.Person.Where(x => x.DateCeased != null).ToList();
+            var cutOffDate = (DateOnly?)prmDate.Value;
+            DataSource = DbContext.Person.Where(x => x.DateCeased.HasValue && (cutOffDate == null || x.DateCeased.Value >= cutOffDate.Value.ToDateTime(new TimeOnly()))).ToList();
         }
 
     }
