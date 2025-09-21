@@ -100,7 +100,7 @@
     async Task OnMarkupChanged()
     {
         ValidateImages();
-        if (isValid) 
+        if (isValid && MarkupChanged.HasDelegate) 
         { 
             await MarkupChanged.InvokeAsync(Markup);
         }
@@ -109,7 +109,7 @@
     async Task OnEditorTextChanged()
     {
         ValidateImages();
-        if (isValid)
+        if (isValid && MarkupChanged.HasDelegate)
         {
             await MarkupChanged.InvokeAsync(Markup);
         }
