@@ -166,28 +166,28 @@
                                     <DxGridDataColumn Caption="Occupation" FieldName="Occupation" Visible=false />
                                     <DxGridDataColumn Caption="DOB" FieldName="BirthDate" Visible="false" Width="6rem" DisplayFormat="@constants.LONG_MONTH_AND_YEAR_FORMAT" />
                                     <DxGridDataColumn Caption="Month Born" FieldName="BirthMonthName" Width="6rem" />
-                                    <DxGridDataColumn Caption="Joined" 
+                                    <DxGridDataColumn Caption="Joined"
                                                       FixedPosition="@(selectedTab == Tabs.DateJoined ? GridColumnFixedPosition.Left : GridColumnFixedPosition.None)"
                                                       FieldName="DateJoined" Width="6rem" />
                                     <DxGridDataColumn Caption="T&C's Agreed"
                                                       UnboundType="GridUnboundColumnType.DateTime"
                                                       FieldName="TermsLastAgreed" Width="6rem" DisplayFormat="d/M/yy HH:mm" />
-                                    <DxGridDataColumn Caption="Fin-To" 
-                                                        FixedPosition="@((new[] {Tabs.Unfinancial,Tabs.AllRecords}).Contains(selectedTab) ? GridColumnFixedPosition.Left : GridColumnFixedPosition.None)"
-                                                        FieldName="FinancialToBriefText" 
-                                                        Width="6rem" 
-                                                        SortMode="GridColumnSortMode.Value" />
+                                    <DxGridDataColumn Caption="Fin-To"
+                                                      FixedPosition="@((new[] {Tabs.Unfinancial,Tabs.AllRecords}).Contains(selectedTab) ? GridColumnFixedPosition.Left : GridColumnFixedPosition.None)"
+                                                      FieldName="FinancialToBriefText"
+                                                      Width="6rem"
+                                                      SortMode="GridColumnSortMode.Value" />
                                     <DxGridBandColumn Caption="Membership Ceased"
-                                                        FixedPosition="@(selectedTab == Tabs.DateCeased ? GridColumnFixedPosition.Left : GridColumnFixedPosition.None)">
+                                                      FixedPosition="@(selectedTab == Tabs.DateCeased ? GridColumnFixedPosition.Left : GridColumnFixedPosition.None)">
                                         <Columns>
-                                    <DxGridDataColumn Caption="Date" FieldName="DateCeased" Width="6rem" 
-                                                        Visible="@(selectedTab == Tabs.DateCeased || selectedTab == Tabs.AllRecords)" />
-                                    <DxGridDataColumn Caption="Reason" FieldName="CeasedReason" Width="10rem" 
-                                                        Visible="@(selectedTab == Tabs.DateCeased || selectedTab == Tabs.AllRecords)" />
-                                                        </Columns>
-                                                        </DxGridBandColumn>
+                                            <DxGridDataColumn Caption="Date" FieldName="DateCeased" Width="6rem"
+                                                              Visible="@(selectedTab == Tabs.DateCeased || selectedTab == Tabs.AllRecords)" />
+                                            <DxGridDataColumn Caption="Reason" FieldName="CeasedReason" Width="10rem"
+                                                              Visible="@(selectedTab == Tabs.DateCeased || selectedTab == Tabs.AllRecords)" />
+                                        </Columns>
+                                    </DxGridBandColumn>
                                     <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" Width="8rem"
-                                                      DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")" 
+                                                      DisplayFormat="d/M/yy HH:mm" Visible="@(LastUpdateTabCaption != "Last Update")"
                                                       FixedPosition="@(selectedTab == Tabs.LastUpdate ? GridColumnFixedPosition.Left : GridColumnFixedPosition.None)" />
                                     <DxGridDataColumn Visible="@(!(IsSelectionList || IsReadOnly))" Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                         <CellDisplayTemplate>
@@ -639,7 +639,7 @@
             if (callResult.Succeeded)
             {
                 string msg = $@"A login has been created for: <b>{email}</b><br/>
-                            and confirmed with password: <b>{personIdentity}</b>";
+                        and confirmed with password: <b>{personIdentity}</b>";
                 await messageBox.ShowOkOnlyAsync("Login created", msg);
             }
             else
@@ -651,7 +651,7 @@
                 }
                 result = await messageBox.ShowAsync("Email change failed",
                                                                                                 $@"<p>Your attempt to add the email address has failed because...<br/>{msg}</p>
-                    <p>Are you sure you wish to continue?</p>");
+                <p>Are you sure you wish to continue?</p>");
             }
         }
         return result;
@@ -680,9 +680,9 @@
                     var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
                     _ = await UserManager.ConfirmEmailAsync(user, token);
                     string msg = $@"<p>The login has changed...</p>
-                            From: &ensp; <b>{originalEmail}</b><br/>
-                            To: &emsp;&ensp; <b>{newEmail}</b>
-                            <p>The password remains unchanged</p>";
+                        From: &ensp; <b>{originalEmail}</b><br/>
+                        To: &emsp;&ensp; <b>{newEmail}</b>
+                        <p>The password remains unchanged</p>";
                     _ = await messageBox.ShowOkOnlyAsync("Login changed", msg);
                 }
                 else
@@ -694,7 +694,7 @@
                     }
                     result = await messageBox.ShowAsync("Email change failed",
                                                                                                         $@"<p>Your attempt to change the email address has failed because...<br/>{msg}</p>
-                    <p>Are you sure you wish to continue?</p>");
+                <p>Are you sure you wish to continue?</p>");
                 }
             }
             else
