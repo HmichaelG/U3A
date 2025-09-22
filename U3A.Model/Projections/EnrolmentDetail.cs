@@ -13,12 +13,15 @@ namespace U3A.Model
 {
     public class EnrolmentDetail : OrganisationPersonDetail
     {
+        public Guid CourseID { get; set; }
+        public DateTime? ClassDateTime { get; set; }
         public int CourseLegacyID { get; set; }
         public string CourseName { get; set; }
         public string? CourseDescription { get; set; }
         public string CourseParticipationType { get; set; }
         public decimal CourseFeePerYear { get; set; }
         public string? CourseFeePerYearDescription { get; set; }
+        public bool CourseHasTermFees { get; set; }
         public string? CourseFeePerTerm { get; set; }
         public string? CourseFeePerTermDescription { get; set; }
         public decimal CourseDuration { get; set; }

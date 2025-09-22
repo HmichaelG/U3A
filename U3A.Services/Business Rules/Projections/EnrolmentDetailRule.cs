@@ -82,12 +82,15 @@ namespace U3A.BusinessRules
                 ed = new EnrolmentDetail()
                 {
                     // Course
+                    CourseID = cr.ID,
+                    ClassDateTime = c.StartDate,
                     CourseLegacyID = cr.ConversionID,
                     CourseName = cr.Name,
                     CourseDescription = cr.DisplayDescriptionWithoutImages ?? String.Empty,
                     CourseParticipationType = pt.Name,
                     CourseFeePerYear = cr.CourseFeePerYear,
                     CourseFeePerYearDescription = cr.CourseFeePerYearDescription ?? String.Empty,
+                    CourseHasTermFees = cr.HasFees,
                     CourseFeePerTerm = cr.TermFeesTextNoTitle,
                     CourseFeePerTermDescription = cr.CourseFeePerTermDescription ?? String.Empty,
                     CourseDuration = cr.Duration,
@@ -170,7 +173,7 @@ Your request remains <b>Waitlisted</b> until allocation occurs on or before {t.S
                 if (ed.EnrolmentIsClerk) { ed.PersonFullName += " (Clerk)"; }
                 result.Add(ed);
             }
-            return result;
+            return result.OrderBy(x => x.CourseID).ThenBy(x => x.ClassDateTime).ToList();
         }
 
     }
