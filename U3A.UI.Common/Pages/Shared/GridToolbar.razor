@@ -229,15 +229,6 @@
                 if (layout != null)
                 {
                     dxGrid.LoadLayout(layout);
-                    ToastService.ShowToast(new ToastOptions()
-                    {
-                        Title = "Layout Restored",
-                        Text = "Grid restored from saved layout.",
-                        ProviderName = "Result",
-                        ThemeMode = ToastThemeMode.Pastel,
-                        RenderStyle = ToastRenderStyle.Success,
-                        IconCssClass = "bi bi-check-circle"
-                    });
                 }
             }
             dxGrid.BeginUpdate();
@@ -279,6 +270,21 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            if (layout is not null)
+            {
+                ToastService.ShowToast(new ToastOptions()
+                    {
+                        Title = "Layout Restored",
+                        Text = "Grid restored from saved layout.",
+                        ProviderName = "Result",
+                        ThemeMode = ToastThemeMode.Pastel,
+                        RenderStyle = ToastRenderStyle.Success,
+                        IconCssClass = "bi bi-check-circle"
+                    });
+            }
+        }
         if (LinkedGrid != null)
         {
             LinkedGrid.BeginUpdate();
