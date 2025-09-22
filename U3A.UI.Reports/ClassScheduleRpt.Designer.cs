@@ -380,7 +380,7 @@
             // 
             this.Detail.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrTable1});
-            this.Detail.HeightF = 335F;
+            this.Detail.HeightF = 327.4254F;
             this.Detail.Name = "Detail";
             // 
             // xrTable1
@@ -407,7 +407,7 @@
             this.rowStatisticsTitle,
             this.rowStatistics,
             this.xrTableRow9});
-            this.xrTable1.SizeF = new System.Drawing.SizeF(726.5F, 335F);
+            this.xrTable1.SizeF = new System.Drawing.SizeF(725F, 327.4254F);
             this.xrTable1.StylePriority.UseBorderColor = false;
             this.xrTable1.StylePriority.UseBorders = false;
             this.xrTable1.StylePriority.UsePadding = false;
@@ -447,7 +447,7 @@
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Iif([TotalActiveStudents]>=[Course].[MaximumStudents] Or (Not [Course].[AllowAuto" +
                     "Enrol]),true ,false )\n")});
             this.xrTableRow3.Name = "xrTableRow3";
-            this.xrTableRow3.Weight = 1.4D;
+            this.xrTableRow3.Weight = 1.0000000734682435D;
             // 
             // xrClosedReason
             // 
@@ -468,7 +468,7 @@
             this.xrTableRow10.Cells.AddRange(new DevExpress.XtraReports.UI.XRTableCell[] {
             this.xrTableCell3});
             this.xrTableRow10.Name = "xrTableRow10";
-            this.xrTableRow10.Weight = 1.4D;
+            this.xrTableRow10.Weight = 0.99999999773943871D;
             // 
             // xrTableCell3
             // 
@@ -494,7 +494,9 @@
             this.xrTableCell4,
             this.xrTableCell2});
             this.xrTableRow2.Name = "xrTableRow2";
-            this.xrTableRow2.Weight = 1.5199999999999998D;
+            this.xrTableRow2.Padding = new DevExpress.XtraPrinting.PaddingInfo(0F, 0F, 0F, 0F, 100F);
+            this.xrTableRow2.StylePriority.UsePadding = false;
+            this.xrTableRow2.Weight = 0.999999906186704D;
             // 
             // xrTableCell4
             // 
@@ -519,11 +521,11 @@
             this.xrRichText1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Html", "[Course].[DisplayDescriptionWithoutImages]")});
             this.xrRichText1.Font = new DevExpress.Drawing.DXFont("Times New Roman", 8F);
-            this.xrRichText1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
+            this.xrRichText1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 7.629395E-06F);
             this.xrRichText1.Name = "xrRichText1";
-            this.xrRichText1.Padding = new DevExpress.XtraPrinting.PaddingInfo(8F, 8F, 8F, 8F, 100F);
+            this.xrRichText1.Padding = new DevExpress.XtraPrinting.PaddingInfo(5F, 5F, 0F, 0F, 100F);
             this.xrRichText1.SerializableRtfString = resources.GetString("xrRichText1.SerializableRtfString");
-            this.xrRichText1.SizeF = new System.Drawing.SizeF(612.2499F, 37.99995F);
+            this.xrRichText1.SizeF = new System.Drawing.SizeF(612.2499F, 25.18652F);
             this.xrRichText1.StylePriority.UseBorders = false;
             this.xrRichText1.StylePriority.UseFont = false;
             this.xrRichText1.StylePriority.UsePadding = false;
@@ -562,7 +564,7 @@
             this.xrTableRow8.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "[Course].[CourseFeePerYear] != 0")});
             this.xrTableRow8.Name = "xrTableRow8";
-            this.xrTableRow8.Weight = 0.080000000000000182D;
+            this.xrTableRow8.Weight = 0.9999999446162473D;
             // 
             // xrTableCell6
             // 
@@ -598,7 +600,7 @@
             this.xrTableCell15,
             this.xrTableCell16});
             this.xrTableRow7.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "[Course].[CourseFeePerTerm] != 0")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "[Course].[HasTermFees]")});
             this.xrTableRow7.Name = "xrTableRow7";
             this.xrTableRow7.Weight = 1D;
             // 
@@ -893,7 +895,7 @@
             this.xrTableRow9.StylePriority.UseBackColor = false;
             this.xrTableRow9.StylePriority.UseTextAlignment = false;
             this.xrTableRow9.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            this.xrTableRow9.Weight = 1D;
+            this.xrTableRow9.Weight = 0.9999998485423901D;
             // 
             // xrTableCell1
             // 
@@ -921,7 +923,7 @@
             this.GroupFooter1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.label2});
             this.GroupFooter1.GroupUnion = DevExpress.XtraReports.UI.GroupFooterUnion.WithLastDetail;
-            this.GroupFooter1.HeightF = 3.541565F;
+            this.GroupFooter1.HeightF = 58.45811F;
             this.GroupFooter1.Name = "GroupFooter1";
             // 
             // label2
