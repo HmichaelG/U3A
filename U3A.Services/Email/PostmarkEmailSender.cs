@@ -4,6 +4,7 @@ using Postmark;
 using PostmarkDotNet;
 using System.Net;
 using System.Reactive.Subjects;
+using System.Reflection;
 using System.Text;
 using U3A.Model;
 
@@ -285,15 +286,21 @@ namespace U3A.Services
 
         private string AddUnsubscribeMessage(string htmlMessage)
         {
-            return htmlMessage.Replace("</body>",
-                        @"<p></p><p></p><p></p><p></p><p></p><p></p><p></p>
-                        <div style=""text-align: center; font-size: 8.75pt; margin-top: 200pt;"" >
-                        <p>If you no longer wish to receive <strong>any</strong> email notifications from this U3A, click the link below...</p>
-                        <p>{{{ pm:unsubscribe }}}</p>
-                        </div>
-                        </body>
-                        ");
+            var unsubscribeText = ReadUnsubscribeTemplate();
+            return htmlMessage.Replace("</body>",unsubscribeText);
         }
+        string ReadUnsubscribeTemplate()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = $"U3A.Services.Email.unsubscribe.html";
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
         protected virtual void OnBatchEmailSent(string From,
                 string? FailedEmailAddress,
                 string Subject,
