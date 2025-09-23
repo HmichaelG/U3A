@@ -1,4 +1,5 @@
-﻿
+﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
 <DxPopup Visible="@popupVisible" @ref="@InputBox"
          ApplyBackgroundShading="true"
          CloseButtonClick="@NegativeButtonClicked"
@@ -71,19 +72,17 @@
     string action;
 
     TaskCompletionSource<bool>? tcs;
-    U3ADbContext? mDbc { get; set; }
 
-    public async Task<bool> ShowTransferAsync(U3ADbContext dbc, Term FromTerm, Course FromCourse, Class FromClass) {
+    public async Task<bool> ShowTransferAsync(Term FromTerm, Course FromCourse, Class FromClass) {
         action = "Transfer";
-        return await ShowAsync(dbc, FromTerm, FromCourse, FromClass);
+        return await ShowAsync(FromTerm, FromCourse, FromClass);
     }
-    public async Task<bool> ShowCopyAsync(U3ADbContext dbc, Term FromTerm, Course FromCourse, Class FromClass) {
+    public async Task<bool> ShowCopyAsync(Term FromTerm, Course FromCourse, Class FromClass) {
         action = "Copy";
-        return await ShowAsync(dbc, FromTerm, FromCourse, FromClass);
+        return await ShowAsync(FromTerm, FromCourse, FromClass);
     }
 
-    Task<bool> ShowAsync(U3ADbContext dbc, Term FromTerm, Course FromCourse, Class FromClass) {
-        mDbc = dbc;
+    Task<bool> ShowAsync(Term FromTerm, Course FromCourse, Class FromClass) {
         fromClass = FromClass;
         fromCourse = FromCourse;
         fromTerm = FromTerm;
@@ -116,8 +115,9 @@
         AffirmativeButtonEnabled = false;
         courseComboEnabled = false;
         quickMessage = new MarkupString(string.Empty);
-        terms = await BusinessRule.SelectableRelaxedTermsAsync(mDbc);
-        selectedTerm = await BusinessRule.CurrentEnrolmentTermAsync(mDbc);
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+        selectedTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
         if (selectedTerm != null) { await SelectedTermChanged(selectedTerm); }
     }
 
@@ -130,7 +130,8 @@
         courseComboNullText = "Loading Course & Enrolment data ... please wait";
         classComboNullText = string.Empty;
         StateHasChanged();
-        courses = await BusinessRule.SelectableCoursesByTermAsync(mDbc,term.Year, term.TermNumber);
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
         courseComboNullText = string.Empty;
         courseComboEnabled = true;
         StateHasChanged();
