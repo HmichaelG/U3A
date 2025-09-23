@@ -252,7 +252,7 @@ namespace U3A.BusinessRules
                                   (c.OfferedTerm2 && TermNumber == 2) ||
                                   (c.OfferedTerm3 && TermNumber == 3) ||
                                   (c.OfferedTerm4 && TermNumber == 4)
-                                  select c).ToList();
+                                  select c).OrderBy(c => c.StartDate).ThenBy(c => c.ID).ToList();
 
             }
             return courses;

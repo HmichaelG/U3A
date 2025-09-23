@@ -511,7 +511,7 @@ else
             hasMultiCampusVisitors = false;
             classes = selectedCourse.Classes;
             SetupClassToEnrol();
-            if (selectedCourse.Classes.Count == 1) { await SetupGrid(); }
+            if (selectedClass == null || selectedCourse.Classes.Count == 1) { await SetupGrid(); }
         }
     }
 
