@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="AdminMemberPortal.razor" />
+    <None Remove="Email\unsubscribe.html" />
     <None Remove="MembershipFeesMnt.razor" />
     <None Remove="ReceiptMnt.razor" />
   </ItemGroup>
@@ -15,6 +16,7 @@
     <EmbeddedResource Include="Email\Preheader.html" />
     <EmbeddedResource Include="Email\emailConfirmEmail.html" />
     <EmbeddedResource Include="Email\passwordResetEmail.html" />
+    <EmbeddedResource Include="Email\unsubscribe.html" />
   </ItemGroup>
   <ItemGroup>
 	  <PackageReference Include="AngleSharp" Version="1.3.0" />

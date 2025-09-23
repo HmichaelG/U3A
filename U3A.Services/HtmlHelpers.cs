@@ -68,13 +68,14 @@ public static class HtmlHelpers
         return result;
     }
 
-    public static (string WithImages, string WithImagesDarkMode, string WithoutImages) AdjustAndMinifyHtml(string Html)
+    public static (string WithImages, string WithImagesDarkMode, string WithoutImages) AdjustAndMinifyHtml(string Html, bool RemoveEmptyBlocks = true)
     {
         (string WithImages, string WithImagesDarkMode, string WithoutImages) result = (string.Empty, string.Empty, string.Empty);
         if (string.IsNullOrWhiteSpace(Html)) return result;
 
         // First remove empty elements and minify the structure
-        var minified = RemoveEmptyElements(Html);
+        string minified = Html;
+        if (RemoveEmptyBlocks) { minified = RemoveEmptyElements(Html); }
         result.WithImages = minified;
 
         // Sanitize and remove images for the 'WithoutImages' variant
