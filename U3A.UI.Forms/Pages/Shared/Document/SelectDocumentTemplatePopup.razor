@@ -16,499 +16,507 @@
 <PdfViewer @bind-PdfIsReady=@pdfVisible DocumentContent="@pdfContent" />
 
 <DxPopup Visible="@popupVisible" @ref="@popup" Width="100dvw" CssClass="editor-popup"
-         PositionY="5"
-         CloseButtonClick="@NegativeButtonClicked"
-         CloseOnEscape="false"
-         CloseOnOutsideClick="false"
-         AllowDrag=true
-         HeaderText="Communicate">
-    <HeaderContentTemplate>
-        <ContextHelpTitle Title="Communicate" HelpTopic="Communicate.html" />
-    </HeaderContentTemplate>
-    <BodyContentTemplate Context="PopupContext">
-        <DxSplitter Orientation="Orientation.Horizontal"
-                    Height="100&)">
-            <Panes>
-                <DxSplitterPane Size="35%">
-                    <div class="alert alert-warning  text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
-                        The mail system is currently disabled or in sandbox mode.<br />
-                        Your email will be routed through Postmark's servers but members wil not receive it.<br />
-                        Please use sparingly, all email delivered or not incurs usage cost.
-                    </div>
-                    <div class="alert alert-info  text-center" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
-                        @{
-                            var financial = SendTo.Count(x => x.FinancialTo >= term?.Year);
-                            var unFinancial = SendTo.Count(x => x.FinancialTo < term?.Year);
-                        }
-                        <div class="h6">Please Confirm!</div>
-                        You will be communicating with <b>@(SendTo.Count)</b> participants.
-                        <br />There are <b>@financial</b> financial participants, and
-                        <b>@unFinancial</b> participants not financial.
-                    </div>
-                    <DxFormLayoutGroup Caption="Parameters" CaptionPosition="CaptionPosition.Vertical">
-                        <DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
-                            <DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
-                                        Value="@SelectedDocumentTemplate"
-                                        ValueChanged="@((DocumentTemplate template) => SelectedTemplateChanged(template))"
-                                        EditFormat="{0}">
-                                <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Name)"
-                                                    Caption="Template" Width="25rem" />
-                                <DxListEditorColumn FieldName="@nameof(DocumentTemplate.DocumentTypeName)"
-                                                    Caption="Type" Width="8rem" />
-                                <DxListEditorColumn FieldName="@nameof(DocumentTemplate.Subject)" Width="25rem" />
-                            </DxComboBox>
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Email Subject" ColSpanMd="12" Visible="@IsEmail">
-                            <DxTextBox @bind-Text="@SelectedDocumentTemplate.Subject"
-                                       NullText="Enter a Subject" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Email Preheader" ColSpanMd="12" Visible="@IsEmail">
-                            <DxTextBox @bind-Text="@SelectedDocumentTemplate.EmailPreheader"
-                                       NullText="A short introduction displayed in the email inbox." />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="From Address" ColSpanMd="12" Visible="@IsEmail">
-                            <DxComboBox Data="@emailAddresses" AllowUserInput="true"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Enter the email address to send from..."
-                                        TData="string"
-                                        TValue="string"
-                                        Text="@SelectedDocumentTemplate.FromEmailAddress"
-                                        TextExpression="@(() => SelectedDocumentTemplate.FromEmailAddress)"
-                                        TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress))" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="@FromDisplayNameText" ColSpanMd="12" Visible="@IsEmailOrSMS">
-                            <DxComboBox Data="@displayNames" AllowUserInput="true"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Enter a friendly name to send from..."
-                                        TData="string"
-                                        TValue="string"
-                                        @bind-Text="@SelectedDocumentTemplate.FromDisplayName" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem Caption="Attachments" ColSpanMd="9" Visible="@IsEmail">
-                            <DxTagBox Data="@attachments" DropDownVisible=false @ref="attachFileTagBox"
-                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                      NullText="Upload attachments, if required."
-                                      @bind-Values="@selectedAttachments" />
-                        </DxFormLayoutItem>
-                        <DxFormLayoutItem ColSpanMd="2" Visible="@IsEmail">
-                            <DxButton Text="Pdf"
-                                      Click="OnAttachFile"
-                                      IconCssClass="bi bi-upload" />
-                        </DxFormLayoutItem>
-                        <DxFormLayout CssClass="m-2">
-                            <DxFormLayoutItem Caption="Start Delay (Hours)"
-                                              Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
-                                              ColSpanMd="9">
-                                <DxSpinEdit @bind-Value="@DelayedStart" MinValue=0 />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Override Communication Preference?"
-                                              Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
-                                              ColSpanMd="12">
-                                <DxCheckBox @bind-Checked="@OverrideCommunicationPreference" />
-                            </DxFormLayoutItem>
-                        </DxFormLayout>
-                    </DxFormLayoutGroup>
-                    <div class="d-flex mx-2 mt-5">
-                        <DxButton CssClass="flex-grow-1 mx-1" Enabled="IsEmailOrSMS"
-                                  RenderStyle="ButtonRenderStyle.Primary"
-                                  Text="Process Email"
-                                  IconCssClass="bi bi-envelope"
-                                  Click="@AffirmativeButtonClicked" />
-                        <DxButton CssClass="flex-grow-1 me-2"
-                                  RenderStyle="ButtonRenderStyle.Secondary"
-                                  Text="Cancel" Click="@NegativeButtonClicked" />
-                    </div>
-                </DxSplitterPane>
+		 PositionY="0"
+		 PositionX="0"
+		 CloseButtonClick="@NegativeButtonClicked"
+		 CloseOnEscape="false"
+		 CloseOnOutsideClick="false"
+		 AllowDrag=true
+		 HeaderText="Communicate">
+	<HeaderContentTemplate>
+		<ContextHelpTitle Title="Communicate" HelpTopic="Communicate.html" />
+	</HeaderContentTemplate>
+	<BodyContentTemplate Context="PopupContext">
+		<DxSplitter Orientation="Orientation.Horizontal"
+					Height="100&)">
+			<Panes>
+				<DxSplitterPane Size="35%">
+					<div class="alert alert-warning  text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
+						The mail system is currently disabled or in sandbox mode.<br />
+						Your email will be routed through Postmark's servers but members wil not receive it.<br />
+						Please use sparingly, all email delivered or not incurs usage cost.
+					</div>
+					<div class="alert alert-info  text-center" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
+						@{
+							var financial = SendTo.Count(x => x.FinancialTo >= term?.Year);
+							var unFinancial = SendTo.Count(x => x.FinancialTo < term?.Year);
+						}
+						<div class="h6">Please Confirm!</div>
+						You will be communicating with <b>@(SendTo.Count)</b> participants.
+						<br />There are <b>@financial</b> financial participants, and
+						<b>@unFinancial</b> participants not financial.
+					</div>
+					<DxFormLayoutGroup Caption="Parameters" CaptionPosition="CaptionPosition.Vertical">
+						<DxFormLayoutItem Caption="Document Templates" ColSpanMd="12">
+							<DxComboBox Data="@DocumentTemplates" NullText="Select the document template..."
+										Value="@SelectedDocumentTemplate"
+										ValueChanged="@((DocumentTemplate template) => SelectedTemplateChanged(template))"
+										EditFormat="{0}">
+								<DxListEditorColumn FieldName="@nameof(DocumentTemplate.Name)"
+													Caption="Template" Width="25rem" />
+								<DxListEditorColumn FieldName="@nameof(DocumentTemplate.DocumentTypeName)"
+													Caption="Type" Width="8rem" />
+								<DxListEditorColumn FieldName="@nameof(DocumentTemplate.Subject)" Width="25rem" />
+							</DxComboBox>
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="Email Subject" ColSpanMd="12" Visible="@IsEmail">
+							<DxTextBox @bind-Text="@SelectedDocumentTemplate.Subject"
+									   NullText="Enter a Subject" />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="Email Preheader" ColSpanMd="12" Visible="@IsEmail">
+							<DxTextBox @bind-Text="@SelectedDocumentTemplate.EmailPreheader"
+									   NullText="A short introduction displayed in the email inbox." />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="From Address" ColSpanMd="12" Visible="@IsEmail">
+							<DxComboBox Data="@emailAddresses" AllowUserInput="true"
+										ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+										NullText="Enter the email address to send from..."
+										TData="string"
+										TValue="string"
+										Text="@SelectedDocumentTemplate.FromEmailAddress"
+										TextExpression="@(() => SelectedDocumentTemplate.FromEmailAddress)"
+										TextChanged="@((string emailAddress) => SelectedEmailAddressChanged(emailAddress))" />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="@FromDisplayNameText" ColSpanMd="12" Visible="@IsEmailOrSMS">
+							<DxComboBox Data="@displayNames" AllowUserInput="true"
+										ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+										NullText="Enter a friendly name to send from..."
+										TData="string"
+										TValue="string"
+										@bind-Text="@SelectedDocumentTemplate.FromDisplayName" />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="Attachments" ColSpanMd="9" Visible="@IsEmail">
+							<DxTagBox Data="@attachments" DropDownVisible=false @ref="attachFileTagBox"
+									  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+									  NullText="Upload attachments, if required."
+									  @bind-Values="@selectedAttachments" />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem ColSpanMd="2" Visible="@IsEmail">
+							<DxButton Text="Pdf"
+									  Click="OnAttachFile"
+									  IconCssClass="bi bi-upload" />
+						</DxFormLayoutItem>
+						<DxFormLayout CssClass="m-2">
+							<DxFormLayoutItem Caption="Start Delay (Hours)"
+											  Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
+											  ColSpanMd="9">
+								<DxSpinEdit @bind-Value="@DelayedStart" MinValue=0 />
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="Override Communication Preference?"
+											  Visible="@(DocumentTemplates.Contains(SelectedDocumentTemplate))"
+											  ColSpanMd="12">
+								<DxCheckBox @bind-Checked="@OverrideCommunicationPreference" />
+							</DxFormLayoutItem>
+						</DxFormLayout>
+					</DxFormLayoutGroup>
+					<div class="d-flex mx-2 mt-5">
+						<DxButton CssClass="flex-grow-1 mx-1" Enabled="IsEmailOrSMS"
+								  RenderStyle="ButtonRenderStyle.Primary"
+								  Text="Process Email"
+								  IconCssClass="bi bi-envelope"
+								  Click="@AffirmativeButtonClicked" />
+						<DxButton CssClass="flex-grow-1 me-2"
+								  RenderStyle="ButtonRenderStyle.Secondary"
+								  Text="Cancel" Click="@NegativeButtonClicked" />
+					</div>
+				</DxSplitterPane>
 
-                <DxSplitterPane Size="60%">
-                    <div class="text-fl-danger text-center col-12"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
-                    <DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
-                                ViewType="ViewType.PrintLayout"
-                                ActiveRibbonTabIndex="@ActiveTabIndex"
-                                CheckSpelling=true
-                                BarMode=BarMode.Ribbon
-                                DocumentContent="@SelectedDocumentTemplate.Content"
-                                DocumentFormat="DocumentFormat.Rtf"
-                                CustomizeRibbon="OnCustomizeRichEditToolbar"
-                                DocumentLoaded="OnDocumentLoaded"
-                                DocumentContentChanged="OnDocumentContentChanged"
-                                CssClass="w-100 rtf-style">
-                        <AdditionalItems>
-                            <SummarizeAIContextMenuItem />
-                            <ExplainAIContextMenuItem />
-                            <ProofreadAIContextMenuItem />
-                            <ExpandAIContextMenuItem />
-                            <ShortenAIContextMenuItem />
-                            <AskAssistantAIContextMenuItem />
-                            <ChangeStyleAIContextMenuItem />
-                            <ChangeToneAIContextMenuItem />
-                            <GenerateDescriptionAIContextMenuItem />
-                            <TranslateAIContextMenuItem Languages="@("English, German, French, Chinese")" />
-                        </AdditionalItems>
-                        <MailMergeSettings>
-                            <DxMailMergeSettings Data="@ExportData" />
-                        </MailMergeSettings>
-                    </DxRichEdit>
-                </DxSplitterPane>
-            </Panes>
-        </DxSplitter>
-    </BodyContentTemplate>
+				<DxSplitterPane Size="60%">
+						<div class="text-fl-danger rtf-editor-hints"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
+						<div class="text-fl-info rtf-editor-hints"><strong>Hint:</strong> To access AI, select text and right-click for context menu.</div>
+						<DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
+									ViewType="ViewType.PrintLayout"
+									ActiveRibbonTabIndex="@ActiveTabIndex"
+									CheckSpelling=true
+									BarMode=BarMode.Ribbon
+									DocumentContent="@SelectedDocumentTemplate.Content"
+									DocumentFormat="DocumentFormat.Rtf"
+									CustomizeRibbon="OnCustomizeRichEditToolbar"
+									DocumentLoaded="OnDocumentLoaded"
+									DocumentContentChanged="OnDocumentContentChanged"
+									CssClass="w-100 rtf-style">
+							<AdditionalItems>
+								<SummarizeAIContextMenuItem />
+								<ExplainAIContextMenuItem />
+								<ProofreadAIContextMenuItem />
+								<ExpandAIContextMenuItem />
+								<ShortenAIContextMenuItem />
+								<AskAssistantAIContextMenuItem />
+								<ChangeStyleAIContextMenuItem />
+								<ChangeToneAIContextMenuItem />
+								<GenerateDescriptionAIContextMenuItem />
+								<TranslateAIContextMenuItem Languages="@("English, German, French, Chinese")" />
+							</AdditionalItems>
+							<MailMergeSettings>
+								<DxMailMergeSettings Data="@ExportData" />
+							</MailMergeSettings>
+						</DxRichEdit>
+				</DxSplitterPane>
+			</Panes>
+		</DxSplitter>
+	</BodyContentTemplate>
 </DxPopup>
 
 <style>
-    .editor-popup {
-        height: 100dvh;
-    }
+	.rtf-editor-hints {
+		font-size: 0.8rem;
+		text-align: center !important;
+		width: 100%;
+	}
 
-    .preview {
-        height: calc(100dvh - 5rem) !important;
-        overflow: hidden;
-    }
+	.editor-popup {
+		height: 100dvh;
+	}
 
-    .rtf-style {
-        height: calc(100dvh - 7rem) !important;
-        overflow: hidden;
-    }
+	.preview {
+		height: calc(100dvh - 5rem) !important;
+		overflow: hidden;
+	}
+
+	.rtf-style {
+		height: calc(100dvh - 9rem) !important;
+		overflow: hidden;
+	}
 
 
-    .icon-size {
-        font-size: 16px;
-    }
+	.icon-size {
+		font-size: 16px;
+	}
 
-    .warning-style {
-        display: @((isEmailEnabled) ? "block" : "none");
-    }
+	.warning-style {
+		display: @((isEmailEnabled) ? "block" : "none");
+	}
 
-    ul.centered-list {
-        display: inline-block;
-        text-align: left;
-        padding-bottom: 0px;
-        margin-bottom: 0px;
-    }
+	ul.centered-list {
+		display: inline-block;
+		text-align: left;
+		padding-bottom: 0px;
+		margin-bottom: 0px;
+	}
 
-    div.list-container {
-        text-align: center;
-    }
+	div.list-container {
+		text-align: center;
+	}
 
 </style>
 
 @code {
 
-    [Parameter, EditorRequired]
-    public U3ADbContext dbContext { get; set; }
-    [Parameter, EditorRequired]
-    public List<DocumentTemplate> DocumentTemplates { get; set; }
-    [Parameter, EditorRequired]
-    public List<Person> SendTo { get; set; }
-    [Parameter]
-    public DocumentTemplate SelectedDocumentTemplate { get; set; }
-    [Parameter]
-    public bool OverrideCommunicationPreference { get; set; }
-    [Parameter]
-    public int DelayedStart { get; set; }
+	[Parameter, EditorRequired]
+	public U3ADbContext dbContext { get; set; }
+	[Parameter, EditorRequired]
+	public List<DocumentTemplate> DocumentTemplates { get; set; }
+	[Parameter, EditorRequired]
+	public List<Person> SendTo { get; set; }
+	[Parameter]
+	public DocumentTemplate SelectedDocumentTemplate { get; set; }
+	[Parameter]
+	public bool OverrideCommunicationPreference { get; set; }
+	[Parameter]
+	public int DelayedStart { get; set; }
 
-    List<ExportData>? ExportData;
-    MessageBox? messageBox;
-    DxTagBox<string, string> attachFileTagBox;
-    IEnumerable<string?> attachments = new List<string>();
-    List<string?> newAttachments = new List<string>();
-    IEnumerable<string?> selectedAttachments = new List<string>();
+	List<ExportData>? ExportData;
+	MessageBox? messageBox;
+	DxTagBox<string, string> attachFileTagBox;
+	IEnumerable<string?> attachments = new List<string>();
+	List<string?> newAttachments = new List<string>();
+	IEnumerable<string?> selectedAttachments = new List<string>();
 
-    int ActiveTabIndex = 1;
-    bool pdfVisible = false;
-    bool popupVisible;
-    DxPopup? popup;
-    DxRichEdit? richEdit;
-    Document documentAPI;
-    bool IsEmail;
-    bool IsEmailOrPostal;
-    bool IsEmailOrSMS;
-    bool allowOk = false;
-    string OkButtonText = "Ok";
-    string FromDisplayNameText;
-    IEnumerable<string?> emailAddresses = new List<string>();
-    IEnumerable<string?> displayNames = new List<string>();
-    AttachFile attachFile;
-    byte[] pdfContent;
-    Progress? progressBar;
-    bool isEmailEnabled;
-    Term term;
+	int ActiveTabIndex = 1;
+	bool pdfVisible = false;
+	bool popupVisible;
+	DxPopup? popup;
+	DxRichEdit? richEdit;
+	Document documentAPI;
+	bool IsEmail;
+	bool IsEmailOrPostal;
+	bool IsEmailOrSMS;
+	bool allowOk = false;
+	string OkButtonText = "Ok";
+	string FromDisplayNameText;
+	IEnumerable<string?> emailAddresses = new List<string>();
+	IEnumerable<string?> displayNames = new List<string>();
+	AttachFile attachFile;
+	byte[] pdfContent;
+	Progress? progressBar;
+	bool isEmailEnabled;
+	Term term;
 
-    TaskCompletionSource<bool>? tcs;
+	TaskCompletionSource<bool>? tcs;
 
-    protected override async Task OnInitializedAsync()
-    {
-        newAttachments.Clear();
-        using var dbc = await U3Adbfactory.CreateDbContextAsync();
-        var tInfo = await tenantService.GetTenantInfoAsync();
-        term = await BusinessRule.CurrentEnrolmentTermAsync(dbc)
-                ?? await BusinessRule.CurrentTermAsync(dbc);
-        isEmailEnabled = tInfo.UsePostmarkTestEnviroment;
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		newAttachments.Clear();
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		var tInfo = await tenantService.GetTenantInfoAsync();
+		term = await BusinessRule.CurrentEnrolmentTermAsync(dbc)
+				?? await BusinessRule.CurrentTermAsync(dbc);
+		isEmailEnabled = tInfo.UsePostmarkTestEnviroment;
+	}
 
-    public async Task<bool> ShowAsync()
-    {
-        StateHasChanged();
-        DelayedStart = 1;
-        attachments = new List<string>();
-        newAttachments.Clear();
-        selectedAttachments = new List<string>();
-        allowOk = false;
-        IsEmailOrPostal = false;
-        IsEmailOrSMS = false;
-        IsEmail = false;
-        ActiveTabIndex = 1;
-        pdfVisible = false;
-        SelectedDocumentTemplate = new DocumentTemplate();
-        emailAddresses = DocumentTemplates
-                            .OrderBy(x => x.FromEmailAddress)
-                            .Where(x => x.FromEmailAddress != null)
-                            .Select(x => x.FromEmailAddress.ToLower()).Distinct().ToList();
-        popupVisible = true;
-        tcs = new TaskCompletionSource<bool>();
-        await tcs.Task.ContinueWith(_ =>
-        {
-            popupVisible = false;
-        });
-        StateHasChanged();
-        return await tcs.Task;
-    }
+	public async Task<bool> ShowAsync()
+	{
+		StateHasChanged();
+		DelayedStart = 1;
+		attachments = new List<string>();
+		newAttachments.Clear();
+		selectedAttachments = new List<string>();
+		allowOk = false;
+		IsEmailOrPostal = false;
+		IsEmailOrSMS = false;
+		IsEmail = false;
+		ActiveTabIndex = 1;
+		pdfVisible = false;
+		SelectedDocumentTemplate = new DocumentTemplate();
+		emailAddresses = DocumentTemplates
+							.OrderBy(x => x.FromEmailAddress)
+							.Where(x => x.FromEmailAddress != null)
+							.Select(x => x.FromEmailAddress.ToLower()).Distinct().ToList();
+		popupVisible = true;
+		tcs = new TaskCompletionSource<bool>();
+		await tcs.Task.ContinueWith(_ =>
+		{
+			popupVisible = false;
+		});
+		StateHasChanged();
+		return await tcs.Task;
+	}
 
-    async Task OnAttachFile()
-    {
-        _ = await attachFile.ShowAsync();
-    }
+	async Task OnAttachFile()
+	{
+		_ = await attachFile.ShowAsync();
+	}
 
-    async Task OnFileAttachmentsChanged(IEnumerable<string> items)
-    {
-        attachFileTagBox.BeginUpdate();
-        attachments = items.ToList();
-        selectedAttachments = items.ToList();
-        attachFileTagBox.Reload();
-        attachFileTagBox.EndUpdate();
-        await InvokeAsync(StateHasChanged);
-    }
+	async Task OnFileAttachmentsChanged(IEnumerable<string> items)
+	{
+		attachFileTagBox.BeginUpdate();
+		attachments = items.ToList();
+		selectedAttachments = items.ToList();
+		attachFileTagBox.Reload();
+		attachFileTagBox.EndUpdate();
+		await InvokeAsync(StateHasChanged);
+	}
 
-    async Task AffirmativeButtonClicked()
-    {
-        if (!await IsDataOK()) { return; }
-        if (tcs?.Task.IsCompleted == false)
-        {
-            await richEdit.SaveDocumentAsync();
-            popupVisible = false;
-            if (SelectedDocumentTemplate == null ||
-                        SelectedDocumentTemplate.DocumentType == null ||
-                        SelectedDocumentTemplate.DocumentType.IsPostal)
-            {
-                tcs?.TrySetResult(false);
-            }
-            else
-            {
-                tcs?.TrySetResult(true);
-            }
-        }
-    }
+	async Task AffirmativeButtonClicked()
+	{
+		if (!await IsDataOK()) { return; }
+		if (tcs?.Task.IsCompleted == false)
+		{
+			await richEdit.SaveDocumentAsync();
+			popupVisible = false;
+			if (SelectedDocumentTemplate == null ||
+						SelectedDocumentTemplate.DocumentType == null ||
+						SelectedDocumentTemplate.DocumentType.IsPostal)
+			{
+				tcs?.TrySetResult(false);
+			}
+			else
+			{
+				tcs?.TrySetResult(true);
+			}
+		}
+	}
 
-    void NegativeButtonClicked()
-    {
-        if (tcs?.Task.IsCompleted == false)
-        {
-            popupVisible = false;
-            tcs?.TrySetResult(false);
-        }
-    }
+	void NegativeButtonClicked()
+	{
+		if (tcs?.Task.IsCompleted == false)
+		{
+			popupVisible = false;
+			tcs?.TrySetResult(false);
+		}
+	}
 
-    async Task<bool> IsDataOK()
-    {
-        bool result = true;
-        if (SelectedDocumentTemplate.DocumentType.Name == "Email")
-        {
-            var settings = await dbContext.SystemSettings.FirstOrDefaultAsync();
-            string[]? defaultSplits = settings?.SendEmailAddesss.ToLower().Trim().Split("@");
-            string[]? fromSplits = SelectedDocumentTemplate.FromEmailAddress?.ToLower().Trim().Split("@");
-            if (defaultSplits != null && defaultSplits.Length == 2)
-            {
-                if (fromSplits == null || fromSplits.Length != 2)
-                {
-                    _ = await messageBox.ShowOkOnlyAsync("Invalid Email", $"From Email address must be of the form: [sender]@{defaultSplits[1]}.");
-                    result = false;
-                }
-                if (fromSplits?.Count() > 1 && defaultSplits?.Count() > 1)
-                {
-                    if (fromSplits[1] != defaultSplits[1] && fromSplits[1] != constants.SYSTEM_DOMAIN)
-                    {
-                        _ = await messageBox.ShowOkOnlyAsync("Invalid Domain", $"From Email address must end: @{defaultSplits[1]}.");
-                        result = false;
-                    }
-                }
-            }
-            var msg = string.Empty;
-            if (string.IsNullOrWhiteSpace(SelectedDocumentTemplate.Subject))
-            {
-                msg += "<div class='text-center' style='color: red'>*** Subject is required ***<br/></div>";
-            }
-            if (string.IsNullOrWhiteSpace(SelectedDocumentTemplate.FromEmailAddress))
-            {
-                msg += "<div class='text-center' style='color: red'>*** From Email Address is required ***<br/></div>";
-            }
-            if (string.IsNullOrWhiteSpace(SelectedDocumentTemplate.FromDisplayName))
-            {
-                msg += "<div class='text-center' style='color: red'>*** From Display Name is required ***<br/></div>";
-            }
-            await richEdit.SaveDocumentAsync();
-            bool isEmpty = await richEdit.DocumentAPI.GetIsEmptyAsync();
-            if (isEmpty || SelectedDocumentTemplate.Content == null)
-            {
-                msg += @"<div class='text-center' style='color: red'>*** This email does not contain text ***<br/>
+	async Task<bool> IsDataOK()
+	{
+		bool result = true;
+		if (SelectedDocumentTemplate.DocumentType.Name == "Email")
+		{
+			var settings = await dbContext.SystemSettings.FirstOrDefaultAsync();
+			string[]? defaultSplits = settings?.SendEmailAddesss.ToLower().Trim().Split("@");
+			string[]? fromSplits = SelectedDocumentTemplate.FromEmailAddress?.ToLower().Trim().Split("@");
+			if (defaultSplits != null && defaultSplits.Length == 2)
+			{
+				if (fromSplits == null || fromSplits.Length != 2)
+				{
+					_ = await messageBox.ShowOkOnlyAsync("Invalid Email", $"From Email address must be of the form: [sender]@{defaultSplits[1]}.");
+					result = false;
+				}
+				if (fromSplits?.Count() > 1 && defaultSplits?.Count() > 1)
+				{
+					if (fromSplits[1] != defaultSplits[1] && fromSplits[1] != constants.SYSTEM_DOMAIN)
+					{
+						_ = await messageBox.ShowOkOnlyAsync("Invalid Domain", $"From Email address must end: @{defaultSplits[1]}.");
+						result = false;
+					}
+				}
+			}
+			var msg = string.Empty;
+			if (string.IsNullOrWhiteSpace(SelectedDocumentTemplate.Subject))
+			{
+				msg += "<div class='text-center' style='color: red'>*** Subject is required ***<br/></div>";
+			}
+			if (string.IsNullOrWhiteSpace(SelectedDocumentTemplate.FromEmailAddress))
+			{
+				msg += "<div class='text-center' style='color: red'>*** From Email Address is required ***<br/></div>";
+			}
+			if (string.IsNullOrWhiteSpace(SelectedDocumentTemplate.FromDisplayName))
+			{
+				msg += "<div class='text-center' style='color: red'>*** From Display Name is required ***<br/></div>";
+			}
+			await richEdit.SaveDocumentAsync();
+			bool isEmpty = await richEdit.DocumentAPI.GetIsEmptyAsync();
+			if (isEmpty || SelectedDocumentTemplate.Content == null)
+			{
+				msg += @"<div class='text-center' style='color: red'>*** This email does not contain text ***<br/>
                                 Enter your email text using the editor provided.</div>";
-            }
-            if (DocumentServer.HasMergeCodesAndAttachments(SelectedDocumentTemplate))
-            {
-                msg += @"<div class='text-center' style='color: red'>*** An email may not contain both merge codes and attachments ***<br/>
+			}
+			if (DocumentServer.HasMergeCodesAndAttachments(SelectedDocumentTemplate))
+			{
+				msg += @"<div class='text-center' style='color: red'>*** An email may not contain both merge codes and attachments ***<br/>
                                 Choose one or the other.</div>";
-            }
-            if (msg != string.Empty)
-            {
-                _ = await messageBox.ShowOkOnlyAsync("Input required", msg);
-                result = false;
-            }
-        }
-        if (result)
-        {
-            string msg = $@"Are you sure you are ready to process this communication to the
+			}
+			if (msg != string.Empty)
+			{
+				_ = await messageBox.ShowOkOnlyAsync("Input required", msg);
+				result = false;
+			}
+		}
+		if (result)
+		{
+			string msg = $@"Are you sure you are ready to process this communication to the
                             <b>{SendTo.Count().ToString("n0")}</b> selected members?";
-            if (selectedAttachments.Count() > 0)
-            {
-                SelectedDocumentTemplate.Attachments = selectedAttachments.ToList();
-                msg = $@"Are you sure you are ready to process this email with
+			if (selectedAttachments.Count() > 0)
+			{
+				SelectedDocumentTemplate.Attachments = selectedAttachments.ToList();
+				msg = $@"Are you sure you are ready to process this email with
                         <b>{SelectedDocumentTemplate.Attachments.Count()}</b> attachments to the {SendTo.Count().ToString("n0")} selected members?";
-            }
-            result = await messageBox.ShowAsync("Process Documents", msg);
-        }
-        return result;
-    }
+			}
+			result = await messageBox.ShowAsync("Process Documents", msg);
+		}
+		return result;
+	}
 
-    async Task SelectedTemplateChanged(DocumentTemplate template)
-    {
-        if (template is null) { return; }
-        SelectedDocumentTemplate = template;
-        IsEmail = SelectedDocumentTemplate.DocumentType.IsEmail;
-        IsEmailOrPostal = SelectedDocumentTemplate.DocumentType.IsEmail ||
-                                SelectedDocumentTemplate.DocumentType.IsPostal;
-        IsEmailOrSMS = SelectedDocumentTemplate.DocumentType.IsEmail ||
-                                SelectedDocumentTemplate.DocumentType.IsSMS;
-        ExportData = await BusinessRule.GetExportDataAsync(dbContext, SendTo);
-        ActiveTabIndex = 0;
-        switch (template.DocumentType.Name)
-        {
-            case "Postal":
-                OkButtonText = "Ok";
-                break;
-            case "Email":
-                FromDisplayNameText = "From Display Name";
-                OkButtonText = "Send Email!";
-                break;
-            case "SMS":
-                FromDisplayNameText = "From (11 Chars Max)";
-                OkButtonText = "Send SMS!";
-                break;
-            default:
-                break;
-        }
-        allowOk = true;
-        SelectedEmailAddressChanged(SelectedDocumentTemplate.FromEmailAddress);
-        StateHasChanged();
-    }
+	async Task SelectedTemplateChanged(DocumentTemplate template)
+	{
+		if (template is null) { return; }
+		SelectedDocumentTemplate = template;
+		IsEmail = SelectedDocumentTemplate.DocumentType.IsEmail;
+		IsEmailOrPostal = SelectedDocumentTemplate.DocumentType.IsEmail ||
+								SelectedDocumentTemplate.DocumentType.IsPostal;
+		IsEmailOrSMS = SelectedDocumentTemplate.DocumentType.IsEmail ||
+								SelectedDocumentTemplate.DocumentType.IsSMS;
+		ExportData = await BusinessRule.GetExportDataAsync(dbContext, SendTo);
+		ActiveTabIndex = 0;
+		switch (template.DocumentType.Name)
+		{
+			case "Postal":
+				OkButtonText = "Ok";
+				break;
+			case "Email":
+				FromDisplayNameText = "From Display Name";
+				OkButtonText = "Send Email!";
+				break;
+			case "SMS":
+				FromDisplayNameText = "From (11 Chars Max)";
+				OkButtonText = "Send SMS!";
+				break;
+			default:
+				break;
+		}
+		allowOk = true;
+		SelectedEmailAddressChanged(SelectedDocumentTemplate.FromEmailAddress);
+		StateHasChanged();
+	}
 
-    void SelectedDocTypeChanged(DocumentType DocType, DocumentTemplate editItem)
-    {
-        editItem.DocumentType = DocType;
-        SelectedEmailAddressChanged(editItem.FromEmailAddress);
-    }
+	void SelectedDocTypeChanged(DocumentType DocType, DocumentTemplate editItem)
+	{
+		editItem.DocumentType = DocType;
+		SelectedEmailAddressChanged(editItem.FromEmailAddress);
+	}
 
-    void SelectedEmailAddressChanged(string emailAddress)
-    {
-        switch (SelectedDocumentTemplate.DocumentType.Name)
-        {
-            case "Email":
-                SelectedDocumentTemplate.FromEmailAddress = emailAddress;
-                displayNames = DocumentTemplates
-                                    .OrderBy(x => x.FromDisplayName)
-                                    .Where(x => x.FromEmailAddress?.ToLower() == emailAddress)
-                                    .Select(x => x.FromDisplayName).Distinct().ToList();
-                SelectedDocumentTemplate.FromDisplayName = displayNames.FirstOrDefault();
-                break;
-            case "SMS":
-                displayNames = DocumentTemplates
-                                    .OrderBy(x => x.FromDisplayName)
-                                    .Where(x => x.DocumentType.Name == "SMS")
-                                    .Select(x => x.FromDisplayName).Distinct().ToList();
-                SelectedDocumentTemplate.FromDisplayName = displayNames.FirstOrDefault();
-                break;
-            default:
-                break;
-        }
-    }
+	void SelectedEmailAddressChanged(string emailAddress)
+	{
+		switch (SelectedDocumentTemplate.DocumentType.Name)
+		{
+			case "Email":
+				SelectedDocumentTemplate.FromEmailAddress = emailAddress;
+				displayNames = DocumentTemplates
+									.OrderBy(x => x.FromDisplayName)
+									.Where(x => x.FromEmailAddress?.ToLower() == emailAddress)
+									.Select(x => x.FromDisplayName).Distinct().ToList();
+				SelectedDocumentTemplate.FromDisplayName = displayNames.FirstOrDefault();
+				break;
+			case "SMS":
+				displayNames = DocumentTemplates
+									.OrderBy(x => x.FromDisplayName)
+									.Where(x => x.DocumentType.Name == "SMS")
+									.Select(x => x.FromDisplayName).Distinct().ToList();
+				SelectedDocumentTemplate.FromDisplayName = displayNames.FirstOrDefault();
+				break;
+			default:
+				break;
+		}
+	}
 
-    void OnDocumentContentChanged()
-    {
-        SelectedDocumentTemplate.Content = richEdit.DocumentContent;
-    }
+	void OnDocumentContentChanged()
+	{
+		SelectedDocumentTemplate.Content = richEdit.DocumentContent;
+	}
 
-    async Task OnDocumentLoaded(Document doc)
-    {
-        await richEdit.DocumentAPI.Fields.ShowAllFieldCodesAsync(true);
-        try
-        {
-            documentAPI = richEdit.DocumentAPI;
-            var sections = await documentAPI.Sections.GetAllAsync();
-            foreach (Section s in sections)
-                await s.ChangePropertiesAsync(properties =>
-                {
-                    if (properties.PaperKind == DXPaperKind.Letter)
-                        properties.PaperKind = DXPaperKind.A4;
-                });
-        }
-        catch (OperationCanceledException e)
-        {
-            Console.WriteLine($"{nameof(OperationCanceledException)} thrown with message: {e.Message}");
-        }
-    }
+	async Task OnDocumentLoaded(Document doc)
+	{
+		await richEdit.DocumentAPI.Fields.ShowAllFieldCodesAsync(true);
+		try
+		{
+			documentAPI = richEdit.DocumentAPI;
+			var sections = await documentAPI.Sections.GetAllAsync();
+			foreach (Section s in sections)
+				await s.ChangePropertiesAsync(properties =>
+				{
+					if (properties.PaperKind == DXPaperKind.Letter)
+						properties.PaperKind = DXPaperKind.A4;
+				});
+		}
+		catch (OperationCanceledException e)
+		{
+			Console.WriteLine($"{nameof(OperationCanceledException)} thrown with message: {e.Message}");
+		}
+	}
 
-    void OnCustomizeRichEditToolbar(IRibbon ribbon)
-    {
+	void OnCustomizeRichEditToolbar(IRibbon ribbon)
+	{
 		ribbon.Tabs.Remove("File");
-        IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab(0,"File");
-        IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
-        IBarButton mm = newFileGroup.Items.AddCustomButton("Show/Preview Mail", MailMergeDocumentAsync);
-        newFileGroup.Items.Add("FullScreen");
-        mm.IconCssClass = "icon-size bi-envelope";
-    }
+		IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab(0, "File");
+		IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
+		IBarButton mm = newFileGroup.Items.AddCustomButton("Show/Preview Mail", MailMergeDocumentAsync);
+		newFileGroup.Items.Add("FullScreen");
+		mm.IconCssClass = "icon-size bi-envelope";
+	}
 
 
-    async Task MailMergeDocumentAsync()
-    {
-        if (SelectedDocumentTemplate != null)
-        {
-            pdfVisible = true;
-            await richEdit.SaveDocumentAsync();
-            if (SelectedDocumentTemplate.Content != null)
-            {
-                var server = new DocumentServer(dbContext);
-                pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
-                                                            ExportData, OverrideCommunicationPreference);
-            }
-            else
-            {
-                pdfVisible = false;
-            }
-            StateHasChanged();
-        }
-    }
+	async Task MailMergeDocumentAsync()
+	{
+		if (SelectedDocumentTemplate != null)
+		{
+			pdfVisible = true;
+			await richEdit.SaveDocumentAsync();
+			if (SelectedDocumentTemplate.Content != null)
+			{
+				var server = new DocumentServer(dbContext);
+				pdfContent = server.MergeDocumentAsPdf(SelectedDocumentTemplate,
+															ExportData, OverrideCommunicationPreference);
+			}
+			else
+			{
+				pdfVisible = false;
+			}
+			StateHasChanged();
+		}
+	}
 
-    void OnReturnToTemplate()
-    {
-        pdfVisible = false;
-        StateHasChanged();
-    }
+	void OnReturnToTemplate()
+	{
+		pdfVisible = false;
+		StateHasChanged();
+	}
 }
