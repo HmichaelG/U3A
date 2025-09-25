@@ -477,16 +477,12 @@
 
     void OnCustomizeRichEditToolbar(IRibbon ribbon)
     {
-        ribbon.Tabs.Clear();
-        IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab("File");
+		ribbon.Tabs.Remove("File");
+        IRibbonTab newFileTab = ribbon.Tabs.AddCustomTab(0,"File");
         IBarGroup newFileGroup = newFileTab.Groups.AddCustomGroup(0);
         IBarButton mm = newFileGroup.Items.AddCustomButton("Show/Preview Mail", MailMergeDocumentAsync);
         newFileGroup.Items.Add("FullScreen");
         mm.IconCssClass = "icon-size bi-envelope";
-        ribbon.Tabs.Add("Home");
-        ribbon.Tabs.Add("Insert");
-        ribbon.Tabs.Add("View");
-        ribbon.Tabs.Add("MailMerge");
     }
 
 

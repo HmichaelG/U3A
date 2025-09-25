@@ -28,7 +28,7 @@ namespace U3A.UI.Reports
         private void VenueConflictList_ParametersRequestBeforeShow(object sender, DevExpress.XtraReports.Parameters.ParametersRequestEventArgs e)
         {
             var term = BusinessRule.CurrentTerm(DbContext);
-            var terms = BusinessRule.SelectableTerms(DbContext).Where(x => x.Comparer >= term.Comparer).ToList();
+            var terms = BusinessRule.SelectableTerms(DbContext).Where(x => x.Comparer >= term.Comparer-1).ToList();
             objectDataSource2.DataSource = terms;
             prmTerm.Value = term?.TermSummary;
             prmTerm.Value = term?.ID;
