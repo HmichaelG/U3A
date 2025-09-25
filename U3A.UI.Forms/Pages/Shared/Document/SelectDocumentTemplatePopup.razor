@@ -27,8 +27,7 @@
 		<ContextHelpTitle Title="Communicate" HelpTopic="Communicate.html" />
 	</HeaderContentTemplate>
 	<BodyContentTemplate Context="PopupContext">
-		<DxSplitter Orientation="Orientation.Horizontal"
-					Height="100&)">
+		<DxSplitter Orientation="Orientation.Horizontal" Height="100%)">
 			<Panes>
 				<DxSplitterPane Size="35%">
 					<div class="alert alert-warning  text-center warning-style" hidden="@(DocumentTemplates.Contains(SelectedDocumentTemplate))">
@@ -122,8 +121,9 @@
 				</DxSplitterPane>
 
 				<DxSplitterPane Size="60%">
-						<div class="text-fl-danger rtf-editor-hints"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
-						<div class="text-fl-info rtf-editor-hints"><strong>Hint:</strong> To access AI, select text and right-click for context menu.</div>
+					<div class="text-fl-danger rtf-editor-hints"><strong>Warning:</strong> If you copy/paste document text all merge codes will be lost and must be recreated.</div>
+					<div class="text-fl-info rtf-editor-hints"><strong>Hint:</strong> To access AI, select text and right-click for context menu.</div>
+					<div class="rtf-style">
 						<DxRichEdit @ref="@richEdit" ReadOnly="@(!IsEmailOrSMS && !IsEmailOrPostal)"
 									ViewType="ViewType.PrintLayout"
 									ActiveRibbonTabIndex="@ActiveTabIndex"
@@ -134,7 +134,7 @@
 									CustomizeRibbon="OnCustomizeRichEditToolbar"
 									DocumentLoaded="OnDocumentLoaded"
 									DocumentContentChanged="OnDocumentContentChanged"
-									CssClass="w-100 rtf-style">
+									CssClass="w-100">
 							<AdditionalItems>
 								<SummarizeAIContextMenuItem />
 								<ExplainAIContextMenuItem />
@@ -151,6 +151,7 @@
 								<DxMailMergeSettings Data="@ExportData" />
 							</MailMergeSettings>
 						</DxRichEdit>
+					</div>
 				</DxSplitterPane>
 			</Panes>
 		</DxSplitter>
