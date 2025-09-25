@@ -5,6 +5,7 @@
 @using AngleSharp.Html
 @using AngleSharp.Html.Dom
 @using AngleSharp.Html.Parser
+@using DevExpress.Blazor.Office
 @using Ganss.Xss
 @using DevExpress.AIIntegration.Blazor.HtmlEditor
 @using DevExpress.Blazor
@@ -15,7 +16,8 @@
 
 <MessageBox @ref=@messageBox />
 
-<DxTabs CssClass="w-100">
+<div class="html-edit-style">
+<DxTabs @ref="@tabs" CssClass="w-100" >
     <DxTabPage Text="Editor">
         <DxHtmlEditor AllowSoftLineBreak="true"
                       TableResizeEnabled="true"
@@ -24,6 +26,8 @@
                       ValidationMessagePosition="HtmlEditorValidationMessagePosition.Top"
                       IsValid="@isValid"
                       BindMarkupMode="HtmlEditorBindMarkupMode.OnDelayedInput"
+                      CustomizeToolbar="@OnCustomizeToolbar"
+                      ReadOnly=@(Markup.Contains(editorComment))
                       @bind-Markup="@Markup"
                       @bind-Markup:after="@OnMarkupChanged"
                       Width="@Width" Height="@Height">
@@ -42,14 +46,23 @@
                 }
             </AdditionalItems>
         </DxHtmlEditor>
-            <small>
+        @if (Markup.Contains(editorComment))
+        {
+            <p class="text-fl-info" style="font-size: 0.6rem">
+                <b>Read Only:</b> Markup  contains manual edits.
+            </p>
+        }
+        else
+        {
+            <p style="font-size: 0.6rem">
             <div class="py-1">Always <DxButton Text="Sanitise" Click="@OnSanitise" /> after you copy / paste text.</div>
                 <div>
                     <b>Hint:</b> <span class=key-style>Enter</span> = paragraph break;
                 <span class=key-style>SHIFT</span> +
                 <span class=key-style>Enter</span> = line break.
                 </div>
-            </small>
+            </p>
+        }
     </DxTabPage>
     <DxTabPage Text="Code" Click="() => {Markup = HtmlHelpers.PrettyPrint(Markup);
                                             isCodeEditable=false;
@@ -58,10 +71,14 @@
                 @bind-Text:after=@OnEditorTextChanged
                 Rows="20"
                 ReadOnly="@(!isCodeEditable)" />
+        <div class="d-flex gap-2 align-items-center">
         <DxButton Text="Edit" Click="OnEditClicked" CssClass="mt-1" />
+        <span style="font-size: 0.6rem">Warning: Changes in the <b>Editor</b> will override <b>Code</b> changes.</span>
+        </div>
         <div class="text-fl-danger">@errorText</div>
     </DxTabPage>
 </DxTabs>
+</div>
 
 <style>
     .key-style {
@@ -69,6 +86,9 @@
         padding: 2px;
         border: 1px solid cadetblue;
         border-radius: 3px;
+    }
+    .html-edit-style {
+            width: @Width;
     }
 </style>
 @code {
@@ -86,17 +106,34 @@
     [Parameter]
     public bool DisableAIExtensions { get; set; }
 
+    [Parameter]
+    public bool HideFontMenu { get; set; }
+    [Parameter]
+    public bool HideTableMenu { get; set; }
+
     MessageBox? messageBox;
+    DxTabs? tabs;
     bool isCodeEditable;
     static string errorText = "";
     bool isValid;
+
+    const string editorComment = "<!-- markup contains manual edits -->";
 
     protected override Task OnInitializedAsync()
     {
         isValid = true;
         return base.OnInitializedAsync();
     }
-
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            HtmlHelpers.PrettyPrint(Markup);
+            tabs.ActiveTabIndex = Markup.Contains(editorComment) ? 1 : 0;
+            StateHasChanged();
+        }
+    }
     async Task OnMarkupChanged()
     {
         ValidateImages();
@@ -111,6 +148,10 @@
         ValidateImages();
         if (isValid && MarkupChanged.HasDelegate)
         {
+            if (!Markup.Contains(editorComment))
+            {
+                Markup += Environment.NewLine + editorComment;
+            }
             await MarkupChanged.InvokeAsync(Markup);
         }
     }
@@ -122,6 +163,11 @@
         errorText = result.errorText;
     }
 
+    void OnCustomizeToolbar(IToolbar toolbar )
+    {
+        if (HideFontMenu) toolbar.Groups.Remove(HtmlEditorToolbarGroupNames.Font);
+        if (HideTableMenu) toolbar.Groups.Remove(HtmlEditorToolbarGroupNames.Table);
+    }
 
     async Task OnEditClicked()
     {
