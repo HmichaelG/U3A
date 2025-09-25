@@ -184,7 +184,7 @@ namespace U3A.Model
 
         public string CeasedReasons { get; set; }
 
-
+        public string EmailFooter { get; set; }
     }
 
     public enum AutoEnrollOccurrence

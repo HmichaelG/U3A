@@ -287,18 +287,17 @@ namespace U3A.Services
         private string AddUnsubscribeMessage(string htmlMessage)
         {
             var unsubscribeText = ReadUnsubscribeTemplate();
-            return htmlMessage.Replace("</body>",unsubscribeText);
+            return htmlMessage.Replace("</body>", unsubscribeText);
         }
         string ReadUnsubscribeTemplate()
         {
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = $"U3A.Services.Email.unsubscribe.html";
 
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
+            using Stream stream = assembly.GetManifestResourceStream(resourceName);
+            using StreamReader reader = new StreamReader(stream);
+            var htmlString = reader.ReadToEnd();
+            return htmlString.Replace("{{{emailFooter}}}",settings.EmailFooter ?? string.Empty);
         }
 
         protected virtual void OnBatchEmailSent(string From,
