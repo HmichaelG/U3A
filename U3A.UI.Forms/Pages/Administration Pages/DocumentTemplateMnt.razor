@@ -2,6 +2,7 @@
 
 @inject IJSRuntime js
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject WorkstationService ws
 @implements IDisposable
 @using DevExpress.Drawing.Printing
 @using DevExpress.Drawing
@@ -28,7 +29,7 @@ else
 		<ContentTemplate>
 			<DxTabs>
 				<DxTabPage Text="Document Templates">
-					<DxGrid id="my-grid" Data="@DocumentTemplates" @ref=@mainGrid
+					<DxGrid id="my-grid" Data="@DocumentTemplates" @ref=@mainGrid CssClass="document-grid-style"
 							ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
 							ShowFilterRow="false"
 							ShowAllRows="true"
@@ -139,6 +140,9 @@ else
 }
 
 <style>
+	.document-grid-style {
+		height: calc(100dvh - @(ws.UseTopMenu ? "10rem" : "8rem"));
+	}
 	.popup {
 		min-width: 65rem;
 	}
