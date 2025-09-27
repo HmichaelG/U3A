@@ -51,6 +51,7 @@ namespace U3A.Database
         public DbSet<Volunteer> Volunteer { get; set; }
         public DbSet<Receipt> Receipt { get; set; }
         public DbSet<Fee> Fee { get; set; }
+        public DbSet<Note> Note { get; set; }
         public DbSet<ReceiptDataImport> ReceiptDataImport { get; set; }
         public DbSet<SendMail> SendMail { get; set; }
         public DbSet<OnlinePaymentStatus> OnlinePaymentStatus { get; set; }

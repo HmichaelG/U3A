@@ -540,6 +540,7 @@ public class Person : BaseEntity, ISoftDelete
     [JsonIgnore] public List<Receipt> Receipts { get; set; } = new List<Receipt>();
     [JsonIgnore] public List<Fee> Fees { get; set; } = new List<Fee>();
     [JsonIgnore] public List<ReceiptDataImport> ReceiptDataImports { get; set; } = new List<ReceiptDataImport>();
+    [JsonIgnore] public List<Note> Notes { get; set; } = new List<Note>();
 
     [NotMapped][JsonIgnore] public bool IsMultiCampusVisitor { get; set; } = false;
     public bool IsDeleted { get; set; }

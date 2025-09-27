@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Person_CeasedReason
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_EmailFooter
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Settings_EmailFooter
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Note
 
-add-migration -context U3ADbContextSeed -project U3A.Database  U3A_Settings_EmailFooter
+add-migration -context U3ADbContextSeed -project U3A.Database  U3A_Note
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 
