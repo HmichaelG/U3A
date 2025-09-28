@@ -19,903 +19,905 @@
 
 @if (!IsReady)
 {
-    <LoadingIndicator />
+	<LoadingIndicator />
 }
 else
 {
 
-    <MessageBox @ref="@messageBox" />
-    <Progress @ref="@ProgressBar" />
-    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+	<MessageBox @ref="@messageBox" />
+	<Progress @ref="@ProgressBar" />
+	<ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <div class="col col-12">
-        <ContextHelpTitle Title="Bank Data Import" HelpTopic="Bank-Data-Import.html" />
-    </div>
+	<div class="col col-12">
+		<ContextHelpTitle Title="Bank Data Import" HelpTopic="Bank-Data-Import.html" />
+	</div>
 
-    @if (!hideReceiptDateRangeMessage)
-    {
-        <h4 class="col col-12 alert alert-warning  text-center p-2">@receiptDateRangeMessage</h4>
-    }
-    <div class="row">
-        <div class="col col-lg-6">
-            <div id="overviewDemoDropZone" class="card custom-drop-zone bg-light rounded-3 m-0" hidden="@(SelectedFilesCount > 0)">
-                <span class="bi bi-upload icon-size mb-3"></span>
-                <span>Drag and Drop <b>OFX</b> or <b>QIF</b> File Here</span><span class="m-1">or</span>
-                <div class="button-container w-25">
-                    <DxButton id="fileSelectButton" CssClass="w-100" SubmitFormOnClick='true' Text="Select file" RenderStyle="ButtonRenderStyle.Primary" />
-                </div>
-            </div>
-            <DxUpload Name="myFile" @ref="FileUploader"
-                      ExternalSelectButtonCssSelector="#fileSelectButton"
-                      ExternalDropZoneCssSelector="#overviewDemoDropZone"
-                      ExternalDropZoneDragOverCssClass="bg-light border-secondary "
-                      UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
-                      AllowedFileExtensions="@(new List<string> { ".ofx",".qif" })"
-                      FileUploaded="FileUploaded"
-                      SelectedFilesChanged="SelectedFilesChanged"
-                      AllowMultiFileUpload="false"
-                      MaxFileSize="15000000" CssClass="w-100">
-            </DxUpload>
-        </div> @*col*@
+	@if (!hideReceiptDateRangeMessage)
+	{
+		<h4 class="col col-12 alert alert-warning  text-center p-2">@receiptDateRangeMessage</h4>
+	}
+	<div class="row">
+		<div class="col col-lg-6">
+			<div id="overviewDemoDropZone"
+				 class="card-fl custom-drop-zone rounded-3 m-0"
+				 hidden="@(SelectedFilesCount > 0)">
+				<span class="bi bi-upload icon-size mb-3"></span>
+				<span>Drag and Drop <b>OFX</b> or <b>QIF</b> File Here</span><span class="m-1">or</span>
+				<div class="button-container w-25">
+					<DxButton id="fileSelectButton" CssClass="w-100" SubmitFormOnClick='true' Text="Select file" RenderStyle="ButtonRenderStyle.Primary" />
+				</div>
+			</div>
+			<DxUpload Name="myFile" @ref="FileUploader"
+					  ExternalSelectButtonCssSelector="#fileSelectButton"
+					  ExternalDropZoneCssSelector="#overviewDemoDropZone"
+					  ExternalDropZoneDragOverCssClass="bg-light border-secondary "
+					  UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
+					  AllowedFileExtensions="@(new List<string> { ".ofx",".qif" })"
+					  FileUploaded="FileUploaded"
+					  SelectedFilesChanged="SelectedFilesChanged"
+					  AllowMultiFileUpload="false"
+					  MaxFileSize="15000000" CssClass="w-100">
+			</DxUpload>
+		</div> @*col*@
 
-        <div class="col-lg-2" />
-        <div class="col col-lg-4">
-            <div class="row">
-                <YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" CssClass="col" />
-            </div>
-            <div class="my-1 text-center mb-2">@FinancialToMessage</div>
-            <div class="d-flex">
-                <DxButton Text="Apply Payments to the Participant Records" CssClass="flex-grow-1"
-                          Click="@ProcessRequests" Enabled="@(importData.Where(x => x.Person != null).Any())"
-                          RenderStyle="ButtonRenderStyle.Primary" />
-            </div>
-            <div class="button-container">
-                <DxButton Text="@ShowAllButtonText" CssClass="w-50 me-1 flex-grow-1"
-                          Click="@ShowAllButtonClicked"
-                          RenderStyle="ButtonRenderStyle.Primary" />
-                <DxButton Text="Clear Bank Import File" CssClass="w-50 ms-1 flex-grow-1"
-                          Click="@ClearAllBankData"
-                          RenderStyle="ButtonRenderStyle.Primary" />
-            </div>
+		<div class="col-lg-2" />
+		<div class="col col-lg-4">
+			<div class="row">
+				<YearComponent @ref="@yearComponent" OnYearChangedEvent="SelectedYearChanged" CssClass="col" />
+			</div>
+			<div class="my-1 text-center mb-2">@FinancialToMessage</div>
+			<div class="d-flex">
+				<DxButton Text="Apply Payments to the Participant Records" CssClass="flex-grow-1"
+						  Click="@ProcessRequests" Enabled="@(importData.Where(x => x.Person != null).Any())"
+						  RenderStyle="ButtonRenderStyle.Primary" />
+			</div>
+			<div class="button-container">
+				<DxButton Text="@ShowAllButtonText" CssClass="w-50 me-1 flex-grow-1"
+						  Click="@ShowAllButtonClicked"
+						  RenderStyle="ButtonRenderStyle.Primary" />
+				<DxButton Text="Clear Bank Import File" CssClass="w-50 ms-1 flex-grow-1"
+						  Click="@ClearAllBankData"
+						  RenderStyle="ButtonRenderStyle.Primary" />
+			</div>
 
-            <div class="d-flex mt-2">
-            </div>
-        </div>
-    </div> @*row*@
+			<div class="d-flex mt-2">
+			</div>
+		</div>
+	</div> @*row*@
 
-    <div>@BankAccountDetails</div>
-    <FullScreen DisplayOffset="20">
-        <ContentTemplate>
-            <DxGrid id="my-grid" Data="@importData" @ref=@mainGrid
-                    SelectionMode="GridSelectionMode.Single"
-                    SelectedDataItem=@selectedDataItem
-                    SelectedDataItemChanged="OnSelectedDataItemChanged"
-                    ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                    DetailRowDisplayMode="GridDetailRowDisplayMode.Always"
-                    CustomizeElement="Grid_CustomizeElement"
-                    AllowSelectRowByClick="true"
-                    ShowFilterRow="false"
-                    ShowAllRows="true"
-                    KeyFieldName="ID"
-                    ValidationEnabled="true"
-                    EditMode="GridEditMode.EditCell"
-                    KeyboardNavigationEnabled=true
-                    CustomizeEditModel="Grid_CustomizeEditModel"
-                    EditCanceling="Grid_EditCanceling"
-                    DataItemDeleting="Grid_DataItemDeleting"
-                    EditModelSaving="Grid_EditModelSaving">
-                <ToolbarTemplate>
-                    <GridToolbar LinkedGrid=@mainGrid LayoutKey="{C32F58B3-404E-433E-8C64-E683BA54E50A}">
-                        <CustomButtonContent>
-                            <DxToolbarItem IconCssClass="bi bi-layout-split" Name="Split" Text="Split"
-                                           BeginGroup=true
-                                           Enabled="@(selectedDataItem != null)"
-                                           Click=@OnSplit
-                                           RenderStyle="ButtonRenderStyle.Primary"
-                                           RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                           Alignment="ToolbarItemAlignment.Left"
-                                           Tooltip="Split the selected item into two">
-                            </DxToolbarItem>
-                        </CustomButtonContent>
-                    </GridToolbar>
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridSelectionColumn Caption="Split" Width="2rem" />
-                    <DxGridCommandColumnEx NewButtonVisible="false" MinWidth="75" />
-                    <DxGridDataColumn Caption="On File?" FieldName="IsOnFile" Width="2rem" DataRowEditorVisible=false />
-                    <DxGridDataColumn Caption="Date"
-                                      FieldName="Date" DisplayFormat="{0:d}" Width="6rem" DataRowEditorVisible=false />
-                    <DxGridDataColumn Caption="Name" FieldName="Person.FullName" Width="15rem">
-                        <CellEditTemplate>
-                            @{
-                                var importData = (ReceiptDataImport)context.EditModel;
-                            }
-                            <PersonsComboBox People="@People" @bind-SelectedPerson="@currentPerson"
-                                             @bind-SelectedPerson:after="async () => await OnPersonChanged(currentPerson, importData)" />
-                        </CellEditTemplate>
-                    </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Amount" Width="10rem"
-                                      FieldName="Amount" DisplayFormat="{0:c2}" />
-                    <DxGridDataColumn Caption="Financial-To" DisplayFormat="{0:f0}"
-                                      FieldName="FinancialTo" Width="10rem">
-                        <EditSettings>
-                            <DxSpinEditSettings MaxValue="@(yearComponent?.Year + 1)"
-                                                MinValue="@(yearComponent?.Year-1)" />
-                        </EditSettings>
-                    </DxGridDataColumn>
-                    <DxGridDataColumn Caption="FinTo-Term"
-                                      Visible=@(settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly)
-                                      FieldName="FinancialToTerm" Width="10rem">
-                        <CellEditTemplate>
-                            @{
-                                var importData = (ReceiptDataImport)context.EditModel;
-                            }
-                            <DxComboBox Data="@memberFeePaidToTerms"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Year"
-                                        @bind-Value=@importData.FinancialToTerm
-                                        AllowUserInput="false" />
-                        </CellEditTemplate>
-                    </DxGridDataColumn>
-                    <DxGridDataColumn Caption="Description"
-                                      FieldName="Description" DataRowEditorVisible=false />
-                    <DxGridDataColumn Caption="Identifier"
-                                      FieldName="Identifier" DataRowEditorVisible=false />
-                </Columns>
-                <DetailRowTemplate>
-                    @{
-                        var receipt = (ReceiptDataImport)context.DataItem;
-                        <text>@(new MarkupString(receipt.ImportIssues))</text>
-                    }
+	<div>@BankAccountDetails</div>
+	<FullScreen DisplayOffset="15">
+		<ContentTemplate>
+			<DxGrid id="my-grid" Data="@importData" @ref=@mainGrid
+					SelectionMode="GridSelectionMode.Single"
+					SelectedDataItem=@selectedDataItem
+					SelectedDataItemChanged="OnSelectedDataItemChanged"
+					ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+					DetailRowDisplayMode="GridDetailRowDisplayMode.Always"
+					CustomizeElement="Grid_CustomizeElement"
+					AllowSelectRowByClick="true"
+					ShowFilterRow="false"
+					ShowAllRows="true"
+					KeyFieldName="ID"
+					ValidationEnabled="true"
+					EditMode="GridEditMode.EditCell"
+					KeyboardNavigationEnabled=true
+					CustomizeEditModel="Grid_CustomizeEditModel"
+					EditCanceling="Grid_EditCanceling"
+					DataItemDeleting="Grid_DataItemDeleting"
+					EditModelSaving="Grid_EditModelSaving">
+				<ToolbarTemplate>
+					<GridToolbar LinkedGrid=@mainGrid LayoutKey="{C32F58B3-404E-433E-8C64-E683BA54E50A}">
+						<CustomButtonContent>
+							<DxToolbarItem IconCssClass="bi bi-layout-split" Name="Split" Text="Split"
+										   BeginGroup=true
+										   Enabled="@(selectedDataItem != null)"
+										   Click=@OnSplit
+										   RenderStyle="ButtonRenderStyle.Primary"
+										   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+										   Alignment="ToolbarItemAlignment.Left"
+										   Tooltip="Split the selected item into two">
+							</DxToolbarItem>
+						</CustomButtonContent>
+					</GridToolbar>
+				</ToolbarTemplate>
+				<Columns>
+					<DxGridSelectionColumn Caption="Split" Width="2rem" />
+					<DxGridCommandColumnEx NewButtonVisible="false" MinWidth="75" />
+					<DxGridDataColumn Caption="On File?" FieldName="IsOnFile" Width="2rem" DataRowEditorVisible=false />
+					<DxGridDataColumn Caption="Date"
+									  FieldName="Date" DisplayFormat="{0:d}" Width="6rem" DataRowEditorVisible=false />
+					<DxGridDataColumn Caption="Name" FieldName="Person.FullName" Width="15rem">
+						<CellEditTemplate>
+							@{
+								var importData = (ReceiptDataImport)context.EditModel;
+							}
+							<PersonsComboBox People="@People" @bind-SelectedPerson="@currentPerson"
+											 @bind-SelectedPerson:after="async () => await OnPersonChanged(currentPerson, importData)" />
+						</CellEditTemplate>
+					</DxGridDataColumn>
+					<DxGridDataColumn Caption="Amount" Width="10rem"
+									  FieldName="Amount" DisplayFormat="{0:c2}" />
+					<DxGridDataColumn Caption="Financial-To" DisplayFormat="{0:f0}"
+									  FieldName="FinancialTo" Width="10rem">
+						<EditSettings>
+							<DxSpinEditSettings MaxValue="@(yearComponent?.Year + 1)"
+												MinValue="@(yearComponent?.Year-1)" />
+						</EditSettings>
+					</DxGridDataColumn>
+					<DxGridDataColumn Caption="FinTo-Term"
+									  Visible=@(settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly)
+									  FieldName="FinancialToTerm" Width="10rem">
+						<CellEditTemplate>
+							@{
+								var importData = (ReceiptDataImport)context.EditModel;
+							}
+							<DxComboBox Data="@memberFeePaidToTerms"
+										ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+										NullText="Year"
+										@bind-Value=@importData.FinancialToTerm
+										AllowUserInput="false" />
+						</CellEditTemplate>
+					</DxGridDataColumn>
+					<DxGridDataColumn Caption="Description"
+									  FieldName="Description" DataRowEditorVisible=false />
+					<DxGridDataColumn Caption="Identifier"
+									  FieldName="Identifier" DataRowEditorVisible=false />
+				</Columns>
+				<DetailRowTemplate>
+					@{
+						var receipt = (ReceiptDataImport)context.DataItem;
+						<text>@(new MarkupString(receipt.ImportIssues))</text>
+					}
 
-                </DetailRowTemplate>
+				</DetailRowTemplate>
 
-                <TotalSummary>
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Amount" ValueDisplayFormat="{0:c2}" />
-                </TotalSummary>
-            </DxGrid>
-        </ContentTemplate>
-    </FullScreen>
+				<TotalSummary>
+					<DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="Amount" ValueDisplayFormat="{0:c2}" />
+				</TotalSummary>
+			</DxGrid>
+		</ContentTemplate>
+	</FullScreen>
 }
 <style>
-    .popup-width {
-        min-width: 65rem;
-    }
+	.popup-width {
+		min-width: 65rem;
+	}
 
-    .icon-size {
-        font-size: 2rem;
-    }
+	.icon-size {
+		font-size: 2rem;
+	}
 
-    .button-bar {
-        height: auto;
-    }
+	.button-bar {
+		height: auto;
+	}
 
-    .custom-drop-zone {
-        padding: 0 !important;
-        border-style: dashed !important;
-        border-width: 2px !important;
-        height: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
+	.custom-drop-zone {
+		padding: 0 !important;
+		border-style: dashed !important;
+		border-width: 2px !important;
+		height: auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
 
-    .highlighted-item {
-        background-color: lightpink;
-        color: black;
-    }
+	.highlighted-item {
+		background-color: lightpink;
+		color: black;
+	}
 </style>
 
 @code {
-    bool IsReady;
-    U3ADbContext? dbc;
-    int SelectedFilesCount;
-    IEnumerable<UploadFileInfo> UploadedFiles;
-    List<ReceiptDataImport> importData { get; set; }
-    List<Person>? People;
-    string UploadUrl;
-    bool hideReceiptDateRangeMessage = true;
-    string receiptDateRangeMessage;
-    object? selectedDataItem;
+	bool IsReady;
+	U3ADbContext? dbc;
+	int SelectedFilesCount;
+	IEnumerable<UploadFileInfo> UploadedFiles;
+	List<ReceiptDataImport> importData { get; set; }
+	List<Person>? People;
+	string UploadUrl;
+	bool hideReceiptDateRangeMessage = true;
+	string receiptDateRangeMessage;
+	object? selectedDataItem;
 
-    DxUpload? FileUploader;
-    IGrid? mainGrid { get; set; }
-    ErrorPopup? ErrorPopup { get; set; }
-    GridToolbar? Toolbar;
-    Progress? ProgressBar;
-    MessageBox? messageBox;
-    string ErrorHeader;
-    string ErrorMessage;
-    SystemSettings settings;
-    Communication Communication;
-    private AUState states;
-    private Gender gender;
-    IReadOnlyList<object>? SelectedDataItems { get; set; }
+	DxUpload? FileUploader;
+	IGrid? mainGrid { get; set; }
+	ErrorPopup? ErrorPopup { get; set; }
+	GridToolbar? Toolbar;
+	Progress? ProgressBar;
+	MessageBox? messageBox;
+	string ErrorHeader;
+	string ErrorMessage;
+	SystemSettings settings;
+	Communication Communication;
+	private AUState states;
+	private Gender gender;
+	IReadOnlyList<object>? SelectedDataItems { get; set; }
 
-    YearComponent? yearComponent;
-    int ProcessingYear;
-    string FinancialToMessage = string.Empty;
-    Person? currentPerson;
-    int? currentFinancialTo;
-    Term? currentTerm;
-    Term? FirstTermNextYear;
-    string FileProcessed;
-    DateTime TimeProcessed;
-    string BankAccountDetails;
-    string ShowAllButtonText;
-    bool ShowAllBankTransactions = true;
-    LocalTime localTime;
-    DateTime today;
+	YearComponent? yearComponent;
+	int ProcessingYear;
+	string FinancialToMessage = string.Empty;
+	Person? currentPerson;
+	int? currentFinancialTo;
+	Term? currentTerm;
+	Term? FirstTermNextYear;
+	string FileProcessed;
+	DateTime TimeProcessed;
+	string BankAccountDetails;
+	string ShowAllButtonText;
+	bool ShowAllBankTransactions = true;
+	LocalTime localTime;
+	DateTime today;
 
-    DateTime? startDate;
-    DateTime processStartTime;
-    DateTime endDate;
-    MemberFeePaidToTerm memberFeePaidToTerms = new();
+	DateTime? startDate;
+	DateTime processStartTime;
+	DateTime endDate;
+	MemberFeePaidToTerm memberFeePaidToTerms = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        // wire up the data
-        IsReady = false;
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        People = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
-        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        await SetupAndCheckLastReceiptDateAsync(settings);
-        states = new AUState();
-        gender = new Gender();
-        Communication = new Communication();
-        currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-        if (currentTerm != null)
-        {
-            FirstTermNextYear = await BusinessRule.FirstTermNextYearAsync(dbc, currentTerm.Year);
-            if (FirstTermNextYear != null
-                && DateTime.Today.ToLocalTime() >= FirstTermNextYear.EnrolmentStartDate) currentTerm = FirstTermNextYear;
-            SelectedYearChanged(currentTerm.Year);
-        }
-        await ShowAllButtonClicked();
-        IsReady = true;
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		// wire up the data
+		IsReady = false;
+		dbc = await U3Adbfactory.CreateDbContextAsync();
+		People = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
+		settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+		await SetupAndCheckLastReceiptDateAsync(settings);
+		states = new AUState();
+		gender = new Gender();
+		Communication = new Communication();
+		currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+		if (currentTerm != null)
+		{
+			FirstTermNextYear = await BusinessRule.FirstTermNextYearAsync(dbc, currentTerm.Year);
+			if (FirstTermNextYear != null
+				&& DateTime.Today.ToLocalTime() >= FirstTermNextYear.EnrolmentStartDate) currentTerm = FirstTermNextYear;
+			SelectedYearChanged(currentTerm.Year);
+		}
+		await ShowAllButtonClicked();
+		IsReady = true;
+	}
 
-    async Task SetupAndCheckLastReceiptDateAsync(SystemSettings settings)
-    {
-        if (settings != null)
-        {
-            startDate = settings.LastCashReceiptDate?.AddDays(1);
-            var strStartDate = startDate?.ToString("dd-MMM-yyyy");
-            var strEndDate = endDate.ToString("dd-MMM-yyyy");
-            if (startDate >= endDate)
-            {
-                receiptDateRangeMessage = "Bank data import is up-to-date";
-            }
-            else
-            {
-                receiptDateRangeMessage = $"Upload an OFX or QIF file starting {strStartDate} and ending no later than {strEndDate}";
-            }
-            hideReceiptDateRangeMessage = false;
-            StateHasChanged();
-        }
-    }
+	async Task SetupAndCheckLastReceiptDateAsync(SystemSettings settings)
+	{
+		if (settings != null)
+		{
+			startDate = settings.LastCashReceiptDate?.AddDays(1);
+			var strStartDate = startDate?.ToString("dd-MMM-yyyy");
+			var strEndDate = endDate.ToString("dd-MMM-yyyy");
+			if (startDate >= endDate)
+			{
+				receiptDateRangeMessage = "Bank data import is up-to-date";
+			}
+			else
+			{
+				receiptDateRangeMessage = $"Upload an OFX or QIF file starting {strStartDate} and ending no later than {strEndDate}";
+			}
+			hideReceiptDateRangeMessage = false;
+			StateHasChanged();
+		}
+	}
 
-    async Task<bool> CheckBankFileDate(DateTime? firstImportDate, DateTime? lastImportDate)
-    {
-        var result = false;
-        if (firstImportDate != null && lastImportDate != null)
-        {
-            result = (firstImportDate >= startDate && firstImportDate <= endDate) &&
-                            (lastImportDate >= startDate && lastImportDate <= endDate);
-        }
-        if (!result)
-        {
-            var args = new MessageBoxArgs()
-            {
-                OKButtonText = "Yes, I'm Ok with that!",
-                Caption = "Unexpected date range in Bank import file",
-                Message = $"<div class='text-center alert alert-danger alert  p-2'><p>The Bank date range <strong>{firstImportDate?.ToShortDateString()}</strong> to <strong>{lastImportDate?.ToShortDateString()}</strong>.<br>" +
-                                                                                                                                                                        $"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
-                                                                                                                                                                            "<p class='text-center'>Do you really want to import the out of range file?</p></div>"
-            };
-            result = await messageBox.ShowAsync(args);
-            hideReceiptDateRangeMessage = true;
-        }
-        return result;
-    }
+	async Task<bool> CheckBankFileDate(DateTime? firstImportDate, DateTime? lastImportDate)
+	{
+		var result = false;
+		if (firstImportDate != null && lastImportDate != null)
+		{
+			result = (firstImportDate >= startDate && firstImportDate <= endDate) &&
+							(lastImportDate >= startDate && lastImportDate <= endDate);
+		}
+		if (!result)
+		{
+			var args = new MessageBoxArgs()
+			{
+				OKButtonText = "Yes, I'm Ok with that!",
+				Caption = "Unexpected date range in Bank import file",
+				Message = $"<div class='text-center alert alert-danger alert  p-2'><p>The Bank date range <strong>{firstImportDate?.ToShortDateString()}</strong> to <strong>{lastImportDate?.ToShortDateString()}</strong>.<br>" +
+																																										$"It should be within the range <strong>{startDate?.ToShortDateString()}</strong> to <strong>{endDate.ToShortDateString()}</strong>.</p>" +
+																																											"<p class='text-center'>Do you really want to import the out of range file?</p></div>"
+			};
+			result = await messageBox.ShowAsync(args);
+			hideReceiptDateRangeMessage = true;
+		}
+		return result;
+	}
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            localTime = new LocalTime(js);
-            today = await localTime.GetLocalTimeAsync();
-            endDate = today.Date.AddDays(-1);
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			localTime = new LocalTime(js);
+			today = await localTime.GetLocalTimeAsync();
+			endDate = today.Date.AddDays(-1);
+		}
+		await base.OnAfterRenderAsync(firstRender);
+	}
 
-    void SelectedYearChanged(int NewYear)
-    {
-        ProcessingYear = NewYear;
-        FinancialToMessage = $"Participants will be made Financial To: {ProcessingYear}";
-    }
+	void SelectedYearChanged(int NewYear)
+	{
+		ProcessingYear = NewYear;
+		FinancialToMessage = $"Participants will be made Financial To: {ProcessingYear}";
+	}
 
-    async Task OnPersonChanged(Person newValue, ReceiptDataImport model)
-    {
-        currentPerson = newValue;
-        model.Person = newValue;
-        if (newValue != null)
-        {
-            model.Person = newValue;
-            await CalcculateFinancialTo(dbc, model, processStartTime);
-        }
-        else
-        {
-            model.Person = null;
-            model.FinancialTo = null;
-            model.FinancialToTerm = null;
-            currentFinancialTo = null;
-        }
-        StateHasChanged();
-    }
+	async Task OnPersonChanged(Person newValue, ReceiptDataImport model)
+	{
+		currentPerson = newValue;
+		model.Person = newValue;
+		if (newValue != null)
+		{
+			model.Person = newValue;
+			await CalcculateFinancialTo(dbc, model, processStartTime);
+		}
+		else
+		{
+			model.Person = null;
+			model.FinancialTo = null;
+			model.FinancialToTerm = null;
+			currentFinancialTo = null;
+		}
+		StateHasChanged();
+	}
 
-    protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
-    {
-        UploadedFiles = files;
-        SelectedFilesCount = files.ToList().Count;
-        InvokeAsync(StateHasChanged);
-    }
+	protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
+	{
+		UploadedFiles = files;
+		SelectedFilesCount = files.ToList().Count;
+		InvokeAsync(StateHasChanged);
+	}
 
-    protected string GetUploadUrl(string url)
-    {
-        return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
-    }
+	protected string GetUploadUrl(string url)
+	{
+		return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
+	}
 
-    async Task FileUploaded()
-    {
-        await ProgressBar.ShowSpinnerAsync("Processing ... Please Wait");
-        string response = string.Empty;
-        List<Guid> IdAlreadyUsed = new List<Guid>();
-        foreach (var fi in UploadedFiles)
-        {
-            FileProcessed = fi.Name;
-            TimeProcessed = dbc.GetLocalTime();
-            var file = Path.Combine("uploads", fi.Name);
-            string extension = Path.GetExtension(file);
-            switch (extension.ToLower())
-            {
-                case ".ofx":
-                    await ParseOFXFile(file, IdAlreadyUsed);
-                    break;
-                case ".qif":
-                    await ParseQIFFile(file, IdAlreadyUsed);
-                    break;
-                default:
-                    await messageBox.ShowOkOnlyAsync("File type not supported.", $"files of type {extension} are not supported.");
-                    break;
-            }
-            await ProgressBar.ShowSpinnerAsync("Updating Database - Please Wait");
-            await dbc.SaveChangesAsync();
-        }
-        await ImportReceiptData();
-        await ProgressBar.Close();
-        FileUploader.RemoveAllFiles();
-        SelectedFilesCount = 0;
-        var msg = $@"{importData.Count()} bank transactions have been added to the process queue.<br/>
+	async Task FileUploaded()
+	{
+		await ProgressBar.ShowSpinnerAsync("Processing ... Please Wait");
+		string response = string.Empty;
+		List<Guid> IdAlreadyUsed = new List<Guid>();
+		foreach (var fi in UploadedFiles)
+		{
+			FileProcessed = fi.Name;
+			TimeProcessed = dbc.GetLocalTime();
+			var file = Path.Combine("uploads", fi.Name);
+			string extension = Path.GetExtension(file);
+			switch (extension.ToLower())
+			{
+				case ".ofx":
+					await ParseOFXFile(file, IdAlreadyUsed);
+					break;
+				case ".qif":
+					await ParseQIFFile(file, IdAlreadyUsed);
+					break;
+				default:
+					await messageBox.ShowOkOnlyAsync("File type not supported.", $"files of type {extension} are not supported.");
+					break;
+			}
+			await ProgressBar.ShowSpinnerAsync("Updating Database - Please Wait");
+			await dbc.SaveChangesAsync();
+		}
+		await ImportReceiptData();
+		await ProgressBar.Close();
+		FileUploader.RemoveAllFiles();
+		SelectedFilesCount = 0;
+		var msg = $@"{importData.Count()} bank transactions have been added to the process queue.<br/>
     {importData.Where(x => x.Person != null).Count()} receipts have been matched to participants.";
-        await messageBox.ShowOkOnlyAsync("File import complete", msg);
-        StateHasChanged();
-    }
+		await messageBox.ShowOkOnlyAsync("File import complete", msg);
+		StateHasChanged();
+	}
 
-    async Task ParseQIFFile(string file, List<Guid> IdAlreadyUsed)
-    {
-        int currentRecord = 0;
+	async Task ParseQIFFile(string file, List<Guid> IdAlreadyUsed)
+	{
+		int currentRecord = 0;
 
-        // Fix whitespace issue
-        string input = await File.ReadAllTextAsync(file);
-        string pattern = @"\s+$";
-        string replacement = "";
-        string result = Regex.Replace(input, pattern, replacement, RegexOptions.Multiline);
-        await File.WriteAllTextAsync(file, result);
+		// Fix whitespace issue
+		string input = await File.ReadAllTextAsync(file);
+		string pattern = @"\s+$";
+		string replacement = "";
+		string result = Regex.Replace(input, pattern, replacement, RegexOptions.Multiline);
+		await File.WriteAllTextAsync(file, result);
 
-        // and, parse...
-        QifDocument qif = QifDocument.Load(File.OpenRead(file));
-        var firstDate = qif.BankTransactions.OrderBy(b => b.Date).FirstOrDefault()?.Date;
-        var lastDate = qif.BankTransactions.OrderByDescending(b => b.Date).FirstOrDefault()?.Date;
-        //
-        if (!await CheckBankFileDate(firstDate, lastDate)) return;
-        //
-        BankAccountDetails = $"From {firstDate?.ToLongDateString()} to {lastDate?.ToLongDateString()}.";
-        var records = qif.BankTransactions.Count;
-        processStartTime = DateTime.UtcNow;
-        foreach (BasicTransaction trx in qif.BankTransactions)
-        {
-            var description = trx.Memo;
-            // CBA uses payee
-            if (string.IsNullOrWhiteSpace(description)) { description = trx.Payee; }
-            await ProcessReceiptData(trx.Amount, trx.Date, description, trx.Category, IdAlreadyUsed);
-        }
-    }
+		// and, parse...
+		QifDocument qif = QifDocument.Load(File.OpenRead(file));
+		var firstDate = qif.BankTransactions.OrderBy(b => b.Date).FirstOrDefault()?.Date;
+		var lastDate = qif.BankTransactions.OrderByDescending(b => b.Date).FirstOrDefault()?.Date;
+		//
+		if (!await CheckBankFileDate(firstDate, lastDate)) return;
+		//
+		BankAccountDetails = $"From {firstDate?.ToLongDateString()} to {lastDate?.ToLongDateString()}.";
+		var records = qif.BankTransactions.Count;
+		processStartTime = DateTime.UtcNow;
+		foreach (BasicTransaction trx in qif.BankTransactions)
+		{
+			var description = trx.Memo;
+			// CBA uses payee
+			if (string.IsNullOrWhiteSpace(description)) { description = trx.Payee; }
+			await ProcessReceiptData(trx.Amount, trx.Date, description, trx.Category, IdAlreadyUsed);
+		}
+	}
 
-    async Task ParseOFXFile(string file, List<Guid> IdAlreadyUsed)
-    {
-        int currentRecord = 0;
+	async Task ParseOFXFile(string file, List<Guid> IdAlreadyUsed)
+	{
+		int currentRecord = 0;
 
-        // // Fix ampersand issue
-        // string text = await File.ReadAllTextAsync(file);
-        // // Regular expression to find & that are not part of predefined entities
-        // string pattern = @"&(?!amp;|lt;|gt;|quot;|apos;)";
-        // string replacement = "&amp;";
-        // // Replace & with &amp; where it's not part of a predefined entity
-        // string result = Regex.Replace(text, pattern, replacement);
-        // await File.WriteAllTextAsync(file, result);
+		// // Fix ampersand issue
+		// string text = await File.ReadAllTextAsync(file);
+		// // Regular expression to find & that are not part of predefined entities
+		// string pattern = @"&(?!amp;|lt;|gt;|quot;|apos;)";
+		// string replacement = "&amp;";
+		// // Replace & with &amp; where it's not part of a predefined entity
+		// string result = Regex.Replace(text, pattern, replacement);
+		// await File.WriteAllTextAsync(file, result);
 
-        // and, parse...
-        var statements = OfxDocument.Load(file).GetStatements();
-        if (statements is null) { return; }
-        foreach (OfxBankStatement statement in statements)
-        {
-            //
-            var startDate = statement.TransactionList.StartDate.Date;
-            var endDate = statement.TransactionList.EndDate.Date;
-            if (!await CheckBankFileDate(startDate, endDate)) return;
+		// and, parse...
+		var statements = OfxDocument.Load(file).GetStatements();
+		if (statements is null) { return; }
+		foreach (OfxBankStatement statement in statements)
+		{
+			//
+			var startDate = statement.TransactionList.StartDate.Date;
+			var endDate = statement.TransactionList.EndDate.Date;
+			if (!await CheckBankFileDate(startDate, endDate)) return;
 
-            BankAccountDetails = $"Account {statement.Account.AccountNumber}: From {startDate.ToLongDateString()} to {endDate.ToLongDateString()}.";
-            processStartTime = DateTime.UtcNow;
-            foreach (var trx in statement.TransactionList.Transactions)
-            {
-                await ProcessReceiptData((trx.TxType == OfxTransactionType.DEBIT)
-                                                ? (decimal)-trx.Amount
-                                                : (decimal)trx.Amount,
-                                                trx.DatePosted.Date,
-                                                trx.Memo,
-                                                trx.ReferenceNumber,
-                                                IdAlreadyUsed);
-            }
-        }
-    }
+			BankAccountDetails = $"Account {statement.Account.AccountNumber}: From {startDate.ToLongDateString()} to {endDate.ToLongDateString()}.";
+			processStartTime = DateTime.UtcNow;
+			foreach (var trx in statement.TransactionList.Transactions)
+			{
+				await ProcessReceiptData((trx.TxType == OfxTransactionType.DEBIT)
+												? (decimal)-trx.Amount
+												: (decimal)trx.Amount,
+												trx.DatePosted.Date,
+												trx.Memo,
+												trx.ReferenceNumber,
+												IdAlreadyUsed);
+			}
+		}
+	}
 
-    async Task ProcessReceiptData(decimal amount,
-                        DateTime date,
-                        string description,
-                        string identifier,
-                        List<Guid> IdAlreadyUsed)
-    {
-        var receiptImport = new ReceiptDataImport()
-        {
-            Amount = amount,
-            Date = date,
-            Description = description,
-            Identifier = identifier,
-        };
-        receiptImport.IsOnFile = await BusinessRule.IsReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
-        if (receiptImport.IsOnFile)
-        {
-            // receipt is previously on file - set the person to that which was previously posted.
-            var r = await BusinessRule.GetReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
-            var person = await dbc.Person.FindAsync(r.PersonID);
-            if (person == null)
-            {
-                person = await dbc.Contact.FindAsync(r.PersonID);
-            }
-            if (person != null)
-            {
-                receiptImport.Person = person;
-                receiptImport.FinancialTo = person.FinancialTo;
-                receiptImport.FinancialToTerm = person.FinancialToTerm;
-            }
-        }
-        else
-        {
-            // Otherwise, parse the person from the imported description
-            var people = await BusinessRule.ParseBankDescription(dbc, description);
-            if (people.Count() == 1)
-            {
-                var thisPerson = people.First();
-                if (await DoesReceiptMatchFee(thisPerson, receiptImport.Amount))
-                {
-                    if (!IdAlreadyUsed.Contains(thisPerson.ID))
-                    {
-                        receiptImport.Person = thisPerson;
-                        await CalcculateFinancialTo(dbc, receiptImport, processStartTime);
-                        IdAlreadyUsed.Add(thisPerson.ID);
-                    }
-                }
-            }
-        }
+	async Task ProcessReceiptData(decimal amount,
+						DateTime date,
+						string description,
+						string identifier,
+						List<Guid> IdAlreadyUsed)
+	{
+		var receiptImport = new ReceiptDataImport()
+		{
+			Amount = amount,
+			Date = date,
+			Description = description,
+			Identifier = identifier,
+		};
+		receiptImport.IsOnFile = await BusinessRule.IsReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
+		if (receiptImport.IsOnFile)
+		{
+			// receipt is previously on file - set the person to that which was previously posted.
+			var r = await BusinessRule.GetReceiptOnFileAsync(dbc, receiptImport.Date, receiptImport.Description, processStartTime);
+			var person = await dbc.Person.FindAsync(r.PersonID);
+			if (person == null)
+			{
+				person = await dbc.Contact.FindAsync(r.PersonID);
+			}
+			if (person != null)
+			{
+				receiptImport.Person = person;
+				receiptImport.FinancialTo = person.FinancialTo;
+				receiptImport.FinancialToTerm = person.FinancialToTerm;
+			}
+		}
+		else
+		{
+			// Otherwise, parse the person from the imported description
+			var people = await BusinessRule.ParseBankDescription(dbc, description);
+			if (people.Count() == 1)
+			{
+				var thisPerson = people.First();
+				if (await DoesReceiptMatchFee(thisPerson, receiptImport.Amount))
+				{
+					if (!IdAlreadyUsed.Contains(thisPerson.ID))
+					{
+						receiptImport.Person = thisPerson;
+						await CalcculateFinancialTo(dbc, receiptImport, processStartTime);
+						IdAlreadyUsed.Add(thisPerson.ID);
+					}
+				}
+			}
+		}
 
-        await dbc.ReceiptDataImport.AddAsync(receiptImport);
-    }
+		await dbc.ReceiptDataImport.AddAsync(receiptImport);
+	}
 
-    async Task CalcculateFinancialTo(U3ADbContext dbc, ReceiptDataImport importItem, DateTime startTime)
-    {
-        if (ProcessingYear == 0) throw new InvalidOperationException("Processing Year not set");
-        var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, importItem.Person);
-        var totalDue = service.CalculateFee();
-        var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, importItem.PersonID, ProcessingYear, startTime);
-        var minFullMembershipFee = service.CalculateMinimumFeePayable();
-        var calculationMonths = 2; //First semester number of months
-        var minPartMembershipFee = service.CalculateMinimumFeePayable(calculationMonths);
-        // assume tests fail
-        importItem.FinancialTo = importItem.Person.FinancialTo;
-        importItem.FinancialToTerm = null;
-        // Calculate financials
-        if (importItem.Amount >= 0)
-        {
-            var totalPaid = importItem.Amount + previouslyPaid;
-            // process a payment
-            if (settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly
-                    && currentTerm.TermNumber <= 2
-                    && totalPaid >= minPartMembershipFee
-                    && totalPaid < totalDue)
-            {
-                importItem.FinancialTo = ProcessingYear;
-                importItem.FinancialToTerm = calculationMonths;
-            }
-            else if (totalPaid >= minFullMembershipFee)
-            {
-                importItem.FinancialTo = (importItem.Person.FinancialTo >= ProcessingYear) ? importItem.Person.FinancialTo : ProcessingYear;
-                importItem.FinancialToTerm = null;
-            }
-        }
-        else
-        {
-            // process a refund - reset Financial To
-            if (importItem.Amount + previouslyPaid < minFullMembershipFee)
-            {
-                importItem.FinancialTo = (importItem.Person.PreviousFinancialTo == null) ? 2020 : importItem.Person.PreviousFinancialTo.Value;
-            }
-            else { importItem.FinancialTo = importItem.Person.FinancialTo; }
-        }
-    }
+	async Task CalcculateFinancialTo(U3ADbContext dbc, ReceiptDataImport importItem, DateTime startTime)
+	{
+		if (ProcessingYear == 0) throw new InvalidOperationException("Processing Year not set");
+		var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, importItem.Person);
+		var totalDue = service.CalculateFee();
+		var previouslyPaid = await BusinessRule.GetPreviouslyPaidAsync(dbc, importItem.PersonID, ProcessingYear, startTime);
+		var minFullMembershipFee = service.CalculateMinimumFeePayable();
+		var calculationMonths = 2; //First semester number of months
+		var minPartMembershipFee = service.CalculateMinimumFeePayable(calculationMonths);
+		// assume tests fail
+		importItem.FinancialTo = importItem.Person.FinancialTo;
+		importItem.FinancialToTerm = null;
+		// Calculate financials
+		if (importItem.Amount >= 0)
+		{
+			var totalPaid = importItem.Amount + previouslyPaid;
+			// process a payment
+			if (settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly
+					&& currentTerm.TermNumber <= 2
+					&& totalPaid >= minPartMembershipFee
+					&& totalPaid < totalDue)
+			{
+				importItem.FinancialTo = ProcessingYear;
+				importItem.FinancialToTerm = calculationMonths;
+			}
+			else if (totalPaid >= minFullMembershipFee)
+			{
+				importItem.FinancialTo = (importItem.Person.FinancialTo >= ProcessingYear) ? importItem.Person.FinancialTo : ProcessingYear;
+				importItem.FinancialToTerm = null;
+			}
+		}
+		else
+		{
+			// process a refund - reset Financial To
+			if (importItem.Amount + previouslyPaid < minFullMembershipFee)
+			{
+				importItem.FinancialTo = (importItem.Person.PreviousFinancialTo == null) ? 2020 : importItem.Person.PreviousFinancialTo.Value;
+			}
+			else { importItem.FinancialTo = importItem.Person.FinancialTo; }
+		}
+	}
 
-    async Task<bool> DoesReceiptMatchFee(Person person, Decimal receipt)
-    {
-        var result = false;
-        var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm,person);
-        var fees = service.CalculateFee();
-        if (fees == receipt) { result = true; }
-        else if (fees > 0)
-        {
-            foreach (var fee in service.GetMemberFees(person.ID)) { if (fee.Amount == receipt) result = true; break; }
-        }
-        if (!result
-                && settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly
-                && currentTerm.TermNumber <= 2)
-        {
-            var calculationMonths = 2; //First semester number of months
-            fees = service.CalculateFee(calculationMonths);
-            if (fees == receipt) { result = true; }
-        }
-        return result;
-    }
+	async Task<bool> DoesReceiptMatchFee(Person person, Decimal receipt)
+	{
+		var result = false;
+		var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, person);
+		var fees = service.CalculateFee();
+		if (fees == receipt) { result = true; }
+		else if (fees > 0)
+		{
+			foreach (var fee in service.GetMemberFees(person.ID)) { if (fee.Amount == receipt) result = true; break; }
+		}
+		if (!result
+				&& settings.AllowedMemberFeePaymentTypes != MemberFeePaymentType.PerYearOnly
+				&& currentTerm.TermNumber <= 2)
+		{
+			var calculationMonths = 2; //First semester number of months
+			fees = service.CalculateFee(calculationMonths);
+			if (fees == receipt) { result = true; }
+		}
+		return result;
+	}
 
-    async Task<Decimal> GetFees(Person person)
-    {
-        var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, person);
-        return service.CalculateFee();
-    }
+	async Task<Decimal> GetFees(Person person)
+	{
+		var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, person);
+		return service.CalculateFee();
+	}
 
 
-    bool isProcessingRequests = false;
-    async void ProcessRequests()
-    {
-        if (isProcessingRequests) return;
-        isProcessingRequests = true;
-        var people = new List<Person>();
-        int currentRecord = 0;
-        ShowAllBankTransactions = true;
-        var startTime = dbc.GetLocalTime();
-        await ProgressBar.ShowAsync("Processing ... Please Wait", importData.Where(x => x.Person != null).Count());
-        await ImportReceiptData();
-        foreach (ReceiptDataImport importItem in importData)
-        {
+	bool isProcessingRequests = false;
+	async void ProcessRequests()
+	{
+		if (isProcessingRequests) return;
+		isProcessingRequests = true;
+		var people = new List<Person>();
+		int currentRecord = 0;
+		ShowAllBankTransactions = true;
+		var startTime = dbc.GetLocalTime();
+		await ProgressBar.ShowAsync("Processing ... Please Wait", importData.Where(x => x.Person != null).Count());
+		await ImportReceiptData();
+		foreach (ReceiptDataImport importItem in importData)
+		{
 
-            // delete any previous receipt(s)
-            if (await BusinessRule.IsReceiptOnFileAsync(dbc, importItem.Date, importItem.Description, startTime))
-            {
-                var prevReceipt = await BusinessRule.GetReceiptOnFileAsync(dbc, importItem.Date, importItem.Description, startTime);
-                if (prevReceipt.PersonID != importItem.PersonID)
-                {
-                    var p = await dbc.Person.FindAsync(prevReceipt.PersonID);
-                    if (p == null)
-                    {
-                        p = await dbc.Contact.FindAsync(prevReceipt.PersonID);
-                    }
-                    var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, p);
-                    var minMembershipFee = service.CalculateMinimumFeePayable();
-                    if (prevReceipt.Amount >= minMembershipFee)
-                    {
-                        p.FinancialTo = p.PreviousFinancialTo.GetValueOrDefault();
-                        p.DateJoined = p.PreviousDateJoined;
-                        p.FinancialToTerm = null;
-                        dbc.Update(p);
-                    }
-                }
-                await BusinessRule.DeleteReceiptOnFileAsync(dbc, importItem.Date, importItem.Description, startTime); ;
-            }
+			// delete any previous receipt(s)
+			if (await BusinessRule.IsReceiptOnFileAsync(dbc, importItem.Date, importItem.Description, startTime))
+			{
+				var prevReceipt = await BusinessRule.GetReceiptOnFileAsync(dbc, importItem.Date, importItem.Description, startTime);
+				if (prevReceipt.PersonID != importItem.PersonID)
+				{
+					var p = await dbc.Person.FindAsync(prevReceipt.PersonID);
+					if (p == null)
+					{
+						p = await dbc.Contact.FindAsync(prevReceipt.PersonID);
+					}
+					var service = await MemberFeeCalculationService.CreateAsync(dbc, currentTerm, p);
+					var minMembershipFee = service.CalculateMinimumFeePayable();
+					if (prevReceipt.Amount >= minMembershipFee)
+					{
+						p.FinancialTo = p.PreviousFinancialTo.GetValueOrDefault();
+						p.DateJoined = p.PreviousDateJoined;
+						p.FinancialToTerm = null;
+						dbc.Update(p);
+					}
+				}
+				await BusinessRule.DeleteReceiptOnFileAsync(dbc, importItem.Date, importItem.Description, startTime); ;
+			}
 
-            if (importItem.Person != null)
-            {
+			if (importItem.Person != null)
+			{
 
-                // Now, create the receipt
-                var receipt = new Receipt()
-                {
-                    Amount = importItem.Amount,
-                    Date = importItem.Date,
-                    Description = importItem.Description,
-                    Identifier = importItem.Identifier,
-                    Person = importItem.Person,
-                    ProcessingYear = ProcessingYear
-                };
+				// Now, create the receipt
+				var receipt = new Receipt()
+				{
+					Amount = importItem.Amount,
+					Date = importItem.Date,
+					Description = importItem.Description,
+					Identifier = importItem.Identifier,
+					Person = importItem.Person,
+					ProcessingYear = ProcessingYear
+				};
 
-                if (receipt.Person.DateJoined == null)
-                {
-                    receipt.DateJoined = receipt.Date;
-                }
-                else
-                {
-                    receipt.DateJoined = receipt.Person.DateJoined.Value;
-                }
+				if (receipt.Person.DateJoined == null)
+				{
+					receipt.DateJoined = receipt.Date;
+				}
+				else
+				{
+					receipt.DateJoined = receipt.Person.DateJoined.Value;
+				}
 
-                receipt.FinancialTo = importItem.FinancialTo.Value;
-                receipt.TermPaid = importItem.FinancialToTerm;
+				receipt.FinancialTo = importItem.FinancialTo.Value;
+				receipt.TermPaid = importItem.FinancialToTerm;
 
-                dbc.Add(receipt);
-                people.Add(receipt.Person);
-                currentRecord++;
-                await ProgressBar.SetValueAsync(currentRecord);
-            }
-            dbc.Remove(importItem);
-        }
-        await ProgressBar.ShowSpinnerAsync("Save to Database");
-        await BusinessRule.CreateReceiptSendMailAsync(dbc);
-        settings.LastCashReceiptDate = endDate;
-        dbc.Update(settings);
-        await SaveChangesAsync();
-        await ProgressBar.ShowSpinnerAsync("Update Participant Financial Status");
-        foreach (Person p in people)
-        {
-            var thisPerson = await dbc.Person.FindAsync(p.ID);
-            Receipt? receipt = await dbc.Receipt.Where(x => x.PersonID == p.ID)
-                                        .OrderByDescending(x => x.Date)
-                                        .ThenByDescending(x => x.UpdatedOn).FirstOrDefaultAsync();
-            if (receipt != null)
-            {
-                if (receipt.Amount >= 0)
-                {
-                    // process a receipt
-                    var currentFT = thisPerson.FinancialTo * 10 + (thisPerson.FinancialToTerm ?? 9);
-                    var receiptFT = receipt.FinancialTo * 10 + (receipt.TermPaid ?? 9);
-                    if (currentFT < receiptFT)
-                    {
-                        thisPerson.PreviousDateJoined = thisPerson.DateJoined;
-                        thisPerson.PreviousFinancialTo = thisPerson.FinancialTo;
-                        thisPerson.FinancialTo = receipt.FinancialTo;
-                        thisPerson.FinancialToTerm = receipt.TermPaid;
-                        thisPerson.DateJoined = receipt.DateJoined;
-                    }
-                }
-                else
-                {
-                    // process a refund
-                    thisPerson.FinancialTo = (thisPerson.PreviousFinancialTo == null) ? 2020 : thisPerson.PreviousFinancialTo.Value; ;
-                }
-            }
-        }
-        await dbc.SaveChangesAsync();
-        await ProgressBar.Close();
-        await messageBox.ShowOkOnlyAsync("Database upload complete", $@"{currentRecord} membership payments have been saved to the database.");
-        isProcessingRequests = false;
-        NavigationManager.NavigateTo("/");
-    }
+				dbc.Add(receipt);
+				people.Add(receipt.Person);
+				currentRecord++;
+				await ProgressBar.SetValueAsync(currentRecord);
+			}
+			dbc.Remove(importItem);
+		}
+		await ProgressBar.ShowSpinnerAsync("Save to Database");
+		await BusinessRule.CreateReceiptSendMailAsync(dbc);
+		settings.LastCashReceiptDate = endDate;
+		dbc.Update(settings);
+		await SaveChangesAsync();
+		await ProgressBar.ShowSpinnerAsync("Update Participant Financial Status");
+		foreach (Person p in people)
+		{
+			var thisPerson = await dbc.Person.FindAsync(p.ID);
+			Receipt? receipt = await dbc.Receipt.Where(x => x.PersonID == p.ID)
+										.OrderByDescending(x => x.Date)
+										.ThenByDescending(x => x.UpdatedOn).FirstOrDefaultAsync();
+			if (receipt != null)
+			{
+				if (receipt.Amount >= 0)
+				{
+					// process a receipt
+					var currentFT = thisPerson.FinancialTo * 10 + (thisPerson.FinancialToTerm ?? 9);
+					var receiptFT = receipt.FinancialTo * 10 + (receipt.TermPaid ?? 9);
+					if (currentFT < receiptFT)
+					{
+						thisPerson.PreviousDateJoined = thisPerson.DateJoined;
+						thisPerson.PreviousFinancialTo = thisPerson.FinancialTo;
+						thisPerson.FinancialTo = receipt.FinancialTo;
+						thisPerson.FinancialToTerm = receipt.TermPaid;
+						thisPerson.DateJoined = receipt.DateJoined;
+					}
+				}
+				else
+				{
+					// process a refund
+					thisPerson.FinancialTo = (thisPerson.PreviousFinancialTo == null) ? 2020 : thisPerson.PreviousFinancialTo.Value; ;
+				}
+			}
+		}
+		await dbc.SaveChangesAsync();
+		await ProgressBar.Close();
+		await messageBox.ShowOkOnlyAsync("Database upload complete", $@"{currentRecord} membership payments have been saved to the database.");
+		isProcessingRequests = false;
+		NavigationManager.NavigateTo("/");
+	}
 
-    async Task ShowAllButtonClicked()
-    {
-        ShowAllBankTransactions = !ShowAllBankTransactions;
-        ShowAllButtonText = (ShowAllBankTransactions) ? "Show Payment Transactions Only" : "Show All Bank Transactions";
-        await ImportReceiptData();
-    }
+	async Task ShowAllButtonClicked()
+	{
+		ShowAllBankTransactions = !ShowAllBankTransactions;
+		ShowAllButtonText = (ShowAllBankTransactions) ? "Show Payment Transactions Only" : "Show All Bank Transactions";
+		await ImportReceiptData();
+	}
 
-    public int CountLines(FileInfo file) => File.ReadLines(file.FullName).Count();
+	public int CountLines(FileInfo file) => File.ReadLines(file.FullName).Count();
 
-    async Task ImportReceiptData()
-    {
-        mainGrid?.BeginUpdate();
-        if (ShowAllBankTransactions)
-        {
-            importData = await dbc.ReceiptDataImport
-                                        .Include(x => x.Person)
-                                        .OrderBy(x => x.Date)
-                                                        .ThenBy(x => x.Description)
-                                                        .ThenBy(x => x.Identifier)
-                                                        .ThenBy(x => x.Amount)
-                                                        .ThenBy(x => x.Person.LastName).ToListAsync();
-        }
-        else
-        {
-            importData = await dbc.ReceiptDataImport
-                                        .Include(x => x.Person)
-                                        .Where(x => (x.Amount > 0 && !x.Description.StartsWith("Ezidebit eWAY:")) || x.Person != null)
-                                        .OrderBy(x => x.Date)
-                                            .ThenBy(x => x.Description)
-                                            .ThenBy(x => x.Identifier)
-                                            .ThenBy(x => x.Amount)
-                                            .ThenBy(x => x.Person.LastName).ToListAsync();
+	async Task ImportReceiptData()
+	{
+		mainGrid?.BeginUpdate();
+		if (ShowAllBankTransactions)
+		{
+			importData = await dbc.ReceiptDataImport
+										.Include(x => x.Person)
+										.OrderBy(x => x.Date)
+														.ThenBy(x => x.Description)
+														.ThenBy(x => x.Identifier)
+														.ThenBy(x => x.Amount)
+														.ThenBy(x => x.Person.LastName).ToListAsync();
+		}
+		else
+		{
+			importData = await dbc.ReceiptDataImport
+										.Include(x => x.Person)
+										.Where(x => (x.Amount > 0 && !x.Description.StartsWith("Ezidebit eWAY:")) || x.Person != null)
+										.OrderBy(x => x.Date)
+											.ThenBy(x => x.Description)
+											.ThenBy(x => x.Identifier)
+											.ThenBy(x => x.Amount)
+											.ThenBy(x => x.Person.LastName).ToListAsync();
 
-        }
-        foreach (var receipt in importData)
-        {
-            if (receipt.PersonID == null)
-            {
-                var people = await BusinessRule.ParseBankDescription(dbc, receipt.Description);
-                if (people.Count() == 1)
-                {
-                    var thisPerson = people.First();
-                    if (!(await DoesReceiptMatchFee(thisPerson, receipt.Amount)))
-                    {
-                        var fees = await GetFees(thisPerson);
-                        receipt.ImportIssues = $"Participant: <strong>{thisPerson.FullName}</strong> found but fees due: {fees.ToString("c2")} do not equal receipt: {receipt.Amount.ToString("c2")}";
-                    }
-                }
-                else if (people.Count() > 0)
-                {
-                    receipt.ImportIssues = $"Bank description resolves to {people.Count} members";
-                    foreach (var p in people)
-                    {
-                        receipt.ImportIssues = $" {receipt.ImportIssues}, {p.FullName}";
-                    }
-                }
-            }
-        }
-        hideReceiptDateRangeMessage = importData.Any();
-        mainGrid?.EndUpdate();
-        await InvokeAsync(StateHasChanged);
-    }
+		}
+		foreach (var receipt in importData)
+		{
+			if (receipt.PersonID == null)
+			{
+				var people = await BusinessRule.ParseBankDescription(dbc, receipt.Description);
+				if (people.Count() == 1)
+				{
+					var thisPerson = people.First();
+					if (!(await DoesReceiptMatchFee(thisPerson, receipt.Amount)))
+					{
+						var fees = await GetFees(thisPerson);
+						receipt.ImportIssues = $"Participant: <strong>{thisPerson.FullName}</strong> found but fees due: {fees.ToString("c2")} do not equal receipt: {receipt.Amount.ToString("c2")}";
+					}
+				}
+				else if (people.Count() > 0)
+				{
+					receipt.ImportIssues = $"Bank description resolves to {people.Count} members";
+					foreach (var p in people)
+					{
+						receipt.ImportIssues = $" {receipt.ImportIssues}, {p.FullName}";
+					}
+				}
+			}
+		}
+		hideReceiptDateRangeMessage = importData.Any();
+		mainGrid?.EndUpdate();
+		await InvokeAsync(StateHasChanged);
+	}
 
-    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
-    {
-        currentPerson = (e.EditModel as ReceiptDataImport).Person;
-        currentFinancialTo = (e.EditModel as ReceiptDataImport).FinancialTo;
-    }
+	void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+	{
+		currentPerson = (e.EditModel as ReceiptDataImport).Person;
+		currentFinancialTo = (e.EditModel as ReceiptDataImport).FinancialTo;
+	}
 
-    bool isCancelling = false;
-    async Task Grid_EditCanceling(GridEditCancelingEventArgs e)
-    {
-        if (isCancelling) { return; }
-        isCancelling = true;
-        e.Cancel = false;
-        if (dbc.Entry(e.DataItem).State != EntityState.Unchanged)
-        {
-            e.Cancel = !await messageBox.ShowAsync("Cancel Edit", "Are you sure you wish to cancel your edit?");
-        }
-        if (!e.Cancel)
-        {
-            await ImportReceiptData();
-        }
-        isCancelling = false;
-    }
+	bool isCancelling = false;
+	async Task Grid_EditCanceling(GridEditCancelingEventArgs e)
+	{
+		if (isCancelling) { return; }
+		isCancelling = true;
+		e.Cancel = false;
+		if (dbc.Entry(e.DataItem).State != EntityState.Unchanged)
+		{
+			e.Cancel = !await messageBox.ShowAsync("Cancel Edit", "Are you sure you wish to cancel your edit?");
+		}
+		if (!e.Cancel)
+		{
+			await ImportReceiptData();
+		}
+		isCancelling = false;
+	}
 
-    bool isBusy;
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
-    {
-        if (isBusy) return;
-        isBusy = true;
-        try
-        {
-            await SaveRecord(e);
-        }
-        finally
-        {
-            isBusy = false;
-        }
-    }
+	bool isBusy;
+	async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+	{
+		if (isBusy) return;
+		isBusy = true;
+		try
+		{
+			await SaveRecord(e);
+		}
+		finally
+		{
+			isBusy = false;
+		}
+	}
 
-    async Task SaveRecord(GridEditModelSavingEventArgs e)
-    {
-        var editModel = (ReceiptDataImport)e.EditModel;
-        // Re-query a data item from the store.
-        var dataItem = dbc.ReceiptDataImport.Find(editModel.ID);
-        // Assign changes from the edit model to the data item.
-        if (dataItem != null)
-        {
-            editModel.CopyTo(dataItem);
-            if (editModel.Person != null) dataItem.Person = dbc.Person.Find(editModel.Person.ID); else dataItem.IsOnFile = false;
-            if (dataItem.Person == null) dataItem.FinancialTo = null;
-            // Post changes to the database.
-            if (await SaveChangesAsync())
-            {
-                // update the Grid.
-                await ImportReceiptData();
-            }
-        }
-    }
+	async Task SaveRecord(GridEditModelSavingEventArgs e)
+	{
+		var editModel = (ReceiptDataImport)e.EditModel;
+		// Re-query a data item from the store.
+		var dataItem = dbc.ReceiptDataImport.Find(editModel.ID);
+		// Assign changes from the edit model to the data item.
+		if (dataItem != null)
+		{
+			editModel.CopyTo(dataItem);
+			if (editModel.Person != null) dataItem.Person = dbc.Person.Find(editModel.Person.ID); else dataItem.IsOnFile = false;
+			if (dataItem.Person == null) dataItem.FinancialTo = null;
+			// Post changes to the database.
+			if (await SaveChangesAsync())
+			{
+				// update the Grid.
+				await ImportReceiptData();
+			}
+		}
+	}
 
-    async Task<bool>
-    SaveChangesAsync()
-    {
-        bool result = false;
-        try
-        {
-            // Post changes to the database.
-            await dbc.SaveChangesAsync();
-            result = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHeader = "Save to database error";
-            ErrorMessage = Helpers.GetErrorMessage(ex);
-            await ErrorPopup.ShowPopupAsync();
-            dbc?.ChangeTracker?.Clear();
-        }
-        return result;
-    }
+	async Task<bool>
+	SaveChangesAsync()
+	{
+		bool result = false;
+		try
+		{
+			// Post changes to the database.
+			await dbc.SaveChangesAsync();
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			ErrorHeader = "Save to database error";
+			ErrorMessage = Helpers.GetErrorMessage(ex);
+			await ErrorPopup.ShowPopupAsync();
+			dbc?.ChangeTracker?.Clear();
+		}
+		return result;
+	}
 
-    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
-    {
-        dbc.Remove(e.DataItem as ReceiptDataImport);
-        await SaveChangesAsync();
-        await ImportReceiptData();
-        mainGrid.ClearSelection();
-    }
+	async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+	{
+		dbc.Remove(e.DataItem as ReceiptDataImport);
+		await SaveChangesAsync();
+		await ImportReceiptData();
+		mainGrid.ClearSelection();
+	}
 
-    async Task ClearAllBankData()
-    {
-        if (await messageBox.ShowAsync("Clear Bank Data", @"<p>
+	async Task ClearAllBankData()
+	{
+		if (await messageBox.ShowAsync("Clear Bank Data", @"<p>
         This procedure will remove all bank data from the grid.<br />
         It is intended to be used if you have imported the same import file twice.
     </p>
     <p>Do you wish to continue?</p>"))
-        {
-            dbc.RemoveRange(await dbc.ReceiptDataImport.ToListAsync());
-            await dbc.SaveChangesAsync();
-            importData.Clear();
-        }
-    }
+		{
+			dbc.RemoveRange(await dbc.ReceiptDataImport.ToListAsync());
+			await dbc.SaveChangesAsync();
+			importData.Clear();
+		}
+	}
 
-    void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-    {
-        if (e.ElementType == GridElementType.DetailCell)
-        {
-            e.Style = "padding: 0rem; color: red; text-align: center;";
-        }
-        if (e.ElementType == GridElementType.HeaderCell)
-        {
-            e.CssClass = "my-header-cell";
-            e.Attributes["fieldname"] = e.Column is DxGridDataColumn c ? c.FieldName : null;
-        }
-    }
+	void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+	{
+		if (e.ElementType == GridElementType.DetailCell)
+		{
+			e.Style = "padding: 0rem; color: red; text-align: center;";
+		}
+		if (e.ElementType == GridElementType.HeaderCell)
+		{
+			e.CssClass = "my-header-cell";
+			e.Attributes["fieldname"] = e.Column is DxGridDataColumn c ? c.FieldName : null;
+		}
+	}
 
-    async Task OnSplit()
-    {
-        var importToSplit = selectedDataItem as ReceiptDataImport;
-        var half = decimal.Round(importToSplit.Amount / 2.0m, 2);
-        importToSplit.Amount = importToSplit.Amount - half;
-        var newImport = new ReceiptDataImport()
-        {
-            PersonID = null,
-            Person = null,
-            Amount = half,
-            Date = importToSplit.Date,
-            Description = importToSplit.Description,
-            FinancialTo = null,
-            Identifier = importToSplit.Identifier,
-            ImportIssues = null,
-            IsOnFile = importToSplit.IsOnFile
-        };
-        dbc.Update(importToSplit);
-        await dbc.AddAsync(newImport);
-        await dbc.SaveChangesAsync();
-        await ImportReceiptData();
-        mainGrid.ClearSelection();
-        await InvokeAsync(StateHasChanged);
-    }
+	async Task OnSplit()
+	{
+		var importToSplit = selectedDataItem as ReceiptDataImport;
+		var half = decimal.Round(importToSplit.Amount / 2.0m, 2);
+		importToSplit.Amount = importToSplit.Amount - half;
+		var newImport = new ReceiptDataImport()
+		{
+			PersonID = null,
+			Person = null,
+			Amount = half,
+			Date = importToSplit.Date,
+			Description = importToSplit.Description,
+			FinancialTo = null,
+			Identifier = importToSplit.Identifier,
+			ImportIssues = null,
+			IsOnFile = importToSplit.IsOnFile
+		};
+		dbc.Update(importToSplit);
+		await dbc.AddAsync(newImport);
+		await dbc.SaveChangesAsync();
+		await ImportReceiptData();
+		mainGrid.ClearSelection();
+		await InvokeAsync(StateHasChanged);
+	}
 
-    void OnSelectedDataItemChanged(object dataItem)
-    {
-        selectedDataItem = dataItem as ReceiptDataImport;
-        StateHasChanged();
-    }
+	void OnSelectedDataItemChanged(object dataItem)
+	{
+		selectedDataItem = dataItem as ReceiptDataImport;
+		StateHasChanged();
+	}
 
-    public void Dispose()
-    {
-        dbc?.Dispose();
-    }
+	public void Dispose()
+	{
+		dbc?.Dispose();
+	}
 }
