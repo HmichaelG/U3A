@@ -9,7 +9,6 @@
 else
 {
     <DxFormLayoutGroup Caption="@($"Enrolment History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
-        <div class="h-25 overflow-auto">
             <DxGrid id="do-not-print" Data="@enrolments" @ref="@dxGrid"
                     TextWrapEnabled=false
                     ColumnResizeMode="GridColumnResizeMode.NextColumn"
@@ -40,7 +39,6 @@ else
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" DisplayText="{0:c2}" FieldName="Class" />
                 </TotalSummary>
             </DxGrid>
-        </div>
 
     </DxFormLayoutGroup>
 

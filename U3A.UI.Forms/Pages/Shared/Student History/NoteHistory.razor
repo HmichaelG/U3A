@@ -10,8 +10,8 @@
 else
 {
 	<DxFormLayoutGroup Caption="@($"Notes for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
-		<div class="h-75 overflow-auto">
-			<DxGrid id="do-not-print" Data="@notes" @ref="@dxGrid" CssClass="grid-style"
+		<div class="overflow-auto">
+			<DxGrid id="do-not-print" Data="@notes" @ref="@dxGrid" CssClass="@CssClass"
 					ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
 					TextWrapEnabled="true"
 					ShowFilterRow="false"

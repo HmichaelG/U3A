@@ -9,7 +9,6 @@
     else
     {
 <DxFormLayoutGroup Caption="@($"Leadership History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
-    <div class="h-25 overflow-auto">
         <DxGrid id="do-not-print" Data="@leadersHistory" @ref="@dxGrid"
                 TextWrapEnabled=false
                 ColumnResizeMode="GridColumnResizeMode.NextColumn"
@@ -31,8 +30,6 @@
                 <DxGridDataColumn FieldName="Class" Caption="Class" />
             </Columns>
         </DxGrid>
-    </div>
-
 </DxFormLayoutGroup>
 
 <PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />

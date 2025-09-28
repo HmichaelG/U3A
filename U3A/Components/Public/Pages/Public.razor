@@ -259,7 +259,7 @@ else
                 currentTerm = await BusinessRule.CurrentTermAsync(dbc);
                 if (localTime < currentTerm!.EnrolmentStartDate)
                 {
-                    await SetUnavailableMessage(currentTerm);
+                    SetUnavailableMessage(currentTerm);
                 }
                 else
                 {
@@ -268,7 +268,7 @@ else
                     {
                         if (localTime.Date > currentTerm.EndDate)
                         {
-                            await SetUnavailableMessage(nextTerm);
+                            SetUnavailableMessage(nextTerm);
                         }
                     }
                 }
@@ -300,7 +300,7 @@ else
         NavigationManager.NavigateTo("/", true);
     }
 
-    async Task SetUnavailableMessage(Term term)
+    void SetUnavailableMessage(Term term)
     {
         var sOpeningTime = term?.EnrolmentStartDate.ToString("dddd, dd-MMM-yyyy");
         lockoutMessage = $@"<h6><strong>{term!.Year} Term-{term.TermNumber}</strong> membership and course enrolments will open</br>{sOpeningTime}.

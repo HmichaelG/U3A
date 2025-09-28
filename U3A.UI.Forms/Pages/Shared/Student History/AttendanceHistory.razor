@@ -9,7 +9,6 @@
 else
 {
     <DxFormLayoutGroup Caption="@($"Attendance History for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
-        <div class="h-25 overflow-auto">
             <DxGrid id="do-not-print" Data="@attendance" @ref="@dxGrid"
                     TextWrapEnabled=false
                     ColumnResizeMode="GridColumnResizeMode.NextColumn"
@@ -87,7 +86,6 @@ else
                                        FooterColumnName="AbsentWithoutApology" />
                 </TotalSummary>
             </DxGrid>
-        </div>
 
     </DxFormLayoutGroup>
 

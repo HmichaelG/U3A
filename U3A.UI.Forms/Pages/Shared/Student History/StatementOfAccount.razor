@@ -4,149 +4,150 @@
 
 @if (!isReady)
 {
-    <LoadingIndicator />
+	<LoadingIndicator />
 }
 else
 {
-    <DxFormLayoutGroup Caption="@($"Statement of Account for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
-        <div class="d-flex flex-row-reverse w-100">
-            <DxDropDownButton Text="Allocate">
-                <Items>
-                    <DxDropDownButtonItem Text="Full Detail" Click="@(() => AllocateTransactions(true))" />
-                    <DxDropDownButtonItem Text="Outstanding Only" Click="@(() => AllocateTransactions(false))" />
-                    <DxDropDownButtonItem BeginGroup Text="Unallocate" Click="@RestoreOriginal" />
-                </Items>
-            </DxDropDownButton>
-        </div>
-        <div class="h-25 overflow-auto">
-            <DxGrid id="do-not-print" @ref=@dxGrid Data="@memberFees"
-                    AllowSorting=false
-                    AllowFiltering=false
-                    AllowGrouping=false
-                    TextWrapEnabled=false
-                    VirtualScrollingEnabled=true
-                    CssClass="@CssClass">
-                <Columns>
-                    <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Date)" Caption="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="6rem" />
-                    <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Description)" Caption="Description" />
-                    <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Amount)"
-                                      Caption="Amount" DisplayFormat="c2" Width="5rem">
-                        <CellDisplayTemplate>
-                            @if (context.Value is decimal amount && amount < 0)
-                            {
-                                <span class="text-fl-danger">@context.Value</span>
-                            }
-                            else
-                            {
-                                <span>@context.Value</span>
-                            }
-                        </CellDisplayTemplate>
-                    </DxGridDataColumn>
-                    <DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Balance)"
-                                      Visible="@showBalance"
-                                      Caption="Balance" DisplayFormat="c2" Width="75px" />
-                </Columns>
-                <TotalSummary>
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Description" />
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
-                </TotalSummary>
-            </DxGrid>
-        </div>
+	<DxFormLayoutGroup Caption="@($"Statement of Account for: {SelectedPerson?.FullName}")" HeaderCssClass="h4">
+		<DxGrid id="do-not-print" @ref=@dxGrid Data="@memberFees"
+				AllowSorting=false
+				AllowFiltering=false
+				AllowGrouping=false
+				TextWrapEnabled=false
+				VirtualScrollingEnabled=true
+				CssClass="@CssClass">
+			<ToolbarTemplate>
+				<DxToolbar>
+					<Items>
+						<DxToolbarItem Text="Allocate" Alignment="ToolbarItemAlignment.Right">
+							<Items>
+								<DxToolbarItem Text="Full Detail" Click="@(() => AllocateTransactions(true))" />
+								<DxToolbarItem Text="Outstanding Only" Click="@(() => AllocateTransactions(false))" />
+								<DxToolbarItem BeginGroup Text="Deallocate" Click="@RestoreOriginal" />
+							</Items>
+						</DxToolbarItem>
+					</Items>
+				</DxToolbar>
+			</ToolbarTemplate>
+			<Columns>
+				<DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Date)" Caption="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="6rem" />
+				<DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Description)" Caption="Description" />
+				<DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Amount)"
+								  Caption="Amount" DisplayFormat="c2" Width="5rem">
+					<CellDisplayTemplate>
+						@if (context.Value is decimal amount && amount < 0)
+						{
+							<span class="text-fl-danger">@context.Value</span>
+						}
+						else
+						{
+							<span>@context.Value</span>
+						}
+					</CellDisplayTemplate>
+				</DxGridDataColumn>
+				<DxGridDataColumn AllowSort="false" FieldName="@nameof(MemberFee.Balance)"
+								  Visible="@showBalance"
+								  Caption="Balance" DisplayFormat="c2" Width="75px" />
+			</Columns>
+			<TotalSummary>
+				<DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="Total" FieldName="Description" />
+				<DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" DisplayText="{0:c2}" FieldName="Amount" />
+			</TotalSummary>
+		</DxGrid>
+	</DxFormLayoutGroup>
 
-    </DxFormLayoutGroup>
-
-    <PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
+	<PdfViewer @bind-PdfIsReady=isPdfReady DocumentContent="@documentContent" ReportTitle="@reportTitle" />
 }
 
 @code {
 
-    [Parameter]
-    public Term SelectedTerm { get; set; }
+	[Parameter]
+	public Term SelectedTerm { get; set; }
 
-    [Parameter]
-    public Person SelectedPerson { get; set; }
+	[Parameter]
+	public Person SelectedPerson { get; set; }
 
-    [Parameter]
-    public string CssClass { get; set; }
+	[Parameter]
+	public string CssClass { get; set; }
 
 
-    List<MemberFee> originalMemberFees = new();
-    List<MemberFee> memberFees = new();
-    MemberFeeCalculationService? service;
-    bool showBalance;
-    DxGrid? dxGrid;
-    string reportTitle;
-    byte[] documentContent;
-    bool isPdfReady = false;
-    bool isReady;
+	List<MemberFee> originalMemberFees = new();
+	List<MemberFee> memberFees = new();
+	MemberFeeCalculationService? service;
+	bool showBalance;
+	DxGrid? dxGrid;
+	string reportTitle;
+	byte[] documentContent;
+	bool isPdfReady = false;
+	bool isReady;
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (SelectedPerson != null)
-        {
-            using (var dbContext = U3Adbfactory.CreateDbContext())
-            {
-                showBalance = false;
-                service = await MemberFeeCalculationService.CreateAsync(dbContext, SelectedTerm, SelectedPerson);
-                var totalFees = service.CalculateFee();
-                originalMemberFees = service.GetMemberFees(SelectedPerson.ID);
-                memberFees = originalMemberFees.ToList();
-            }
-        }
-        isReady = true;
-    }
+	protected override async Task OnParametersSetAsync()
+	{
+		if (SelectedPerson != null)
+		{
+			using (var dbContext = U3Adbfactory.CreateDbContext())
+			{
+				showBalance = false;
+				service = await MemberFeeCalculationService.CreateAsync(dbContext, SelectedTerm, SelectedPerson);
+				var totalFees = service.CalculateFee();
+				originalMemberFees = service.GetMemberFees(SelectedPerson.ID);
+				memberFees = originalMemberFees.ToList();
+			}
+		}
+		isReady = true;
+	}
 
-    void RestoreOriginal()
-    {
-        showBalance = false;
-        memberFees = originalMemberFees.ToList();
-        StateHasChanged();
-    }
+	void RestoreOriginal()
+	{
+		showBalance = false;
+		memberFees = originalMemberFees.ToList();
+		StateHasChanged();
+	}
 
-    void AllocateTransactions(bool ShowFullAllocation)
-    {
-        showBalance = true;
-        memberFees = originalMemberFees.ToList();
-        memberFees = service.AllocateMemberPayments(memberFees, SelectedPerson, ShowFullAllocation);
-        StateHasChanged();
-    }
+	void AllocateTransactions(bool ShowFullAllocation)
+	{
+		showBalance = true;
+		memberFees = originalMemberFees.ToList();
+		memberFees = service.AllocateMemberPayments(memberFees, SelectedPerson, ShowFullAllocation);
+		StateHasChanged();
+	}
 
-    public async Task Print()
-    {
-        reportTitle = $"Statement of Account: {SelectedPerson.FullName}";
-        using var ms = new MemoryStream();
-        await dxGrid.ExportToPdfAsync(ms,
-            new GridPdfExportOptions()
-            {
-                FitToPage = true,
-                CustomizeDocument = OnCustomizeDocument,
-                CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
-                CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
-                CustomizeColumn = OnCustomizeColumn,
-            });
-        documentContent = ms.ToArray();
-        isPdfReady = true;
-    }
+	public async Task Print()
+	{
+		reportTitle = $"Statement of Account: {SelectedPerson.FullName}";
+		using var ms = new MemoryStream();
+		await dxGrid.ExportToPdfAsync(ms,
+			new GridPdfExportOptions()
+			{
+				FitToPage = true,
+				CustomizeDocument = OnCustomizeDocument,
+				CustomizeDocumentHeader = OnCustomizeDocumentHeader, // Adds a document header
+				CustomizePageFooter = OnCustomizePageFooter, // Adds page footers            });
+				CustomizeColumn = OnCustomizeColumn,
+			});
+		documentContent = ms.ToArray();
+		isPdfReady = true;
+	}
 
-    void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
-    {
-        args.ElementStyle.Font = new DXFont("Arial", 16);
-        args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
-        args.Text = reportTitle;
-    }
-    void OnCustomizeColumn(GridDocumentExportCustomizeColumnEventArgs args)
-    {
-        if (args.FieldName == "Date") args.Width = 300;
-        if (args.FieldName == "Description") args.Width = 1500;
-    }
-    void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
-    {
-        args.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
-        args.PaperKind = DXPaperKind.A4;
-        args.Margins = new DXMargins(50, 50, 50, 50);
-    }
-    void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
-    {
-        args.Text = "Page {0} of {1}";
-    }
+	void OnCustomizeDocumentHeader(GridDocumentExportCustomizeDocumentHeaderFooterEventArgs args)
+	{
+		args.ElementStyle.Font = new DXFont("Arial", 16);
+		args.ElementStyle.ForeColor = System.Drawing.Color.RoyalBlue;
+		args.Text = reportTitle;
+	}
+	void OnCustomizeColumn(GridDocumentExportCustomizeColumnEventArgs args)
+	{
+		if (args.FieldName == "Date") args.Width = 300;
+		if (args.FieldName == "Description") args.Width = 1500;
+	}
+	void OnCustomizeDocument(GridDocumentExportCustomizeDocumentEventArgs args)
+	{
+		args.DefaultElementStyle.Font = new DXFont("Times New Roman", 8);
+		args.PaperKind = DXPaperKind.A4;
+		args.Margins = new DXMargins(50, 50, 50, 50);
+	}
+	void OnCustomizePageFooter(GridDocumentExportCustomizePageHeaderFooterEventArgs args)
+	{
+		args.Text = "Page {0} of {1}";
+	}
 }
