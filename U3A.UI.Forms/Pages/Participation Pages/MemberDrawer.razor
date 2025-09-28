@@ -2,132 +2,147 @@
 @using U3A.UI.Forms.Pages.Participation_Pages.Financial_Status_Enquiry
 
 @inject WorkstationService ws
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
 
 <DxDrawer @bind-IsOpen="@isDrawerOpen"
-          CssClass="drawer-style"
-          Mode="DrawerMode.Overlap"
-          Position="DrawerPosition.Right"
-          PanelWidth="min(40rem, 100%)">
-    <TargetContent>
+		  CssClass="drawer-style"
+		  Mode="DrawerMode.Overlap"
+		  Position="DrawerPosition.Right"
+		  PanelWidth="min(40rem, 100%)">
+	<TargetContent>
 
-        @{
-            switch (TargetName)
-            {
-                case "PersonMnt":
-                    <PersonMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
-                    break;
-                case "PersonMntEmbedded":
-                    <PersonMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))"
-                               GridDisplayOffset="16"
-                               IsEmbedded=true GridLayoutKey="{1F6F77E7-6276-48FC-A1D3-E3A8959DA561}" />
-                    break;
-                case "EnrolMnt":
-                    <EnrolMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
-                    break;
-                case "ReceiptMnt":
-                    <ReceiptMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
-                    break;
-                case "FeeMnt":
-                    <FeeMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
-                    break;
-                case "FinancialStatusEnquiry":
-                    <FinancialStatusEnquiry MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
-                    break;
-            }
-        }
+		@{
+			switch (TargetName)
+			{
+				case "PersonMnt":
+					<PersonMnt PersonNoteCounts="@PersonNoteCounts"
+							   MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+					break;
+				case "PersonMntEmbedded":
+					<PersonMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))"
+							   GridDisplayOffset="16"
+							   IsEmbedded=true GridLayoutKey="{1F6F77E7-6276-48FC-A1D3-E3A8959DA561}" />
+					break;
+				case "EnrolMnt":
+					<EnrolMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+					break;
+				case "ReceiptMnt":
+					<ReceiptMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+					break;
+				case "FeeMnt":
+					<FeeMnt MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+					break;
+				case "FinancialStatusEnquiry":
+					<FinancialStatusEnquiry MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+					break;
+			}
+		}
 
-    </TargetContent>
-    <BodyTemplate>
-        <DxTabs @ref=@dxTabs ScrollMode="TabsScrollMode.Auto" @bind-ActiveTabIndex="@activeTab" >
-            <DxTabPage Text="Statement of Account">
-                <StatementOfAccount @ref=@statementOfAccount 
-                                    SelectedPerson="@selectedPerson"
-                                    SelectedTerm="@currentTerm"
-                                    CssClass="drawer-content-style" />
-            </DxTabPage>
-            <DxTabPage Text="Enrolment History">
-                <EnrolmentHistory @ref=@enrolmentHistory SelectedPerson="@selectedPerson"
-                                  SelectedTerm="@currentTerm"
-                                  CssClass="drawer-content-style" />
-            </DxTabPage>
-            <DxTabPage Text="Attendance History">
-                <AttendanceHistory @ref=@attendanceHistory SelectedPerson="@selectedPerson"
-                                   SelectedTerm="@currentTerm"
-                                   CssClass="drawer-content-style" />
-            </DxTabPage>
-            <DxTabPage Text="Leadership History">
-                <LeadershipHistory @ref=@leadershipHistory SelectedPerson="@selectedPerson"
-                                   CssClass="drawer-content-style" />
-            </DxTabPage>
-            <DxTabPage Text="Notes">
-                <NoteHistory @ref=@noteHistory SelectedPerson="@selectedPerson"
-                                   CssClass="drawer-content-style" />
-            </DxTabPage>
-        </DxTabs>
-        <div class="links-container">
-            <DxButton Text="Close"
-                      Click="@(() => { isDrawerOpen = false; StateHasChanged(); })" />
-            <DxButton Text="Print" 
-                      IconCssClass="bi bi-file-pdf"
-                      RenderStyle=ButtonRenderStyle.Secondary
-                      Click="OnPrint" />
-        </div>
-    </BodyTemplate>
+	</TargetContent>
+	<BodyTemplate>
+		<DxTabs @ref=@dxTabs ScrollMode="TabsScrollMode.Auto" @bind-ActiveTabIndex="@activeTab">
+			<DxTabPage Text="Statement of Account">
+				<StatementOfAccount @ref=@statementOfAccount
+									SelectedPerson="@selectedPerson"
+									SelectedTerm="@currentTerm"
+									CssClass="drawer-content-style" />
+			</DxTabPage>
+			<DxTabPage Text="Enrolment History">
+				<EnrolmentHistory @ref=@enrolmentHistory SelectedPerson="@selectedPerson"
+								  SelectedTerm="@currentTerm"
+								  CssClass="drawer-content-style" />
+			</DxTabPage>
+			<DxTabPage Text="Attendance History">
+				<AttendanceHistory @ref=@attendanceHistory SelectedPerson="@selectedPerson"
+								   SelectedTerm="@currentTerm"
+								   CssClass="drawer-content-style" />
+			</DxTabPage>
+			<DxTabPage Text="Leadership History">
+				<LeadershipHistory @ref=@leadershipHistory SelectedPerson="@selectedPerson"
+								   CssClass="drawer-content-style" />
+			</DxTabPage>
+			<DxTabPage Text="Notes">
+				<NoteHistory @ref=@noteHistory SelectedPerson="@selectedPerson"
+							 CssClass="drawer-content-style" />
+			</DxTabPage>
+		</DxTabs>
+		<div class="links-container">
+			<DxButton Text="Close"
+					  Click="@(async () => { isDrawerOpen = false; await GetDataAsync(); await InvokeAsync(StateHasChanged); })" />
+			<DxButton Text="Print"
+					  IconCssClass="bi bi-file-pdf"
+					  RenderStyle=ButtonRenderStyle.Secondary
+					  Click="OnPrint" />
+		</div>
+	</BodyTemplate>
 </DxDrawer>
 
 <style>
-    .drawer-style {
-        max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
-    }
+	.drawer-style {
+		max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
+	}
 
-    .drawer-content-style {
-        max-height: 75dvh;
-    }
+	.drawer-content-style {
+		max-height: 75dvh;
+	}
 </style>
 
 @code {
 
-    [Parameter]
-    public string TargetName { get; set; }
+	[Parameter]
+	public string TargetName { get; set; }
+	Dictionary<Guid, int>? PersonNoteCounts { get; set; }
 
-    DxTabs? dxTabs;
-    StatementOfAccount? statementOfAccount;
-    EnrolmentHistory? enrolmentHistory;
-    LeadershipHistory? leadershipHistory;
-    AttendanceHistory? attendanceHistory;
-    NoteHistory? noteHistory;
-    bool isDrawerOpen { get; set; }
-    Person? selectedPerson { get; set; }
-    Term? currentTerm { get; set; }
+	DxTabs? dxTabs;
+	StatementOfAccount? statementOfAccount;
+	EnrolmentHistory? enrolmentHistory;
+	LeadershipHistory? leadershipHistory;
+	AttendanceHistory? attendanceHistory;
+	NoteHistory? noteHistory;
+	bool isDrawerOpen { get; set; }
+	Person? selectedPerson { get; set; }
+	Term? currentTerm { get; set; }
 	int activeTab { get; set; } = 0;
 
-    void OnMemberDrawerRequested(Person person, Term term)
-    {
-        selectedPerson = person;
-        currentTerm = term;
-        isDrawerOpen = true;
-        dxTabs.ActiveTabIndex = 0;
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		await GetDataAsync();
+	}
 
-    async Task OnPrint()
-    {
-        switch (dxTabs.ActiveTabIndex)
-        {
-            case 0:
-                statementOfAccount.Print();
-                break;
-            case 1:
-                enrolmentHistory.Print();
-                break;
-            case 2:
-                attendanceHistory.Print();
-                break;
-            case 3:
-                leadershipHistory.Print();
-                break;
-            case 4:
-                noteHistory.Print();
-                break;
-        }
-    }
+	async Task GetDataAsync()
+	{
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		PersonNoteCounts = await BusinessRule.GetPersonNoteCountsAsync(dbc);
+	}
+
+	void OnMemberDrawerRequested(Person person, Term term)
+	{
+		selectedPerson = person;
+		currentTerm = term;
+		isDrawerOpen = true;
+		dxTabs.ActiveTabIndex = 0;
+	}
+
+	async Task OnPrint()
+	{
+		switch (dxTabs.ActiveTabIndex)
+		{
+			case 0:
+				statementOfAccount.Print();
+				break;
+			case 1:
+				enrolmentHistory.Print();
+				break;
+			case 2:
+				attendanceHistory.Print();
+				break;
+			case 3:
+				leadershipHistory.Print();
+				break;
+			case 4:
+				noteHistory.Print();
+				break;
+		}
+	}
 }

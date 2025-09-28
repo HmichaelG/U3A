@@ -9,7 +9,7 @@
 	</DxButton>
 	<div class="note-badge badge bg-fl-success"
 		 onclick="@(async () => await Click.InvokeAsync())">
-		@(noteCount > 0 ? noteCount.ToString() : "")
+		@(NoteCount > 0 ? NoteCount.ToString() : "")
 	</div>
 </container>
 
@@ -36,13 +36,7 @@
 
 @code {
 	[Parameter, EditorRequired] public Guid PersonID { get; set; }
+	[Parameter] public int NoteCount { get; set; } = 0;
 	[Parameter] public EventCallback<MouseEventArgs> Click { get; set; }
-	int noteCount = 0;
 
-	protected override async Task OnParametersSetAsync()
-	{
-		noteCount = 0;
-		using var dbContext = await U3Adbfactory.CreateDbContextAsync();
-		noteCount = await dbContext.Note.CountAsync(n => n.PersonID == PersonID);
-	}
 }

@@ -7,6 +7,7 @@
 @using System.Text
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.WebUtilities
+@using System.Threading.Tasks
 @using U3A.Data
 
 @inject NavigationManager NavMan
@@ -192,6 +193,7 @@
                                 <DxGridDataColumn Visible="@(!(IsSelectionList || IsReadOnly))" Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                     <CellDisplayTemplate>
                                         <HistoryButton PersonID="@(((Person)context.DataItem).ID)"
+                                            NoteCount="@(PersonNoteCounts.GetValueOrDefault(((Person)context.DataItem).ID))"
                                             Click="async() => {selectedPerson = ((Person)context.DataItem);
 	                                                                await fullScreen.ResetFullScreen();
 	                                                                await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
@@ -420,6 +422,7 @@
 
 
 @code {
+    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
     [Parameter]
     public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
 
@@ -511,6 +514,8 @@
         gender = new Gender();
         Communication = new Communication();
         dbc = await U3Adbfactory.CreateDbContextAsync();
+        currentTerm = await BusinessRule.CurrentTermAsync(dbc);
+        await GetData();
         monthName = dbc.GetLocalDate().ToString("MMM");
         DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
         settings = await dbc.SystemSettings.FirstOrDefaultAsync();
@@ -518,8 +523,6 @@
                                 StringSplitOptions.None)
                                 .Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
         server = new DocumentServer(dbc);
-        currentTerm = await BusinessRule.CurrentTermAsync(dbc);
-        await GetData();
         IsReady = true;
     }
 
@@ -548,7 +551,6 @@
                 await PageHasRendered.InvokeAsync();
             }
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     void Grid_UnboundColumnData(GridUnboundColumnDataEventArgs e)

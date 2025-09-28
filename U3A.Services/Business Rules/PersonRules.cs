@@ -558,14 +558,15 @@ public static partial class BusinessRule
 
     }
 
-    public static async Task<List<(Guid PersonID, int NoteCount)>> GetPersonNoteCountsAsync(U3ADbContext dbc)
+    public static async Task<Dictionary<Guid, int>> GetPersonNoteCountsAsync(U3ADbContext dbc)
     {
-        var grouped = await dbc.Note
-                .GroupBy(x => x.PersonID)
-                .Select(g => new { PersonID = g.Key, NoteCount = g.Count() })
-                .OrderByDescending(x => x.NoteCount)
-                .ToListAsync();
+        var groupedList = await dbc.Note
+            .GroupBy(x => x.PersonID)
+            .Select(g => new { PersonID = g.Key, NoteCount = g.Count() })
+            .OrderByDescending(x => x.NoteCount)
+            .ToListAsync();
 
-        return grouped.Select(x => (x.PersonID, x.NoteCount)).ToList();
+        // Convert the materialized list to a Dictionary<Guid,int>
+        return groupedList.ToDictionary(x => x.PersonID, x => x.NoteCount);
     }
 }
