@@ -76,7 +76,8 @@ else
                     <DxGridDataColumn Caption="Updated By" FieldName="User" Visible=false />
                     <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                         <CellDisplayTemplate>
-                            <HistoryButton PersonID=@(((Receipt)context.DataItem).Person.ID)
+                            <HistoryButton PersonID=@(((Receipt)context.DataItem).PersonID)
+                                      NoteCount="@(PersonNoteCounts.GetValueOrDefault(((Receipt)context.DataItem).PersonID))"
                                       Click="async() => {var selectedPerson = (((Receipt)context.DataItem)).Person;
                                                 await fullScreen.ResetFullScreen();
                                                 await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
@@ -193,6 +194,7 @@ else
 @code {
     [Parameter]
     public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
 
     bool IsReady;
     bool setFinancialTo;

@@ -162,6 +162,7 @@
                                           FixedPosition="GridColumnFixedPosition.Right">
                             <CellDisplayTemplate>
                                 <HistoryButton  PersonID=@(((PersonFinancialStatus)context.DataItem).PersonBase.ID)
+                                          NoteCount="@(PersonNoteCounts.GetValueOrDefault(((PersonFinancialStatus)context.DataItem).PersonBase.ID))"
                                           Click="async() => {var selectedPerson = (((PersonFinancialStatus)context.DataItem).PersonBase);
                                                     await fullScreen.ResetFullScreen();
                                                     await MemberDrawerRequested.InvokeAsync((selectedPerson,selectedTerm)); }">
@@ -212,6 +213,7 @@
     public string GridLayoutKey { get; set; } = "{D82F7F55-5055-4E58-B07C-DDC2B73704EB}";
     [Parameter]
     public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
 
     bool IsReady;
 

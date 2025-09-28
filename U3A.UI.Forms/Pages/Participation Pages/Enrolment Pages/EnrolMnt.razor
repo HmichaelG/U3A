@@ -187,6 +187,7 @@ else
                             <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                 <CellDisplayTemplate>
                                     <HistoryButton PersonID=@(((Enrolment)context.DataItem).Person.ID) 
+                                                    NoteCount="@(PersonNoteCounts.GetValueOrDefault(((Enrolment)context.DataItem).PersonID))"
                                                     Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
                                                                 await fullScreen.ResetFullScreen();
                                                                 await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
@@ -299,6 +300,7 @@ else
 @code {
         [Parameter]
         public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
 
         bool IsReady;
         int ShowEnrolmentType;
@@ -543,9 +545,9 @@ else
             }
         }
         UpdateStatistics();
-        await ProgressBar.Close();
-        mainGrid.EndUpdate();
         mainGrid.AutoFitColumnWidths();
+        mainGrid.EndUpdate();
+        await ProgressBar.Close();
     }
 
     void ClearSelection()

@@ -560,7 +560,7 @@ public static partial class BusinessRule
 
     public static async Task<Dictionary<Guid, int>> GetPersonNoteCountsAsync(U3ADbContext dbc)
     {
-        var groupedList = await dbc.Note
+        var groupedList = await dbc.Note.AsNoTracking()
             .GroupBy(x => x.PersonID)
             .Select(g => new { PersonID = g.Key, NoteCount = g.Count() })
             .OrderByDescending(x => x.NoteCount)
