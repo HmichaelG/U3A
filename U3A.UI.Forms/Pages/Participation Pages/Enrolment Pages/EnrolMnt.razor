@@ -186,12 +186,11 @@ else
                                               UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
                             <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                                 <CellDisplayTemplate>
-                                    <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
-                                              RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
-                                              Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
-                                                    await fullScreen.ResetFullScreen();
-                                                    await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
-                                    </DxButton>
+                                    <HistoryButton PersonID=@(((Enrolment)context.DataItem).Person.ID) 
+                                                    Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
+                                                                await fullScreen.ResetFullScreen();
+                                                                await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
+                                    </HistoryButton>
                                 </CellDisplayTemplate>
                             </DxGridDataColumn>
                         </Columns>

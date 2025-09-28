@@ -38,7 +38,7 @@
 
     </TargetContent>
     <BodyTemplate>
-        <DxTabs @ref=@dxTabs>
+        <DxTabs @ref=@dxTabs ScrollMode="TabsScrollMode.Auto" @bind-ActiveTabIndex="@activeTab" >
             <DxTabPage Text="Statement of Account">
                 <StatementOfAccount @ref=@statementOfAccount 
                                     SelectedPerson="@selectedPerson"
@@ -57,6 +57,10 @@
             </DxTabPage>
             <DxTabPage Text="Leadership History">
                 <LeadershipHistory @ref=@leadershipHistory SelectedPerson="@selectedPerson"
+                                   CssClass="drawer-content-style" />
+            </DxTabPage>
+            <DxTabPage Text="Notes">
+                <NoteHistory @ref=@noteHistory SelectedPerson="@selectedPerson"
                                    CssClass="drawer-content-style" />
             </DxTabPage>
         </DxTabs>
@@ -91,9 +95,11 @@
     EnrolmentHistory? enrolmentHistory;
     LeadershipHistory? leadershipHistory;
     AttendanceHistory? attendanceHistory;
+    NoteHistory? noteHistory;
     bool isDrawerOpen { get; set; }
     Person? selectedPerson { get; set; }
     Term? currentTerm { get; set; }
+	int activeTab { get; set; } = 0;
 
     void OnMemberDrawerRequested(Person person, Term term)
     {
@@ -118,6 +124,9 @@
                 break;
             case 3:
                 leadershipHistory.Print();
+                break;
+            case 4:
+                noteHistory.Print();
                 break;
         }
     }

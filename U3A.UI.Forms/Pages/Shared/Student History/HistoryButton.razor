@@ -1,0 +1,48 @@
+﻿@using System.Threading.Tasks
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+<container>
+	<DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details"
+			  RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in"
+			  CssClass="w-100"
+			  Click="async(e) => await Click.InvokeAsync(e)">
+	</DxButton>
+	<div class="note-badge badge bg-fl-success"
+		 onclick="@(async () => await Click.InvokeAsync())">
+		@(noteCount > 0 ? noteCount.ToString() : "")
+	</div>
+</container>
+
+<style>
+	/* make the container the positioning context for the badge */
+	container {
+		position: relative;
+	}
+
+	/* position badge top-right inside the container*/
+	.note-badge {
+		position: absolute;
+		top: -4px;
+		right: -4px;
+		z-index: 10;
+		cursor: pointer;
+	}
+
+		/* hide when empty (no notes) to avoid occupying space) */
+		.note-badge:empty {
+			display: none;
+		}
+</style>
+
+@code {
+	[Parameter, EditorRequired] public Guid PersonID { get; set; }
+	[Parameter] public EventCallback<MouseEventArgs> Click { get; set; }
+	int noteCount = 0;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		noteCount = 0;
+		using var dbContext = await U3Adbfactory.CreateDbContextAsync();
+		noteCount = await dbContext.Note.CountAsync(n => n.PersonID == PersonID);
+	}
+}

@@ -1,0 +1,214 @@
+﻿@page "/ReviewParticipantNotes"
+
+@using DevExpress.Drawing
+@using DevExpress.Drawing.Printing
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject LocalTime lt
+
+@if (!isReady)
+{
+	<LoadingIndicator />
+}
+else
+{
+	<ContextHelpTitle Title="Review Participant Notes" HelpTopic="Review-Participant-Notes.html"
+					  Subtitle="Review notes attached to participant records." />
+	<FullScreen DisplayOffset="4">
+		<ContentTemplate>
+			<DxGrid Data="@notes" @ref="@dxGrid" id="my-grid"
+					AutoExpandAllGroupRows=true
+					SelectionMode="GridSelectionMode.Multiple"
+					SelectedDataItems="@SelectedDataItems"
+					ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+					TextWrapEnabled="true"
+					ShowFilterRow="false"
+					ShowAllRows="true"
+					KeyFieldName="Id"
+					ValidationEnabled="true"
+					PopupEditFormHeaderText="Add/Edit Note"
+					UnboundColumnData="Grid_CustomUnboundColumnData"
+					CustomizeEditModel="Grid_CustomizeEditModel"
+					EditMode="GridEditMode.PopupEditForm"
+					EditModelSaving="Grid_EditModelSaving"
+					DataItemDeleting="Grid_DataItemDeleting">
+				<ToolbarTemplate>
+					<GridToolbar LinkedGrid=@dxGrid LayoutKey="{D13C54AB-FBFF-4E0D-8A80-A7A77D0B498B}">
+						<CustomButtonContent>
+							<DxToolbarItem Text="Bump Expiry" 
+								IconCssClass="bi bi-arrow-up-circle"
+								RenderStyle="ButtonRenderStyle.Primary"
+								Visible=true Context="a" 
+								BeginGroup="true" 
+								Alignment="ToolbarItemAlignment.Right" />
+						</CustomButtonContent>
+					</GridToolbar>
+				</ToolbarTemplate>
+				<Columns>
+					<DxGridSelectionColumn />
+					<DxGridCommandColumnEx Width="1rem"
+										   NewButtonVisible=true
+										   DeleteButtonVisible=true
+										   EditButtonVisible=true />
+					<DxGridDataColumn FieldName="Person.FullNameAlpha" Caption="Participant" Width="15rem" GroupIndex="0" />
+					<DxGridDataColumn FieldName="@nameof(Note.Content)" Caption="Note" Width="24rem">
+						<CellDisplayTemplate Context="cellContext">
+							<DxMemo Text="@((string)cellContext.Value)" ReadOnly="true" Rows="2" />
+						</CellDisplayTemplate>
+					</DxGridDataColumn>
+					<DxGridDataColumn FieldName="@nameof(Note.Expires)" Caption="Expires" Width="4rem"
+									  DisplayFormat="yyyy" />
+					<DxGridDataColumn FieldName="CreatedOnLocal" UnboundType="GridUnboundColumnType.DateTime" 
+										DisplayFormat="@constants.SHORT_DATE_FORMAT"
+										Caption="Created" Width="6rem" />
+					<DxGridDataColumn FieldName="UpdatedOnLocal" UnboundType="GridUnboundColumnType.DateTime" 
+										DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
+										Caption="Last Updated" Width="10rem" />
+					<DxGridDataColumn FieldName="@nameof(Note.User)" Caption="Updated by" />
+				</Columns>
+				<EditFormTemplate Context="EditFormContext">
+					@{
+						var editItem = (Note)EditFormContext.EditModel;
+					}
+					<DxFormLayout Data="@editItem">
+						<DxFormLayoutItem Caption="Content" ColSpanMd="12">
+							<DxMemo @bind-Text="@editItem.Content" Rows="4" style="width:24rem;" />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="Expires" ColSpanMd="12">
+							<DxDateEdit @bind-Date="@editItem.Expires" Enabled="false"
+										DisplayFormat="@constants.STD_DATE_FORMAT" />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="Created" ColSpanMd="12" Visible="@(editItem.CreatedOn.HasValue)">
+							<DxDateEdit @bind-Date="@editItem.LocalCreatedOn" Enabled="false"
+										DisplayFormat="@constants.STD_DATETIME_FORMAT" />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="Last Updated" ColSpanMd="12" Visible="@(editItem.CreatedOn.HasValue)">
+							<DxDateEdit @bind-Date="@editItem.LocalUpdatedOn" Enabled="false"
+										DisplayFormat="@constants.STD_DATETIME_FORMAT" />
+						</DxFormLayoutItem>
+						<DxFormLayoutItem Caption="Last Update By" Visible="@(editItem.CreatedOn.HasValue)"
+										  Field="@nameof(editItem.User)" Enabled="false" ColSpanMd="12" />
+					</DxFormLayout>
+				</EditFormTemplate>
+
+			</DxGrid>
+		</ContentTemplate>
+	</FullScreen>
+}
+@code {
+
+	[Parameter]
+	public Person SelectedPerson { get; set; }
+
+	[Parameter]
+	public string CssClass { get; set; }
+
+	List<Note> notes = new();
+	IReadOnlyList<Note>? SelectedDataItems;
+	DxGrid? dxGrid;
+
+	string reportTitle;
+	bool isPdfReady = false;
+	bool isReady = false;
+	byte[] documentContent;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await RefreshData();
+		isReady = true;
+	}
+
+	async Task RefreshData()
+	{
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		notes = await BusinessRule.GetNotesAsync(dbc);
+	}
+
+	async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+	{
+		var editModel = (Note)e.EditModel;
+		editModel.PersonID = SelectedPerson.ID;
+		editModel.Person = SelectedPerson;
+		if (e.IsNew)
+		{
+			var endDate = new DateOnly(DateTime.UtcNow.Year, 12, 31);
+			var lastQuarter = new int[] { 10, 11, 12 };
+			if (lastQuarter.Contains(endDate.Month))
+			{
+				editModel.Expires = endDate.AddYears(1);
+			}
+		}
+		else
+		{
+			editModel.LocalCreatedOn = await lt.GetLocalTimeAsync(editModel.CreatedOn.Value);
+			editModel.LocalUpdatedOn = await lt.GetLocalTimeAsync(editModel.UpdatedOn.Value);
+		}
+	}
+
+	bool isBusy;
+	async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+	{
+		if (isBusy) return;
+		isBusy = true;
+		try
+		{
+			await SaveRecord(e);
+		}
+		finally
+		{
+			isBusy = false;
+		}
+	}
+
+	async Task SaveRecord(GridEditModelSavingEventArgs e)
+	{
+		var editModel = (Note)e.EditModel;
+		if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
+		// Re-query a data item from the store.
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		var dataItem = e.IsNew ? new Note() : dbc.Note.Find(editModel.Id);
+		// Assign changes from the edit model to the data item.
+		if (dataItem != null)
+		{
+			editModel.CopyTo(dataItem);
+			dataItem.PersonID = SelectedPerson.ID;
+			dataItem.Person = await dbc.Person.FindAsync(SelectedPerson.ID);
+			// Post changes to the database.
+			if (e.IsNew) await dbc.AddAsync(dataItem);
+			await dbc.SaveChangesAsync();
+			// update the Grid.
+			if (e.IsNew)
+			{
+				notes.Insert(0, dataItem);
+			}
+			else
+			{
+				int idx = notes.FindIndex(x => x.Id == dataItem.Id);
+				notes[idx] = dataItem;
+			}
+		}
+	}
+
+	async Task<bool> IsDataOk(Note editItem)
+	{
+		bool result = true;
+		return result;
+	}
+
+	async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+	{
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		Note note = await dbc.Note.FindAsync(((Note)e.DataItem).Id);
+		dbc.Remove(note);
+		await dbc.SaveChangesAsync();
+		notes = await BusinessRule.GetNotesForPersonAsync(dbc, SelectedPerson.ID);
+		StateHasChanged();
+	}
+
+	async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+	{
+		if (e.FieldName == "CreatedOnLocal") e.Value = await lt.GetLocalTimeAsync((e.DataItem as Note).CreatedOn.Value);
+		if (e.FieldName == "UpdatedOnLocal") e.Value = await lt.GetLocalTimeAsync((e.DataItem as Note).UpdatedOn.Value);
+	}
+
+
+}

@@ -76,12 +76,11 @@ else
                     <DxGridDataColumn Caption="Updated By" FieldName="User" Visible=false />
                     <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
                         <CellDisplayTemplate>
-                            <DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details" CssClass="w-100"
-                                      RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in" Text=""
+                            <HistoryButton PersonID=@(((Receipt)context.DataItem).Person.ID)
                                       Click="async() => {var selectedPerson = (((Receipt)context.DataItem)).Person;
                                                 await fullScreen.ResetFullScreen();
                                                 await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
-                            </DxButton>
+                            </HistoryButton>
                         </CellDisplayTemplate>
                     </DxGridDataColumn>
                 </Columns>

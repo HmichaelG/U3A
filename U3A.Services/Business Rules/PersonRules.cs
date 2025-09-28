@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraRichEdit.Model;
+﻿using DevExpress.Blazor.RichEdit;
 using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -539,5 +539,33 @@ public static partial class BusinessRule
                     .Where(x => x.PersonID == PersonID)
                     .OrderByDescending(x => x.Year).ThenBy(x => x.Course).ThenBy(x => x.Term)
                     .ToListAsync();
+    }
+
+    public static async Task<List<Note>> GetNotesForPersonAsync(U3ADbContext dbc, Guid PersonID)
+    {
+        return await dbc.Note.AsNoTracking()
+                    .Where(x => x.PersonID == PersonID)
+                    .OrderByDescending(x => x.UpdatedOn)
+                    .ToListAsync();
+    }
+    public static async Task<List<Note>> GetNotesAsync(U3ADbContext dbc)
+    {
+        var notes = await dbc.Note.AsNoTracking()
+                    .Include(x => x.Person)
+                    .ToListAsync();
+        return notes.OrderBy(x => x.Person.FullNameAlpha)
+                    .ThenByDescending(x => x.UpdatedOn).ToList();
+
+    }
+
+    public static async Task<List<(Guid PersonID, int NoteCount)>> GetPersonNoteCountsAsync(U3ADbContext dbc)
+    {
+        var grouped = await dbc.Note
+                .GroupBy(x => x.PersonID)
+                .Select(g => new { PersonID = g.Key, NoteCount = g.Count() })
+                .OrderByDescending(x => x.NoteCount)
+                .ToListAsync();
+
+        return grouped.Select(x => (x.PersonID, x.NoteCount)).ToList();
     }
 }
