@@ -42,13 +42,8 @@ public static class SerilogLoggingExtensions
                 logEvent.Exception is ObjectDisposedException ||
                 logEvent.Exception is AntiforgeryValidationException ||
                 logEvent.Exception is CryptographicException ||
-                logEvent.Exception is JSDisconnectedException ||
-                (
-                    // Use ContainsKey to avoid KeyNotFoundException when a property is absent
-                    !logEvent.Properties.ContainsKey("LogEvent")
-                    && !logEvent.Properties.ContainsKey("Tenant")
-                    && !logEvent.Properties.ContainsKey("User")
-                ))
+                logEvent.Exception is JSDisconnectedException
+                )
             .WriteTo.Logger(lc => lc
                 .Filter.ByIncludingOnly(Matching.WithProperty("AutoEnrolParticipants"))
                 .WriteTo.MSSqlServer(connectionString: TenantConnectionString,
