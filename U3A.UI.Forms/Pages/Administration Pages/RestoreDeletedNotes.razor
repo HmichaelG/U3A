@@ -1,0 +1,203 @@
+﻿@page "/RestoreDeletedNotes"
+
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject LocalTime lt
+
+@if (!isReady)
+{
+	<LoadingIndicator />
+}
+else
+{
+	<MessageBox @ref="@messageBox" />
+
+	<div class="mb-2">
+		<ContextHelpTitle Title="Restore Deleted Notes" HelpTopic="restore-deleted-Notes.html"
+						  Subtitle="Restore previously deleted notes." />
+	</div>
+	<FullScreen DisplayOffset="4">
+		<ContentTemplate>
+			<DxGrid Data="@notes" @ref="@dxGrid" id="my-grid"
+					AutoExpandAllGroupRows=true
+					SelectionMode="GridSelectionMode.Multiple"
+					SelectedDataItems="@SelectedNotes"
+					SelectedDataItemsChanged="@OnSelectedNotesChanged"
+					AllowSelectRowByClick=false
+					ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+					TextWrapEnabled="true"
+					ShowFilterRow="false"
+					ShowAllRows="true"
+					KeyFieldName="Id"
+					ValidationEnabled="true"
+					UnboundColumnData="Grid_CustomUnboundColumnData">
+				<ToolbarTemplate>
+					<GridToolbar LinkedGrid=@dxGrid LayoutKey="{AFB41159-D858-420F-A819-DD2CF530F6D4}">
+						<CustomButtonContent>
+							<DxToolbarItem Text="Restore Deleted" Enabled="@(SelectedNotes?.Count > 0)"
+										   Click="@RestoreDeleted"
+										   IconCssClass="bi bi-arrow-counterclockwise"
+										   RenderStyle="ButtonRenderStyle.Primary"
+										   Visible=true Context="a"
+										   BeginGroup="true"
+										   Alignment="ToolbarItemAlignment.Right" />
+						</CustomButtonContent>
+					</GridToolbar>
+				</ToolbarTemplate>
+				<Columns>
+					<DxGridSelectionColumn Width="1rem" />
+					<DxGridDataColumn FieldName="Person.FullNameAlpha" Caption="Participant" Width="15rem" GroupIndex="0" />
+					<DxGridDataColumn FieldName="@nameof(Note.Content)" Caption="Note" Width="24rem">
+						<CellDisplayTemplate Context="cellContext">
+							<DxMemo Text="@((string)cellContext.Value)" ReadOnly="true" Rows="2" />
+						</CellDisplayTemplate>
+					</DxGridDataColumn>
+					<DxGridDataColumn FieldName="@nameof(Note.Expires)" Caption="Expires" Width="4rem"
+									  DisplayFormat="yyyy" />
+					<DxGridDataColumn FieldName="CreatedOnLocal" UnboundType="GridUnboundColumnType.DateTime"
+									  DisplayFormat="@constants.SHORT_DATE_FORMAT"
+									  Caption="Created" Width="6rem" />
+					<DxGridDataColumn FieldName="UpdatedOnLocal" UnboundType="GridUnboundColumnType.DateTime"
+									  DisplayFormat="@constants.SHORT_DATETIME_FORMAT"
+									  Caption="Deleted" Width="10rem" />
+					<DxGridDataColumn FieldName="@nameof(Note.User)" Caption="Deleted by" />
+				</Columns>
+			</DxGrid>
+		</ContentTemplate>
+	</FullScreen>
+}
+@code {
+
+	[Parameter]
+	public Person SelectedPerson { get; set; }
+
+	[Parameter]
+	public string CssClass { get; set; }
+
+	List<Note> notes = new();
+	public IReadOnlyList<object>? SelectedNotes { get; set; }
+	IEnumerable<Person>? Persons { get; set; }
+	DxGrid? dxGrid;
+
+	string reportTitle;
+	bool isPdfReady = false;
+	bool isReady = false;
+	byte[] documentContent;
+	MessageBox? messageBox;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await RefreshData();
+		isReady = true;
+	}
+
+	async Task RefreshData()
+	{
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		Persons = await BusinessRule.SelectablePeopleIncludeUnfinancialAsync(dbc);
+		notes = await BusinessRule.GetDeletedNotesAsync(dbc);
+	}
+
+	async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+	{
+		var editModel = (Note)e.EditModel;
+		if (e.IsNew)
+		{
+			var endDate = new DateOnly(DateTime.UtcNow.Year, 12, 31);
+			var lastQuarter = new int[] { 10, 11, 12 };
+			if (lastQuarter.Contains(endDate.Month))
+			{
+				editModel.Expires = endDate.AddYears(1);
+			}
+		}
+	}
+
+	bool isBusy;
+	async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+	{
+		if (isBusy) return;
+		isBusy = true;
+		try
+		{
+			await SaveRecord(e);
+		}
+		finally
+		{
+			isBusy = false;
+		}
+	}
+
+	async Task SaveRecord(GridEditModelSavingEventArgs e)
+	{
+		var editModel = (Note)e.EditModel;
+		if (!await IsDataOk(editModel)) { e.Cancel = true; return; }
+		// Re-query a data item from the store.
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		var dataItem = e.IsNew ? new Note() : dbc.Note.Find(editModel.Id);
+		// Assign changes from the edit model to the data item.
+		if (dataItem != null)
+		{
+			editModel.PersonID = editModel.Person.ID;
+			editModel.CopyTo(dataItem);
+			dataItem.Person = await dbc.Person.FindAsync(dataItem.PersonID);
+			// Post changes to the database.
+			if (e.IsNew) await dbc.AddAsync(dataItem);
+			await dbc.SaveChangesAsync();
+			// update the Grid.
+			if (e.IsNew)
+			{
+				notes.Insert(0, dataItem);
+			}
+			else
+			{
+				int idx = notes.FindIndex(x => x.Id == dataItem.Id);
+				notes[idx] = dataItem;
+			}
+		}
+	}
+
+	async Task<bool> IsDataOk(Note editItem)
+	{
+		bool result = true;
+		return result;
+	}
+
+	async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+	{
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		Note note = await dbc.Note.FindAsync(((Note)e.DataItem).Id);
+		dbc.Remove(note);
+		await dbc.SaveChangesAsync();
+		await RefreshData();
+		StateHasChanged();
+	}
+
+	async void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+	{
+		if (e.FieldName == "CreatedOnLocal") e.Value = await lt.GetLocalTimeAsync((e.DataItem as Note).CreatedOn.Value);
+		if (e.FieldName == "UpdatedOnLocal") e.Value = await lt.GetLocalTimeAsync((e.DataItem as Note).UpdatedOn.Value);
+	}
+
+	async Task OnSelectedNotesChanged(IReadOnlyList<object> newSelection)
+	{
+		SelectedNotes = newSelection;
+	}
+
+	async Task RestoreDeleted()
+	{
+		if (SelectedNotes == null || SelectedNotes.Count == 0) return;
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		var year = (await lt.GetLocalDateAsync()).Year + 1;
+		foreach (var sn in SelectedNotes)
+		{
+			var note = await dbc.Note.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == ((Note)sn).Id);
+			(note as ISoftDelete).Undo();
+			note.Expires = new DateOnly(year, 12, 31);
+			dbc.Update(note);
+		}
+		await dbc.SaveChangesAsync();
+		await messageBox.ShowOkOnlyAsync("Restore Notes", "The selected Note records have been restored.");
+		await RefreshData();
+		StateHasChanged();
+	}
+
+}
