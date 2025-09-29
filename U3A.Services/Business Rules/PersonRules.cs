@@ -557,6 +557,16 @@ public static partial class BusinessRule
                     .ThenByDescending(x => x.UpdatedOn).ToList();
 
     }
+    public static async Task<List<Note>> GetDeletedNotesAsync(U3ADbContext dbc)
+    {
+        var notes = await dbc.Note.AsNoTracking().IgnoreQueryFilters()
+                    .Where(x => x.IsDeleted)
+                    .Include(x => x.Person)
+                    .ToListAsync();
+        return notes.OrderBy(x => x.Person.FullNameAlpha)
+                    .ThenByDescending(x => x.UpdatedOn).ToList();
+
+    }
 
     public static async Task<Dictionary<Guid, int>> GetPersonNoteCountsAsync(U3ADbContext dbc)
     {

@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Settings_EmailFooter
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Note
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Note
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Note_SoftDelete
 
-add-migration -context U3ADbContextSeed -project U3A.Database  U3A_Note
+add-migration -context U3ADbContextSeed -project U3A.Database  U3A_Note_SoftDelete
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

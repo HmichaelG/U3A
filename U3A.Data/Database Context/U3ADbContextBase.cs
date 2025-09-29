@@ -294,6 +294,8 @@ namespace U3A.Database
 
             // Automatically adding IsDeleted filter to 
             // all LINQ queries that use ISoftDelete
+            modelBuilder.Entity<Note>()
+                .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Course>()
                 .HasQueryFilter(x => x.IsDeleted == false);
             modelBuilder.Entity<Class>()

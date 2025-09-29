@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace U3A.Model;
 
-public class Note : BaseEntity
+public class Note : BaseEntity, ISoftDelete
 {
     public Guid Id { get; set; }
     public Guid PersonID { get; set; }
@@ -18,4 +18,6 @@ public class Note : BaseEntity
     [Required] public DateOnly Expires { get; set; } = new DateOnly(DateTime.UtcNow.Year,12,31);
     [NotMapped] public DateTime LocalCreatedOn { get; set; }
     [NotMapped] public DateTime LocalUpdatedOn { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }
