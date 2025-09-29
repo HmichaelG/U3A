@@ -633,8 +633,6 @@ else
 
 		await OneReadyStatusChanged.InvokeAsync(false); // disable external user input
 
-		var watch = Stopwatch.StartNew();
-
 		deletedClasses = new List<Class>();
 		activeTabIndex = 0;
 		using (var dbc = await U3Adbfactory.CreateDbContextAsync())
@@ -683,9 +681,12 @@ else
 					else
 					{
 						// Fast lookup from Schedule cache
+						var watch = Stopwatch.StartNew();
 						isFinancial = false;
 						if (loginState?.SelectedPerson?.FinancialTo >= term.Year) { isFinancial = true; }
 						Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
+						watch.Stop();
+						Log.Information("Member Enrolment: RestoreClassesFromScheduleAsync() {duration}ms", watch.ElapsedMilliseconds);
 					}
 					if (Classes != null)
 					{
@@ -706,9 +707,6 @@ else
 		}
 		googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
 		if (string.IsNullOrWhiteSpace(googleMapAPIKey)) googleMapAPIKey = config.GetConnectionString("GoogleMapAPIKey");
-
-		watch.Stop();
-		Logger.LogInformation("Member Enrolment: OnInitializedAsync() {duration}ms", watch.ElapsedMilliseconds);
 		await ShowSelectedClasses(scrollToTop: true);
 		await OneReadyStatusChanged.InvokeAsync(true); // enable external user input
 		IsReady = true;
