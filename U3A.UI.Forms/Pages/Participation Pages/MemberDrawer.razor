@@ -11,7 +11,7 @@
 else
 {
 	<DxDrawer @bind-IsOpen="@isDrawerOpen"
-			  CssClass="drawer-style"
+			  @bind-IsOpen:after="@(async () => {if (!isDrawerOpen) await GetDataAsync();})"
 			  Mode="DrawerMode.Overlap"
 			  Position="DrawerPosition.Right"
 			  PanelWidth="min(40rem, 100%)">
@@ -51,7 +51,7 @@ else
 
 		</TargetContent>
 		<BodyTemplate>
-			<DxFormLayoutGroup>
+			<DxFormLayoutGroup ColSpanMd="12">
 				<DxTabs @ref=@dxTabs ScrollMode="TabsScrollMode.Auto" @bind-ActiveTabIndex="@activeTab">
 					<DxTabPage Text="Statement of Account">
 						<StatementOfAccount @ref=@statementOfAccount
@@ -91,12 +91,8 @@ else
 	</DxDrawer>
 }
 <style>
-	.drawer-style {
-		max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
-	}
-
 	.drawer-content-style {
-		height: 75dvh;
+		height: calc(100dvh - @((ws.UseTopMenu) ? "15rem" : "11rem") );
 	}
 </style>
 
@@ -128,6 +124,7 @@ else
 	{
 		using var dbc = await U3Adbfactory.CreateDbContextAsync();
 		PersonNoteCounts = await BusinessRule.GetPersonNoteCountsAsync(dbc);
+		StateHasChanged();
 	}
 
 	void OnMemberDrawerRequested(Person person, Term term)
@@ -146,16 +143,16 @@ else
 				statementOfAccount.Print();
 				break;
 			case 1:
-				enrolmentHistory.Print();
+				noteHistory.Print();
 				break;
 			case 2:
-				attendanceHistory.Print();
+				enrolmentHistory.Print();
 				break;
 			case 3:
-				leadershipHistory.Print();
+				attendanceHistory.Print();
 				break;
 			case 4:
-				noteHistory.Print();
+				leadershipHistory.Print();
 				break;
 		}
 	}
