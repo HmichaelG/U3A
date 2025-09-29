@@ -14,6 +14,17 @@ public static class DatabaseCleanup
             dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
             try
             {
+                // soft delete all Note where Expiry year is less than current year
+                var result = await dbc.Note.Where(n => n.Expires.Year < DateTime.UtcNow.Year).ToListAsync();
+                dbc.Note.RemoveRange(result);
+                var count = await dbc.SaveChangesAsync();
+                Log.Information($"[{tenant.Identifier}]: {count} records soft deleted from [Note]");
+                
+                // hard delete all Notes where DeletedAt is more than 30 days ago
+                var cutOff = DateTime.UtcNow.AddDays(-30);
+                count = await dbc.Note.IgnoreQueryFilters().Where(n => n.DeletedAt != null && n.DeletedAt.Value < cutOff).ExecuteDeleteAsync();
+                Log.Information($"[{tenant.Identifier}]: {count} records hard deleted from [Note]");
+
                 _ = await dbc.Database.ExecuteSqlRawAsync(@"execute [dbo].[prcDbCleanup]");
                 Log.Information($"[{tenant.Identifier}]: Execute [dbo].[prcDbCleanup] completed.");
             }

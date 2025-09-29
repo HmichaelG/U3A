@@ -156,9 +156,9 @@ public partial class DurableFunctions
     [Function(nameof(DoDailyProcedures))]
     public async Task DoDailyProcedures(
         [TimerTrigger("0 0 17 * * *"
-    //#if DEBUG
-               //, RunOnStartup=true
-    //#endif            
+    #if DEBUG
+               , RunOnStartup=true
+    #endif            
                 )]
                 TimerInfo myTimer,
         [DurableClient] DurableTaskClient client,
