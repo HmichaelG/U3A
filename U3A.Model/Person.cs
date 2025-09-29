@@ -145,7 +145,7 @@ public class Person : BaseEntity, ISoftDelete
         }
     }
     public DateTime? DateCeased { get; set; }
-    public string CeasedReason { get; set; }
+    public string CeasedReason { get; set; } = string.Empty;
 
     [Range(constants.START_OF_TIME, 9999)]
     [DefaultValue(constants.START_OF_TIME)]
