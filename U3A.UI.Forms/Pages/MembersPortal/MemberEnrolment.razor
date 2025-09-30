@@ -7,6 +7,7 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject ILogger<MemberEnrolment> Logger
 @inject WorkstationService ws
+@inject IScheduleCacheService scheduleService
 
 @using System.Web
 @using Microsoft.AspNetCore.Builder
@@ -671,12 +672,12 @@ else
 				if (term != null)
 				{
 					prevTerm = await BusinessRule.GetPreviousTermAsync(dbc, term.Year, term.TermNumber) ?? term;
-					var exludeOffScheduleActivities = (IsReadOnly) ? false : true;
+					var excludeOffScheduleActivities = (IsReadOnly) ? false : true;
 
 					if (PreviewTerm != null)
 					{
 						// slow database lookup, required because PreviewTerm is selectable.
-						Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, exludeOffScheduleActivities);
+						Classes = await BusinessRule.GetClassDetailsAsync(dbc, term, settings, excludeOffScheduleActivities);
 					}
 					else
 					{
@@ -684,7 +685,7 @@ else
 						var watch = Stopwatch.StartNew();
 						isFinancial = false;
 						if (loginState?.SelectedPerson?.FinancialTo >= term.Year) { isFinancial = true; }
-						Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, exludeOffScheduleActivities, isFinancial);
+						Classes = await BusinessRule.RestoreClassesFromScheduleAsync(dbc, dbcT, tenantService, term, settings, excludeOffScheduleActivities, isFinancial);
 						watch.Stop();
 						Log.Information("Member Enrolment: RestoreClassesFromScheduleAsync() {duration}ms", watch.ElapsedMilliseconds);
 					}
