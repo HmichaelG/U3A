@@ -131,9 +131,10 @@ else
 		var editModel = (Note)e.EditModel;
 		if (e.IsNew)
 		{
-			var endDate = new DateOnly(DateTime.UtcNow.Year, 12, 31);
+			var currentDate = await lt.GetLocalDateAsync();
+			var endDate = new DateOnly(currentDate.Year, 12, 31);
 			var lastQuarter = new int[] { 10, 11, 12 };
-			if (lastQuarter.Contains(endDate.Month))
+			if (lastQuarter.Contains(currentDate.Month))
 			{
 				editModel.Expires = endDate.AddYears(1);
 			}
