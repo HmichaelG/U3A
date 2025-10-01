@@ -108,7 +108,7 @@ else
                             UnboundColumnData="Grid_CustomUnboundColumnData"
                             AllowSelectRowByClick="true"
                             @bind-SelectedDataItems="SelectedDataItems"
-                            EditMode="GridEditMode.EditCell"
+                            EditMode="GridEditMode.EditRow"
                             KeyboardNavigationEnabled=true
                             CustomizeEditModel="Grid_CustomizeEditModel"
                             DataItemDeleting="Grid_DataItemDeleting"
@@ -184,9 +184,14 @@ else
                                               FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                               Visible=@(selectedCourse != null && selectedCourse.HasFees)
                                               UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
-                            <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
+                            <DxGridDataColumn Width="3rem" 
+                                            Caption="Details" 
+                                            AllowGroup="false" 
+                                            ExportEnabled="false" ReadOnly=true
+                                            FixedPosition="GridColumnFixedPosition.Right">
                                 <CellDisplayTemplate>
-                                    <HistoryButton PersonID=@(((Enrolment)context.DataItem).Person.ID) 
+                                    <HistoryButton PersonID=@(((Enrolment)context.DataItem).Person.ID)
+                                                    
                                                     NoteCount="@(PersonNoteCounts.GetValueOrDefault(((Enrolment)context.DataItem).PersonID))"
                                                     Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
                                                                 await fullScreen.ResetFullScreen();
@@ -298,9 +303,8 @@ else
 
 
 @code {
-        [Parameter]
-        public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
-    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
+        [Parameter] public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+        [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
 
         bool IsReady;
         int ShowEnrolmentType;
