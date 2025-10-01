@@ -321,18 +321,18 @@ else
         @if (!IsLargerLayout())
         {
             <div class="card border-primary input-group mx-2 p-1 mb-1">
-                <div class="input-group mb-1 gap-1">
+                <div class="input-group mb-1">
                     <InputRadioGroup @bind-Value=@selectedStatusType>
                         <ChildContent>
-                            <div class="flex-grow-1 bg-fl-success text-white btn">
+                            <div class="flex-grow-1 bg-fl-success text-white btn-style">
                                 <InputRadio  Value=AttendClassStatusType.Present />
                                 Present
                             </div>
-                            <div class="flex-grow-1 bg-fl-info text-white btn">
+                            <div class="flex-grow-1 bg-fl-info text-white btn-style">
                                 <InputRadio Value=AttendClassStatusType.AbsentFromClassWithApology />
                                 Apology
                             </div>
-                            <div class="flex-grow-1 bg-fl-danger text-white btn">
+                            <div class="flex-grow-1 bg-fl-danger text-white btn-style">
                                 <InputRadio Value=AttendClassStatusType.AbsentFromClassWithoutApology />
                                 No Apology
                             </div>
@@ -375,6 +375,40 @@ else
 
 }
 <style>
+.btn-style {
+  --bs-btn-padding-x: 0.75rem;
+  --bs-btn-padding-y: 0.375rem;
+  --bs-btn-font-family: ;
+  --bs-btn-font-size: 1rem;
+  --bs-btn-font-weight: 400;
+  --bs-btn-line-height: 1.5;
+  --bs-btn-bg: transparent;
+  --bs-btn-border-width: var(--bs-border-width);
+  --bs-btn-border-color: transparent;
+  --bs-btn-border-radius: var(--bs-border-radius);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+  --bs-btn-disabled-opacity: 0.65;
+  --bs-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-btn-focus-shadow-rgb), .5);
+  display: inline-block;
+  padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+  font-family: var(--bs-btn-font-family);
+  font-size: var(--bs-btn-font-size);
+  font-weight: var(--bs-btn-font-weight);
+  line-height: var(--bs-btn-line-height);
+  color: var(--bs-btn-color);
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
+  border-radius: var(--bs-btn-border-radius);
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
     .bg-muted {
         --bs-bg-opacity: 0.1;
     }
