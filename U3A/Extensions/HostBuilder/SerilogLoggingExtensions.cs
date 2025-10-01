@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
+﻿using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Serilog;
 using Serilog.Events;
@@ -18,6 +20,11 @@ public static class SerilogLoggingExtensions
 {
     public static WebApplicationBuilder UseSerilogLogging(this WebApplicationBuilder builder, string TenantConnectionString)
     {
+        // Build a temporary service provider to resolve TelemetryConfiguration if it's registered.
+        // If not available, fall back to a default TelemetryConfiguration.
+        var tempServiceProvider = builder.Services.BuildServiceProvider();
+        var telemetryConfig = tempServiceProvider.GetService<TelemetryConfiguration>() ?? TelemetryConfiguration.CreateDefault();
+
         var columnOptions = new ColumnOptions
         {
             AdditionalColumns = new Collection<SqlColumn>
@@ -59,6 +66,9 @@ public static class SerilogLoggingExtensions
                         theme: AnsiConsoleTheme.Sixteen,
                         applyThemeToRedirectedOutput: true)
             .WriteTo.OpenTelemetry()
+            .WriteTo.ApplicationInsights(
+                        telemetryConfig,
+                        TelemetryConverter.Traces)
             .WriteTo.MSSqlServer(connectionString: TenantConnectionString,
                                     formatProvider: new CultureInfo("en-AU"),
                                     restrictedToMinimumLevel: LogEventLevel.Error,
