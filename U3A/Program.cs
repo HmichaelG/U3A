@@ -10,6 +10,8 @@ using U3A.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpContextAccessor();
+
 // Environment
 string? tenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
 if (tenantConnectionString is null)

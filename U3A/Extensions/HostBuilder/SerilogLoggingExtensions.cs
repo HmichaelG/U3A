@@ -29,8 +29,6 @@ public static class SerilogLoggingExtensions
     */
     public static WebApplicationBuilder UseSerilogLogging(this WebApplicationBuilder builder, string TenantConnectionString)
     {
-        // Ensure IHttpContextAccessor is available for SerilogEnricher
-        builder.Services.AddHttpContextAccessor();
 
         // Register the enricher so it can be resolved from the temporary provider
         builder.Services.AddSingleton<SerilogEnricher>();
