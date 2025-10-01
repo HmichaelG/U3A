@@ -10,6 +10,7 @@ using U3A.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Required by Serilog
 builder.Services.AddHttpContextAccessor();
 
 // Environment

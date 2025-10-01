@@ -67,9 +67,9 @@ public static class SerilogLoggingExtensions
                 logEvent.Exception is CryptographicException ||
                 logEvent.Exception is JSDisconnectedException
                 )
-            .WriteTo.Logger(lc => lc
+            .WriteTo.Async(a => a.Logger(lc => lc
                 .Filter.ByIncludingOnly(Matching.WithProperty("AutoEnrolParticipants"))
-                .WriteTo.MSSqlServer(connectionString: TenantConnectionString,
+                .WriteTo.Async(a => a.MSSqlServer(connectionString: TenantConnectionString,
                                         formatProvider: new CultureInfo("en-AU"),
                                         sinkOptions: new MSSqlServerSinkOptions
                                         {
@@ -77,15 +77,15 @@ public static class SerilogLoggingExtensions
                                         },
                                         columnOptions: columnOptions
                                     )
-                )
-            .WriteTo.Console(formatProvider: new CultureInfo("en-AU"),
+                )))
+            .WriteTo.Async(a => a.Console(formatProvider: new CultureInfo("en-AU"),
                         theme: AnsiConsoleTheme.Sixteen,
-                        applyThemeToRedirectedOutput: true)
-            .WriteTo.OpenTelemetry()
-            .WriteTo.ApplicationInsights(
+                        applyThemeToRedirectedOutput: true))
+            .WriteTo.Async(a => a.OpenTelemetry())
+            .WriteTo.Async(a => a.ApplicationInsights(
                         telemetryConfig,
-                        TelemetryConverter.Traces)
-            .WriteTo.MSSqlServer(connectionString: TenantConnectionString,
+                        TelemetryConverter.Traces))
+            .WriteTo.Async(a => a.MSSqlServer(connectionString: TenantConnectionString,
                                     formatProvider: new CultureInfo("en-AU"),
                                     restrictedToMinimumLevel: LogEventLevel.Error,
                                     sinkOptions: new MSSqlServerSinkOptions
@@ -93,7 +93,7 @@ public static class SerilogLoggingExtensions
                                         TableName = "LogEvents"
                                     },
                                     columnOptions: columnOptions
-                                )
+                                ))
             .CreateLogger();
 
         builder.Host.UseSerilog(Log.Logger);
