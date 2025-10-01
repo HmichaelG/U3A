@@ -35,13 +35,16 @@ public class WorkstationService
     private readonly IJSRuntime js;
     private readonly ILocalStorageService localStorage;
     private readonly IDbContextFactory<U3ADbContext> U3AdbFactory;
+    private readonly TenantInfoService tenantInfoService;
 
     public WorkstationService() { } // for Json deserialize
-    public WorkstationService(IJSRuntime js, ILocalStorageService localStorage, IDbContextFactory<U3ADbContext> U3AdbFactory)
+    public WorkstationService(IJSRuntime js, 
+        ILocalStorageService localStorage, 
+        TenantInfoService tenantInfoService)
     {
         this.js = js;
         this.localStorage = localStorage;
-        this.U3AdbFactory = U3AdbFactory;
+        this.tenantInfoService = tenantInfoService;
     }
 
     // size Changed event
@@ -95,15 +98,21 @@ public class WorkstationService
         if (string.IsNullOrEmpty(AccentColor))
         {
             //Use Website primary color as default
-            using var dbc = U3AdbFactory.CreateDbContext();
-            var tenant = dbc.TenantInfo;
-            if (string.IsNullOrEmpty(tenant.PrimaryWebsiteColor))
+            var tenant = await tenantInfoService.GetTenantInfoAsync();
+            if (tenant != null)
             {
-                AccentColor = DEFAULT_COLOR;
+                if (string.IsNullOrEmpty(tenant.PrimaryWebsiteColor))
+                {
+                    AccentColor = DEFAULT_COLOR;
+                }
+                else
+                {
+                    AccentColor = tenant.PrimaryWebsiteColor;
+                }
             }
             else
             {
-                AccentColor = tenant.PrimaryWebsiteColor;
+                AccentColor = DEFAULT_COLOR;
             }
         }
 
