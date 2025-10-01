@@ -537,6 +537,7 @@ else
 	string selectButtonIcon;
 	List<Guid> newEnrolmentGuids;
 	private readonly Dictionary<Guid, bool> expandStates = new();
+	TenantInfo tenantInfo;
 
 	// Search filter function
 	string? _filterText = null;
@@ -705,6 +706,7 @@ else
 				}
 			}
 		}
+		tenantInfo = await tenantService.GetTenantInfoAsync();
 		googleMapAPIKey = config.GetValue<string>("GoogleMapAPIKey");
 		if (string.IsNullOrWhiteSpace(googleMapAPIKey)) googleMapAPIKey = config.GetConnectionString("GoogleMapAPIKey");
 		await ShowSelectedClasses(scrollToTop: true);
@@ -1273,7 +1275,6 @@ else
 	{
 		if (newEnrolmentGuids.Count <= 0) return;
 		var client = new APIClient();
-		var tenantInfo = await tenantService.GetTenantInfoAsync();
 		client.DoAutoEnrolment(tenantInfo.Identifier, newEnrolmentGuids)
 			   .SafeFireAndForget(onException: ex => Log.Error($"Error executing Auto Enroll:{Environment.NewLine} {ex.ToString()}", ex));
 	}
