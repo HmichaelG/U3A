@@ -1,5 +1,4 @@
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +7,6 @@ using U3A.Components.Account;
 using U3A.Extensions.HostBuilder;
 using U3A.Model;
 using U3A.Services;
-using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 

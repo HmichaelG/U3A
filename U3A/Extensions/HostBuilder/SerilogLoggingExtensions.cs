@@ -1,6 +1,5 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Serilog;
 using Serilog.Events;
@@ -12,18 +11,36 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.Security.Cryptography;
-using U3A.Model;
+using Microsoft.Extensions.DependencyInjection;
+using U3A.Services;
 
 namespace U3A.Extensions.HostBuilder;
 
 public static class SerilogLoggingExtensions
 {
+    /*
+    Pseudocode / Plan:
+    1. Ensure IHttpContextAccessor is registered in DI so SerilogEnricher can be activated.
+    2. Register the HttpContext accessor with builder.Services.AddHttpContextAccessor().
+    3. Register SerilogEnricher as a singleton.
+    4. Build a temporary service provider (disposed after use) to resolve TelemetryConfiguration (if present) and SerilogEnricher.
+    5. Configure Serilog using the resolved enricher and telemetry configuration.
+    6. Attach Serilog to the host and log startup information.
+    */
     public static WebApplicationBuilder UseSerilogLogging(this WebApplicationBuilder builder, string TenantConnectionString)
     {
+        // Ensure IHttpContextAccessor is available for SerilogEnricher
+        builder.Services.AddHttpContextAccessor();
+
+        // Register the enricher so it can be resolved from the temporary provider
+        builder.Services.AddSingleton<SerilogEnricher>();
+
         // Build a temporary service provider to resolve TelemetryConfiguration if it's registered.
         // If not available, fall back to a default TelemetryConfiguration.
-        var tempServiceProvider = builder.Services.BuildServiceProvider();
+        using var tempServiceProvider = builder.Services.BuildServiceProvider();
         var telemetryConfig = tempServiceProvider.GetService<TelemetryConfiguration>() ?? TelemetryConfiguration.CreateDefault();
+
+        var enricher = tempServiceProvider.GetRequiredService<SerilogEnricher>();
 
         var columnOptions = new ColumnOptions
         {
@@ -43,6 +60,7 @@ public static class SerilogLoggingExtensions
             .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Error)
             // Ensure enrichers run before the filter so properties are present
             .Enrich.FromLogContext()
+            .Enrich.With(enricher)
             .Enrich.WithExceptionDetails()
             .Filter.ByExcluding(logEvent =>
                 logEvent.Exception is OperationCanceledException ||
