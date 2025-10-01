@@ -146,9 +146,11 @@ else
             }
         }
         var authEmail = authenticationState.User.Identity!.Name;
-        if (authEmail == constants.superAdmin) hasRole = true;
-        loginState = new LoginState(authEmail!, U3Adbfactory);
-
+        if (authEmail != null)
+        {
+            if (authEmail == constants.superAdmin) hasRole = true;
+            loginState = new LoginState(authEmail!, U3Adbfactory);
+        }
         var ch = circuitHandler as CircuitHandlerService;
         ch!.CircuitsChanged += HandleCircuitsChanged!;
         openCircuits = ch.CircuitDetails.Count();

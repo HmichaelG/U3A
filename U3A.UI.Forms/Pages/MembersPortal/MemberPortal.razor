@@ -9,10 +9,10 @@
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
-@implements IDisposable
 @inject NavigationManager navMan
 @inject SignInManager<ApplicationUser> SignInMgr
 @inject WorkstationService ws
+@inject TenantInfoService tenantService
 
 @attribute [Authorize]
 
@@ -144,7 +144,6 @@ else
     bool IsProcessing;
     bool IsNewLinkedMember;
     bool IsMobileLayout;
-    U3ADbContext? dbc;
     SystemSettings? settings;
     Term? term;
     MarkupString? message;
@@ -159,7 +158,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        dbc = await U3Adbfactory.CreateDbContextAsync();
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
         term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
         if (term == null)
         {
@@ -351,7 +350,8 @@ else
 
     async Task<bool> IsAdminOnU3ADesktop()
     {
-        if (dbc.TenantInfo.UseEwayTestEnviroment) return true;
+		var tenantInfo = await tenantService.GetTenantInfoAsync();
+        if (tenantInfo.UseEwayTestEnviroment) return true;
         if (!loginState.IsAdminOnBehalfOfMember) return true;
         bool result = false;
         var value = await js.InvokeAsync<string?>("GetSessionState", "isU3ADesktop");
@@ -423,8 +423,4 @@ else
         StateHasChanged();
     }
 
-    public void Dispose()
-    {
-        dbc?.Dispose();
-    }
 }
