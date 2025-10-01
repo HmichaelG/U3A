@@ -87,8 +87,6 @@ public class MemberFeeCalculationService
         var s = new Stopwatch();
         s.Start();
         Settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        Log.Information("MemberFeeCalculationService: Settings loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
-        s.Restart();
         if (Term != null)
         {
             BillingTerm = Term;
@@ -106,29 +104,21 @@ public class MemberFeeCalculationService
                         .ToArrayAsync();
             GetBillingTerm();
         }
-        Log.Information("MemberFeeCalculationService: Terms loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
-        s.Restart();
         if (People == null)
         {
             People = await dbc.Person.AsNoTracking()
                             .Where(x => person == null || x.ID == person.ID)
                             .ToListAsync();
-            Log.Information("MemberFeeCalculationService: People loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
-            s.Restart();
         }
         Fees = await dbc.Fee.AsNoTracking().IgnoreQueryFilters()
                             .Where(x => (person == null || x.PersonID == person.ID)
                                         && !x.IsDeleted && x.ProcessingYear >= BillingYear)
                             .ToListAsync();
-        Log.Information("MemberFeeCalculationService: Fees loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
-        s.Restart();
         Receipts = await dbc.Receipt.AsNoTracking().IgnoreQueryFilters()
                             .Where(x => (person == null || x.PersonID == person.ID)
                                         && !x.IsDeleted && x.ProcessingYear >= BillingYear)
                             .GroupBy(x => x.PersonID)
                             .ToDictionaryAsync(g => g.Key, g => g.ToList());
-        Log.Information("MemberFeeCalculationService: Receipts loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
-        s.Restart();
         Enrolments = await dbc.Enrolment.AsNoTracking()
                             .AsSplitQuery()
                             .IgnoreQueryFilters()
@@ -145,8 +135,6 @@ public class MemberFeeCalculationService
                             .Include(x => x.Class)
                             .GroupBy(x => x.PersonID)
                             .ToDictionaryAsync(g => g.Key, g => g.ToList());
-        Log.Information("MemberFeeCalculationService: {count} Enrolments loaded in {ElapsedMilliseconds} ms", Enrolments.Count, s.ElapsedMilliseconds);
-        s.Restart();
         Classes = await dbc.Class
                     .Where(x => x.Course.Year == BillingYear &&
                                     (x.Course.CourseFeePerYear != 0
@@ -157,7 +145,8 @@ public class MemberFeeCalculationService
                                     )
                     .Include(x => x.Course)
                     .ToListAsync();
-        Log.Information("MemberFeeCalculationService: Classes loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
+        Log.Information("MemberFeeCalculationService: data loaded in {ElapsedMilliseconds} ms", s.ElapsedMilliseconds);
+        s.Stop();
     }
 
 
