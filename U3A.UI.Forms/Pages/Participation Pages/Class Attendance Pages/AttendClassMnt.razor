@@ -191,10 +191,10 @@ else
                                 switch (status)
                                 {
                                     case AttendClassStatusType.Present:
-                                        css = "text-fl-info";
+                                        css = "text-fl-success";
                                         break;
                                     case AttendClassStatusType.AbsentFromClassWithApology:
-                                        css = "text-fl-warning";
+                                        css = "text-fl-info";
                                         break;
                                     default:
                                         css = "text-fl-danger";
@@ -218,6 +218,20 @@ else
                     <DxGridDataColumn Caption="Email" FieldName="Person.Email" Visible=false />
                     <DxGridDataColumn Caption="ICE Phone" FieldName="Person.AdjustedICEPhone" Visible=false />
                     <DxGridDataColumn Caption="ICE Contact" FieldName="Person.ICEContact" Visible=false />
+                            <DxGridDataColumn Width="3rem" 
+                                            Visible=@(IsLargeLayout || IsLargerLayout())
+                                            Caption="Details" 
+                                            AllowGroup="false" 
+                                            ExportEnabled="false" ReadOnly=true
+                                            FixedPosition="GridColumnFixedPosition.Right">
+                                <CellDisplayTemplate>
+                                    <HistoryButton PersonID=@(((AttendClass)context.DataItem).Person.ID)                                                    
+                                                    NoteCount="@(PersonNoteCounts.GetValueOrDefault(((AttendClass)context.DataItem).PersonID))"
+                                                    Click="async() => {selectedPerson = (((AttendClass)context.DataItem).Person);
+                                                                await MemberDrawerRequested.InvokeAsync((selectedPerson, null)); }">
+                                    </HistoryButton>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
                 </Columns>
 
                 <EditFormTemplate Context="EditFormContext">
@@ -307,18 +321,18 @@ else
         @if (!IsLargerLayout())
         {
             <div class="card border-primary input-group mx-2 p-1 mb-1">
-                <div class="input-group mb-1">
+                <div class="input-group mb-1 gap-1">
                     <InputRadioGroup @bind-Value=@selectedStatusType>
                         <ChildContent>
-                            <div class="flex-grow-1 bg-success bg-muted  btn">
-                                <InputRadio Value=AttendClassStatusType.Present />
+                            <div class="flex-grow-1 bg-fl-success text-white btn">
+                                <InputRadio  Value=AttendClassStatusType.Present />
                                 Present
                             </div>
-                            <div class="flex-grow-1 bg-warning bg-muted  btn">
+                            <div class="flex-grow-1 bg-fl-info text-white btn">
                                 <InputRadio Value=AttendClassStatusType.AbsentFromClassWithApology />
                                 Apology
                             </div>
-                            <div class="flex-grow-1 bg-danger bg-muted  btn">
+                            <div class="flex-grow-1 bg-fl-danger text-white btn">
                                 <InputRadio Value=AttendClassStatusType.AbsentFromClassWithoutApology />
                                 No Apology
                             </div>
@@ -386,6 +400,10 @@ else
     public Course? SelectedCourse { get; set; }
     [Parameter]
     public Class? SelectedClass { get; set; }
+
+    [Parameter] public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
+    Person selectedPerson;
 
     bool IsLargeLayout { get; set; }
     bool IsXtraLargeLayout { get; set; }

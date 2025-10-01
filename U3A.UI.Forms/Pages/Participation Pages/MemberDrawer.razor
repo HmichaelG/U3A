@@ -18,6 +18,8 @@ else
 		<TargetContent>
 
 			@{
+				// TargetName is passed in the URL to determine which page is hosting this drawer.
+				// refer MainMenu
 				switch (TargetName)
 				{
 					case "PersonMnt":
@@ -32,6 +34,10 @@ else
 						break;
 					case "EnrolMnt":
 						<EnrolMnt PersonNoteCounts="@PersonNoteCounts"
+								  MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
+						break;
+					case "AttendClassMnt":
+						<AttendClassMnt PersonNoteCounts="@PersonNoteCounts"
 								  MemberDrawerRequested="@(args => OnMemberDrawerRequested(args.Item1, args.Item2))" />
 						break;
 					case "ReceiptMnt":
@@ -124,13 +130,14 @@ else
 	{
 		using var dbc = await U3Adbfactory.CreateDbContextAsync();
 		PersonNoteCounts = await BusinessRule.GetPersonNoteCountsAsync(dbc);
+		currentTerm = await BusinessRule.CurrentTermAsync(dbc);
 		StateHasChanged();
 	}
 
-	void OnMemberDrawerRequested(Person person, Term term)
+	void OnMemberDrawerRequested(Person person, Term? term)
 	{
 		selectedPerson = person;
-		currentTerm = term;
+		if (term is not null)	currentTerm = term;
 		isDrawerOpen = true;
 		dxTabs.ActiveTabIndex = 0;
 	}
