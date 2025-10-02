@@ -436,7 +436,7 @@ else
     public Class? SelectedClass { get; set; }
 
     [Parameter] public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
-    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
+    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; } = new();
     Person selectedPerson;
 
     bool IsLargeLayout { get; set; }
