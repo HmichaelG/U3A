@@ -1,6 +1,7 @@
-﻿
-@inject IDbContextFactory<TenantDbContext> tenantDbfactory
+﻿@inject IDbContextFactory<TenantDbContext> tenantDbfactory
 @inject LocalTime lt
+
+@using System.Xml.Linq
 
 
 @if (isReady)
@@ -34,6 +35,13 @@
         <div class="h6">Exception</div>
         <pre>@log?.Exception.Trim()</pre>
     }
+
+    @if (xmlDoc != null)
+    {
+        <div class="h6 mt-2">Additional Properties</div>
+        <pre>@xmlDoc.ToString()</pre>
+	}
+
 }
 
 <style>
@@ -53,6 +61,7 @@
     DateTime localTime;
     LogEvents? log;
     bool isReady;
+	XDocument? xmlDoc;
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,6 +73,11 @@
                 if (log != null)
                 {
                     localTime = await lt.GetLocalTimeAsync(log.TimeStamp);
+                    //deserialize log.properties. This is an XML string not JSON
+                    if (!string.IsNullOrEmpty(log.Properties))
+                    {
+                        xmlDoc = XDocument.Parse(log.Properties);
+                    }
                 }
             }
         }

@@ -20,10 +20,10 @@
     {
         <ExceptionLogPage Id="@logId"
                           OnFinished="@(async() =>
-                                                                    {
-                                                                        logId = null;
-                                                                        StateHasChanged();
-                                                                    })" />
+                                    {
+                                        logId = null;
+                                        StateHasChanged();
+                                    })" />
     }
     else
     {
