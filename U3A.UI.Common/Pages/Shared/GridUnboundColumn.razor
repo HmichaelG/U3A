@@ -1,0 +1,15 @@
+﻿@inherits DxGridCommandColumn
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        base.ShowInColumnChooser = false;
+        base.NewButtonVisible = false;
+        base.EditButtonVisible = false;
+        base.DeleteButtonVisible = false;
+        base.ClearFilterButtonVisible = false;
+    }
+
+}
