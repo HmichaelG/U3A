@@ -218,20 +218,18 @@ else
                     <DxGridDataColumn Caption="Email" FieldName="Person.Email" Visible=false />
                     <DxGridDataColumn Caption="ICE Phone" FieldName="Person.AdjustedICEPhone" Visible=false />
                     <DxGridDataColumn Caption="ICE Contact" FieldName="Person.ICEContact" Visible=false />
-                            <DxGridDataColumn Width="3rem" 
-                                            Visible=@(IsLargeLayout || IsLargerLayout())
-                                            Caption="Details" 
-                                            AllowGroup="false" 
-                                            ExportEnabled="false" ReadOnly=true
-                                            FixedPosition="GridColumnFixedPosition.Right">
-                                <CellDisplayTemplate>
-                                    <HistoryButton PersonID=@(((AttendClass)context.DataItem).Person.ID)                                                    
-                                                    NoteCount="@(PersonNoteCounts.GetValueOrDefault(((AttendClass)context.DataItem).PersonID))"
-                                                    Click="async() => {selectedPerson = (((AttendClass)context.DataItem).Person);
-                                                                await MemberDrawerRequested.InvokeAsync((selectedPerson, null)); }">
-                                    </HistoryButton>
-                                </CellDisplayTemplate>
-                            </DxGridDataColumn>
+                    <GridUnboundColumn Width="3rem" 
+                                    Visible=@(IsLargeLayout || IsLargerLayout())
+                                    Caption="Details" 
+                                    FixedPosition="GridColumnFixedPosition.Right">
+                        <CellDisplayTemplate>
+                            <HistoryButton PersonID=@(((AttendClass)context.DataItem).Person.ID)                                                    
+                                            NoteCount="@(PersonNoteCounts.GetValueOrDefault(((AttendClass)context.DataItem).PersonID))"
+                                            Click="async() => {selectedPerson = (((AttendClass)context.DataItem).Person);
+                                                        await MemberDrawerRequested.InvokeAsync((selectedPerson, null)); }">
+                            </HistoryButton>
+                        </CellDisplayTemplate>
+                    </GridUnboundColumn>
                 </Columns>
 
                 <EditFormTemplate Context="EditFormContext">

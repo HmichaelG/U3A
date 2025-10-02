@@ -156,9 +156,8 @@
                             </Columns>
                         </DxGridBandColumn>
                         <DxGridDataColumn Caption="Total" FieldName="TotalFees" DisplayFormat="c2" Width="5rem" />
-                        <DxGridDataColumn Width="3rem" Visible=@(!IsReadOnly)
-                                          Caption="Details" AllowGroup="false"
-                                          ExportEnabled="false"
+                        <GridUnboundColumn Width="3rem" Visible=@(!IsReadOnly)
+                                          Caption="Details"
                                           FixedPosition="GridColumnFixedPosition.Right">
                             <CellDisplayTemplate>
                                 <HistoryButton  PersonID=@(((PersonFinancialStatus)context.DataItem).PersonBase.ID)
@@ -168,7 +167,7 @@
                                                     await MemberDrawerRequested.InvokeAsync((selectedPerson,selectedTerm)); }">
                                 </HistoryButton>
                             </CellDisplayTemplate>
-                        </DxGridDataColumn>
+                        </GridUnboundColumn>
                     </Columns>
                     <GroupSummary>
                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" DisplayText="{0:n0}" FieldName="IsComplimentary" />

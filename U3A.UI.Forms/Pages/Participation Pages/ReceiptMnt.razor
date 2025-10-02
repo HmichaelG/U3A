@@ -74,7 +74,7 @@ else
                     <DxGridDataColumn Caption="Fee" FieldName="MerchantFee" DisplayFormat="{0:c2}" Width="6rem" />
                     <DxGridDataColumn Caption="Last Update" FieldName="UpdatedOn" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="8rem" Visible=false />
                     <DxGridDataColumn Caption="Updated By" FieldName="User" Visible=false />
-                    <DxGridDataColumn Width="3rem" Caption="Details" AllowGroup="false" ExportEnabled="false" FixedPosition="GridColumnFixedPosition.Right">
+                    <GridUnboundColumn Width="3rem" Caption="Details" FixedPosition="GridColumnFixedPosition.Right">
                         <CellDisplayTemplate>
                             <HistoryButton PersonID=@(((Receipt)context.DataItem).PersonID)
                                       NoteCount="@(PersonNoteCounts.GetValueOrDefault(((Receipt)context.DataItem).PersonID))"
@@ -83,7 +83,7 @@ else
                                                 await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
                             </HistoryButton>
                         </CellDisplayTemplate>
-                    </DxGridDataColumn>
+                    </GridUnboundColumn>
                 </Columns>
                 <GroupSummary>
                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
