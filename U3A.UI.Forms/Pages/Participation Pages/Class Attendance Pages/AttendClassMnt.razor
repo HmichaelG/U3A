@@ -64,7 +64,7 @@ else
         </BodyTemplate>
     </DxFlyout>
 
-    <DxFormLayout CssClass="mt-2 mx-2">
+    <DxFormLayout CssClass="my-2 mx-2 w-100 mx-auto">
         <div class="col col-12 col-lg-9">
             @if (IsMemberPortal)
             {
@@ -252,7 +252,8 @@ else
                 </EditFormTemplate>
             </DxGrid>
         </div>
-        <div class="pt-3 pe-1 col col-3 d-none d-lg-inline">
+        <div class="pt-3 col col-3 d-none d-lg-inline">
+            <div class="mx-1 pe-3 w-100">
             <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" CssClass="pt-2">
                 <div class="border">
                     <div class="pt-3 px-2 text-fl-info"><b>Class Summary</b></div>
@@ -317,11 +318,12 @@ else
                               RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await DeleteAdHocAttendee())" />
                 </div>
             </DxFormLayoutGroup>
+            </div>
         </div>
         @if (!IsLargerLayout())
         {
-            <div class="card border-primary input-group mx-2 p-1 mb-1">
-                <div class="input-group mb-1">
+            <div class="card border-primary d-flex mx-2 p-1 mb-1 w-100">
+                <div class="d-flex gap-1 mb-1 w-100">
                     <InputRadioGroup @bind-Value=@selectedStatusType>
                         <ChildContent>
                             <div class="flex-grow-1 bg-fl-success text-white btn-style">
@@ -339,14 +341,14 @@ else
                         </ChildContent>
                     </InputRadioGroup>
                 </div>
-                <div class="input-group mb-1">
-                    <div class="flex-grow-1">Comment</div>
-                    <div class="flex-grow-4">
+                <div class="d-flex gap-1 mb-1">
+                    <div class="flex-grow-0 text-fl-body">Comment</div>
+                    <div class="flex-grow-1">
                         <DxTextBox @bind-Text="QuickAttendanceComment"
                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                     </div>
                 </div>
-                <div class="input-group">
+                <div class="d-flex">
                     <DxButton Text="Set Selected" CssClass="flex-grow-1"
                               Id="SetSelected"
                               IconCssClass="bi bi-mortarboard menu-icon"
