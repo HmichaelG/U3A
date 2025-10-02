@@ -20,8 +20,8 @@ public class SerilogEnricher : ILogEventEnricher
         if (httpContext != null)
         {
             // Add properties to the log event based on HttpContext
-            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("Tenant", httpContext.Request.Host));
-            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("User", httpContext.User.Identity.Name));
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty("Tenant", httpContext.Request.Host));
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty("User", httpContext.User.Identity.Name));
         }
     }
 }
