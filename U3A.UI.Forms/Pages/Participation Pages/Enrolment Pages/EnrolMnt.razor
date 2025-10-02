@@ -108,7 +108,7 @@ else
                             UnboundColumnData="Grid_CustomUnboundColumnData"
                             AllowSelectRowByClick="true"
                             @bind-SelectedDataItems="SelectedDataItems"
-                            EditMode="GridEditMode.EditRow"
+                            EditMode="GridEditMode.EditCell"
                             KeyboardNavigationEnabled=true
                             CustomizeEditModel="Grid_CustomizeEditModel"
                             DataItemDeleting="Grid_DataItemDeleting"
@@ -184,11 +184,12 @@ else
                                               FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                               Visible=@(selectedCourse != null && selectedCourse.HasFees)
                                               UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
-                            <DxGridDataColumn Width="3rem" 
+                            <GridUnboundColumn Width="3rem"
                                             Caption="Details" 
-                                            AllowGroup="false" 
-                                            ExportEnabled="false" ReadOnly=true
                                             FixedPosition="GridColumnFixedPosition.Right">
+                                <CellEditTemplate>
+                                    <div style="display: none;"></div>
+                                </CellEditTemplate>
                                 <CellDisplayTemplate>
                                     <HistoryButton PersonID=@(((Enrolment)context.DataItem).Person.ID)
                                                     
@@ -198,7 +199,7 @@ else
                                                                 await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
                                     </HistoryButton>
                                 </CellDisplayTemplate>
-                            </DxGridDataColumn>
+                            </GridUnboundColumn>
                         </Columns>
                         <GroupSummary>
                             <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
