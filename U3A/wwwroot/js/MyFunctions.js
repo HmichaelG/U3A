@@ -309,3 +309,10 @@ function getGridColumnWidths(gridSelector) {
     }
     return Object.fromEntries(gridMap);
 }
+
+function goBack() {
+    window.history.back();
+}
+function isBackButtonEnabled() {
+    return window.history.length > 1;
+}

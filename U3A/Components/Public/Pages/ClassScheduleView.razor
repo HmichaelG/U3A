@@ -14,106 +14,105 @@
 
 @if (!IsReady)
 {
-    <LoadingIndicator />
+	<LoadingIndicator />
 }
 else
 {
-    <DxWindow Width="100dvw"
-    Height="100dvh"
-              PositionY="0"
-              CloseOnEscape="false"
-              Visible="true"
-              ShowHeader="false">
-        <BodyContentTemplate Context="PopupContext">
-            <DxReportViewer @ref="@reportViewer"
-                            Report="@rpt"
-                            SinglePagePreview="false"
-                            Zoom="1"
-                            CssClass="w-100 h-100"
-                            OnCustomizeToolbar="OnCustomizeToolbar" />
-        </BodyContentTemplate>
-    </DxWindow>
+	<DxWindow Width="100dvw"
+			  Height="100dvh"
+			  PositionY="0"
+			  CloseOnEscape="false"
+			  Visible="true"
+			  ShowHeader="false">
+		<BodyContentTemplate Context="PopupContext">
+			<DxReportViewer @ref="@reportViewer"
+							Report="@rpt"
+							SinglePagePreview="false"
+							Zoom="1"
+							CssClass="w-100 h-100"
+							OnCustomizeToolbar="OnCustomizeToolbar" />
+		</BodyContentTemplate>
+	</DxWindow>
 }
 
 @code {
-    bool IsReady;
+	bool IsReady;
 
-    ClassScheduleRpt? rpt;
-    MarkupString message = new MarkupString("");
-    DxReportViewer? reportViewer;
-    U3ADbContext? dbc { get; set; }
-    TenantDbContext? dbcT { get; set; }
+	ClassScheduleRpt? rpt;
+	MarkupString message = new MarkupString("");
+	DxReportViewer? reportViewer;
+	U3ADbContext? dbc { get; set; }
+	TenantDbContext? dbcT { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        dbcT = await TenantDbfactory.CreateDbContextAsync();
-        var today = DateTime.Today;
-        Term? term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
-        if (term != null)
-        {
-            rpt = new ClassScheduleRpt();
-            (rpt as IXtraReportWithNavManager).NavManager = NavMan;
-            foreach (var prm in rpt.Parameters)
-            {
-                prm.Visible = false;
-            }
-            rpt.DbContext = dbc;
-            rpt.TenantDbContext = dbcT;
-            rpt.prmTerm.Value = term.ID;
-            rpt.prmIntendedUse.Value = 0; // Public
-            rpt.CreateReport();
-        }
-        IsReady = true;
-    }
-
-
-    void OnCustomizeToolbar(ToolbarModel toolbarModel)
-    {
-        string[] itemsToRemove = new string[] {"HighlightEditingFields",
-                                                "CancelDocumentCreation"
-        };
-        foreach (var item in toolbarModel.AllItems)
-        {
-            if (itemsToRemove.Contains(item.Id))
-            {
-                item.GetEnabled = () => { return false; };
-                item.Visible = false;
-            }
-        }
-        toolbarModel.AllItems.Add(new ToolbarItem()
-        {
-            IconCssClass = "fw-bold text-fl-primary exit-icon",
-            BeginGroup = true,
-            Text = "Close Report",
-            AdaptiveText = "Close Report",
-            AdaptivePriority = 1,
-            Click = async (args) =>
-            {
-                NavMan.NavigateTo("/public");
-                await InvokeAsync(StateHasChanged);
-            }
-        });
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (reportViewer != null)
-            {
-                reportViewer.TabPanelModel[TabContentKind.Parameters].Visible = false;
-                reportViewer.TabPanelModel[TabContentKind.Search].Visible = true;
-                reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
-                reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
-            }
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		dbc = await U3Adbfactory.CreateDbContextAsync();
+		dbcT = await TenantDbfactory.CreateDbContextAsync();
+		var today = DateTime.Today;
+		Term? term = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+		if (term != null)
+		{
+			rpt = new ClassScheduleRpt();
+			(rpt as IXtraReportWithNavManager).NavManager = NavMan;
+			foreach (var prm in rpt.Parameters)
+			{
+				prm.Visible = false;
+			}
+			rpt.DbContext = dbc;
+			rpt.TenantDbContext = dbcT;
+			rpt.prmTerm.Value = term.ID;
+			rpt.prmIntendedUse.Value = 0; // Public
+			rpt.CreateReport();
+		}
+		IsReady = true;
+	}
 
 
-    public void Dispose()
-    {
-        dbc?.Dispose();
-    }
+	void OnCustomizeToolbar(ToolbarModel toolbarModel)
+	{
+		string[] itemsToRemove = new string[] {"HighlightEditingFields",
+												"CancelDocumentCreation"
+	};
+		foreach (var item in toolbarModel.AllItems)
+		{
+			if (itemsToRemove.Contains(item.Id))
+			{
+				item.GetEnabled = () => { return false; };
+				item.Visible = false;
+			}
+		}
+		toolbarModel.AllItems.Add(new ToolbarItem()
+		{
+			IconCssClass = "fw-bold text-fl-primary exit-icon",
+			BeginGroup = true,
+			Text = "Close Report",
+			AdaptiveText = "Close Report",
+			AdaptivePriority = 1,
+			Click = async (args) =>
+			{
+				await js.InvokeVoidAsync("goBack");
+			}
+		});
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			if (reportViewer != null)
+			{
+				reportViewer.TabPanelModel[TabContentKind.Parameters].Visible = false;
+				reportViewer.TabPanelModel[TabContentKind.Search].Visible = true;
+				reportViewer.TabPanelModel[TabContentKind.ExportOptions].Visible = false;
+				reportViewer.TabPanelModel[TabContentKind.DocumentMap].Visible = false;
+			}
+		}
+		await base.OnAfterRenderAsync(firstRender);
+	}
+
+
+	public void Dispose()
+	{
+		dbc?.Dispose();
+	}
 }

@@ -2,76 +2,88 @@
 
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject NavigationManager navMan
+@inject IJSRuntime js
 
 @if (isReady)
 {
-    <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
-                        @bind-IsActive="@isSmallLayout" />
-    <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
-                        @bind-IsActive="@isSmallLayout" />
+	<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall"
+						@bind-IsActive="@isSmallLayout" />
+	<DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
+						@bind-IsActive="@isSmallLayout" />
 
 
-    <header class="navbar-bg-color w-100 mt-4">
-        @{
-            string title = "Member Portal";
-            if (NoU3AGroup)
-            {
-                title = $"{settings?.U3AGroup}";
-                if (!isSmallLayout) { title = $"{title} Ph: {settings?.Phone}"; }
-            }
-        }
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm box-shadow my-2 p-1">
-            <div class="w-100">
-                <div tabindex="-1" class="h5 nav make-hover justify-content-center" onclick="location.href = '@NavigateTo';">
-                    <img src="images/u3alogo.png" width="81" />&nbsp; &nbsp; @title
-                </div>
-            </div>
-        </nav>
-        @if (!NoU3AGroup)
-        {
-            <div align="center">
-                <div class="h2 u3a-group"><b>@settings?.U3AGroup</b></div>
-                <div class="h5 text-fl-primary text-center">
-                    @(new MarkupString($"Phone: <b>{settings?.Phone}</b>"))
-                </div>
-            </div>
-        }
-    </header>
+	<header class="navbar-bg-color w-100 mt-4">
+		@{
+			string title = "Member Portal";
+			if (NoU3AGroup)
+			{
+				title = $"{settings?.U3AGroup}";
+				if (!isSmallLayout) { title = $"{title} Ph: {settings?.Phone}"; }
+			}
+		}
+		<nav class="navbar navbar-expand-sm navbar-toggleable-sm box-shadow my-2 p-1">
+			<div class="w-100">
+				<div tabindex="-1" class="h5 nav make-hover justify-content-center" onclick="@OnHeaderClick">
+					<div class="me-2 fs-4 bi bi-arrow-left-circle portal-header-back-button-style text-fl-primary" />
+					<img src="images/u3alogo.png" width="81" />&nbsp; &nbsp; @title
+				</div>
+			</div>
+		</nav>
+		@if (!NoU3AGroup)
+		{
+			<div align="center">
+				<div class="h2 u3a-group"><b>@settings?.U3AGroup</b></div>
+				<div class="h5 text-fl-primary text-center">
+					@(new MarkupString($"Phone: <b>{settings?.Phone}</b>"))
+				</div>
+			</div>
+		}
+	</header>
 }
 
 <style>
-    .make-hover {
-        cursor: pointer;
-    }
+	.portal-header-back-button-style {
+		display: @(ShowBackButton ? "flex" : "none");
+	}
 
-    .u3a-group {
-        display: block;
-        margin-bottom: -0.1rem;
-    }
+	.make-hover {
+		cursor: pointer;
+	}
+
+	.u3a-group {
+		display: block;
+		margin-bottom: -0.1rem;
+	}
 </style>
 
 @code {
-    [Parameter]
-    public string NavigateTo { get; set; } = "/";
-    [Parameter]
-    public bool NoU3AGroup { get; set; }
+	[Parameter] public bool ShowBackButton { get; set; }
+	[Parameter]
+	public string NavigateTo { get; set; } = "/";
+	[Parameter]
+	public bool NoU3AGroup { get; set; }
 
-    bool isSmallLayout;
-    bool isReady;
-    SystemSettings? settings;
+	bool isSmallLayout;
+	bool isReady;
+	SystemSettings? settings;
 
-    protected override async Task OnInitializedAsync()
-    {
-        using (var dbc = await U3Adbfactory.CreateDbContextAsync())
-        {
-            settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        };
-        isReady = true;
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		using (var dbc = await U3Adbfactory.CreateDbContextAsync())
+		{
+			settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+		}
+		;
+		isReady = true;
+	}
 
-    void OnHeaderClick()
-    {
-        navMan.NavigateTo(NavigateTo, true);
-    }
+	async void OnHeaderClick()
+	{
+		if (ShowBackButton && NavigateTo == "/") { await js.InvokeVoidAsync("goBack"); }
+		else
+		{
+			navMan.NavigateTo(NavigateTo, true);
+		}
+	}
 
 }
