@@ -89,8 +89,10 @@ else
             }
             else
             {
+                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" CssClass="px-3">
                     <ContextHelpTitle Title="Class Attendance" HelpTopic="Class-Attendance.html"
                         Subtitle="Mark the class attendance roll."/>
+                </DxFormLayoutGroup>
                 <DxFormLayoutGroup Caption="Enrolment Details" Expanded="@areDetailsExpanded"
                                    ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.End"
                                    ExpandedChanged="@(async () => {areDetailsExpanded = !areDetailsExpanded;
@@ -273,6 +275,7 @@ else
                         <div class="col-3 text-end">@countAbsentWithApology</div>
                         <div class="col-9">Absent W/out Apology</div>
                         <div class="col-3 text-end">@countAbsentWithoutApology</div>
+                        <p></p>
                     </div>
                 </div>
             </DxFormLayoutGroup>
