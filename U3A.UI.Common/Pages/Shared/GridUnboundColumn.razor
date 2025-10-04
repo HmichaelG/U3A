@@ -5,6 +5,10 @@
     [Parameter] public int ColumnMinWidth { get; set; }
     [Parameter] public string ColumnWidth { get; set; } = "4rem";
 
+	// Hide parent parameters from the user
+    new int Width { get; set; }
+    new string? MinWidth { get; set; }
+
 
     protected override void OnInitialized()
     {
