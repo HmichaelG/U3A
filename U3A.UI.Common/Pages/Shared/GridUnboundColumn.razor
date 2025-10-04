@@ -2,6 +2,10 @@
 
 @code {
 
+    [Parameter] public int ColumnMinWidth { get; set; }
+    [Parameter] public string ColumnWidth { get; set; } = "4rem";
+
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -11,5 +15,13 @@
         base.DeleteButtonVisible = false;
         base.ClearFilterButtonVisible = false;
     }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (ColumnMinWidth > 0)  base.MinWidth = ColumnMinWidth;
+       if (!string.IsNullOrWhiteSpace(ColumnWidth)) base.Width = ColumnWidth;
+    }
+
 
 }
