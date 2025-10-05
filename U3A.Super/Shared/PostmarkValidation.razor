@@ -60,7 +60,7 @@
     public EventCallback<PostmarkCompleteDomain> OnDomainVerified { get; set; }
 
 
-    PostmarkAdminService service;
+    PostmarkAdminService? service;
     string? Message;
     bool IsErrorMessage;
 
@@ -74,6 +74,8 @@
     {
         try
         {
+            if (service == null) service = new (config);
+            if (domain == null) throw new NullReferenceException("Domain is null");
             _ = await service.VerifyDomainDkim(domain);
             domain = await service.GetDomainDetailsAsync(domain.ID);
             await OnDomainVerified.InvokeAsync(domain);
@@ -90,6 +92,8 @@
     {
         try
         {
+            if (service == null) service = new(config);
+            if (domain == null) throw new NullReferenceException("Domain is null");
             _ = await service.VerifyDomainReturnPath(domain);
             domain = await service.GetDomainDetailsAsync(domain.ID);
             await OnDomainVerified.InvokeAsync(domain);

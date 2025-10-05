@@ -45,7 +45,7 @@ else {
             <DataAnnotationsValidator />
             <DxFormLayout>
                 <DxFormLayoutItem Caption="Tenant ID" ColSpanMd="12">
-                    <DxTextBox @bind-Text=@details.TenantKey NullText="The tenant subdomain name." />
+                    <DxTextBox @bind-Text=@details!.TenantKey NullText="The tenant subdomain name." />
                 </DxFormLayoutItem>
                 <DxFormLayoutItem ColSpanMd="12" Context="myContext">
                     <Template>
@@ -61,7 +61,7 @@ else {
             </DxFormLayout>
         </EditForm>
         <ul class="my-2">
-            @(new MarkupString(status))
+            @(new MarkupString(status ?? ""))
         </ul>
     </div>
 }
@@ -73,16 +73,15 @@ else {
     U3ASecrets? mySecrets;
     bool IsReady = false;
     int ActiveTabIndex { get; set; } = 0;
-    Details details { get; set; }
+    Details? details { get; set; }
     AUState states = new AUState();
     string? ErrorMessage;
     string? SuccessMessage;
     bool isProcessing;
-    string status;
-    PostmarkAdminService service;
+    string? status;
+    PostmarkAdminService? service;
 
     protected override async Task OnInitializedAsync() {
-        var authenticationState = await authenticationStateTask;
         mySecrets = new U3ASecrets(config);
         details = new Details();
         service = new(config);
@@ -124,7 +123,7 @@ else {
         }
         else {
             SuccessMessage = null;
-            ErrorMessage = $"The name [{details.TenantKey}] was not found in the tenant database!";
+            ErrorMessage = $"The name [{details!.TenantKey}] was not found in the tenant database!";
             StateHasChanged();
         }
         isProcessing = false;
@@ -132,7 +131,7 @@ else {
 
     async Task<bool> TenantExistsAsync() {
         var result = false;
-        var key = details.TenantKey.ToLower();
+        var key = details!.TenantKey.ToLower();
         using (var dbc = await Tenantdbfactory.CreateDbContextAsync()) {
             result = await dbc.TenantInfo.AnyAsync(x => x.Identifier == key);
         }
@@ -141,13 +140,24 @@ else {
 
 
     async Task DeleteTenantAsync() {
-        string key = details.TenantKey.ToLower();
+        if (service == null) throw new NullReferenceException("PostmarkAdminService is null");
+        string key = details!.TenantKey.ToLower();
         string dbName = string.Empty;
         TenantInfo? tenant = default;
         using (var dbc = await Tenantdbfactory.CreateDbContextAsync()) {
             tenant = await dbc.TenantInfo.FirstAsync(x => x.Identifier == key);
             var builder = new SqlConnectionStringBuilder(tenant.ConnectionString);
             dbName = builder.InitialCatalog;
+        }
+        if (tenant == null) 
+        {
+            SetMessage($"Tenant [{key}] not found in Tenant database.");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(tenant.PostmarkAPIKey))
+        {
+            SetMessage($"Tenant [{key}] does not have a Postmark API key.");
+            return;
         }
         string mailServer = string.Empty;
         try
@@ -175,11 +185,11 @@ else {
 
     async Task DeleteDNSAsync(SubscriptionResource subscription) {
         // Get the resource group
-        string rgName = mySecrets.DNS_RESOURCE_GROUP;
+        string rgName = mySecrets!.DNS_RESOURCE_GROUP;
         ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(rgName);
         // Get the DnsZone from the resource group
         DnsZoneResource dnsZone = await resourceGroup.GetDnsZoneAsync(mySecrets.DNS_NAME);
-        var tenant = details.TenantKey.ToLower();
+        var tenant = details!.TenantKey.ToLower();
         // Delete CName pointing to A record
         string cnameName = tenant;
         try {
@@ -197,10 +207,11 @@ else {
     }
 
     async Task DeleteWebAppCustomDomainAsync(SubscriptionResource subscription) {
+		if (mySecrets == null) throw new NullReferenceException("U3ASecrets is null");
         ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(mySecrets.WEBAPP_RESOURCE_GROUP);
         var website = (await resourceGroup.GetWebSiteAsync(mySecrets.WEBAPP_NAME)).Value;
         SiteHostNameBindingCollection hostNameBindings = website.GetSiteHostNameBindings();
-        var hostName = $"{details.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
+        var hostName = $"{details!.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
         try {
             var binding = await hostNameBindings.GetAsync(hostName);
             await binding.Value.DeleteAsync(WaitUntil.Completed);
@@ -211,9 +222,9 @@ else {
     }
 
     async Task DeleteAppCertificate(ResourceGroupResource resourceGroup) {
-        var website = (await resourceGroup.GetWebSiteAsync(mySecrets.WEBAPP_NAME)).Value;
+        var website = (await resourceGroup.GetWebSiteAsync(mySecrets!.WEBAPP_NAME)).Value;
         AppServicePlanResource plan = await resourceGroup.GetAppServicePlanAsync(mySecrets.WEBAPP_SERVICE_PLAN);
-        var canonicalName = $"{details.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
+        var canonicalName = $"{details!.TenantKey.ToLower()}.{mySecrets.DNS_NAME}";
         var certificateName = $"{canonicalName}-{mySecrets.WEBAPP_NAME}";
         try {
             var cert = (await resourceGroup.GetAppCertificateAsync(certificateName));
@@ -226,7 +237,7 @@ else {
 
 
     async Task<AzureLocation> GetAuEastLocationAsync(ResourceGroupResource rg) {
-        return (await rg.GetAvailableLocationsAsync()).Value.First(x => x.Name == mySecrets.LOCATION);
+        return (await rg.GetAvailableLocationsAsync()).Value.First(x => x.Name == mySecrets!.LOCATION);
     }
 
     void SetMessage(string msg) {
@@ -242,7 +253,7 @@ else {
     }
 
     class Details {
-        [Required] public string TenantKey { get; set; }
+        [Required] public string TenantKey { get; set; } = "";
     }
 
 }

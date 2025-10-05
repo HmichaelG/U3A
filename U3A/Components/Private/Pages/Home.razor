@@ -99,10 +99,10 @@ else
                 }
                 else
                 {
-                    <span class="d-flex flex-row align-items-center">
+                    <div class="d-flex flex-row align-items-center">
                         <i class="text-fl-primary bi bi-people fs-4"></i>
                         <div class="mx-2" ondblclick="@(() => OnCircuitClick())">@($"{openCircuits} users logged in.")</div>
-                    </span>
+                    </div>
 
                     <ContextHelpTitle @ref=helpAndTitle Title=@($"Ver: {GetAssemblyVersion()}")
                                       IsVersionButton=true
@@ -192,7 +192,7 @@ else
     DxWindow? circuitDisplay;
     List<CircuitDetail>? circuitDetails;
     bool showPopup;
-    string tenantId;
+    string? tenantId;
     bool isFlyoutOpen;
     bool isSmallScreen = true;
     ContextHelpTitle? helpAndTitle;

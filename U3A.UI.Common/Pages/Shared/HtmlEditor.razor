@@ -17,7 +17,7 @@
 <MessageBox @ref=@messageBox />
 
 <div class="html-edit-style">
-<DxTabs @ref="@tabs" CssClass="w-100" >
+<DxTabs CssClass="w-100" @bind-ActiveTabIndex="@activeIndex" >
     <DxTabPage Text="Editor">
         <DxHtmlEditor AllowSoftLineBreak="true"
                       TableResizeEnabled="true"
@@ -112,7 +112,7 @@
     public bool HideTableMenu { get; set; }
 
     MessageBox? messageBox;
-    DxTabs? tabs;
+    int activeIndex = 0;
     bool isCodeEditable;
     static string errorText = "";
     bool isValid;
@@ -130,7 +130,7 @@
         if (firstRender)
         {
             HtmlHelpers.PrettyPrint(Markup);
-            tabs.ActiveTabIndex = Markup.Contains(editorComment) ? 1 : 0;
+            activeIndex = Markup.Contains(editorComment) ? 1 : 0;
             StateHasChanged();
         }
     }

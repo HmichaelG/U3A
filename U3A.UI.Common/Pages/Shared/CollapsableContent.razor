@@ -10,7 +10,7 @@
             RenderStyleMode="ButtonRenderStyleMode.Text"
             Visible="@(ShowCollapseButton)" />
         @ContentTemplate
-        @(new MarkupString(AlertText))
+        @(new MarkupString(AlertText ?? ""))
     </section>
 }
 
@@ -33,19 +33,19 @@
     [Parameter] public bool Visible { get; set; } = true;
     [Parameter] public bool ShowCollapseButton { get; set; } = true;
     [Parameter] public string AlertType { get; set; } = "info";
-    [Parameter] public string AlertText { get; set; }
+    [Parameter] public string? AlertText { get; set; }
     [Parameter] public EventCallback OnToggleAlert { get; set; }
     [Parameter] public EventCallback<bool> OnDismissChanged { get; set; }
     [Parameter] public EventCallback OnContentExpanded { get; set; }
     [Parameter] public EventCallback OnContentCollapsed { get; set; }
-    [Parameter] public RenderFragment ContentTemplate { get; set; }
+    [Parameter] public RenderFragment? ContentTemplate { get; set; }
     [Parameter] public string CssClass { get; set; } = " text-center";
     [Parameter] public string? DismissKey { get; set; }
 
     bool IsDismissed = true;
 
     bool isHidden = false;
-    string alertRender;
+    string? alertRender;
 
     protected override void OnInitialized()
     {
@@ -66,7 +66,7 @@
         if (firstRender)
         {
             var original = IsDismissed;
-            if (!await localStorage.ContainKeyAsync(DismissKey)) { IsDismissed = false; }
+            if (string.IsNullOrWhiteSpace(DismissKey) || !await localStorage.ContainKeyAsync(DismissKey)) { IsDismissed = false; }
             await OnDismissChanged.InvokeAsync(IsDismissed);
             StateHasChanged();
         }
@@ -74,6 +74,7 @@
 
     async Task OnDismiss()
     {
+		if (string.IsNullOrWhiteSpace(DismissKey)) { return; }
         IsDismissed = true;
         await localStorage.SetItemAsStringAsync(DismissKey, "Dismiss");
         await OnDismissChanged.InvokeAsync(IsDismissed);

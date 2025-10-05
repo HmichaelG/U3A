@@ -104,7 +104,7 @@ else
         await base.OnInitializedAsync();
     }
 
-    async Task GetDataAsync() { domains = (await service.ListCompleteDomainsAsync()).OrderBy(x => x.Name); }
+    async Task GetDataAsync() { domains = (await service!.ListCompleteDomainsAsync()).OrderBy(x => x.Name); }
 
     async Task UpdateDataAsync(PostmarkCompleteDomain domain) {
         selectedDomain = domain;

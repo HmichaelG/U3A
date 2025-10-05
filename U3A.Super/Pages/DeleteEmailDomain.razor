@@ -117,7 +117,7 @@ else
         await base.OnInitializedAsync();
     }
 
-    async Task GetDataAsync() { domains = (await service.ListCompleteDomainsAsync()).OrderBy(x => x.Name); }
+    async Task GetDataAsync() { domains = (await service!.ListCompleteDomainsAsync()).OrderBy(x => x.Name); }
 
     async Task UpdateDataAsync()
     {
@@ -134,7 +134,7 @@ else
     async Task DoDelete() {
         PanelVisible = true;
         try{
-            await service.DeleteDomain(selectedDomain.Name); 
+            await service!.DeleteDomain(selectedDomain!.Name); 
             await UpdateDataAsync(); 
         } finally { PanelVisible = false; }
     }

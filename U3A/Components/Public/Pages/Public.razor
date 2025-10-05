@@ -100,7 +100,7 @@ else
                                             else
                                             {
                                                 <p>
-                                                    Click below to view the <b>@(settings.U3AGroup)</b>
+                                                    Click below to view the <b>@(settings!.U3AGroup)</b>
                                                     Class Schedule, our calendar of classes, activities and events in the year.
                                                     You do not need to be logged in to view or print this report.
                                                 </p>
@@ -128,7 +128,7 @@ else
                                             <div class="mt-2 px-2 col-12">
                                                 <div class="h6">Start Here</div>
                                                 <p class="box-height" hidden="@(IsXtraSmallLayout || IsSmallLayout)">
-                                                    If you wish to join <b>@(settings.U3AGroup)</b>, please register to securely use the membership system and protect your privacy. You will need an email address to do so.
+                                                    If you wish to join <b>@(settings!.U3AGroup)</b>, please register to securely use the membership system and protect your privacy. You will need an email address to do so.
                                                 </p>
                                                 <DxButton Text="Register" Enabled="@(!isBeforeEnrolmentDay && !isNoEnrolmentTermAvailable)"
                                                           IconCssClass="bi bi-person-plus menu-icon me-3 fs-4"
@@ -310,11 +310,6 @@ else
     {
         var url = "/public/ClassSchedulePreview";
         NavigationManager.NavigateTo(url);
-    }
-
-    async Task OnClose()
-    {
-            NavigationManager.NavigateTo(tenantInfo!.Website, true);
     }
 
 }
