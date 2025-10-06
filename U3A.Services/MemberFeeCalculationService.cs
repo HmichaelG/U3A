@@ -44,6 +44,7 @@ public class MemberFeeCalculationService
     ConcurrentBag<(Guid MemberID, Guid CourseID, Guid TermID)> TermFeeAdded;
 
     DateTime localTime;
+    TimeSpan UtcOffset;
     private MemberFeeCalculationService()
     {
         MemberFees = new();
@@ -83,6 +84,7 @@ public class MemberFeeCalculationService
 
     private async Task InitializeAsync(U3ADbContext dbc, Term? Term, Person? person)
     {
+        UtcOffset = dbc.UtcOffset;
         localTime = dbc.GetLocalTime(DateTime.UtcNow);
         var s = new Stopwatch();
         s.Start();
@@ -517,7 +519,8 @@ public class MemberFeeCalculationService
         {
             foreach (var e in enrolments.Where(x => x.TermID == t.ID))
             {
-                DateTime dateEnrolled = e.DateEnrolled.Value;
+                DateTime dateEnrolled = e.DateEnrolled.Value + UtcOffset;
+                dateEnrolled = new DateTime(dateEnrolled.Year, dateEnrolled.Month, dateEnrolled.Day);
                 DateTime dateDue = (e.Course.CourseFeePerYearDueDate.HasValue)
                                         ? e.Course.CourseFeePerYearDueDate.Value.ToDateTime(TimeOnly.MinValue)
                                         : dateEnrolled;
