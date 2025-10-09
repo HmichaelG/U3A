@@ -87,7 +87,7 @@ else
                                     <Columns>
                                         <DxGridSelectionColumn Width="2rem" />
                                         <DxGridCommandColumnEx @ref="GridCommandColumn" Width="8rem"
-                                                               EditButtonVisible="true" DeleteButtonVisible="true" NewButtonVisible="true" />
+                                                               EditButtonVisible="true" DeleteButtonVisible="true" NewButtonVisible="@(selectedClass is not null)" />
                                         <DxGridDataColumn Width="6rem" Caption="Start Date" FieldName="StartDate" />
                                         <DxGridDataColumn Width="6rem" Caption="End Date" FieldName="EndDate" />
                                         <DxGridDataColumn Caption="Reason" FieldName="Reason" />
