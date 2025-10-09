@@ -304,12 +304,12 @@ else
 
 
 @code {
-        [Parameter] public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
-        [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
+    [Parameter] public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
 
-        bool IsReady;
-        int ShowEnrolmentType;
-        SystemSettings? settings;
+    bool IsReady;
+    int ShowEnrolmentType;
+    SystemSettings? settings;
 
     private List<Enrolment>? Enrolments { get; set; }
     Enrolment? thisEnrolment;
@@ -698,6 +698,20 @@ else
             }
         }
         await SaveChangesAsync();
+        Person person = dataItem?.Person;
+        Guid courseID = dataItem.CourseID;
+        service = await MemberFeeCalculationService.CreateAsync(dbc,
+                currentTerm, person);
+        service.CalculateFee(person);
+        var allocatedFees = service.GetAllocatedMemberFees(person).Where(x => x.CourseID == courseID);
+        if (feesDue.ContainsKey(person.ID))
+        {
+            feesDue[person.ID] = allocatedFees.Sum(x => x.Balance ?? 0m);
+        }
+        else
+        {
+            feesDue.Add(person.ID, allocatedFees.Sum(x => x.Balance ?? 0m));
+        }
         if (e.IsNew)
         {
             Enrolments.Insert(0, dataItem);
