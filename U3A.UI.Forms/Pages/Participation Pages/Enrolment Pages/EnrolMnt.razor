@@ -14,1169 +14,1169 @@
 
 @if (!IsReady)
 {
-    <LoadingIndicator />
+	<LoadingIndicator />
 }
 else
 {
 
-    <MemberFeeAdjustment @ref="@adjustMemberFee" />
-    <MessageBox @ref="@messageBox" />
-    <TransferOrCopyEnrolment @ref="@transferOrCopyEnrolment" />
+	<MemberFeeAdjustment @ref="@adjustMemberFee" />
+	<MessageBox @ref="@messageBox" />
+	<TransferOrCopyEnrolment @ref="@transferOrCopyEnrolment" />
 
-    <QuickEnrolment @ref="quickEnrolment"
-                    AvailablePersons=Persons
-                    IsWaitListEnabled=@((selectedTerm?.Comparer <= currentTerm?.Comparer)) />
+	<QuickEnrolment @ref="quickEnrolment"
+					AvailablePersons=Persons
+					IsWaitListEnabled=@((selectedTerm?.Comparer <= currentTerm?.Comparer)) />
 
-    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+	<ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
 
-    <SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
-                                 DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
-    <Progress @ref="@ProgressBar" />
+	<SelectDocumentTemplatePopup @ref="@selectDocumentTemplatePopup" dbContext="@dbc"
+								 DocumentTemplates="@DocumentTemplates" SendTo="@SendTo" />
+	<Progress @ref="@ProgressBar" />
 
-    <DxFlyout @bind-IsOpen=IsFlyoutOpen
-              PositionTarget="@FlyoutTargetID"
-              Position="FlyoutPosition.Left"
-              FitToRestriction=false
-              CloseMode="FlyoutCloseMode.Close"
-              HeaderVisible="true"
-              HeaderText="@HeaderContent"
-              Width="max(25vw, 250px)"
-              PreventCloseOnPositionTargetClick="false">
-        <HeaderTemplate>
-            <div class="d-flex m-1 justify-content-between align-items-center">
-                <span>@HeaderContent</span>
-                <DxButton IconCssClass="bi bi-x-lg" Click="@(() => IsFlyoutOpen = false)"
-                          RenderStyleMode="ButtonRenderStyleMode.Outline"
-                          RenderStyle="ButtonRenderStyle.Primary" />
-            </div>
-        </HeaderTemplate>
-        <BodyTemplate>
-            <div class="card">
-                <div class="card-body text-fl-body">
-                    @(new MarkupString(MessageContent))
-                </div>
-            </div>
-        </BodyTemplate>
-    </DxFlyout>
+	<DxFlyout @bind-IsOpen=IsFlyoutOpen
+			  PositionTarget="@FlyoutTargetID"
+			  Position="FlyoutPosition.Left"
+			  FitToRestriction=false
+			  CloseMode="FlyoutCloseMode.Close"
+			  HeaderVisible="true"
+			  HeaderText="@HeaderContent"
+			  Width="max(25vw, 250px)"
+			  PreventCloseOnPositionTargetClick="false">
+		<HeaderTemplate>
+			<div class="d-flex m-1 justify-content-between align-items-center">
+				<span>@HeaderContent</span>
+				<DxButton IconCssClass="bi bi-x-lg" Click="@(() => IsFlyoutOpen = false)"
+						  RenderStyleMode="ButtonRenderStyleMode.Outline"
+						  RenderStyle="ButtonRenderStyle.Primary" />
+			</div>
+		</HeaderTemplate>
+		<BodyTemplate>
+			<div class="card">
+				<div class="card-body text-fl-body">
+					@(new MarkupString(MessageContent))
+				</div>
+			</div>
+		</BodyTemplate>
+	</DxFlyout>
 
-        <DxFormLayout CssClass="mt-2 mx-2">
+	<DxFormLayout CssClass="mt-2 mx-2">
 
-        <div class="col col-12 col-lg-9">
-                <ContextHelpTitle Title="Enroll Participants" HelpTopic="Enrol-Participants.html"
-                    Subtitle="Register participants in courses and/or activities offered in the selected term."/>
-            <DxFormLayoutGroup Caption="Enrolment Details">
-                <DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
-                    <TermsComboBox Terms="@terms"
-                                   @bind-SelectedTerm="@selectedTerm"
-                                   @bind-SelectedTerm:after=@(async () => await SelectedTermChanged(selectedTerm)) />
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Course To Enrol" ColSpanMd="12">
-                    <DxComboBox Data="@courses"
-                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                Enabled="@courseComboEnabled"
-                                NullText="@courseComboNullText"
-                                SearchMode="ListSearchMode.AutoSearch"
-                                ListRenderMode="ListRenderMode.Virtual"
-                                TextFieldName="@nameof(Course.Name)"
-                                Value="@selectedCourse"
-                                ValueChanged="@(async(Course course) => await SelectedCourseChanged(course))">
-                        <DxListEditorColumn FieldName="@nameof(Course.ConversionID)"
-                                            Caption="No"
-                                            Width="25%" />
-                        <DxListEditorColumn FieldName="@nameof(Course.Name)"
-                                            Caption="Course"
-                                            Width="75%" />
-                    </DxComboBox>
-                </DxFormLayoutItem>
-                <DxFormLayoutItem Caption="Class To Enrol" ColSpanMd="12">
-                    <DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
-                                AllowUserInput=false
-                                TextFieldName="@nameof(Class.ClassSummary)"
-                                Value="@selectedClass"
-                                ValueChanged="@(async (Class selectedClass) => await SelectedClassChanged(selectedClass))" />
-                </DxFormLayoutItem>
-            </DxFormLayoutGroup>
+		<div class="col col-12 col-lg-9">
+				<ContextHelpTitle Title="Enroll Participants" HelpTopic="Enrol-Participants.html"
+					Subtitle="Register participants in courses and/or activities offered in the selected term."/>
+			<DxFormLayoutGroup Caption="Enrolment Details">
+				<DxFormLayoutItem Caption="Enrolment Term" ColSpanMd="12">
+					<TermsComboBox Terms="@terms"
+								   @bind-SelectedTerm="@selectedTerm"
+								   @bind-SelectedTerm:after=@(async () => await SelectedTermChanged(selectedTerm)) />
+				</DxFormLayoutItem>
+				<DxFormLayoutItem Caption="Course To Enrol" ColSpanMd="12">
+					<DxComboBox Data="@courses"
+								ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+								Enabled="@courseComboEnabled"
+								NullText="@courseComboNullText"
+								SearchMode="ListSearchMode.AutoSearch"
+								ListRenderMode="ListRenderMode.Virtual"
+								TextFieldName="@nameof(Course.Name)"
+								Value="@selectedCourse"
+								ValueChanged="@(async(Course course) => await SelectedCourseChanged(course))">
+						<DxListEditorColumn FieldName="@nameof(Course.ConversionID)"
+											Caption="No"
+											Width="25%" />
+						<DxListEditorColumn FieldName="@nameof(Course.Name)"
+											Caption="Course"
+											Width="75%" />
+					</DxComboBox>
+				</DxFormLayoutItem>
+				<DxFormLayoutItem Caption="Class To Enrol" ColSpanMd="12">
+					<DxComboBox @ref="@ClassComboBox" Data="@classes" Enabled="@classComboEnabled" NullText="@classComboNullText"
+								AllowUserInput=false
+								TextFieldName="@nameof(Class.ClassSummary)"
+								Value="@selectedClass"
+								ValueChanged="@(async (Class selectedClass) => await SelectedClassChanged(selectedClass))" />
+				</DxFormLayoutItem>
+			</DxFormLayoutGroup>
 
-            <FullScreen @ref="@fullScreen" ToggleButtonRightSideOffset="1.1rem" DisplayOffset="13">
-                <ContentTemplate>
-                    <DxGrid id="my-grid" Data="@Enrolments" @ref=@mainGrid
-                            ShowAllRows="true"
-                            ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
-                            KeyFieldName="ID"
-                            ValidationEnabled="true"
-                            SelectionMode="GridSelectionMode.Multiple"
-                            UnboundColumnData="Grid_CustomUnboundColumnData"
-                            AllowSelectRowByClick="true"
-                            @bind-SelectedDataItems="SelectedDataItems"
-                            EditMode="GridEditMode.EditCell"
-                            KeyboardNavigationEnabled=true
-                            CustomizeEditModel="Grid_CustomizeEditModel"
-                            DataItemDeleting="Grid_DataItemDeleting"
-                            EditModelSaving="Grid_EditModelSaving">
-                        <ToolbarTemplate>
-                            <GridToolbar LinkedGrid=@mainGrid LayoutKey="{95A32121-B773-4562-A285-00E3B9378590}">
-                                <CustomButtonContent>
-                                      <DxToolbarItem Text="Adjust Fees" 
-                                       BeginGroup="true"              
-                                        Alignment=ToolbarItemAlignment.Right
-                                       IconCssClass="bi bi-currency-dollar"
-                                       RenderStyle=ButtonRenderStyle.Primary
-                                       Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
-                                       Click="@OnFeeReversal" />
-                                    <DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
-                                                   BeginGroup=true
-                                                   RenderStyle="ButtonRenderStyle.Primary"
-                                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
-                                                   Alignment="ToolbarItemAlignment.Right">
-                                        <Items>
-                                            <DxToolbarItem IconCssClass="bi bi-envelope" Name="EmailStudentsOnly" Text="Selected Students Only"
-                                                           Click=@(async () => await OnCommunicate(false))
-                                                           Tooltip="Send email and/or SMS to students only" />
-                                            <DxToolbarItem IconCssClass="bi bi-envelope" Name="EmailStudentsAndLeaders" Text="Selected Students & Leaders"
-                                                           BeginGroup=true
-                                                           Click=@(async() => await OnCommunicate(true))
-                                                           Tooltip="Send email and/or SMS to selected students & leaders" />
-                                        </Items>
-                                    </DxToolbarItem>
-                                </CustomButtonContent>
-                            </GridToolbar>
-                        </ToolbarTemplate>
-                        <Columns>
-                            <DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" />
-                            <DxGridCommandColumnEx @ref="GridCommandColumn" 
-                                Width="8rem" FixedPosition="GridColumnFixedPosition.Left"
-                                NewButtonVisible="@(selectedCourse is not null)"
-                                EditButtonVisible="true" DeleteButtonVisible="true" />
-                            <DxGridDataColumn 
-                                Caption="Name"  FixedPosition="GridColumnFixedPosition.Left"
-                                FieldName="Person.FullName" MinWidth="200">
-                                <CellEditTemplate>
-                                    @{
-                                        var enrolment = (Enrolment)context.EditModel;
-                                    }
-                                    <PersonsComboBox People="@Persons" @bind-SelectedPerson="@enrolment.Person" />
-                                </CellEditTemplate>
-                            </DxGridDataColumn>
-                            <DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />
-                            <DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
-                            <DxGridDataColumn Caption="Other Class"
-                                              FieldName="EnrolledInOtherClass"
-                                              Visible=@(selectedCourse?.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass)
-                                              UnboundType="GridUnboundColumnType.String" Width="6rem" />
-                            <DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
-                                              Width="5rem" Visible="@settings.RequireVaxCertificate" />
-                            <DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialToBriefText" Width="4rem" />
-                            <DxGridDataColumn ReadOnly=true
-                                              Visible=@(selectedCourse?.AllowMultiCampsuFrom != null)
-                                              Caption="Visitor?"
-                                              FieldName="Person.IsMultiCampusVisitor" />
-                            <DxGridDataColumn ReadOnly=true Caption="City" FieldName="Person.City" Visible=false />
-                            <DxGridDataColumn ReadOnly=true Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
-                            <DxGridDataColumn ReadOnly=true Caption="Email" FieldName="Person.Email" Visible=false />
-                            <DxGridDataColumn ReadOnly=true Caption="Enrolled" FieldName="DateEnrolled"
-                                              DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
-                            <DxGridDataColumn ReadOnly=true Caption="Joined" FieldName="Person.DateJoined"
-                                              DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible=false />
-                            <DxGridDataColumn ReadOnly=true Caption="Created" FieldName="Created"
-                                              DisplayFormat="{0:dd-MMM-yy HH:mm:ss}" Width="8rem" Visible="false" />
-                            <DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
-                            <DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
-                                              FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                              Visible=@(selectedCourse != null && selectedCourse.HasFees)
-                                              UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
-                            <GridUnboundColumn
-                                            Caption="Details" 
-                                            FixedPosition="GridColumnFixedPosition.Right">
-                                <CellEditTemplate>
-                                    <div style="display: none;"></div>
-                                </CellEditTemplate>
-                                <CellDisplayTemplate>
-                                    <HistoryButton PersonID=@(((Enrolment)context.DataItem).Person.ID)
-                                                    
-                                                    NoteCount="@(PersonNoteCounts.GetValueOrDefault(((Enrolment)context.DataItem).PersonID))"
-                                                    Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
-                                                                await fullScreen.ResetFullScreen();
-                                                                await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
-                                    </HistoryButton>
-                                </CellDisplayTemplate>
-                            </GridUnboundColumn>
-                        </Columns>
-                        <GroupSummary>
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
-                                               FieldName="FeesDue" ValueDisplayFormat="{0:c2}"
-                                               FooterColumnName="FeesDue" />
-                        </GroupSummary>
-                        <TotalSummary>
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
-                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FeesDue" ValueDisplayFormat="{0:c2}" />
-                        </TotalSummary>
-                    </DxGrid>
-                </ContentTemplate>
-            </FullScreen>
-        </div>
-        <div class="col-3 d-none d-lg-inline p-1">
-            <DxFormLayoutGroup BeginRow=true CssClass="leader-height border w-100" Decoration="FormLayoutGroupDecoration.None">
-                <Items>
-                    <div class="mx-2 mt-3 mb-2">
-                        <div class="text-fl-info"><b>Leaders</b></div>
-                        @if (CourseLeaders != null)
-                        {
-                            foreach (Person l in CourseLeaders)
-                            {
-                                <span class="ms-2">@l.FullName</span>
-                            }
-                        }
-                    </div>
-                </Items>
-            </DxFormLayoutGroup>
-            <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
-                <div class="pt-3 mx-2 text-fl-info"><b>Statistics</b></div>
-                <div class="px-3">
-                    <div class="row">
-                        <div class="w-75">Min-Required</div>
-                        <div class="w-25 text-end">@MinimumParticipants</div>
-                        <div class="w-75">Max-Available</div>
-                        <div class="w-25 text-end">@MaximumParticipants</div>
-                        <div class="w-75">Enrolled</div>
-                        <div class="w-25 text-end">@EnrolledParticipants</div>
-                        <div class="w-75">Waitlisted</div>
-                        <div class="w-25 text-end">@WaitlistedParticipants</div>
-                    </div>
-                </div>
-            </DxFormLayoutGroup>
-            <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
-                <div class="pt-3 px-2 text-fl-info"><b>Filter</b></div>
-                <InputRadioGroup ValueChanged="@((int s) => ShowEnrolledTypeChanged(s))"
-                                 Value="@ShowEnrolmentType"
-                                 ValueExpression="@( () => ShowEnrolmentType )">
-                    <span class="col-11 mt-3"><InputRadio Value="0" class="col-2" />Show All</span>
-                    <span class="col-11 mt-3"><InputRadio Value="1" class="col-2" />Show Enrolled</span>
-                    <span class="col-11 mt-3"><InputRadio Value="2" class="col-2" />Show Waitlisted</span>
-                </InputRadioGroup>
-            </DxFormLayoutGroup>
-            <DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
-                <div class="pt-3 px-2 text-fl-info"><b>Quick Actions</b></div>
-                <div class="m-2">
-                    <DxButton Text="Quick Enrolment" CssClass="col col-12 mt-1"
-                              Id="QuickEnrolment"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await DoQuickEnrolmentAsync())" />
-                    <DxButton Text="Set Selection: Enrolled" CssClass="col col-12 mt-1"
-                              Id="SetSelectionEnrolled" Enabled="@IsSetSelectionEnrolledEnabled"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionEnrolledAsync())" />
-                    <DxButton Text="Set Selection: Waitlisted" CssClass="col col-12 mt-1"
-                              Id="SetSelectionWaitlisted"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionWaitListedAsync())" />
-                    <DxButton Text="Transfer Selection" CssClass="col col-12 mt-1"
-                              Id="SetSelectionTransfer"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionTransferAsync())" />
-                    <DxButton Text="Copy Selection" CssClass="col col-12 mt-1"
-                              Id="SetSelectionCopy"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionCopyAsync())" />
-                    <DxButton Text="Delete Selection" CssClass="col col-12 mt-1"
-                              Id="DeleteSelection"
-                              RenderStyleMode="ButtonRenderStyleMode.Outline"
-                              RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await DeleteSelection())" />
-                </div>
-            </DxFormLayoutGroup>
-        </div>
-    </DxFormLayout>
+			<FullScreen @ref="@fullScreen" ToggleButtonRightSideOffset="1.1rem" DisplayOffset="13">
+				<ContentTemplate>
+					<DxGrid id="my-grid" Data="@Enrolments" @ref=@mainGrid
+							ShowAllRows="true"
+							ColumnResizeMode="GridColumnResizeMode.ColumnsContainer"
+							KeyFieldName="ID"
+							ValidationEnabled="true"
+							SelectionMode="GridSelectionMode.Multiple"
+							UnboundColumnData="Grid_CustomUnboundColumnData"
+							AllowSelectRowByClick="true"
+							@bind-SelectedDataItems="SelectedDataItems"
+							EditMode="GridEditMode.EditCell"
+							KeyboardNavigationEnabled=true
+							CustomizeEditModel="Grid_CustomizeEditModel"
+							DataItemDeleting="Grid_DataItemDeleting"
+							EditModelSaving="Grid_EditModelSaving">
+						<ToolbarTemplate>
+							<GridToolbar LinkedGrid=@mainGrid LayoutKey="{95A32121-B773-4562-A285-00E3B9378590}">
+								<CustomButtonContent>
+									  <DxToolbarItem Text="Adjust Fees" 
+									   BeginGroup="true"              
+										Alignment=ToolbarItemAlignment.Right
+									   IconCssClass="bi bi-currency-dollar"
+									   RenderStyle=ButtonRenderStyle.Primary
+									   Enabled=@((SelectedDataItems?.Count > 0) ? true : false)
+									   Click="@OnFeeReversal" />
+									<DxToolbarItem IconCssClass="bi bi-envelope" Name="Communicate" Text="Communicate"
+												   BeginGroup=true
+												   RenderStyle="ButtonRenderStyle.Primary"
+												   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+												   Alignment="ToolbarItemAlignment.Right">
+										<Items>
+											<DxToolbarItem IconCssClass="bi bi-envelope" Name="EmailStudentsOnly" Text="Selected Students Only"
+														   Click=@(async () => await OnCommunicate(false))
+														   Tooltip="Send email and/or SMS to students only" />
+											<DxToolbarItem IconCssClass="bi bi-envelope" Name="EmailStudentsAndLeaders" Text="Selected Students & Leaders"
+														   BeginGroup=true
+														   Click=@(async() => await OnCommunicate(true))
+														   Tooltip="Send email and/or SMS to selected students & leaders" />
+										</Items>
+									</DxToolbarItem>
+								</CustomButtonContent>
+							</GridToolbar>
+						</ToolbarTemplate>
+						<Columns>
+							<DxGridSelectionColumn Width="2rem" FixedPosition="GridColumnFixedPosition.Left" />
+							<DxGridCommandColumnEx @ref="GridCommandColumn" 
+								Width="8rem" FixedPosition="GridColumnFixedPosition.Left"
+								NewButtonVisible="@(selectedCourse is not null)"
+								EditButtonVisible="true" DeleteButtonVisible="true" />
+							<DxGridDataColumn 
+								Caption="Name"  FixedPosition="GridColumnFixedPosition.Left"
+								FieldName="Person.FullName" MinWidth="200">
+								<CellEditTemplate>
+									@{
+										var enrolment = (Enrolment)context.EditModel;
+									}
+									<PersonsComboBox People="@Persons" @bind-SelectedPerson="@enrolment.Person" />
+								</CellEditTemplate>
+							</DxGridDataColumn>
+							<DxGridDataColumn Caption="Clerk?" FieldName="IsCourseClerk" Width="5rem" />
+							<DxGridDataColumn Caption="Waitlisted?" FieldName="IsWaitlisted" Width="5rem" />
+							<DxGridDataColumn Caption="Other Class"
+											  FieldName="EnrolledInOtherClass"
+											  Visible=@(selectedCourse?.CourseParticipationTypeID == (int)ParticipationType.DifferentParticipantsInEachClass)
+											  UnboundType="GridUnboundColumnType.String" Width="6rem" />
+							<DxGridDataColumn Caption="Vax Cert?" FieldName="Person.VaxCertificateViewed"
+											  Width="5rem" Visible="@settings.RequireVaxCertificate" />
+							<DxGridDataColumn ReadOnly=true Caption="Fin-To" FieldName="Person.FinancialToBriefText" Width="4rem" />
+							<DxGridDataColumn ReadOnly=true
+											  Visible=@(selectedCourse?.AllowMultiCampsuFrom != null)
+											  Caption="Visitor?"
+											  FieldName="Person.IsMultiCampusVisitor" />
+							<DxGridDataColumn ReadOnly=true Caption="City" FieldName="Person.City" Visible=false />
+							<DxGridDataColumn ReadOnly=true Caption="Mobile" FieldName="Person.Mobile" Width="6rem" />
+							<DxGridDataColumn ReadOnly=true Caption="Email" FieldName="Person.Email" Visible=false />
+							<DxGridDataColumn ReadOnly=true Caption="Enrolled" FieldName="DateEnrolled"
+											  DisplayFormat="{0:dd-MMM-yy}" Width="6rem" />
+							<DxGridDataColumn ReadOnly=true Caption="Joined" FieldName="Person.DateJoined"
+											  DisplayFormat="{0:dd-MMM-yy}" Width="6rem" Visible=false />
+							<DxGridDataColumn ReadOnly=true Caption="Created" FieldName="Created"
+											  DisplayFormat="{0:dd-MMM-yy HH:mm:ss}" Width="8rem" Visible="false" />
+							<DxGridDataColumn ReadOnly=true SortMode="GridColumnSortMode.Value" Caption="Random" FieldName="Random" Width="5rem" Visible="false" />
+							<DxGridDataColumn ReadOnly=true @ref=@FeesDueColumn FieldName="FeesDue" Caption="Fees Due" DisplayFormat="{0:c2}"
+											  FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+											  Visible=@(selectedCourse != null && selectedCourse.HasFees)
+											  UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
+							<GridUnboundColumn
+											Caption="Details" 
+											FixedPosition="GridColumnFixedPosition.Right">
+								<CellEditTemplate>
+									<div style="display: none;"></div>
+								</CellEditTemplate>
+								<CellDisplayTemplate>
+									<HistoryButton PersonID=@(((Enrolment)context.DataItem).Person.ID)
+													
+													NoteCount="@(PersonNoteCounts.GetValueOrDefault(((Enrolment)context.DataItem).PersonID))"
+													Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
+																await fullScreen.ResetFullScreen();
+																await MemberDrawerRequested.InvokeAsync((selectedPerson,currentTerm)); }">
+									</HistoryButton>
+								</CellDisplayTemplate>
+							</GridUnboundColumn>
+						</Columns>
+						<GroupSummary>
+							<DxGridSummaryItem SummaryType="GridSummaryItemType.Sum"
+											   FieldName="FeesDue" ValueDisplayFormat="{0:c2}"
+											   FooterColumnName="FeesDue" />
+						</GroupSummary>
+						<TotalSummary>
+							<DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="Person.FullName" />
+							<DxGridSummaryItem SummaryType="GridSummaryItemType.Sum" FieldName="FeesDue" ValueDisplayFormat="{0:c2}" />
+						</TotalSummary>
+					</DxGrid>
+				</ContentTemplate>
+			</FullScreen>
+		</div>
+		<div class="col-3 d-none d-lg-inline p-1">
+			<DxFormLayoutGroup BeginRow=true CssClass="leader-height border w-100" Decoration="FormLayoutGroupDecoration.None">
+				<Items>
+					<div class="mx-2 mt-3 mb-2">
+						<div class="text-fl-info"><b>Leaders</b></div>
+						@if (CourseLeaders != null)
+						{
+							foreach (Person l in CourseLeaders)
+							{
+								<span class="ms-2">@l.FullName</span>
+							}
+						}
+					</div>
+				</Items>
+			</DxFormLayoutGroup>
+			<DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
+				<div class="pt-3 mx-2 text-fl-info"><b>Statistics</b></div>
+				<div class="px-3">
+					<div class="row">
+						<div class="w-75">Min-Required</div>
+						<div class="w-25 text-end">@MinimumParticipants</div>
+						<div class="w-75">Max-Available</div>
+						<div class="w-25 text-end">@MaximumParticipants</div>
+						<div class="w-75">Enrolled</div>
+						<div class="w-25 text-end">@EnrolledParticipants</div>
+						<div class="w-75">Waitlisted</div>
+						<div class="w-25 text-end">@WaitlistedParticipants</div>
+					</div>
+				</div>
+			</DxFormLayoutGroup>
+			<DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
+				<div class="pt-3 px-2 text-fl-info"><b>Filter</b></div>
+				<InputRadioGroup ValueChanged="@((int s) => ShowEnrolledTypeChanged(s))"
+								 Value="@ShowEnrolmentType"
+								 ValueExpression="@( () => ShowEnrolmentType )">
+					<span class="col-11 mt-3"><InputRadio Value="0" class="col-2" />Show All</span>
+					<span class="col-11 mt-3"><InputRadio Value="1" class="col-2" />Show Enrolled</span>
+					<span class="col-11 mt-3"><InputRadio Value="2" class="col-2" />Show Waitlisted</span>
+				</InputRadioGroup>
+			</DxFormLayoutGroup>
+			<DxFormLayoutGroup CssClass="mt-1 border" Decoration="FormLayoutGroupDecoration.None">
+				<div class="pt-3 px-2 text-fl-info"><b>Quick Actions</b></div>
+				<div class="m-2">
+					<DxButton Text="Quick Enrolment" CssClass="col col-12 mt-1"
+							  Id="QuickEnrolment"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await DoQuickEnrolmentAsync())" />
+					<DxButton Text="Set Selection: Enrolled" CssClass="col col-12 mt-1"
+							  Id="SetSelectionEnrolled" Enabled="@IsSetSelectionEnrolledEnabled"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionEnrolledAsync())" />
+					<DxButton Text="Set Selection: Waitlisted" CssClass="col col-12 mt-1"
+							  Id="SetSelectionWaitlisted"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionWaitListedAsync())" />
+					<DxButton Text="Transfer Selection" CssClass="col col-12 mt-1"
+							  Id="SetSelectionTransfer"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionTransferAsync())" />
+					<DxButton Text="Copy Selection" CssClass="col col-12 mt-1"
+							  Id="SetSelectionCopy"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await SetSelectionCopyAsync())" />
+					<DxButton Text="Delete Selection" CssClass="col col-12 mt-1"
+							  Id="DeleteSelection"
+							  RenderStyleMode="ButtonRenderStyleMode.Outline"
+							  RenderStyle="ButtonRenderStyle.Primary" Click="@(async() => await DeleteSelection())" />
+				</div>
+			</DxFormLayoutGroup>
+		</div>
+	</DxFormLayout>
 }
 <style>
-    .drawer-style {
-        max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
-    }
+	.drawer-style {
+		max-height: calc(100% - @((ws.UseTopMenu) ? "6rem" : "2rem") );
+	}
 
-    .drawer-content-style {
-        max-height: 75dvh;
-    }
+	.drawer-content-style {
+		max-height: 75dvh;
+	}
 
-    .leader-height {
-        min-height: 3dvh;
-        height: auto;
-    }
+	.leader-height {
+		min-height: 3dvh;
+		height: auto;
+	}
 
 </style>
 
 
 @code {
-    [Parameter] public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
-    [Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
+	[Parameter] public EventCallback<(Person, Term)> MemberDrawerRequested { get; set; }
+	[Parameter] public Dictionary<Guid, int>? PersonNoteCounts { get; set; }
 
-    bool IsReady;
-    int ShowEnrolmentType;
-    SystemSettings? settings;
+	bool IsReady;
+	int ShowEnrolmentType;
+	SystemSettings? settings;
 
-    private List<Enrolment>? Enrolments { get; set; }
-    Enrolment? thisEnrolment;
+	private List<Enrolment>? Enrolments { get; set; }
+	Enrolment? thisEnrolment;
 
-    private List<Person>? Persons { get; set; }
-    private List<Person>? CourseLeaders { get; set; }
-    private IEnumerable<Person>? leaders { get; set; }
+	private List<Person>? Persons { get; set; }
+	private List<Person>? CourseLeaders { get; set; }
+	private IEnumerable<Person>? leaders { get; set; }
 
-    private List<Term> terms { get; set; }
-    private Term? selectedTerm { get; set; } // Term selected in the grid
-    private Term? currentTerm { get; set; } // Current default Term
+	private List<Term> terms { get; set; }
+	private Term? selectedTerm { get; set; } // Term selected in the grid
+	private Term? currentTerm { get; set; } // Current default Term
 
-    private List<Course> courses { get; set; }
-    private Course? selectedCourse { get; set; }
+	private List<Course> courses { get; set; }
+	private Course? selectedCourse { get; set; }
 
-    private List<Class> classes { get; set; }
-    private Class? selectedClass { get; set; }
+	private List<Class> classes { get; set; }
+	private Class? selectedClass { get; set; }
 
-    IReadOnlyList<object> SelectedDataItems { get; set; }
+	IReadOnlyList<object> SelectedDataItems { get; set; }
 
-    bool EmailActiveParticipants = false;
-    bool EmailWaitlisted = false;
-    DxGridDataColumn? FeesDueColumn;
-    FullScreen? fullScreen;
-    Person selectedPerson;
+	bool EmailActiveParticipants = false;
+	bool EmailWaitlisted = false;
+	DxGridDataColumn? FeesDueColumn;
+	FullScreen? fullScreen;
+	Person selectedPerson;
 
-    bool IsFlyoutOpen = false;
-    string FlyoutTargetID;
-    string HeaderContent;
-    string MessageContent;
-    MessageBox? messageBox { get; set; }
-    bool MessageBoxShowCancelButton;
-    bool IsSetSelectionEnrolledEnabled;
-    Dictionary<Guid, Decimal> feesDue = new();
+	bool IsFlyoutOpen = false;
+	string FlyoutTargetID;
+	string HeaderContent;
+	string MessageContent;
+	MessageBox? messageBox { get; set; }
+	bool MessageBoxShowCancelButton;
+	bool IsSetSelectionEnrolledEnabled;
+	Dictionary<Guid, Decimal> feesDue = new();
 
-    QuickEnrolment? quickEnrolment;
-    TransferOrCopyEnrolment? transferOrCopyEnrolment;
+	QuickEnrolment? quickEnrolment;
+	TransferOrCopyEnrolment? transferOrCopyEnrolment;
 
-    private string classComboNullText;
-    private bool classComboEnabled;
-    private string courseComboNullText = "Select the Course to enrol...";
-    private bool courseComboEnabled;
-
-
-    private DxGridCommandColumnEx? GridCommandColumn;
-    private DxComboBox<Class, Class?> ClassComboBox;
-
-    int MinimumParticipants;
-    int MaximumParticipants;
-    int EnrolledParticipants;
-    int WaitlistedParticipants;
-    string ClassStatus = "Status: N/A";
-    ButtonRenderStyle buttonRenderStyle = ButtonRenderStyle.Light;
-
-    IGrid? mainGrid { get; set; }
-    ErrorPopup? ErrorPopup { get; set; }
-    GridToolbar Toolbar;
-    string ErrorHeader;
-    string ErrorMessage;
-    U3ADbContext dbc { get; set; }
-    TenantDbContext dbcT { get; set; }
-
-    Communication Communication;
-    private List<Person> SendTo { get; set; }
-    private List<DocumentTemplate> DocumentTemplates;
-    private SelectDocumentTemplatePopup selectDocumentTemplatePopup;
-    DocumentServer server;
-    int documentsSent;
-    internal Progress? ProgressBar;
-    MemberFeeCalculationService service;
-    bool hasMultiCampusVisitors = false;
-    MemberFeeAdjustment? adjustMemberFee;
+	private string classComboNullText;
+	private bool classComboEnabled;
+	private string courseComboNullText = "Select the Course to enrol...";
+	private bool courseComboEnabled;
 
 
-    List<(Guid CourseID, Guid PersonID, string ClassStart)> AllEnrolmentsForDifferentParticipantsInEachClass;
+	private DxGridCommandColumnEx? GridCommandColumn;
+	private DxComboBox<Class, Class?> ClassComboBox;
 
-    protected override async Task OnInitializedAsync()
-    {
-        // wire up the data
-        dbc = await U3Adbfactory.CreateDbContextAsync();
-        dbcT = await tenantDbfactory.CreateDbContextAsync();
-        Communication = new Communication();
-        DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
-        server = new DocumentServer(dbc);
-        settings = await dbc.SystemSettings.FirstOrDefaultAsync();
-        terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-        currentTerm = selectedTerm = await BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
-        IsSetSelectionEnrolledEnabled = true;
-        courseComboEnabled = false;
-        if (selectedTerm != null)
-        {
-            Persons = await BusinessRule.EnrollablePeopleAsync(dbc, selectedTerm);
-            await SelectedTermChanged(selectedTerm);
-        }
-        ShowEnrolledTypeChanged(0);
-        IsReady = true;
-    }
+	int MinimumParticipants;
+	int MaximumParticipants;
+	int EnrolledParticipants;
+	int WaitlistedParticipants;
+	string ClassStatus = "Status: N/A";
+	ButtonRenderStyle buttonRenderStyle = ButtonRenderStyle.Light;
 
-    protected override async void OnAfterRender(bool firstRender)
-    {
-        // wire up the toolbar
-        base.OnAfterRender(firstRender);
-        if (!firstRender)
-        {
-            if (selectedTerm == null)
-            {
-                await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");
-                NavMan.NavigateTo("/");
-            }
-        }
-    }
+	IGrid? mainGrid { get; set; }
+	ErrorPopup? ErrorPopup { get; set; }
+	GridToolbar Toolbar;
+	string ErrorHeader;
+	string ErrorMessage;
+	U3ADbContext dbc { get; set; }
+	TenantDbContext dbcT { get; set; }
 
-    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
-    {
-        var editModel = (Enrolment)e.EditModel;
-        if (e.IsNew)
-        {
-            editModel.IsWaitlisted = BusinessRule.SetWaitlistStatus(selectedTerm, currentTerm);
-        }
-    }
-
-    void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
-    {
-        e.Value = 0;
-        if (e.FieldName == "FeesDue" && FeesDueColumn.Visible)
-        {
-            Person p = (Person)e.GetRowValue("Person");
-            decimal fee = 0;
-            if (feesDue.TryGetValue(p.ID, out fee)) { e.Value = fee; }
-        }
-        if (e.FieldName == "EnrolledInOtherClass")
-        {
-            e.Value = string.Empty;
-            Guid pID = (Guid)e.GetRowValue("PersonID");
-            Guid cID = (Guid)e.GetRowValue("CourseID");
-            bool wl = (bool)e.GetRowValue("IsWaitlisted");
-            if (wl)
-            {
-                var inOtherClass = AllEnrolmentsForDifferentParticipantsInEachClass
-                                    .FirstOrDefault(x => x.PersonID == pID && x.CourseID == cID);
-                e.Value = (inOtherClass == default) ? string.Empty : inOtherClass.ClassStart;
-            }
-        }
-    }
-
-    async Task OnWaitlistedChanged(bool isWaitlisted)
-    {
-        if (selectedTerm.Comparer > currentTerm.Comparer && !isWaitlisted)
-        {
-            await messageBox.ShowOkOnlyAsync("Enroll is not allowed",
-                "The enrolment status for future enrolments must remain Waitlisted.");
-        }
-        else
-        {
-            if (thisEnrolment.Person?.FinancialTo < currentTerm.Year && !isWaitlisted)
-            {
-                await messageBox.ShowOkOnlyAsync("Enroll is not allowed",
-                    "The enrolment status must remain Waitlisted because the student is unfinancial.");
-            }
-            else { thisEnrolment.IsWaitlisted = isWaitlisted; }
-        }
-    }
-
-    async Task OnCourseClerkChanged(bool isCourseClerk)
-    {
-        if (isCourseClerk && thisEnrolment.IsWaitlisted)
-        {
-            await messageBox.ShowOkOnlyAsync("Student is waitlisted",
-                "A waitlisted student cannot be a course clerk.");
-        }
-        else { thisEnrolment.IsCourseClerk = isCourseClerk; }
-    }
+	Communication Communication;
+	private List<Person> SendTo { get; set; }
+	private List<DocumentTemplate> DocumentTemplates;
+	private SelectDocumentTemplatePopup selectDocumentTemplatePopup;
+	DocumentServer server;
+	int documentsSent;
+	internal Progress? ProgressBar;
+	MemberFeeCalculationService service;
+	bool hasMultiCampusVisitors = false;
+	MemberFeeAdjustment? adjustMemberFee;
 
 
-    async Task SelectedTermChanged(Term term)
-    {
-        ClearSelection();
-        selectedTerm = term;
-        CourseLeaders = null;
-        selectedCourse = null;
-        selectedClass = null;
-        classComboEnabled = false;
-        courseComboEnabled = false;
-        if (Enrolments != null) { Enrolments.Clear(); }
-        courseComboNullText = "Loading Course & Enrolment data ... please wait";
-        StateHasChanged();
-        courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
-        AllEnrolmentsForDifferentParticipantsInEachClass =
-            await BusinessRule.AllEnrolmentsForDifferentParticipantsInEachClassAsync(dbc, selectedTerm);
-        courseComboNullText = string.Empty;
-        courseComboEnabled = true;
-        IsSetSelectionEnrolledEnabled = (selectedTerm.Comparer <= currentTerm.Comparer);
-        StateHasChanged();
-    }
+	List<(Guid CourseID, Guid PersonID, string ClassStart)> AllEnrolmentsForDifferentParticipantsInEachClass;
 
-    async Task SelectedCourseChanged(Course course)
-    {
-        selectedClass = null;
-        CourseLeaders = null;
-        classComboNullText = null;
-        if (Enrolments != null) { Enrolments.Clear(); }
-        selectedCourse = course;
-        if (selectedCourse != null)
-        {
-            hasMultiCampusVisitors = false;
-            classes = selectedCourse.Classes;
-            SetupClassToEnrol();
-            if (selectedClass == null || selectedCourse.Classes.Count == 1) { await SetupGrid(); }
-        }
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		// wire up the data
+		dbc = await U3Adbfactory.CreateDbContextAsync();
+		dbcT = await tenantDbfactory.CreateDbContextAsync();
+		Communication = new Communication();
+		DocumentTemplates = await BusinessRule.SelectableDocumentTemplatesAsync(dbc);
+		server = new DocumentServer(dbc);
+		settings = await dbc.SystemSettings.FirstOrDefaultAsync();
+		terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
+		currentTerm = selectedTerm = await BusinessRule.CurrentEnrolmentTermOrNextAsync(dbc);
+		IsSetSelectionEnrolledEnabled = true;
+		courseComboEnabled = false;
+		if (selectedTerm != null)
+		{
+			Persons = await BusinessRule.EnrollablePeopleAsync(dbc, selectedTerm);
+			await SelectedTermChanged(selectedTerm);
+		}
+		ShowEnrolledTypeChanged(0);
+		IsReady = true;
+	}
 
-    async Task SelectedClassChanged(Class Class)
-    {
-        selectedClass = Class;
-        await SetupGrid();
-    }
+	protected override async void OnAfterRender(bool firstRender)
+	{
+		// wire up the toolbar
+		base.OnAfterRender(firstRender);
+		if (!firstRender)
+		{
+			if (selectedTerm == null)
+			{
+				await messageBox.ShowOkOnlyAsync("Current Term is undefined", "Use <strong>Add/Edit Enrolment Terms</strong> to set the current term.");
+				NavMan.NavigateTo("/");
+			}
+		}
+	}
 
-    async Task SetupGrid()
-    {
-        await ProgressBar.ShowSmallSpinnerAsync();
-        ClearSelection();
-        mainGrid.BeginUpdate();
-        GridCommandColumn.Visible = false;
-        if (selectedCourse != null)
-        {
-            if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
-            {
-                GridCommandColumn.Visible = true;
-                await GetEnrolments();
-            }
-            else
-            {
-                if (selectedClass != null)
-                {
-                    GridCommandColumn.Visible = true;
-                    await GetEnrolments();
-                }
-            }
-        }
-        UpdateStatistics();
-        mainGrid.AutoFitColumnWidths();
-        mainGrid.EndUpdate();
-        await ProgressBar.Close();
-    }
+	async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+	{
+		var editModel = (Enrolment)e.EditModel;
+		if (e.IsNew)
+		{
+			editModel.IsWaitlisted = BusinessRule.SetWaitlistStatus(selectedTerm, currentTerm);
+		}
+	}
 
-    void ClearSelection()
-    {
-        SendTo = null;
-        SelectedDataItems = null;
-    }
+	void Grid_CustomUnboundColumnData(GridUnboundColumnDataEventArgs e)
+	{
+		e.Value = 0;
+		if (e.FieldName == "FeesDue" && FeesDueColumn.Visible)
+		{
+			Person p = (Person)e.GetRowValue("Person");
+			decimal fee = 0;
+			if (feesDue.TryGetValue(p.ID, out fee)) { e.Value = fee; }
+		}
+		if (e.FieldName == "EnrolledInOtherClass")
+		{
+			e.Value = string.Empty;
+			Guid pID = (Guid)e.GetRowValue("PersonID");
+			Guid cID = (Guid)e.GetRowValue("CourseID");
+			bool wl = (bool)e.GetRowValue("IsWaitlisted");
+			if (wl)
+			{
+				var inOtherClass = AllEnrolmentsForDifferentParticipantsInEachClass
+									.FirstOrDefault(x => x.PersonID == pID && x.CourseID == cID);
+				e.Value = (inOtherClass == default) ? string.Empty : inOtherClass.ClassStart;
+			}
+		}
+	}
 
-    bool isProcessingEnrolments = false;
-    async Task GetEnrolments()
-    {
-        if (isProcessingEnrolments) return;
-        try
-        {
-            Enrolments = await BusinessRule.EditableEnrolmentsAsync(dbc, selectedTerm, selectedCourse, selectedClass);
-            var tenant = await tenantService.GetTenantIdentifierAsync();
-            List<Enrolment> mcE = new();
-            if (selectedCourse.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
-            {
-                mcE = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant, selectedCourse.ID);
-            }
-            else
-            {
-                mcE = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant, selectedCourse.ID, selectedClass.ID);
-            }
-            hasMultiCampusVisitors = (mcE.Count > 0) ? true : false;
-            Enrolments.AddRange(mcE);
-            Enrolments = Enrolments.OrderBy(x => x.Person.FullNameAlphaKey).ToList();
-            feesDue = new();
-            service = await MemberFeeCalculationService.CreateAsync(dbc,
-                            currentTerm,
-                            Enrolments.Select(x => x.Person).ToList());
-            foreach (var e in Enrolments)
-            {
-                if (!feesDue.ContainsKey(e.PersonID))
-                {
-                    service.CalculateFee(e.Person);
-                    var allocatedFees = service.GetAllocatedMemberFees(e.Person).Where(x => x.CourseID == e.CourseID);
-                    feesDue.Add(e.PersonID, allocatedFees.Sum(x => x.Balance ?? 0m));
-                }
-            }
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (Exception ex) { throw ex; }
-        finally { isProcessingEnrolments = false; }
-    }
+	async Task OnWaitlistedChanged(bool isWaitlisted)
+	{
+		if (selectedTerm.Comparer > currentTerm.Comparer && !isWaitlisted)
+		{
+			await messageBox.ShowOkOnlyAsync("Enroll is not allowed",
+				"The enrolment status for future enrolments must remain Waitlisted.");
+		}
+		else
+		{
+			if (thisEnrolment.Person?.FinancialTo < currentTerm.Year && !isWaitlisted)
+			{
+				await messageBox.ShowOkOnlyAsync("Enroll is not allowed",
+					"The enrolment status must remain Waitlisted because the student is unfinancial.");
+			}
+			else { thisEnrolment.IsWaitlisted = isWaitlisted; }
+		}
+	}
 
-    void SetupClassToEnrol()
-    {
-        selectedClass = null;
-        classComboNullText = null;
-        if (selectedCourse.CourseParticipationTypeID ==
-            (int?)ParticipationType.SameParticipantsInAllClasses)
-        {
-            selectedClass = null; // *** Most Important ***
-            classComboNullText = (selectedCourse.Classes.Count() == 1)
-                    ? selectedCourse.Classes[0].ClassSummary
-                    : selectedCourse.CourseParticipationType.Name;
-            classComboNullText = selectedCourse.CourseParticipationType.Name;
-            classComboEnabled = false;
-        }
-        else
-        {
-            if (selectedCourse.Classes.Count() == 1)
-            {
-                selectedClass = classes[0];
-                classComboEnabled = false;
-            }
-            else
-            {
-                classComboNullText = "Select the Class to enroll...";
-                classComboEnabled = true;
-            }
-        }
-    }
+	async Task OnCourseClerkChanged(bool isCourseClerk)
+	{
+		if (isCourseClerk && thisEnrolment.IsWaitlisted)
+		{
+			await messageBox.ShowOkOnlyAsync("Student is waitlisted",
+				"A waitlisted student cannot be a course clerk.");
+		}
+		else { thisEnrolment.IsCourseClerk = isCourseClerk; }
+	}
 
 
-    bool isBusySaving;
-    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
-    {
-        if (isBusySaving) return;
-        isBusySaving = true;
-        try
-        {
-            await SaveRecord(e);
-            UpdateStatistics();
-        }
-        finally
-        {
-            isBusySaving = false;
-        }
-    }
+	async Task SelectedTermChanged(Term term)
+	{
+		ClearSelection();
+		selectedTerm = term;
+		CourseLeaders = null;
+		selectedCourse = null;
+		selectedClass = null;
+		classComboEnabled = false;
+		courseComboEnabled = false;
+		if (Enrolments != null) { Enrolments.Clear(); }
+		courseComboNullText = "Loading Course & Enrolment data ... please wait";
+		StateHasChanged();
+		courses = await BusinessRule.SelectableCoursesByTermAsync(dbc, term.Year, term.TermNumber);
+		AllEnrolmentsForDifferentParticipantsInEachClass =
+			await BusinessRule.AllEnrolmentsForDifferentParticipantsInEachClassAsync(dbc, selectedTerm);
+		courseComboNullText = string.Empty;
+		courseComboEnabled = true;
+		IsSetSelectionEnrolledEnabled = (selectedTerm.Comparer <= currentTerm.Comparer);
+		StateHasChanged();
+	}
 
-    async Task SaveRecord(GridEditModelSavingEventArgs e)
-    {
-        Enrolment dataItem = null;
-        var editModel = (Enrolment)e.EditModel;
-        if (!await IsDataOk(editModel))
-        {
-            await mainGrid.CancelEditAsync();
-            e.Cancel = true; return;
-        }
-        // Re-query a data item from the store.
-        dbc?.ChangeTracker?.Clear();
-        if (editModel.Person.IsMultiCampusVisitor)
-        {
-            var mce = await dbcT.MultiCampusEnrolment.FindAsync(editModel.ID);
-            if (mce != null)
-            {
-                mce.IsWaitlisted = editModel.IsWaitlisted;
-                List<Class> classes = new();
-                if (selectedClass != null)
-                {
-                    classes.Add(selectedClass);
-                }
-                else
-                {
-                    classes.AddRange(selectedCourse.Classes);
-                }
-                await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, classes, settings);
-            }
-        }
-        else
-        {
-            dataItem = e.IsNew ? new Enrolment() : dbc.Enrolment.Find(editModel.ID);
-            // Assign changes from the edit model to the data item.
-            if (dataItem != null)
-            {
-                editModel.CopyTo(dataItem);
-                dataItem.Person = await dbc.Person.IgnoreQueryFilters()
-                                    .FirstAsync(x => !x.IsDeleted && x.ID == editModel.Person.ID);
-                dataItem.Term = dbc.Term.Find(selectedTerm.ID);
-                dataItem.Course = dbc.Course.Find(selectedCourse.ID);
-                if (selectedClass != null) { dataItem.Class = dbc.Class.Find(selectedClass.ID); }
-                if (e.IsNew && EnrolledParticipants >= MaximumParticipants && !dataItem.IsWaitlisted)
-                {
-                    await messageBox.ShowOkOnlyAsync("Participant Waitlisted", $"{dataItem.Person.FullName} was waitlisted because the class is full.</p>");
-                    dataItem.IsWaitlisted = true;
-                }
+	async Task SelectedCourseChanged(Course course)
+	{
+		selectedClass = null;
+		CourseLeaders = null;
+		classComboNullText = null;
+		if (Enrolments != null) { Enrolments.Clear(); }
+		selectedCourse = course;
+		if (selectedCourse != null)
+		{
+			hasMultiCampusVisitors = false;
+			classes = selectedCourse.Classes;
+			SetupClassToEnrol();
+			if (selectedClass == null || selectedCourse.Classes.Count == 1) { await SetupGrid(); }
+		}
+	}
 
-                // Post changes to the database.
-                if (e.IsNew) await dbc.AddAsync(dataItem);
-            }
-        }
-        await SaveChangesAsync();
-        Person person = dataItem?.Person;
-        Guid courseID = dataItem.CourseID;
-        service = await MemberFeeCalculationService.CreateAsync(dbc,
-                currentTerm, person);
-        service.CalculateFee(person);
-        var allocatedFees = service.GetAllocatedMemberFees(person).Where(x => x.CourseID == courseID);
-        if (feesDue.ContainsKey(person.ID))
-        {
-            feesDue[person.ID] = allocatedFees.Sum(x => x.Balance ?? 0m);
-        }
-        else
-        {
-            feesDue.Add(person.ID, allocatedFees.Sum(x => x.Balance ?? 0m));
-        }
-        if (e.IsNew)
-        {
-            Enrolments.Insert(0, dataItem);
-        }
-        else
-        {
-            int idx = Enrolments.FindIndex(x => x.ID == dataItem.ID);
-            Enrolments[idx] = dataItem;
-        }
-    }
+	async Task SelectedClassChanged(Class Class)
+	{
+		selectedClass = Class;
+		await SetupGrid();
+	}
 
+	async Task SetupGrid()
+	{
+		await ProgressBar.ShowSmallSpinnerAsync();
+		ClearSelection();
+		mainGrid.BeginUpdate();
+		GridCommandColumn.Visible = false;
+		if (selectedCourse != null)
+		{
+			if (selectedCourse.CourseParticipationTypeID == (int?)ParticipationType.SameParticipantsInAllClasses)
+			{
+				GridCommandColumn.Visible = true;
+				await GetEnrolments();
+			}
+			else
+			{
+				if (selectedClass != null)
+				{
+					GridCommandColumn.Visible = true;
+					await GetEnrolments();
+				}
+			}
+		}
+		UpdateStatistics();
+		mainGrid.AutoFitColumnWidths();
+		mainGrid.EndUpdate();
+		await ProgressBar.Close();
+	}
 
-    async Task<bool> IsDataOk(Enrolment editItem)
-    {
-        bool result = true;
-        var dupMarkup = await BusinessRule.DuplicateMarkUpAsync(dbc, editItem, selectedTerm, selectedCourse, selectedClass);
-        if (!string.IsNullOrWhiteSpace(dupMarkup))
-        {
-            await messageBox.ShowOkOnlyAsync("Duplicate Record", dupMarkup);
-            return false;
-        }
-        if (editItem.Person.FinancialTo < selectedTerm.Year && !editItem.IsWaitlisted)
-        {
-            editItem.IsWaitlisted = !await messageBox.ShowAsync("Participant Unfinancial",
-                                        $"<p>{editItem.Person.FullName} is <strong>Unfinancial</strong>. Do you still wish to enrol them?</p>");
-        }
-        return result;
-    }
+	void ClearSelection()
+	{
+		SendTo = null;
+		SelectedDataItems = null;
+	}
 
-    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
-    {
-        var enrolment = ((Enrolment)e.DataItem);
-        if (enrolment.Person.IsMultiCampusVisitor)
-        {
-            var mcE = await dbcT.MultiCampusEnrolment.FindAsync(enrolment.ID);
-            dbcT.Remove(mcE);
-        }
-        else
-        {
-            await BusinessRule.DeleteEnrolmentAsync(dbc, enrolment);
-        }
-        await SaveChangesAsync();
-        int idx = Enrolments.FindIndex(x => x.ID == enrolment.ID);
-        Enrolments.RemoveAt(idx);
-    }
+	bool isProcessingEnrolments = false;
+	async Task GetEnrolments()
+	{
+		if (isProcessingEnrolments) return;
+		try
+		{
+			Enrolments = await BusinessRule.EditableEnrolmentsAsync(dbc, selectedTerm, selectedCourse, selectedClass);
+			var tenant = await tenantService.GetTenantIdentifierAsync();
+			List<Enrolment> mcE = new();
+			if (selectedCourse.CourseParticipationTypeID == (int)ParticipationType.SameParticipantsInAllClasses)
+			{
+				mcE = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant, selectedCourse.ID);
+			}
+			else
+			{
+				mcE = await BusinessRule.GetMultiCampusEnrolmentsAsync(dbc, dbcT, tenant, selectedCourse.ID, selectedClass.ID);
+			}
+			hasMultiCampusVisitors = (mcE.Count > 0) ? true : false;
+			Enrolments.AddRange(mcE);
+			Enrolments = Enrolments.OrderBy(x => x.Person.FullNameAlphaKey).ToList();
+			feesDue = new();
+			service = await MemberFeeCalculationService.CreateAsync(dbc,
+							currentTerm,
+							Enrolments.Select(x => x.Person).ToList());
+			foreach (var e in Enrolments)
+			{
+				if (!feesDue.ContainsKey(e.PersonID))
+				{
+					service.CalculateFee(e.Person);
+					var allocatedFees = service.GetAllocatedMemberFees(e.Person).Where(x => x.CourseID == e.CourseID);
+					feesDue.Add(e.PersonID, allocatedFees.Sum(x => x.Balance ?? 0m));
+				}
+			}
+			await InvokeAsync(StateHasChanged);
+		}
+		catch (Exception ex) { throw ex; }
+		finally { isProcessingEnrolments = false; }
+	}
 
-    async Task<bool> SaveChangesAsync()
-    {
-        bool result = false;
-        try
-        {
-            // Create mail items
-            DateTime? emailAt = null;
-            if (BusinessRule.IsEnrolmentBlackoutPeriod(settings)) { emailAt = settings.EnrolmentBlackoutEndsUTC; }
-            await BusinessRule.CreateEnrolmentSendMailAsync(dbc, emailAt);
-
-            // Post changes to the database.
-            await dbc.SaveChangesAsync();
-            await dbcT.SaveChangesAsync();
-            mainGrid.ClearSelection();
-            // update the Grid.
-            result = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHeader = "Save to database error";
-            ErrorMessage = ex.ToString(); // Helpers.GetErrorMessage(ex);
-            await ErrorPopup.ShowPopupAsync();
-            dbc?.ChangeTracker?.Clear();
-            dbcT?.ChangeTracker?.Clear();
-        }
-        return result;
-    }
-
-    void ShowEnrolledTypeChanged(int Value)
-    {
-        ShowEnrolmentType = Value;
-        switch (Value)
-        {
-            case 1:
-                mainGrid?.FilterBy("IsWaitlisted", GridFilterRowOperatorType.Equal, false);
-                break;
-            case 2:
-                mainGrid?.FilterBy("IsWaitlisted", GridFilterRowOperatorType.Equal, true);
-                break;
-            default:
-                mainGrid?.ClearFilter();
-                break;
-        }
-    }
-
-    void UpdateStatistics()
-    {
-        CourseLeaders = BusinessRule.SelectableCourseLeaders(selectedCourse, selectedClass);
-        if (selectedCourse != null)
-        {
-            MinimumParticipants = selectedCourse.RequiredStudents;
-            MaximumParticipants = selectedCourse.MaximumStudents;
-        }
-        else
-        {
-            MinimumParticipants = 0;
-            MaximumParticipants = 0;
-        }
-        if (Enrolments != null)
-        {
-            EnrolledParticipants = Enrolments.Where(x => !x.IsWaitlisted).Count();
-            WaitlistedParticipants = Enrolments.Where(x => x.IsWaitlisted).Count();
-        }
-        else
-        {
-            EnrolledParticipants = 0;
-            WaitlistedParticipants = 0;
-        }
-        ClassStatus = BusinessRule.GetCourseEnrolmentStatus(selectedCourse, Enrolments);
-        buttonRenderStyle = BusinessRule.GetEnrolmentButtonRenderStyle(selectedCourse, Enrolments);
-        StateHasChanged();
-    }
-
-    async Task SetSelectionWaitListedAsync()
-    {
-        if (SelectedDataItems == null || SelectedDataItems.Count < 1)
-        {
-            ShowWaitlistFlyout("#SetSelectionWaitlisted");
-            IsFlyoutOpen = true;
-        }
-        else { await SetWaitlistedAsync(true); }
-    }
-
-    async Task SetSelectionTransferAsync()
-    {
-        if (SelectedDataItems == null || SelectedDataItems.Count < 1)
-        {
-            ShowWaitlistFlyout("#SetSelectionTransfer");
-            IsFlyoutOpen = true;
-        }
-        else if (hasMultiCampusVisitors)
-        {
-            ShowMultiCampusFlyout("#SetSelectionTransfer");
-            IsFlyoutOpen = true;
-        }
-        else
-        {
-            if (await transferOrCopyEnrolment.ShowTransferAsync(selectedTerm, selectedCourse, selectedClass))
-            {
-                await BulkTransfer();
-            }
-            else
-            {
-                await OperationCancelledAsync("Transfer Selection Cancelled");
-            }
-        }
-    }
-    async Task SetSelectionCopyAsync()
-    {
-        if (SelectedDataItems == null || SelectedDataItems.Count < 1)
-        {
-            ShowWaitlistFlyout("#SetSelectionCopy");
-            IsFlyoutOpen = true;
-        }
-        else if (hasMultiCampusVisitors)
-        {
-            ShowMultiCampusFlyout("#SetSelectionCopy");
-            IsFlyoutOpen = true;
-        }
-        else
-        {
-            if (await transferOrCopyEnrolment.ShowCopyAsync(selectedTerm, selectedCourse, selectedClass))
-            {
-                await BulkCopy();
-            }
-            else
-            {
-                await OperationCancelledAsync("Copy Selection Cancelled");
-            }
-        }
-    }
-
-    async Task BulkTransfer() => await BulkProcess(false);
-    async Task BulkCopy() => await BulkProcess(true);
-
-    async Task BulkProcess(bool IsCopy)
-    {
-        //dbc?.ChangeTracker?.Clear();
-        var action = (IsCopy) ? "Copy" : "Transfer";
-        // Add transfers as new enrolments in the selected course.
-        int failures = 0;
-        foreach (var enrolment in SelectedDataItems.Cast<Enrolment>())
-        {
-            if (await BusinessRule.DuplicateEnrolment(dbc,
-                                 enrolment.Person, transferOrCopyEnrolment.selectedTerm,
-                                 transferOrCopyEnrolment.selectedCourse, transferOrCopyEnrolment.selectedClass) == null)
-            {
-                var e = new Enrolment()
-                {
-                    Created = DateTime.UtcNow
-                };
-                e.Person = await dbc.Person.IgnoreQueryFilters()
-                                    .FirstAsync(x => !x.IsDeleted && x.ID == enrolment.Person.ID);
-                e.Term = await dbc.Term.FindAsync(transferOrCopyEnrolment.selectedTerm.ID);
-                e.IsWaitlisted = (e.Term.Comparer <= selectedTerm.Comparer)
-                                        ? e.IsWaitlisted = enrolment.IsWaitlisted
-                                        : e.IsWaitlisted = true;
-                e.Course = await dbc.Course.FindAsync(transferOrCopyEnrolment.selectedCourse.ID);
-                if (transferOrCopyEnrolment.selectedClass != null)
-                {
-                    e.Class = await dbc.Class.FindAsync(transferOrCopyEnrolment.selectedClass.ID);
-                }
-                await dbc.AddAsync<Enrolment>(e);
-            }
-            else { failures++; }
-        }
-        int count = SelectedDataItems.Count() - failures;
-        // If transfer, delete the selected items
-        if (!IsCopy) dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
-        // and save...
-        await SaveChangesAsync();
-        await SetupGrid();
-        string msg = $"<p>{count} Enrolments processed successfully. &nbsp";
-        if (failures > 0) { msg += $"{failures} failed because they were already enrolled."; }
-        msg += "</p>";
-        await messageBox.ShowOkOnlyAsync($"{action} Enrolment", msg);
-    }
-
-    async Task SetSelectionEnrolledAsync()
-    {
-        if (SelectedDataItems == null || SelectedDataItems.Count < 1)
-        {
-            ShowWaitlistFlyout("#SetSelectionEnrolled");
-            IsFlyoutOpen = true;
-        }
-        else { await SetWaitlistedAsync(false); }
-    }
-
-    async Task SetWaitlistedAsync(bool SetTo)
-    {
-        if (!SetTo)
-        {
-            var unfinancial = SelectedDataItems.Cast<Enrolment>().Any(x => x.Person.FinancialTo < selectedTerm.Year);
-            if (unfinancial)
-            {
-                if (!await messageBox.ShowAsync("Unfinancial Enrolments",
-                        "One or more selected enrolments are unfinancial. Do you wish to continue?"))
-                {
-                    return;
-                }
-            }
-        }
-        foreach (var enrol in SelectedDataItems.Cast<Enrolment>())
-        {
-            if (enrol.Person.IsMultiCampusVisitor)
-            {
-                var mcE = await dbcT.MultiCampusEnrolment.FindAsync(enrol.ID);
-                if (mcE != null)
-                {
-                    mcE.IsWaitlisted = SetTo;
-                }
-            }
-            else
-            {
-                dbc.Enrolment.Find(enrol.ID).IsWaitlisted = SetTo;
-            }
-        }
-        await SaveChangesAsync();
-        await SetupGrid();
-    }
-
-    void ShowWaitlistFlyout(string FlyoutTarget)
-    {
-        HeaderContent = "Select Items";
-        MessageContent = "<p>You must select items from the list to perform this Quick Action.<br/>" +
-        "Use the Selection column on the grid to select one or multiple items.</p>";
-        FlyoutTargetID = FlyoutTarget;
-        IsFlyoutOpen = true;
-    }
-    void ShowMultiCampusFlyout(string FlyoutTarget)
-    {
-        HeaderContent = "Not available";
-        MessageContent = "<p>Copy/Transfer functions are not permitted for Multi-Campus courses.</p>";
-        FlyoutTargetID = FlyoutTarget;
-        IsFlyoutOpen = true;
-    }
-
-    async Task DeleteSelection()
-    {
-        if (SelectedDataItems == null || SelectedDataItems.Count < 1)
-        {
-            ShowWaitlistFlyout("#DeleteSelection");
-            IsFlyoutOpen = true;
-        }
-        else
-        {
-            int count = SelectedDataItems.Count();
-            MessageBoxShowCancelButton = true;
-            HeaderContent = "Delete Selected Items?";
-            MessageContent = $"<p>You are about to permanently delete {count} participant enrolments.<br/>" +
-                                "Do you wish to continue?";
-            if (await messageBox.ShowAsync(HeaderContent, MessageContent))
-            {
-                await BulkDelete();
-            }
-            else
-            {
-                await OperationCancelledAsync("Delete Selection Cancelled");
-            }
-        }
-    }
-
-    async Task OperationCancelledAsync(string HeaderContent)
-    {
-        await messageBox.ShowOkOnlyAsync(HeaderContent, "The operation was cancelled at you request.");
-    }
-
-    async Task BulkDelete()
-    {
-        var mcItems = SelectedDataItems.Cast<Enrolment>().Where(x => x.Person.IsMultiCampusVisitor).ToList();
-        var items = SelectedDataItems.Cast<Enrolment>().Where(x => !x.Person.IsMultiCampusVisitor).ToList();
-        dbcT.RemoveRange(mcItems);
-        dbc.RemoveRange(items);
-        await SaveChangesAsync();
-        await SetupGrid();
-    }
-
-    async Task DoQuickEnrolmentAsync()
-    {
-        if (selectedTerm == null || selectedCourse == null)
-        {
-            ShowQuickEnrolFlyout();
-        }
-        else
-        {
-            dbc?.ChangeTracker?.Clear();
-            if (await quickEnrolment.ShowAsync())
-            {
-                int failures = 0;
-                foreach (var person in quickEnrolment.SelectedPersons)
-                {
-                    if (await BusinessRule.DuplicateEnrolment(dbc,
-                                         person, selectedTerm,
-                                         selectedCourse, selectedClass) == null)
-                    {
-                        var e = new Enrolment()
-                        {
-                            Created = DateTime.UtcNow
-                        };
-                        // Only allow enrolment if financial
-                        if (person.FinancialTo >= selectedTerm.Year)
-                        {
-                            e.IsWaitlisted = quickEnrolment.IsWaitListed;
-                        }
-                        else { e.IsWaitlisted = true; }
-                        e.Person = await dbc.Person.IgnoreQueryFilters()
-                                        .FirstAsync(x => !x.IsDeleted && x.ID == person.ID);
-                        e.Term = await dbc.Term.FindAsync(selectedTerm.ID);
-                        e.Course = await dbc.Course.FindAsync(selectedCourse.ID);
-                        if (selectedClass != null) { e.Class = await dbc.Class.FindAsync(selectedClass.ID); }
-                        await dbc.AddAsync<Enrolment>(e);
-                    }
-                    else { failures++; }
-                }
-                await SaveChangesAsync();
-                await SetupGrid();
-                if (failures != 0)
-                {
-                    int count = quickEnrolment.SelectedPersons.Count() - failures;
-                    string msg = $"<p>{count} Enrolments created.&nbsp";
-                    if (failures > 0) { msg += $"{failures} failed because they were already enrolled."; }
-                    msg += "</p>";
-                    await messageBox.ShowOkOnlyAsync("Quick Enrolment", msg);
-                }
-            }
-        }
-    }
-
-    void ShowQuickEnrolFlyout()
-    {
-        HeaderContent = "Quick Enrolment";
-        MessageContent = "<p>You must select Term, Course and optionally, Class to perform this Quick Action.</p>";
-        FlyoutTargetID = "#QuickEnrolment";
-        IsFlyoutOpen = true;
-    }
-
-    async Task OnCommunicate(bool includeLeaders)
-    {
-
-        if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
-        {
-            await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
-            return;
-        }
-        SendTo = new List<Person>();
-        foreach (var e in SelectedDataItems.Cast<Enrolment>().ToList())
-        {
-            SendTo.Add(e.Person);
-        }
-        if (includeLeaders)
-        {
-            if (CourseLeaders != null)
-            {
-                foreach (var l in CourseLeaders)
-                {
-                    if (!SendTo.Contains(l)) { SendTo.Add(l); }
-                }
-            }
-        }
-        if (await selectDocumentTemplatePopup.ShowAsync())
-        {
-            documentsSent = 0;
-            await ProgressBar.ShowSmallSpinnerAsync();
-            List<Guid> personIDsToExport = SendTo.Select(x => x.ID).ToList();
-            bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;
-            int delayedStart = selectDocumentTemplatePopup.DelayedStart;
-            await server.MailMerge(dbc,
-                selectDocumentTemplatePopup.SelectedDocumentTemplate,
-                personIDsToExport,
-                overridePreference,
-                delayedStart);
-            await ProgressBar.Close();
-            await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
-        }
-    }
-
-    async Task OnFeeReversal()
-    {
-        using var dbc = await U3Adbfactory.CreateDbContextAsync();
-        if (await adjustMemberFee.ShowAsync())
-        {
-            if (adjustMemberFee.FeeAmount != 0)
-            {
-                foreach (var e in SelectedDataItems)
-                {
-                    Enrolment enrolment = e as Enrolment;
-                    Fee fee = new()
-                    {
-                        Amount = adjustMemberFee.FeeAmount,
-                        Date = adjustMemberFee.ProcessingDate,
-                        Description = adjustMemberFee.FeeDescription,
-                        PersonID = enrolment.PersonID,
-                        IsMembershipFee = false,
-                        ProcessingYear = selectedTerm.Year
-                    };
-                    await dbc.Fee.AddAsync(fee);
-                }
-                await dbc.SaveChangesAsync();
-                mainGrid.ClearSelection();
-                await GetEnrolments();
-                await messageBox.ShowAsync("Fees Adjusted!",
-                        @"The selected fee adjustments have been made.");
-            }
-            else
-            {
-                await messageBox.ShowOkOnlyAsync("No Adjustment Made!", "No adjustment made because the fee adjustment amount was zero.");
-            }
-        }
-        else
-        {
-            await messageBox.ShowOkOnlyAsync("Cancelled!", "Fee adjustment was cancelled by you.");
-        }
-    }
+	void SetupClassToEnrol()
+	{
+		selectedClass = null;
+		classComboNullText = null;
+		if (selectedCourse.CourseParticipationTypeID ==
+			(int?)ParticipationType.SameParticipantsInAllClasses)
+		{
+			selectedClass = null; // *** Most Important ***
+			classComboNullText = (selectedCourse.Classes.Count() == 1)
+					? selectedCourse.Classes[0].ClassSummary
+					: selectedCourse.CourseParticipationType.Name;
+			classComboNullText = selectedCourse.CourseParticipationType.Name;
+			classComboEnabled = false;
+		}
+		else
+		{
+			if (selectedCourse.Classes.Count() == 1)
+			{
+				selectedClass = classes[0];
+				classComboEnabled = false;
+			}
+			else
+			{
+				classComboNullText = "Select the Class to enroll...";
+				classComboEnabled = true;
+			}
+		}
+	}
 
 
-    public void Dispose()
-    {
-        dbc?.Dispose();
-        dbcT?.Dispose();
-    }
+	bool isBusySaving;
+	async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e)
+	{
+		if (isBusySaving) return;
+		isBusySaving = true;
+		try
+		{
+			await SaveRecord(e);
+			UpdateStatistics();
+		}
+		finally
+		{
+			isBusySaving = false;
+		}
+	}
+
+	async Task SaveRecord(GridEditModelSavingEventArgs e)
+	{
+		Enrolment dataItem = null;
+		var editModel = (Enrolment)e.EditModel;
+		if (!await IsDataOk(editModel))
+		{
+			await mainGrid.CancelEditAsync();
+			e.Cancel = true; return;
+		}
+		// Re-query a data item from the store.
+		dbc?.ChangeTracker?.Clear();
+		if (editModel.Person.IsMultiCampusVisitor)
+		{
+			var mce = await dbcT.MultiCampusEnrolment.FindAsync(editModel.ID);
+			if (mce != null)
+			{
+				mce.IsWaitlisted = editModel.IsWaitlisted;
+				List<Class> classes = new();
+				if (selectedClass != null)
+				{
+					classes.Add(selectedClass);
+				}
+				else
+				{
+					classes.AddRange(selectedCourse.Classes);
+				}
+				await BusinessRule.CreateMultiCampusEnrolmentSendMailAsync(dbcT, classes, settings);
+			}
+		}
+		else
+		{
+			dataItem = e.IsNew ? new Enrolment() : dbc.Enrolment.Find(editModel.ID);
+			// Assign changes from the edit model to the data item.
+			if (dataItem != null)
+			{
+				editModel.CopyTo(dataItem);
+				dataItem.Person = await dbc.Person.IgnoreQueryFilters()
+									.FirstAsync(x => !x.IsDeleted && x.ID == editModel.Person.ID);
+				dataItem.Term = dbc.Term.Find(selectedTerm.ID);
+				dataItem.Course = dbc.Course.Find(selectedCourse.ID);
+				if (selectedClass != null) { dataItem.Class = dbc.Class.Find(selectedClass.ID); }
+				if (e.IsNew && EnrolledParticipants >= MaximumParticipants && !dataItem.IsWaitlisted)
+				{
+					await messageBox.ShowOkOnlyAsync("Participant Waitlisted", $"{dataItem.Person.FullName} was waitlisted because the class is full.</p>");
+					dataItem.IsWaitlisted = true;
+				}
+
+				// Post changes to the database.
+				if (e.IsNew) await dbc.AddAsync(dataItem);
+			}
+		}
+		await SaveChangesAsync();
+		Person person = dataItem?.Person;
+		Guid courseID = dataItem.CourseID;
+		service = await MemberFeeCalculationService.CreateAsync(dbc,
+				currentTerm, person);
+		service.CalculateFee(person);
+		var allocatedFees = service.GetAllocatedMemberFees(person).Where(x => x.CourseID == courseID);
+		if (feesDue.ContainsKey(person.ID))
+		{
+			feesDue[person.ID] = allocatedFees.Sum(x => x.Balance ?? 0m);
+		}
+		else
+		{
+			feesDue.Add(person.ID, allocatedFees.Sum(x => x.Balance ?? 0m));
+		}
+		if (e.IsNew)
+		{
+			Enrolments.Insert(0, dataItem);
+		}
+		else
+		{
+			int idx = Enrolments.FindIndex(x => x.ID == dataItem.ID);
+			Enrolments[idx] = dataItem;
+		}
+	}
+
+
+	async Task<bool> IsDataOk(Enrolment editItem)
+	{
+		bool result = true;
+		var dupMarkup = await BusinessRule.DuplicateMarkUpAsync(dbc, editItem, selectedTerm, selectedCourse, selectedClass);
+		if (!string.IsNullOrWhiteSpace(dupMarkup))
+		{
+			await messageBox.ShowOkOnlyAsync("Duplicate Record", dupMarkup);
+			return false;
+		}
+		if (editItem.Person.FinancialTo < selectedTerm.Year && !editItem.IsWaitlisted)
+		{
+			editItem.IsWaitlisted = !await messageBox.ShowAsync("Participant Unfinancial",
+										$"<p>{editItem.Person.FullName} is <strong>Unfinancial</strong>. Do you still wish to enrol them?</p>");
+		}
+		return result;
+	}
+
+	async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e)
+	{
+		var enrolment = ((Enrolment)e.DataItem);
+		if (enrolment.Person.IsMultiCampusVisitor)
+		{
+			var mcE = await dbcT.MultiCampusEnrolment.FindAsync(enrolment.ID);
+			dbcT.Remove(mcE);
+		}
+		else
+		{
+			await BusinessRule.DeleteEnrolmentAsync(dbc, enrolment);
+		}
+		await SaveChangesAsync();
+		int idx = Enrolments.FindIndex(x => x.ID == enrolment.ID);
+		Enrolments.RemoveAt(idx);
+	}
+
+	async Task<bool> SaveChangesAsync()
+	{
+		bool result = false;
+		try
+		{
+			// Create mail items
+			DateTime? emailAt = null;
+			if (BusinessRule.IsEnrolmentBlackoutPeriod(settings)) { emailAt = settings.EnrolmentBlackoutEndsUTC; }
+			await BusinessRule.CreateEnrolmentSendMailAsync(dbc, emailAt);
+
+			// Post changes to the database.
+			await dbc.SaveChangesAsync();
+			await dbcT.SaveChangesAsync();
+			mainGrid.ClearSelection();
+			// update the Grid.
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			ErrorHeader = "Save to database error";
+			ErrorMessage = ex.ToString(); // Helpers.GetErrorMessage(ex);
+			await ErrorPopup.ShowPopupAsync();
+			dbc?.ChangeTracker?.Clear();
+			dbcT?.ChangeTracker?.Clear();
+		}
+		return result;
+	}
+
+	void ShowEnrolledTypeChanged(int Value)
+	{
+		ShowEnrolmentType = Value;
+		switch (Value)
+		{
+			case 1:
+				mainGrid?.FilterBy("IsWaitlisted", GridFilterRowOperatorType.Equal, false);
+				break;
+			case 2:
+				mainGrid?.FilterBy("IsWaitlisted", GridFilterRowOperatorType.Equal, true);
+				break;
+			default:
+				mainGrid?.ClearFilter();
+				break;
+		}
+	}
+
+	void UpdateStatistics()
+	{
+		CourseLeaders = BusinessRule.SelectableCourseLeaders(selectedCourse, selectedClass);
+		if (selectedCourse != null)
+		{
+			MinimumParticipants = selectedCourse.RequiredStudents;
+			MaximumParticipants = selectedCourse.MaximumStudents;
+		}
+		else
+		{
+			MinimumParticipants = 0;
+			MaximumParticipants = 0;
+		}
+		if (Enrolments != null)
+		{
+			EnrolledParticipants = Enrolments.Where(x => !x.IsWaitlisted).Count();
+			WaitlistedParticipants = Enrolments.Where(x => x.IsWaitlisted).Count();
+		}
+		else
+		{
+			EnrolledParticipants = 0;
+			WaitlistedParticipants = 0;
+		}
+		ClassStatus = BusinessRule.GetCourseEnrolmentStatus(selectedCourse, Enrolments);
+		buttonRenderStyle = BusinessRule.GetEnrolmentButtonRenderStyle(selectedCourse, Enrolments);
+		StateHasChanged();
+	}
+
+	async Task SetSelectionWaitListedAsync()
+	{
+		if (SelectedDataItems == null || SelectedDataItems.Count < 1)
+		{
+			ShowWaitlistFlyout("#SetSelectionWaitlisted");
+			IsFlyoutOpen = true;
+		}
+		else { await SetWaitlistedAsync(true); }
+	}
+
+	async Task SetSelectionTransferAsync()
+	{
+		if (SelectedDataItems == null || SelectedDataItems.Count < 1)
+		{
+			ShowWaitlistFlyout("#SetSelectionTransfer");
+			IsFlyoutOpen = true;
+		}
+		else if (hasMultiCampusVisitors)
+		{
+			ShowMultiCampusFlyout("#SetSelectionTransfer");
+			IsFlyoutOpen = true;
+		}
+		else
+		{
+			if (await transferOrCopyEnrolment.ShowTransferAsync(selectedTerm, selectedCourse, selectedClass))
+			{
+				await BulkTransfer();
+			}
+			else
+			{
+				await OperationCancelledAsync("Transfer Selection Cancelled");
+			}
+		}
+	}
+	async Task SetSelectionCopyAsync()
+	{
+		if (SelectedDataItems == null || SelectedDataItems.Count < 1)
+		{
+			ShowWaitlistFlyout("#SetSelectionCopy");
+			IsFlyoutOpen = true;
+		}
+		else if (hasMultiCampusVisitors)
+		{
+			ShowMultiCampusFlyout("#SetSelectionCopy");
+			IsFlyoutOpen = true;
+		}
+		else
+		{
+			if (await transferOrCopyEnrolment.ShowCopyAsync(selectedTerm, selectedCourse, selectedClass))
+			{
+				await BulkCopy();
+			}
+			else
+			{
+				await OperationCancelledAsync("Copy Selection Cancelled");
+			}
+		}
+	}
+
+	async Task BulkTransfer() => await BulkProcess(false);
+	async Task BulkCopy() => await BulkProcess(true);
+
+	async Task BulkProcess(bool IsCopy)
+	{
+		//dbc?.ChangeTracker?.Clear();
+		var action = (IsCopy) ? "Copy" : "Transfer";
+		// Add transfers as new enrolments in the selected course.
+		int failures = 0;
+		foreach (var enrolment in SelectedDataItems.Cast<Enrolment>())
+		{
+			if (await BusinessRule.DuplicateEnrolment(dbc,
+								 enrolment.Person, transferOrCopyEnrolment.selectedTerm,
+								 transferOrCopyEnrolment.selectedCourse, transferOrCopyEnrolment.selectedClass) == null)
+			{
+				var e = new Enrolment()
+				{
+					Created = DateTime.UtcNow
+				};
+				e.Person = await dbc.Person.IgnoreQueryFilters()
+									.FirstAsync(x => !x.IsDeleted && x.ID == enrolment.Person.ID);
+				e.Term = await dbc.Term.FindAsync(transferOrCopyEnrolment.selectedTerm.ID);
+				e.IsWaitlisted = (e.Term.Comparer <= selectedTerm.Comparer)
+										? e.IsWaitlisted = enrolment.IsWaitlisted
+										: e.IsWaitlisted = true;
+				e.Course = await dbc.Course.FindAsync(transferOrCopyEnrolment.selectedCourse.ID);
+				if (transferOrCopyEnrolment.selectedClass != null)
+				{
+					e.Class = await dbc.Class.FindAsync(transferOrCopyEnrolment.selectedClass.ID);
+				}
+				await dbc.AddAsync<Enrolment>(e);
+			}
+			else { failures++; }
+		}
+		int count = SelectedDataItems.Count() - failures;
+		// If transfer, delete the selected items
+		if (!IsCopy) dbc.RemoveRange(SelectedDataItems.Cast<Enrolment>());
+		// and save...
+		await SaveChangesAsync();
+		await SetupGrid();
+		string msg = $"<p>{count} Enrolments processed successfully. &nbsp";
+		if (failures > 0) { msg += $"{failures} failed because they were already enrolled."; }
+		msg += "</p>";
+		await messageBox.ShowOkOnlyAsync($"{action} Enrolment", msg);
+	}
+
+	async Task SetSelectionEnrolledAsync()
+	{
+		if (SelectedDataItems == null || SelectedDataItems.Count < 1)
+		{
+			ShowWaitlistFlyout("#SetSelectionEnrolled");
+			IsFlyoutOpen = true;
+		}
+		else { await SetWaitlistedAsync(false); }
+	}
+
+	async Task SetWaitlistedAsync(bool SetTo)
+	{
+		if (!SetTo)
+		{
+			var unfinancial = SelectedDataItems.Cast<Enrolment>().Any(x => x.Person.FinancialTo < selectedTerm.Year);
+			if (unfinancial)
+			{
+				if (!await messageBox.ShowAsync("Unfinancial Enrolments",
+						"One or more selected enrolments are unfinancial. Do you wish to continue?"))
+				{
+					return;
+				}
+			}
+		}
+		foreach (var enrol in SelectedDataItems.Cast<Enrolment>())
+		{
+			if (enrol.Person.IsMultiCampusVisitor)
+			{
+				var mcE = await dbcT.MultiCampusEnrolment.FindAsync(enrol.ID);
+				if (mcE != null)
+				{
+					mcE.IsWaitlisted = SetTo;
+				}
+			}
+			else
+			{
+				dbc.Enrolment.Find(enrol.ID).IsWaitlisted = SetTo;
+			}
+		}
+		await SaveChangesAsync();
+		await SetupGrid();
+	}
+
+	void ShowWaitlistFlyout(string FlyoutTarget)
+	{
+		HeaderContent = "Select Items";
+		MessageContent = "<p>You must select items from the list to perform this Quick Action.<br/>" +
+		"Use the Selection column on the grid to select one or multiple items.</p>";
+		FlyoutTargetID = FlyoutTarget;
+		IsFlyoutOpen = true;
+	}
+	void ShowMultiCampusFlyout(string FlyoutTarget)
+	{
+		HeaderContent = "Not available";
+		MessageContent = "<p>Copy/Transfer functions are not permitted for Multi-Campus courses.</p>";
+		FlyoutTargetID = FlyoutTarget;
+		IsFlyoutOpen = true;
+	}
+
+	async Task DeleteSelection()
+	{
+		if (SelectedDataItems == null || SelectedDataItems.Count < 1)
+		{
+			ShowWaitlistFlyout("#DeleteSelection");
+			IsFlyoutOpen = true;
+		}
+		else
+		{
+			int count = SelectedDataItems.Count();
+			MessageBoxShowCancelButton = true;
+			HeaderContent = "Delete Selected Items?";
+			MessageContent = $"<p>You are about to permanently delete {count} participant enrolments.<br/>" +
+								"Do you wish to continue?";
+			if (await messageBox.ShowAsync(HeaderContent, MessageContent))
+			{
+				await BulkDelete();
+			}
+			else
+			{
+				await OperationCancelledAsync("Delete Selection Cancelled");
+			}
+		}
+	}
+
+	async Task OperationCancelledAsync(string HeaderContent)
+	{
+		await messageBox.ShowOkOnlyAsync(HeaderContent, "The operation was cancelled at you request.");
+	}
+
+	async Task BulkDelete()
+	{
+		var mcItems = SelectedDataItems.Cast<Enrolment>().Where(x => x.Person.IsMultiCampusVisitor).ToList();
+		var items = SelectedDataItems.Cast<Enrolment>().Where(x => !x.Person.IsMultiCampusVisitor).ToList();
+		dbcT.RemoveRange(mcItems);
+		dbc.RemoveRange(items);
+		await SaveChangesAsync();
+		await SetupGrid();
+	}
+
+	async Task DoQuickEnrolmentAsync()
+	{
+		if (selectedTerm == null || selectedCourse == null)
+		{
+			ShowQuickEnrolFlyout();
+		}
+		else
+		{
+			dbc?.ChangeTracker?.Clear();
+			if (await quickEnrolment.ShowAsync())
+			{
+				int failures = 0;
+				foreach (var person in quickEnrolment.SelectedPersons)
+				{
+					if (await BusinessRule.DuplicateEnrolment(dbc,
+										 person, selectedTerm,
+										 selectedCourse, selectedClass) == null)
+					{
+						var e = new Enrolment()
+						{
+							Created = DateTime.UtcNow
+						};
+						// Only allow enrolment if financial
+						if (person.FinancialTo >= selectedTerm.Year)
+						{
+							e.IsWaitlisted = quickEnrolment.IsWaitListed;
+						}
+						else { e.IsWaitlisted = true; }
+						e.Person = await dbc.Person.IgnoreQueryFilters()
+										.FirstAsync(x => !x.IsDeleted && x.ID == person.ID);
+						e.Term = await dbc.Term.FindAsync(selectedTerm.ID);
+						e.Course = await dbc.Course.FindAsync(selectedCourse.ID);
+						if (selectedClass != null) { e.Class = await dbc.Class.FindAsync(selectedClass.ID); }
+						await dbc.AddAsync<Enrolment>(e);
+					}
+					else { failures++; }
+				}
+				await SaveChangesAsync();
+				await SetupGrid();
+				if (failures != 0)
+				{
+					int count = quickEnrolment.SelectedPersons.Count() - failures;
+					string msg = $"<p>{count} Enrolments created.&nbsp";
+					if (failures > 0) { msg += $"{failures} failed because they were already enrolled."; }
+					msg += "</p>";
+					await messageBox.ShowOkOnlyAsync("Quick Enrolment", msg);
+				}
+			}
+		}
+	}
+
+	void ShowQuickEnrolFlyout()
+	{
+		HeaderContent = "Quick Enrolment";
+		MessageContent = "<p>You must select Term, Course and optionally, Class to perform this Quick Action.</p>";
+		FlyoutTargetID = "#QuickEnrolment";
+		IsFlyoutOpen = true;
+	}
+
+	async Task OnCommunicate(bool includeLeaders)
+	{
+
+		if (SelectedDataItems == null || SelectedDataItems.Count <= 0)
+		{
+			await messageBox.ShowOkOnlyAsync("Make a Selection", "Select one or more participants to communicate with.");
+			return;
+		}
+		SendTo = new List<Person>();
+		foreach (var e in SelectedDataItems.Cast<Enrolment>().ToList())
+		{
+			SendTo.Add(e.Person);
+		}
+		if (includeLeaders)
+		{
+			if (CourseLeaders != null)
+			{
+				foreach (var l in CourseLeaders)
+				{
+					if (!SendTo.Contains(l)) { SendTo.Add(l); }
+				}
+			}
+		}
+		if (await selectDocumentTemplatePopup.ShowAsync())
+		{
+			documentsSent = 0;
+			await ProgressBar.ShowSmallSpinnerAsync();
+			List<Guid> personIDsToExport = SendTo.Select(x => x.ID).ToList();
+			bool overridePreference = selectDocumentTemplatePopup.OverrideCommunicationPreference;
+			int delayedStart = selectDocumentTemplatePopup.DelayedStart;
+			await server.MailMerge(dbc,
+				selectDocumentTemplatePopup.SelectedDocumentTemplate,
+				personIDsToExport,
+				overridePreference,
+				delayedStart);
+			await ProgressBar.Close();
+			await messageBox.ShowOkOnlyAsync("Communication Complete", server.GetHTMLResult());
+		}
+	}
+
+	async Task OnFeeReversal()
+	{
+		using var dbc = await U3Adbfactory.CreateDbContextAsync();
+		if (await adjustMemberFee.ShowAsync())
+		{
+			if (adjustMemberFee.FeeAmount != 0)
+			{
+				foreach (var e in SelectedDataItems)
+				{
+					Enrolment enrolment = e as Enrolment;
+					Fee fee = new()
+					{
+						Amount = adjustMemberFee.FeeAmount,
+						Date = adjustMemberFee.ProcessingDate,
+						Description = adjustMemberFee.FeeDescription,
+						PersonID = enrolment.PersonID,
+						IsMembershipFee = false,
+						ProcessingYear = selectedTerm.Year
+					};
+					await dbc.Fee.AddAsync(fee);
+				}
+				await dbc.SaveChangesAsync();
+				mainGrid.ClearSelection();
+				await GetEnrolments();
+				await messageBox.ShowAsync("Fees Adjusted!",
+						@"The selected fee adjustments have been made.");
+			}
+			else
+			{
+				await messageBox.ShowOkOnlyAsync("No Adjustment Made!", "No adjustment made because the fee adjustment amount was zero.");
+			}
+		}
+		else
+		{
+			await messageBox.ShowOkOnlyAsync("Cancelled!", "Fee adjustment was cancelled by you.");
+		}
+	}
+
+
+	public void Dispose()
+	{
+		dbc?.Dispose();
+		dbcT?.Dispose();
+	}
 
 }
