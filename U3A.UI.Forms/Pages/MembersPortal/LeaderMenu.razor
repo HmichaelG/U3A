@@ -98,7 +98,7 @@ else
                                     <DxFormLayoutItem Caption="Home Phone" ColSpanMd="12" Context="layoutContext">
                                         <DxTextBox Text="@selectedLookupStudent.Person.HomePhoneOrSilent" ReadOnly="true" />
                                     </DxFormLayoutItem>
-                                    <DxFormLayoutItem Caption="Home Phone" ColSpanMd="12" Context="layoutContext">
+                                    <DxFormLayoutItem Caption="Mobile Phone" ColSpanMd="12" Context="layoutContext">
                                         <DxTextBox Text="@selectedLookupStudent.Person.MobileOrSilent" ReadOnly="true" />
                                     </DxFormLayoutItem>
                                     <DxFormLayoutItem Caption="ICE Phone" ColSpanMd="12" Context="layoutContext">
@@ -184,8 +184,14 @@ else
                         <Template>
                             <div class="text-box border-fl-neutral">
                                 <span>@selectedVenue.Coordinator</span>
-                                <span><b>Phone:</b>&nbsp;@selectedVenue.Phone</span>
-                                <span><b>Email:</b>&nbsp;@selectedVenue.Email</span>
+                                @if (!string.IsNullOrWhiteSpace(selectedVenue.Phone))
+                                { 
+                                    <span><b>Phone:</b>&nbsp;@selectedVenue.Phone</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(selectedVenue.Email))
+                                {
+                                    <span><b>Email:</b>&nbsp;@selectedVenue.Email</span>
+                                }
                             </div>
                         </Template>
                     </DxFormLayoutItem>

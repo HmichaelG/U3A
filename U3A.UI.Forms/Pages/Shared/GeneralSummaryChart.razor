@@ -46,7 +46,7 @@ else
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     CustomizeSeriesPoint="CustomizeGenderSeriesPoint"
                     T="MemberSummary">
-            <DxChartTitle Text=@titleMembersByGender />
+            <DxChartTitle Text=@titleMembersByGender CssClass="title-style text-fl-neutral" />
             <DxPieChartSeries T="MemberSummary"
                               TArgument="string"
                               TValue="int"
@@ -76,7 +76,7 @@ else
                  T="MemberSummary" CssClass="col-12 col-md-4"
                  CustomizeSeriesPoint="CustomizeAttritionSeriesPoint"
                  LabelOverlap="ChartLabelOverlap.Hide">
-            <DxChartTitle Text=@($"{term?.Year}: Net Gain / Loss") />
+            <DxChartTitle Text=@($"{term?.Year}: Net Gain / Loss") CssClass="title-style text-fl-neutral" />
             <DxChartCommonSeries NameField="@((MemberSummary t) => t.Year)"
                                  ArgumentField="@(s => s.Group)"
                                  ValueField="@(s => s.Count)"
@@ -104,7 +104,7 @@ else
                     Palette="@memberLengthTheme"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     T="MemberSummary">
-            <DxChartTitle Text=@titleLengthOfMship />
+            <DxChartTitle Text=@titleLengthOfMship CssClass="title-style text-fl-neutral" />
             <DxPieChartSeries T="MemberSummary"
                               TArgument="string"
                               TValue="int"
@@ -137,7 +137,7 @@ else
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     Palette="@enrolmentTheme"
                     T="MemberSummary">
-            <DxChartTitle Text=@($"{term?.Name}: Enrolment") />
+            <DxChartTitle Text=@($"{term?.Name}: Enrolment") CssClass="title-style text-fl-neutral" />
             <DxPieChartSeries T="MemberSummary"
                               TArgument="string"
                               TValue="int"
@@ -170,7 +170,7 @@ else
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     Palette="@waitlistTheme"
                     T="MemberSummary">
-            <DxChartTitle Text=@($"{term?.Name}: Waitlist") />
+            <DxChartTitle Text=@($"{term?.Name}: Waitlist") CssClass="title-style text-fl-neutral" />
             <DxPieChartSeries T="MemberSummary"
                               TArgument="string"
                               TValue="int"
@@ -203,7 +203,7 @@ else
                     Palette="@memberLengthTheme"
                     LabelOverlap="PieChartLabelOverlap.Hide"
                     T="MemberSummary">
-            <DxChartTitle Text=@titleMembersAge />
+            <DxChartTitle Text=@titleMembersAge CssClass="title-style text-fl-neutral" />
             <DxPieChartSeries T="MemberSummary"
                               TArgument="string"
                               TValue="int"
@@ -222,16 +222,24 @@ else
                         @(
                                             $"{context.Point.Value:#,0.}"
                                             )
+                    </div>
                 </div>
-            </div>
-        </DxChartTooltip>
-        <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
-                       VerticalAlignment="VerticalEdge.Top"
-                       Position="RelativePosition.Outside"
-                       Orientation="Orientation.Vertical" />
-    </DxPieChart>
-</div>
+            </DxChartTooltip>
+            <DxChartLegend HorizontalAlignment="HorizontalAlignment.Right"
+                           VerticalAlignment="VerticalEdge.Top"
+                           Position="RelativePosition.Outside"
+                           Orientation="Orientation.Vertical" />
+        </DxPieChart>
+    </div>
 }
+<style>
+    .title-style {
+        display: block;
+        font-size: 1rem;
+        text-align: center;
+        margin-top: 0rem;
+    }
+</style>
 
 @code {
     IEnumerable<MemberSummary> memberData;
@@ -242,7 +250,7 @@ else
     IEnumerable<MemberSummary> attritionData;
     Term? term;
     DxPieChart<MemberSummary> chartMemberSummary;
-    string titleMembersByGender = "Member By Gender";
+    string titleMembersByGender = "Members By Gender";
     DxPieChart<MemberSummary> chartLengthOfMship;
     string titleMembersAge = "Member Age Summary";
     DxPieChart<MemberSummary> chartMemberAge;
