@@ -42,7 +42,7 @@ else
             @switch (menuSelection)
             {
                 case PortalMenuSelection.DoMemberPaymentPreamble:
-                    <DxFormLayoutGroup Caption="@($"Membership Fees for: {loginState.SelectedPerson.FullName}")" HeaderCssClass="h4">
+                    <DxFormLayoutGroup Caption="@($"U3A Fees for: {loginState.SelectedPerson.FullName}")" HeaderCssClass="fs-5">
                         @if (showFeesDueToggle)
                         {
                             <div class="h-25 overflow-auto">
@@ -51,7 +51,7 @@ else
                                         AllowFiltering=false
                                         AllowGrouping=false
                                         VirtualScrollingEnabled=true
-                                        CssClass="mb-2 grid-style">
+                                        CssClass="my-2 grid-style">
                                     <Columns>
                                         <DxGridDataColumn FieldName="@nameof(MemberFee.Date)" Caption="Date" DisplayFormat="@constants.SHORT_DATE_FORMAT" Width="5.5rem" />
                                         <DxGridDataColumn FieldName="@nameof(MemberFee.Description)" Caption="Description" />
@@ -67,7 +67,7 @@ else
                         else
                         {
                             <div class="px-2 pt-2">
-                                <div class="h6">It's your choice!</div>
+                                <div class="fs-6 my-1">It's your choice!</div>
                                 <ul>
                                     <li><strong>Secure Online Payment</strong> is safe, fast and reliable. It is the recommended method of payment.</li>
                                     <li><strong>Direct Bank Payment</strong> is much slower due to additional reconciliation procedures required by our volunteer staff.</li>
@@ -103,7 +103,7 @@ else
                                       @bind-Value=@selectedPaymentType />
                     </DxFormLayoutGroup>
 
-                    <DxButton Text="@((isOnlinePaymentEnabled) ? "Pay by Secure Online Payment" : "Online Payment is not currently available" )"
+                    <DxButton Text="@((isOnlinePaymentEnabled) ? "Pay by Secure Online Payment" : "Online Payment is not currently available")"
                               Enabled="@isOnlinePaymentEnabled"
                               IconCssClass="bi-credit-card me-1"
                               CssClass="col-12 my-1"
@@ -121,9 +121,9 @@ else
                     break;
 
                 case PortalMenuSelection.DoMemberPaymentDirectDebit:
-                    <DxFormLayoutGroup Caption="Direct Bank Payment" HeaderCssClass="h4">
+                    <DxFormLayoutGroup Caption="Direct Bank Payment" HeaderCssClass="fs-5">
                         <div class="p-2">
-                            <div class="h5">Payment Instruction</div>
+                            <div class="fs-6">Payment Instruction</div>
                             <p>Please create a payment using your banking software with the following detail... </p>
                             <div class="row">
                                 <div class="col col-5"><strong>Amount Due:</strong></div>
@@ -327,7 +327,7 @@ else
     {
         using var dbc = await U3Adbfactory.CreateDbContextAsync();
         feeService = await MemberFeeCalculationService.CreateAsync(dbc, term, loginState.SelectedPerson);
-        decimal  result = feeService.CalculateFee();
+        decimal result = feeService.CalculateFee();
         feeAsString = GetFeeAsString(result);
         return result;
     }
