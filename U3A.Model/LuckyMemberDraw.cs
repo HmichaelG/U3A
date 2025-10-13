@@ -11,11 +11,13 @@ namespace U3A.Model
         [Required]
         public string Name { get; set; } = "Lucky Member Draw";
 
-        public bool IsComplete {get; set; }
-        
+        public bool IsComplete { get; set; }
+
         [NotMapped]
-        public string Secret { 
-            get {
+        public string Secret
+        {
+            get
+            {
                 string result = string.Empty;
                 if (CreatedOn.HasValue)
                 {
@@ -25,7 +27,7 @@ namespace U3A.Model
                     result = $"{value.ToString("0")}";
                 }
                 return result;
-            } 
+            }
         }
 
         //Navigation properties

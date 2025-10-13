@@ -212,7 +212,7 @@ namespace U3A.Services
 
         private async Task CreateReceipt(U3ADbContext dbc, PaymentResult result, Person person, Term term)
         {
-            var feeService = await MemberFeeCalculationService.CreateAsync(dbc,term,person);
+            var feeService = await MemberFeeCalculationService.CreateAsync(dbc, term, person);
             if (result.AccessCode != null && (result.ResponseCode == "00" || result.ResponseCode == "08"))
             {
                 var receipt = new Receipt()

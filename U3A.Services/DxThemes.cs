@@ -73,7 +73,7 @@ public class DxThemesService
 
         ActiveTheme = Themes.Fluent.Clone(properties =>
          {
-             properties.Mode = (theme.ToLowerInvariant() == "dark") ? ThemeMode.Dark : ThemeMode.Light ;
+             properties.Mode = (theme.ToLowerInvariant() == "dark") ? ThemeMode.Dark : ThemeMode.Light;
              properties.SetCustomAccentColor(color);
              properties.AddFilePaths($"css/theme-fluent.css");
          });

@@ -12,10 +12,10 @@ public static class AutoEnrollParticipants
                                         string tenantConnectionString)
     {
         bool hasRandomAllocationExecuted = false; //Return value
-        using (var dbc = new U3ADbContext(tenant))
+        using (U3ADbContext dbc = new(tenant))
         {
             dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-            var settings = await dbc.SystemSettings
+            SystemSettings? settings = await dbc.SystemSettings
                                 .OrderBy(x => x.ID)
                                 .FirstOrDefaultAsync();
             if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
@@ -23,17 +23,24 @@ public static class AutoEnrollParticipants
                 Log.Information($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
                 return hasRandomAllocationExecuted;
             }
-            var IsClassAllocationFinalised = false;
-            var forceEmailQueue = false;
+            bool IsClassAllocationFinalised = false;
+            bool forceEmailQueue = false;
             DateTime? emailDate = null;
-            var today = await Common.GetTodayAsync(dbc);
-            var now = await Common.GetNowAsync(dbc);
+            DateTime today = await Common.GetTodayAsync(dbc);
+            DateTime now = await Common.GetNowAsync(dbc);
             DateTime? allocationDate = null;
-            if (string.IsNullOrWhiteSpace(settings!.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
+            if (string.IsNullOrWhiteSpace(settings!.AutoEnrolRemainderMethod))
+            {
+                settings.AutoEnrolRemainderMethod = "Random";
+            }
 
             //get the current enrolment term
-            var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
-            if (currentTerm == null) return hasRandomAllocationExecuted;
+            Term? currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+            if (currentTerm == null)
+            {
+                return hasRandomAllocationExecuted;
+            }
+
             if (settings.AutoEnrolRemainderMethod.ToLower() == "random")
             {
                 //Allocation is random
@@ -52,7 +59,7 @@ public static class AutoEnrollParticipants
                         if (today == allocationDate)
                         {
                             Log.Information($"!!! [{dbc.TenantInfo.Identifier}]: Random Auto-Allocation Day !!!");
-                            var utcNow = DateTime.UtcNow;
+                            DateTime utcNow = DateTime.UtcNow;
                             // emailDate will be 3 days from now less two hours to ensure it occurs.
                             emailDate = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, 0, 0, 0) +
                                             TimeSpan.FromHours((constants.RANDOM_ALLOCATION_PREVIEW * 24) - 2);
@@ -81,7 +88,7 @@ public static class AutoEnrollParticipants
                                             IsClassAllocationFinalised,
                                             forceEmailQueue, emailDate);
             Log.Information($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
-            foreach (var log in BusinessRule.AutoEnrolments)
+            foreach (string log in BusinessRule.AutoEnrolments)
             {
                 Log.Information(log);
             }
@@ -100,50 +107,55 @@ public static class AutoEnrollParticipants
                                         IEnumerable<Guid> EnrollmentIdsToProcess,
                                         string tenantConnectionString)
     {
-        using (var dbc = new U3ADbContext(tenant))
+        using U3ADbContext dbc = new(tenant);
+        dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
+        SystemSettings? settings = await dbc.SystemSettings
+                            .OrderBy(x => x.ID)
+                            .FirstOrDefaultAsync();
+        if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
         {
-            dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-            var settings = await dbc.SystemSettings
-                                .OrderBy(x => x.ID)
-                                .FirstOrDefaultAsync();
-            if (BusinessRule.IsEnrolmentBlackoutPeriod(settings!))
+            Log.Information($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
+            return;
+        }
+        DateTime today = await Common.GetTodayAsync(dbc);
+        DateTime now = await Common.GetNowAsync(dbc);
+        DateTime allocationDate = DateTime.MinValue;
+        if (string.IsNullOrWhiteSpace(settings!.AutoEnrolRemainderMethod))
+        {
+            settings.AutoEnrolRemainderMethod = "Random";
+        }
+
+        //get the current enrolment term
+        Term? currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+        if (currentTerm == null)
+        {
+            return;
+        }
+
+        if (settings.AutoEnrolRemainderMethod.ToLower() == "random")
+        {
+            //Allocation is random
+
+            if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
             {
-                Log.Information($"[{dbc.TenantInfo.Identifier}]: Allocation not performed - Enrolment Blackout till: {settings!.EnrolmentBlackoutEndsUTC.GetValueOrDefault().ToString(constants.STD_DATETIME_FORMAT)}");
-                return;
+                allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
             }
-            var today = await Common.GetTodayAsync(dbc);
-            var now = await Common.GetNowAsync(dbc);
-            DateTime allocationDate = DateTime.MinValue;
-            if (string.IsNullOrWhiteSpace(settings!.AutoEnrolRemainderMethod)) settings.AutoEnrolRemainderMethod = "Random";
+        }
 
-            //get the current enrolment term
-            var currentTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
-            if (currentTerm == null) return;
-            if (settings.AutoEnrolRemainderMethod.ToLower() == "random")
+        //  Make sure random allocation is complete
+        if (today > allocationDate.AddDays(constants.RANDOM_ALLOCATION_PREVIEW))
+        {
+            // process for participants
+            await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm, EnrollmentIdsToProcess);
+            Log.Information($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
+            foreach (string log in BusinessRule.AutoEnrolments)
             {
-                //Allocation is random
-
-                if (BusinessRule.IsRandomAllocationTerm(currentTerm, settings))
-                {
-                    allocationDate = BusinessRule.GetThisTermAllocationDay(currentTerm, settings);
-                }
+                Log.Information(log);
             }
+            BusinessRule.AutoEnrolments.Clear();
 
-            //  Make sure random allocation is complete
-            if (today > allocationDate.AddDays(constants.RANDOM_ALLOCATION_PREVIEW))
-            {
-                // process for participants
-                await BusinessRule.AutoEnrolParticipantsAsync(dbc, currentTerm, EnrollmentIdsToProcess);
-                Log.Information($">>>> [{dbc.TenantInfo.Identifier}]: {BusinessRule.AutoEnrolments.Count} Auto-Enrolments for {currentTerm.Year} term {currentTerm.TermNumber}. <<<<");
-                foreach (var log in BusinessRule.AutoEnrolments)
-                {
-                    Log.Information(log);
-                }
-                BusinessRule.AutoEnrolments.Clear();
-
-                // process for multi-campus visitors
-                await BusinessRule.AutoEnrolMultiCampus(tenant, tenantConnectionString, now);
-            }
+            // process for multi-campus visitors
+            await BusinessRule.AutoEnrolMultiCampus(tenant, tenantConnectionString, now);
         }
     }
 }

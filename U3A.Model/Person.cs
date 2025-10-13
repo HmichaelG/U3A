@@ -121,7 +121,7 @@ public class Person : BaseEntity, ISoftDelete
     {
         get
         {
-            return (BirthDate == null) ? -1 : BirthDate.Value.Month ;
+            return (BirthDate == null) ? -1 : BirthDate.Value.Month;
         }
     }
     [NotMapped]
@@ -590,7 +590,7 @@ public class Person : BaseEntity, ISoftDelete
         get
         {
             var result = string.Empty;
-            if (!string.IsNullOrWhiteSpace(CarerName) 
+            if (!string.IsNullOrWhiteSpace(CarerName)
                 && !string.IsNullOrWhiteSpace(CarerEmail) && CarerGetsEmailCopy)
             {
                 result = CarerEmail;

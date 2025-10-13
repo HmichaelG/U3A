@@ -68,7 +68,7 @@ namespace U3A.BusinessRules
                                 .Include(x => x.Term)
                                 .Where(x => x.DropoutDate > lastSchedule.UpdatedOn).ToListAsync();
             var schedule = await dbc.Schedule.AsNoTracking().ToListAsync();
-            await Parallel.ForEachAsync(schedule, async(s,_) =>
+            await Parallel.ForEachAsync(schedule, async (s, _) =>
             {
                 Class c;
                 using Stream classStream = new MemoryStream(Encoding.UTF8.GetBytes(s.jsonClass.Unzip()));
@@ -126,7 +126,7 @@ namespace U3A.BusinessRules
             });
             List<Class> result = classes.Except(deletions).ToList();
 
-            await Parallel.ForEachAsync(result, async(c, _) =>
+            await Parallel.ForEachAsync(result, async (c, _) =>
             {
                 AssignClassCounts(term, c);
             });

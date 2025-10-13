@@ -15,25 +15,23 @@ public partial class DurableFunctions
     [Function(nameof(DoBuildScheduleActivity))]
     public async Task<string> DoBuildScheduleActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        string? cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(options.TenantIdentifier, cn);
+            TenantInfo? tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 Log.Information($"****** Started {nameof(DoBuildScheduleActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
                     await LogStartTime(tenant);
-                    using (var dbc = new U3ADbContext(tenant))
+                    using U3ADbContext dbc = new(tenant);
+                    dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
+                    using (TenantDbContext dbcT = new(cn!))
                     {
-                        dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-                        using (var dbcT = new TenantDbContext(cn!))
-                        {
-                            await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
-                        }
-                        Log.Information($"Class Schedule cache created for: {tenant.Identifier}.");
+                        await BusinessRule.BuildScheduleAsync(dbc, dbcT, tenant.Identifier!);
                     }
+                    Log.Information($"Class Schedule cache created for: {tenant.Identifier}.");
                 }
                 catch (Exception ex)
                 {
@@ -53,7 +51,7 @@ public partial class DurableFunctions
     [DurableClient] DurableTaskClient client,
     FunctionContext executionContext)
     {
-        var options = new U3AFunctionOptions(req)
+        U3AFunctionOptions options = new(req)
         {
             DurableActivity = DurableActivity.DoBuildSchedule
         };

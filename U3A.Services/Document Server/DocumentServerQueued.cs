@@ -67,7 +67,7 @@ namespace U3A.Services
                                             bodyText.PlainText,
                                             PDFFileContents, filenames);
                 docsSent++;
-                if (!string.IsNullOrWhiteSpace( mergeItem.P_CarerSendToEmail))
+                if (!string.IsNullOrWhiteSpace(mergeItem.P_CarerSendToEmail))
                 {
                     response = await IEmailSender.SendEmailAsync(EmailType.Broadcast,
                                                 documentTemplate.FromEmailAddress,

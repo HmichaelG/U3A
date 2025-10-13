@@ -19,7 +19,7 @@ namespace U3A.Model
 
         // Navigation properties
         public LuckyMemberDraw LuckyMemberDraw { get; set; }
-        
-        public Person Person { get; set; }  
+
+        public Person Person { get; set; }
     }
 }

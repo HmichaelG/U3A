@@ -16,17 +16,17 @@ public partial class DurableFunctions
                         U3AFunctionOptions options,
                         FunctionContext executionContext)
     {
-        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        string? cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(options.TenantIdentifier, cn);
+            TenantInfo? tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 Log.Information($"****** Started {nameof(DoSendRequestedLeaderReportsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
                     await LogStartTime(tenant);
-                    var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
+                    bool isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                     if (isBackgroundProcessingEnabled)
                     {
                         await ProcessCorrespondence.Process(tenant, cn!, options);
@@ -52,7 +52,7 @@ public partial class DurableFunctions
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
-        var options = new U3AFunctionOptions(req)
+        U3AFunctionOptions options = new(req)
         {
             DurableActivity = DurableActivity.DoSendRequestedLeaderReports
         };

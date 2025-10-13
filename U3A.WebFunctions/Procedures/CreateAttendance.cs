@@ -11,43 +11,41 @@ namespace U3A.WebFunctions.Procedures
     {
         public static async Task Process(TenantInfo tenant)
         {
-            using (var dbc = new U3ADbContext(tenant))
+            using U3ADbContext dbc = new(tenant);
+            dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
+            DateTime today = await Common.GetTodayAsync(dbc);
+            Term? term = await BusinessRule.FindTermAsync(dbc, today);
+            if (term == null) { return; }
+
+            // Get the schedule storage for the current term
+            DxSchedulerDataStorage storage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, term);
+
+            // find today's classes starting from now
+            DateTime end = today.AddDays(1);
+            DxSchedulerDateTimeRange range = new(today, end);
+            List<Class> classes = (from a in storage.GetAppointments(range)
+                                   where a.CustomFields["Source"] != null
+                                             && (int)a.LabelId != 9 // Cancelled/Postponed
+                                   select a.CustomFields["Source"] as Class).ToList();
+            if (classes?.Any() == true)
             {
-                dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
-                var today = await Common.GetTodayAsync(dbc);
-                var term = await BusinessRule.FindTermAsync(dbc, today);
-                if (term == null) { return; }
-
-                // Get the schedule storage for the current term
-                var storage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, term);
-
-                // find today's classes starting from now
-                var end = today.AddDays(1);
-                var range = new DxSchedulerDateTimeRange(today, end);
-                var classes = (from a in storage.GetAppointments(range)
-                               where a.CustomFields["Source"] != null
-                                         && (int)a.LabelId != 9 // Cancelled/Postponed
-                               select a.CustomFields["Source"] as Class).ToList();
-                if (classes?.Any() == true)
+                Log.Information(">>>> Create today's attendance records <<<");
+                foreach (Class c in classes)
                 {
-                    Log.Information(">>>> Create today's attendance records <<<");
-                    foreach (var c in classes)
+                    Course? course = await dbc.Course.FindAsync(c.CourseID);
+                    if (course != null)
                     {
-                        var course = await dbc.Course.FindAsync(c.CourseID);
-                        if (course != null)
+                        if (course.IsOffScheduleActivity)
                         {
-                            if (course.IsOffScheduleActivity)
-                            {
-                                Log.Information($"{course.Name} at {c.StartTime.ToShortTimeString()} not created -  Off Schedule Activity.");
-                            }
-                            else
-                            {
-                                var classDate = new DateTime(today.Year, today.Month, today.Day,
-                                                        c.StartTime.Hour, c.StartTime.Minute, 0);
-                                var attendance = await BusinessRule.EditableAttendanceAsync(dbc, term, c.Course, c, classDate);
-                                await ApplyStudentLeaveAsync(dbc, attendance, course);
-                                Log.Information($"{course.Name} at {c.StartTime.ToShortTimeString()} created.");
-                            }
+                            Log.Information($"{course.Name} at {c.StartTime:t} not created -  Off Schedule Activity.");
+                        }
+                        else
+                        {
+                            DateTime classDate = new(today.Year, today.Month, today.Day,
+                                                    c.StartTime.Hour, c.StartTime.Minute, 0);
+                            List<AttendClass> attendance = await BusinessRule.EditableAttendanceAsync(dbc, term, c.Course, c, classDate);
+                            await ApplyStudentLeaveAsync(dbc, attendance, course);
+                            Log.Information($"{course.Name} at {c.StartTime:t} created.");
                         }
                     }
                 }
@@ -58,9 +56,9 @@ namespace U3A.WebFunctions.Procedures
                                     Course course)
         {
             DateTime now = await Common.GetNowAsync(dbc);
-            foreach (var ac in ClassAttendance.Where(x => x.DateProcessed == null))
+            foreach (AttendClass? ac in ClassAttendance.Where(x => x.DateProcessed == null))
             {
-                var leave = await BusinessRule.GetLeaveForPersonForCourseForClass(dbc, ac.Person, course, ac.Date.Date);
+                Leave leave = await BusinessRule.GetLeaveForPersonForCourseForClass(dbc, ac.Person, course, ac.Date.Date);
                 if (leave != null)
                 {
                     ac.AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithApology;

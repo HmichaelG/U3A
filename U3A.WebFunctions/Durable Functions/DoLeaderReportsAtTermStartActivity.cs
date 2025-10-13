@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using U3A.Model;
 using U3A.WebFunctions.Procedures;
 
 
@@ -12,17 +13,17 @@ public partial class DurableFunctions
     [Function(nameof(DoLeaderReportsAtTermStartActivity))]
     public async Task<string> DoLeaderReportsAtTermStartActivity([ActivityTrigger] string tenantToProcess, FunctionContext executionContext)
     {
-        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        string? cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(tenantToProcess, cn);
+            TenantInfo? tenant = GetTenant(tenantToProcess, cn);
             if (tenant != null)
             {
                 Log.Information($"****** Started {nameof(DoLeaderReportsAtTermStartActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
                     await LogStartTime(tenant);
-                    var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
+                    bool isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                     if (isBackgroundProcessingEnabled)
                     {
                         await SendLeaderReportsAtTermStart.Process(tenant);

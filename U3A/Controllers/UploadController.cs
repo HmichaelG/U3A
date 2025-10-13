@@ -13,11 +13,9 @@ namespace U3A.Controllers
         {
             try
             {
-                var path = GetOrCreateUploadFolder();
-                using (var fileStream = System.IO.File.Create(Path.Combine(path, myFile.FileName)))
-                {
-                    myFile.CopyTo(fileStream);
-                }
+                string path = GetOrCreateUploadFolder();
+                using FileStream fileStream = System.IO.File.Create(Path.Combine(path, myFile.FileName));
+                myFile.CopyTo(fileStream);
             }
             catch
             {
@@ -33,10 +31,13 @@ namespace U3A.Controllers
 
         public string GetOrCreateUploadFolder()
         {
-            var pathname = "uploads";
-            var path = Path.Combine(ContentRootPath, pathname);
+            string pathname = "uploads";
+            string path = Path.Combine(ContentRootPath, pathname);
             if (!Directory.Exists(path))
+            {
                 _ = Directory.CreateDirectory(path);
+            }
+
             DeleteOldTempFiles(path);
             return path;
         }

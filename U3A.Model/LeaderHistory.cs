@@ -38,7 +38,7 @@ namespace U3A.Model
         public virtual Person Person { get; set; }
     }
 
-   
+
     public enum LeaderType
     {
         Leader,

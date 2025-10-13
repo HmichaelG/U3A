@@ -15,17 +15,17 @@ public partial class DurableFunctions
     [Function(nameof(DoMembershipAlertsEmailActivity))]
     public async Task<string> DoMembershipAlertsEmailActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        string? cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(options.TenantIdentifier, cn);
+            TenantInfo? tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 Log.Information($"****** Started {nameof(DoMembershipAlertsEmailActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
                     await LogStartTime(tenant);
-                    var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
+                    bool isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                     if (isBackgroundProcessingEnabled)
                     {
                         await ProcessMembershipAlertsEmail.Process(tenant);
@@ -51,7 +51,7 @@ public partial class DurableFunctions
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
-        var options = new U3AFunctionOptions(req)
+        U3AFunctionOptions options = new(req)
         {
             DurableActivity = DurableActivity.DoFinalisePayments
         };

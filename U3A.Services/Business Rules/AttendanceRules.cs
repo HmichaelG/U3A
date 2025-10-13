@@ -95,7 +95,7 @@ public static partial class BusinessRule
         var validAttendance = (dbc.AttendClass.IgnoreQueryFilters().Include(x => x.Class)
             .Where(ac => !ac.Class.IsDeleted && ac.Date >= startDate && ac.Date <= endDate)
             .ToList())
-            .GroupBy(ac => new {ac.ClassID, ac.Date.Date })
+            .GroupBy(ac => new { ac.ClassID, ac.Date.Date })
             .Select(g => new
             {
                 ClassID = g.Key.ClassID,
@@ -271,13 +271,13 @@ public static partial class BusinessRule
         List<ClassDate> onFileDates = await dbc.AttendClass
                                                 .Where(x => x.TermID == selectedTerm.ID
                                                             && x.ClassID == selectedClass.ID
-                                                            && x.Date <= onFileCutoffDate )
+                                                            && x.Date <= onFileCutoffDate)
                                                 .Select(x => new ClassDate()
                                                 {
                                                     Date = x.Date,
                                                     TermStart = selectedTerm.StartDate
                                                 }).Distinct().ToListAsync();
-        
+
         // Calculate the date range for class schedule calculation ( start & end)
 
         // the last class date for term
@@ -361,28 +361,28 @@ public static partial class BusinessRule
 
     private static async Task CreateAttendance(U3ADbContext dbc, Term SelectedTerm, Class SelectedClass, DateTime ClassDate, List<AttendClass> attendance, Guid PersonID)
     {
-            var attendClass = new AttendClass()
-            {
-                TermID = SelectedTerm.ID,
-                Term = await dbc.Term.FindAsync(SelectedTerm.ID),
-                ClassID = SelectedClass.ID,
-                Class = await dbc.Class.FindAsync(SelectedClass.ID),
-                Date = ClassDate,
-                Person = await dbc.Person.FindAsync(PersonID),
-                PersonID = PersonID,
-                AttendClassStatus = await dbc.AttendClassStatus.FindAsync((int)AttendClassStatusType.AbsentFromClassWithoutApology),
-                AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithoutApology,
-                Comment = String.Empty
-            };
-            attendClass.Class.Venue = await dbc.Venue.FindAsync(attendClass.Class.VenueID);
-            attendClass.Class.Leader = await dbc.Person.FindAsync(attendClass.Class.LeaderID);
-            attendClass.Class.OnDay = await dbc.WeekDay.FindAsync(attendClass.Class.OnDayID);
-            attendClass.Class.Occurrence = await dbc.Occurrence.FindAsync(attendClass.Class.OccurrenceID);
-            attendClass.Class.Course = await dbc.Course.FindAsync(attendClass.Class.CourseID);
-            attendClass.Class.Course.CourseType = await dbc.CourseType.FindAsync(attendClass.Class.Course.CourseTypeID);
-            attendClass.Class.Course.CourseParticipationType = await dbc.CourseParticpationType.FindAsync(attendClass.Class.Course.CourseParticipationTypeID);
-            attendance.Add(attendClass);
-            await dbc.AttendClass.AddAsync(attendClass);
+        var attendClass = new AttendClass()
+        {
+            TermID = SelectedTerm.ID,
+            Term = await dbc.Term.FindAsync(SelectedTerm.ID),
+            ClassID = SelectedClass.ID,
+            Class = await dbc.Class.FindAsync(SelectedClass.ID),
+            Date = ClassDate,
+            Person = await dbc.Person.FindAsync(PersonID),
+            PersonID = PersonID,
+            AttendClassStatus = await dbc.AttendClassStatus.FindAsync((int)AttendClassStatusType.AbsentFromClassWithoutApology),
+            AttendClassStatusID = (int)AttendClassStatusType.AbsentFromClassWithoutApology,
+            Comment = String.Empty
+        };
+        attendClass.Class.Venue = await dbc.Venue.FindAsync(attendClass.Class.VenueID);
+        attendClass.Class.Leader = await dbc.Person.FindAsync(attendClass.Class.LeaderID);
+        attendClass.Class.OnDay = await dbc.WeekDay.FindAsync(attendClass.Class.OnDayID);
+        attendClass.Class.Occurrence = await dbc.Occurrence.FindAsync(attendClass.Class.OccurrenceID);
+        attendClass.Class.Course = await dbc.Course.FindAsync(attendClass.Class.CourseID);
+        attendClass.Class.Course.CourseType = await dbc.CourseType.FindAsync(attendClass.Class.Course.CourseTypeID);
+        attendClass.Class.Course.CourseParticipationType = await dbc.CourseParticpationType.FindAsync(attendClass.Class.Course.CourseParticipationTypeID);
+        attendance.Add(attendClass);
+        await dbc.AttendClass.AddAsync(attendClass);
     }
 
     private static async Task<List<AttendClass>> GetAttendanceAsync(U3ADbContext dbc,
@@ -457,21 +457,21 @@ public static partial class BusinessRule
                         .Where(x => x.PersonID == PersonID && x.Term.Year == Year)
                         .OrderBy(x => x.Term.Year).ThenBy(x => x.Term.TermNumber).ThenBy(x => x.Class.Course.Name).ThenBy(x => x.Date)
                         .ToListAsync();
-            Parallel.ForEach(attendance, a =>
+        Parallel.ForEach(attendance, a =>
+        {
+            if (cancelledClass.Any(x => x.ClassID == a.ClassID && a.AttendanceDate >= x.StartDate && a.AttendanceDate <= x.EndDate))
             {
-                if (cancelledClass.Any(x => x.ClassID == a.ClassID && a.AttendanceDate >= x.StartDate && a.AttendanceDate <= x.EndDate))
-                {
-                    a.AttendClassStatusID = -1;
-                    a.Comment = "Cancelled Class";
-                }
-                if (publicHolidays.Select(x => x.Date).Contains(a.AttendanceDate))
-                {
-                    a.AttendClassStatusID = -1;
-                    a.Comment = publicHolidays
-                        .Where(x => x.Date == a.AttendanceDate)
-                        .Select(x => x.Name).FirstOrDefault();
-                }
-            });
+                a.AttendClassStatusID = -1;
+                a.Comment = "Cancelled Class";
+            }
+            if (publicHolidays.Select(x => x.Date).Contains(a.AttendanceDate))
+            {
+                a.AttendClassStatusID = -1;
+                a.Comment = publicHolidays
+                    .Where(x => x.Date == a.AttendanceDate)
+                    .Select(x => x.Name).FirstOrDefault();
+            }
+        });
         return attendance;
     }
 
@@ -517,7 +517,7 @@ public static partial class BusinessRule
         string tenant = dbc.TenantInfo.Identifier;
         var otherU3APersons = await dbct.MultiCampusPerson
                                     .Where(x => x.TenantIdentifier != tenant)
-                                    .Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, Gender="Visitor", ID = x.ID })
+                                    .Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, Gender = "Visitor", ID = x.ID })
                                     .ToListAsync();
         persons.AddRange(otherU3APersons.Select(x => new Person() { LastName = x.LastName, FirstName = x.FirstName, ID = x.ID }));
         var courses = await dbc.Course.Include(x => x.CourseParticipationType).ToListAsync();

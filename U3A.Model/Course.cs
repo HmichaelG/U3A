@@ -70,12 +70,13 @@ namespace U3A.Model
         public bool OverrideComplimentaryPerYearFee { get; set; }
         public bool LeadersPayYearFee { get; set; }
 
-        [Obsolete][Required]
+        [Obsolete]
+        [Required]
         [Precision(precision: 18, 2)]
         [DefaultValue(0.00)]
         [Comment("Optional fee per term)")]
         public decimal CourseFeePerTerm { get; set; }
-        
+
         [Required]
         [Precision(precision: 18, 2)]
         [DefaultValue(0.00)]
@@ -152,7 +153,7 @@ namespace U3A.Model
                     {
                         if (fees[i] > 0)
                         {
-                                sb.Append($"Term {i + 1}: {fees[i]:C} ");
+                            sb.Append($"Term {i + 1}: {fees[i]:C} ");
                         }
                     }
                 }

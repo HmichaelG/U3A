@@ -5,16 +5,17 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using U3A.Database;
 using U3A.Model;
+using U3A.ServiceDefaults;
 using U3A.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
 builder.Services.AddScoped<LocalTime>();
 
-var MultiTenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
-var assemblyName = typeof(U3ADbContext).Namespace;
+string? MultiTenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
+string? assemblyName = typeof(U3ADbContext).Namespace;
 builder.Services.AddDbContext<TenantDbContext>(options =>
     options.UseSqlServer(MultiTenantConnectionString,
      b =>
@@ -29,7 +30,7 @@ builder.Services.AddDbContextFactory<TenantDbContext>(options =>
     _ = options.UseSqlServer();
 }, ServiceLifetime.Scoped);
 
-var initialScopes = builder.Configuration["DownstreamApi:Scopes"]?.Split(' ') ?? builder.Configuration["MicrosoftGraph:Scopes"]?.Split(' ');
+string[]? initialScopes = builder.Configuration["DownstreamApi:Scopes"]?.Split(' ') ?? builder.Configuration["MicrosoftGraph:Scopes"]?.Split(' ');
 
 // Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
@@ -62,7 +63,7 @@ builder.Services.AddServerSideBlazor()
     .AddMicrosoftIdentityConsentHandler();
 builder.Services.AddScoped<WorkstationService>();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.MapDefaultEndpoints();
 

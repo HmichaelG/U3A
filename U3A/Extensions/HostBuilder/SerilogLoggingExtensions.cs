@@ -7,11 +7,9 @@ using Serilog.Exceptions;
 using Serilog.Filters;
 using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.SystemConsole.Themes;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.Security.Cryptography;
-using Microsoft.Extensions.DependencyInjection;
 using U3A.Services;
 
 namespace U3A.Extensions.HostBuilder;
@@ -31,26 +29,26 @@ public static class SerilogLoggingExtensions
     {
 
         // Register the enricher so it can be resolved from the temporary provider
-        builder.Services.AddSingleton<SerilogEnricher>();
+        _ = builder.Services.AddSingleton<SerilogEnricher>();
 
         // Build a temporary service provider to resolve TelemetryConfiguration if it's registered.
         // If not available, fall back to a default TelemetryConfiguration.
-        using var tempServiceProvider = builder.Services.BuildServiceProvider();
-        var telemetryConfig = tempServiceProvider.GetService<TelemetryConfiguration>() ?? TelemetryConfiguration.CreateDefault();
+        using ServiceProvider tempServiceProvider = builder.Services.BuildServiceProvider();
+        TelemetryConfiguration telemetryConfig = tempServiceProvider.GetService<TelemetryConfiguration>() ?? TelemetryConfiguration.CreateDefault();
 
-        var enricher = tempServiceProvider.GetRequiredService<SerilogEnricher>();
+        SerilogEnricher enricher = tempServiceProvider.GetRequiredService<SerilogEnricher>();
 
-        var columnOptions = new ColumnOptions
+        ColumnOptions columnOptions = new()
         {
-            AdditionalColumns = new Collection<SqlColumn>
-            {
+            AdditionalColumns =
+            [
                 new SqlColumn
                 { ColumnName = "Tenant", PropertyName = "Tenant", DataType = SqlDbType.NVarChar, DataLength = 64 },
                 new SqlColumn
                 { ColumnName = "User", PropertyName = "User", DataType = SqlDbType.NVarChar, DataLength = 64 },
                 new SqlColumn
                 { ColumnName = "LogEvent", PropertyName = "LogEvent", DataType = SqlDbType.NVarChar, DataLength = 64 },
-            }
+            ]
         };
 
         Log.Logger = new LoggerConfiguration()
@@ -61,11 +59,11 @@ public static class SerilogLoggingExtensions
             .Enrich.With(enricher)
             .Enrich.WithExceptionDetails()
             .Filter.ByExcluding(logEvent =>
-                logEvent.Exception is OperationCanceledException ||
-                logEvent.Exception is ObjectDisposedException ||
-                logEvent.Exception is AntiforgeryValidationException ||
-                logEvent.Exception is CryptographicException ||
-                logEvent.Exception is JSDisconnectedException
+                logEvent.Exception is OperationCanceledException or
+                ObjectDisposedException or
+                AntiforgeryValidationException or
+                CryptographicException or
+                JSDisconnectedException
                 )
             .WriteTo.Async(a => a.Logger(lc => lc
                 .Filter.ByIncludingOnly(Matching.WithProperty("AutoEnrolParticipants"))
@@ -96,7 +94,7 @@ public static class SerilogLoggingExtensions
                                 ))
             .CreateLogger();
 
-        builder.Host.UseSerilog(Log.Logger);
+        _ = builder.Host.UseSerilog(Log.Logger);
         Log.Information("Logging started {now}", DateTime.Now);
 
         return builder;

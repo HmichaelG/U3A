@@ -27,17 +27,17 @@ namespace U3A.WebFunctions
         {
 
             // get form-body
-            var parsedFormBody = await MultipartFormDataParser.ParseAsync(req.Body);
+            MultipartFormDataParser parsedFormBody = await MultipartFormDataParser.ParseAsync(req.Body);
 
             // parse form-data
-            var token = parsedFormBody.GetParameterValue("token");
-            var name = parsedFormBody.GetParameterValue("name");
-            var email = parsedFormBody.GetParameterValue("email");
-            var phone = parsedFormBody.GetParameterValue("phone");
-            var u3a = parsedFormBody.GetParameterValue("u3a");
-            var message = parsedFormBody.GetParameterValue("message");
-            if (phone == null) { phone = string.Empty; }
-            if (message == null) { message = string.Empty; }
+            string token = parsedFormBody.GetParameterValue("token");
+            string name = parsedFormBody.GetParameterValue("name");
+            string email = parsedFormBody.GetParameterValue("email");
+            string phone = parsedFormBody.GetParameterValue("phone");
+            string u3a = parsedFormBody.GetParameterValue("u3a");
+            string message = parsedFormBody.GetParameterValue("message");
+            phone ??= string.Empty;
+            message ??= string.Empty;
 
             Log.Information($"Request: {name}, Email: {email}, Phone: {phone}, U3A: {u3a}");
 
@@ -61,13 +61,12 @@ namespace U3A.WebFunctions
             return response;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Async/await", "CRR0029:ConfigureAwait(true) is called implicitly", Justification = "<Pending>")]
         public async Task SendInitialResponseEmailAsync(string name, string email, string phone, string message, string u3a)
         {
-            var postmarkKey = _config.GetValue<string>("PostmarkKey");
-            var supportEmail = _config.GetValue<string>("SupportEmailAddress");
-            var emailSender = EmailFactory.GetEmailSender(postmarkKey!, false);
-            var table = BuildTable(name, email, phone, message, u3a);
+            string? postmarkKey = _config.GetValue<string>("PostmarkKey");
+            string? supportEmail = _config.GetValue<string>("SupportEmailAddress");
+            IEmailService? emailSender = EmailFactory.GetEmailSender(postmarkKey!, false);
+            string table = BuildTable(name, email, phone, message, u3a);
             string HTMMessage = @$"
             <h3>Thank you for contacting U3Admin.org.au</h3>
             <p>This is an automated email. Please do not respond.</p>
@@ -101,9 +100,9 @@ namespace U3A.WebFunctions
                 string.Empty);
         }
 
-        string BuildTable(string name, string email, string phone, string message, string u3a)
+        private string BuildTable(string name, string email, string phone, string message, string u3a)
         {
-            var txt = new StringBuilder();
+            StringBuilder txt = new();
             _ = txt.AppendLine(@"<table style='width: 100%;
                                         border: 1pt solid black;'>");
             _ = txt.AppendLine(@"<tr>
@@ -156,9 +155,9 @@ namespace U3A.WebFunctions
         public async Task<bool> IsReCaptchaOK(string token)
         {
             bool result = false;
-            HttpClient httpClient = new HttpClient();
-            var reCaptchaSecret = _config.GetValue(typeof(string), "GoogleReCaptchaKey");
-            var res = await httpClient.GetAsync($"https://www.google.com/recaptcha/api/siteverify?secret={reCaptchaSecret}&response={token}");
+            HttpClient httpClient = new();
+            object? reCaptchaSecret = _config.GetValue(typeof(string), "GoogleReCaptchaKey");
+            HttpResponseMessage res = await httpClient.GetAsync($"https://www.google.com/recaptcha/api/siteverify?secret={reCaptchaSecret}&response={token}");
             if (res.StatusCode != HttpStatusCode.OK)
             {
                 return result;
@@ -191,10 +190,9 @@ namespace U3A.WebFunctions
 
         private async Task WriteRequestAsync(string name, string email, string phone, string message, string u3a)
         {
-            var cn = _config.GetConnectionString("TenantConnectionString");
-            using (var cnn = new SqlConnection(cn))
-            {
-                var cmdText = @"INSERT INTO [dbo].[ContactRequest]
+            string? cn = _config.GetConnectionString("TenantConnectionString");
+            using SqlConnection cnn = new(cn);
+            string cmdText = @"INSERT INTO [dbo].[ContactRequest]
                                    ([Id]
                                    ,[Name]
                                    ,[Email]
@@ -214,31 +212,28 @@ namespace U3A.WebFunctions
                                    ,@UpdatedOn
                                    ,@User
                                    ,@U3A)";
-                using (var cmd = new SqlCommand(cmdText, cnn))
-                {
-                    try
-                    {
-                        _ = cmd.Parameters.AddWithValue("Id", Guid.NewGuid());
-                        _ = cmd.Parameters.AddWithValue("Name", name);
-                        _ = cmd.Parameters.AddWithValue("Email", email);
-                        _ = cmd.Parameters.AddWithValue("PhoneNumber", phone);
-                        _ = cmd.Parameters.AddWithValue("Message", message);
-                        _ = cmd.Parameters.AddWithValue("@U3A", u3a);
-                        _ = cmd.Parameters.AddWithValue("@CreatedOn", DateTime.UtcNow);
-                        _ = cmd.Parameters.AddWithValue("@UpdatedOn", DateTime.UtcNow);
-                        _ = cmd.Parameters.AddWithValue("@User", "Initial Web Request");
-                        await cnn.OpenAsync();
-                        _ = await cmd.ExecuteNonQueryAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex.Message, "Error writing ContactRequest");
-                    }
-                    finally
-                    {
-                        await cnn.CloseAsync();
-                    }
-                }
+            using SqlCommand cmd = new(cmdText, cnn);
+            try
+            {
+                _ = cmd.Parameters.AddWithValue("Id", Guid.NewGuid());
+                _ = cmd.Parameters.AddWithValue("Name", name);
+                _ = cmd.Parameters.AddWithValue("Email", email);
+                _ = cmd.Parameters.AddWithValue("PhoneNumber", phone);
+                _ = cmd.Parameters.AddWithValue("Message", message);
+                _ = cmd.Parameters.AddWithValue("@U3A", u3a);
+                _ = cmd.Parameters.AddWithValue("@CreatedOn", DateTime.UtcNow);
+                _ = cmd.Parameters.AddWithValue("@UpdatedOn", DateTime.UtcNow);
+                _ = cmd.Parameters.AddWithValue("@User", "Initial Web Request");
+                await cnn.OpenAsync();
+                _ = await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, "Error writing ContactRequest");
+            }
+            finally
+            {
+                await cnn.CloseAsync();
             }
         }
 

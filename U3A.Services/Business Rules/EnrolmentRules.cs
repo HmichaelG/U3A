@@ -693,7 +693,7 @@ namespace U3A.BusinessRules
             var deletions = await dbc.Enrolment
                         .Include(x => x.Class)
                         .Where(x => x.ClassID == ClassID).ToArrayAsync();
-            await DeleteEnrolmentsAsync(dbc, deletions); 
+            await DeleteEnrolmentsAsync(dbc, deletions);
         }
         public static async Task DeleteEnrolmentAsync(U3ADbContext dbc, Enrolment deletion)
         {

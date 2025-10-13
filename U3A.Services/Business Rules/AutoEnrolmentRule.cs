@@ -649,7 +649,7 @@ namespace U3A.BusinessRules
                 var end = new DateTime(today.Year, 12, 31);
                 var range = new DxSchedulerDateTimeRange(start, end);
                 Dictionary<Guid, List<DxSchedulerAppointmentItem>> classAppointments = new();
-                result.AddRange( calendar.GetAppointments(range)
+                result.AddRange(calendar.GetAppointments(range)
                         .Where(x => course.Classes.Contains((Class)x.CustomFields["Source"]))
                         .Select(x => (Class)x.CustomFields["Source"]).ToList());
             }

@@ -34,7 +34,7 @@ namespace U3A.Model
         public string P_FullName { get; set; }
         public Boolean P_IsCourseLeader { get; set; }
         public string P_CarerName { get; set; }
-        public string P_CarerSendToEmail { get; set; }  
+        public string P_CarerSendToEmail { get; set; }
 
         // System Settings data
 

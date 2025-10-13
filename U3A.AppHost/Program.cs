@@ -1,12 +1,14 @@
-var builder = DistributedApplication.CreateBuilder(args);
+using Aspire.Hosting.Azure;
 
-var openai = builder.ExecutionContext.IsPublishMode
+IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
+
+IResourceBuilder<IResourceWithConnectionString> openai = builder.ExecutionContext.IsPublishMode
     ? builder.AddAzureOpenAI("openai")
     : builder.AddConnectionString("openai");
 
-var api = builder.AddAzureFunctionsProject<Projects.U3A_WebFunctions>("u3a-webfunctions");
+IResourceBuilder<AzureFunctionsProjectResource> api = builder.AddAzureFunctionsProject<Projects.U3A_WebFunctions>("u3a-webfunctions");
 
-var mainApp = builder.AddProject<Projects.U3A>("u3a")
+IResourceBuilder<ProjectResource> mainApp = builder.AddProject<Projects.U3A>("u3a")
     .WithReference(openai)
     .WaitFor(api);
 

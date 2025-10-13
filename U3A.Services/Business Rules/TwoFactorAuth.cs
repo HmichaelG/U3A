@@ -8,7 +8,7 @@ namespace U3A.BusinessRules;
 
 public static partial class BusinessRule
 {
-    
+
     static readonly int gracePeriodDays = 30;
     public static async Task<int> TwoFactorGracePeriodRemainingAsync(U3ADbContext dbc, string? userName)
     {
@@ -31,7 +31,7 @@ public static partial class BusinessRule
         return difference;
     }
 
-    public static async Task<bool> IsTwoFactorRequiredAsync(U3ADbContext dbContext, 
+    public static async Task<bool> IsTwoFactorRequiredAsync(U3ADbContext dbContext,
         IConfiguration config,
         string? userName)
     {

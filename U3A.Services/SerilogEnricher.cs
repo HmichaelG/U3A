@@ -3,6 +3,7 @@ using Serilog.Core;
 using Serilog.Events;
 
 namespace U3A.Services;
+
 public class SerilogEnricher : ILogEventEnricher
 {
     private readonly IHttpContextAccessor _httpContextAccessor;

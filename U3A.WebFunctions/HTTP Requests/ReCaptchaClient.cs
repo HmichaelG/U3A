@@ -17,9 +17,9 @@ namespace U3A.WebFunctions
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
         {
 
-            var reCaptchaSecret = _config.GetValue(typeof(string), "GoogleReCaptchaClientKey");
+            object? reCaptchaSecret = _config.GetValue(typeof(string), "GoogleReCaptchaClientKey");
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
+            HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
 
             if (reCaptchaSecret != null)

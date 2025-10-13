@@ -1,9 +1,6 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
 using DevExpress.AIIntegration;
-using DevExpress.AIIntegration.Blazor.Reporting.Viewer.Models;
-using DevExpress.AIIntegration.Reporting.Common.Models;
-using DevExpress.Blazor.Reporting;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
@@ -18,37 +15,28 @@ public static class AIChatServiceExtension
     }
     public static WebApplicationBuilder AddAIChatService(this WebApplicationBuilder builder, ChatServiceType chatService)
     {
-        string azureAIuri = builder.Configuration.GetValue<String>("AzureAIEndpoint")!;
-        string azureAIkey = builder.Configuration.GetValue<String>("AzureAIKey")!;
-        string openAIkey = builder.Configuration.GetValue<String>("OpenAIKey")!;
+        string azureAIuri = builder.Configuration.GetValue<string>("AzureAIEndpoint")!;
+        string azureAIkey = builder.Configuration.GetValue<string>("AzureAIKey")!;
+        string openAIkey = builder.Configuration.GetValue<string>("OpenAIKey")!;
         string model = "gpt-4o-mini";
-
-        OpenAIClient openAiClient;
-
-        switch (chatService)
+        OpenAIClient openAiClient = chatService switch
         {
-            case ChatServiceType.Azure:
-                openAiClient = new AzureOpenAIClient(
-                    new Uri(azureAIuri),
-                    new AzureKeyCredential(azureAIkey));
-                break;
-            case ChatServiceType.OpenAI:
-                openAiClient = new OpenAI.OpenAIClient(openAIkey);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(chatService), chatService, null);
-        }
-
+            ChatServiceType.Azure => new AzureOpenAIClient(
+                                new Uri(azureAIuri),
+                                new AzureKeyCredential(azureAIkey)),
+            ChatServiceType.OpenAI => new OpenAI.OpenAIClient(openAIkey),
+            _ => throw new ArgumentOutOfRangeException(nameof(chatService), chatService, null),
+        };
         IChatClient aiChatClient = openAiClient.AsChatClient(model);
 
-        builder.Services.AddDevExpressBlazor();
-        builder.Services.AddChatClient(aiChatClient);
-        builder.Services.AddDevExpressAI(config =>
+        _ = builder.Services.AddDevExpressBlazor();
+        _ = builder.Services.AddChatClient(aiChatClient);
+        _ = builder.Services.AddDevExpressAI(config =>
         {
             config.RegisterOpenAIAssistants(openAiClient, model);
         });
 
-        builder.Services.AddSingleton<IAIExceptionHandler>(new AIExceptionHandler());
+        _ = builder.Services.AddSingleton<IAIExceptionHandler>(new AIExceptionHandler());
 
 
         return builder;

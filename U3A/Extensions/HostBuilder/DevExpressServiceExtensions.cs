@@ -1,5 +1,4 @@
-﻿using DevExpress.Blazor;
-using DevExpress.Blazor.RichEdit.SpellCheck;
+﻿using DevExpress.Blazor.RichEdit.SpellCheck;
 using DevExpress.Drawing;
 using Microsoft.Extensions.FileProviders;
 using System.Reflection;
@@ -13,13 +12,13 @@ public static class DevExpressServiceExtensions
         DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
         DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.Model.Class).Assembly);
         DevExpress.Drawing.Settings.DrawingEngine = DrawingEngine.Skia;
-        foreach (var file in Directory.GetFiles(@"wwwroot/fonts"))
+        foreach (string file in Directory.GetFiles(@"wwwroot/fonts"))
         {
             DXFontRepository.Instance.AddFont(file);
         }
 
 
-        builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
+        _ = builder.Services.AddDevExpressBlazor().AddSpellCheck(opts =>
         {
             opts.FileProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly(), "U3A");
             opts.MaxSuggestionCount = 6;
@@ -36,7 +35,7 @@ public static class DevExpressServiceExtensions
         });
 
         builder.Services.AddDevExpressServerSideBlazorReportViewer();
-        builder.Services.AddDevExpressBlazor();
+        _ = builder.Services.AddDevExpressBlazor();
 
         builder.Services.AddDevExpressServerSideBlazorPdfViewer();
 

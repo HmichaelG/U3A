@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using U3A.Database;
 using U3A.Model;
-using Serilog;
 
 namespace U3A.BusinessRules;
 
@@ -91,7 +91,7 @@ public static partial class BusinessRule
                 if (c.Leader != null) { await AddLeaderHistory(result, dbc, c, c.Leader, term, keys); }
                 if (c.Leader2 != null) { await AddLeaderHistory(result, dbc, c, c.Leader2, term, keys); }
                 if (c.Leader3 != null) { await AddLeaderHistory(result, dbc, c, c.Leader3, term, keys); }
-            }   
+            }
             if (c.OfferedTerm3 && term.TermNumber == 3)
             {
                 if (c.Leader != null) { await AddLeaderHistory(result, dbc, c, c.Leader, term, keys); }

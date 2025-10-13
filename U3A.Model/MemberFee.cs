@@ -35,11 +35,11 @@ namespace U3A.Model
         }
         public Guid PersonID { get; set; }
 
-    public string PersonName
+        public string PersonName
         {
             get
             {
-               return Person.FullNameAlpha;
+                return Person.FullNameAlpha;
             }
         }
         public Person Person { get; set; }

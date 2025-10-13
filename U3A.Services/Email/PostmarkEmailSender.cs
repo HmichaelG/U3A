@@ -297,7 +297,7 @@ namespace U3A.Services
             using Stream stream = assembly.GetManifestResourceStream(resourceName);
             using StreamReader reader = new StreamReader(stream);
             var htmlString = reader.ReadToEnd();
-            return htmlString.Replace("{{{emailFooter}}}",settings.EmailFooter ?? string.Empty);
+            return htmlString.Replace("{{{emailFooter}}}", settings.EmailFooter ?? string.Empty);
         }
 
         protected virtual void OnBatchEmailSent(string From,

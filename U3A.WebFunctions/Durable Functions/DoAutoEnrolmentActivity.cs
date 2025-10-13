@@ -17,10 +17,10 @@ public partial class DurableFunctions
     public async Task<bool> DoAutoEnrolmentActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
         bool hasRandomAllocationExecuted = false; //Return value
-        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        string? cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(options.TenantIdentifier, cn);
+            TenantInfo? tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 Log.Information($"****** Started {nameof(DoAutoEnrolmentActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
@@ -53,38 +53,33 @@ public partial class DurableFunctions
     [DurableClient] DurableTaskClient client,
     FunctionContext executionContext)
     {
-        var options = new U3AFunctionOptions()
+        U3AFunctionOptions options = new()
         {
             DurableActivity = DurableActivity.DoAutoEnrolment
         };
         options.SetTenant(req);
         options.SetEnrollmentIdsToProcess(req);
 
-        List<Guid> enrolmentIDs = new();
-        enrolmentIDs.AddRange(options.EnrollmentIdsToProcess);
+        List<Guid> enrolmentIDs = [.. options.EnrollmentIdsToProcess];
 
         // Get the list of SendMail ID's to process correspondence
-        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        string? cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(options.TenantIdentifier, cn);
+            TenantInfo? tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
-                using (var dbc = new U3ADbContext(tenant))
+                using U3ADbContext dbc = new(tenant);
+                foreach (Enrolment? enrolment in dbc.Enrolment
+                        .Where(x => enrolmentIDs.Contains(x.ID)))
                 {
-                    foreach (var enrolment in dbc.Enrolment
-                            .Where(x => enrolmentIDs.Contains(x.ID)))
+                    using U3ADbContext dbc1 = new(tenant);
+                    foreach (SendMail? sendMail in dbc1.SendMail
+                                .Where(x => x.RecordKey == enrolment.ID
+                                            && x.PersonID == enrolment.PersonID
+                                            && string.IsNullOrWhiteSpace(x.Status)))
                     {
-                        using (var dbc1 = new U3ADbContext(tenant))
-                        {
-                            foreach (var sendMail in dbc1.SendMail
-                                        .Where(x => x.RecordKey == enrolment.ID
-                                                    && x.PersonID == enrolment.PersonID
-                                                    && string.IsNullOrWhiteSpace(x.Status)))
-                            {
-                                options.SendMailIdsToProcess.Add(sendMail.ID);
-                            }
-                        }
+                        options.SendMailIdsToProcess.Add(sendMail.ID);
                     }
                 }
             }

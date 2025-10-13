@@ -20,21 +20,21 @@ namespace U3A.WebFunctions
         [Function("GetTenants")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
         {
-            var response = req.CreateResponse(HttpStatusCode.OK);
+            HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-            var tenant = (await GetTenantAsync()).ToArray();
-            var jsonResponse = JsonSerializer.Serialize(tenant);
+            TenantDetail[] tenant = (await GetTenantAsync()).ToArray();
+            string jsonResponse = JsonSerializer.Serialize(tenant);
             await response.WriteStringAsync(jsonResponse);
             return response;
         }
 
         private async Task<List<TenantDetail>> GetTenantAsync()
         {
-            var result = new List<TenantDetail>();
-            var cn = _config.GetConnectionString("TenantConnectionString");
-            using (var cnn = new SqlConnection(cn))
+            List<TenantDetail> result = [];
+            string? cn = _config.GetConnectionString("TenantConnectionString");
+            using (SqlConnection cnn = new(cn))
             {
-                var cmdText = @"SELECT [Website]
+                string cmdText = @"SELECT [Website]
                                   ,[State]
                                   ,[Identifier]
                                   ,[Name]
@@ -42,34 +42,30 @@ namespace U3A.WebFunctions
                                     UsePostmarkTestEnviroment=0 or
                                     (UsePostmarkTestEnviroment=1 and PostmarkSandboxAPIKey is null)
                                     order by Name";
-                using (var cmd = new SqlCommand(cmdText, cnn))
+                using SqlCommand cmd = new(cmdText, cnn);
+                try
                 {
-                    try
+                    await cnn.OpenAsync();
+                    using SqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                    while (rdr.Read())
                     {
-                        await cnn.OpenAsync();
-                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        TenantDetail t = new()
                         {
-                            while (rdr.Read())
-                            {
-                                var t = new TenantDetail()
-                                {
-                                    tenantID = rdr.GetString(2),
-                                    name = rdr.GetString(3),
-                                    website = rdr.GetString(0),
-                                };
-                                result.Add(t);
-                            }
-                            await rdr.CloseAsync();
-                        }
+                            tenantID = rdr.GetString(2),
+                            name = rdr.GetString(3),
+                            website = rdr.GetString(0),
+                        };
+                        result.Add(t);
                     }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex.Message, "Error reading TenantInfo");
-                    }
-                    finally
-                    {
-                        await cnn.CloseAsync();
-                    }
+                    await rdr.CloseAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.Message, "Error reading TenantInfo");
+                }
+                finally
+                {
+                    await cnn.CloseAsync();
                 }
             }
             return result;

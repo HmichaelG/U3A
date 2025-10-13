@@ -15,7 +15,7 @@ public class Note : BaseEntity, ISoftDelete
     public Guid PersonID { get; set; }
     [Required] public Person Person { get; set; }
     [Required] public string Content { get; set; } = string.Empty;
-    [Required] public DateOnly Expires { get; set; } = new DateOnly(DateTime.UtcNow.Year,12,31);
+    [Required] public DateOnly Expires { get; set; } = new DateOnly(DateTime.UtcNow.Year, 12, 31);
     [NotMapped] public DateTime LocalCreatedOn { get; set; }
     [NotMapped] public DateTime LocalUpdatedOn { get; set; }
     public bool IsDeleted { get; set; }

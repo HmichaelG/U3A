@@ -12,7 +12,7 @@ using U3A.Services;
 
 namespace U3A.UI.Reports
 {
-    public partial class MemberFinancialReport 
+    public partial class MemberFinancialReport
         : DevExpress.XtraReports.UI.XtraReport
     {
         public MemberFinancialReport()

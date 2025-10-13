@@ -6,21 +6,19 @@ using U3A.Components;
 using U3A.Components.Account;
 using U3A.Extensions.HostBuilder;
 using U3A.Model;
+using U3A.ServiceDefaults;
 using U3A.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Required by Serilog
 builder.Services.AddHttpContextAccessor();
 
 // Environment
 string? tenantConnectionString = builder.Configuration.GetConnectionString("TenantConnectionString");
-if (tenantConnectionString is null)
-{
-    tenantConnectionString = Environment.GetEnvironmentVariable("TenantConnectionString")
+tenantConnectionString ??= Environment.GetEnvironmentVariable("TenantConnectionString")
         ?? throw new ArgumentNullException("The TenantConnectionString is not defined.");
-}
-var recaptureKey = builder.Configuration.GetValue<String>("GoogleReCAPTCHAv2Key");
+string? recaptureKey = builder.Configuration.GetValue<string>("GoogleReCAPTCHAv2Key");
 
 // Add services to the container.
 builder.Services.AddRazorComponents(options =>
@@ -36,7 +34,12 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSingleton<CircuitHandler, CircuitHandlerService>();
 builder.Services.AddScoped<IErrorBoundaryLogger, ErrorBoundaryLoggingService>();
 builder.AddDevExpressService();
-if (recaptureKey != null) builder.Services.Configure<reCAPTCHAVerificationOptions>(o => o.Secret = recaptureKey);
+
+if (recaptureKey != null)
+{
+    _ = builder.Services.Configure<reCAPTCHAVerificationOptions>(o => o.Secret = recaptureKey);
+}
+
 builder.Services.AddTransient<ReCaptchaV2API>();
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
@@ -45,15 +48,10 @@ builder.AddAIChatService(AIChatServiceExtension.ChatServiceType.Azure);
 builder.AddIdentityService();
 
 constants.IS_DEVELOPMENT = builder.Environment.IsDevelopment();
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Services.AddApplicationInsightsTelemetry(options =>
-       options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
-}
-else
-{
-    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-}
+_ = !builder.Environment.IsDevelopment()
+    ? builder.Services.AddApplicationInsightsTelemetry(options =>
+       options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"])
+    : builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
     {
@@ -65,7 +63,7 @@ builder.AddServiceDefaults();
 
 builder.Services.AddAntiforgery();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.MapDefaultEndpoints();
 
@@ -74,13 +72,13 @@ app.UseRequestLocalization("en-AU");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+    _ = app.UseMigrationsEndPoint();
 }
 else
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    _ = app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    _ = app.UseHsts();
 }
 
 app.UseHttpsRedirection();

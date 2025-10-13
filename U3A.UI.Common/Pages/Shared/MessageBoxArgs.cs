@@ -2,8 +2,8 @@
 {
     public MessageBoxArgs()
     {
-        Caption = String.Empty;
-        Message = String.Empty;
+        Caption = string.Empty;
+        Message = string.Empty;
         OKButtonText = "Ok";
         NoButtonText = "No";
         CancelButtonText = "Cancel";

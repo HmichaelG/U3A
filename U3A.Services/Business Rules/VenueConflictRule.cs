@@ -13,7 +13,7 @@ namespace U3A.BusinessRules
             List<VenueConflict> potentialConflicts = new List<VenueConflict>();
             Task<DxSchedulerDataStorage> syncTask = Task.Run(async () =>
             {
-                return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm,IncludeOffScheduleActivities: true);
+                return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, IncludeOffScheduleActivities: true);
             });
             syncTask.Wait();
             var scheduleStorage = syncTask.Result;

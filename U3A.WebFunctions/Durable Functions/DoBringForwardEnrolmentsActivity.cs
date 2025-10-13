@@ -15,10 +15,10 @@ public partial class DurableFunctions
     [Function(nameof(DoBringForwardEnrolmentsActivity))]
     public async Task<string> DoBringForwardEnrolmentsActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        string? cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(options.TenantIdentifier, cn);
+            TenantInfo? tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 Log.Information($"****** Started {nameof(DoBringForwardEnrolmentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
@@ -43,7 +43,7 @@ public partial class DurableFunctions
         [DurableClient] DurableTaskClient client,
         FunctionContext executionContext)
     {
-        var options = new U3AFunctionOptions(req)
+        U3AFunctionOptions options = new(req)
         {
             DurableActivity = DurableActivity.DoBringForwardEnrolments
         };

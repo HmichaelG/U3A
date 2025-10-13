@@ -9,19 +9,19 @@ public static class DatabaseCleanup
 {
     public static async Task Process(TenantInfo tenant, string connectionString)
     {
-        using (var dbc = new U3ADbContext(tenant))
+        using (U3ADbContext dbc = new(tenant))
         {
             dbc.UtcOffset = await Common.GetUtcOffsetAsync(dbc);
             try
             {
                 // soft delete all Note where Expiry year is less than current year
-                var result = await dbc.Note.Where(n => n.Expires.Year < DateTime.UtcNow.Year).ToListAsync();
+                List<Note> result = await dbc.Note.Where(n => n.Expires.Year < DateTime.UtcNow.Year).ToListAsync();
                 dbc.Note.RemoveRange(result);
-                var count = await dbc.SaveChangesAsync();
+                int count = await dbc.SaveChangesAsync();
                 Log.Information($"[{tenant.Identifier}]: {count} records soft deleted from [Note]");
-                
+
                 // hard delete all Notes where DeletedAt is more than 30 days ago
-                var cutOff = DateTime.UtcNow.AddDays(-30);
+                DateTime cutOff = DateTime.UtcNow.AddDays(-30);
                 count = await dbc.Note.IgnoreQueryFilters().Where(n => n.DeletedAt != null && n.DeletedAt.Value < cutOff).ExecuteDeleteAsync();
                 Log.Information($"[{tenant.Identifier}]: {count} records hard deleted from [Note]");
 
@@ -33,24 +33,24 @@ public static class DatabaseCleanup
                 Log.Error("[{tenant.Identifier}]: Execute [dbo].[prcDbCleanup] failed: " + ex.Message);
             }
         }
-        using (var dbc = new TenantDbContext(connectionString))
+        using (TenantDbContext dbc = new(connectionString))
         {
-            var cutOff = DateTime.UtcNow.Date.AddDays(-3);
-            var tableName = "LogAutoEnrol";
+            DateTime cutOff = DateTime.UtcNow.Date.AddDays(-3);
+            string tableName = "LogAutoEnrol";
             await deleteLogs(tenant, dbc, cutOff, tableName);
             tableName = "LogEvents";
             await deleteLogs(tenant, dbc, cutOff, tableName);
         }
     }
-    static async Task deleteLogs(TenantInfo tenant, TenantDbContext dbc, DateTime cutOff, string tableName)
+    private static async Task deleteLogs(TenantInfo tenant, TenantDbContext dbc, DateTime cutOff, string tableName)
     {
-        var total = 0;
+        int total = 0;
         try
         {
             while (true)
             {
-                var cmd = $"delete top (5000) from [dbo].[{tableName}] where timestamp < '{cutOff.ToString("dd-MMMM-yyyy")}'";
-                var count = await dbc.Database.ExecuteSqlRawAsync(cmd);
+                string cmd = $"delete top (5000) from [dbo].[{tableName}] where timestamp < '{cutOff:dd-MMMM-yyyy}'";
+                int count = await dbc.Database.ExecuteSqlRawAsync(cmd);
                 total += count;
                 Log.Information("[{identifier}]: {total} records deleted from [{tableName}]",
                                     tenant.Identifier,

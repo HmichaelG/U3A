@@ -31,8 +31,8 @@ namespace U3A.Model
         [JsonIgnore] public Class? Class { get; set; }
 
         [Required] public Guid PersonID { get; set; }
-        
-        [Required,JsonIgnore]
+
+        [Required, JsonIgnore]
         public Person Person { get; set; }
 
         [Required]

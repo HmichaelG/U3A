@@ -14,17 +14,17 @@ public partial class DurableFunctions
     [Function(nameof(DoProcessQueuedDocumentsActivity))]
     public async Task<string> DoProcessQueuedDocumentsActivity([ActivityTrigger] U3AFunctionOptions options, FunctionContext executionContext)
     {
-        var cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
+        string? cn = config.GetConnectionString(Common.TENANT_CN_CONFIG);
         if (cn != null)
         {
-            var tenant = GetTenant(options.TenantIdentifier, cn);
+            TenantInfo? tenant = GetTenant(options.TenantIdentifier, cn);
             if (tenant != null)
             {
                 Log.Information($"****** Started {nameof(DoProcessQueuedDocumentsActivity)} for {tenant.Identifier}: {tenant.Name}. ******");
                 try
                 {
                     await LogStartTime(tenant);
-                    var isBackgroundProcessingEnabled = !(await Common.isBackgroundProcessingDisabled(tenant));
+                    bool isBackgroundProcessingEnabled = !await Common.isBackgroundProcessingDisabled(tenant);
                     if (isBackgroundProcessingEnabled)
                     {
                         await ProcessQueuedDocuments.Process(tenant, options);
@@ -50,7 +50,7 @@ public partial class DurableFunctions
     [DurableClient] DurableTaskClient client,
     FunctionContext executionContext)
     {
-        var options = new U3AFunctionOptions(req)
+        U3AFunctionOptions options = new(req)
         {
             DurableActivity = DurableActivity.DoProcessQueuedDocuments
         };

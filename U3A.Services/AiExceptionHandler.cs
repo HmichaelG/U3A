@@ -10,6 +10,6 @@ public class AIExceptionHandler : IAIExceptionHandler
         var exception = args.Exception;
         var msg = $"an error has occurred in Chat, please try again later.{Environment.NewLine}{exception.Message}";
         Log.Error(exception, "An error occurred while processing an AI Chat");
-        args.Response = new ChatResponse(new ChatMessage(ChatRole.System,msg));
+        args.Response = new ChatResponse(new ChatMessage(ChatRole.System, msg));
     }
 }

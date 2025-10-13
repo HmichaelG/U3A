@@ -12,12 +12,12 @@ public static class IdentityServiceExtension
     public static WebApplicationBuilder AddIdentityService(this WebApplicationBuilder builder)
     {
 
-        builder.Services.AddCascadingAuthenticationState();
-        builder.Services.AddScoped<IdentityUserAccessor>();
-        builder.Services.AddScoped<IdentityRedirectManager>();
-        builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+        _ = builder.Services.AddCascadingAuthenticationState();
+        _ = builder.Services.AddScoped<IdentityUserAccessor>();
+        _ = builder.Services.AddScoped<IdentityRedirectManager>();
+        _ = builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-        builder.Services.AddAuthentication(options =>
+        _ = builder.Services.AddAuthentication(options =>
         {
             options.DefaultScheme = IdentityConstants.ApplicationScheme;
             options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
@@ -25,7 +25,7 @@ public static class IdentityServiceExtension
         .AddIdentityCookies(options =>
             options.TwoFactorRememberMeCookie!.Configure(a => a.ExpireTimeSpan = TimeSpan.FromDays(30)));
 
-        builder.Services.AddIdentityCore<ApplicationUser>(options =>
+        _ = builder.Services.AddIdentityCore<ApplicationUser>(options =>
         {
             options.SignIn.RequireConfirmedAccount = true;
             options.User.RequireUniqueEmail = true;
@@ -45,7 +45,7 @@ public static class IdentityServiceExtension
             .AddUserManager<UserManager<ApplicationUser>>()
             .AddDefaultTokenProviders();
 
-        builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
+        _ = builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
 
         return builder;
     }

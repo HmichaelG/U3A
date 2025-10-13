@@ -83,7 +83,7 @@ namespace U3A.Model
         {
             get
             {
-                return new DateTime(Date.Year,Date.Month,Date.Day);
+                return new DateTime(Date.Year, Date.Month, Date.Day);
             }
         }
 

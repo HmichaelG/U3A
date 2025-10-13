@@ -43,7 +43,7 @@ namespace U3A.BusinessRules
         {
             return await dbc.Leave
                             .Include(x => x.Person)
-                            .Where(x => 
+                            .Where(x =>
                                 (x.CourseID == null || x.CourseID == course.ID) &&
                                 x.StartDate.Date <= classDate &&
                                 x.EndDate.Date.AddDays(1) > classDate).ToListAsync();

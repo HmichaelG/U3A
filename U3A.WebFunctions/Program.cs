@@ -11,16 +11,16 @@ using U3A.Model;
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.UI.Reports.ProFormaReportFactory).Assembly);
 DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(typeof(U3A.Model.Class).Assembly);
 DevExpress.Drawing.Settings.DrawingEngine = DrawingEngine.Skia;
-foreach (var file in Directory.GetFiles(@"fonts"))
+foreach (string file in Directory.GetFiles(@"fonts"))
 {
     DXFontRepository.Instance.AddFont(file);
 }
 
-var host = new HostBuilder()
+IHost host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .ConfigureLogging((hostingContext, logging) =>
     {
-        var filePath = string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("WEBSITE_OS")) ?
+        string filePath = string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("WEBSITE_OS")) ?
                         "log.txt" :
                         @"D:\home\LogFiles\Application\log.txt";
 
@@ -44,7 +44,7 @@ var host = new HostBuilder()
                         shared: true,
                         rollingInterval: RollingInterval.Day)
             .CreateLogger();
-        logging.AddSerilog(Log.Logger, true);
+        _ = logging.AddSerilog(Log.Logger, true);
         constants.IS_DEVELOPMENT = hostingContext.HostingEnvironment.IsDevelopment();
     })
     .Build();

@@ -38,8 +38,8 @@ public class WorkstationService
     private readonly TenantInfoService tenantInfoService;
 
     public WorkstationService() { } // for Json deserialize
-    public WorkstationService(IJSRuntime js, 
-        ILocalStorageService localStorage, 
+    public WorkstationService(IJSRuntime js,
+        ILocalStorageService localStorage,
         TenantInfoService tenantInfoService)
     {
         this.js = js;
