@@ -185,7 +185,7 @@ else
                             <div class="text-box border-fl-neutral">
                                 <span>@selectedVenue.Coordinator</span>
                                 @if (!string.IsNullOrWhiteSpace(selectedVenue.Phone))
-                                { 
+                                {
                                     <span><b>Phone:</b>&nbsp;@selectedVenue.Phone</span>
                                 }
                                 @if (!string.IsNullOrWhiteSpace(selectedVenue.Email))
@@ -197,9 +197,14 @@ else
                     </DxFormLayoutItem>
                     <div class="fw-bold text-fl-primary mt-1">Access</div>
                     <DxFormLayoutItem Caption="Key Code" ColSpanMd="12" Context="layoutContext">
-                        <Template>
-                            <div class="text-box border-fl-neutral">@selectedVenue.KeyCode</div>
-                        </Template>
+                        <DxTextBox @bind-Text=@selectedVenue.KeyCode ReadOnly=true
+                                   Password="@(!showKeyCode)">
+                            <Buttons>
+                                <DxEditorButton IconCssClass="bi bi-eye"
+                                                Tooltip="Show/hide KeyCode"
+                                                onclick="@(() => {showKeyCode = !showKeyCode; StateHasChanged();})" />
+                            </Buttons>
+                        </DxTextBox>
                     </DxFormLayoutItem>
                     <DxFormLayoutItem Caption="Details" ColSpanMd="12" Context="layoutContext">
                         <Template>
@@ -494,6 +499,7 @@ else
     [Parameter]
     public bool IsAdminPortal { get; set; }
 
+    bool showKeyCode = false;
     int emailDelimiter;
     Term? selectedTerm { get; set; }
     Course? selectedCourse { get; set; }
