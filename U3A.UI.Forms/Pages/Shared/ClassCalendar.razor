@@ -1,80 +1,92 @@
 ﻿@inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject IJSRuntime js
+@inject WorkstationService ws
+
 
 @if (IsReady)
 {
-    <DxFormLayout CssClass="w-100 d-flex flex-column justify-content-center" style="background-color=red;;">
-            <DxFormLayoutGroup>
-                <HeaderContentTemplate>
-                    <div class="input-group fs-6">
-                        <div class="flex-grow-1">Calendar</div>
-                        <a class="link" onclick="@OnToggleButtonClick">@toggleButtonText</a>
-                    </div>
-                </HeaderContentTemplate>
-                <Items>
-                    <div class="w-100 pt-1 d-flex justify-content-center">
-                        <DxCalendar @bind-SelectedDate=@selectedDate CssClass="@CalendarCssClass"
-                                    @bind-SelectedDate:after=OnDateChanged
-                                    ShowClearButton=false
-                                    VisibleDate="@today"
-                                    MinDate="@today">
-                            <DayCellTemplate>
-                                <div class="@GetCssClassNames(context)">@context.Day.ToString()</div>
-                            </DayCellTemplate>
-                        </DxCalendar>
-                    </div>
+    <MessageBox @ref="@messageBox" PopupWidth="min(45rem, 100%)">
+        <TextTemplate>
+                <div class="card card-body" style="max-height: 50dvh; overflow-y:scroll;">
+                @(new MarkupString((ws.Theme == "light") ? selectedCourse.DisplayDescription : selectedCourse.DisplayDescriptionDarkMode))
+            </div>
+        </TextTemplate>
+    </MessageBox>
 
-                    <DxGrid Data="@FilteredEvents" id="listBox" @ref=@grid
-                            KeyFieldName="Id"
-                            ShowAllRows=true
-                            VirtualScrollingEnabled=true
-                            AllowSelectRowByClick=false
-                            AutoExpandAllGroupRows=true
-                            AllowGroup=false
-                            AllowSort=false
-                            PagerVisible=false
-                            CssClass="mt-1 box-style">
-                        <Columns>
-                            <DxGridDataColumn Width="100%"
-                                              FieldName="Start"
-                                              GroupIndex="0" GroupInterval="GridColumnGroupInterval.Date">
-                                <GroupRowTemplate>
-                                    @{
-                                        <div class="pt-2">
-                                            <div class="h6 text-fl-info">@(((DateTime)context.GroupValue).ToString(constants.FULL_DAY_DATE_FORMAT))</div>
-                                        </div>
+
+    <DxFormLayout CssClass="w-100 d-flex flex-column justify-content-center" style="background-color=red;;">
+        <DxFormLayoutGroup>
+            <HeaderContentTemplate>
+                <div class="input-group fs-6">
+                    <div class="flex-grow-1">Calendar</div>
+                    <a class="link" onclick="@OnToggleButtonClick">@toggleButtonText</a>
+                </div>
+            </HeaderContentTemplate>
+            <Items>
+                <div class="w-100 pt-1 d-flex justify-content-center">
+                    <DxCalendar @bind-SelectedDate=@selectedDate CssClass="@CalendarCssClass"
+                                @bind-SelectedDate:after=OnDateChanged
+                                ShowClearButton=false
+                                VisibleDate="@today"
+                                MinDate="@today">
+                        <DayCellTemplate>
+                            <div class="@GetCssClassNames(context)">@context.Day.ToString()</div>
+                        </DayCellTemplate>
+                    </DxCalendar>
+                </div>
+
+                <DxGrid Data="@FilteredEvents" id="listBox" @ref=@grid
+                        KeyFieldName="Id"
+                        ShowAllRows=true
+                        VirtualScrollingEnabled=true
+                        AllowSelectRowByClick=false
+                        AutoExpandAllGroupRows=true
+                        AllowGroup=false
+                        AllowSort=false
+                        PagerVisible=false
+                        RowClick="@OnRowClick"
+                        CssClass="mt-1 box-style">
+                    <Columns>
+                        <DxGridDataColumn Width="100%"
+                                          FieldName="Start"
+                                          GroupIndex="0" GroupInterval="GridColumnGroupInterval.Date">
+                            <GroupRowTemplate>
+                                @{
+                                    <div class="pt-2">
+                                        <div class="h6 text-fl-info">@(((DateTime)context.GroupValue).ToString(constants.FULL_DAY_DATE_FORMAT))</div>
+                                    </div>
+                                }
+                            </GroupRowTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn Width="100%">
+                            <HeaderCaptionTemplate />
+                            <CellDisplayTemplate>
+                                @{
+                                    var e = (DxSchedulerAppointmentItem)context.DataItem;
+                                    if (e.AllDay)
+                                    {
+                                        <div class="font-weight-bold">@e.Subject</div>
                                     }
-                                </GroupRowTemplate>
-                            </DxGridDataColumn>
-                            <DxGridDataColumn Width="100%">
-                                <HeaderCaptionTemplate />
-                                <CellDisplayTemplate>
-                                    @{
-                                        var e = (DxSchedulerAppointmentItem)context.DataItem;
-                                        if (e.AllDay)
+                                    else
+                                    {
+                                        if ((int)e.LabelId == 9)    // Cancelled
                                         {
-                                            <div class="font-weight-bold">@e.Subject</div>
+                                            <div class="text-muted text-decoration-line-through">@e.Subject</div>
                                         }
                                         else
                                         {
-                                            if ((int)e.LabelId == 9)    // Cancelled
-                                            {
-                                                <div class="text-muted text-decoration-line-through">@e.Subject</div>
-                                            }
-                                            else
-                                            {
-                                                <div class="font-weight-bold">@e.Subject</div>
-                                                <div>@e.Start.ToString(constants.SHORT_DAY_AND_TIME_FORMAT) to @e.End.ToShortTimeString()</div>
-                                                <div>@e.Location</div>
-                                            }
+                                            <div class="font-weight-bold">@e.Subject</div>
+                                            <div>@e.Start.ToString(constants.SHORT_DAY_AND_TIME_FORMAT) to @e.End.ToShortTimeString()</div>
+                                            <div>@e.Location</div>
                                         }
                                     }
-                                </CellDisplayTemplate>
-                            </DxGridDataColumn>
-                        </Columns>
-                    </DxGrid>
-                </Items>
-            </DxFormLayoutGroup>
+                                }
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                </DxGrid>
+            </Items>
+        </DxFormLayoutGroup>
     </DxFormLayout>
 }
 <style>
@@ -83,7 +95,7 @@
     }
 
     .box-style {
-        height: calc(100dvh - @($"{DisplayOffset - hiddenCalendarOffset + 21}rem"));
+        height: calc(100dvh - @($"{DisplayOffset - hiddenCalendarOffset + 21}rem") );
     }
 
     .font-weight-bold {
@@ -102,6 +114,8 @@
     IEnumerable<DxSchedulerAppointmentItem> FilteredEvents;
     DateTime today;
     DateTime selectedDate;
+    Course selectedCourse;
+    Class selectedClass;
     bool IsReady;
     IGrid grid;
 
@@ -110,6 +124,7 @@
     bool isCalendarVisible = true;
     string CalendarCssClass = "w-100";
     double hiddenCalendarOffset = 0;
+    MessageBox messageBox { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -169,5 +184,15 @@
     bool DaysEqual(DateTime date1, DateTime date2)
     {
         return (date1.Year == date2.Year && date1.DayOfYear == date2.DayOfYear);
+    }
+
+    async Task OnRowClick(GridRowClickEventArgs args)
+    {
+        var row = args.Grid.GetDataItem(args.VisibleIndex) as DxSchedulerAppointmentItem;
+        selectedClass = row.CustomFields["Source"] as Class;
+        if (selectedClass == null)
+            return;
+        selectedCourse = selectedClass.Course;
+        await messageBox.ShowOkOnlyAsync(selectedCourse.Name, string.Empty);
     }
 }
