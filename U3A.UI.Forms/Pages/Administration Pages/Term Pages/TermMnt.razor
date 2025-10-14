@@ -22,177 +22,185 @@ else
 
     <ContextHelpTitle Title="Enrolment Terms" HelpTopic="add_edit-enrolment-terms.html"
                       Subtitle="<div>Enrolment Terms are the periods of time in which courses and/or activities are offered to participants.</div>
-                                                <div>A Term is preceded by an enrolment period in which participants are allowed to enrol in courses.</div>"/>
+                                                    <div>A Term is preceded by an enrolment period in which participants are allowed to enrol in courses.</div>"/>
 
-                <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
-                <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
+                    <ErrorPopup @ref="@ErrorPopup" PopupHeader="@ErrorHeader" PopupMessage="@ErrorMessage" />
+                    <MessageBox @ref="@messageBox" PopupWidth="@messageBoxWidth" />
 
-                <DxGrid id="my-grid" Data="@Terms" @ref=@mainGrid CssClass="grid-height"
-                        ShowFilterRow="false"
-                        ShowAllRows="true"
-                        KeyFieldName="ID"
-                        ValidationEnabled="true"
-                        AutoExpandAllGroupRows="true"
-                        CustomizeEditModel="OnCustomizeEditModel"
-                        EditMode="GridEditMode.PopupEditForm"
-                        EditModelSaving="Grid_EditModelSaving">
-                    <ToolbarTemplate>
-                        <GridToolbar LinkedGrid=@mainGrid HideGroupPanel="true" LayoutKey="{99BEB110-F5CC-4A9B-AEAB-86E0AE757BCF}">
-                            <CustomButtonContentAtStart>
-                                <DxToolbarItem RenderStyle="ButtonRenderStyle.Primary"
-                                               Alignment="ToolbarItemAlignment.Left"
-                                               Text="Create/Edit New Year"
-                                               Click="@(async() => await CreateNewYear())"
-                                               IconCssClass="bi bi-magic" />
-                            </CustomButtonContentAtStart>
-                        </GridToolbar>
-                    </ToolbarTemplate>
-                    <Columns>
-                        <DxGridCommandColumnEx @ref="GridCommandColumn" Width="6rem" EditButtonVisible="true" DeleteButtonVisible="false" NewButtonVisible="false" />
-                        <DxGridDataColumn Width="6rem" Caption="Current?" FieldName="IsDefaultTerm" />
-                        <DxGridDataColumn Width="6rem" Caption="Final Allocation?" FieldName="IsClassAllocationFinalised" />
-                        <DxGridDataColumn Caption="Year"
-                                          GroupIndex="0" SortOrder="GridColumnSortOrder.Descending"
-                                          FieldName="Year" DisplayFormat="{0:D}" Width="6rem" />
-                        <DxGridDataColumn Caption="Term" FieldName="TermNumber" DisplayFormat="Term-{0:D}" Width="6rem" />
-                        <DxGridDataColumn Caption="Term Start" FieldName="StartDate"
-                                          DisplayFormat="@constants.STD_DATE_FORMAT" />
-                        <DxGridDataColumn Caption="Term End" FieldName="DurationSummary" />
-                        <DxGridDataColumn Caption="Enrol Start" FieldName="EnrolStartSummary" />
-                        <DxGridDataColumn Caption="Enrol End" FieldName="EnrolEndSummary" />
-                    </Columns>
-                    <TotalSummary>
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom" FieldName="Discontinued" />
-                    </TotalSummary>
+            <DxSplitter Width="100%" Height="90dvh" Orientation="Orientation.Vertical" >
+                <Panes>
+                    <DxSplitterPane Size="60%">
+                    <DxGrid id="my-grid" Data="@Terms" @ref=@mainGrid CssClass="grid-height"
+                            ShowFilterRow="false"
+                            ShowAllRows="true"
+                            KeyFieldName="ID"
+                            ValidationEnabled="true"
+                            AutoExpandAllGroupRows="true"
+                            CustomizeEditModel="OnCustomizeEditModel"
+                            EditMode="GridEditMode.PopupEditForm"
+                            EditModelSaving="Grid_EditModelSaving">
+                        <ToolbarTemplate>
+                            <GridToolbar LinkedGrid=@mainGrid HideGroupPanel="true" LayoutKey="{99BEB110-F5CC-4A9B-AEAB-86E0AE757BCF}">
+                                <CustomButtonContentAtStart>
+                                    <DxToolbarItem RenderStyle="ButtonRenderStyle.Primary"
+                                                   Alignment="ToolbarItemAlignment.Left"
+                                                   Text="Create/Edit New Year"
+                                                   Click="@(async() => await CreateNewYear())"
+                                                   IconCssClass="bi bi-magic" />
+                                </CustomButtonContentAtStart>
+                            </GridToolbar>
+                        </ToolbarTemplate>
+                        <Columns>
+                            <DxGridCommandColumnEx @ref="GridCommandColumn" Width="6rem" EditButtonVisible="true" DeleteButtonVisible="false" NewButtonVisible="false" />
+                            <DxGridDataColumn Width="6rem" Caption="Current?" FieldName="IsDefaultTerm" />
+                            <DxGridDataColumn Width="6rem" Caption="Final Allocation?" FieldName="IsClassAllocationFinalised" />
+                            <DxGridDataColumn Caption="Year"
+                                              GroupIndex="0" SortOrder="GridColumnSortOrder.Descending"
+                                              FieldName="Year" DisplayFormat="{0:D}" Width="6rem" />
+                            <DxGridDataColumn Caption="Term" FieldName="TermNumber" DisplayFormat="Term-{0:D}" Width="6rem" />
+                            <DxGridDataColumn Caption="Term Start" FieldName="StartDate"
+                                              DisplayFormat="@constants.STD_DATE_FORMAT" />
+                            <DxGridDataColumn Caption="Term End" FieldName="DurationSummary" />
+                            <DxGridDataColumn Caption="Enrol Start" FieldName="EnrolStartSummary" />
+                            <DxGridDataColumn Caption="Enrol End" FieldName="EnrolEndSummary" />
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Custom" Name="Custom" FieldName="Discontinued" />
+                        </TotalSummary>
 
-                    <EditFormTemplate Context="EditFormContext">
-                        @{
-                                        var editItem = (Term)EditFormContext.EditModel;
-                        }
-                        <DxFormLayout>
-                            <DxFormLayoutItem @ref="@customValidations" ColSpanMd="12" CaptionCssClass="text-fl-danger"
-                                              Visible="false" ReadOnly="true" />
-                        </DxFormLayout>
-                        <DxFormLayout>
-                            <DxFormLayoutItem Caption="Year" ColSpanMd="12">
-                                <DxComboBox Data="@Years" @bind-Value="@editItem.Year" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Term" ColSpanMd="12">
-                                <DxSpinEdit @bind-Value="@editItem.TermNumber" MinValue="1" MaxValue="4" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
-                                <DxDateEdit @bind-Date="@editItem.StartDate"
-                                            Mask=@constants.STD_DATE_FORMAT>
-                                </DxDateEdit>
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Duration (Weeks)" ColSpanMd="8">
-                                <DxSpinEdit @bind-Value="editItem.Duration" MinValue="1" MaxValue="52" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem ColSpanMd="4">
-                                <label>@editItem.EndDate.ToString(constants.STD_DATE_FORMAT)</label>
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Enrolment Starts (Weeks)" ColSpanMd="8">
-                                <DxSpinEdit @bind-Value="@editItem.EnrolmentStarts" MinValue="-20" MaxValue="20" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem ColSpanMd="4">
-                                <label>@editItem.EnrolmentStartDate.ToString(constants.STD_DATE_FORMAT)</label>
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Enrolment Ends (Weeks)" ColSpanMd="8">
-                                <DxSpinEdit @bind-Value="@editItem.EnrolmentEnds" MinValue="-20" MaxValue="20" />
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem ColSpanMd="4">
-                                <label>@editItem.EnrolmentEndDate.ToString(constants.STD_DATE_FORMAT)</label>
-                            </DxFormLayoutItem>
-                            <DxFormLayoutItem Caption="Is this the current Term?" ColSpanMd="12">
-                                <DxCheckBox @bind-Checked="editItem.IsDefaultTerm" />
-                            </DxFormLayoutItem>
-                        </DxFormLayout>
-                    </EditFormTemplate>
-                </DxGrid>
+                        <EditFormTemplate Context="EditFormContext">
+                            @{
+                                                var editItem = (Term)EditFormContext.EditModel;
+                            }
+                            <DxFormLayout>
+                                <DxFormLayoutItem @ref="@customValidations" ColSpanMd="12" CaptionCssClass="text-fl-danger"
+                                                  Visible="false" ReadOnly="true" />
+                            </DxFormLayout>
+                            <DxFormLayout>
+                                <DxFormLayoutItem Caption="Year" ColSpanMd="12">
+                                    <DxComboBox Data="@Years" @bind-Value="@editItem.Year" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Term" ColSpanMd="12">
+                                    <DxSpinEdit @bind-Value="@editItem.TermNumber" MinValue="1" MaxValue="4" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Start Date" ColSpanMd="12">
+                                    <DxDateEdit @bind-Date="@editItem.StartDate"
+                                                Mask=@constants.STD_DATE_FORMAT>
+                                    </DxDateEdit>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Duration (Weeks)" ColSpanMd="8">
+                                    <DxSpinEdit @bind-Value="editItem.Duration" MinValue="1" MaxValue="52" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem ColSpanMd="4">
+                                    <label>@editItem.EndDate.ToString(constants.STD_DATE_FORMAT)</label>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Enrolment Starts (Weeks)" ColSpanMd="8">
+                                    <DxSpinEdit @bind-Value="@editItem.EnrolmentStarts" MinValue="-20" MaxValue="20" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem ColSpanMd="4">
+                                    <label>@editItem.EnrolmentStartDate.ToString(constants.STD_DATE_FORMAT)</label>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Enrolment Ends (Weeks)" ColSpanMd="8">
+                                    <DxSpinEdit @bind-Value="@editItem.EnrolmentEnds" MinValue="-20" MaxValue="20" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem ColSpanMd="4">
+                                    <label>@editItem.EnrolmentEndDate.ToString(constants.STD_DATE_FORMAT)</label>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Is this the current Term?" ColSpanMd="12">
+                                    <DxCheckBox @bind-Checked="editItem.IsDefaultTerm" />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </EditFormTemplate>
+                    </DxGrid>
+                    </DxSplitterPane>
 
-                <DxToolbar>
-                    <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
-                        <Template>
-                            <div class="d-flex">
-                                <div class="flex-grow-0 pt-1 pe-2">Year:</div>
-                                <DxSpinEdit @bind-Value=@year CssClass="flex-grow-1" />
-                            </div>
-                        </Template>
-                    </DxToolbarItem>
-                </DxToolbar>
-                <DxScheduler StartDate="@(new DateTime(year, 1, 1))"
-                             AllowCreateAppointment="false"
-                             AllowDeleteAppointment="false"
-                             AllowEditAppointment="false"
-                             ShowAppointmentTooltip="true"
-                             ActiveViewType=SchedulerViewType.Timeline
-                             GroupType="SchedulerGroupType.Date"
-                             DataStorage="@TermDataStorage">
-                    <Views>
-                        <DxSchedulerTimelineView SnapToCellsMode="SchedulerSnapToCellsMode.Never">
-                            <Scales>
-                                <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" UnitCount="12" />
-                            </Scales>
-                            <DateHeaderCellTemplate>
-                                <div style="width: 100%; text-align:center;">
-                                    <span>@context.Interval.Start.ToString("yyyy")</span>
-                                </div>
+                    <DxSplitterPane>
+                    <DxToolbar>
+                        <DxToolbarItem Context="a" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                            <Template>
                                 <div class="d-flex">
-                                    <div class="month-style">Jan</div>
-                                    <div class="month-style">Feb</div>
-                                    <div class="month-style">Mar</div>
-                                    <div class="month-style">Apr</div>
-                                    <div class="month-style">May</div>
-                                    <div class="month-style">Jun</div>
-                                    <div class="month-style">Jul</div>
-                                    <div class="month-style">Aug</div>
-                                    <div class="month-style">Sep</div>
-                                    <div class="month-style">Oct</div>
-                                    <div class="month-style">Nov</div>
-                                    <div class="month-style-nb">Dec</div>
+                                    <div class="flex-grow-0 pt-1 pe-2">Year:</div>
+                                    <DxSpinEdit @bind-Value=@year CssClass="flex-grow-1" />
                                 </div>
-                            </DateHeaderCellTemplate>
-                            <HorizontalAppointmentTemplate>
-                                @if ((int)context.Label.Id == 3)
-                                {
-                                                <div class="card-fl appointment-height
-                                                        @context.Label.BackgroundCssClass">
-                                                    @string.Empty
-                                                </div>
-                                }
-                                else
-                                {
-                                                <div class="card-fl text-center overflow-hidden
-                                                        @context.Label.TextCssClass
-                                                        @context.Label.BackgroundCssClass">
-                                                    <b>@(context.Appointment.Subject)</b>
-                                                    @($"{context.Appointment.Start.ToString(constants.SHORTER_DATE_FORMAT)} to {context.Appointment.End.ToString(constants.SHORTER_DATE_FORMAT)}")
-                                                </div>
-                                }
-                            </HorizontalAppointmentTemplate>
-                        </DxSchedulerTimelineView>
-                    </Views>
-                    <AppointmentTooltipHeaderTemplate>
-                        <div class="fs-5 @context.Label.TextCssClass" >
-                            @context.Label?.Caption
-                        </div>
-                    </AppointmentTooltipHeaderTemplate>
-                    <AppointmentTooltipTemplate>
-                        <div class="container">
-                            <span style="vertical-align: middle;">
-                                <strong>Period:</strong>  @context.Appointment.Subject<br />
-                                <strong>From:</strong>  @context.Appointment.Start.ToString("ddd, dd-MMM-yyyy") <strong>To:</strong>
-                                @context.Appointment.End.ToString("ddd, dd-MMM-yyyy")<br />
-                            </span>
-                        </div>
-                    </AppointmentTooltipTemplate>
-                </DxScheduler>
+                            </Template>
+                        </DxToolbarItem>
+                    </DxToolbar>
+                    <DxScheduler StartDate="@(new DateTime(year, 1, 1))"
+                                 AllowCreateAppointment="false"
+                                 AllowDeleteAppointment="false"
+                                 AllowEditAppointment="false"
+                                 ShowAppointmentTooltip="true"
+                                 ActiveViewType=SchedulerViewType.Timeline
+                                 GroupType="SchedulerGroupType.Date"
+                                 DataStorage="@TermDataStorage">
+                        <Views>
+                            <DxSchedulerTimelineView SnapToCellsMode="SchedulerSnapToCellsMode.Never">
+                                <Scales>
+                                    <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" UnitCount="12" />
+                                </Scales>
+                                <DateHeaderCellTemplate>
+                                    <div style="width: 100%; text-align:center;">
+                                        <span>@context.Interval.Start.ToString("yyyy")</span>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div class="month-style">Jan</div>
+                                        <div class="month-style">Feb</div>
+                                        <div class="month-style">Mar</div>
+                                        <div class="month-style">Apr</div>
+                                        <div class="month-style">May</div>
+                                        <div class="month-style">Jun</div>
+                                        <div class="month-style">Jul</div>
+                                        <div class="month-style">Aug</div>
+                                        <div class="month-style">Sep</div>
+                                        <div class="month-style">Oct</div>
+                                        <div class="month-style">Nov</div>
+                                        <div class="month-style-nb">Dec</div>
+                                    </div>
+                                </DateHeaderCellTemplate>
+                                <HorizontalAppointmentTemplate>
+                                    @if ((int)context.Label.Id == 3)
+                                    {
+                                                        <div class="card-fl appointment-height
+                                                                @context.Label.BackgroundCssClass">
+                                                            @string.Empty
+                                                        </div>
+                                    }
+                                    else
+                                    {
+                                                        <div class="card-fl text-center overflow-hidden
+                                                                @context.Label.TextCssClass
+                                                                        @context.Label.BackgroundCssClass"  style="white-space: nowrap">
+                                                            <b>@(context.Appointment.Subject)</b>
+                                                            @($"{context.Appointment.Start.ToString(constants.SHORTER_DATE_FORMAT)} to {context.Appointment.End.ToString(constants.SHORTER_DATE_FORMAT)}")
+                                                        </div>
+                                    }
+                                </HorizontalAppointmentTemplate>
+                            </DxSchedulerTimelineView>
+                        </Views>
+                        <AppointmentTooltipHeaderTemplate>
+                            <div class="fs-5 @context.Label.TextCssClass" >
+                                @context.Label?.Caption
+                            </div>
+                        </AppointmentTooltipHeaderTemplate>
+                        <AppointmentTooltipTemplate>
+                            <div class="container">
+                                <span style="vertical-align: middle;">
+                                    <strong>Period:</strong>  @context.Appointment.Subject<br />
+                                    <strong>From:</strong>  @context.Appointment.Start.ToString("ddd, dd-MMM-yyyy") <strong>To:</strong>
+                                    @context.Appointment.End.ToString("ddd, dd-MMM-yyyy")<br />
+                                </span>
+                            </div>
+                        </AppointmentTooltipTemplate>
+                    </DxScheduler>
+                    </DxSplitterPane>
+                    </Panes>
+                    </DxSplitter>
+
 }
 
 <style>
 .grid-height {
-    overflow: auto;
-    height: 50dvh;
+    height: 100%;
 }
 
 .appointment-height {
