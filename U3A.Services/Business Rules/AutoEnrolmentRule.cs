@@ -667,7 +667,7 @@ namespace U3A.BusinessRules
                 case AutoEnrollOccurrence.Semester:
                     return (enrolmentTerm.TermNumber <= 2 && thisTermNumber > 2);
                 case AutoEnrollOccurrence.Term:
-                    return true;
+                    return (thisTermNumber < 4);
                 default: throw new InvalidOperationException();
             }
         }
