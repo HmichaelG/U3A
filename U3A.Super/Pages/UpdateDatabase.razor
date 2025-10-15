@@ -82,6 +82,7 @@
                 await dbc.Roles.AddAsync(role);
             }
         }
+        await dbc.SaveChangesAsync();
 
         if (!await dbc.Users.AnyAsync(x => x.Email == constants.superAdmin))
         {
