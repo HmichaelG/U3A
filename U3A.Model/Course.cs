@@ -208,6 +208,7 @@ namespace U3A.Model
         public List<Class> Classes { get; set; } = new List<Class>();
 
         [Comment("Ignore dB values. Used for JSON only")]
+        [JsonInclude]
         public List<String> ClassSummaries { get; set; } = new();
 
         [JsonIgnore]

@@ -187,7 +187,6 @@ public static partial class BusinessRule
             AssignClassContacts(c, term, settings);
             AssignClassCounts(term, c);
         }
-        classes = GetClassSummaries(classes, dbc.GetLocalTime()).ToList();
         Log.Information("");
         Log.Information("{p1} Total classes retrieved", totalClasses);
         Log.Information("{p1} Total classes remaining in year", TotalClassesRemainingInYear);
@@ -195,6 +194,7 @@ public static partial class BusinessRule
 
         classes = EnsureOneClassOnlyForSameParticipantsInEachClass(dbc, classes)
                     .OrderBy(x => x.OnDayID).ThenBy(x => x.Course.Name).ToList();
+        classes = GetClassSummaries(classes, dbc.GetLocalTime()).ToList();
 
         Log.Information("{p1} Unique classes returned", TotalClassesRemainingInYear);
         return classes
@@ -262,8 +262,8 @@ public static partial class BusinessRule
                 .ThenBy(x => x.OnDayID)
                 .ThenBy(x => x.StartTime))
             {
-                if (!course.ClassSummaries.Contains(thisClass.ClassDetail))
-                { course.ClassSummaries.Add(thisClass.ClassDetail); }
+                if (!course.ClassSummaries.Contains(thisClass.ClassDetailWithoutVenue))
+                { course.ClassSummaries.Add(thisClass.ClassDetailWithoutVenue); }
             }
         }
         return classes;
