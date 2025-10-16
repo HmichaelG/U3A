@@ -1,0 +1,300 @@
+﻿@page "/Atherton"
+@using System.Threading.Tasks
+
+@inject NavigationManager NavManager
+@inject IJSRuntime js
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+
+
+<h3>Atherton</h3>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var dbc = await U3Adbfactory.CreateDbContextAsync();
+        using var connection = dbc.Database.GetDbConnection();
+        connection.Open();
+
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = "Delete [Class]";
+        await cmd.ExecuteNonQueryAsync();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT * FROM [Atherton].[dbo].[course]";
+
+        using var reader = command.ExecuteReader();
+        var aCourses = new List<ACourse>();
+
+        while (reader.Read())
+        {
+            var course = new ACourse
+            {
+                ClassID = Convert.ToInt32(reader["ClassID"]),
+                ScheduleDescription = reader["ScheduleDescription"] as string,
+                VenueName = reader["VenueName"] as string,
+            };
+            aCourses.Add(course);
+        }
+        await reader.CloseAsync();
+        await connection.CloseAsync();
+
+        foreach (var ac in aCourses)
+        {
+            var course = await dbc.Course.FirstOrDefaultAsync(x => x.ConversionID == ac.ClassID);
+            if (course is not null)
+            {
+                Venue venue = await dbc.Venue.FirstOrDefaultAsync(x => x.Name == ac.VenueName);
+                OccurrenceType occurenceType = OccurrenceType.Weekly;
+                DateTime? startDate = null;
+                DateTime? startTime = null;
+                DateTime? endTime = null;
+                int? dayOfWeek = null;
+                string[] strings = ac.ScheduleDescription.Split(" ");
+                switch (strings[0].ToLower())
+                {
+                    case "one":
+                        occurenceType = OccurrenceType.OnceOnly;
+                        startDate = Convert.ToDateTime(string.Concat(strings[3], " ", strings[4], " ", strings[5]));
+                        startTime = Convert.ToDateTime(string.Concat(strings[6], " ", strings[7]));
+                        if (strings[10].ToLower() == "noon") strings[10] = "pm";
+                        endTime = Convert.ToDateTime(string.Concat(strings[9], " ", strings[10]));
+                        dayOfWeek = (int)startDate.Value.DayOfWeek;
+                        await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                        break;
+                    case "weekly":
+                        occurenceType = OccurrenceType.Weekly;
+                        startTime = Convert.ToDateTime(string.Concat(strings[3], " ", strings[4]));
+                        if (strings[7].ToLower() == "noon") strings[7] = "pm";
+                        endTime = Convert.ToDateTime(string.Concat(strings[6], " ", strings[7]));
+                        dayOfWeek = (int)Enum.Parse(typeof(DayOfWeek), strings[2], ignoreCase: true);
+                        await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                        break;
+                    case "monthly":
+                        switch (strings.Length)
+                        {
+                            case 12:
+                                switch (strings[1].ToLower())
+                                {
+                                    case "1st":
+                                        occurenceType = OccurrenceType.FirstWeekOfMonth;
+                                        break;
+                                    case "2nd":
+                                        occurenceType = OccurrenceType.SecondWeekOfMonth;
+                                        break;
+                                    case "3rd":
+                                        occurenceType = OccurrenceType.ThirdWeekOfMonth;
+                                        break;
+                                    case "4th":
+                                        occurenceType = OccurrenceType.FourthWeekOfMonth;
+                                        break;
+                                    case "5th":
+                                        occurenceType = OccurrenceType.LastWeekOfMonth;
+                                        break;
+                                }
+                                startTime = Convert.ToDateTime(string.Concat(strings[7], " ", strings[8]));
+                                if (strings[11].ToLower() == "noon") strings[11] = "pm";
+                                endTime = Convert.ToDateTime(string.Concat(strings[10], " ", strings[11]));
+                                dayOfWeek = (int)Enum.Parse(typeof(DayOfWeek), strings[6], ignoreCase: true);
+                                await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                                break;
+                            case 13:
+                                switch (strings[1].ToLower().Substring(0, 3))
+                                {
+                                    case "1st":
+                                        occurenceType = OccurrenceType.FirstWeekOfMonth;
+                                        break;
+                                    case "2nd":
+                                        occurenceType = OccurrenceType.SecondWeekOfMonth;
+                                        break;
+                                    case "3rd":
+                                        occurenceType = OccurrenceType.ThirdWeekOfMonth;
+                                        break;
+                                    case "4th":
+                                        occurenceType = OccurrenceType.FourthWeekOfMonth;
+                                        break;
+                                    case "5th":
+                                        occurenceType = OccurrenceType.LastWeekOfMonth;
+                                        break;
+                                }
+                                startTime = Convert.ToDateTime(string.Concat(strings[8], " ", strings[9]));
+                                if (strings[12].ToLower() == "noon") strings[12] = "pm";
+                                endTime = Convert.ToDateTime(string.Concat(strings[11], " ", strings[12]));
+                                dayOfWeek = (int)Enum.Parse(typeof(DayOfWeek), strings[7], ignoreCase: true);
+                                await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                                ;
+                                switch (strings[2].ToLower().Substring(0, 3))
+                                {
+                                    case "1st":
+                                        occurenceType = OccurrenceType.FirstWeekOfMonth;
+                                        break;
+                                    case "2nd":
+                                        occurenceType = OccurrenceType.SecondWeekOfMonth;
+                                        break;
+                                    case "3rd":
+                                        occurenceType = OccurrenceType.ThirdWeekOfMonth;
+                                        break;
+                                    case "4th":
+                                        occurenceType = OccurrenceType.FourthWeekOfMonth;
+                                        break;
+                                    case "5th":
+                                        occurenceType = OccurrenceType.LastWeekOfMonth;
+                                        break;
+                                }
+                                startTime = Convert.ToDateTime(string.Concat(strings[8], " ", strings[9]));
+                                if (strings[12].ToLower() == "noon") strings[12] = "pm";
+                                endTime = Convert.ToDateTime(string.Concat(strings[11], " ", strings[12]));
+                                dayOfWeek = (int)Enum.Parse(typeof(DayOfWeek), strings[7], ignoreCase: true);
+                                await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                                break;
+                            case 15:
+                                switch (strings[1].ToLower().Substring(0, 3))
+                                {
+                                    case "1st":
+                                        occurenceType = OccurrenceType.FirstWeekOfMonth;
+                                        break;
+                                    case "2nd":
+                                        occurenceType = OccurrenceType.SecondWeekOfMonth;
+                                        break;
+                                    case "3rd":
+                                        occurenceType = OccurrenceType.ThirdWeekOfMonth;
+                                        break;
+                                    case "4th":
+                                        occurenceType = OccurrenceType.FourthWeekOfMonth;
+                                        break;
+                                    case "5th":
+                                        occurenceType = OccurrenceType.LastWeekOfMonth;
+                                        break;
+                                }
+                                startTime = Convert.ToDateTime(string.Concat(strings[10], " ", strings[11]));
+                                if (strings[14].ToLower() == "noon") strings[14] = "pm";
+                                endTime = Convert.ToDateTime(string.Concat(strings[13], " ", strings[14]));
+                                dayOfWeek = (int)Enum.Parse(typeof(DayOfWeek), strings[9], ignoreCase: true);
+                                await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                                ;
+                                switch (strings[2].ToLower().Substring(0, 3))
+                                {
+                                    case "1st":
+                                        occurenceType = OccurrenceType.FirstWeekOfMonth;
+                                        break;
+                                    case "2nd":
+                                        occurenceType = OccurrenceType.SecondWeekOfMonth;
+                                        break;
+                                    case "3rd":
+                                        occurenceType = OccurrenceType.ThirdWeekOfMonth;
+                                        break;
+                                    case "4th":
+                                        occurenceType = OccurrenceType.FourthWeekOfMonth;
+                                        break;
+                                    case "5th":
+                                        occurenceType = OccurrenceType.LastWeekOfMonth;
+                                        break;
+                                }
+                                startTime = Convert.ToDateTime(string.Concat(strings[10], " ", strings[11]));
+                                if (strings[14].ToLower() == "noon") strings[14] = "pm";
+                                endTime = Convert.ToDateTime(string.Concat(strings[13], " ", strings[14]));
+                                dayOfWeek = (int)Enum.Parse(typeof(DayOfWeek), strings[9], ignoreCase: true);
+                                await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                                ;
+                                switch (strings[3].ToLower().Substring(0, 3))
+                                {
+                                    case "1st":
+                                        occurenceType = OccurrenceType.FirstWeekOfMonth;
+                                        break;
+                                    case "2nd":
+                                        occurenceType = OccurrenceType.SecondWeekOfMonth;
+                                        break;
+                                    case "3rd":
+                                        occurenceType = OccurrenceType.ThirdWeekOfMonth;
+                                        break;
+                                    case "4th":
+                                        occurenceType = OccurrenceType.FourthWeekOfMonth;
+                                        break;
+                                    case "5th":
+                                        occurenceType = OccurrenceType.LastWeekOfMonth;
+                                        break;
+                                }
+                                startTime = Convert.ToDateTime(string.Concat(strings[10], " ", strings[11]));
+                                if (strings[14].ToLower() == "noon") strings[14] = "pm";
+                                endTime = Convert.ToDateTime(string.Concat(strings[13], " ", strings[14]));
+                                dayOfWeek = (int)Enum.Parse(typeof(DayOfWeek), strings[9], ignoreCase: true);
+                                await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                                ;
+                                switch (strings[4].ToLower().Substring(0, 3))
+                                {
+                                    case "1st":
+                                        occurenceType = OccurrenceType.FirstWeekOfMonth;
+                                        break;
+                                    case "2nd":
+                                        occurenceType = OccurrenceType.SecondWeekOfMonth;
+                                        break;
+                                    case "3rd":
+                                        occurenceType = OccurrenceType.ThirdWeekOfMonth;
+                                        break;
+                                    case "4th":
+                                        occurenceType = OccurrenceType.FourthWeekOfMonth;
+                                        break;
+                                    case "5th":
+                                        occurenceType = OccurrenceType.LastWeekOfMonth;
+                                        break;
+                                }
+                                startTime = Convert.ToDateTime(string.Concat(strings[10], " ", strings[11]));
+                                if (strings[14].ToLower() == "noon") strings[14] = "pm";
+                                endTime = Convert.ToDateTime(string.Concat(strings[13], " ", strings[14]));
+                                dayOfWeek = (int)Enum.Parse(typeof(DayOfWeek), strings[9], ignoreCase: true);
+                                await WriteData(dayOfWeek, course, venue, startDate, startTime, endTime, occurenceType);
+                                ;
+                                break;
+                        }
+                        break;
+                }
+
+            }
+            await dbc.SaveChangesAsync();
+        }
+
+        async Task WriteData(int? dayOfWeek, Course course, Venue venue, DateTime? startDate, DateTime? startTime, DateTime? endTime, OccurrenceType occurenceType)
+    {
+            if (dayOfWeek != null)
+            {
+                course.Duration = (decimal)((endTime.Value - startTime.Value).TotalMinutes / 60);
+                dbc.Update(course);
+                Class newClass = new Class()
+                {
+                    ID = Guid.NewGuid(),
+                    CourseID = course.ID,
+                    VenueID = venue.ID,
+                    OnDayID = dayOfWeek.Value,
+                    OccurrenceID = (int)occurenceType,
+                    StartDate = startDate,
+                    StartTime = startTime.Value,
+                };
+                dbc.Add(newClass);
+            }
+        }
+
+}
+
+public class ACourse
+{
+    public int ClassID { get; set; }
+    public string? Name { get; set; }
+    public string? InternalNotes { get; set; }
+    public double? EnrolledStudentCount { get; set; }
+    public double? WaitListStudentCount { get; set; }
+    public double? MaxStudents { get; set; }
+    public double? CategoryID { get; set; }
+    public string ScheduleDescription { get; set; }
+    public double? Active { get; set; }
+    public string? SClassStartDate { get; set; }
+    public string? SClassFinishDate { get; set; }
+    public double? MemberCostPerLesson { get; set; }
+    public double? MemberCostPerCourse { get; set; }
+    public string? StructClassSubject { get; set; }
+    public bool Online { get; set; }
+    public double? VenueID { get; set; }
+    public string? VenueName { get; set; }
+}
+
+
+}

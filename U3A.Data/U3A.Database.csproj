@@ -17,6 +17,9 @@
     <UserSecretsId>3c3844e6-398e-41df-8e91-0e0c67b2a568</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Conversions\U3AAtherton.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AsyncAwaitBestPractices" Version="9.0.0" />
     <PackageReference Include="Azure.Identity" Version="1.17.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
@@ -47,6 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\U3A.Model\U3A.Model.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Conversions\U3AAtherton.sql" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Database Context\U3ADbContext.cs">
