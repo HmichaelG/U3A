@@ -106,16 +106,16 @@ else
                                                 </p>
                                             }
                                             <div class="d-flex w-100">
-                                                <DxButton Text="Print (Desktop View)" Enabled="@(!isNoEnrolmentTermAvailable)"
+                                                <DxButton Text="Print (Desktop Only)" Enabled="@(!isNoEnrolmentTermAvailable)"
                                                           IconCssClass="bi bi-printer menu-icon me-3 fs-4"
                                                           Click="OnReportClick"
                                                           CssClass="flex-grow-1 me-1"
                                                           RenderStyle="ButtonRenderStyle.Primary"
                                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
                                                 </DxButton>
-                                                <DxButton Text="Display (Mobile View)" Enabled="@(!isNoEnrolmentTermAvailable)"
-                                                          IconCssClass="bi-phone menu-icon me-3 fs-4"
-                                                          Click="OnPreviewClick"
+                                                <DxButton Text="Calendar View" Enabled="@(!isNoEnrolmentTermAvailable)"
+                                                          IconCssClass="bi bi-calendar menu-icon me-3 fs-4"
+                                                          Click="OnCalendarClick"
                                                           CssClass="flex-grow-1 me-1"
                                                           RenderStyle="ButtonRenderStyle.Primary"
                                                           RenderStyleMode="ButtonRenderStyleMode.Outline">
@@ -304,6 +304,11 @@ else
     void OnReportClick()
     {
         var url = "/public/ClassScheduleView";
+        NavigationManager.NavigateTo(url);
+    }
+    void OnCalendarClick()
+    {
+        var url = "/public/ClassCalendarView";
         NavigationManager.NavigateTo(url);
     }
     void OnPreviewClick()

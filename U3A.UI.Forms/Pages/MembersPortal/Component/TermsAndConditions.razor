@@ -140,7 +140,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (SystemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment)
+        if (SystemSettings != null && SystemSettings.DoNotRequireTermsAndConditionsConfirmationOnFeePayment)
         {
             RequireConfirmation = false;
             isConfirmed = true;

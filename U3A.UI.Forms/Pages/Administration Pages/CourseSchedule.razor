@@ -26,7 +26,7 @@ else
     {
         <ContextHelpTitle Title="Course Schedule" HelpTopic="course-schedule.html" />
     }
-    <FullScreen DisplayOffset=@((IsAdminPortal) ? 7 : 4)
+    <FullScreen DisplayOffset=@((IsAdminPortal || IsPublic) ? 7 : 4)
                 HideToggle=false>
         <ContentTemplate>
             <DxScheduler StartDate="@StartDate"
@@ -40,7 +40,7 @@ else
                          ActiveViewTypeChanged="OnViewTypeChanged"
                          CssClass="w-100">
                 <ToolbarItems>
-                    <DxToolbarItem Visible=@(!IsPortal) AdaptivePriority="1">
+                    <DxToolbarItem Visible=@(!IsPortal && !IsPublic) AdaptivePriority="1">
                         <Template Context="termContext">
                             <div class="d-flex">
                                 <div class="flex-grow-0 pt-1 pe-2">Term:</div>
@@ -148,7 +148,6 @@ else
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         venues = await BusinessRule.SelectableVenuesAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
-        if (IsPublic) IsPortal = true;
         if (selectedTerm != null)
         {
             await SelectedTermChanged(selectedTerm);

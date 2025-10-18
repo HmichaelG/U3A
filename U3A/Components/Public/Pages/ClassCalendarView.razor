@@ -1,0 +1,49 @@
+﻿@page "/public/ClassCalendarView"
+
+@using U3A.BusinessRules
+
+@inject IJSRuntime js
+@inject NavigationManager NavMan
+@inject IDbContextFactory<U3ADbContext> U3Adbfactory
+@inject IDbContextFactory<TenantDbContext> TenantDbfactory
+@inject TenantInfoService tenantService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+@layout BasicLayout
+
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" @bind-IsActive="@isXSmall" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Small" @bind-IsActive="@isSmall" />
+
+@if (!isReady)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <PortalHeader ShowBackButton="true" NoU3AGroup="true" />
+    @if (isSmall || isXSmall)
+    {
+        <ClassCalendar />
+    }
+    else
+    {
+        <div class="container container-fluid">
+            <CourseSchedule IsPublic=true />
+        </div>
+    }
+}
+@code {
+    bool isReady;
+    bool isSmall;
+    bool isXSmall;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isReady = true; await InvokeAsync(StateHasChanged);
+        }
+    }
+
+}
