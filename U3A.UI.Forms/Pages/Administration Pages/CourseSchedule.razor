@@ -22,7 +22,7 @@ else
 {
 
 
-    if (!IsPortal)
+    if (!IsPortal && !IsPublic)
     {
         <ContextHelpTitle Title="Course Schedule" HelpTopic="course-schedule.html" />
     }
@@ -162,7 +162,7 @@ else
         if (firstRender)
         {
             var vt = await ls.GetItemAsStringAsync(VIEW_TYPE_KEY);
-            if (!Enum.TryParse<SchedulerViewType>(vt, out viewType)) { viewType = SchedulerViewType.Day; }
+            if (!Enum.TryParse<SchedulerViewType>(vt, out viewType)) { viewType = SchedulerViewType.Month; }
             IsReady = true;
             await InvokeAsync(StateHasChanged);
         }
@@ -201,7 +201,7 @@ else
             if (VenuesToFilter == null) { VenuesToFilter = new List<Venue>(); }
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IncludeOffScheduleActivities: !IsPortal);
+                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IncludeOffScheduleActivities: (!IsPortal && !IsPublic));
             }
         }
     }
