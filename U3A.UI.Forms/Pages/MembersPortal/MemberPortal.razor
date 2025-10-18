@@ -25,7 +25,7 @@
 else
 {
     <DxLayoutBreakpoint MaxWidth="1200"
-    @bind-IsActive="@IsMobileLayout" />
+                        @bind-IsActive="@IsMobileLayout" />
 
     <MessageBox @ref="@messageBox" />
 
@@ -41,11 +41,11 @@ else
 
                 case PortalMenuSelection.ShowMenu:
                     <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
-                    CurrentTerm="term" ShowEnrolmentSubMneu=false />
+                                      CurrentTerm="term" ShowEnrolmentSubMneu=false />
                     break;
                 case PortalMenuSelection.DoShowEnrolmentSubmenu:
                     <MemberPortalMenu OnMenuOptionSelected="OnMenuOptionSelected"
-                    CurrentTerm="term" ShowEnrolmentSubMneu=true />
+                                      CurrentTerm="term" ShowEnrolmentSubMneu=true />
                     break;
                 case PortalMenuSelection.DoMemberMaintenance:
                     <MemberDetails IsNewLinkedMember=false OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
@@ -77,13 +77,13 @@ else
 
                 case PortalMenuSelection.DoRequestMemberEnrolment:
                     <MemberEnrolment IsEnrolmentRequestView=true
-                    QRClassID=QRClassID
-                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                                     QRClassID=QRClassID
+                                     OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoWithdrawMemberEnrolment:
                     <MemberEnrolment IsEnrolmentWithdrawalView=true
-                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                                     OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoViewMemberEnrolment:
@@ -92,24 +92,30 @@ else
 
                 case PortalMenuSelection.DoShowLeaderMenu:
                     <LeaderMenu IsAdminPortal="@IsAdminMemberPortal"
-                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                                OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
                     break;
 
                 case PortalMenuSelection.DoWhatsOn:
-                    <CourseSchedule IsPortal=true
-                    OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    @if (ws.IsSmallScreen)
+                    {
+                        <ClassCalendar IsPortal="true" OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                    }
+                    else
+                    {
+                        <div class="allow-scroll">
+                        <CourseSchedule IsPortal=true OnSelectedOptionCompleted="OnSelectedOptionCompleted" />
+                        </div>
+                    }
                     break;
-
                 case PortalMenuSelection.PrintMemberBadge:
-                    <PdfViewer PdfIsReady=true 
-                        FileName="@(GetMemberBadgeReport())"
-                        PdfIsReadyChanged=@(() => 
-                        {
-                        menuSelection = PortalMenuSelection.ShowMenu;
-                        OnReportComplete();
-                        })
-                    />
-                    break;
+                    <PdfViewer PdfIsReady=true
+                               FileName="@(GetMemberBadgeReport())"
+                               PdfIsReadyChanged=@(() =>
+                                                  {
+                                                      menuSelection = PortalMenuSelection.ShowMenu;
+                                                      OnReportComplete();
+                                                  }) />
+                break;
                 case PortalMenuSelection.DoReturnToAdminPortal:
                     OnReturnToAdminPortal.InvokeAsync();
                     break;
@@ -119,9 +125,17 @@ else
 }
 <style>
     .report-viewer {
-    height: calc(100dvh - 12rem);
+        height: calc(100dvh - 12rem);
+    }
+
+    .allow-scroll {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-width: 100%;
     }
 </style>
+
 
 
 @code {
@@ -350,7 +364,7 @@ else
 
     async Task<bool> IsAdminOnU3ADesktop()
     {
-		var tenantInfo = await tenantService.GetTenantInfoAsync();
+        var tenantInfo = await tenantService.GetTenantInfoAsync();
         if (tenantInfo.UseEwayTestEnviroment) return true;
         if (!loginState.IsAdminOnBehalfOfMember) return true;
         bool result = false;

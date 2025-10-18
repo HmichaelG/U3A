@@ -7,6 +7,7 @@
 @using System.Text.Json.Nodes
 @inject IDbContextFactory<U3ADbContext> U3Adbfactory
 @inject WorkstationService ws
+@inject Blazored.LocalStorage.ILocalStorageService ls
 
 @implements IDisposable
 
@@ -26,7 +27,7 @@ else
         <ContextHelpTitle Title="Course Schedule" HelpTopic="course-schedule.html" />
     }
     <FullScreen DisplayOffset=@((IsAdminPortal) ? 7 : 4)
-                HideToggle=@(IsPortal)>
+                HideToggle=false>
         <ContentTemplate>
             <DxScheduler StartDate="@StartDate"
                          AllowCreateAppointment="false"
@@ -62,26 +63,23 @@ else
                             </div>
                         </Template>
                     </DxToolbarItem>
-                    <DxSchedulerDateNavigatorToolbarItem Alignment="ToolbarItemAlignment.Right" />
-                    <DxSchedulerPreviousIntervalToolbarItem Alignment="ToolbarItemAlignment.Right" />
-                    <DxSchedulerNextIntervalToolbarItem Alignment="ToolbarItemAlignment.Right" />
-                    <DxSchedulerResourceNavigatorToolbarItem Visible=@(!IsPortal) />
-                    <DxSchedulerViewNavigatorToolbarItem Visible=@(!IsPortal) />
+                    <DxSchedulerDateNavigatorToolbarItem />
+                    <DxSchedulerPreviousIntervalToolbarItem />
+                    <DxSchedulerNextIntervalToolbarItem />
+                    <DxSchedulerResourceNavigatorToolbarItem />
+                    <DxSchedulerViewNavigatorToolbarItem />
                 </ToolbarItems>
                 <Views>
                     <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
-                    @if (!IsPortal)
-                    {
-                        <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
-                        <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
-                        <DxSchedulerMonthView MonthCount="1"></DxSchedulerMonthView>
-                        <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(14)" CellMinWidth="80">
-                            <Scales>
-                                <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1"></DxSchedulerTimeScale>
-                                <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Hour" UnitCount="2"></DxSchedulerTimeScale>
-                            </Scales>
-                        </DxSchedulerTimelineView>
-                    }
+                    <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
+                    <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
+                    <DxSchedulerMonthView MonthCount="1"></DxSchedulerMonthView>
+                    <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(7)">
+                        <Scales>
+                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" />
+                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1" />
+                        </Scales>
+                    </DxSchedulerTimelineView>
                 </Views>
                 <AppointmentTooltipHeaderTemplate>
                     <div class="fs-5">
@@ -116,6 +114,8 @@ else
 
 @code {
 
+    const string VIEW_TYPE_KEY = "{BFE9C0BE-E49C-44AA-8598-1A65483F68E2}";
+
     [Parameter]
     public bool IsPortal { get; set; }
     [Parameter]
@@ -149,7 +149,6 @@ else
         venues = await BusinessRule.SelectableVenuesAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         if (IsPublic) IsPortal = true;
-        viewType = (IsPortal) ? SchedulerViewType.Day : SchedulerViewType.Day;
         if (selectedTerm != null)
         {
             await SelectedTermChanged(selectedTerm);
@@ -160,9 +159,22 @@ else
         IsReady = true;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var vt = await ls.GetItemAsStringAsync(VIEW_TYPE_KEY);
+            if (!Enum.TryParse<SchedulerViewType>(vt, out viewType)) { viewType = SchedulerViewType.Day; }
+        }
+    }
+
     async void OnStartDateChanged(DateTime newStartDate) => StartDate = dbc.GetLocalTime(newStartDate).Date;
 
-    async void OnViewTypeChanged(SchedulerViewType v) => viewType = v;
+    async void OnViewTypeChanged(SchedulerViewType v)
+    {
+        viewType = v;
+        ls.SetItemAsStringAsync(VIEW_TYPE_KEY, Enum.GetName<SchedulerViewType>(v));
+    }
 
     async Task SelectedTermChanged(Term term)
     {
