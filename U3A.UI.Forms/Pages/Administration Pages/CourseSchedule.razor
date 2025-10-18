@@ -156,7 +156,6 @@ else
             var venueNames = DataStorage.GetAppointments(range).Select(x => x.Location);
             AvailableVenues = venues.Where(x => venueNames.Contains(x.Name)).ToList();
         }
-        IsReady = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -165,6 +164,7 @@ else
         {
             var vt = await ls.GetItemAsStringAsync(VIEW_TYPE_KEY);
             if (!Enum.TryParse<SchedulerViewType>(vt, out viewType)) { viewType = SchedulerViewType.Day; }
+            IsReady = true;
             await InvokeAsync(StateHasChanged);
         }
     }
