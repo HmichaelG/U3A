@@ -40,7 +40,7 @@ else
                          ActiveViewTypeChanged="OnViewTypeChanged"
                          CssClass="w-100">
                 <ToolbarItems>
-                    <DxToolbarItem Visible=@(!IsPortal)>
+                    <DxToolbarItem Visible=@(!IsPortal) AdaptivePriority="1">
                         <Template Context="termContext">
                             <div class="d-flex">
                                 <div class="flex-grow-0 pt-1 pe-2">Term:</div>
@@ -50,7 +50,7 @@ else
                             </div>
                         </Template>
                     </DxToolbarItem>
-                    <DxToolbarItem BeginGroup="true" Visible=@(!IsPortal)>
+                    <DxToolbarItem BeginGroup="true" Visible=@(!IsPortal) AdaptivePriority="2">
                         <Template Context="venueContext">
                             <div class="d-flex">
                                 <div class="flex-grow-0 pt-1 pe-2">Venue(s):</div>
@@ -165,6 +165,7 @@ else
         {
             var vt = await ls.GetItemAsStringAsync(VIEW_TYPE_KEY);
             if (!Enum.TryParse<SchedulerViewType>(vt, out viewType)) { viewType = SchedulerViewType.Day; }
+            await InvokeAsync(StateHasChanged);
         }
     }
 
