@@ -14,6 +14,7 @@
 
 <DxLayoutBreakpoint DeviceSize="DeviceSize.XSmall" @bind-IsActive="@isXSmall" />
 <DxLayoutBreakpoint DeviceSize="DeviceSize.Small" @bind-IsActive="@isSmall" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Medium" @bind-IsActive="@isMedium" />
 
 @if (!isReady)
 {
@@ -22,7 +23,7 @@
 else
 {
     <PortalHeader ShowBackButton="true" NoU3AGroup="true" />
-    @if (isSmall || isXSmall)
+    @if (isSmall || isXSmall || isMedium)
     {
         <ClassCalendar />
     }
@@ -37,6 +38,7 @@ else
     bool isReady;
     bool isSmall;
     bool isXSmall;
+    bool isMedium;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

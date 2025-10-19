@@ -20,7 +20,35 @@
 }
 else
 {
-
+    <MessageBox @ref="@messageBox">
+        <TextTemplate>
+            <DxFormLayout CssClass="w-100">
+                <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Term" ColSpanSm="12">
+                        <TermsComboBox Terms="@terms"
+                                       @bind-SelectedTerm="@selectedTerm"
+                                       @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Venue(s)" ColSpanSm="12">
+                        <DxTagBox Data="@AvailableVenues"
+                                  ClearButtonDisplayMode="default"
+                                  TextFieldName="@nameof(Venue.Name)"
+                                  NullText="Optionally filter by one or more venue locations."
+                                  @bind-Values="@VenuesToFilter" @bind-Values:after=@SelectedFilterChanged>
+                        </DxTagBox>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem Caption="Course Types(s)" ColSpanSm="12">
+                        <DxTagBox Data="@courseTypes"
+                                  ClearButtonDisplayMode="default"
+                                  TextFieldName="@nameof(CourseType.Name)"
+                                  NullText="Optionally filter by one or more course types."
+                                  @bind-Values="@CourseTypesToFilter" @bind-Values:after=@SelectedFilterChanged>
+                        </DxTagBox>
+                    </DxFormLayoutItem>
+                </DxFormLayoutGroup>
+            </DxFormLayout>
+        </TextTemplate>
+    </MessageBox>
 
     if (!IsPortal && !IsPublic)
     {
@@ -29,76 +57,65 @@ else
     <FullScreen DisplayOffset=@((IsAdminPortal || IsPublic) ? 7 : 4)
                 HideToggle=false>
         <ContentTemplate>
-            <DxScheduler StartDate="@StartDate"
-                         AllowCreateAppointment="false"
-                         AllowDeleteAppointment="false"
-                         AllowEditAppointment="false"
-                         ShowAppointmentTooltip="true"
-                         ActiveViewType=@viewType
-                         DataStorage="@DataStorage"
-                         StartDateChanged="OnStartDateChanged"
-                         ActiveViewTypeChanged="OnViewTypeChanged"
-                         CssClass="w-100">
-                <ToolbarItems>
-                    <DxToolbarItem Visible=@(!IsPortal && !IsPublic) AdaptivePriority="1">
-                        <Template Context="termContext">
-                            <div class="d-flex">
-                                <div class="flex-grow-0 pt-1 pe-2">Term:</div>
-                                <TermsComboBox Terms="@terms"
-                                               @bind-SelectedTerm="@selectedTerm"
-                                               @bind-SelectedTerm:after=@(async() => await SelectedTermChanged(selectedTerm)) />
+                    <DxScheduler StartDate="@StartDate"
+                                 AllowCreateAppointment="false"
+                                 AllowDeleteAppointment="false"
+                                 AllowEditAppointment="false"
+                                 ShowAppointmentTooltip="true"
+                                 ActiveViewType=@viewType
+                                 DataStorage="@DataStorage"
+                                 StartDateChanged="OnStartDateChanged"
+                                 ActiveViewTypeChanged="OnViewTypeChanged"
+                                 CssClass="w-100">
+                        <ToolbarItems>
+                            <DxToolbarItem BeginGroup="true"
+                                Alignment="ToolbarItemAlignment.Right"
+                                CssClass="text-fl-primary" 
+                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained" 
+                                Text="Click to Filter" 
+                                Click="@(async() => await messageBox.ShowOkOnlyAsync("Schedule Filter"))" />
+                            <DxSchedulerDateNavigatorToolbarItem />
+                            <DxSchedulerPreviousIntervalToolbarItem />
+                            <DxSchedulerNextIntervalToolbarItem />
+                            <DxSchedulerResourceNavigatorToolbarItem />
+                            <DxSchedulerViewNavigatorToolbarItem />
+                        </ToolbarItems>
+                        <Views>
+                            <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
+                            <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
+                            <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
+                            <DxSchedulerMonthView MonthCount="1"></DxSchedulerMonthView>
+                            <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(7)">
+                                <Scales>
+                                    <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" />
+                                    <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1" />
+                                </Scales>
+                            </DxSchedulerTimelineView>
+                        </Views>
+                        <AppointmentTooltipHeaderTemplate>
+                            <div class="fs-5">
+                                @context.Label?.Caption
                             </div>
-                        </Template>
-                    </DxToolbarItem>
-                    <DxToolbarItem BeginGroup="true" Visible=@(!IsPortal) AdaptivePriority="2">
-                        <Template Context="venueContext">
-                            <div class="d-flex">
-                                <div class="flex-grow-0 pt-1 pe-2">Venue(s):</div>
-                                <DxTagBox Data="@AvailableVenues"
-                                          ClearButtonDisplayMode="default"
-                                          TextFieldName="@nameof(Venue.Name)"
-                                          NullText="Optionally filter by one or more venue locations."
-                                          @bind-Values="@VenuesToFilter" @bind-Values:after=@SelectedVenuesChanged>
-                                </DxTagBox>
+                        </AppointmentTooltipHeaderTemplate>
+                        <AppointmentTooltipTemplate>
+                            <div class="container">
+                                <span style="card-fl vertical-align: middle;">
+                                    <strong>Subject:</strong>  @context.Appointment.Subject<br />
+                                    <strong>Leader:</strong>  @context.Appointment.Description<br />
+                                    <strong>Location:</strong>  @context.Appointment.Location<br />
+                                    <strong>From:</strong>  @context.Appointment.Start.ToString("hh:mm tt") <strong>To:</strong>
+                                    @context.Appointment.End.ToString("hh:mm tt")<br />
+                                    <strong>Status:</strong>  @context.Label?.Caption<br />
+                                </span>
                             </div>
-                        </Template>
-                    </DxToolbarItem>
-                    <DxSchedulerDateNavigatorToolbarItem />
-                    <DxSchedulerPreviousIntervalToolbarItem />
-                    <DxSchedulerNextIntervalToolbarItem />
-                    <DxSchedulerResourceNavigatorToolbarItem />
-                    <DxSchedulerViewNavigatorToolbarItem />
-                </ToolbarItems>
-                <Views>
-                    <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
-                    <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
-                    <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
-                    <DxSchedulerMonthView MonthCount="1"></DxSchedulerMonthView>
-                    <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(7)">
-                        <Scales>
-                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" />
-                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1" />
-                        </Scales>
-                    </DxSchedulerTimelineView>
-                </Views>
-                <AppointmentTooltipHeaderTemplate>
-                    <div class="fs-5">
-                        @context.Label?.Caption
-                    </div>
-                </AppointmentTooltipHeaderTemplate>
-                <AppointmentTooltipTemplate>
-                    <div class="container">
-                        <span style="card-fl vertical-align: middle;">
-                            <strong>Subject:</strong>  @context.Appointment.Subject<br />
-                            <strong>Leader:</strong>  @context.Appointment.Description<br />
-                            <strong>Location:</strong>  @context.Appointment.Location<br />
-                            <strong>From:</strong>  @context.Appointment.Start.ToString("hh:mm tt") <strong>To:</strong>
-                            @context.Appointment.End.ToString("hh:mm tt")<br />
-                            <strong>Status:</strong>  @context.Label?.Caption<br />
-                        </span>
-                    </div>
-                </AppointmentTooltipTemplate>
-            </DxScheduler>
+                        </AppointmentTooltipTemplate>
+                    </DxScheduler>
+@*                     </div>
+                </TargetContent>
+                <BodyTemplate>
+                </BodyTemplate>
+            </DxDrawer>
+ *@
         </ContentTemplate>
     </FullScreen>
     <div class="row col col-12 col-md-7 mx-auto mt-2">
@@ -128,8 +145,10 @@ else
 
     bool IsReady;
     public List<Venue>? venues { get; set; }
+    public List<CourseType>? courseTypes { get; set; }
     public List<Venue>? AvailableVenues { get; set; }
     public IEnumerable<Venue>? VenuesToFilter { get; set; }
+    public IEnumerable<CourseType>? CourseTypesToFilter { get; set; }
     LocalTime localTime;
     SchedulerViewType viewType;
 
@@ -137,6 +156,10 @@ else
     private Term? selectedTerm { get; set; }
     DateTime StartDate { get; set; } = DateTime.Today;
     U3ADbContext dbc { get; set; }
+    string[] filterBy = new string[] { "Venue", "Course Type" };
+    string selectedFilterBy = "Venue";
+    bool isDrawerOpen;
+    MessageBox? messageBox;
 
     DxSchedulerTimeSpanRange VisibleTime = new DxSchedulerTimeSpanRange(TimeSpan.FromHours(6), TimeSpan.FromHours(22));
 
@@ -147,6 +170,7 @@ else
         dbc = await U3Adbfactory.CreateDbContextAsync();
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         venues = await BusinessRule.SelectableVenuesAsync(dbc);
+        courseTypes = await BusinessRule.SelectableCourseTypesAsync(dbc);
         selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
         if (selectedTerm != null)
         {
@@ -189,7 +213,7 @@ else
         await ProcessSelection();
     }
 
-    async Task SelectedVenuesChanged()
+    async Task SelectedFilterChanged()
     {
         await ProcessSelection();
     }
@@ -201,7 +225,7 @@ else
             if (VenuesToFilter == null) { VenuesToFilter = new List<Venue>(); }
             using (var dbc = await U3Adbfactory.CreateDbContextAsync())
             {
-                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IncludeOffScheduleActivities: (!IsPortal && !IsPublic));
+                DataStorage = await BusinessRule.GetCourseScheduleDataStorageAsync(dbc, selectedTerm, CourseTypesToFilter, VenuesToFilter, IncludeOffScheduleActivities: (!IsPortal && !IsPublic));
             }
         }
     }

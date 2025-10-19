@@ -10,19 +10,28 @@ namespace U3A.BusinessRules
     {
         public static async Task<DxSchedulerDataStorage> GetCalendarDataStorageAsync(U3ADbContext dbc, Term selectedTerm)
         {
-            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>(), IsCalendarView: true, IncludeOffScheduleActivities: false);
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<CourseType>(), new List<Venue>(), IsCalendarView: true, IncludeOffScheduleActivities: false);
         }
         public static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc, Term selectedTerm, bool IncludeOffScheduleActivities = true)
         {
-            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<Venue>(), IsCalendarView: false, IncludeOffScheduleActivities);
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<CourseType>(), new List<Venue>(), IsCalendarView: false, IncludeOffScheduleActivities);
         }
         public static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc,
-                    Term selectedTerm, IEnumerable<Venue> VenuesToFilter, bool IncludeOffScheduleActivities = true)
+                    Term selectedTerm,
+                    IEnumerable<CourseType> CourseTypeFilter,
+                    IEnumerable<Venue> VenuesToFilter,
+                    bool IncludeOffScheduleActivities = true
+                    )
         {
-            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView: false, ShowFullYear: true, IncludeOffScheduleActivities);
+            if (CourseTypeFilter is null)
+            {
+                CourseTypeFilter = new List<CourseType>();
+            }
+            return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, CourseTypeFilter, VenuesToFilter, IsCalendarView: false, ShowFullYear: true, IncludeOffScheduleActivities);
         }
         static async Task<DxSchedulerDataStorage> GetCourseScheduleDataStorageAsync(U3ADbContext dbc,
                     Term selectedTerm,
+                    IEnumerable<CourseType> CourseTypeFilter,
                     IEnumerable<Venue> VenuesToFilter,
                     bool IsCalendarView,
                     bool ShowFullYear = false,
@@ -91,12 +100,12 @@ namespace U3A.BusinessRules
             {
                 foreach (var t in termsInYear)
                 {
-                    list.AddRange(await GetScheduleAsync(dbc, t, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities));
+                    list.AddRange(await GetScheduleAsync(dbc, t, CourseTypeFilter, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities));
                 }
             }
             else
             {
-                list = await GetScheduleAsync(dbc, selectedTerm, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities);
+                list = await GetScheduleAsync(dbc, selectedTerm, CourseTypeFilter, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities);
             }
             list.AddRange(await GetPublicHolidays(dbc));
             dataStorage.AppointmentsSource = list;
@@ -133,6 +142,7 @@ namespace U3A.BusinessRules
         }
         static async Task<List<ClassSchedule>> GetScheduleAsync(U3ADbContext dbc,
                         Term selectedTerm,
+                        IEnumerable<CourseType> CourseTypeFilter,
                         IEnumerable<Venue> VenuesToFilter,
                         bool IsCalendarView,
                         bool IncludeOffScheduleActivities)
@@ -151,7 +161,9 @@ namespace U3A.BusinessRules
             }
             foreach (Class c in classes)
             {
-                if (VenuesToFilter.Count() <= 0 || VenuesToFilter.Where(x => x.ID == c.VenueID).Any())
+                bool venueFilterPassed = VenuesToFilter.Count() <= 0 || VenuesToFilter.Where(x => x.ID == c.VenueID).Any();
+                bool courseTypeFilterPassed = CourseTypeFilter.Count() <= 0 || CourseTypeFilter.Any(x => x.ID == c.Course.CourseTypeID);
+                if (venueFilterPassed && courseTypeFilterPassed)
                 {
                     if (isOfferedInTerm(selectedTerm, c))
                     {
