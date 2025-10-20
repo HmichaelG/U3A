@@ -180,7 +180,7 @@ else
 
     async void ValidFormSubmitted(EditContext editContext)
     {
-        await ws.SetWorkstationDetail();
+        await ws.SetWorkstationDetail(IsPortal: IsPortal);
         NavigationManager.Refresh(forceReload: true);
     }
 

@@ -40,7 +40,7 @@
                         <div class="me-2 fs-4 bi bi-arrow-left-circle portal-header-back-button-style text-fl-primary" />
                         <img src="images/u3alogo.png" width="81" />&nbsp; &nbsp; @title &nbsp; &nbsp;
                     </div>
-                    <div type="button" class="fs-5 bi bi-gear"
+                    <div type="button" class="fs-5 bi bi-gear" hidden="@IsAccount"
                          title="Customise your device settings"
                          onclick="@(async () => await messageBox.ShowOkOnlyAsync(""))" />
                 </div>
@@ -82,6 +82,8 @@
     public string NavigateTo { get; set; } = "/";
     [Parameter]
     public bool NoU3AGroup { get; set; }
+    [Parameter]
+    public bool IsAccount { get; set; }
 
     bool isSmallLayout;
     bool isReady;

@@ -132,8 +132,20 @@ public class WorkstationService
         }
     }
 
-    public async Task SetWorkstationDetail()
+    public async Task SetWorkstationDetail(bool IsPortal = false)
     {
+        if (IsPortal)
+        {
+            // Reload from local storage to avoid overwriting non-portal settings
+            var currentValues = await localStorage.GetItemAsStringAsync(WORKSTATION_KEY) ?? string.Empty;
+            if (currentValues != string.Empty)
+            {
+                var workstation = JsonSerializer.Deserialize<WorkstationService>(currentValues);
+                UseTopMenu = workstation.UseTopMenu;
+                SidebarImage = workstation.SidebarImage;
+                MenuBehavior = workstation.MenuBehavior;
+            }
+        }
         await RefreshCookies();
         var json = JsonSerializer.Serialize<WorkstationService>(this);
         await localStorage.SetItemAsStringAsync(WORKSTATION_KEY, json);
