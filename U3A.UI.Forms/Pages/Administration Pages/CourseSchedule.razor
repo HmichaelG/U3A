@@ -72,7 +72,7 @@ else
                                 Alignment="ToolbarItemAlignment.Right"
                                 CssClass="text-fl-primary" 
                                 RenderStyleMode="ToolbarItemRenderStyleMode.Contained" 
-                                Text="Click to Filter" 
+                                Text="Filter" 
                                 Click="@(async() => await messageBox.ShowOkOnlyAsync("Schedule Filter"))" />
                             <DxSchedulerDateNavigatorToolbarItem />
                             <DxSchedulerPreviousIntervalToolbarItem />
@@ -98,24 +98,16 @@ else
                             </div>
                         </AppointmentTooltipHeaderTemplate>
                         <AppointmentTooltipTemplate>
-                            <div class="container">
-                                <span style="card-fl vertical-align: middle;">
+                                <div style="vertical-align: middle;">
                                     <strong>Subject:</strong>  @context.Appointment.Subject<br />
                                     <strong>Leader:</strong>  @context.Appointment.Description<br />
                                     <strong>Location:</strong>  @context.Appointment.Location<br />
                                     <strong>From:</strong>  @context.Appointment.Start.ToString("hh:mm tt") <strong>To:</strong>
                                     @context.Appointment.End.ToString("hh:mm tt")<br />
                                     <strong>Status:</strong>  @context.Label?.Caption<br />
-                                </span>
-                            </div>
+                                </div>
                         </AppointmentTooltipTemplate>
                     </DxScheduler>
-@*                     </div>
-                </TargetContent>
-                <BodyTemplate>
-                </BodyTemplate>
-            </DxDrawer>
- *@
         </ContentTemplate>
     </FullScreen>
     <div class="row col col-12 col-md-7 mx-auto mt-2">

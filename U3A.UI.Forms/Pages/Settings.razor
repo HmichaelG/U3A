@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
-@attribute [Authorize]
+@attribute [AllowAnonymous]
 
 @if (!IsReady)
 {
@@ -14,14 +14,15 @@
 }
 else
 {
-
-    <ContextHelpTitle Title="Workstation Settings" HelpTopic="Workstation-Settings.html"
-                      Subtitle="System Settings to coustomise your device." />
-
+    @if (!IsPortal)
+    {
+        <ContextHelpTitle Title="Workstation Settings" HelpTopic="Workstation-Settings.html"
+        Subtitle="System Settings to coustomise your device." />
+    }
     <EditForm Model="@ws" OnValidSubmit=@ValidFormSubmitted Context="editContext">
         <DataAnnotationsValidator />
         <div class="d-flex flex-column box-position">
-            <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12" ColSpanLg="8">
+            <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="12">
                 <DxFormLayoutGroup Decoration="FormLayoutGroupDecoration.None" ColSpanMd="6">
                     <DxFormLayoutItem Caption="Theme" ColSpanMd="12">
                         <DxRadioGroup Items="@themes"
@@ -29,19 +30,19 @@ else
                                       ValueFieldName="@nameof(Theme.Key)"
                                       @bind-Value="@ws.Theme" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Menu Style" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Menu Style" ColSpanMd="12" Visible="@(!IsPortal)">
                         <DxRadioGroup Items="@menuTypes"
                                       TextFieldName="@nameof(MenuType.Title)"
                                       ValueFieldName="@nameof(MenuType.Key)"
                                       @bind-Value="@ws!.UseTopMenu" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Menu Behavior" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Menu Behavior" ColSpanMd="12" Visible="@(!IsPortal)">
                         <DxRadioGroup Items="@menuBehaviors"
                                       TextFieldName="@nameof(MenuBehavior.Title)"
                                       ValueFieldName="@nameof(MenuBehavior.Key)"
                                       @bind-Value="@ws!.MenuBehavior" />
                     </DxFormLayoutItem>
-                    <DxFormLayoutItem Caption="Sidebar Image" ColSpanMd="12">
+                    <DxFormLayoutItem Caption="Sidebar Image" ColSpanMd="12" Visible="@(!IsPortal)">
                         <DxComboBox Data="@sidebarImageMenu"
                                     TextFieldName="@nameof(SidebarImage.MenuName)"
                                     ValueFieldName="@nameof(SidebarImage.MenuName)"
@@ -78,7 +79,9 @@ else
                 </DxFormLayoutGroup>
                 <div class="links-container">
                     <DxButton SubmitFormOnClick="true" Text="Apply Settings" RenderStyle="@ButtonRenderStyle.Primary" />
-                    <DxButton SubmitFormOnClick="false" Text="Close" RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
+                    <DxButton SubmitFormOnClick="false" 
+                        Text="Close" Visible="@(!IsPortal)"
+                        RenderStyle="@ButtonRenderStyle.Secondary" Click="@Close" />
                 </div>
             </DxFormLayoutGroup>
         </div>
@@ -108,6 +111,9 @@ else
 </style>
 
 @code {
+    [Parameter]
+    public bool IsPortal {get; set;}
+
     bool IsReady = false;
     public struct MenuType
     {
@@ -162,15 +168,20 @@ else
 
     IEnumerable<SidebarImage> sidebarImageMenu = new SidebarImageMenuOptions();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        IsReady = true;
+        if (firstRender)
+        {
+            await ws.GetWorkstationDetail();
+            IsReady = true;
+            StateHasChanged();
+        }
     }
 
     async void ValidFormSubmitted(EditContext editContext)
     {
         await ws.SetWorkstationDetail();
-        NavigationManager.Refresh();
+        NavigationManager.Refresh(forceReload: true);
     }
 
     void Close()

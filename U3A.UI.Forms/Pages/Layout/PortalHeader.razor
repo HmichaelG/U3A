@@ -11,37 +11,54 @@
     <DxLayoutBreakpoint DeviceSize="DeviceSize.Small"
                         @bind-IsActive="@isSmallLayout" />
 
+    @if (showTheme)
+    {
+        <U3A.UI.Forms.Pages.Settings />
+    }
+    else
+    {
+        <MessageBox @ref="@messageBox" 
+            PopupWidth="min(40rem,100%)" 
+            Caption="Your Device Settings">
+            <TextTemplate>
+                <U3A.UI.Forms.Pages.Settings IsPortal="true" />
+            </TextTemplate>
+        </MessageBox>
 
-    <header class="navbar-bg-color w-100 mt-4">
-        @{
-            string title = "Member Portal";
-            if (NoU3AGroup)
-            {
-                title = $"{settings?.U3AGroup}";
-                if (!isSmallLayout && !string.IsNullOrWhiteSpace(settings.Phone)) { title = $"{title} Ph: {settings?.Phone}"; }
-            }
-        }
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm box-shadow my-2 p-1">
-            <div class="w-100">
-                <div tabindex="-1" class="h5 nav make-hover justify-content-center" onclick="@OnHeaderClick">
-                    <div class="me-2 fs-4 bi bi-arrow-left-circle portal-header-back-button-style text-fl-primary" />
-                    <img src="images/u3alogo.png" width="81" />&nbsp; &nbsp; @title
-                </div>
-            </div>
-        </nav>
-        @if (!NoU3AGroup)
-        {
-            <div align="center">
-                <div class="h2 u3a-group"><b>@settings?.U3AGroup</b></div>
-                @if (!string.IsNullOrWhiteSpace(settings?.Phone))
+        <header class="navbar-bg-color w-100 mt-4">
+            @{
+                string title = "Member Portal";
+                if (NoU3AGroup)
                 {
-                    <div class="h5 text-fl-primary text-center">
-                        @(new MarkupString($"Phone: <b>{settings?.Phone}</b>"))
-                    </div>
+                    title = $"{settings?.U3AGroup}";
+                    if (!isSmallLayout && !string.IsNullOrWhiteSpace(settings.Phone)) { title = $"{title} Ph: {settings?.Phone}"; }
                 }
-            </div>
-        }
-    </header>
+            }
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm box-shadow my-2 p-1 w-100">
+                <div class="d-flex flex-row mx-auto align-items-center">
+                    <div tabindex="-1" class="h5 nav make-hover justify-content-center" onclick="@OnHeaderClick" title="Click to return to menu">
+                        <div class="me-2 fs-4 bi bi-arrow-left-circle portal-header-back-button-style text-fl-primary" />
+                        <img src="images/u3alogo.png" width="81" />&nbsp; &nbsp; @title &nbsp; &nbsp;
+                    </div>
+                    <div type="button" class="fs-5 bi bi-gear"
+                         title="Customise your device settings"
+                         onclick="@(async () => await messageBox.ShowOkOnlyAsync(""))" />
+                </div>
+            </nav>
+            @if (!NoU3AGroup)
+            {
+                <div align="center">
+                    <div class="h2 u3a-group"><b>@settings?.U3AGroup</b></div>
+                    @if (!string.IsNullOrWhiteSpace(settings?.Phone))
+                    {
+                        <div class="h5 text-fl-primary text-center">
+                            @(new MarkupString($"Phone: <b>{settings?.Phone}</b>"))
+                        </div>
+                    }
+                </div>
+            }
+        </header>
+    }
 }
 
 <style>
@@ -69,6 +86,8 @@
     bool isSmallLayout;
     bool isReady;
     SystemSettings? settings;
+    MessageBox? messageBox;
+    bool showTheme;
 
     protected override async Task OnInitializedAsync()
     {
