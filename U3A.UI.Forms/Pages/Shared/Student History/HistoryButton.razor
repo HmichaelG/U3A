@@ -3,13 +3,16 @@
 <container>
 	<DxButton RenderStyleMode="ButtonRenderStyleMode.Outline" tooltip="Show Account &/or Enrolment Details"
 			  RenderStyle="ButtonRenderStyle.Primary" IconCssClass="text-primary bi bi-zoom-in"
-			  CssClass="w-100"
+			  CssClass="w-100" Enabled="@Enabled"
 			  Click="async(e) => await Click.InvokeAsync(e)">
 	</DxButton>
-	<div class="note-badge badge bg-fl-success"
-		 onclick="@(async () => await Click.InvokeAsync())">
-		@(NoteCount > 0 ? NoteCount.ToString() : "")
-	</div>
+	@if (Enabled)
+	{
+		<div class="note-badge badge bg-fl-success"
+		onclick="@(async () => await Click.InvokeAsync())">
+			@(NoteCount > 0 ? NoteCount.ToString() : "")
+		</div>
+	}
 </container>
 
 <style>
@@ -37,5 +40,6 @@
 	[Parameter, EditorRequired] public Guid PersonID { get; set; }
 	[Parameter] public int NoteCount { get; set; } = 0;
 	[Parameter] public EventCallback<MouseEventArgs> Click { get; set; }
+    [Parameter] public bool Enabled { get; set; } = true;
 
 }

@@ -184,7 +184,7 @@ else
 											  FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
 											  Visible=@(selectedCourse != null && selectedCourse.HasFees)
 											  UnboundType="GridUnboundColumnType.Decimal" Width="5em" />
-							<GridUnboundColumn
+							<GridUnboundColumn 
 											Caption="Details" 
 											FixedPosition="GridColumnFixedPosition.Right">
 								<CellEditTemplate>
@@ -192,7 +192,7 @@ else
 								</CellEditTemplate>
 								<CellDisplayTemplate>
 									<HistoryButton PersonID=@(((Enrolment)context.DataItem).Person.ID)
-													
+													Enabled="@(!mainGrid.IsEditing())"
 													NoteCount="@(PersonNoteCounts.GetValueOrDefault(((Enrolment)context.DataItem).PersonID))"
 													Click="async() => {selectedPerson = (((Enrolment)context.DataItem).Person);
 																await fullScreen.ResetFullScreen();
@@ -902,8 +902,8 @@ else
 		foreach (var enrolment in SelectedDataItems.Cast<Enrolment>())
 		{
 			if (await BusinessRule.DuplicateEnrolment(dbc,
-								 enrolment.Person, transferOrCopyEnrolment.selectedTerm,
-								 transferOrCopyEnrolment.selectedCourse, transferOrCopyEnrolment.selectedClass) == null)
+									enrolment.Person, transferOrCopyEnrolment.selectedTerm,
+									transferOrCopyEnrolment.selectedCourse, transferOrCopyEnrolment.selectedClass) == null)
 			{
 				var e = new Enrolment()
 				{
@@ -1050,8 +1050,8 @@ else
 				foreach (var person in quickEnrolment.SelectedPersons)
 				{
 					if (await BusinessRule.DuplicateEnrolment(dbc,
-										 person, selectedTerm,
-										 selectedCourse, selectedClass) == null)
+											person, selectedTerm,
+											selectedCourse, selectedClass) == null)
 					{
 						var e = new Enrolment()
 						{
@@ -1170,6 +1170,11 @@ else
 		{
 			await messageBox.ShowOkOnlyAsync("Cancelled!", "Fee adjustment was cancelled by you.");
 		}
+	}
+
+	async Task OnShowDetails()
+	{
+		
 	}
 
 
