@@ -100,22 +100,22 @@ else
                         var Class = context.Appointment.CustomFields["Source"] as Class;
                         var leaders = Class?.LeaderNamesOnly.Replace(Environment.NewLine, "<br/>");
                     }
-                    <div class="fs-6" style="line-height:1.5rem;">
+                    <div style="line-height:1.5rem;">
                         <div class="d-flex">
                             <div class="bi bi-person popup-icon-style" />
-                            <div class="flex-grow-1"> @(new MarkupString(leaders))</div>
+                            <div class="popup-text-style flex-grow-1"> @(new MarkupString(leaders))</div>
                         </div>
                         <div class="d-flex">
                             <div class="bi bi-geo-alt popup-icon-style" />
-                            <div class="flex-grow-1"> @context.Appointment.Location</div>
+                            <div class="popup-text-style flex-grow-1"> @context.Appointment.Location</div>
                         </div>
                         <div class="d-flex">
                             <div class="bi bi-alarm popup-icon-style" />
-                            <div class="flex-grow-1"> @start - @end</div>
+                            <div class="popup-text-style flex-grow-1"> @start - @end</div>
                         </div>
                         <div class="d-flex">
                             <div class="bi bi-calendar-week popup-icon-style" />
-                            <div class="flex-grow-1"> @Class.OccurrenceTextBrief</div>
+                            <div class="popup-text-style flex-grow-1"> @Class.OccurrenceTextBrief</div>
                         </div>
                         <br />
                         <div class="d-flex">
@@ -140,8 +140,13 @@ else
 
 <style>
     .popup-icon-style {
-        vertical-align: middle;
+        font-size: 1.2rem;
+        align-items: center;
         margin-right: 0.5rem;
+    }
+    .popup-text-style {
+        font-size: 0.75rem;
+        align-items: center;
     }
 </style>
 
@@ -191,8 +196,9 @@ else
         if (selectedTerm != null)
         {
             await SelectedTermChanged(selectedTerm);
-            DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(StartDate, StartDate.AddYears(1));
-            var venueNames = DataStorage.GetAppointments(range).Select(x => x.Location);
+            var venueNames = BusinessRule.GetAppointmentsInRange(DataStorage, StartDate, StartDate.AddYears(1), ExcludeCancellations: true)
+                                .Select(x => x.Location)
+                                .Distinct();
             AvailableVenues = venues.Where(x => venueNames.Contains(x.Name)).ToList();
         }
     }

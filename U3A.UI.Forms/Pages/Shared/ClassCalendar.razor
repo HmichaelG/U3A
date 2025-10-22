@@ -153,8 +153,7 @@
             if (selectedTerm != null)
             {
                 var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, selectedTerm);
-                var range = new DxSchedulerDateTimeRange(DateTime.Today, new DateTime(selectedTerm.Year, 12, 31));
-                FilteredEvents = Events = dataStorage.GetAppointments(range).Where(x => (int)x.LabelId != 10); // Not this week
+                FilteredEvents = Events = BusinessRule.GetAppointmentsInRange(dataStorage, DateTime.Today, new DateTime(selectedTerm.Year, 12, 31),ExcludeCancellations:false); // Not this week
             }
         }
         isCalendarVisible = !isCalendarVisible;

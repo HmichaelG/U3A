@@ -210,12 +210,9 @@ public static partial class BusinessRule
         DateTime start = selectedTerm.StartDate;
         DateTime end = Now;
         end = (end > start && end <= lastAllowedClassDate) ? end : lastAllowedClassDate;
-        DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(start, end);
 
         // for each appointment find attendance recorded / not recorded
-        var appointments = (from a in storage.GetAppointments(range)
-                            where a.CustomFields["Source"] != null
-                            select a);
+        var appointments = BusinessRule.GetAppointmentsInRange(storage, start, end, ExcludeCancellations: true);
         ConcurrentBag<AttendanceRecorded> bag = new ConcurrentBag<AttendanceRecorded>();
         Parallel.ForEach(appointments, a =>
         {
@@ -285,12 +282,7 @@ public static partial class BusinessRule
         var storage = await GetCourseScheduleDataStorageAsync(dbc, selectedTerm);
 
         // calculate class dates
-        DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(startDate, endDate);
-        result = (from a in storage.GetAppointments(range)
-                  where (a.CustomFields["Source"] != null
-                            && (int)a.LabelId != 9    // Cancelled/Postponed
-                            && selectedClass.ID == (a.CustomFields["Source"] as Class).ID)
-                  select new ClassDate() { TermStart = selectedTerm.StartDate, Date = a.Start }).ToList();
+        result = BusinessRule.GetClassAppointmentDates(selectedClass.ID, storage, startDate, endDate).ToList();
 
         // merge what is already on file & sort
         result.AddRange(onFileDates);

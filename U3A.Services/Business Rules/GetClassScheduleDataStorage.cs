@@ -1,5 +1,7 @@
 ﻿using DevExpress.Blazor;
+using Eway.Rapid.Abstractions.Response;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client.Extensions.Msal;
 using Serilog;
 using U3A.Database;
 using U3A.Model;
@@ -8,6 +10,17 @@ namespace U3A.BusinessRules
 {
     public static partial class BusinessRule
     {
+        public static IEnumerable<DxSchedulerAppointmentItem> GetAppointmentsInRange(DxSchedulerDataStorage dataStorage, DateTime startDate, DateTime endDate, bool ExcludeCancellations)
+        {
+            DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(startDate, endDate);
+            return dataStorage.GetAppointments(range).Where(x => (int)x.LabelId != 99 && !(ExcludeCancellations && (int)x.LabelId == 9));
+        }
+        public static IEnumerable<ClassDate> GetClassAppointmentDates(Guid ClassID, DxSchedulerDataStorage dataStorage, DateTime startDate, DateTime endDate)
+        {
+            return GetAppointmentsInRange(dataStorage, startDate, endDate, ExcludeCancellations: true)
+                                    .Where(x => x.CustomFields["Source"] != null && (x.CustomFields["Source"] as Class).ID == ClassID)
+                                      .Select(x => new ClassDate() { TermStart = startDate, Date = x.Start });
+        }
         public static async Task<DxSchedulerDataStorage> GetCalendarDataStorageAsync(U3ADbContext dbc, Term selectedTerm)
         {
             return await GetCourseScheduleDataStorageAsync(dbc, selectedTerm, new List<CourseType>(), new List<Venue>(), IsCalendarView: true, IncludeOffScheduleActivities: false);
@@ -61,7 +74,7 @@ namespace U3A.BusinessRules
             int year = selectedTerm.Year;
             dataStorage = RemoveExceptions(year, dataStorage, exceptionsStorage);
 
-            // Set any class on a public holiday to LabelID = 9 (Xancellation)
+            // Set any class on a public holiday to LabelID = 9 (Cancellation)
             foreach (var ph in dbc.PublicHoliday.AsNoTracking().ToArray())
             {
                 DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(ph.Date,
@@ -172,7 +185,7 @@ namespace U3A.BusinessRules
                         Class c = (Class)a.CustomFields["Source"];
                         if (c != null && c.ID == exceptionClass.ID)
                         {
-                            a.Subject = $"{a.Subject} (Not this week)";
+                            a.LabelId = 99;
                             a.Start = DateTime.Parse("12 am");
                             a.End = DateTime.Parse("12 am");
                             dataStorage.RemoveAppointment(a);

@@ -20,10 +20,9 @@ namespace U3A.BusinessRules
 
             DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(selectedTerm.StartDate,
                         selectedTerm.EndDate.AddDays(1));
-            var appointments = scheduleStorage.GetAppointments(range)
-                                .OrderBy(x => x.Start)
-                                .ToList();
-            foreach (var a in scheduleStorage.GetAppointments(range))
+            var appointments = BusinessRule.GetAppointmentsInRange(scheduleStorage, selectedTerm.StartDate, selectedTerm.EndDate.AddDays(1), ExcludeCancellations: true)
+                                .OrderBy(x => x.Start);
+            foreach (var a in appointments)
             {
                 if ((int)a.LabelId != 9)
                 {

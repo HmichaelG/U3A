@@ -43,12 +43,11 @@ namespace U3A.BusinessRules
             IEnumerable<Class> classes)
         {
             var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, term);
-            var range = new DxSchedulerDateTimeRange(dbc.GetLocalDate(), new DateTime(term.Year, 12, 31));
             Dictionary<Guid, List<DxSchedulerAppointmentItem>> classAppointments = new();
-            foreach (var a in dataStorage?.GetAppointments(range))
+            foreach (var a in BusinessRule.GetAppointmentsInRange(dataStorage, dbc.GetLocalDate(), new DateTime(term.Year, 12, 31), ExcludeCancellations: true))
             {
                 Class c = (Class)a.CustomFields["Source"];
-                if (c != null && (int)a.LabelId != 9)
+                if (c != null)
                 {
                     if (!classAppointments.ContainsKey(c.ID))
                     {

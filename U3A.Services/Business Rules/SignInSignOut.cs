@@ -65,9 +65,7 @@ namespace U3A.BusinessRules
             // find today's classes starting from now
             var end = new DateTime(DateNow.Year, DateNow.Month, DateNow.Day, 23, 59, 59);
             var range = new DxSchedulerDateTimeRange(DateNow, end);
-            return (from a in storage.GetAppointments(range)
-                    where (a.CustomFields["Source"] != null
-                              && (int)a.LabelId != 9) // Cancelled/Postponed
+            return (from a in BusinessRule.GetAppointmentsInRange(storage, DateNow, end, ExcludeCancellations: true)
                     select a.CustomFields["Source"] as Class).ToList();
 
         }
@@ -86,7 +84,7 @@ namespace U3A.BusinessRules
             // find today's classes starting from now
             var end = new DateTime(DateNow.Year, DateNow.Month, DateNow.Day, 23, 59, 59);
             var range = new DxSchedulerDateTimeRange(DateNow, end);
-            var classes = (from a in storage.GetAppointments(range)
+            var classes = (from a in BusinessRule.GetAppointmentsInRange(storage, DateNow, end, ExcludeCancellations: false)
                            where (a.CustomFields["Source"] != null)
                            select new
                            {
