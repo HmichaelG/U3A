@@ -244,7 +244,7 @@
         editModel.CopyTo(dataItem);
         // Map OccurrenceException.ID to OccurrenceExceptionID
         dataItem.OccurrenceExceptionID = new List<int>();
-        if (editModel.OccurrenceID == (int)OccurrenceType.Weekly)
+        if (editModel.Occurrence.ID == (int)OccurrenceType.Weekly)
         {
             foreach (var oe in editModel.OccurrenceException)
             {
