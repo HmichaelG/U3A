@@ -93,7 +93,20 @@ else
     bool isReady;
 
 
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CheckSecurity();
+            await GetWorkstationDetails();
+            objRef = DotNetObjectReference.Create(this);
+            await js.InvokeVoidAsync("registerOrientationChange", objRef);
+            isReady = true; await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task CheckSecurity()
     {
         dbc = await U3Adbfactory.CreateDbContextAsync();
 
@@ -157,16 +170,6 @@ else
         currentUrl = navMan.ToBaseRelativePath(navMan.Uri);
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await GetWorkstationDetails();
-            objRef = DotNetObjectReference.Create(this);
-            await js.InvokeVoidAsync("registerOrientationChange", objRef);
-            isReady = true; await InvokeAsync(StateHasChanged);
-        }
-    }
 
     [JSInvokable]
     public void OnOrientationChanged(string orientation)
