@@ -457,6 +457,8 @@ namespace U3A.BusinessRules
         public static async Task<List<StudentClassSummary>> GetAllEnrolmentsForStudent(U3ADbContext dbc, Term term, Person Student)
         {
             ConcurrentBag<StudentClassSummary> result = new();
+            var terms = await dbc.Term.AsNoTracking()
+                                .Where(x => x.Year == term.Year).ToListAsync();
             var enrolments = await dbc.Enrolment
                                     .Include(x => x.Term)
                                     .Include(x => x.Course)
@@ -478,21 +480,24 @@ namespace U3A.BusinessRules
                 {
                     foreach (var c in classes.Where(x => x.CourseID == course.ID))
                     {
-                        result.Add(new StudentClassSummary()
+                        if (c is not null && IsClassInTerm(c, e.Term.TermNumber))
                         {
-                            Course = course.Name,
-                            Class = c.OccurrenceText,
-                            Term = e.Term.Name,
-                            IsWaitlisted = e.IsWaitlisted,
-                            DateEnrolled = e.DateEnrolled
-                        }
+                            result.Add(new StudentClassSummary()
+                            {
+                                Course = course.Name,
+                                Class = c.OccurrenceText,
+                                Term = e.Term.Name,
+                                IsWaitlisted = e.IsWaitlisted,
+                                DateEnrolled = e.DateEnrolled
+                            }
                         );
+                        }
                     }
                 }
                 else
                 {
                     var c = classes.Where(x => x.ID == e.ClassID).FirstOrDefault();
-                    if (c is not null)
+                    if (c is not null && IsClassInTerm(c, e.Term.TermNumber))
                     {
                         result.Add(new StudentClassSummary()
                         {
