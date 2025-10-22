@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" modified="2025-05-16T11:16:30.566+10:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+<topic template="Default" modified="2025-10-22T16:28:51.339+11:00" lasteditedby="hanlo" version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
   <title>Add/Edit Courses</title>
   <body>
     <header>
@@ -385,7 +385,7 @@
       <tr style="vertical-align:top">
         <td>
           <para styleclass="Normal">Use the add/edit/delete on the Class grid within the Course record pop-up to create and /or edit classes. Enrolment cannot occur until a course has at least one class assigned.</para>
-          <para styleclass="Normal"><table styleclass="Default" rowcount="10" colcount="2" style="border-width:1px; border-spacing:0px; border-collapse:collapse; cell-border-width:1px; border-color:#c0c0c0; border-style:solid;">
+          <para styleclass="Normal"><table styleclass="Default" rowcount="11" colcount="2" style="border-width:1px; border-spacing:0px; border-collapse:collapse; cell-border-width:1px; border-color:#c0c0c0; border-style:solid;">
             <tr style="vertical-align:top">
               <td style="width:272px; background-color:#c0c0c0;">
                 <para styleclass="Normal"><text style="font-weight:bold;">Field</text></para>
@@ -451,6 +451,14 @@
               </td>
               <td style="width:1288px;">
                 <para styleclass="Normal">Select from the list how the class occurs. The default value is <text style="font-style:italic;">Weekly</text> meaning the class will occur once per week.</para>
+              </td>
+            </tr>
+            <tr style="vertical-align:top">
+              <td style="width:272px;">
+                <para styleclass="Normal">Weekly Exception(s)</para>
+              </td>
+              <td style="width:1288px;">
+                <para styleclass="Normal">This field is only displayed if the <text style="font-style:italic;">Occurrence</text> is <text style="font-style:italic;">&#32;</text><text style="font-weight:bold;">Weekly. </text>It allows you to enter one or more exceptions to a Weekly occurrence pattern, being weeks 1, 2, 3 and/or 4. For example, if a class has a Weekly occurrence pattern and week 2 and week 4 are selected as Weekly Exceptions then the class will be held every week except weeks 2 &amp; 4.</para>
               </td>
             </tr>
             <tr style="vertical-align:top">

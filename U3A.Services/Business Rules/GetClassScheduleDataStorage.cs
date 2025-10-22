@@ -38,83 +38,35 @@ namespace U3A.BusinessRules
                     bool IncludeOffScheduleActivities = true)
         {
             var termsInYear = await BusinessRule.SelectableTermsInCurrentYearAsync(dbc, selectedTerm);
-            DxSchedulerDataStorage dataStorage = new DxSchedulerDataStorage()
-            {
-                AppointmentMappings = new DxSchedulerAppointmentMappings()
-                {
-                    Type = "AppointmentType",
-                    Start = "StartDate",
-                    End = "EndDate",
-                    Subject = "Caption",
-                    AllDay = "AllDay",
-                    Location = "Location",
-                    Description = "Description",
-                    LabelId = "Label",
-                    RecurrenceInfo = "Recurrence",
-                    CustomFieldMappings = new List<DxSchedulerCustomFieldMapping> {
-                        new DxSchedulerCustomFieldMapping { Name = "Source", Mapping = "Class" }
-                    }
-                },
-                AppointmentLabelsSource = new List<LabelObject>() {
-            new LabelObject() {
-                Id = 0,
-                LabelCaption = "Undersubscribed",
-                BackgroundCssClass = "bg-fl-warning-subtle",
-                TextCssClass = "text-fl-warning"
-            },
-            new LabelObject() {
-                Id = 1,
-                LabelCaption = "Good To Go",
-                BackgroundCssClass = "bg-fl-success-subtle",
-                TextCssClass = "text-fl-success"
-            },
-            new LabelObject() {
-                Id = 2,
-                LabelCaption = "Oversubscribed",
-                BackgroundCssClass = "bg-fl-danger-subtle",
-                TextCssClass = "text-fl-danger"
-            },
-            new LabelObject() {
-                Id = 3,
-                LabelCaption = "Off-Schedule Activity",
-                BackgroundCssClass = "bg-fl-info-subtle",
-                TextCssClass = "text-fl-info"
-            },
-            new LabelObject() {
-                Id = 9,
-                LabelCaption = "Cancelled/Postponed",
-                BackgroundCssClass = "bg-fl-neutral-subtle",
-                TextCssClass = "text-fl-neutral"
-            },
-        },
-                AppointmentLabelMappings = new DxSchedulerAppointmentLabelMappings()
-                {
-                    Id = "Id",
-                    Caption = "LabelCaption",
-                    BackgroundCssClass = "BackgroundCssClass",
-                    TextCssClass = "TextCssClass"
-                }
-            };
-            var list = new List<ClassSchedule>();
+            DxSchedulerDataStorage dataStorage = CreateDataStorage();
+            DxSchedulerDataStorage exceptionsStorage = CreateDataStorage();
+            var schedule = new List<ClassSchedule>();
+            var exceptions = new List<ClassSchedule>();
             if (IsCalendarView || ShowFullYear)
             {
                 foreach (var t in termsInYear)
                 {
-                    list.AddRange(await GetScheduleAsync(dbc, t, CourseTypeFilter, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities));
+                    schedule.AddRange((await GetScheduleAsync(dbc, t, CourseTypeFilter, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities)).Schedule);
+                    exceptions.AddRange((await GetScheduleAsync(dbc, t, CourseTypeFilter, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities)).Exceptions);
                 }
             }
             else
             {
-                list = await GetScheduleAsync(dbc, selectedTerm, CourseTypeFilter, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities);
+                schedule = (await GetScheduleAsync(dbc, selectedTerm, CourseTypeFilter, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities)).Schedule;
+                exceptions = (await GetScheduleAsync(dbc, selectedTerm, CourseTypeFilter, VenuesToFilter, IsCalendarView, IncludeOffScheduleActivities)).Exceptions;
             }
-            list.AddRange(await GetPublicHolidays(dbc));
-            dataStorage.AppointmentsSource = list;
+            schedule.AddRange(await GetPublicHolidays(dbc));
+            dataStorage.AppointmentsSource = schedule;
+            exceptionsStorage.AppointmentsSource = exceptions;
+            int year = selectedTerm.Year;
+            dataStorage = RemoveExceptions(year, dataStorage, exceptionsStorage);
+
             // Set any class on a public holiday to LabelID = 9 (Xancellation)
             foreach (var ph in dbc.PublicHoliday.AsNoTracking().ToArray())
             {
                 DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(ph.Date,
                             ph.Date.AddDays(1));
-                var appointments = dataStorage?.GetAppointments(range);
+                var appointments = dataStorage?.GetAppointments(range).ToList();
                 if (appointments != null)
                 {
                     foreach (var a in appointments)
@@ -140,7 +92,104 @@ namespace U3A.BusinessRules
 
             return dataStorage;
         }
-        static async Task<List<ClassSchedule>> GetScheduleAsync(U3ADbContext dbc,
+
+        static DxSchedulerDataStorage CreateDataStorage()
+        {
+            return new DxSchedulerDataStorage()
+            {
+                AppointmentLabelMappings = new DxSchedulerAppointmentLabelMappings()
+                {
+                    Id = "Id",
+                    Caption = "LabelCaption",
+                    BackgroundCssClass = "BackgroundCssClass",
+                    TextCssClass = "TextCssClass",
+                    Color = "Color"
+                },
+                AppointmentMappings = new DxSchedulerAppointmentMappings()
+                {
+                    Type = "AppointmentType",
+                    Start = "StartDate",
+                    End = "EndDate",
+                    Subject = "Caption",
+                    AllDay = "AllDay",
+                    Location = "Location",
+                    Description = "Description",
+                    LabelId = "Label",
+                    RecurrenceInfo = "Recurrence",
+                    CustomFieldMappings = new List<DxSchedulerCustomFieldMapping> {
+                        new DxSchedulerCustomFieldMapping { Name = "Source", Mapping = "Class" }
+                    }
+                },
+                AppointmentLabelsSource = new List<LabelObject>() {
+                    new LabelObject() {
+                        Id = 0,
+                        LabelCaption = "Undersubscribed",
+                        BackgroundCssClass = "bg-fl-warning-subtle",
+                        TextCssClass = "text-fl-warning"
+                    },
+                    new LabelObject() {
+                        Id = 1,
+                        LabelCaption = "Good To Go",
+                        BackgroundCssClass = "bg-fl-success-subtle",
+                        TextCssClass = "text-fl-success"
+                    },
+                    new LabelObject() {
+                        Id = 2,
+                        LabelCaption = "Oversubscribed",
+                        BackgroundCssClass = "bg-fl-danger-subtle",
+                        TextCssClass = "text-fl-danger"
+                    },
+                    new LabelObject() {
+                        Id = 3,
+                        LabelCaption = "Off-Schedule Activity",
+                        BackgroundCssClass = "bg-fl-info-subtle",
+                        TextCssClass = "text-fl-info"
+                    },
+                    new LabelObject() {
+                        Id = 9,
+                        LabelCaption = "Cancelled/Postponed",
+                        BackgroundCssClass = "bg-fl-neutral-subtle",
+                        TextCssClass = "text-fl-neutral"
+                    },
+                    new LabelObject() {
+                        Id = 10,
+                        LabelCaption = "Not this week",
+                        BackgroundCssClass = "cross-hatch",
+                    },
+                }
+            };
+        }
+
+        static DxSchedulerDataStorage RemoveExceptions(int Year, DxSchedulerDataStorage dataStorage, DxSchedulerDataStorage exceptions)
+        {
+            var startDate = new DateTime(Year, 1, 1);
+            var endDate = new DateTime(Year, 12, 31, 23, 59, 59);
+            DxSchedulerDateTimeRange exceptionRange = new DxSchedulerDateTimeRange(startDate, endDate);
+            foreach (var ex in exceptions.GetAppointments(exceptionRange))
+            {
+                var exceptionClass = (Class)ex.CustomFields["Source"];
+                DxSchedulerDateTimeRange range = new DxSchedulerDateTimeRange(ex.QueryStart, ex.QueryEnd);
+                var appointments = dataStorage?.GetAppointments(range).ToList();
+                if (appointments != null)
+                {
+                    foreach (var a in appointments)
+                    {
+                        Class c = (Class)a.CustomFields["Source"];
+                        if (c != null && c.ID == exceptionClass.ID)
+                        {
+                            a.Subject = $"{a.Subject} (Not this week)";
+                            a.Start = DateTime.Parse("12 am");
+                            a.End = DateTime.Parse("12 am");
+                            a.LabelId = 10; // Not this week
+                            dataStorage.RemoveAppointment(a);
+                        }
+                    }
+                }
+            }
+            return dataStorage;
+        }
+
+        static async Task<(List<ClassSchedule> Schedule, List<ClassSchedule> Exceptions)> GetScheduleAsync(U3ADbContext dbc,
                         Term selectedTerm,
                         IEnumerable<CourseType> CourseTypeFilter,
                         IEnumerable<Venue> VenuesToFilter,
@@ -148,7 +197,8 @@ namespace U3A.BusinessRules
                         bool IncludeOffScheduleActivities)
         {
             List<ClassSchedule> list = new List<ClassSchedule>();
-            if (selectedTerm == null) { return list; }
+            List<ClassSchedule> exceptions = new List<ClassSchedule>();
+            if (selectedTerm == null) { return (list, exceptions); }
             ClassSchedule schedule;
             List<Class> classes;
             if (IsCalendarView)
@@ -171,12 +221,20 @@ namespace U3A.BusinessRules
                         switch (occurrenceType)
                         {
                             case OccurrenceType.FirstAndThirdWeekOfMonth:
-                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.FirstWeekOfMonth));
-                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.ThirdWeekOfMonth));
+                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.Wk_1));
+                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.Wk_3));
                                 break;
                             case OccurrenceType.SecondAndFourthWeekOfMonth:
-                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.SecondWeekOfMonth));
-                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.FourthWeekOfMonth));
+                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.Wk_2));
+                                list.Add(CreateSchedule(selectedTerm, c, OccurrenceType.Wk_4));
+                                break;
+                            case OccurrenceType.Weekly:
+                                list.Add(CreateSchedule(selectedTerm, c, occurrenceType));
+                                foreach (var ex in c.OccurrenceExceptionID)
+                                {
+                                    schedule = CreateSchedule(selectedTerm, c, (OccurrenceType)ex);
+                                    exceptions.Add(schedule);
+                                }
                                 break;
                             default:
                                 list.Add(CreateSchedule(selectedTerm, c, occurrenceType));
@@ -185,7 +243,7 @@ namespace U3A.BusinessRules
                     }
                 }
             }
-            return list;
+            return (list, exceptions);
         }
 
         private static ClassSchedule CreateSchedule(Term selectedTerm, Class c, OccurrenceType occurrenceType)
@@ -201,7 +259,7 @@ namespace U3A.BusinessRules
             }
             schedule.EndDate = GetDateTime(schedule.StartDate, c.Course.Duration);
 
-            if ((OccurrenceType?)c.OccurrenceID != OccurrenceType.OnceOnly)
+            if (occurrenceType != OccurrenceType.OnceOnly)
             {
                 schedule.AppointmentType = 1;
             }
@@ -271,8 +329,8 @@ namespace U3A.BusinessRules
                 schedule.AppointmentType = 0;
             }
             OccurrenceType occurrenceType = (OccurrenceType)c.OccurrenceID;
-            if (occurrenceType == OccurrenceType.FirstAndThirdWeekOfMonth) { occurrenceType = OccurrenceType.ThirdWeekOfMonth; }
-            if (occurrenceType == OccurrenceType.SecondAndFourthWeekOfMonth) { occurrenceType = OccurrenceType.FourthWeekOfMonth; }
+            if (occurrenceType == OccurrenceType.FirstAndThirdWeekOfMonth) { occurrenceType = OccurrenceType.Wk_3; }
+            if (occurrenceType == OccurrenceType.SecondAndFourthWeekOfMonth) { occurrenceType = OccurrenceType.Wk_4; }
             schedule.Recurrence = GetRecurrence(c, thisTerm, occurrenceType);
             list.Add(schedule);
             DxSchedulerDataStorage dataStorage = new DxSchedulerDataStorage()
@@ -365,7 +423,7 @@ namespace U3A.BusinessRules
                         info.Frequency = 2;
                         break;
                     }
-                case OccurrenceType.FirstWeekOfMonth:
+                case OccurrenceType.Wk_1:
                     {
                         info.Type = SchedulerRecurrenceType.Monthly;
                         switch (c.OnDayID)
@@ -382,7 +440,7 @@ namespace U3A.BusinessRules
                         info.WeekOfMonth = SchedulerWeekOfMonth.First;
                         break;
                     }
-                case OccurrenceType.SecondWeekOfMonth:
+                case OccurrenceType.Wk_2:
                     {
                         info.Type = SchedulerRecurrenceType.Monthly;
                         switch (c.OnDayID)
@@ -399,7 +457,7 @@ namespace U3A.BusinessRules
                         info.WeekOfMonth = SchedulerWeekOfMonth.Second;
                         break;
                     }
-                case OccurrenceType.ThirdWeekOfMonth:
+                case OccurrenceType.Wk_3:
                     {
                         info.Type = SchedulerRecurrenceType.Monthly;
                         switch (c.OnDayID)
@@ -416,7 +474,7 @@ namespace U3A.BusinessRules
                         info.WeekOfMonth = SchedulerWeekOfMonth.Third;
                         break;
                     }
-                case OccurrenceType.FourthWeekOfMonth:
+                case OccurrenceType.Wk_4:
                     {
                         info.Type = SchedulerRecurrenceType.Monthly;
                         switch (c.OnDayID)

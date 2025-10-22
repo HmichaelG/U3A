@@ -133,6 +133,10 @@ namespace U3A.Model
         [DefaultValue(2)]
         public int? OccurrenceID { get; set; }
         public Occurrence Occurrence { get; set; }
+        public List<int> OccurrenceExceptionID { get; set; } = new();
+
+        [NotMapped]
+        public IEnumerable<Occurrence> OccurrenceException { get; set; } = new List<Occurrence>();
 
         [Description("Optional. Number of recurrencies. Only set when not the end of term")]
         public int? Recurrence { get; set; }
@@ -172,21 +176,21 @@ namespace U3A.Model
                             result = "Daily: Mon - Fri";
                             break;
                         case OccurrenceType.Weekly:
-                            result = $"{OnDay.Day}, Weekly";
+                            result = $"{OnDay.Day}, Weekly {getExceptions()}";
                             break;
                         case OccurrenceType.Fortnightly:
                             result = $"{OnDay.Day}, Fortnightly";
                             break;
-                        case OccurrenceType.FirstWeekOfMonth:
+                        case OccurrenceType.Wk_1:
                             result = $"{OnDay.Day}, Week 1";
                             break;
-                        case OccurrenceType.SecondWeekOfMonth:
+                        case OccurrenceType.Wk_2:
                             result = $"{OnDay.Day}, Week 2";
                             break;
-                        case OccurrenceType.ThirdWeekOfMonth:
+                        case OccurrenceType.Wk_3:
                             result = $"{OnDay.Day}, Week 3";
                             break;
-                        case OccurrenceType.FourthWeekOfMonth:
+                        case OccurrenceType.Wk_4:
                             result = $"{OnDay.Day}, Week 4";
                             break;
                         case OccurrenceType.LastWeekOfMonth:
@@ -212,6 +216,22 @@ namespace U3A.Model
                 return result;
             }
         }
+
+        private string getExceptions()
+        {
+            string result = string.Empty;
+            if (OccurrenceExceptionID != null && OccurrenceExceptionID.Count > 0)
+            {
+                result = " Except ";
+                foreach (var ex in OccurrenceExceptionID)
+                {
+                    result += $"{Enum.GetName<OccurrenceType>((OccurrenceType)ex).Replace("_", ": ")}, ";
+                }
+                result = result.TrimEnd(',', ' ');
+            }
+            return result;
+        }
+
         [NotMapped]
         public string OccurrenceText
         {
@@ -228,26 +248,26 @@ namespace U3A.Model
                         result = $"{result}{GetDateRange()}";
                         break;
                     case OccurrenceType.Weekly:
-                        result = $"{OnDay.Day}, Weekly";
+                        result = $"{OnDay.Day}, Weekly {getExceptions()}";
                         result = $"{result}{GetDateRange()}";
                         break;
                     case OccurrenceType.Fortnightly:
                         result = $"{OnDay.Day}, Fortnightly";
                         result = $"{result}{GetDateRange()}";
                         break;
-                    case OccurrenceType.FirstWeekOfMonth:
+                    case OccurrenceType.Wk_1:
                         result = $"{OnDay.Day}, Week 1";
                         result = $"{result}{GetDateRange()}";
                         break;
-                    case OccurrenceType.SecondWeekOfMonth:
+                    case OccurrenceType.Wk_2:
                         result = $"{OnDay.Day}, Week 2";
                         result = $"{result}{GetDateRange()}";
                         break;
-                    case OccurrenceType.ThirdWeekOfMonth:
+                    case OccurrenceType.Wk_3:
                         result = $"{OnDay.Day}, Week 3";
                         result = $"{result}{GetDateRange()}";
                         break;
-                    case OccurrenceType.FourthWeekOfMonth:
+                    case OccurrenceType.Wk_4:
                         result = $"{OnDay.Day}, Week 4";
                         result = $"{result}{GetDateRange()}";
                         break;
@@ -444,6 +464,7 @@ namespace U3A.Model
                 result += $"{Leader?.PersonSummary}{Environment.NewLine}";
                 result += $"{Leader2?.PersonSummary}{Environment.NewLine}";
                 result += $"{Leader3?.PersonSummary}{Environment.NewLine}";
+                if (string.IsNullOrWhiteSpace(result)) result = "The Group";
                 return result.Trim();
             }
         }
@@ -457,6 +478,7 @@ namespace U3A.Model
                 result += $"{Leader?.FullNameWithPostNominals}{Environment.NewLine}";
                 result += $"{Leader2?.FullNameWithPostNominals}{Environment.NewLine}";
                 result += $"{Leader3?.FullNameWithPostNominals}{Environment.NewLine}";
+                if (string.IsNullOrWhiteSpace(result)) result = "The Group";
                 return result.Trim();
             }
         }

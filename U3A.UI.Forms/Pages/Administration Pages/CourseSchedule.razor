@@ -57,57 +57,74 @@ else
     <FullScreen DisplayOffset=@((IsAdminPortal || IsPublic) ? 7 : 4)
                 HideToggle=false>
         <ContentTemplate>
-                    <DxScheduler StartDate="@StartDate"
-                                 AllowCreateAppointment="false"
-                                 AllowDeleteAppointment="false"
-                                 AllowEditAppointment="false"
-                                 ShowAppointmentTooltip="true"
-                                 ActiveViewType=@viewType
-                                 DataStorage="@DataStorage"
-                                 StartDateChanged="OnStartDateChanged"
-                                 ActiveViewTypeChanged="OnViewTypeChanged"
-                                 CssClass="w-100">
-                        <ToolbarItems>
-                            <DxToolbarItem BeginGroup="true"
-                                Alignment="ToolbarItemAlignment.Right"
-                                CssClass="text-fl-primary" 
-                                RenderStyleMode="ToolbarItemRenderStyleMode.Contained" 
-                                Text="Filter" 
-                                Click="@(async() => await messageBox.ShowOkOnlyAsync("Schedule Filter"))" />
-                            <DxSchedulerDateNavigatorToolbarItem />
-                            <DxSchedulerPreviousIntervalToolbarItem />
-                            <DxSchedulerNextIntervalToolbarItem />
-                            <DxSchedulerResourceNavigatorToolbarItem />
-                            <DxSchedulerViewNavigatorToolbarItem />
-                        </ToolbarItems>
-                        <Views>
-                            <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
-                            <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
-                            <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
-                            <DxSchedulerMonthView MonthCount="1"></DxSchedulerMonthView>
-                            <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(7)">
-                                <Scales>
-                                    <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" />
-                                    <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1" />
-                                </Scales>
-                            </DxSchedulerTimelineView>
-                        </Views>
-                        <AppointmentTooltipHeaderTemplate>
-                            <div class="fs-5">
-                                @context.Label?.Caption
-                            </div>
-                        </AppointmentTooltipHeaderTemplate>
-                        <AppointmentTooltipTemplate>
-                                <div style="vertical-align: middle;">
-                                    <strong>Subject:</strong>  @context.Appointment.Subject<br />
-                                    <strong>Leader:</strong>  @context.Appointment.Description<br />
-                                    <strong>Location:</strong>  @context.Appointment.Location<br />
-                                    <strong>From:</strong>  @context.Appointment.Start.ToString("hh:mm tt") <strong>To:</strong>
-                                    @context.Appointment.End.ToString("hh:mm tt")<br />
-                                    <strong>Status:</strong>  @context.Label?.Caption<br />
-                                </div>
-                        </AppointmentTooltipTemplate>
-                    </DxScheduler>
+            <DxScheduler StartDate="@StartDate"
+                         AllowCreateAppointment="false"
+                         AllowDeleteAppointment="false"
+                         AllowEditAppointment="false"
+                         ShowAppointmentTooltip="true"
+                         ActiveViewType=@viewType
+                         DataStorage="@DataStorage"
+                         StartDateChanged="OnStartDateChanged"
+                         ActiveViewTypeChanged="OnViewTypeChanged"
+                         CssClass="w-100">
+                <ToolbarItems>
+                    <DxToolbarItem BeginGroup="true"
+                                   Alignment="ToolbarItemAlignment.Right"
+                                   CssClass="text-fl-primary"
+                                   RenderStyleMode="ToolbarItemRenderStyleMode.Contained"
+                                   Text="Filter"
+                                   Click="@(async() => await messageBox.ShowOkOnlyAsync("Schedule Filter"))" />
+                    <DxSchedulerDateNavigatorToolbarItem />
+                    <DxSchedulerPreviousIntervalToolbarItem />
+                    <DxSchedulerNextIntervalToolbarItem />
+                    <DxSchedulerResourceNavigatorToolbarItem />
+                    <DxSchedulerViewNavigatorToolbarItem />
+                </ToolbarItems>
+                <Views>
+                    <DxSchedulerDayView DayCount="1" ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerDayView>
+                    <DxSchedulerWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWeekView>
+                    <DxSchedulerWorkWeekView ShowWorkTimeOnly="true" WorkTime="@VisibleTime"></DxSchedulerWorkWeekView>
+                    <DxSchedulerMonthView MonthCount="1"></DxSchedulerMonthView>
+                    <DxSchedulerTimelineView Duration="@TimeSpan.FromDays(7)">
+                        <Scales>
+                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Month" />
+                            <DxSchedulerTimeScale Unit="@SchedulerTimeScaleUnit.Day" UnitCount="1" />
+                        </Scales>
+                    </DxSchedulerTimelineView>
+                </Views>
+                <AppointmentTooltipTemplate>
+                    @{
+                        var leader = context.Appointment.Description;
+                        var start = context.Appointment.Start.ToString("hh:mm tt");
+                        var end = context.Appointment.End.ToString("hh:mm tt");
+                        var Class = context.Appointment.CustomFields["Source"] as Class;
+                        var leaders = Class?.LeaderNamesOnly.Replace(Environment.NewLine, "<br/>&nbsp;&nbsp;&nbsp;");
+                    }
+                    <div class="fs-6" style="line-height:1.5rem;">
+                        <div class="d-flex">
+                            <div class="bi bi-person" />
+                            <div class="flex-grow-1">&nbsp;&nbsp; @(new MarkupString(leaders))</div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="bi bi-geo-alt" />
+                            <div class="flex-grow-1">&nbsp;&nbsp; @context.Appointment.Location</div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="bi bi-alarm" />
+                            <div class="flex-grow-1">&nbsp;&nbsp; @start - @end</div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="bi bi-calendar-week" />
+                            <div class="flex-grow-1">&nbsp;&nbsp; @Class.OccurrenceTextBrief</div>
+                        </div>
+                        <br />
+                        <div class="d-flex">
+                            <div class="bi bi-card-checklist" />
+                            <div class="flex-grow-1">&nbsp;&nbsp; @context.Label?.Caption</div>
+                        </div>
+                    </div>
+                </AppointmentTooltipTemplate>
+            </DxScheduler>
         </ContentTemplate>
     </FullScreen>
     <div class="row col col-12 col-md-7 mx-auto mt-2">

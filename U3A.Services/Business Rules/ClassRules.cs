@@ -59,6 +59,9 @@ public static partial class BusinessRule
         var classes = await dbc.Class.AsNoTracking()
                         .Include(x => x.OnDay)
                         .Include(x => x.Course)
+                        .Include(x => x.Leader)
+                        .Include(x => x.Leader2)
+                        .Include(x => x.Leader3)
                         .Include(x => x.Occurrence)
                         .Include(x => x.Venue)
                         .Where(x => x.Course.Year == term.Year
@@ -76,6 +79,8 @@ public static partial class BusinessRule
                         .Include(x => x.OnDay)
                         .Include(x => x.Course)
                         .Include(x => x.Leader)
+                        .Include(x => x.Leader2)
+                        .Include(x => x.Leader3)
                         .Include(x => x.Occurrence)
                         .Include(x => x.Venue)
                         .Where(x => x.Course.Year == term.Year && x.OccurrenceID != 999)

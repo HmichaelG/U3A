@@ -28,7 +28,6 @@ namespace U3A.Model
         public string Name { get; set; }
         public string ShortName { get; set; }
 
-        List<Class> Courses { get; set; } = new List<Class>();
     }
 
     public enum OccurrenceType
@@ -37,10 +36,10 @@ namespace U3A.Model
         Daily,
         Weekly,
         Fortnightly,
-        FirstWeekOfMonth,
-        SecondWeekOfMonth,
-        ThirdWeekOfMonth,
-        FourthWeekOfMonth,
+        Wk_1,
+        Wk_2,
+        Wk_3,
+        Wk_4,
         LastWeekOfMonth,
         Every5Weeks,
         Every6Weeks,

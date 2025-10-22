@@ -1,9 +1,9 @@
 ﻿
-update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Note
+update-database -cont U3ADbContextSeed -project U3A.Database  -args U3A_Note_SoftDelete
 
-remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Note_SoftDelete
+remove-migration -cont U3ADbContextSeed -project U3A.Database -args U3A_Class_OccurenceExceptions
 
-add-migration -context U3ADbContextSeed -project U3A.Database  U3A_Note_SoftDelete
+add-migration -context U3ADbContextSeed -project U3A.Database  U3A_Class_OccurenceExceptions
 
 update-database -cont U3ADbContextSeed -project U3A.Database
 

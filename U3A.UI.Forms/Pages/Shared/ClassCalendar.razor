@@ -17,8 +17,8 @@
     <DxFormLayout CssClass="w-100 d-flex flex-column justify-content-center" style="background-color=red;;">
         <DxFormLayoutGroup>
             <HeaderContentTemplate>
-                <div class="input-group fs-6">
-                    <a class="link" onclick="@OnToggleButtonClick">@toggleButtonText</a>
+                <div class="input-group">
+                    <DxButton Click="OnToggleButtonClick" Text="@toggleButtonText" RenderStyleMode="ButtonRenderStyleMode.Outline" />
                 </div>
             </HeaderContentTemplate>
             <Items>
@@ -62,6 +62,7 @@
                             <CellDisplayTemplate>
                                 @{
                                     var e = (DxSchedulerAppointmentItem)context.DataItem;
+                                    var Class = e.CustomFields["Source"] as Class;
                                     if (e.AllDay)
                                     {
                                         <div class="font-weight-bold">@e.Subject</div>
@@ -75,6 +76,7 @@
                                         else
                                         {
                                             <div class="font-weight-bold">@e.Subject</div>
+                                            <div>@Class.OccurrenceTextBrief</div>
                                             <div>@e.Start.ToString(constants.SHORT_DAY_AND_TIME_FORMAT) to @e.End.ToShortTimeString()</div>
                                             <div>@e.Location</div>
                                         }
@@ -152,7 +154,7 @@
             {
                 var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, selectedTerm);
                 var range = new DxSchedulerDateTimeRange(DateTime.Today, new DateTime(selectedTerm.Year, 12, 31));
-                FilteredEvents = Events = dataStorage.GetAppointments(range);
+                FilteredEvents = Events = dataStorage.GetAppointments(range).Where(x => (int)x.LabelId != 10); // Not this week
             }
         }
         isCalendarVisible = !isCalendarVisible;
