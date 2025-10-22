@@ -151,11 +151,6 @@ namespace U3A.BusinessRules
                         BackgroundCssClass = "bg-fl-neutral-subtle",
                         TextCssClass = "text-fl-neutral"
                     },
-                    new LabelObject() {
-                        Id = 10,
-                        LabelCaption = "Not this week",
-                        BackgroundCssClass = "cross-hatch",
-                    },
                 }
             };
         }
@@ -180,7 +175,6 @@ namespace U3A.BusinessRules
                             a.Subject = $"{a.Subject} (Not this week)";
                             a.Start = DateTime.Parse("12 am");
                             a.End = DateTime.Parse("12 am");
-                            a.LabelId = 10; // Not this week
                             dataStorage.RemoveAppointment(a);
                         }
                     }

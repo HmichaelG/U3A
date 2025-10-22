@@ -98,24 +98,24 @@ else
                         var start = context.Appointment.Start.ToString("hh:mm tt");
                         var end = context.Appointment.End.ToString("hh:mm tt");
                         var Class = context.Appointment.CustomFields["Source"] as Class;
-                        var leaders = Class?.LeaderNamesOnly.Replace(Environment.NewLine, "<br/>&nbsp;&nbsp;&nbsp;");
+                        var leaders = Class?.LeaderNamesOnly.Replace(Environment.NewLine, "<br/>");
                     }
                     <div class="fs-6" style="line-height:1.5rem;">
                         <div class="d-flex">
-                            <div class="bi bi-person" />
-                            <div class="flex-grow-1">&nbsp;&nbsp; @(new MarkupString(leaders))</div>
+                            <div class="bi bi-person popup-icon-style" />
+                            <div class="flex-grow-1"> @(new MarkupString(leaders))</div>
                         </div>
                         <div class="d-flex">
-                            <div class="bi bi-geo-alt" />
-                            <div class="flex-grow-1">&nbsp;&nbsp; @context.Appointment.Location</div>
+                            <div class="bi bi-geo-alt popup-icon-style" />
+                            <div class="flex-grow-1"> @context.Appointment.Location</div>
                         </div>
                         <div class="d-flex">
-                            <div class="bi bi-alarm" />
-                            <div class="flex-grow-1">&nbsp;&nbsp; @start - @end</div>
+                            <div class="bi bi-alarm popup-icon-style" />
+                            <div class="flex-grow-1"> @start - @end</div>
                         </div>
                         <div class="d-flex">
-                            <div class="bi bi-calendar-week" />
-                            <div class="flex-grow-1">&nbsp;&nbsp; @Class.OccurrenceTextBrief</div>
+                            <div class="bi bi-calendar-week popup-icon-style" />
+                            <div class="flex-grow-1"> @Class.OccurrenceTextBrief</div>
                         </div>
                         <br />
                         <div class="d-flex">
@@ -137,6 +137,13 @@ else
         </DxButton>
     </div>
 }
+
+<style>
+    .popup-icon-style {
+        vertical-align: middle;
+        margin-right: 0.5rem;
+    }
+</style>
 
 @code {
 
