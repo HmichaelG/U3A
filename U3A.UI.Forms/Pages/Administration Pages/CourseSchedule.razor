@@ -192,7 +192,8 @@ else
         terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
         venues = await BusinessRule.SelectableVenuesAsync(dbc);
         courseTypes = await BusinessRule.SelectableCourseTypesAsync(dbc);
-        selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+        selectedTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+        if (selectedTerm == null) { selectedTerm = await BusinessRule.CurrentTermAsync(dbc); }
         if (selectedTerm != null)
         {
             await SelectedTermChanged(selectedTerm);

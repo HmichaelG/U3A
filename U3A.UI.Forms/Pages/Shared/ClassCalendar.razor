@@ -149,7 +149,8 @@
         {
             today = selectedDate = dbc.GetLocalTime().Date;
             terms = await BusinessRule.SelectableRelaxedTermsAsync(dbc);
-            selectedTerm = await BusinessRule.CurrentTermAsync(dbc);
+            selectedTerm = await BusinessRule.CurrentEnrolmentTermAsync(dbc);
+            if (selectedTerm == null) { selectedTerm = await BusinessRule.CurrentTermAsync(dbc); }
             if (selectedTerm != null)
             {
                 var dataStorage = await BusinessRule.GetCalendarDataStorageAsync(dbc, selectedTerm);
