@@ -39,6 +39,7 @@ public class MemberFeeCalculationService
     Dictionary<Guid, List<Receipt>> Receipts { get; set; } = null;
     Term[] Terms { get; set; } = null;
     Dictionary<Guid, List<Enrolment>> Enrolments { get; set; } = null;
+    List<Enrolment> enrolmentsForCount;
     List<Class> Classes { get; set; } = null;
     ConcurrentBag<(Guid MemberID, Guid CourseID)> CourseFeeAdded;
     ConcurrentBag<(Guid MemberID, Guid CourseID, Guid TermID)> TermFeeAdded;
@@ -61,6 +62,7 @@ public class MemberFeeCalculationService
         await instance.InitializeAsync(dbc, Term, null);
         return instance;
     }
+
     public static async Task<MemberFeeCalculationService> CreateAsync(U3ADbContext dbc, IEnumerable<Person> PeopleToCalculate)
     {
         var instance = new MemberFeeCalculationService();
@@ -137,6 +139,13 @@ public class MemberFeeCalculationService
                             .Include(x => x.Class)
                             .GroupBy(x => x.PersonID)
                             .ToDictionaryAsync(g => g.Key, g => g.ToList());
+        enrolmentsForCount = await dbc.Enrolment
+                            .IgnoreQueryFilters()
+                            .Include(x => x.Course)
+                            .Include(x => x.Term)
+                            .Where(x => !x.IsDeleted &&
+                            x.TermID == BillingTerm.ID &&
+                            !x.Course.ExcludeFromLeaderComplimentaryCount).ToListAsync();
         Classes = await dbc.Class
                     .Where(x => x.Course.Year == BillingYear &&
                                     (x.Course.CourseFeePerYear != 0
@@ -757,9 +766,7 @@ public class MemberFeeCalculationService
 
     private int ActiveCourseCount(Person person)
     {
-        List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
-        return enrolments.Where(x => x.PersonID == person.ID &&
-                                    x.TermID == BillingTerm.ID &&
+        return enrolmentsForCount.Where(x => x.PersonID == person.ID &&
                                     !x.Course.ExcludeFromLeaderComplimentaryCount &&
                                     !x.IsWaitlisted)
                         .DistinctBy(x => x.CourseID).Count();
@@ -767,9 +774,7 @@ public class MemberFeeCalculationService
 
     private int WaitlistedCourseCount(Person person)
     {
-        List<Enrolment> enrolments = Enrolments.TryGetValue(person.ID, out var list) ? list : new List<Enrolment>();
-        return enrolments.Where(x => x.PersonID == person.ID &&
-                                    x.TermID == BillingTerm.ID &&
+        return enrolmentsForCount.Where(x => x.PersonID == person.ID &&
                                     !x.Course.ExcludeFromLeaderComplimentaryCount &&
                                     x.IsWaitlisted)
                         .DistinctBy(x => x.CourseID).Count();
