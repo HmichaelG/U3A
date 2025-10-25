@@ -39,7 +39,7 @@ public class MemberFeeCalculationService
     Dictionary<Guid, List<Receipt>> Receipts { get; set; } = null;
     Term[] Terms { get; set; } = null;
     Dictionary<Guid, List<Enrolment>> Enrolments { get; set; } = null;
-    List<Enrolment> enrolmentsForCount;
+    Dictionary<Guid, (int Enrolled, int Waitlisted)> enrolmentCount;
     List<Class> Classes { get; set; } = null;
     ConcurrentBag<(Guid MemberID, Guid CourseID)> CourseFeeAdded;
     ConcurrentBag<(Guid MemberID, Guid CourseID, Guid TermID)> TermFeeAdded;
@@ -139,13 +139,20 @@ public class MemberFeeCalculationService
                             .Include(x => x.Class)
                             .GroupBy(x => x.PersonID)
                             .ToDictionaryAsync(g => g.Key, g => g.ToList());
-        enrolmentsForCount = await dbc.Enrolment
-                            .IgnoreQueryFilters()
-                            .Include(x => x.Course)
-                            .Include(x => x.Term)
-                            .Where(x => !x.IsDeleted &&
-                            x.TermID == BillingTerm.ID &&
-                            !x.Course.ExcludeFromLeaderComplimentaryCount).ToListAsync();
+        enrolmentCount = await dbc.Enrolment.AsNoTracking()
+                                .IgnoreQueryFilters()
+                                .Where(x => (person == null || x.PersonID == person.ID)
+                                    && !x.IsDeleted && x.Term.ID == BillingTerm.ID)
+                                .GroupBy(x => x.PersonID)
+                                .Select(g => new
+                                {
+                                    MemberID = g.Key,
+                                    Enrolled = g.Count(x => !x.IsWaitlisted && !x.Course.ExcludeFromLeaderComplimentaryCount),
+                                    Waitlisted = g.Count(x => x.IsWaitlisted && !x.Course.ExcludeFromLeaderComplimentaryCount)
+                                })
+                                .ToDictionaryAsync(
+                                    k => k.MemberID,
+                                    v => (v.Enrolled, v.Waitlisted));
         Classes = await dbc.Class
                     .Where(x => x.Course.Year == BillingYear &&
                                     (x.Course.CourseFeePerYear != 0
@@ -267,10 +274,10 @@ public class MemberFeeCalculationService
             Mobile = person.AdjustedMobile,
             HomePhone = person.AdjustedHomePhone,
             Email = person.Email,
-            Enrolments = ActiveCourseCount(person),
-            Waitlisted = WaitlistedCourseCount(person)
         };
-
+        var enrolmentCounts = enrolmentCount.TryGetValue(person.ID, out var counts) ? counts : (0, 0);
+        personFinancialStatus.Enrolments = counts.Enrolled;
+        personFinancialStatus.Waitlisted = counts.Waitlisted;
         var isComplimentary = IsComplimentaryMembership(person);
         personFinancialStatus.IsComplimentary = isComplimentary;
         // membership fees
@@ -762,22 +769,6 @@ public class MemberFeeCalculationService
             MemberFees.TryAdd(person.ID, fees);
         }
         fees.Add(fee);
-    }
-
-    private int ActiveCourseCount(Person person)
-    {
-        return enrolmentsForCount.Where(x => x.PersonID == person.ID &&
-                                    !x.Course.ExcludeFromLeaderComplimentaryCount &&
-                                    !x.IsWaitlisted)
-                        .DistinctBy(x => x.CourseID).Count();
-    }
-
-    private int WaitlistedCourseCount(Person person)
-    {
-        return enrolmentsForCount.Where(x => x.PersonID == person.ID &&
-                                    !x.Course.ExcludeFromLeaderComplimentaryCount &&
-                                    x.IsWaitlisted)
-                        .DistinctBy(x => x.CourseID).Count();
     }
 
     public List<MemberFee> AllocateMemberPayments(IEnumerable<MemberFee> ItemsToAllocate, Person person,
